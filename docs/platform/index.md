@@ -6,7 +6,7 @@ Please feel free to contribute.
 ## CANFAR-maintained Containers
 Curently the repository contains basic build system to build a hierarchy of default containers supported by CANFAR:
 
-```
+``` py
 	                    Ubuntu LTS
 	                    	|
 		            base (headless)
@@ -18,7 +18,7 @@ astroml (headless)			Desktop Application (desktop-app)
 astroml-notebook (notebook) 
 astroml-vscode   (contributed)
 astroml-desktop  (desktop-app)
- ```
+```
 
 - The `base` is a `headless` container are built from a vanilla Ubutu LTS, with extra operating system installed (compilers, development libraries), and conda install.
 - The `astroml` is another `headless` container and is built with a large set of astronomy, machine learning, deep learning, visualisations and data science libraries. 
