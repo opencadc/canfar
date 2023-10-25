@@ -20,7 +20,7 @@ astroml-vscode   (contributed)
 astroml-desktop  (desktop-app)
 ```
 
-- The `base` is a `headless` container are built from a vanilla Ubutu LTS, with extra operating system installed (compilers, development libraries), and conda install.
+- The `base` is a `headless` container are built from a vanilla Ubuntu LTS, with extra operating system installed (compilers, development libraries), and conda install.
 - The `astroml` is another `headless` container and is built with a large set of astronomy, machine learning, deep learning, visualisations and data science libraries. 
 - The `astroml-*` add visualisation and interactivity software. They can be launched as a `notebook` session, a `contributed` VSCode session, or a terminal through a `desktop` session.
 - The `Desktop Application` containers do not typically derive from `astroml` and sometimes not from `base` containers, as they are legacy and may rely on now unsupported OS.
