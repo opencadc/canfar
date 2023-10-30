@@ -118,5 +118,4 @@ Set the read-write group:
 setfacl -R -d -m group:{group-name}:rwx {read-write-dir}
 ```
 
-![CANFAR](https://www.canfar.net/css/images/logo.png)
-#![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
+![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }

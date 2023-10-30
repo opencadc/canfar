@@ -45,5 +45,4 @@ This directory also contains the building of the [CANFAR usage documentation](ht
 - environments in home directory with pip by default
 - add other alternative notebooks such as querybook, cocalc, nteract_on_jupyter
 
-![CANFAR](https://www.canfar.net/css/images/logo.png)
-#![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
+![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
