@@ -1,24 +1,14 @@
 # CANFAR Science Platform Documentation
 
-# Table of Contents
-1. [Introduction and Access](#introduction-and-access)
-2. [Interactive Sessions](#interactive-sessions)
-3. [Batch Jobs](#batch-jobs)
-4. [Storage](#storage)
-5. [Groups and Permissions](#groups-and-permissions)
-6. [Programmatic Access](#programmatic-access)
-7. [Community and Support](#community-and-support)
-7. [FAQ](#faq)
-
 ## Introduction and Access
 
-Access to the [CANFAR Science Platform](https://www.canfar.net/science-portal) is through an authorized access to the [CANFAR Portal](https://www.canfar.net). A Canadian Astronomy Data Centre (CADC) Account is required.
+Access to the CANFAR Science Platform is through authorized access to the [CANFAR Portal](https://www.canfar.net). A Canadian Astronomy Data Centre (CADC) Account is required.
 - To request a CADC Account:  https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html
 - Authorization to access the science platform:
   - if you are part of a collaboration already using CANFAR, ask the admininistrator of the collaboration you belong to add you as a member of the group using the [Group Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
   - in any other case, send an email to [support@canfar.net](mailto:support@canfar.net) specifying you are requesting access to the CANFAR Science Platform and a short line of justification.
 
-The CANFAR Science Platform runs software packaged in [containers](https://www.docker.com/resources/what-container/). The platform allows users to run both pre-built, shared containers or private, custom containers. Users can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](CONTAINERS.md) capable to run on the CANFAR Science Platform.
+The CANFAR Science Platform runs software packaged in [containers](https://www.docker.com/resources/what-container/). The platform allows users to run both pre-built, shared containers or private, custom containers. Users can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](containers.md) capable to run on the CANFAR Science Platform.
 
 The CANFAR Science Platform supports both launching interactive sessions and non-interactive ones. A more visual documentation for new users can be found [here](https://canfar-scienceportal.readthedocs.io/en/latest/) 
 
@@ -42,14 +32,11 @@ For running non browser-native applications in the Science Platform, a browser D
 
 Contributed sessions are user-customised web applications, typically not maintained by CANFAR. This can be anything, such as a [VSCode server](https://github.com/coder/code-server) and [Pluto notebook](https://plutojl.org/) for the Julia language. 
 
-The rules of building a container of type "contributed" on the CANFAR Science Platform are:
-1. Incoming trafic will be over http (which may include websocket trafic) on port 5000
-1. From the point of view of the container, requests will be received at the root path (/), but URLs in the browser will look like https:///, where <host> and <path> are subject to change. This path will initially be https://ws-uv.canfar.net/sessions/contrib/<sessionid>
-1. The instance will be started by a script in the image that must be available at /skaha/startup.sh and will be passed 1 parameter: the sessionid.
+Please refer to the [container documentation](containers.md) for more information on building contributed sessions.
 
 ## Batch Jobs
 
-There is limited possibility to run a batch job, which can be understood of a non-interactive executable launched on a headless container. Please contact us before making use of the headless job support--we are incrementally adding support for batch processing in the science platform. See the specific [documentation](HEADLESS.md). This is still experimental.
+There is limited possibility to run a batch job, which can be understood of a non-interactive executable launched on a headless container. Please contact us before making use of the headless job support--we are incrementally adding support for batch processing in the science platform. See the specific [documentation](headless.md). This is still experimental.
 
 ## Storage
 
@@ -60,8 +47,11 @@ An efficient way to access the `arc` storage outside the Science Platform is thr
 The `arc` storage is also accesible through an API. The following list the ways it can be accessed beyond the use of the Science Portal and sshfs:
 
 - Using the CANFAR storage management interface: https://www.canfar.net/storage/arc/list
-- Using the [VOSPace Python libraries](https://github.com/opencadc/vostools/tree/master/vos)
+- Using the [VOSpace Python libraries](https://github.com/opencadc/vostools/tree/master/vos)
 - Using the `/arc/files` URL endpoint [documentation](https://ws-uv.canfar.net/arc)
+- Using sshfs
+
+More detailed instructions of the data transfer options are documented [here](https://canfar-scienceportal.readthedocs.io/en/latest/General_tools/File_transfers.html)
 
 Please take care to protect sensitive information by ensuring it is not publicly accessible.
 
@@ -73,7 +63,7 @@ Groups and their memberships can be managed through the CANFAR groups web interf
 
 Once created, groups can be assigned to files and directories in arc storage directly from their interactive sessions, or through the [CANFAR storage](https://www.canfar.net/storage/arc/list)
 
-For more details, see the documentation on [file permissions](PERMISSIONS.md)
+For more details, see the documentation on [file permissions](permissions.md)
 
 ## Programmatic Access
 
@@ -89,6 +79,6 @@ Reporting of bugs and new feature requests:
 
 Contributions to the platform (including updates or corrections to the documentation) can be submitted as pull requests to this GitHub repositories. We especially encourage science-containers.
 
-General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](FAQ.md).
+General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](faq.md).
 
-![canfar](canfar-logo.png)
+[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)

@@ -1,13 +1,5 @@
 # CANFAR Science Platform Containers
 
-1. [Introduction](#intro)
-2. [Building](#building)
-3. [Initialization](#init)
-4. [Publishing](#publishing)
-5. [Launching](#launching)
-6. [Testing](#testing)
-
-<a name="intro"></a>
 ## Introduction
 
 The CANFAR Science Platform supports various types of containers: `session`, `software`,  and `legacy desktop application`
@@ -16,7 +8,6 @@ The CANFAR Science Platform supports various types of containers: `session`, `so
 - `Software` are containers launched with any kind of executable, installed with custom software stack. 
 - `Legacy desktop application` are containers launched and viewed specifically through a desktop `session`.  
 
-<a name="building"></a>
 ## Building CANFAR Science Platform Containers
 
 ### Minimum requirements
@@ -42,7 +33,6 @@ Also the default executuable is `xterm`, so ensure it is installed.
 
 Note: the desktop session is also sometimes known as the ARCADE software environment.
 
-<a name="init"></a>
 ## Initialization and Startup
 
 #### Running container process owners
@@ -51,11 +41,18 @@ Containers in the CANFAR Science Platform are always executed as the *CADC User*
 #### Session container initialization
 Initialization for session containers is based on the session container *type*.  There are currently four types with different startup procedures:
 1. `notebook`: it requires a `jupyter lab` executable
-2. `carta`: initialization and startup is done through a customized script
-3. `desktop-app`: desktop session startup is managed by the skaha infrastructure.
-4. `contributed`: it will follow a customized startup script
+1. `carta`: initialization and startup is done through a customized script
+1. `desktop-app`: desktop session startup is managed by the skaha infrastructure.
+1. `contributed`: it will follow a customized startup script
 
 There may be multiple versions of the same type of session container, but the startup procedure for these must remain the same for them to be of the same type.
+
+#### Contributed session containers
+Contributed sessions are for custom-build, web-browser applications that are not officially created and maintained by CANFAR.
+The rules of building a container of type "contributed" on the CANFAR Science Platform are:
+1. Incoming trafic will be over http (which may include websocket trafic) on port 5000
+1. From the point of view of the container, requests will be received at the root path (/), but URLs in the browser will look like https:///, where <host> and <path> are subject to change. This path will initially be https://ws-uv.canfar.net/sessions/contrib/<sessionid>
+1. The instance will be started by a script in the image that must be available at /skaha/startup.sh and will be passed 1 parameter: the sessionid.
 
 #### Software container initialization
 
@@ -175,3 +172,5 @@ For session containers, nearly all testing can be done by using `docker` to run 
 For legacy desktop application containers, docker will not be able to provide a graphical display of CASA windows, so most testing must be done in a skaha-desktop instance running in the cloud.
 
 The only requirement for a container is to ensure the web application to be launched with a `/skaha/startup.sh` script in the container, and the web application running on port 5000.
+
+[<img src="canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
