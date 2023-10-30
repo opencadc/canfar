@@ -20,4 +20,4 @@
 
 These steps were taken from https://medium.com/@mreichelt/how-to-show-x11-windows-within-docker-on-mac-50759f4b65cb
 
-
+[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)

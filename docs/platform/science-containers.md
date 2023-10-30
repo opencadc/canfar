@@ -30,3 +30,19 @@ There are CUDA-enabled versions of the containers, which include NVIDIA software
 ## CANFAR User Customised Container
 If you want to build your own containers, documentation can be found in the [docs directory](docs).
 This directory also contains the building of the [CANFAR usage documentation](https://canfar-scienceportal.readthedocs.io/en/latest/) in the readthedocs style.
+
+## TODO
+
+# Laundry list for possible actions
+
+- write a Makefile allowing: `make build astroml`
+- install jupyterlab extensions in home directory rather than /opt/conda
+- configure jupyterlab containers to automatically creating directories  somewhere less intrusive than just `$HOME`:
+ `migrated astropy matplotlib yarn lab pip fontconfig serverconfig jedi numba`
+- launcher in jupyterlab has too many launching and confusing icons
+- make a button on jupyterlab that will create a new environment automatically and create an icon
+- build npm apps on container directories to avoid populating million of useless files
+- environments in home directory with pip by default
+- add other alternative notebooks such as querybook, cocalc, nteract_on_jupyter
+
+[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
