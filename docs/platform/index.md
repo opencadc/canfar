@@ -81,4 +81,4 @@ Contributions to the platform (including updates or corrections to the documenta
 
 General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](faq.md).
 
-[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
