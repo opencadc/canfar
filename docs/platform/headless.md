@@ -65,5 +65,5 @@ General inquiries can be made to [support@canfar.net](mailto:support@canfar.net)
 * ***How do I test a graphical container on my Mac?***
    * See the instructions to have container display shown on your Mac here:  [Display ENV on OSX](DISPLAY_ENV_ON_OSX.md)
 
-[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
 

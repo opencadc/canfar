@@ -173,4 +173,4 @@ For legacy desktop application containers, docker will not be able to provide a 
 
 The only requirement for a container is to ensure the web application to be launched with a `/skaha/startup.sh` script in the container, and the web application running on port 5000.
 
-[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)

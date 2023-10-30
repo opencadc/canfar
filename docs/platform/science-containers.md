@@ -45,4 +45,4 @@ This directory also contains the building of the [CANFAR usage documentation](ht
 - environments in home directory with pip by default
 - add other alternative notebooks such as querybook, cocalc, nteract_on_jupyter
 
-[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)

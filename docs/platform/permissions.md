@@ -118,4 +118,4 @@ Set the read-write group:
 setfacl -R -d -m group:{group-name}:rwx {read-write-dir}
 ```
 
-[<img src="../canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
