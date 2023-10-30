@@ -1,6 +1,6 @@
-# [CANFAR Science Platform](https://www.canfar.net) User Containers
+# CANFAR Science Platform User Containers
 
-This repository includes build recipes for containers to be launched on the CANFAR science-platform. 
+This repository ([scicon.git](https://github.com/opencadc/scicon.git)) includes build recipes for containers to be launched on the CANFAR science-platform. 
 Please feel free to contribute.
 
 ## CANFAR-maintained Containers
