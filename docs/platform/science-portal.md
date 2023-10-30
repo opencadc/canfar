@@ -7,4 +7,5 @@ It has the following services:
 - [DOI Publication Service](https://www.canfar.net/citation)
 - [The Science Platform UI](https://www.canfar.net/science-portal)
 
-[<img src="https://github.com/opencadc/scicon/blob/main/canfar-logo.png" height="200" />](https://www.opencadc.org/scicon/)
+![CANFAR](https://www.canfar.net/css/images/logo.png)
+#![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
