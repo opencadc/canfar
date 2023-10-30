@@ -4,10 +4,11 @@
 
 Access to the CANFAR Science Platform is through authorized access to the [CANFAR Portal](https://www.canfar.net). A Canadian Astronomy Data Centre (CADC) Account is required.
 
-* To request a CADC Account:  https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html
-* Authorization to access the science platform:
-  * if you are part of a collaboration already using CANFAR, ask the admininistrator of the collaboration you belong to add you as a member of the group using the [Group Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
-  * in any other case, send an email to [support@canfar.net](mailto:support@canfar.net) specifying you are requesting access to the CANFAR Science Platform and a short line of justification.
+- To request a CADC Account:  https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html
+- Authorization to access the science platform:
+
+    * if you are part of a collaboration already using CANFAR, ask the admininistrator of the collaboration you belong to add you as a member of the group using the [Group Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
+    * in any other case, send an email to [support@canfar.net](mailto:support@canfar.net) specifying you are requesting access to the CANFAR Science Platform and a short line of justification.
 
 The CANFAR Science Platform runs software packaged in [containers](https://www.docker.com/resources/what-container/). The platform allows users to run both pre-built, shared containers or private, custom containers. Users can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](containers.md) capable to run on the CANFAR Science Platform.
 
