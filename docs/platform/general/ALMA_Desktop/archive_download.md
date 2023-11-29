@@ -47,10 +47,8 @@ within your home directory.
 
 > ![image](images/archive/8_download_data6.png)
 
-::: {#desktop_run_download_script}
 Open a terminal (double-click the terminal icon), go to the Downloads
 directory, and run the data download script.
-:::
 
 > ![image](images/archive/9_download_data7.png)
 
