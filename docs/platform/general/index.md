@@ -1,4 +1,4 @@
-# Welcome to the documentation for CANFAR\'s Science Portal!
+# Welcome to the documentation for CANFAR's Science Portal!
 
 The CANFAR Science Portal provides astronomers the computing resources
 they need to work with their data. In addition to the documentation
