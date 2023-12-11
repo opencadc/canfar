@@ -31,7 +31,7 @@ is active, you can close your browser and re-open the session later from
 the Science Portal landing page (on any computer), and all of your
 files, running processes, etc, will be as you left them.
 
--   A `Desktop session <launch_desktop>`{.interpreted-text role="ref"}
+-   A [Desktop session](/general/NewUser/LaunchDesktop)`Desktop session <launch_desktop>`{.interpreted-text role="ref"}
     provides a linux desktop-like environment in which to interact with
     software containers; many commonly-used astronomy software packages
     are available in the \'astrosoftware\' menu.
