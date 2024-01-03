@@ -1,4 +1,4 @@
-# Portal Overview {#overview}
+# Portal Overview
 
 The CANFAR Science Portal allows users to access the tools and computing
 resources they need to conduct their research. This page provides a
@@ -31,14 +31,14 @@ is active, you can close your browser and re-open the session later from
 the Science Portal landing page (on any computer), and all of your
 files, running processes, etc, will be as you left them.
 
--   A [Desktop session](/general/NewUser/LaunchDesktop)`Desktop session <launch_desktop>`{.interpreted-text role="ref"}
+-   A [Desktop session](/science-containers/general/NewUser/LaunchDesktop)
     provides a linux desktop-like environment in which to interact with
     software containers; many commonly-used astronomy software packages
     are available in the \'astrosoftware\' menu.
--   A `Notebook session <launch_notebook>`{.interpreted-text role="ref"}
+-   A [Notebook session](/science-containers/general/NewUser/LaunchNotebook)
     provides a Jupyter Notebook style of environment in which to
     interact with your data and run software.
--   A `CARTA session <launch_carta>`{.interpreted-text role="ref"} runs
+-   A [CARTA session](/science-containers/general/NewUser/LaunchCARTA) runs
     the CARTA image viewing software, which provides an efficient way to
     examine large 3-D data cubes.
 -   The Contributed session provides access to community-created tools,
@@ -52,7 +52,7 @@ All of your files are simultaneously accessible from all active
 sessions, as well as several other modes such as this website:
 <https://www.canfar.net/storage/arc/list/home> and you may
 upload/download files via the methods described
-`here <filetransfer>`{.interpreted-text role="ref"}.
+[here](science-containers/general/General_tools/File_transfers).
 
 ## File Storage
 
@@ -63,7 +63,7 @@ on the Science Portal:
     should be used for long-term stable file storage, as it includes
     multiple backups at different geographical locations.
 -   Users can request space in both a personal home directory as well as
-    a `'project' space <projectspace>`{.interpreted-text role="ref"}.
+    a ['project' space](science-containers/general/NewUser/ProjectSpace/).
     Use of project space for most analyses is highly encouraged, as
     there are mechanisms available for users to easily share access to
     files, etc with their collaborators there.
