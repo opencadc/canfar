@@ -1,4 +1,4 @@
-# How to log in {#login}
+# How to log in
 
 You will need a CADC account to access the system. If you do not have
 one, you can request one here:
@@ -9,7 +9,7 @@ To request authorization to use the Science Portal, send an email to
 
 -   *Project space*: If you intend to work on a dataset with
     collaborators, it is recommended that you set up a
-    `project space<projectspace>`{.interpreted-text role="ref"}, where a
+    [project space](/science-containers/general/NewUser/ProjectSpace), where a
     designated group of users all has common access to the files
     contained within it. You will need to supply a project name and
     estimated space requirement to the email address above.
