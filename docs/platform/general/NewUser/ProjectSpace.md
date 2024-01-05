@@ -1,4 +1,4 @@
-# Setting up a Project Space {#projectspace}
+# Setting up a Project Space 
 
 ## What is a Project Space?
 
@@ -7,7 +7,7 @@ is their personal home directory, found in `/home/[username]`. The
 second is within a project directory, found in
 `/project/[project_name]`. These project directories provide a space
 where files can easily be shared and analyzed with collaborators. Using
-the `groupmanagement`{.interpreted-text role="ref"} tools, users can
+the (Group Management)[science-containers/general/General_tools/Group_management] tools, users can
 designate a list of others who can access their files. These designated
 individuals, if also given an account on the Science Portal, may
 interact with the files using the various session types available. These
@@ -23,7 +23,7 @@ more than this (e.g., working with large datasets such as from ALMA or
 the VLA), you will need an estimate of the amount of diskspace that you
 will need. (Requests to change the diskspace allocation at a later date
 are also possible.) Once you have this information, if you are on the
-Slack workspace, the easiest way to request a project space is to post
+Discord workspace, the easiest way to request a project space is to post
 the request there, with a note to Kevin Casteels. Alternatively, you can
 email the request to `support@canfar.net`
 
@@ -37,14 +37,12 @@ your collaborators only wish to download the files and analyze them on
 their own computers, this step is sufficient; they can access the files
 on the web at
 <https://www.canfar.net/storage/arc/list/project/%5Bproject_name%5D> or
-use the `VOS Tools <vostools>`{.interpreted-text role="ref"} to download
+use the (VOS Tools)[science-containers/general/General_tools/Using_vostools] to download
 them. If your collaborators wish to work on the files directly on the
 Science Portal, they will need to request an account on the system,
 either through emailing `support@canfar.net` or you can post a request
 on the slack channel on their behalf (please include their CADC username
-and the project that you\'d like them to have access to).
+and the project that you'd like them to have access to).
 
 Finally, you can manage which users are able to access your files on the
-project space using the
-`group management tools <groupmanagement>`{.interpreted-text
-role="ref"}.
+project space using the (Group Management tools)[science-containers/general/General_tools/Group_management).
