@@ -13,7 +13,7 @@ To request authorization to use the Science Portal, send an email to
     designated group of users all has common access to the files
     contained within it. You will need to supply a project name and
     estimated space requirement to the email address above.
--   *Communications on Slack*: a Slack workspace is used for some
+-   *Communications on Discord*: a Discord workspace is used for some
     aspects of communication around the Science Portal, including notice
     of service outages and some trouble-shooting support. You can
     request that you be added to this space also by contacting the email
