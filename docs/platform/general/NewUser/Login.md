@@ -31,7 +31,7 @@ Start a new session by clicking the plus sign
 There are four different types of sessions that you can choose to
 launch: Desktop, CARTA, Notebook, and Contributed. All are described
 below; in brief, Desktop provides a linux desktop-like working
-environment, CARTA corresponds to ALMA\'s CARTA visualization tool,
+environment, CARTA corresponds to ALMA's CARTA visualization tool,
 Notebook provides a Jupyter Notebook environment, and Contributed
 contains community-contributed tools such as a time estimator for the
 CASTOR mission. Start by selecting the session type in the upper
@@ -43,6 +43,6 @@ remaining menu items.
 See the following pages for the subsequent steps. Note that you can have
 at most three active sessions of any type.
 
-> -   `launch_desktop`{.interpreted-text role="ref"}
-> -   `launch_carta`{.interpreted-text role="ref"}
-> -   `launch_notebook`{.interpreted-text role="ref"}
+> - [Desktop](science-containers/general/NewUser/LaunchDesktop)
+> - [CARTA](science-containers/general/NewUser/LaunchCARTA)
+> - [Notebook](science-containers/general/NewUser/LaunchNotebook)
