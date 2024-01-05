@@ -1,14 +1,14 @@
-# Launching a Desktop session {#launch_desktop}
+# Launching a Desktop session 
 
 After logging in to the Science Portal and clicking the plus sign to
-launch a new session, choose a session type of \'desktop\'
+launch a new session, choose a session type of `desktop`
 
 > ![image](images/desktop/1_launch_desktop.png)
 
 Note that the remaining menu bars and options update automatically after
 your session type selection. (Please be patient, sometimes this takes a
-few seconds.) There is currently only one option for \'container
-image\', so no selection is needed.
+few seconds.) There is currently only one option for `container
+image`, so no selection is needed.
 
 > ![image](images/desktop/2_select_container.png)
 
@@ -44,5 +44,4 @@ clicking the connect button.
 As you can see, this desktop session has a similar look and feel to a
 standard linux desktop that you may be familiar with. See the main page
 for tutorials on using various aspects of the Desktop session, including
-`launching a CASA-enabled terminal<desktop_start_casa>`{.interpreted-text
-role="ref"}.
+(launching a CASA-enabled terminal)[science-containers/general/NewUser/LaunchDesktop].
