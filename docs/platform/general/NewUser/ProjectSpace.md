@@ -36,7 +36,7 @@ can be requested at
 your collaborators only wish to download the files and analyze them on
 their own computers, this step is sufficient; they can access the files
 on the web at
-<https://www.canfar.net/storage/arc/list/project/%5Bproject_name%5D> or
+<https://www.canfar.net/storage/arc/list/project/[project_name]> or
 use the (VOS Tools)[science-containers/general/General_tools/Using_vostools] to download
 them. If your collaborators wish to work on the files directly on the
 Science Portal, they will need to request an account on the system,
@@ -45,4 +45,4 @@ on the slack channel on their behalf (please include their CADC username
 and the project that you'd like them to have access to).
 
 Finally, you can manage which users are able to access your files on the
-project space using the (Group Management tools)[science-containers/general/General_tools/Group_management).
+project space using the (Group Management tools)[science-containers/general/General_tools/Group_management].
