@@ -44,4 +44,4 @@ clicking the connect button.
 As you can see, this desktop session has a similar look and feel to a
 standard linux desktop that you may be familiar with. See the main page
 for tutorials on using various aspects of the Desktop session, including
-(launching a CASA-enabled terminal)[science-containers/general/NewUser/LaunchDesktop].
+(launching a CASA-enabled terminal)[/science-containers/general/NewUser/LaunchDesktop].
