@@ -1,7 +1,7 @@
-# Launching a Notebook session {#launch_notebook}
+# Launching a Notebook session 
 
 After logging in to the Science Portal and clicking the plus sign to
-launch a new session, choose a session type of \'notebook\'.
+launch a new session, choose a session type of `notebook`.
 
 > ![image](images/notebook/1_select_notebook_session.png)
 >
@@ -34,7 +34,7 @@ one core would be required.
 
 > ![image](images/notebook/6_choose_cores.png)
 
-Next, click the \'Launch\' button to start the Notebook session.
+Next, click the `Launch` button to start the Notebook session.
 
 > ![image](images/notebook/7_launch_notebook.png)
 
