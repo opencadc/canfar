@@ -1,14 +1,14 @@
-# Launching a CARTA session {#launch_carta}
+# Launching a CARTA session 
 
 After logging in to the Science Portal and clicking the plus sign to
-launch a new session, choose a session type of \'carta\'.
+launch a new session, choose a session type of `carta`.
 
 > ![image](images/carta/1_select_carta_session.png)
 
 Note that the remaining menu bars and options update automatically after
 your session type selection. (Please be patient; sometimes it takes a
 few seconds to update.) There are currently three options for
-\'container image\': choose the version of CARTA that you need here
+`container image`: choose the version of CARTA that you need here
 (1.4, 2.0, or 3.0 beta).
 
 > ![image](images/carta/2_select_carta_container.png)
@@ -56,7 +56,7 @@ page.
 
 Now, navigate through to the file that you would like to display on
 CARTA. For information on how to upload files, see
-`filetransfer`{.interpreted-text role="ref"} for the options available.
+(file transfers)[science-containers/general/General-tools/File_transfers] for the options available.
 This tutorial assumes that you have a file uploaded already. First,
 click the icon on the upper left to navigate up one directory.
 
@@ -69,6 +69,6 @@ and click the load button.
 
 > ![image](images/carta/11_select_file.png)
 
-Congratulations! You\'re displaying your first image in CARTA!
+Congratulations! You're displaying your first image in CARTA!
 
 > ![image](images/carta/12_success_CARTA.png)
