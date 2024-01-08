@@ -1,4 +1,4 @@
-# Download data from the ALMA archive (web browser) {#desktop_download}
+# Download data from the ALMA archive (web browser) 
 
 Downloading data directly from an ALMA archive web query is quite
 straightforward. Double-click on the Firefox icon on the desktop, and
@@ -17,16 +17,16 @@ each project.
 > ![image](images/archive/2_select_data.png)
 
 On the upper right panel, click the downward-pointing arrow, then click
-the green \'Explore and download\' button that pops up.
+the green `Explore and download` button that pops up.
 
 > ![image](images/archive/3_download_data1.png)
 
 In the next window that pops up, select the files that you are
-interested in and click \'Download Selected\'.
+interested in and click `Download Selected`.
 
 > ![image](images/archive/4_download_data2.png)
 
-In the pop up window that next appears, click the \'Download Script\'
+In the pop up window that next appears, click the `Download Script`
 button.
 
 > ![image](images/archive/5_download_data3.png)
@@ -53,7 +53,7 @@ directory, and run the data download script.
 > ![image](images/archive/9_download_data7.png)
 
 When all of the files have been downloaded, you should see a query about
-un-tarring (uncompressing) them. Click \'y\' for yes.
+un-tarring (uncompressing) them. Click `y` for yes.
 
 > ![image](images/archive/10_download_data8.png)
 
