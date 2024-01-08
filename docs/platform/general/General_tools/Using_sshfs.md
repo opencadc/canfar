@@ -1,4 +1,4 @@
-# Using SSHFS {#sshfs}
+# Using SSHFS 
 
 SSHFS, or the secure shell file system, allows users to interact with
 the directories and files from their Science Portal account directly on
@@ -26,7 +26,7 @@ Instructions for Windows users can be found at the bottom of
 page.
 
 To start, we will need to create a local directory in which to mount the
-file system, \"arc\":
+file system, "arc":
 
     mkdir $HOME/arc
 
@@ -49,7 +49,7 @@ for more details.
 
 ## Synch Local and Remote Directories with rsync
 
-With the steps above in place, the rsync (\"remote synch\") command can
+With the steps above in place, the rsync ("remote synch") command can
 be used. rsync uses an algorithm that minimizes the amount of data
 copied by only moving the portions of files that have changed. Further
 rsync examples and docs are
@@ -64,7 +64,7 @@ where
 -   `-v` increases verbosity
 -   `-r` recurses into directories
 -   `-l` copies symlinks as symlinks
--   `-t` preserves modification times (use the command \"man rsync\" for
+-   `-t` preserves modification times (use the command `man rsync` for
     more details on why this option prevents resending already
     transferred data when not using `-a`)
 -   `-P` keeps partially transferred files and shows progress during
