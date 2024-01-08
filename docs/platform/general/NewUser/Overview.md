@@ -54,7 +54,7 @@ All of your files are simultaneously accessible from all active
 sessions, as well as several other modes such as this website:
 <https://www.canfar.net/storage/arc/list/home> and you may
 upload/download files via the methods described
-[here](science-containers/general/General_tools/File_transfers).
+[here](/science-containers/general/General_tools/File_transfers).
 
 ## File Storage
 
@@ -65,7 +65,7 @@ on the Science Portal:
     should be used for long-term stable file storage, as it includes
     multiple backups at different geographical locations.
 -   Users can request space in both a personal home directory as well as
-    a ['project' space](science-containers/general/NewUser/ProjectSpace/).
+    a ['project' space](/science-containers/general/NewUser/ProjectSpace/).
     Use of project space for most analyses is highly encouraged, as
     there are mechanisms available for users to easily share access to
     files, etc with their collaborators there.
