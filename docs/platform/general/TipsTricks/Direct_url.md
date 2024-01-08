@@ -1,4 +1,4 @@
-# Direct URL Upload/Download {#directurl}
+# Direct URL Upload/Download 
 
 A direct url is available for files on the /arc storage system, i.e.,
 those in the home or project directories of the Science Portal. A file
