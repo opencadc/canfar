@@ -1,4 +1,4 @@
-# Using Web Storage {#webstorage}
+# Using Web Storage 
 
 For both [VOSpace](https://www.canfar.net/storage/vault/list/) and the
 [Science Portal](https://www.canfar.net/storage/arc/list/), users can
@@ -6,15 +6,15 @@ upload or download files via a web interface (at the links given). This
 page provides a quick tutorial on how to use the web interface, which is
 nearly identical for both systems. Note that for the Science Portal,
 users can alternatively upload or download files using direct URLs as
-outlined `here<directurl>`{.interpreted-text role="ref"}.
+outlined [here](/science-containers/general/TipsTricks/Direct_url).
 
 ## Upload File(s)
 
 To upload one or more files (or folders), navigate to the desired
-directory, then click the \'Add\' button along the top, selecting the
+directory, then click the `Add` button along the top, selecting the
 appropriate option. In this example, the directory of interest is in the
-Science Portal, in a directory called \'Tutorial_example\' in the
-user\'s home directory.
+Science Portal, in a directory called `Tutorial_example` in the
+user's home directory.
 
 > ![image](images/webstorage/1_click_add.png)
 
@@ -24,7 +24,7 @@ Follow the instructions on the pop-up box that appears next.
 >
 > ![image](images/webstorage/3_choose_file.png)
 
-Once the file is selected, click \'Upload\' and then \'Ok\'.
+Once the file is selected, click `Upload` and then `Ok`.
 
 > ![image](images/webstorage/4_click_upload.png)
 >
@@ -38,10 +38,10 @@ Your file will now appear in the list for the directory.
 
 Downloading files is also straightforward, and three options are
 outlined here. To begin, select the files you wish to download, and
-click the \'Download\' button from the menu bar. The \'URL List\',
-\'HTML List\', and \'Zip\' options are described below: the \'Zip\'
-option will usually be the most practical, but the \'HTML List\' option
-may be preferred when downloading only a few files, and \'URL List\' may
+click the `Download` button from the menu bar. The `URL List`,
+`HTML List`, and `Zip` options are described below: the `Zip`
+option will usually be the most practical, but the `HTML List` option
+may be preferred when downloading only a few files, and `URL List` may
 be best for scripting (command line with no user interaction required).
 
 > ![image](images/webstorage/7_start_download.png)
@@ -52,8 +52,8 @@ For this method, you are downloading a list of URLs which you will then
 run additional commands on your local machine in order to grab the files
 themselves.
 
-First, choose the \'URL List\' option, then select the desired directory
-and file name and click \'save\'.
+First, choose the `URL List` option, then select the desired directory
+and file name and click `save`.
 
 > ![image](images/webstorage/8_url_download_popup.png)
 
@@ -64,7 +64,7 @@ by:
     cadc-get-cert -u [username]
 
 and entering your password at the prompt. You will need to have
-installed the `VOStools<vostools>`{.interpreted-text role="ref"} package
+installed the [VOStools](/science-containers/general/General_tools/Using_vostools) package
 for this step. The command will generate a file called
 `~/.ssl/cadcproxy.pem` which contains the security certificate
 information. This certificate is valid for 10 days, so if you have
@@ -91,7 +91,7 @@ The remainder of the process is identical to what was outlined above.
 
 ## Download - HTML List Option
 
-Clicking the \'HTML List\' option will bring up a pop up window with a
+Clicking the `HTML List` option will bring up a pop up window with a
 series of long URL strings - each (ususally 2-line) entry is a clickable
 direct link to your individual files. You can interact with these as you
 normally do with file download links. For example, you can left click
@@ -105,9 +105,9 @@ download a very small number of files.
 
 ## Download - Zip Option
 
-The \'Zip\' option allows you to download a single zip file containing
-all of your requested files. Choose the \'zip\' option, and click
-\'save\' in the pop-up window after adjusting your preferred directory
+The `Zip` option allows you to download a single zip file containing
+all of your requested files. Choose the `zip` option, and click
+`save` in the pop-up window after adjusting your preferred directory
 and zip file name.
 
 > ![image](images/webstorage/11_zip_download_popup.png)
