@@ -1,17 +1,16 @@
-# Starting CASA {#desktop_start_casa}
+# Starting CASA 
 
 Once you have
-`launched a Desktop session<launch_desktop>`{.interpreted-text
-role="ref"}, it is straightforward to run CASA in a terminal.
+[launched a Desktop session](/science-containers/general/NewUser/LaunchDesktop/), it is straightforward to run CASA in a terminal.
 
 > ![image](images/start_casa/1_new_desktop.png)
 
-To start a CASA-enabled terminal, first click on the \'Applications\'
+To start a CASA-enabled terminal, first click on the `Applications`
 menu at the top left corner of your screen
 
 > ![image](images/start_casa/2_applications_menu.png)
 
-Click through the \'AstroSoftware\' and main CASA version to select the
+Click through the `AstroSoftware` and main CASA version to select the
 specific version that you want to use. Every version of CASA back to
 CASA 3.4.0 is available (this is the version of CASA which is tied to
 the scripts distributed with ALMA Cycle 0 data on the archive; see link
@@ -20,16 +19,16 @@ the scripts distributed with ALMA Cycle 0 data on the archive; see link
 > ![image](images/start_casa/3_choose_casa.png)
 
 Clicking on your prefered version of CASA will open a terminal in which
-you can run CASA in the standard manner (typing either \'casa\' or
-\'casa \--pipeline\' depending on the mode you wish to use). \[NB: there
-are two dashes before \'pipeline\' in the previous command\]
+you can run CASA in the standard manner (typing either `casa` or
+`casa --pipeline` depending on the mode you wish to use). (NB: there
+are two dashes before `pipeline` in the previous command)
 
 > ![image](images/start_casa/4_casa_launched.png)
 >
 > ![image](images/start_casa/5_run_casa.png)
 
 You can open a regular (non-CASA) terminal by double-clicking the
-\'terminal\' icon at the lower left side of the screen. Note that each
+`terminal` icon at the lower left side of the screen. Note that each
 terminal has a label on top which denotes what type of terminal it is
 (i.e., a plain terminal or the CASA version that is enabled). Only basic
 linux commands are recognized in the CASA terminals, so it is preferable
