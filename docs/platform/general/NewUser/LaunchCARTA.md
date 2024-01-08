@@ -56,7 +56,7 @@ page.
 
 Now, navigate through to the file that you would like to display on
 CARTA. For information on how to upload files, see
-(file transfers)[/science-containers/general/General-tools/File_transfers] for the options available.
+[file transfers](/science-containers/general/General-tools/File_transfers) for the options available.
 This tutorial assumes that you have a file uploaded already. First,
 click the icon on the upper left to navigate up one directory.
 
