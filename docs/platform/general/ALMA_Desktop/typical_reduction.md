@@ -3,16 +3,16 @@
 This tutorial walks through an example of reducing and imaging and ALMA
 dataset, and copying the final images to a personal computer. First, you
 need to download your ALMA data onto your Desktop Session. See
-[here](science-containers/general/ALMA_Desktop/archive_download/) or 
-[here](science-containers/general/ALMA_Desktop/archive_script_download/) for
+[here](/science-containers/general/ALMA_Desktop/archive_download/) or 
+[here](/science-containers/general/ALMA_Desktop/archive_script_download/) for
 tutorials on how to download data directly from the ALMA Science
-Archive, or [here](science-containers/general/General_tools/File_transfers/) for
+Archive, or [here](/science-containers/general/General_tools/File_transfers/) for
 instructions on how to transfer files from your personal computer or
 VOSpace to the Desktop Session, if you already have your ALMA data
 downloaded there.
 
 Next, open a CASA container (see
-[this tutorial](science-containers/general/ALMA_Desktop/start_casa/) with
+[this tutorial](/science-containers/general/ALMA_Desktop/start_casa/) with
 the version that you need to run. Then, start CASA in either interactive
 or pipeline mode, depending on what is required for your reduction
 script, by typing `casa` or `casa --pipeline`
@@ -48,7 +48,7 @@ parenthesis. Thus, to image the data, you would need to open a new
 During imaging, you might find it helpful to open up a regular terminal
 to view and/or edit the imaging script, for example, to copy and paste
 the commands one line at a time into casa (see the
-[Using the Clipboard](science-containers/general/TipsTricks/Using_clipboard/) tutorial
+[Using the Clipboard](/science-containers/general/TipsTricks/Using_clipboard/) tutorial
 for more information).
 
 > ![image](images/typical_reduc/3_ready_for_imaging.png)
@@ -60,12 +60,12 @@ example, works in the same manner as on a personal desktop machine.
 
 Once imaging and any desired analysis is complete, you can transfer your
 final files off of the system using one of the many options available to
-[transfer files](science-containers/general/General_tools/File_transfers/).
+[transfer files](/science-containers/general/General_tools/File_transfers/).
 
 > ![image](images/typical_reduc/5_imaging_done_copy_out.png)
 
 In the example above, a small subset of files are being transfered to a
-personal VOSpace page using the [vcp](science-containers/general/General_tools/Using_vostools/) command:
+personal VOSpace page using the [vcp](/science-containers/general/General_tools/Using_vostools/) command:
 
     vcp calibrated_final_cont_image_162622-24225.* vos:helenkirk/
 
