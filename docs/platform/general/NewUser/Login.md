@@ -43,6 +43,6 @@ remaining menu items.
 See the following pages for the subsequent steps. Note that you can have
 at most three active sessions of any type.
 
-> - [Desktop](science-containers/general/NewUser/LaunchDesktop)
-> - [CARTA](science-containers/general/NewUser/LaunchCARTA)
-> - [Notebook](science-containers/general/NewUser/LaunchNotebook)
+> - [Desktop](/science-containers/general/NewUser/LaunchDesktop)
+> - [CARTA](/science-containers/general/NewUser/LaunchCARTA)
+> - [Notebook](/science-containers/general/NewUser/LaunchNotebook)
