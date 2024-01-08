@@ -1,4 +1,4 @@
-# Transfer file into Notebook session {#notebook_transfer_file}
+# Transfer file into Notebook session 
 
 Smaller files can be uploaded into a Notebook session easily in two
 different ways. These are outlined in turn below.
@@ -12,7 +12,7 @@ top menu bar.
 > ![image](images/transfer_file/1_landing_click_upload.png)
 
 This will bring up a window that will let you select the file you wish
-to upload. Click the \'Open\' button as usual to confirm your choice of
+to upload. Click the `Open` button as usual to confirm your choice of
 files.
 
 > ![image](images/transfer_file/2_upload_window.png)
