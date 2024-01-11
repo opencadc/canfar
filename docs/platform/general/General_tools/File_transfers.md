@@ -4,7 +4,7 @@ There are a variety of methods available to move files into and out of
 the Science Portal. This page provides a short summary of the options,
 with links to further resources that are available.
 
--   upload individual files in \'Notebook\': Small files can be easily
+-   upload individual files in `Notebook`: Small files can be easily
     uploaded within a Notebook session using the upload icon. A tutorial
     is available [here](/science-containers/general/Notebook/transfer_file)
 -   upload/download files or directories using the [web browser
