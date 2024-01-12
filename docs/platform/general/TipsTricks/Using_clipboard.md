@@ -21,8 +21,8 @@ The image below shows an open Clipboard ready for use.
 
 The Clipboard functions as an intermediary place to put text that you
 wish to transfer from one container session to another. You can copy
-highlighted / selected text using Control-Shift-C, and paste it using
-Control-Shift-V.
+highlighted / selected text using `Control-Shift-C`, and paste it using
+`Control-Shift-V`.
 
 In the example here, a line of code is being copied from a python
 program (being edited in a normal terminal window) into a running
@@ -32,8 +32,8 @@ into the Clipboard.
 
 > ![image](images/clipboard/4_text_into_clipboard.png)
 
-Next, highlight the text on the Clipboard, and type Control-Shift-C.
-Then, click on the CASA terminal and type Control-Shift-V to paste the
+Next, highlight the text on the Clipboard, and type `Control-Shift-C`.
+Then, click on the CASA terminal and type `Control-Shift-V` to paste the
 text there.
 
 > ![image](images/clipboard/5_copy_text_to_casa.png)
