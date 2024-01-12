@@ -76,5 +76,5 @@ Your updated group permissions are now shown on the main page.
 
 Management of groups can also be done via the command line, and is the
 prefered option for more complex settings. See [this
-page](https://github.com/opencadc/science-platform/tree/master/doc#groups-and-permissions)
+page](https://www.opencadc.org/science-containers/complete/permissions/)
 for instructions.
