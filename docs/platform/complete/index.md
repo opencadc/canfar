@@ -27,7 +27,7 @@ Notebooks are using the Jupyter Lab interface.
 ### Desktop
 
 An X11-desktop session that enables running applications in the Science Platform, a browser Desktop session can be launched.
-- 
+
 - Desktop documentation and tutorials are described in more detail in the [User Documentation](https://canfar-scienceportal.readthedocs.io/en/latest/NewUser/LaunchDesktop.html)
 - Launching a CASA window in the Desktop YouTube tutorial:  [YouTube Tutorial](https://youtu.be/GDDQ3jKbldU)
 
