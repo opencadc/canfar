@@ -10,7 +10,7 @@ The CANFAR Science Platform consists of set of services and resources to enable 
     * If the project you are using the resource for is part of a collaboration already using the CANFAR Science Portal, ask the administrator of the collaboration you belong to add you as a member of the collaborations access group using the [CADC Group Management Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
     * If your project is not part of an authorized collaboration, the collaboration lead will need to request access by sending an email to [support@canfar.net](mailto:support@canfar.net) specifying they are requesting access to the CANFAR Science Portal, the scale of resources needed (storage and cores of compute) and a short (few line) resource justification.  Canadian research collaborations are encouraged to apply for CANFAR Science Portal authorization.
 
-The CANFAR Science Portal runs software packaged in [containers](https://www.docker.com/resources/what-container/). The portal allows users to run both pre-built, shared containers or private, custom containers. Authorized collaboration members can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](containers.md) containers capable of being launched within the CANFAR Science Portal.
+The CANFAR Science Portal runs software packaged in [containers](https://www.docker.com/resources/what-container/). The portal allows users to run both pre-built, shared containers or private, custom containers. Authorized collaboration members can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](complete/containers) containers capable of being launched within the CANFAR Science Portal.
 
 The CANFAR Science Platform supports both launching interactive sessions (via the Portal) and non-interactive ones (using cURL or a dedicated Python module). More detailed documentation on launching a computing session on the CANFAR Science Portal can be found [here](https://canfar-scienceportal.readthedocs.io/en/latest/). 
 
@@ -35,11 +35,11 @@ An X11-desktop session that enables running applications in the Science Platform
 
 Contributed sessions are user-customised web applications, typically not maintained by CANFAR. This can be anything, such as a [VSCode server](https://github.com/coder/code-server) and [Pluto notebook](https://plutojl.org/) for the Julia language. 
 
-Please refer to the [container documentation](containers.md) for more information on building contributed sessions.
+Please refer to the [container documentation](complete/containers/) for more information on building contributed sessions.
 
 ## Batch Jobs
 
-Currently, the CANFAR Science Platform has a limited capacity for batch processing.  Batch processing can be understood  as a non-interactive executable launched on a container whose output is not attached to a display (headless). Please contact [support@canfar.net](mailto:support@canfar.net) before making use of the headless job support -- we are incrementally adding support for batch processing in the science platform. See the specific [documentation](headless.md). This is still experimental and the API may change.
+Currently, the CANFAR Science Platform has a limited capacity for batch processing.  Batch processing can be understood  as a non-interactive executable launched on a container whose output is not attached to a display (headless). Please contact [support@canfar.net](mailto:support@canfar.net) before making use of the headless job support -- we are incrementally adding support for batch processing in the science platform. See the specific [documentation](complete/headless/). This is still experimental and the API may change.
 
 ## Storage
 
@@ -66,7 +66,7 @@ Groups and their memberships can be managed through the CANFAR groups web interf
 
 Once created, groups can be assigned to files and directories in arc storage directly from their interactive sessions, or through the [CANFAR storage](https://www.canfar.net/storage/arc/list)
 
-For more details on setting access permissions, see the documentation on [file permissions](permissions.md)
+For more details on setting access permissions, see the documentation on [file permissions](complete/permissions/)
 
 ## Programmatic Access
 
@@ -82,6 +82,6 @@ To report bugs and request new features, please use our GitHub pages:
 
 Contributions to the platform (including updates or corrections to the documentation) can be submitted as pull requests to this GitHub repository. We especially encourage science containers to be shared across the user community by making your published containers public.
 
-General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](faq.md).
+General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](complete/faq/).
 
 ![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
