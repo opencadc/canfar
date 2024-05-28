@@ -11,20 +11,8 @@ The CANFAR Science Platform supports various types of containers: `session`, `so
 ## Building CANFAR Science Platform Containers
 
 ### Minimum requirements
-- Containers must be based on a standard Linux x86_84 distribution.
-- Containers must contain an SSSD client and have ACL capabilities if one want to interact with the `arc` storage
 
-#### SSSD and ACL
-For linux group id (`gid`) names to be resolved, the container must have an SSSD client and ACL tools installed, and must provide an `nsswitch.conf` file as described below.  If any of these are missing, only group IDs will be displayed (when `id` is typed for example), but file system authorization will continue to work as expected.
-The packages to install on a Debian-based Linux distribution are `sssd-client` and  `acl`.
-
-The file `/etc/nsswitch.conf` must include the `sss` module in the `passwd`, `shadow`, and `group` entries.  For example:
-
-```
-passwd:     sss files
-shadow:     files sss
-group:      sss files
-```
+The only requirement for containers builds is that they must be based on a standard Linux x86_84 distribution.
 
 ### Additional requirements for legacy desktop application containers
 Examples of legacy desktop software containers are astronomy GUIs such as CASA, Topcat, Aladin, and customized containers such as Gemini processing containers which require desktop interaction. 
