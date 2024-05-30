@@ -28,19 +28,21 @@ Containers in the CANFAR Science Platform are always executed as the *CADC User*
 
 #### Session container initialization
 Initialization for session containers is based on the session container *type*.  There are currently four types with different startup procedures:
+
 1. `notebook`: it requires a `jupyter lab` executable
-1. `carta`: initialization and startup is done through a customized script
-1. `desktop-app`: desktop session startup is managed by the skaha infrastructure.
-1. `contributed`: it will follow a customized startup script
+2. `carta`: initialization and startup is done through a customized script
+3. `desktop-app`: desktop session startup is managed by the skaha infrastructure.
+4. `contributed`: it will follow a customized startup script
 
 There may be multiple versions of the same type of session container, but the startup procedure for these must remain the same for them to be of the same type.
 
 #### Contributed session containers
 Contributed sessions are for custom-build, web-browser applications that are not officially created and maintained by CANFAR.
 The rules of building a container of type "contributed" on the CANFAR Science Platform are:
+
 1. Incoming trafic will be over http (which may include websocket trafic) on port 5000
-1. From the point of view of the container, requests will be received at the root path (/), but URLs in the browser will look like https:///, where <host> and <path> are subject to change. This path will initially be https://ws-uv.canfar.net/sessions/contrib/<sessionid>
-1. The instance will be started by a script in the image that must be available at /skaha/startup.sh and will be passed 1 parameter: the sessionid.
+2. From the point of view of the container, requests will be received at the root path (/), but URLs in the browser will look like https:///, where <host> and <path> are subject to change. This path will initially be https://ws-uv.canfar.net/sessions/contrib/<sessionid>
+3. The instance will be started by a script in the image that must be available at /skaha/startup.sh and will be passed 1 parameter: the sessionid.
 
 #### Software container initialization
 
