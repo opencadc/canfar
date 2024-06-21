@@ -4,6 +4,8 @@
 
 The CANFAR Science Platform consists of set of services and resources to enable cloud-based astronomy data analysis.  Browser-based access to CANFAR's cloud computing layer is provided via authorized access to the [CANFAR Portal](https://www.canfar.net). A Canadian Astronomy Data Centre (CADC) account that has been authorized to use the Portal is required.
 
+Please acknowledge the CANFAR Science Portal in any resulting publications with the following: The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform. Our work used the facilities of the Canadian Astronomy Data Center, operated by the National Research Council of Canada with the support of the Canadian Space Agency, and CANFAR, a consortium that serves the data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research [(Gaudet et al. 2010)](https://ui.adsabs.harvard.edu/abs/2010SPIE.7740E..1IG/abstract).
+
 - To request a CADC Account:  https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html
 - Authorization to access the CANFAR Portal:
 
