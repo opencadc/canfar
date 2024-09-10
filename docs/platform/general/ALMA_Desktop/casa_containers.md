@@ -39,4 +39,8 @@ CASA versions 6.5.0 to 6.5.2 initially launch with some display errors in the lo
 
 `casa`
 
+## ALMA/CASA Adjacent Containers : Galario
+The UV data analysis package [galario](https://mtazzari.github.io/galario) is available under the radio-submm menu.  Note that this container has had minimal testing, and the uvplot package commands in the quickstart.py script are not presently working, although all preceeding commands in the quickstart.py script do work.
 
+## ALMA/CASA Adjacent Containers : Starlink
+The JCMT's [Starlink](https://starlink.eao.hawaii.edu/starlink) package is available under the radio-submm menu, including image analysis tools and the gaia image viewer.  Note that the [starlink-pywrapper](https://starlink-pywrapper.readthedocs.io/en/latest/) add-on package is presently not working.  Minimal testing has been done on the Starlink container.
