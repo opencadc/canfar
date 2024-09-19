@@ -31,13 +31,18 @@ The [UVMultiFit](https://github.com/onsala-space-observatory/UVMultiFit/blob/mas
 `from NordicARC import uvmultifit as uvm`
 
 ## Known Container Bugs
-CASA versions 6.5.0 to 6.5.2 initially launch with some display errors in the logger window.  Exiting casa (but not the container) and re-starting casa fixes the issue, i.e.,
+1) CASA versions 6.5.0 to 6.5.2 initially launch with some display errors in the logger window.  Exiting casa (but not the container) and re-starting casa fixes the issue, i.e.,
 
 `casa`
 
 `exit`
 
 `casa`
+
+
+2) Running multi-thread pipeline scripts (MPI CASA) may generate error messages, as described [here](https://casadocs.readthedocs.io/en/latest/notebooks/frequently-asked-questions.html) under the 'Running pipeline in non-interactive mode' section.  A CANFAR ALMA user reports success initiating MPI CASA in a Desktop container as follows:
+
+`xvfb-run -a mpicasa casa —nologger —nogui -agg -c casa_script.py`
 
 ## ALMA/CASA Adjacent Containers : Galario
 The UV data analysis package [galario](https://mtazzari.github.io/galario) is available under the radio-submm menu.  Note that this container has had minimal testing, and the uvplot package commands in the quickstart.py script are not presently working, although all preceeding commands in the quickstart.py script do work.
