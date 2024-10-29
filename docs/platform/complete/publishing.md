@@ -6,7 +6,7 @@ The CANFAR Science Platform supports various types of containers: `session`, `so
 
 - `Session` are containers launched as native browser interactive applications (i.e. HTML5/Websocket).
 - `Software` are containers launched with any kind of executable, installed with custom software stack. 
-- `Legacy desktop application` are containers launched and viewed specifically through a desktop `session`.  
+- `Legacy desktop applications` are containers launched and viewed specifically through a desktop `session`.  
 
 ## Building CANFAR Science Platform Containers
 
