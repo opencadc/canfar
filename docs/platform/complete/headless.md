@@ -31,7 +31,7 @@ Example: overriding the command and providing two arguments:
     ![CLI Secret Field](./cli-secret-field.png)
 1. With the CLI secret in your clipboard, create a string with your username and secret, separated by a colon (`:`), and Base64 Encode it:
 ```sh
-ENCODED_HEADER=`echo -n "myusername:my-super-secret" | base64 -i -`
+ENCODED_HEADER=`echo -n "myusername:my-secret" | base64 -i -`
 ```
 1. Now use that in the session create command:
 ```sh
