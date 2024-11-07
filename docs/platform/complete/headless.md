@@ -14,11 +14,34 @@ For the full details of the job launching API, see this section of the akaha API
 
 All jobs will be run as the calling user.  All jobs have the `/arc` filesystem mounted.
 
-Example: launch a headless job, overriding the command and providing two arguments:
+##### With a publically available Image
+Example: overriding the command and providing two arguments:
 
-```curl -E ~/.ssl/cadcproxy.pem https://ws-uv.canfar.net/skaha/v0/session -d "name=headless-test" -d "image=images.canfar.net/skaha/terminal:1.1.2" --data-urlencode "cmd=touch" --data-urlencode "args=/arc/home/majorb/headless-test-1a /arc/home/majorb/headless-test-1b"```
+```sh
+curl -E ~/.ssl/cadcproxy.pem https://ws-uv.canfar.net/skaha/v0/session -d "name=headless-test" -d "image=images.canfar.net/skaha/terminal:1.1.2" --data-urlencode "cmd=touch" --data-urlencode "args=/arc/home/majorb/headless-test-1a /arc/home/majorb/headless-test-1b"
+```
 
-skaha will return the `sessionID` on a successful post (job launch).  The job will remain in the system for 1 hour after completion (success or failure).
+##### With a private Image
+Example: overriding the command and providing two arguments:
+
+1. Obtain your Image Registry secret.
+    1. Login to the [Harbor Image Registry](https://images.canfar.net)
+    1. In the top right, click on your Username, then click on `User Profile`.
+    1. At the bottom of the `User Profile` modal dialog, there is a `CLI secret` field.  Click on the `Copy` icon to copy your secret into the clipboard.  
+    ![CLI Secret Field](./cli-secret-field.png)
+1. With the CLI secret in your clipboard, create a string with your username and secret, separated by a colon (`:`), and Base64 Encode it:
+```sh
+ENCODED_HEADER=`echo -n "myusername:my-super-secret" | base64 -i -`
+```
+1. Now use that in the session create command:
+```sh
+curl --header "x-skaha-registry-auth: ${ENCODED_HEADER}" -E ~/.ssl/cadcproxy.pem https://ws-uv.canfar.net/skaha/v0/session -d "name=headless-test" -d "image=images.canfar.net/skaha/terminal:1.1.2" --data-urlencode "cmd=touch" --data-urlencode "args=/arc/home/myusername/headless-test-1a /arc/home/myusername/headless-test-1b"
+```
+
+**Note**
+The CLI Secret _may_ need to be periodically refreshed from the Harbor page; simply repeat the process from 1.1 above.
+
+On a successful launch from a public or private image, skaha will return the `sessionID` on a post (job launch).  The job will remain in the system for 1 hour after completion (success or failure).
 
 Job phases:
 - Pending
