@@ -28,7 +28,7 @@ Example: overriding the command and providing two arguments:
     1. Login to the [Harbor Image Registry](https://images.canfar.net)
     1. In the top right, click on your Username, then click on `User Profile`.
     1. At the bottom of the `User Profile` modal dialog, there is a `CLI secret` field.  Click on the `Copy` icon to copy your secret into the clipboard.  
-    ![CLI Secret Field](./cli-secret-field.png)
+    <img src="./cli-secret-field.png" alt="CLI Secret field" />
 1. With the CLI secret in your clipboard, create a string with your username and secret, separated by a colon (`:`), and Base64 Encode it:
 ```sh
 ENCODED_HEADER=`echo -n "myusername:my-secret" | base64 -i -`
