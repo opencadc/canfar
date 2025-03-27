@@ -68,7 +68,7 @@ Groups and their memberships can be managed through the CANFAR groups web interf
 
 Once created, groups can be assigned to files and directories in arc storage directly from their interactive sessions, or through the [CANFAR storage](https://www.canfar.net/storage/arc/list)
 
-For more details on setting access permissions, see the documentation on [file permissions](complete/permissions/)
+For more details on setting access permissions, see the documentation on [file permissions](permissions/)
 
 ## Programmatic Access
 
