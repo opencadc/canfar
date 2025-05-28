@@ -1,89 +1,93 @@
-# Official CANFAR Science Platform Documentation
+# CANFAR Science Platform Documentation
 
-## Introduction and Access
+**Cloud-based astronomy data analysis platform with interactive computing and shared storage**
 
-The CANFAR Science Platform consists of set of services and resources to enable cloud-based astronomy data analysis.  Browser-based access to CANFAR's cloud computing layer is provided via authorized access to the [CANFAR Portal](https://www.canfar.net). A Canadian Astronomy Data Centre (CADC) account that has been authorized to use the Portal is required.
+---
 
-Please acknowledge the CANFAR Science Portal in any resulting publications with the following: The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform. Our work used the facilities of the Canadian Astronomy Data Center, operated by the National Research Council of Canada with the support of the Canadian Space Agency, and CANFAR, a consortium that serves the data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research [(Gaudet et al. 2010)](https://ui.adsabs.harvard.edu/abs/2010SPIE.7740E..1IG/abstract).
+## 🚀 Quick Start
 
-- To request a CADC Account:  https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html
-- Authorization to access the CANFAR Portal:
+=== "New to CANFAR"
+    **Get started in 3 steps:**
+    
+    1. **[Get Access →](../getting-started/access.md)** - Request account & authorization
+    2. **[First Login →](../getting-started/first-login.md)** - Access the portal 
+    3. **[Launch Session →](../general/NewUser/LaunchNotebook.md)** - Start with Jupyter
+    
+    ⏱️ **Total time: ~10 minutes** (after account approval)
 
-    * If the project you are using the resource for is part of a collaboration already using the CANFAR Science Portal, ask the administrator of the collaboration you belong to add you as a member of the collaborations access group using the [CADC Group Management Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
-    * If your project is not part of an authorized collaboration, the collaboration lead will need to request access by sending an email to [support@canfar.net](mailto:support@canfar.net) specifying they are requesting access to the CANFAR Science Portal, the scale of resources needed (storage and cores of compute) and a short (few line) resource justification.  Canadian research collaborations are encouraged to apply for CANFAR Science Portal authorization.
+=== "Returning User"
+    **Quick links:**
+    
+    - **[🌐 CANFAR Portal](https://www.canfar.net)** - Launch sessions
+    - **[📁 File Manager](https://www.canfar.net/storage/arc/list)** - Access storage
+    - **[👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage permissions
+    - **[❓ FAQ](../help/faq.md)** - Common issues
 
-The CANFAR Science Portal runs software packaged in [containers](https://www.docker.com/resources/what-container/). The portal allows users to run both pre-built, shared containers or private, custom containers. Authorized collaboration members can publish container images to the [CANFAR Container Images Registry](https://images.canfar.net).  We have specific documentation on how to [build and publish](complete/containers) containers capable of being launched within the CANFAR Science Portal.
+---
 
-The CANFAR Science Platform supports both launching interactive sessions (via the Portal) and non-interactive ones (using cURL or a dedicated Python module). More detailed documentation on launching a computing session on the CANFAR Science Portal can be found [here](https://canfar-scienceportal.readthedocs.io/en/latest/). 
+## What is CANFAR?
 
-## Interactive Sessions
+CANFAR provides **cloud-based astronomy computing** with:
 
-Interactive sessions are applications running on the CANFAR cloud infrastructure and are accessed via a web browser, allowing users to interact with the (typically large) datasets hosted on CANFAR Science Platform storage. There are a few types of Interactive Sessions that cab be launched through the portal:
+- 🖥️ **Interactive sessions** (Jupyter, CARTA, Desktop)
+- 💾 **Shared storage** for datasets and collaboration  
+- 🐳 **Pre-built containers** with astronomy software
+- 🔧 **Custom container support** for specialized workflows
 
-### Notebooks
-Notebooks are using the Jupyter Lab interface.
+---
 
-### CARTA 
-[CARTA](https://cartavis.org/) (Cube Analysis and Rendering Tool for Astronomy) is an astronomy visualization tool that will run natively in the browser. It can read FITS or HDF5 files, often used in radio astronomy, but not only.
+## Choose Your Path
 
-### Desktop
+### 🌱 New Users
+Never used CANFAR before? Follow our structured learning path:
 
-An X11-desktop session that enables running applications in the Science Platform, a browser Desktop session can be launched.
+| Step | What you'll learn | Time |
+|------|------------------|------|
+| **[Quick Start](../getting-started/access.md)** | Get account & first session | 10 min |
+| **[Core Concepts](../storage-systems-guide.md)** | Storage, containers, projects | 15 min |
+| **[Data Management](../data-transfer-guide.md)** | Upload, download, organize files | 20 min |
+| **[Interactive Sessions](../general/NewUser/LaunchNotebook.md)** | Use Jupyter, CARTA, Desktop | 30 min |
 
-- Desktop documentation and tutorials are described in more detail in the [User Documentation](https://canfar-scienceportal.readthedocs.io/en/latest/NewUser/LaunchDesktop.html)
-- Launching a CASA window in the Desktop YouTube tutorial:  [YouTube Tutorial](https://youtu.be/GDDQ3jKbldU)
+### 🔬 Scientists & Researchers
 
-### Contributed
+Ready to analyze data? Jump to your workflow:
 
-Contributed sessions are user-customised web applications, typically not maintained by CANFAR. This can be anything, such as a [VSCode server](https://github.com/coder/code-server) and [Pluto notebook](https://plutojl.org/) for the Julia language. 
+- **[🔭 Radio Astronomy](../tutorials/radio-astronomy.md)** - CARTA, CASA workflows
+- **[📊 Data Analysis](../tutorials/data-analysis.md)** - Jupyter notebooks, Python  
+- **[🖥️ Desktop Applications](../general/NewUser/LaunchDesktop.md)** - GUI tools, CASA, DS9
+- **[📁 Advanced Data Transfer](../data-transfer-guide.md)** - Command line, automation
 
-Please refer to the [container documentation](complete/containers/) for more information on building contributed sessions.
+### ⚡ Advanced Users
 
-## Batch Jobs
+Looking for development and automation?
 
-Currently, the CANFAR Science Platform has a limited capacity for batch processing.  Batch processing can be understood  as a non-interactive executable launched on a container whose output is not attached to a display (headless). Please contact [support@canfar.net](mailto:support@canfar.net) before making use of the headless job support -- we are incrementally adding support for batch processing in the science platform. See the specific [documentation](complete/headless/). This is still experimental and the API may change.
+- **[🐳 Container Building](../container-building-guide.md)** - Create custom containers
+- **[⚙️ Headless Execution](../headless-execution-guide.md)** - Batch jobs, automation
+- **[🔌 API Access](../advanced/api.md)** - Programmatic control
+- **[🔐 Administration](../advanced/permissions.md)** - User management, infrastructure
 
-## Storage
+---
 
-All sessions and applications accessed through the Science Platform (interactive and batch) share a common storage system in the directory `/arc`. The primary folder/directories `/arc/home` and `/arc/projects`.  `/arc/home/${USERNAME}` contains a user's environment initializations details and personal information that might not be shared with collaboration members. `/arc/projects/${GROUP_NAME}` holds the data that the given group will be processing and the outputs of that processing. CANFAR encourages the use of `/arc/projects` for most data, and `/arc/home` for personalized configuration and software.  By default a user's `/arc/home/${USER}` folder is not readable by others on the platform.
+## Need Help?
 
-An efficient and convenient way to access the `arc` storage outside the Science Platform is through `sshfs`. Here is the [documentation](https://canfar-scienceportal.readthedocs.io/en/latest/General_tools/Using_sshfs.html).
+### 🆘 Quick Support
 
-In addition to `sshfs` mentioned above, the `arc` storage is also accessible via an API that is exposed:
+- **[❓ FAQ](../help/faq.md)** - Common questions answered
+- **[💬 Community Chat](https://cadc.slack.com/archives/C01K60U5Q87)** - Slack channel
+- **[📧 Email Support](mailto:support@canfar.net)** - Direct help
 
-- Using the CANFAR storage management interface: https://www.canfar.net/storage/arc/list
-- Using the [VOSpace Python libraries](https://github.com/opencadc/vostools/tree/master/vos)
-- Using the `/arc/files` URL endpoint [documentation](https://ws-uv.canfar.net/arc)
+### 🐛 Report Issues
 
+- **[Platform Issues](https://github.com/opencadc/science-platform/issues)** - Infrastructure bugs
+- **[Container Issues](https://github.com/opencadc/science-containers/issues)** - Software containers
 
-More detailed instructions on data transfer options are documented here: [here](https://canfar-scienceportal.readthedocs.io/en/latest/General_tools/File_transfers.html)
+---
 
-Please take care to protect sensitive information by ensuring it is not publicly accessible.  File access control on `arc` is described in the next section.
+## Citation
 
-## Groups and Permissions
+Please acknowledge CANFAR in publications:
 
-Projects are encouraged to use groups to manage access to resources, including files and directories/folders in the `arc` project storage, mounted at `/arc/projects` in every session.
+!!! quote "Citation"
+    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform. Our work used the facilities of the Canadian Astronomy Data Center, operated by the National Research Council of Canada with the support of the Canadian Space Agency, and CANFAR, a consortium that serves the data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research [(Gaudet et al. 2010)](https://ui.adsabs.harvard.edu/abs/2010SPIE.7740E..1IG/abstract). collaboration, the collaboration lead will need to request access by sending an email to [support@canfar.net](mailto:support@canfar.net) specifying they are requesting access to the CANFAR Science Portal, the scale of resources needed (storage and cores of compute) and a short (few line) resource justification.  Canadian research collaborations are encouraged to apply for CANFAR Science Portal authorization.
 
-Groups and their memberships can be managed through the CANFAR groups web interface, here: https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/
-
-Once created, groups can be assigned to files and directories in arc storage directly from their interactive sessions, or through the [CANFAR storage](https://www.canfar.net/storage/arc/list)
-
-For more details on setting access permissions, see the documentation on [file permissions](permissions/)
-
-## Programmatic Access
-
-Session launching and management are through the `skaha` service. The `skaha` API definition and science platform service are here:  https://ws-uv.canfar.net/skaha
-
-## Community and Support
-
-Discussions of issues and platform features take place in the Science Platform Slack channel: [Science Platform Slack Channel](https://cadc.slack.com/archives/C01K60U5Q87)
-
-To report bugs and request new features, please use our GitHub pages: 
-- For the infrastructure and session, https://github.com/opencadc/science-platform/issues
-- For the containers: https://github.com/opencadc/science-containers/issues
-
-Contributions to the platform (including updates or corrections to the documentation) can be submitted as pull requests to this GitHub repository. We especially encourage science containers to be shared across the user community by making your published containers public.
-
-General inquiries can be made to [support@canfar.net](mailto:support@canfar.net), and take a look at our [FAQ](complete/faq/).
-
-![CANFAR](https://www.canfar.net/css/images/logo.png){ height="200" }
+![CANFAR](https://www.canfar.net/css/images/logo.png){ height="100" }
