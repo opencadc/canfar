@@ -1,5 +1,12 @@
 # CANFAR Storage Systems Guide
 
+> **📚 Related Guides:**
+>
+> - [Complete Data Transfer Methods →](data-transfer-guide.md) - How to move files to/from each storage system
+> - [Container Building Guide →](container-building-guide.md) - Storage access in custom containers
+> - [Headless Execution Guide →](headless-execution-guide.md) - Storage usage in batch processing
+> - [Getting Started: Choose Interface →](getting-started/choose-interface.md) - Interface overview
+
 ## 📊 Storage Types Comparison
 
 CANFAR provides different storage systems optimized for different use cases:
@@ -93,7 +100,7 @@ cp -r processed/ /arc/projects/myproject/results/
 - Compliance with data sharing requirements
 
 **Access methods:**
-- Web interface: https://www.canfar.net/storage/vault/
+- Web interface: <https://www.canfar.net/storage/vault/>
 - Command line: `vcp`, `vls`, `vmkdir` tools
 - From sessions: Limited (use for final uploads)
 
@@ -214,7 +221,10 @@ pwd
 
 ---
 
-**Next Steps:**
-- [Learn about data transfer methods →](data-transfer-guide.md)
-- [Set up your project structure →](general/NewUser/ProjectSpace.md)
-- [Share data with collaborators →](general/General_tools/Group_management.md)
+**Related Documentation:**
+
+- [Complete Data Transfer Guide](data-transfer-guide.md) - All methods to move data to/from storage systems
+- [Container Building Guide](container-building-guide.md) - Storage access patterns in custom containers  
+- [Headless Execution Guide](headless-execution-guide.md) - Storage usage in batch processing workflows
+- [Getting Started: Choose Interface](getting-started/choose-interface.md) - Interface overview for new users
+- [Project Space Management](general/NewUser/project-space.md) - Setting up collaborative project storage

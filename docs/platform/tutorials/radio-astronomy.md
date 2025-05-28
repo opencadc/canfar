@@ -7,7 +7,7 @@ Complete guides for radio astronomy data analysis on CANFAR.
 **CARTA** (Cube Analysis and Rendering Tool for Astronomy) is perfect for visualizing and analyzing radio astronomy data.
 
 ### Quick Start
-1. [Launch CARTA](../general/NewUser/LaunchCARTA.md) from the portal
+1. [Launch CARTA](../general/NewUser/launch-carta.md) from the portal
 2. Load your FITS files from `/arc/projects/your-group/data/`
 3. Use the built-in analysis tools for measurements
 
@@ -17,7 +17,7 @@ Complete guides for radio astronomy data analysis on CANFAR.
 - **Image comparison**: Compare observations at different frequencies
 - **Region analysis**: Define and analyze specific sky regions
 
-[**→ Detailed CARTA Tutorial**](../general/NewUser/LaunchCARTA.md){ .md-button }
+[**→ Detailed CARTA Tutorial**](../general/NewUser/launch-carta.md){ .md-button }
 
 ---
 
@@ -26,18 +26,18 @@ Complete guides for radio astronomy data analysis on CANFAR.
 **CASA** (Common Astronomy Software Applications) runs in the desktop environment for complete interferometry data reduction.
 
 ### Getting Started
-1. [Launch Desktop](../general/NewUser/LaunchDesktop.md) from the portal
+1. [Launch Desktop](../general/NewUser/launch-desktop.md) from the portal
 2. Open CASA from the applications menu
 3. Access your data in `/arc/projects/your-group/`
 
 ### Complete ALMA Workflows
 CANFAR has specialized tutorials for ALMA data reduction:
 
-- **[Starting CASA](../general/ALMA_Desktop/start_casa.md)** - Basic setup and configuration
-- **[Archive Downloads](../general/ALMA_Desktop/archive_download.md)** - Getting data from ALMA archive  
-- **[Script Downloads](../general/ALMA_Desktop/archive_script_download.md)** - Automated data retrieval
-- **[Image Reduction](../general/ALMA_Desktop/typical_reduction.md)** - Complete reduction example
-- **[CASA Container Notes](../general/ALMA_Desktop/casa_containers.md)** - Known issues and features
+- **[Starting CASA](../general/ALMA_Desktop/start-casa.md)** - Basic setup and configuration
+- **[Archive Downloads](../general/ALMA_Desktop/archive-download.md)** - Getting data from ALMA archive  
+- **[Script Downloads](../general/ALMA_Desktop/archive-script-download.md)** - Automated data retrieval
+- **[Image Reduction](../general/ALMA_Desktop/typical-reduction.md)** - Complete reduction example
+- **[CASA Container Notes](../general/ALMA_Desktop/casa-containers.md)** - Known issues and features
 
 ### 📹 Video Tutorial
 [**CASA Desktop Tutorial**](https://youtu.be/GDDQ3jKbldU) - YouTube walkthrough of launching CASA
@@ -84,7 +84,7 @@ cd /arc/projects/your-group/data/
 - **Latest CARTA**: Automatically updated container
 - **Stable CARTA**: Fixed version for reproducible analysis
 
-[**→ Container Details**](../complete/science-containers.md){ .md-button }
+[**→ Container Details**](../complete/available-containers.md){ .md-button }
 
 ---
 
@@ -112,7 +112,7 @@ cd /arc/projects/your-group/data/
 ### Common Issues
 - **Memory errors**: Try using fewer cores or smaller image chunks
 - **Slow performance**: Check if data is in `/arc/projects` (faster access)
-- **CASA crashes**: See [container notes](../general/ALMA_Desktop/casa_containers.md) for known issues
+- **CASA crashes**: See [container notes](../general/ALMA_Desktop/casa-containers.md) for known issues
 
 ### Community
 Join the CANFAR Slack for:

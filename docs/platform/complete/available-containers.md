@@ -28,7 +28,7 @@ astroml-desktop  (desktop-app)
 There are CUDA-enabled versions of the containers, which include NVIDIA software and CUDA-powered libraries. They are built and named as `*-gpu`, i.e. `astroml-gpu`, `astroml-gpu-notebook`.
 
 ## CANFAR User Customised Container
-If you want to build your own containers, documentation can be found in the [docs directory](docs).
+If you want to build your own containers, documentation can be found in the [container building guide](../container-building-guide.md).
 This directory also contains the building of the [CANFAR usage documentation](https://canfar-scienceportal.readthedocs.io/en/latest/) in the readthedocs style.
 
 ## TODO

@@ -1,5 +1,12 @@
 # Complete Data Transfer Guide
 
+> **📚 Related Guides:**
+>
+> - [Storage Systems Overview →](storage-systems-guide.md) - Understand ARC, Scratch, and VOSpace differences
+> - [Container Building Guide →](container-building-guide.md) - Data access in custom containers
+> - [Headless Execution Guide →](headless-execution-guide.md) - Automated data processing workflows
+> - [SSH File System Guide →](general/General_tools/sshfs-setup.md) - Detailed sshfs setup
+
 ## 🎯 Choose Your Method
 
 Different transfer methods work best for different scenarios:
@@ -15,7 +22,7 @@ Different transfer methods work best for different scenarios:
 ## 🌐 Web Interface (Easiest)
 
 ### CANFAR File Manager
-Access at: https://www.canfar.net/storage/arc/list
+Access at: <https://www.canfar.net/storage/arc/list>
 
 **Upload Files:**
 1. Navigate to your target directory
@@ -415,13 +422,15 @@ ls -la /arc/projects/yourproject/
 ```
 
 ### Getting Help
+
 - **Transfer issues**: [support@canfar.net](mailto:support@canfar.net)
 - **Performance questions**: [Slack #canfar-support](https://cadc.slack.com/archives/C01K60U5Q87)
 - **Authentication problems**: Check [CADC documentation](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/)
 
----
+## Related Documentation
 
-**Related Guides:**
-- [Storage Systems Overview →](storage-systems-guide.md)
-- [SSH File System (sshfs) →](general/General_tools/Using_sshfs.md)
-- [Batch Processing & Automation →](advanced/batch.md)
+- **[Storage Systems Guide →](storage-systems-guide.md)** - Understand ARC, Scratch, and VOSpace differences and choose the right storage strategy
+- **[Container Building Guide →](container-building-guide.md)** - Create custom containers with optimized data access patterns
+- **[Headless Execution Guide →](headless-execution-guide.md)** - Automate data processing with batch jobs and API calls
+- **[SSH Access Guide →](getting-started/access.md)** - Set up secure shell connections for command-line transfers
+- **[Getting Started →](getting-started/first-login.md)** - Basic CANFAR account setup and interface introduction

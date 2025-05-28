@@ -10,7 +10,7 @@ Comprehensive guide to data analysis workflows using Jupyter notebooks on CANFAR
 3. Choose your preferred container (Python, R, or multi-language)
 4. Wait ~30 seconds for startup
 
-[**→ Detailed Launch Guide**](../general/NewUser/LaunchNotebook.md){ .md-button }
+[**→ Detailed Launch Guide**](../general/NewUser/launch-notebook.md){ .md-button }
 
 ---
 
@@ -230,10 +230,10 @@ Observations.download_products(data_products,
 
 ### Moving Results Out
 - **Small files**: Download directly from the notebook interface
-- **Large datasets**: Use [file transfer tools](../general/General_tools/File_transfers.md)
+- **Large datasets**: Use [file transfer tools](../data-transfer-guide.md)
 - **Plots and tables**: Use the web file manager
 
-[**→ Complete File Transfer Guide**](../general/General_tools/File_transfers.md){ .md-button }
+[**→ Complete Data Transfer Guide**](../data-transfer-guide.md){ .md-button }
 
 ---
 

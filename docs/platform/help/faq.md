@@ -66,10 +66,10 @@ df -h /arc/projects/your-group
 
 ### How do I transfer large datasets?
 - **Small files** (<100MB): Upload via browser or notebook interface
-- **Large files**: Use [sshfs](../general/General_tools/Using_sshfs.md) or [vostools](../general/General_tools/Using_vostools.md)
+- **Large files**: Use [sshfs](../general/General_tools/sshfs-setup.md) or [vostools](../general/General_tools/vospace-tools.md)
 - **Archives**: Download directly to `/arc/projects` from within sessions
 
-[**→ Complete file transfer guide**](../general/General_tools/File_transfers.md)
+[**→ Complete data transfer guide**](../data-transfer-guide.md)
 
 ### My files disappeared!
 Files in `/arc` are persistent and backed up. If you can't find files:
@@ -145,7 +145,7 @@ Yes, but be careful with sensitive data. Use the [storage interface](https://www
 - **CARTA**: Radio astronomy image viewer
 - **Custom**: Build your own containers for specialized software
 
-[**→ Complete software list**](../complete/science-containers.md)
+[**→ Complete software list**](../complete/available-containers.md)
 
 ### Can I use my own software?
 Yes! You can:
@@ -183,7 +183,7 @@ needs of university groups and centers engaged in astronomy research
 ### Can I run jobs without a GUI (headless)?
 Yes, but with limitations. Contact [support@canfar.net](mailto:support@canfar.net) before using batch processing.
 
-[**→ Headless job documentation**](../complete/headless.md)
+[**→ Headless Execution Guide**](../headless-execution-guide.md)
 
 ---
 

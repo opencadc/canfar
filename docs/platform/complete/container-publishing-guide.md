@@ -16,7 +16,7 @@ The only requirement for containers builds is that they must be based on a stand
 
 ### Additional requirements for legacy desktop application containers
 Examples of legacy desktop software containers are astronomy GUIs such as CASA, Topcat, Aladin, and customized containers such as Gemini processing containers which require desktop interaction. 
-Some of the recipes (Dockerfiles) for building these containers can be found in the [desktop directory](desktop).  They can also be managed and hosted elsewhere. However, wherever the source is hosted, containers must meet a minimal set of requirements and expectations for execution in skaha.
+Some of the recipes (Dockerfiles) for building these containers can be found in the [desktop Dockerfiles](../science-containers/Dockerfiles/desktop/).  They can also be managed and hosted elsewhere. However, wherever the source is hosted, containers must meet a minimal set of requirements and expectations for execution in skaha.
 Also the default executuable is `xterm`, so ensure it is installed.
 
 Note: the desktop session is also sometimes known as the ARCADE software environment.
@@ -137,7 +137,7 @@ If non-default values for cores and/or ram is preferred, the parameters `-d core
 If this is the first time this image has been launched in may take a few minutes for the cloud do retrieve the image from harbor and send it to the selected node.
 
 ### Software containers
-It should just run as is. See also [headless containers](HEADLESS.md).
+It should just run as is. See also the [headless execution guide](../headless-execution-guide.md).
 
 ### Legacy desktop application containers
 

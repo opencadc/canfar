@@ -1,5 +1,12 @@
 # Container Building Guide
 
+> **📚 Related Guides:**
+>
+> - [Storage Systems Guide →](storage-systems-guide.md) - Understanding container data access patterns
+> - [Headless Execution Guide →](headless-execution-guide.md) - Running containers in batch mode
+> - [Data Transfer Guide →](data-transfer-guide.md) - Moving data for container development
+> - [Choose Your Interface →](getting-started/choose-interface.md) - Understanding container session types
+
 This guide covers how to build different types of containers for the CANFAR Science Platform, including notebooks, desktop applications, and headless containers.
 
 ## Container Types Overview
@@ -7,22 +14,42 @@ This guide covers how to build different types of containers for the CANFAR Scie
 The CANFAR Science Platform supports three main container types:
 
 ### 1. Notebook Containers
+
 - **Purpose**: Interactive Jupyter environments for data analysis
 - **Base Images**: Typically based on `jupyter/scipy-notebook` or similar
 - **Access**: Through web browser as native HTML5 applications
-- **Requirements**: Must have `jupyter lab` executable
+- **Requirements**: Must have `jupyter lab` executable available
 
-### 2. Desktop-App Containers  
+### 2. Desktop-App Containers
+
 - **Purpose**: GUI applications requiring X11 display
 - **Base Images**: Desktop environments with VNC support
 - **Access**: Through VNC client or web-based noVNC interface
 - **Requirements**: X11 support, VNC server, default executable is `xterm`
+- **Note**: Desktop-app containers are launched within desktop sessions
 
 ### 3. Headless Containers
+
 - **Purpose**: Batch processing and automation without GUI
 - **Base Images**: Any Linux distribution
 - **Access**: Command-line execution, no interactive interface
 - **Requirements**: Must be labeled as `headless` in Harbor registry
+
+### 4. Contributed Containers
+
+- **Purpose**: Community-developed tools and specialized applications
+- **Base Images**: Various, depending on the tool
+- **Access**: Through the Science Portal contributed session type
+- **Requirements**: Web interface typically on port 5000
+
+!!! info "CANFAR Team Supported Applications"
+    The CANFAR team actively supports and maintains:
+    
+    - **Desktop Sessions** (full Linux desktop environment with VNC)
+    - **CARTA** (radio astronomy visualization tool)
+    - **Firefly** (astronomical image and catalog viewer)
+    
+    Desktop-app containers (individual GUI applications) are contributed by the community.
 
 ## Universal Requirements
 
@@ -31,7 +58,7 @@ All CANFAR containers must meet these minimum requirements:
 - **Architecture**: Linux x86_64 distribution
 - **User Context**: Containers run as the CADC user, never as root
 - **Runtime Root**: If root access needed, configure sudo for specific actions during build
-- **File System**: `/arc` filesystem automatically mounted for data access
+- **File System**: `/arc` filesystem automatically mounted for data access (see [Storage Systems Guide](storage-systems-guide.md))
 
 ## Building Notebook Containers
 
@@ -242,8 +269,9 @@ CMD ["/bin/bash"]
 - **Stateless**: Design for single-use execution
 - **Logging**: Write output to stdout/stderr for monitoring
 - **Exit Codes**: Return proper exit codes (0 for success, non-zero for failure)
-- **File Handling**: Read from/write to `/arc` filesystem paths
+- **File Handling**: Read from/write to `/arc` filesystem paths (see [Storage Guide](storage-systems-guide.md))
 - **Environment**: Check for required environment variables
+- **Scratch Usage**: Use `/scratch/` for temporary high-speed processing (see [Headless Execution Guide](headless-execution-guide.md))
 
 ### Example Processing Script
 
@@ -276,6 +304,7 @@ exit 0
 ### Startup Scripts
 
 #### `/skaha/init.sh` (Non-blocking)
+
 For containers needing runtime initialization:
 
 ```bash
@@ -297,6 +326,7 @@ fi
 ```
 
 #### `/skaha/startup.sh` (Environment Setup)
+
 For containers needing environment setup before execution:
 
 ```bash
@@ -316,22 +346,26 @@ exec "$@"
 ### Local Testing
 
 1. **Build the container**:
+
    ```bash
    docker build -t my-container:test .
    ```
 
 2. **Test notebook containers**:
+
    ```bash
    docker run -p 8888:8888 my-container:test
    ```
 
 3. **Test desktop containers**:
+
    ```bash
    docker run -p 6901:6901 my-container:test
    # Access via http://localhost:6901/?password=vncpassword
    ```
 
 4. **Test headless containers**:
+
    ```bash
    docker run -it my-container:test /bin/bash
    ```
@@ -339,43 +373,51 @@ exec "$@"
 ### Publishing to Harbor
 
 1. **Tag for Harbor**:
+
    ```bash
    docker tag my-container:test images.canfar.net/myproject/my-container:1.0
    ```
 
 2. **Login to Harbor**:
+
    ```bash
    docker login images.canfar.net
    ```
 
 3. **Push to registry**:
+
    ```bash
    docker push images.canfar.net/myproject/my-container:1.0
    ```
 
 4. **Label in Harbor UI**:
-   - Go to https://images.canfar.net
+
+   - Go to <https://images.canfar.net>
    - Navigate to your image
    - Add appropriate labels: `notebook`, `desktop-app`, or `headless`
 
 ## Common Issues and Troubleshooting
 
 ### Permission Issues
+
 - Ensure containers don't run as root
 - Use proper file permissions for `/skaha` scripts
 - Configure sudo only for specific operations
 
 ### Environment Variables
+
 - Don't hardcode paths - use environment variables
 - Check for required variables in startup scripts
 - Use `/arc` paths for persistent data
 
 ### Resource Management
+
 - Don't include unnecessary packages to keep images small
 - Clean package caches and temporary files
 - Use multi-stage builds when appropriate
 
 ### VNC Configuration
+
 - Test VNC connectivity before publishing
 - Ensure proper display resolution settings
 - Verify noVNC web interface works
@@ -383,6 +425,7 @@ exec "$@"
 ## Advanced Topics
 
 ### Multi-Stage Builds
+
 For complex applications with large build dependencies:
 
 ```dockerfile
@@ -399,6 +442,7 @@ COPY --from=builder /build/bin/* /usr/local/bin/
 ```
 
 ### Custom Base Images
+
 Create reusable base images for your organization:
 
 ```dockerfile
@@ -411,9 +455,20 @@ RUN echo "Set disable_coredump false" > /etc/sudo.conf
 ```
 
 ### Performance Optimization
+
 - Use BuildKit for faster builds
 - Leverage Docker layer caching
 - Minimize layer count where possible
 - Use specific package versions for reproducibility
 
 This guide provides the foundation for building all types of containers for the CANFAR Science Platform. Always test thoroughly before publishing to ensure compatibility with the platform infrastructure.
+
+---
+
+**Related Documentation:**
+
+- [Headless Execution Guide](headless-execution-guide.md) - Run your custom containers in batch mode
+- [Storage Systems Guide](storage-systems-guide.md) - Optimize container data access patterns  
+- [Data Transfer Guide](data-transfer-guide.md) - Move data for container development and testing
+- [Harbor Registry Documentation](https://goharbor.io/docs/) - Container registry management
+- [Dockerfile Best Practices](https://docs.docker.com/develop/dev-best-practices/) - Docker official guidelines

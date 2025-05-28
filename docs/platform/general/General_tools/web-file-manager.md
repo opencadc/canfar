@@ -6,7 +6,7 @@ upload or download files via a web interface (at the links given). This
 page provides a quick tutorial on how to use the web interface, which is
 nearly identical for both systems. Note that for the Science Portal,
 users can alternatively upload or download files using direct URLs as
-outlined [here](/science-containers/general/TipsTricks/Direct_url).
+outlined [here](../TipsTricks/direct-url.md).
 
 ## Upload File(s)
 
@@ -64,7 +64,7 @@ by:
     cadc-get-cert -u [username]
 
 and entering your password at the prompt. You will need to have
-installed the [VOStools](/science-containers/general/General_tools/Using_vostools) package
+installed the [VOStools](vospace-tools.md) package
 for this step. The command will generate a file called
 `~/.ssl/cadcproxy.pem` which contains the security certificate
 information. This certificate is valid for 10 days, so if you have

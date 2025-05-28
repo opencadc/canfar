@@ -7,7 +7,7 @@ Comprehensive guide to using desktop applications and specialized astronomy soft
 The CANFAR desktop provides a full Linux environment accessible through your web browser, with pre-installed astronomy software and the ability to run GUI applications.
 
 ### Quick Start
-1. [Launch Desktop](../general/NewUser/LaunchDesktop.md) from the portal
+1. [Launch Desktop](../general/NewUser/launch-desktop.md) from the portal
 2. Wait ~60 seconds for the desktop to load
 3. Access applications through the desktop menu or command line
 
@@ -25,9 +25,9 @@ The CANFAR desktop provides a full Linux environment accessible through your web
 - CASA 6.1-6.2 (legacy support)
 
 **Getting started**:
-1. [Launch Desktop session](../general/NewUser/LaunchDesktop.md)
-2. [Start CASA](../general/ALMA_Desktop/start_casa.md)
-3. Follow [ALMA tutorials](../general/ALMA_Desktop/typical_reduction.md)
+1. [Launch Desktop session](../general/NewUser/launch-desktop.md)
+2. [Start CASA](../general/ALMA_Desktop/start-casa.md)
+3. Follow [ALMA tutorials](../general/ALMA_Desktop/typical-reduction.md)
 
 📹 **Video tutorial**: [CASA Desktop Walkthrough](https://youtu.be/GDDQ3jKbldU)
 
@@ -296,8 +296,8 @@ df -h
 - Use command-line versions when possible
 
 ### Getting Help
-- **Desktop issues**: [Desktop documentation](../general/NewUser/LaunchDesktop.md)
-- **CASA problems**: [CASA container notes](../general/ALMA_Desktop/casa_containers.md)
+- **Desktop issues**: [Desktop documentation](../general/NewUser/launch-desktop.md)
+- **CASA problems**: [CASA container notes](../general/ALMA_Desktop/casa-containers.md)
 - **General support**: [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
 
 ---

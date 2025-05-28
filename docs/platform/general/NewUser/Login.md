@@ -9,7 +9,7 @@ To request authorization to use the Science Portal, send an email to
 
 -   *Project space*: If you intend to work on a dataset with
     collaborators, it is recommended that you set up a
-    [project space](/science-containers/general/NewUser/ProjectSpace), where a
+    [project space](project-space.md), where a
     designated group of users all has common access to the files
     contained within it. You will need to supply a project name and
     estimated space requirement to the email address above.
@@ -43,6 +43,6 @@ remaining menu items.
 See the following pages for the subsequent steps. Note that you can have
 at most three active sessions of any type.
 
-> - [Desktop](/science-containers/general/NewUser/LaunchDesktop)
-> - [CARTA](/science-containers/general/NewUser/LaunchCARTA)
-> - [Notebook](/science-containers/general/NewUser/LaunchNotebook)
+> - [Desktop](launch-desktop.md)
+> - [CARTA](launch-carta.md)
+> - [Notebook](launch-notebook.md)

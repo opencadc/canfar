@@ -310,5 +310,5 @@ Browse [published containers](https://images.canfar.net) for inspiration and reu
 
 ### Documentation
 - **Docker best practices**: [Docker documentation](https://docs.docker.com/develop/dev-best-practices/)
-- **CANFAR specifics**: [Complete container guide](../complete/publishing.md)
+- **CANFAR specifics**: [Complete container guide](../complete/container-publishing-guide.md)
 - **Platform updates**: [Science platform repository](https://github.com/opencadc/science-platform)

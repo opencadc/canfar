@@ -1,7 +1,7 @@
 # Starting CASA 
 
 Once you have
-[launched a Desktop session](/science-containers/general/NewUser/LaunchDesktop/), it is straightforward to run CASA in a terminal.
+[launched a Desktop session](../NewUser/launch-desktop.md), it is straightforward to run CASA in a terminal.
 
 > ![image](images/start_casa/1_new_desktop.png)
 
