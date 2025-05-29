@@ -9,9 +9,9 @@
 === "New to CANFAR"
     **Get started in 3 steps:**
     
-    1. **[Get Access →](getting-started/access.md)** - Request account & authorization
-    2. **[First Login →](getting-started/first-login.md)** - Access the portal 
-    3. **[Launch Session →](general/NewUser/launch-notebook.md)** - Start with Jupyter
+    1. **[Get Access →](user-guide/access.md)** - Request account & authorization
+    2. **[First Login →](user-guide/first-login.md)** - Access the portal 
+    3. **[Launch Session →](user-guide/launch-notebook.md)** - Start with Jupyter
     
     ⏱️ **Total time: ~10 minutes** (after account approval)
 
@@ -43,10 +43,10 @@ Never used CANFAR before? Follow our structured learning path:
 
 | Step | What you'll learn | Time |
 |------|------------------|------|
-| **[Quick Start](getting-started/access.md)** | Get account & first session | 10 min |
+| **[Quick Start](user-guide/access.md)** | Get account & first session | 10 min |
 | **[Core Concepts](storage-systems-guide.md)** | Storage, containers, projects | 15 min |
 | **[Data Management](data-transfer-guide.md)** | Upload, download, organize files | 20 min |
-| **[Interactive Sessions](general/NewUser/launch-notebook.md)** | Use Jupyter, CARTA, Firefly, Desktop, otheres | 30 min |
+| **[Interactive Sessions](user-guide/launch-notebook.md)** | Use Jupyter, CARTA, Firefly, Desktop, otheres | 30 min |
 
 ### 🔬 Scientists & Researchers
 
@@ -54,7 +54,7 @@ Ready to analyze data? Jump to your workflow:
 
 - **[🔭 Radio Astronomy](tutorials/radio-astronomy.md)** - CARTA, CASA workflows
 - **[📊 Data Analysis](tutorials/data-analysis.md)** - Jupyter notebooks, Python  
-- **[🖥️ Desktop Applications](general/NewUser/launch-desktop.md)** - GUI tools, CASA, DS9
+- **[🖥️ Desktop Applications](user-guide/launch-desktop.md)** - GUI tools, CASA, DS9
 - **[📁 Advanced Data Transfer](data-transfer-guide.md)** - Command line, automation
 
 ### ⚡ Advanced Users
@@ -63,8 +63,8 @@ Looking for development and automation?
 
 - **[🐳 Container Building](container-building-guide.md)** - Create custom containers
 - **[⚙️ Headless Execution](headless-execution-guide.md)** - Batch jobs, automation
-- **[🔌 API Access](advanced/api.md)** - Programmatic control
-- **[🔐 Administration](advanced/permissions.md)** - User management, infrastructure
+- **[🔌 API Access](developer-guide/api.md)** - Programmatic control
+- **[🔐 Administration](developer-guide/permissions.md)** - User management, infrastructure
 
 ---
 

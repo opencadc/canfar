@@ -9,7 +9,7 @@ Common questions and solutions for using the CANFAR Science Platform.
 2. **Get portal authorization**: Either join an existing collaboration or request new project access
 3. **Login**: Visit [CANFAR Portal](https://www.canfar.net) with your CADC credentials
 
-[**→ Detailed access guide**](../getting-started/access.md)
+[**→ Detailed access guide**](../user-guide/access.md)
 
 ### What's the difference between CADC and CANFAR accounts?
 - **CADC account**: Your basic astronomy data center account (required for everything)
@@ -66,7 +66,7 @@ df -h /arc/projects/your-group
 
 ### How do I transfer large datasets?
 - **Small files** (<100MB): Upload via browser or notebook interface
-- **Large files**: Use [sshfs](../general/General_tools/sshfs-setup.md) or [vostools](../general/General_tools/vospace-tools.md)
+- **Large files**: Use [sshfs](../user-guide/sshfs-setup.md) or [vostools](../user-guide/vospace-tools.md)
 - **Archives**: Download directly to `/arc/projects` from within sessions
 
 [**→ Complete data transfer guide**](../data-transfer-guide.md)
@@ -100,7 +100,7 @@ conda install -c conda-forge package-name
 
 **In desktop**: Use system package managers (apt, yum) - you have sudo access
 
-**For persistent installs**: Consider building a [custom container](../advanced/containers.md)
+**For persistent installs**: Consider building a [custom container](../developer-guide/containers.md)
 
 ### Graphics/GUI applications don't work
 - **Check DISPLAY variable**: Should be set automatically
@@ -145,7 +145,7 @@ Yes, but be careful with sensitive data. Use the [storage interface](https://www
 - **CARTA**: Radio astronomy image viewer
 - **Custom**: Build your own containers for specialized software
 
-[**→ Complete software list**](../complete/available-containers.md)
+[**→ Complete software list**](../reference-material/available-containers.md)
 
 ### Can I use my own software?
 Yes! You can:
@@ -203,7 +203,7 @@ Yes, but with limitations. Contact [support@canfar.net](mailto:support@canfar.ne
 - **Recovery**: Restart the session and check auto-saved files
 
 ### Platform seems down
-1. **Check status**: Monitor [CANFAR Twitter](https://twitter.com/CANFAR_CADC) for updates
+1. **Check connectivity**: Try accessing [CANFAR Portal](https://www.canfar.net) directly
 2. **Try different interface**: If notebooks fail, try desktop
 3. **Community**: Ask in [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
 4. **Report**: Email [support@canfar.net](mailto:support@canfar.net) with details

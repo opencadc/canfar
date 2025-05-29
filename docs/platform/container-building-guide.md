@@ -5,7 +5,7 @@
 > - [Storage Systems Guide →](storage-systems-guide.md) - Understanding container data access patterns
 > - [Headless Execution Guide →](headless-execution-guide.md) - Running containers in batch mode
 > - [Data Transfer Guide →](data-transfer-guide.md) - Moving data for container development
-> - [Choose Your Interface →](getting-started/choose-interface.md) - Understanding container session types
+> - [Choose Your Interface →](user-guide/choose-interface.md) - Understanding container session types
 
 This guide covers how to build different types of containers for the CANFAR Science Platform, including notebooks, desktop applications, and headless containers.
 

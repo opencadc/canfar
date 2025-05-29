@@ -1,323 +1,312 @@
-# Desktop Applications and Software Tools
+# Using Desktop Applications in CANFAR
 
-Comprehensive guide to using desktop applications and specialized astronomy software on CANFAR.
+Guide to running graphical desktop applications in your CANFAR Desktop sessions, from basic tools to specialized astronomy software.
 
-## 🖥️ Desktop Environment Overview
+## 📋 Overview
 
-The CANFAR desktop provides a full Linux environment accessible through your web browser, with pre-installed astronomy software and the ability to run GUI applications.
+CANFAR Desktop sessions provide a full Linux desktop environment with access to a wide range of scientific applications. This tutorial covers how to find, launch, and use desktop applications effectively.
 
-### Quick Start
-1. [Launch Desktop](../general/NewUser/launch-desktop.md) from the portal
-2. Wait ~60 seconds for the desktop to load
-3. Access applications through the desktop menu or command line
+## 🎯 Prerequisites
 
----
+- **Desktop session running** - Follow the [Desktop launch guide](../user-guide/launch-desktop.md)
+- **Basic familiarity** with Linux desktop environments
 
-## 🔭 Astronomy Software
+## 🚀 Available Applications
 
-### CASA (Radio Interferometry)
-**Common Astronomy Software Applications** - the standard tool for radio interferometry data reduction.
+### Core System Applications
 
-**Available versions**:
-- CASA 6.6 (latest stable)
-- CASA 6.5 (previous stable)  
-- CASA 6.4 (for legacy scripts)
-- CASA 6.1-6.2 (legacy support)
+**File Management**:
+- **File Manager** - Browse and organize files
+- **Archive Manager** - Create and extract compressed files
 
-**Getting started**:
-1. [Launch Desktop session](../general/NewUser/launch-desktop.md)
-2. [Start CASA](../general/ALMA_Desktop/start-casa.md)
-3. Follow [ALMA tutorials](../general/ALMA_Desktop/typical-reduction.md)
+**Text Editing**:
+- **Text Editor (gedit)** - Simple text editing
+- **LibreOffice** - Full office suite (Writer, Calc, Impress)
 
-📹 **Video tutorial**: [CASA Desktop Walkthrough](https://youtu.be/GDDQ3jKbldU)
+**Web Browsing**:
+- **Firefox** - Web browser with full internet access
 
-### DS9 (Image Display)
-**SAOImage DS9** - versatile astronomy image display tool.
+**System Tools**:
+- **Terminal** - Command-line interface
+- **System Monitor** - View resource usage
+- **Calculator** - Basic calculations
 
-**Features**:
-- FITS image viewing and analysis
-- Multi-frame support
-- Coordinate systems and overlays
-- Photometry and spectral extraction
-- Integration with Virtual Observatory tools
+### Astronomy Software
 
-**Usage**:
+**Radio Astronomy**:
+- **CASA** - All versions from 3.4.0 to current
+- **ADMIT** - Analysis toolkit for ALMA data
+
+**Optical/IR Astronomy**:
+- **IRAF** - Image Reduction and Analysis Facility
+- **DS9** - Astronomical image viewer
+- **Astropy-based tools** - Python astronomy libraries
+
+**Data Analysis**:
+- **Python IDEs** - Spyder, VS Code
+- **Jupyter Lab** - Interactive notebooks
+- **R/RStudio** - Statistical analysis
+
+## 🖱️ Launching Applications
+
+### Method 1: Applications Menu
+
+1. **Click Applications** - Located in the top-left corner of your desktop
+2. **Browse categories** - Navigate through organized application folders:
+   - **AstroSoftware** - Astronomy-specific applications
+   - **Office** - LibreOffice suite
+   - **Internet** - Firefox and web tools
+   - **Accessories** - Basic utilities
+   - **System Tools** - Administrative applications
+
+3. **Select application** - Click on the desired application to launch
+
+### Method 2: Quick Launch Icons
+
+Common applications have **quick launch icons** on the desktop taskbar:
+- **Terminal** - Command-line access
+- **File Manager** - File browser
+- **Firefox** - Web browser
+- **Text Editor** - Simple text editing
+
+### Method 3: Command Line
+
+Launch applications from a terminal:
+
 ```bash
-# Launch DS9 from desktop terminal
-ds9 /arc/projects/your-group/data/image.fits &
+# Launch graphical applications
+firefox &
+gedit &
+libreoffice &
 
-# Or use from applications menu
+# Launch astronomy software
+ds9 &
+casa &
 ```
 
-### TOPCAT (Table Analysis)
-**Tool for OPerations on Catalogues And Tables** - interactive graphical viewer for tabular data.
+**💡 Tip**: The `&` runs applications in the background, allowing you to continue using the terminal.
 
-**Features**:
-- Large catalog visualization
-- Cross-matching between catalogs
-- Statistical analysis and plotting
-- VO protocol support (TAP, SAMP)
-- Custom expression evaluation
+## 🔬 Astronomy Software Usage
 
-**Usage**:
-- Find TOPCAT in Applications menu
-- Load tables from `/arc/projects/your-group/data/`
-- Connect to VO services for external data
+### CASA (Radio Astronomy)
 
----
+**Multiple versions available**:
+- Navigate: **Applications → AstroSoftware → CASA → [Version]**
+- Choose specific version based on your data requirements
+- See [CASA tutorial](start-casa.md) for detailed instructions
 
-## 🐍 Programming Environments
+### DS9 (Image Viewer)
 
-### Python Development
-The desktop includes multiple Python environments:
-
-**System Python**:
+**Launch DS9**:
 ```bash
-python3 /path/to/your/script.py
+# From terminal
+ds9 &
+
+# Or from Applications → AstroSoftware → DS9
 ```
 
-**Conda environments**:
+**Basic usage**:
+- **Load images**: File → Open, or drag and drop FITS files
+- **Adjust display**: Use scale, colormap, and zoom controls
+- **Multi-frame**: Load multiple images for comparison
+- **Coordinate systems**: Display various coordinate grids
+
+### IRAF
+
+**Launch IRAF**:
 ```bash
-# List available environments
-conda env list
-
-# Activate astronomy environment
-conda activate astro
-
-# Install packages
-conda install -c astroquery
+# Set up IRAF environment
+mkiraf
+iraf &
 ```
 
-**IPython and Jupyter**:
-```bash
-# Start IPython console
-ipython
+**What this does**: Creates necessary IRAF configuration files and launches the interactive environment.
 
-# Launch Jupyter from desktop
-jupyter lab --no-browser --port=8888
+## 📁 Working with Files
+
+### File Manager Features
+
+**Navigation**:
+- **Bookmarks**: Quick access to frequently used directories
+- **Location bar**: Type paths directly (Ctrl+L)
+- **Split view**: View two directories simultaneously
+
+**File operations**:
+- **Copy/paste**: Standard Ctrl+C, Ctrl+V shortcuts
+- **Drag and drop**: Move files between directories
+- **Right-click menu**: Context-sensitive options
+
+### Opening Files in Applications
+
+**Double-click behavior**:
+- **Text files** → Text Editor
+- **FITS files** → DS9 (if configured)
+- **PDF files** → Document viewer
+- **Images** → Image viewer
+
+**Custom associations**:
+```bash
+# Set DS9 as default for FITS files
+# Right-click FITS file → Properties → Open With → Choose DS9
 ```
 
-### R and RStudio
-```bash
-# R console
-R
+## 🎨 Desktop Customization
 
-# RStudio (if available in container)
-rstudio &
+### Window Management
+
+**Organizing windows**:
+- **Maximize**: Double-click title bar
+- **Minimize**: Click minimize button
+- **Move**: Drag title bar
+- **Resize**: Drag window edges/corners
+
+**Virtual desktops**:
+- Use **workspace switcher** to organize applications
+- Move applications between workspaces
+- Create focused work environments for different tasks
+
+### Display Settings
+
+**Adjust resolution**:
+- **Applications → System Tools → Settings**
+- **Select Display** settings
+- **Choose resolution** that works best for your screen
+
+### Theme and Appearance
+
+**Customize appearance**:
+- **Applications → System Tools → Settings**
+- **Select Appearance** or **Theme**
+- **Adjust** colors, fonts, and window decorations
+
+## 📊 Performance Optimization
+
+### Resource Management
+
+**Monitor usage**:
+```bash
+# Check CPU and memory usage
+top
+
+# Or use graphical system monitor
+# Applications → System Tools → System Monitor
 ```
 
----
+**Close unused applications**:
+- Close applications you're not actively using
+- Use **Alt+Tab** to switch between running applications
+- **Ctrl+Alt+T** for quick terminal access
 
-## 🛠️ Development Tools
+### Application-Specific Tips
 
-### Text Editors and IDEs
+**Firefox**:
+- **Close unused tabs** to save memory
+- **Disable unnecessary plugins** for better performance
+- **Use private browsing** for temporary sessions
 
-**Vim/Nano**: Command-line editors
-```bash
-vim /arc/projects/group/script.py
-nano /arc/projects/group/notes.txt
-```
+**CASA**:
+- **Close CASA completely** when switching versions
+- **Monitor memory usage** for large datasets
+- **Use appropriate image display settings**
 
-**Gedit**: Simple graphical editor
-- Available in Applications → Accessories
-
-**VS Code**: (In custom containers)
-- Full IDE with extensions
-- Git integration
-- Remote development features
-
-### Version Control
-```bash
-# Git is pre-installed
-git clone https://github.com/youruser/project.git
-cd project
-git add .
-git commit -m "Analysis updates"
-git push origin main
-```
-
----
-
-## 💻 Command Line Tools
-
-### System Administration
-```bash
-# Check system resources
-htop
-df -h /arc
-
-# Install software (you have sudo)
-sudo apt update
-sudo apt install package-name
-
-# Check running processes
-ps aux | grep python
-```
-
-### File Management
-```bash
-# Navigate project structure
-cd /arc/projects/your-group
-ls -la data/
-
-# Find files
-find . -name "*.fits" -type f
-locate filename
-
-# Compress/decompress
-tar -czf archive.tar.gz data/
-gunzip compressed_file.gz
-```
-
-### Network Tools
-```bash
-# Download data
-wget https://archive.example.com/dataset.tar.gz
-curl -O https://api.example.com/data.json
-
-# Transfer files
-scp file.txt user@server:/path/
-rsync -av local/ remote:/backup/
-```
-
----
-
-## 🔬 Specialized Workflows
-
-### Image Processing Pipeline
-```bash
-# Example astronomy image processing
-cd /arc/projects/group/data/
-
-# Use CASA for radio data
-casa --nologger -c "importfits('raw.fits', 'calibrated.ms')"
-
-# Use DS9 for inspection
-ds9 processed_image.fits &
-
-# Python analysis
-python analysis_script.py processed_image.fits
-```
-
-### Data Reduction Workflow
-1. **Load raw data** into appropriate software (CASA, DS9)
-2. **Apply calibrations** using standard procedures
-3. **Export processed data** to `/arc/projects/group/results/`
-4. **Generate plots** for quality assessment
-5. **Save analysis scripts** for reproducibility
-
----
-
-## 🎨 Graphical Applications
-
-### X11 Forwarding
-GUI applications work seamlessly in the browser-based desktop:
-- Full window management
-- Copy/paste between applications
-- File dialogs access `/arc` storage
-- Multi-monitor support (within browser window)
-
-### Performance Optimization
-- **Close unused applications** to free memory
-- **Use terminal versions** when possible for better performance
-- **Adjust desktop resolution** if interface seems slow
-- **Monitor resource usage** with `htop`
-
----
-
-## 📁 File Integration
-
-### Desktop File Manager
-- **Nautilus/Thunar**: Graphical file browser
-- **Direct access**: to `/arc/home` and `/arc/projects`
-- **Integration**: with applications for open/save dialogs
-
-### Application Data Paths
-```bash
-# Application configs (persistent across sessions)
-~/.casa/          # CASA settings
-~/.ds9/           # DS9 preferences  
-~/.jupyter/       # Jupyter configuration
-~/.bashrc         # Shell customization
-
-# Project data (shared with team)
-/arc/projects/group/data/      # Input datasets
-/arc/projects/group/results/   # Analysis outputs
-/arc/projects/group/scripts/   # Analysis code
-```
-
----
-
-## 🔧 Customization
-
-### Desktop Environment
-```bash
-# Customize shell
-echo 'alias ll="ls -la"' >> ~/.bashrc
-echo 'export EDITOR=vim' >> ~/.bashrc
-
-# Desktop shortcuts
-cp /usr/share/applications/casa.desktop ~/Desktop/
-chmod +x ~/Desktop/casa.desktop
-```
-
-### Application Settings
-- **CASA**: Customize startup scripts in `~/.casa/init.py`
-- **DS9**: Save preferred settings and regions
-- **Python**: Install personal packages with `pip install --user`
-
----
+**File operations**:
+- **Use command line** for bulk file operations
+- **Compress large files** before transferring
+- **Organize files** to avoid cluttered directories
 
 ## 🚨 Troubleshooting
 
-### Common Issues
+### Application Won't Start
 
-**Application won't start**:
 ```bash
-# Check if process is running
-ps aux | grep application-name
+# Check if application is installed
+which application_name
 
-# Try starting from terminal for error messages
-application-name &
+# Try launching from terminal to see error messages
+application_name
 
 # Check system resources
 free -h
 df -h
 ```
 
+### Graphics Issues
+
 **Display problems**:
-- Refresh browser page
-- Try different browser (Chrome/Firefox work best)
-- Check internet connection stability
+- **Refresh desktop**: Right-click desktop → Refresh
+- **Restart session**: If graphics become corrupted
+- **Check browser compatibility**: Some browsers handle VNC better than others
 
-**Performance issues**:
-- Close unnecessary applications
-- Restart the session if memory is low
-- Use command-line versions when possible
+**Slow graphics**:
+- **Reduce color depth**: Use 16-bit color if 24-bit is slow
+- **Close unnecessary windows**: Reduce graphical load
+- **Disable animations**: In system settings
 
-### Getting Help
-- **Desktop issues**: [Desktop documentation](../general/NewUser/launch-desktop.md)
-- **CASA problems**: [CASA container notes](../general/ALMA_Desktop/casa-containers.md)
-- **General support**: [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
+### Application Crashes
 
----
+**Recovery steps**:
+1. **Save work frequently** in case of crashes
+2. **Use terminal to kill** hung applications:
+   ```bash
+   killall application_name
+   ```
+3. **Restart application** and try again
+4. **Check logs** if available:
+   ```bash
+   tail -f ~/.xsession-errors
+   ```
 
-## 💡 Pro Tips
+### File Association Problems
 
-### Productivity
-- **Learn keyboard shortcuts**: Speed up common tasks
-- **Use screen/tmux**: For persistent terminal sessions
-- **Organize workspaces**: Keep related applications together
-- **Save frequently**: Desktop sessions can be renewed but applications may crash
+```bash
+# Reset file associations
+# Right-click file → Properties → Open With → Reset to Default
 
-### Collaboration
-- **Document your setup**: Share application configurations
-- **Use shared scripts**: Store reusable code in `/arc/projects/group/scripts/`
-- **Standardize environments**: Consider custom containers for team consistency
+# Or set manually
+# Right-click file → Properties → Open With → Choose Application
+```
 
-### Resource Management
-- **Monitor usage**: Keep an eye on CPU and memory
-- **Clean up files**: Remove temporary data regularly
-- **Optimize workflows**: Use appropriate tools for each task
+## 💡 Best Practices
 
-The desktop environment provides the flexibility of a full Linux workstation with the convenience of browser access and shared storage!
+### Workflow Organization
+
+**Use virtual desktops**:
+- **Desktop 1**: File management and general tasks
+- **Desktop 2**: Data analysis (CASA, Python)
+- **Desktop 3**: Documentation and research (Firefox, LibreOffice)
+
+**Keep terminals organized**:
+- **Label terminal windows** for different purposes
+- **Use screen or tmux** for persistent sessions
+- **Keep CASA terminals** separate from general terminals
+
+### Data Management
+
+**Save work regularly**:
+- **Auto-save** in applications when available
+- **Version control** for scripts and analysis
+- **Backup important results** to permanent storage
+
+**File organization**:
+```bash
+# Recommended structure
+/arc/projects/yourproject/
+├── data/           # Raw and processed data
+├── scripts/        # Analysis scripts
+├── results/        # Final outputs
+├── documents/      # Papers, presentations
+└── scratch/        # Temporary files
+```
+
+## 🔗 Related Documentation
+
+- **[Desktop session guide](../user-guide/launch-desktop.md)** - Setting up your workspace
+- **[CASA tutorial](start-casa.md)** - Detailed CASA usage
+- **[File management guide](../user-guide/web-file-manager.md)** - Working with files
+- **[Storage systems guide](../storage-systems-guide.md)** - Understanding CANFAR storage
+- **[Data transfer guide](../data-transfer-guide.md)** - Moving files efficiently
+
+**External Resources**:
+- [DS9 User Manual](http://ds9.si.edu/doc/user/)
+- [CASA Documentation](https://casadocs.readthedocs.io/)
+- [IRAF User Guide](http://iraf.noao.edu/docs/)
