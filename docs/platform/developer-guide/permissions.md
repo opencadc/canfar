@@ -39,7 +39,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 # Example: Launch a new session
 curl -H "Authorization: Bearer YOUR_TOKEN" \
   -d "name=my-session" \
-  -d "image=images.canfar.net/skaha/astroconda:latest" \
+  -d "image=images.canfar.net/skaha/astroml:latest" \
   https://ws-uv.canfar.net/skaha/v0/session
 ```
 
@@ -48,7 +48,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 **Best for**: Long-term automation, file transfers, command-line tools
 
 #### Obtaining Certificates
-
+From the `cadcutils` python package (installable with `pip`)
 ```bash
 # Get a 10-day certificate (default)
 cadc-get-cert -u your_username
@@ -80,7 +80,7 @@ wget --certificate ~/.ssl/cadcproxy.pem \
 | Method | Duration | Best For | Setup Required |
 |--------|----------|----------|----------------|
 | **Tokens** | 48 hours | API calls, temporary scripts | Username/password |
-| **Certificates** | 10-30 days | File transfers, automation | Install vostools |
+| **Certificates** | 10-30 days | File transfers, automation | Install cadcutils |
 
 ---
 
@@ -334,5 +334,5 @@ getfacl /arc/projects/yourproject/directory_name/
 ## 🔗 Related Documentation
 
 - **[API access guide](api.md)** - Programmatic platform usage
-- **[Storage systems guide](../storage-systems-guide.md)** - Understanding CANFAR file systems
-- **[Data transfer guide](../data-transfer-guide.md)** - Moving files with proper authentication
+- **[Storage guide](../user-guide/storage/index.md)** - Understanding CANFAR file systems
+- **[Storage guide](../user-guide/storage/index.md)** - Complete data management with proper authentication

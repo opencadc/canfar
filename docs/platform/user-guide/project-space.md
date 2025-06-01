@@ -7,7 +7,7 @@ is their personal home directory, found in `/home/[username]`. The
 second is within a project directory, found in
 `/project/[project_name]`. These project directories provide a space
 where files can easily be shared and analyzed with collaborators. Using
-the [Group Management](group-permissions.md) tools, users can
+the [Group Management](accounts-permissions/index.md#acl-access-control-lists) tools, users can
 designate a list of others who can access their files. These designated
 individuals, if also given an account on the Science Portal, may
 interact with the files using the various session types available. These
@@ -37,7 +37,7 @@ your collaborators only wish to download the files and analyze them on
 their own computers, this step is sufficient; they can access the files
 on the web at
 <https://www.canfar.net/storage/arc/list/project/[project_name]> or
-use the [VOS Tools](vospace-tools.md) to download
+use the [VOS Tools](storage/vospace-api.md) to download
 them. If your collaborators wish to work on the files directly on the
 Science Portal, they will need to request an account on the system,
 either through emailing `support@canfar.net` or you can post a request
@@ -45,4 +45,4 @@ on the slack channel on their behalf (please include their CADC username
 and the project that you'd like them to have access to).
 
 Finally, you can manage which users are able to access your files on the
-project space using the [Group Management tools](group-permissions.md).
+project space using the [Group Management tools](accounts-permissions/index.md#acl-access-control-lists).

@@ -2,26 +2,43 @@
 
 **Cloud-based astronomy data analysis platform with interactive computing and shared storage**
 
+Welcome to the CANFAR Science Platform - your gateway to powerful cloud-based astronomy computing. This platform provides access to interactive computing sessions, shared storage, and specialized astronomy software through containerized applications.
+
 ---
 
 ## 🚀 Quick Start
 
-=== "New to CANFAR"
-    **Get started in 3 steps:**
-    
-    1. **[Get Access →](user-guide/access.md)** - Request account & authorization
-    2. **[First Login →](user-guide/first-login.md)** - Access the portal 
-    3. **[Launch Session →](user-guide/launch-notebook.md)** - Start with Jupyter
-    
-    ⏱️ **Total time: ~10 minutes** (after account approval)
+New to CANFAR? Get up and running in just 10 minutes:
 
-=== "Returning User"
-    **Quick links:**
-    
-    - **[🌐 CANFAR Portal](https://www.canfar.net)** - Launch sessions
-    - **[📁 File Manager](https://www.canfar.net/storage/arc/list)** - Access storage
-    - **[👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage permissions
-    - **[❓ FAQ](help/faq.md)** - Common issues
+**[📖 Getting Started Guide →](get-started/index.md)**
+
+Already have an account? Quick access:
+- **[🌐 CANFAR Portal](https://www.canfar.net)** - Launch sessions
+- **[📁 File Manager](https://www.canfar.net/storage/arc/list)** - Access storage  
+- **[👥 Groups](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage permissions
+
+---
+
+## 📚 Documentation Sections
+
+### 🎯 [Getting Started](get-started/index.md)
+**Quick 10-minute setup guide** - From account request to your first analysis session
+
+### 📖 [User Guide](user-guide/index.md)
+**Comprehensive documentation** organized by topic:
+- [Platform Concepts](user-guide/concepts/index.md) - Architecture and key concepts
+- [Accounts & Permissions](user-guide/accounts-permissions/index.md) - Access control and collaboration
+- [Storage Systems](user-guide/storage/index.md) - Data management and file operations
+- [Container Usage](user-guide/containers/index.md) - Working with software containers
+- [Interactive Sessions](user-guide/interactive-sessions/index.md) - Jupyter, CARTA, Desktop, and more
+- [Batch Jobs](user-guide/batch-jobs/index.md) - Automated processing and workflows
+- [Radio Astronomy](user-guide/radio-astronomy/index.md) - CASA, CARTA, and interferometry
+
+### ❓ [FAQ](faq/index.md)
+**Common questions and troubleshooting** - Quick answers to frequent issues
+
+### 🆘 [Help & Support](help/index.md)
+**Support resources and community** - Get help when you need it
 
 ---
 
@@ -29,42 +46,36 @@
 
 CANFAR provides **cloud-based astronomy computing** with:
 
-- 🖥️ **Interactive sessions** (Jupyter Lab, CARTA, Firefly, VSCode, Marimo, Browser Desktop)
-- 💾 **Shared storage** for collaborative datasets
-- 🐳 **Pre-built software containers** with astronomy software and possibility to build yours
+- 🖥️ **Interactive sessions** (Jupyter Lab, CARTA, Firefly, Desktop environments)
+- 💾 **Shared storage** for collaborative datasets (ARC, VOSpace, scratch)
+- 🐳 **Pre-built software containers** with astronomy tools
 - 🔧 **Custom container support** for specialized workflows
+- ⚡ **Batch processing** for automated analysis
+- 👥 **Collaboration tools** with group-based permissions
 
 ---
 
 ## Choose Your Path
 
 ### 🌱 New Users
-Never used CANFAR before? Follow our structured learning path:
-
-| Step | What you'll learn | Time |
-|------|------------------|------|
-| **[Quick Start](user-guide/access.md)** | Get account & first session | 10 min |
-| **[Core Concepts](storage-systems-guide.md)** | Storage, containers, projects | 15 min |
-| **[Data Management](data-transfer-guide.md)** | Upload, download, organize files | 20 min |
-| **[Interactive Sessions](user-guide/launch-notebook.md)** | Use Jupyter, CARTA, Firefly, Desktop, otheres | 30 min |
+Start with our **[Getting Started Guide](get-started/index.md)** for a structured learning path.
 
 ### 🔬 Scientists & Researchers
 
 Ready to analyze data? Jump to your workflow:
 
-- **[🔭 Radio Astronomy](tutorials/radio-astronomy.md)** - CARTA, CASA workflows
-- **[📊 Data Analysis](tutorials/data-analysis.md)** - Jupyter notebooks, Python  
-- **[🖥️ Desktop Applications](user-guide/launch-desktop.md)** - GUI tools, CASA, DS9
-- **[📁 Advanced Data Transfer](data-transfer-guide.md)** - Command line, automation
+- **[🔭 Radio Astronomy](user-guide/radio-astronomy/index.md)** - CASA, CARTA workflows
+- **[📊 Interactive Analysis](user-guide/interactive-sessions/index.md)** - Jupyter notebooks, Python  
+- **[🖥️ Desktop Applications](user-guide/interactive-sessions/launch-desktop.md)** - GUI tools, CASA, DS9
+- **[📁 Data Management](user-guide/storage/index.md)** - Advanced transfer and organization
 
 ### ⚡ Advanced Users
 
 Looking for development and automation?
 
-- **[🐳 Container Building](container-building-guide.md)** - Create custom containers
-- **[⚙️ Headless Execution](headless-execution-guide.md)** - Batch jobs, automation
-- **[🔌 API Access](developer-guide/api.md)** - Programmatic control
-- **[🔐 Administration](developer-guide/permissions.md)** - User management, infrastructure
+- **[🐳 Container Usage](user-guide/containers/index.md)** - Work with and build custom containers
+- **[⚙️ Batch Processing](user-guide/batch-jobs/index.md)** - Automated workflows
+- **[🔐 Access Control](user-guide/accounts-permissions/index.md)** - Groups and permissions
 
 ---
 
@@ -72,8 +83,9 @@ Looking for development and automation?
 
 ### 🆘 Quick Support
 
-- **[❓ FAQ](help/faq.md)** - Common questions answered
-- **[💬 Community Chat](https://cadc.slack.com/archives/C01K60U5Q87)** - Slack channel
+- **[❓ FAQ](faq/index.md)** - Common questions answered
+- **[🆘 Help & Support](help/index.md)** - All support resources
+- **[💬 Discord Community](help/index.md#community-support)** - Chat with other users
 - **[📧 Email Support](mailto:support@canfar.net)** - Direct help
 
 ### 🐛 Report Issues

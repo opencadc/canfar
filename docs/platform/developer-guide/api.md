@@ -7,7 +7,7 @@ Learn how to interact with CANFAR programmatically using REST APIs (Application 
 The **Skaha API** is a REST web service that provides programmatic access to CANFAR session management.
 Instead of using the web portal manually, you can write scripts to:
 
-- Launch and terminate computing sessions
+- Launch and terminate computing sessions, including headless ones (jobs)
 - Monitor session status and resource usage
 - List available container images
 - Manage session resources and configurations
@@ -67,7 +67,7 @@ for session in sessions:
 # Launch a Jupyter notebook session
 launch_data = {
     "name": "my-analysis-session",
-    "image": "images.canfar.net/skaha/astroconda:latest",
+    "image": "images.canfar.net/skaha/astroml:latest",
     "cores": 2,
     "ram": 4,  # GB
     "kind": "notebook"
@@ -142,7 +142,7 @@ for image in images:
 ### Check Image Details
 ```python
 # Get detailed information about a specific image
-image_id = "images.canfar.net/skaha/astroconda:latest"
+image_id = "images.canfar.net/skaha/astroml:latest"
 response = requests.get(f"{base_url}/image", 
                        headers=headers,
                        params={"image": image_id})
@@ -167,7 +167,7 @@ def launch_analysis_pipeline(data_files, analysis_script):
         # Create session with unique name
         session_data = {
             "name": f"analysis-job-{i}",
-            "image": "images.canfar.net/skaha/astroconda:latest", 
+            "image": "images.canfar.net/skaha/astroml:latest", 
             "cores": 4,
             "ram": 8,
             "kind": "headless",
@@ -276,7 +276,7 @@ client = skaha.SkahaClient()
 # Launch session
 session = client.create_session(
     name="my-session",
-    image="images.canfar.net/skaha/astroconda:latest",
+    image="images.canfar.net/skaha/astroml:latest",
     session_type="notebook"
 )
 
@@ -387,5 +387,5 @@ elif response.status_code == 403:
 
 ### Getting Help
 - **API issues**: [support@canfar.net](mailto:support@canfar.net)
-- **Authentication problems**: [CADC Support](mailto:cadc@nrc-cnrc.gc.ca)
-- **Community discussion**: [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
+- **Authentication problems**: [CADC Support](mailto:support@canfar.net)
+- **Community discussion**: [Discord](https://discord.gg/YOUR_INVITE_LINK)

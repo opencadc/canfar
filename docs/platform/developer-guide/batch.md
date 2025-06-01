@@ -20,7 +20,7 @@ Guide to running non-interactive batch jobs and automated workflows on CANFAR.
 
 ### 1. Prepare Your Script
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # process_data.py
 
 import sys
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 curl -X POST \
   -H "Authorization: Bearer YOUR_TOKEN" \
   -d "name=data-processing-job" \
-  -d "image=images.canfar.net/skaha/astroconda:latest" \
+  -d "image=images.canfar.net/skaha/astroml:latest" \
   -d "cores=4" \
   -d "ram=8" \
   -d "kind=headless" \
@@ -85,7 +85,7 @@ def launch_processing_job(input_file, output_file, token):
     
     job_data = {
         "name": f"process-{os.path.basename(input_file)}",
-        "image": "images.canfar.net/skaha/astroconda:latest",
+        "image": "images.canfar.net/skaha/astroml:latest",
         "cores": 2,
         "ram": 4,
         "kind": "headless",
@@ -128,7 +128,7 @@ def launch_job(file_info, token):
     
     job_data = {
         "name": f"batch-{os.path.basename(input_file).replace('.fits', '')}",
-        "image": "images.canfar.net/skaha/astroconda:latest",
+        "image": "images.canfar.net/skaha/astroml:latest",
         "cores": 2,
         "ram": 4,
         "kind": "headless",
@@ -210,7 +210,7 @@ def launch_parameter_sweep(param_combinations, script_path, token):
         
         job_data = {
             "name": f"param-sweep-{i:03d}",
-            "image": "images.canfar.net/skaha/astroconda:latest",
+            "image": "images.canfar.net/skaha/astroml:latest",
             "cores": 2,
             "ram": 4,
             "kind": "headless",
@@ -499,25 +499,26 @@ echo "Job completed: $(date)"
 ### Machine Learning Training Template
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # ml_training_job.py
 
 import os
 import sys
 import numpy as np
+import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 
 def main():
     # Configuration from environment or arguments
-    data_path = sys.argv[1] if len(sys.argv) > 1 else "/arc/projects/mygroup/data/training_data.npy"
+    data_path = sys.argv[1] if len(sys.argv) > 1 else "/arc/projects/mygroup/data/training_data.parquet"
     model_output = sys.argv[2] if len(sys.argv) > 2 else "/arc/projects/mygroup/models/trained_model.pkl"
     
     # Load data
     print(f"Loading data from {data_path}")
-    data = np.load(data_path)
-    X, y = data['features'], data['labels']
+    df = pd.read_parquet(data_path)
+    X, y = df['features'], df['labels']
     
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
@@ -550,7 +551,8 @@ if __name__ == "__main__":
 ### Common Issues
 
 **Jobs Stuck in Pending**
-- Check resource limits (3 session maximum)
+- Check resource limits (3 interactive session maximum)
+- Check resource cluster
 - Verify container image access permissions
 - Contact support if image appears broken
 
@@ -566,7 +568,7 @@ if __name__ == "__main__":
 
 **Out of Storage Space**
 - Clean up temporary files in scripts
-- Use `/tmp` for intermediate processing
+- Use `/scratch` for intermediate processing
 - Monitor disk usage during jobs
 
 ### Debugging Tips
@@ -598,7 +600,7 @@ for key, value in sorted(os.environ.items()):
 
 ### Contact Information
 - **Batch processing approval**: [support@canfar.net](mailto:support@canfar.net)
-- **Technical issues**: [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
+- **Technical issues**: [Discord](https://discord.gg/YOUR_INVITE_LINK)
 - **Resource requests**: Include project details and expected usage
 
 ### What to Include in Support Requests

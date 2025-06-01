@@ -25,10 +25,10 @@ Containers package your software with all its dependencies, ensuring it runs con
 ### Your First Container
 ```dockerfile
 # Dockerfile
-FROM images.canfar.net/skaha/astroconda:latest
+FROM images.canfar.net/skaha/astroml:latest
 
 # Install additional packages
-RUN conda install -c conda-forge your-package
+RUN mamba install your-package
 
 # Add your analysis scripts
 COPY scripts/ /opt/scripts/
@@ -46,33 +46,20 @@ CMD ["/bin/bash"]
 ## 📋 Container Requirements
 
 ### Base Images
-Always start from CANFAR-compatible base images:
+You can start from CANFAR-compatible base images:
 
 ```dockerfile
 # Recommended base images
-FROM images.canfar.net/skaha/astroconda:latest    # Python + astronomy
-FROM images.canfar.net/skaha/notebook:latest      # Jupyter environment  
-FROM images.canfar.net/skaha/desktop:latest       # Full desktop
-FROM images.canfar.net/skaha/casa:latest          # CASA + desktop
+FROM images.canfar.net/skaha/astroml:latest       # Python + astronomy + jupyterlab + xterm
+FROM images.canfar.net/skaha/base:latest          # minimal python+conda
 ```
 
-### Required Features
-Your container must:
-- **Run as non-root user** (UID 1000, GID 1000)
-- **Support `/arc` mount point** for storage access
+### Features
+At run time, the container will:
+- **Run as non-root user**: it will run as your CADC user (uid and gid)
+- **Support `/arc` mount point** for shared storage access
+- **Support `/scratch` mount point** for fast, non-shared, temporary storage
 - **Handle DISPLAY environment** for GUI applications
-- **Include necessary dependencies** for your software
-
-### Example User Setup
-```dockerfile
-# Create skaha user (required)
-RUN groupadd -g 1000 skaha && \
-    useradd -u 1000 -g 1000 -d /home/skaha -ms /bin/bash skaha
-
-# Switch to skaha user
-USER skaha
-WORKDIR /home/skaha
-```
 
 ---
 
@@ -89,17 +76,6 @@ docker run -it \
   -e DISPLAY=host.docker.internal:0 \
   -v /path/to/data:/arc/projects/myproject \
   myproject/analysis:v1.0
-```
-
-### Using CANFAR Build Service
-```bash
-# Clone your container repository
-git clone https://github.com/yourusername/mycontainer.git
-cd mycontainer
-
-# Tag and push (triggers automated build)
-git tag v1.0
-git push origin v1.0
 ```
 
 ---
@@ -119,6 +95,7 @@ Visit [images.canfar.net](https://images.canfar.net) and login with your CADC cr
 ```bash
 # Login to registry
 docker login images.canfar.net
+# Here you will use your token copied from the images.canfar.net
 
 # Tag your image
 docker tag myproject/analysis:v1.0 \
@@ -130,68 +107,104 @@ docker push images.canfar.net/yourgroup-containers/analysis:v1.0
 
 ### 4. Test on CANFAR
 1. Go to [CANFAR Portal](https://www.canfar.net)
-2. Launch → "Contributed"
-3. Enter your container name: `yourgroup-containers/analysis:v1.0`
+2. Launch → "notebook" # if your container has jupyterlab installed
+3. Select your group: `yourgroup-containers`
+3. Select your container name: `analysis:v1.0`
 4. Test functionality
 
 ---
 
 ## 🔬 Container Types
 
-### Notebook Containers
+### Notebook Containers (`notebook`)
 Perfect for data analysis environments:
+It must contain the `jupyterlab` executable to be launched as `notebook` kind (type).
+Many existing public containers already have what you need. Ex:
 
 ```dockerfile
-FROM images.canfar.net/skaha/notebook:latest
+FROM jupyter/scipy-notebook:latest
+
+# Install additional OS packages
+USER root
+RUN apt-get update && apt-get install -y swarp
 
 # Install additional Python packages
+USER jovyan
 RUN pip install --no-cache-dir \
     your-package==1.2.3 \
     another-package>=2.0
 
-# Add custom Jupyter extensions
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
-
-# Copy analysis notebooks
-COPY notebooks/ /opt/notebooks/
 ```
 
-### Desktop Applications
-For GUI-based software:
+### Desktop Applications (`desktop-app`)
+Useful for desktop GUI-based software which does not have a browser-native alternative
+If a container is labelled as `desktop-app`, it will expect a startup file. If no `/skaha/startup.sh` file is provided in the container, it will attempt to launch the container with `xterm`. That also means you can turn any existing container into a `desktop-app` container if you have `xterm` installed in your container.
+
+Example with a container capable of running swarp from a desktop xterm:
 
 ```dockerfile
-FROM images.canfar.net/skaha/desktop:latest
+FROM ubuntu:latest
 
 # Install your GUI application
 USER root
-RUN apt-get update && apt-get install -y \
-    your-gui-app \
+RUN apt-get update && \
+    apt-get install -y xterm swarp \
+    && rm -rf /var/lib/apt/lists/*
+```
+Note you can perfectly run `swarp` with a `headless` container, in which case you don't need to labelled `desktop-app` and do not need to install `xterm` which pulls a list of extra dependencies.
+
+
+Example with a container capable of running `xeyes`:
+- the `startup.sh` script (same directory as the `Dockerfile`)
+```bash
+#!/bin/bash
+xeyes
+```
+
+- the `Dockerfile`:
+```dockerfile
+FROM ubuntu:latest
+
+# Install your GUI application
+USER root
+RUN apt-get update && \
+    apt-get install -y xeyes \
     && rm -rf /var/lib/apt/lists/*
 
-# Create desktop shortcuts
-USER skaha
-COPY your-app.desktop /home/skaha/Desktop/
+# start up xeyes directly, bypassing the xterm
+RUN mkdir /skaha
+COPY startup.sh /skaha/startup.sh
+RUN chmod +x /skaha/startup.sh
 ```
 
-### Command-Line Tools
-For headless processing:
+### Browser-native Container Applications  (`contributed`)
+
+Some interactive applications have native support to the browser. JupyterLab, CARTA and Firefly are examples of these, which CANFAR provide specific label. User can make their own.
+The requirements are:
+- the application needs to run on port 5000. (many servers have optional port selections)
+- the container needs to have a `/skaha/startup.sh` file which will start the application in foreground
+
+Example:
+- The `startup.sh` script:
+```bash
+my_beautiful_replacement_of_notebook \
+  --no-browser \
+  --host="0.0.0.0" \
+  --port=5000
+```
 
 ```dockerfile
-FROM images.canfar.net/skaha/astroconda:latest
+FROM images.canfar.net/skaha/base:latest
 
-# Install command-line tools
-RUN conda install -c conda-forge \
-    your-cli-tool \
-    processing-library
+RUN mamba install my_beautiful_replacement_of_notebook
 
-# Add processing scripts
-COPY scripts/ /opt/scripts/
-RUN chmod +x /opt/scripts/*
+EXPOSE 5000
 
-# Set default command
-CMD ["/opt/scripts/process.sh"]
+# start up topcat directly, bypassing the xterm
+RUN mkdir /skaha
+COPY src/startup.sh /skaha/startup.sh
+RUN chmod +x /skaha/startup.sh
 ```
-
 ---
 
 ## 🧪 Testing Strategies
@@ -206,6 +219,12 @@ docker run --rm \
   -v /path/to/test/data:/arc/projects/test \
   mycontainer:latest \
   python /opt/scripts/test_analysis.py
+
+# Test interactively "entering" the container
+docker run --rm -it \
+  -v /path/to/test/data:/arc/projects/test \
+  mycontainer:latest \
+  bash
 ```
 
 ### CANFAR Testing
@@ -215,21 +234,6 @@ docker run --rm \
 4. **Test core functionality**
 5. **Check resource usage** (memory, CPU)
 
-### Automated Testing
-```yaml
-# .github/workflows/test.yml
-name: Test Container
-on: [push]
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Build container
-      run: docker build -t test-container .
-    - name: Test functionality
-      run: docker run --rm test-container python -m pytest tests/
-```
 
 ---
 
@@ -237,16 +241,16 @@ jobs:
 
 ### Performance
 - **Use multi-stage builds** to minimize image size
-- **Cache dependencies** in separate layers
+- **Cache dependencies** in separate layers 
 - **Pin package versions** for reproducibility
 - **Clean up** package managers and temporary files
 
 ```dockerfile
 # Good: Multi-stage build
-FROM images.canfar.net/skaha/astroconda:latest AS builder
+FROM images.canfar.net/skaha/astroml:latest AS builder
 RUN conda install large-build-dependency
 
-FROM images.canfar.net/skaha/astroconda:latest
+FROM images.canfar.net/skaha/astroml:latest
 COPY --from=builder /opt/conda/lib/specific-files /opt/conda/lib/
 ```
 
@@ -269,10 +273,10 @@ COPY --from=builder /opt/conda/lib/specific-files /opt/conda/lib/
 ### Version Management
 ```bash
 # Use semantic versioning
-git tag v1.0.0    # Major release
-git tag v1.0.1    # Bug fix
-git tag v1.1.0    # New features
-git tag v2.0.0    # Breaking changes
+docker tag mycontainer:v1.0.0    # Major release
+docker tag mycontainer:v1.0.1    # Bug fix
+docker tag mycontainer:v1.1.0    # New features
+docker tag mycontainer:v2.0.0    # Breaking changes
 ```
 
 ### Updates and Maintenance
@@ -280,19 +284,6 @@ git tag v2.0.0    # Breaking changes
 - **Test with new CANFAR platform versions**
 - **Monitor container usage** and performance
 - **Deprecate old versions** gracefully
-
----
-
-## 📚 Examples and Templates
-
-### Template Repository
-Check out the [CANFAR container templates](https://github.com/opencadc/science-containers/tree/main/science-containers/Dockerfiles) for examples:
-- **Notebook template**: Basic Jupyter environment
-- **Desktop template**: GUI application container  
-- **CLI template**: Command-line processing tools
-
-### Community Containers
-Browse [published containers](https://images.canfar.net) for inspiration and reusable components.
 
 ---
 
@@ -306,9 +297,9 @@ Browse [published containers](https://images.canfar.net) for inspiration and reu
 ### Support Channels
 - **Container development**: [GitHub Issues](https://github.com/opencadc/science-containers/issues)
 - **Registry questions**: [support@canfar.net](mailto:support@canfar.net)
-- **Community help**: [Slack channel](https://cadc.slack.com/archives/C01K60U5Q87)
+- **Community help**: [Discord community](https://discord.gg/YOUR_INVITE_LINK)
 
 ### Documentation
 - **Docker best practices**: [Docker documentation](https://docs.docker.com/develop/dev-best-practices/)
-- **CANFAR specifics**: [Complete container guide](../reference-material/container-publishing-guide.md)
+- **CANFAR specifics**: [Complete container guide](../user-guide/containers/index.md)
 - **Platform updates**: [Science platform repository](https://github.com/opencadc/science-platform)

@@ -1,10 +1,21 @@
-# Launching a Notebook Session 
+# Launching Jupyter Notebook Sessions
 
-This guide walks you through starting a Jupyter Lab session for interactive data analysis.
+Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualization, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.
 
-## Step 1: Access Session Creation
+## Overview
 
-After logging into the Science Portal, click the **plus sign (+)** to create a new session, 
+Jupyter notebooks combine code execution, rich text documentation, and inline visualizations in a single interface. CANFAR's notebook sessions include:
+
+- **Jupyter Lab**: Full-featured development environment
+- **Pre-configured containers**: Astronomy-specific software stacks
+- **Persistent storage**: Access to your ARC and VOSpace data
+- **Collaborative sharing**: Share sessions with team members
+
+## Creating a New Session
+
+### Step 1: Access Session Creation
+
+From the Science Portal dashboard, click the **plus sign (+)** to create a new session, 
 then select **notebook** as your session type.
 
 > ![image](images/notebook/1_select_notebook_session.png)
@@ -17,7 +28,7 @@ Select a container image that includes the software you need. Each container com
 with specific tools and libraries:
 
 - **CASA 6.5-notebook**: Includes CASA (Common Astronomy Software Applications) for radio astronomy
-- **astroconda**: Python astronomy libraries (AstroPy, NumPy, SciPy)
+- **astroml**: Python astronomy libraries (AstroPy, NumPy, SciPy)
 - **General purpose**: Standard Python data science stack
 
 > ![image](images/notebook/3_choose_casa_container.png)
@@ -89,6 +100,6 @@ You can run CASA (Common Astronomy Software Applications) commands directly in P
 
 ## Next Steps
 
-- **[Data Analysis Tutorial](../tutorials/data-analysis.md)**: Learn common astronomy workflows
-- **[File Management](../user-guide/web-file-manager.md)**: Upload and organize your data
-- **[Storage Guide](../storage-systems-guide.md)**: Understand CANFAR's storage systems
+- **[Radio Astronomy Guide](radio-astronomy/index.md)**: Learn CASA workflows and data analysis
+- **[Data Transfer Guide](storage/index.md#data-transfer-strategies)**: Upload and organize your data
+- **[Storage Guide](storage/index.md)**: Understand CANFAR's storage systems
