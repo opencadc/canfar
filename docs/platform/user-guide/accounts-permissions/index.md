@@ -11,7 +11,7 @@ CANFAR's permission system is built on several layers:
 1. **CADC Accounts** - Your base identity for accessing Canadian astronomy services
 2. **Groups** - Collections of users for collaborative access 
 3. **Harbor Permissions** - Container registry access control
-4. **ACL (Access Control Lists)** - File-level permissions
+4. **ACL (Access Control Lists)** - File-level permissions on `/arc` shared file system.
 5. **API Authentication** - Programmatic access control
 
 ## 👥 Groups and User Management
@@ -291,10 +291,10 @@ curl -X PUT \
 **Cause:** Not a member of the project group
 
 **Solution:**
-1. Contact project administrator to add you to the group
+1. Contact project administrator of your team to add you to the group
 2. Verify group membership at [CADC Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
 
-### Problem: Cannot push to Harbor registry
+### Problem: Cannot push to Harbor container registry
 
 **Cause:** Insufficient Harbor permissions
 

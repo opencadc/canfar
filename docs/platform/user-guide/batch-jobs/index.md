@@ -2,6 +2,20 @@
 
 Batch jobs enable automated, non-interactive processing of astronomical data at scale. This section covers headless execution, API access, job scheduling, and workflow automation on the CANFAR Science Platform.
 
+## What is Batch Processing?
+
+Batch processing refers to the execution of computational tasks without user interaction, typically running in the background to process large datasets or perform repetitive analysis tasks. In the context of the CANFAR Science Platform, batch jobs run as **headless containers** - containerized environments that execute your code without graphical interfaces or interactive terminals.
+
+### Headless vs Interactive Containers
+
+The key difference between headless and interactive containers lies not in the container images themselves, but in how they are executed. The same container image can be launched in either mode depending on your needs.
+
+**Headless containers** execute a user-specified command or script directly. When you submit a headless job, you specify exactly what command should run - whether it's a Python script, a shell command, or any executable available in the container. The container starts, runs your specified command, and terminates when the command completes. For example, submitting a headless job with the `astroml` container might execute `python /arc/projects/myproject/analysis.py` directly.
+
+**Interactive containers** launch predefined interactive services that you can access through your web browser. The same `astroml` container, when launched interactively, would start Jupyter Lab, providing you with a notebook interface for development and exploration. These containers run indefinitely until you manually stop them, allowing for real-time interaction and iterative development.
+
+This distinction makes headless containers ideal for production workflows and automated processing, while interactive containers excel for development, prototyping, and exploratory data analysis.
+
 ## Overview
 
 Batch processing is essential for:
@@ -33,30 +47,63 @@ curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
 
 ### 2. Job Submission Scripts
 
-Create shell scripts for common workflows:
+Create shell scripts for common workflows using the API or Python client:
 
 ```bash
 #!/bin/bash
-# submit_reduction.sh
+# submit_reduction.sh - API-based job submission
 
 # Set job parameters
 JOB_NAME="nightly-reduction-$(date +%Y%m%d)"
 IMAGE="images.canfar.net/skaha/casa:6.5"
-SCRIPT="/arc/projects/survey/pipelines/reduce_night.py"
+CMD="python /arc/projects/survey/pipelines/reduce_night.py /arc/projects/survey/data/$(date +%Y%m%d)"
+
+# Submit job via API
+curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "name=$JOB_NAME" \
+  -d "image=$IMAGE" \
+  -d "cores=8" \
+  -d "ram=32" \
+  -d "kind=headless" \
+  -d "cmd=$CMD"
+```
+
+Or using the Python skaha client:
+
+```python
+#!/usr/bin/env python3
+# submit_reduction.py - Python client-based submission
+
+from skaha.session import Session
+from datetime import datetime
+
+# Initialize session manager
+session = Session()
+
+# Set job parameters
+job_name = f"nightly-reduction-{datetime.now().strftime('%Y%m%d')}"
+image = "images.canfar.net/skaha/casa:6.5"
+data_path = f"/arc/projects/survey/data/{datetime.now().strftime('%Y%m%d')}"
 
 # Submit job
-canfar-submit \
-  --name "$JOB_NAME" \
-  --image "$IMAGE" \
-  --cores 8 \
-  --memory 32G \
-  --script "$SCRIPT" \
-  --data-path "/arc/projects/survey/data/$(date +%Y%m%d)"
+job_id = session.create(
+    name=job_name,
+    image=image,
+    kind="headless",
+    cores=8,
+    ram=32,
+    cmd="python",
+    args=["/arc/projects/survey/pipelines/reduce_night.py", data_path]
+)
+
+print(f"Submitted job: {job_id}")
 ```
 
 ### 3. Workflow Automation
 
-Use workflow managers like Nextflow or Snakemake:
+Use workflow managers like [Prefect](https://www.prefect.io/) or [Snakemake](https://snakemake.readthedocs.io/en/stable/):
 
 ```python
 # Snakemake example: workflow.smk
@@ -201,13 +248,13 @@ curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}/stats" \
 
 ### Method 2: Python skaha Client
 
-The skaha Python client provides a more convenient interface for batch job management and automation.
+The [skaha](https://shinybrar.github.io/skaha/latest/) Python client provides a more convenient interface for batch job management and automation.
 
 #### Installation
 
 ```bash
 mamba activate base
-pip install skaha-client
+pip install skaha
 ```
 
 #### Basic Python Client Usage

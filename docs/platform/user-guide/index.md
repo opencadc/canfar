@@ -9,9 +9,9 @@ This guide provides detailed information for astronomers, grad students, and pro
 CANFAR provides **cloud-based astronomy computing** with:
 
 - 🖥️ **Interactive sessions** (Jupyter Lab, CARTA, Firefly, Desktop environments)
-- 💾 **Shared storage** for collaborative datasets (ARC, VOSpace, scratch)
+- 💾 **Shared storage** for collaborative datasets (shared file system, VOSpace long term, scratch)
 - 🐳 **Pre-built software containers** with astronomy tools
-- 🔧 **Custom container support** for specialized workflows
+- 🔧 **User container support** for specialized workflows
 - ⚡ **Batch processing** for automated analysis
 - 👥 **Collaboration tools** with group-based permissions
 
@@ -27,11 +27,11 @@ Manage users, groups, Harbor permissions, ACLs, and API access.
 
 ### [💾 Storage](storage/index.md)
 
-Master ARC, VOSpace, and scratch storage systems. Learn data transfers, SSHFS, and the full VOSpace API.
+Master `/arc`, VOSpace `vault`, and scratch storage systems. Learn data transfers, `sshfs`, and the full VOSpace API.
 
 ### [🐳 Containers](containers/index.md)
 
-Work with astronomy software containers, build custom environments, and publish to CANFAR.
+Work with astronomy software containers, build custom environments, and upload to CANFAR Science Platform.
 
 ### [🖥️ Interactive Sessions](interactive-sessions/index.md)
 
@@ -39,7 +39,7 @@ Launch Jupyter notebooks, CARTA, Firefly, desktop environments, and contributed 
 
 ### [⚡ Batch Jobs](batch-jobs/index.md)
 
-Run headless containers, understand batch systems, manage logs, and use APIs for automation.
+Run "headless" containers, understand batch systems, manage logs, and use APIs for automation.
 
 ### [📡 Radio Astronomy](radio-astronomy/index.md)
 
@@ -82,15 +82,15 @@ Start with our [Getting Started Guide](../get-started/index.md) for a structured
 
 ### Platform Access
 
-- **[CANFAR Portal](https://www.canfar.net)** - Main interface
-- **[File Manager](https://www.canfar.net/storage/arc/list)** - Browse storage
-- **[Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage permissions
+- **[CANFAR Portal](https://www.canfar.net/science-portal/)** - Main interface
+- **[File Manager](https://www.canfar.net/storage/arc/list)** - Browse storage on `/arc` and `vault`
+- **[Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage teams and their permissions
 
 ### APIs & Tools
 
-- **[REST API Docs](https://ws-uv.canfar.net/)** - Programmatic access
+- **[REST API Docs](https://ws-uv.canfar.net/skaha)** - Programmatic access for `skaha`
 - **[VOSpace Tools](storage/vospace-api.md)** - Advanced data management
-- **[Harbor Registry](https://images.canfar.net/)** - Container repository
+- **[Container Registry](https://images.canfar.net/)** - Container registry for teams (Harbor)
 
 ### Support
 
@@ -110,6 +110,8 @@ Start with our [Getting Started Guide](../get-started/index.md) for a structured
 If you use CANFAR Science Platform for your research, please acknowledge CANFAR in publications:
 
 !!! quote "Citation"
-    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform. Our work used the facilities of the Canadian Astronomy Data Center, operated by the National Research Council of Canada with the support of the Canadian Space Agency, and CANFAR, a consortium that serves the data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research [(Fabbro et al. 2024)](https://doi.org/10.1117/12.3020588).
+    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform. Our work used the facilities of the Canadian Astronomy Data Center, operated by the National Research Council of Canada with the support of the Canadian Space Agency, and CANFAR, a consortium that serves the data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research. 
+    
+If you need to refer to a paper, you can use this  [(SPIE 2024 citation)](https://doi.org/10.1117/12.3020588).
 
 ![CANFAR](https://www.canfar.net/css/images/logo.png){ height="100" }

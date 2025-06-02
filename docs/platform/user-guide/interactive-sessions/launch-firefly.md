@@ -2,7 +2,7 @@
 
 **The LSST table and image visualizer for astronomical data exploration**
 
-Firefly is a powerful web-based visualization tool originally developed for the Large Synoptic Survey Telescope (LSST) project. It provides advanced capabilities for viewing images, overlaying catalogs, and analyzing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
+Firefly is a powerful web-based visualization tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogs, and analyzing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
 
 ## 🎯 What is Firefly?
 
@@ -29,7 +29,7 @@ Firefly offers specialized tools for:
 
 ### Step 1: Create New Session
 
-1. **Login** to the [CANFAR Science Portal](https://www.canfar.net)
+1. **Login** to the [CANFAR Science Portal](https://www.canfar.net/science-portal)
 2. **Click** the plus sign (**+**) to create a new session
 3. **Select** `firefly` as your session type
 
@@ -131,7 +131,7 @@ graph TD
 
 #### Access CANFAR Storage
 
-**From ARC Projects:**
+**From `arc` Projects:**
 ```bash
 # Files in your project directory are accessible via:
 # /arc/projects/yourproject/data/image.fits

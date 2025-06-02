@@ -13,7 +13,7 @@ CANFAR supports multiple session types, each optimized for different research wo
 | **[📓 Notebook](launch-notebook.md)** | JupyterLab | Data analysis, coding, documentation | Interactive Python, visualization, markdown |
 | **[🖥️ Desktop](launch-desktop.md)** | Linux desktop | GUI applications, legacy software | Full desktop environment, X11 apps |
 | **[📊 CARTA](launch-carta.md)** | CARTA viewer | Radio astronomy visualization | Cube analysis, region tools, catalogs |
-| **[🔥 Firefly](launch-firefly.md)** | Firefly viewer | LSST data, table visualization | Image viewer, catalog overlay, cutouts |
+| **[🔥 Firefly](launch-firefly.md)** | Firefly viewer | Optical data, table visualization | Image viewer, catalog overlay, cutouts |
 | **[⚙️ Contributed](launch-contributed.md)** | Various | Community applications | Specialized tools, custom interfaces |
 
 ## 🚀 Quick Start Guide
@@ -46,7 +46,7 @@ Select the interface that best matches your workflow:
 === "🔬 Table Analysis"
     **Session Type:** `firefly`  
     **Container:** `firefly`  
-    **Use Case:** LSST data, catalog visualization, image cutouts
+    **Use Case:** Optical data, catalog overlays, image cutouts
 
 ### Step 3: Configure Resources
 
@@ -94,7 +94,7 @@ stateDiagram-v2
 
 | Limit | Value | Notes |
 |-------|-------|-------|
-| **Concurrent sessions** | 3 active sessions | Across all session types |
+| **Concurrent sessions** | 3 active sessions | Across all interactive session types |
 | **Session duration** | 4 days maximum | Can be renewed indefinitely |
 | **Idle timeout** | None | Sessions run until manually deleted |
 | **Storage** | Persistent | Files saved to `/arc/` persist |
@@ -194,7 +194,7 @@ cp jupyter_config.py /arc/home/$USER/.jupyter/
 echo "alias ll='ls -la'" >> /arc/home/$USER/.bashrc
 
 # Python packages (user installation)
-pip install --user astroplan
+pip install --user astroplan # in some containers, the --user may not be needed
 ```
 
 ### Session Networking

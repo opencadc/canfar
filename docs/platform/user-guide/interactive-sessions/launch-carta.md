@@ -26,14 +26,10 @@ then select **carta** as your session type.
 Note that the menu options update automatically after your session type selection. 
 Choose the CARTA version that meets your needs:
 
-- **CARTA 3.0** (recommended): Latest features and bug fixes
-- **CARTA 2.0**: Stable version with proven reliability
-- **CARTA 1.4**: Legacy version for compatibility
-
+- **CARTA 4.0** (recommended): Latest features and bug fixes
+(The screenshot is old and showed older versions only.)
 > ![image](../images/carta/2_select_carta_container.png)
 
-!!! tip "Version Selection"
-    Use CARTA 3.0 for new projects. Only use older versions if you need specific compatibility with existing workflows.
 
 ### Step 3: Configure Session
 

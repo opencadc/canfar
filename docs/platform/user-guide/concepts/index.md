@@ -2,7 +2,7 @@
 
 **Understanding the CANFAR Science Platform architecture and core concepts**
 
-This section covers the fundamental concepts you need to understand to effectively use CANFAR. Whether you're a grad student starting your first analysis or a project manager setting up a team workspace, these concepts will help you understand how the platform works.
+This section covers the fundamental concepts you need to understand to effectively use CANFAR. Whether you are a student starting your first analysis or a project manager setting up a team workspace, these concepts will help you understand how the platform works.
 
 ## 🎯 What is CANFAR?
 
@@ -16,7 +16,7 @@ The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platfo
 ### Why Use CANFAR?
 
 **For Individual Researchers:**
-- No software installation headaches - everything is pre-configured
+- By default, there is little to no software installation headaches - you might be lucky with a pre-configured container which you can also modify when getting more familiar.
 - Access powerful computing resources without owning hardware
 - Work from anywhere with just a web browser
 - Automatic backups and data protection
@@ -47,9 +47,9 @@ graph TB
     K8s --> Containers[🐳 Container Images<br/>Harbor Registry]
     K8s --> Storage[💾 Storage Systems]
     
-    Storage --> ARC[📁 ARC Storage<br/>Fast SSD]
-    Storage --> VOSpace[☁️ VOSpace<br/>Archive Storage]
-    Storage --> Scratch[⚡ Scratch<br/>Temporary NVMe]
+    Storage --> [📁 `arc` Storage<br/>Shared Filesystem]
+    Storage --> VOSpace[☁️ `vault` VOSpace<br/>Long-term Storage]
+    Storage --> Scratch[⚡ Scratch<br/>Temporary SSDs]
     
     Sessions --> Types[Session Types]
     Types --> Notebook[📓 Jupyter Notebooks]
@@ -68,58 +68,43 @@ graph TB
 : Container orchestration system that manages your computing sessions automatically.
 
 **🐳 Containers**
-: Pre-built software environments containing astronomy tools, Python packages, and dependencies.
+: Pre-built software environments containing astronomy tools, Python packages, and dependencies that you can use as-is or customize for your needs.
 
 **💾 Storage Systems**
-: Multiple storage types optimized for different use cases (active research, archives, temporary files).
+: Multiple storage types optimized for different use cases from active research to long-term archival storage.
 
 **🔐 Authentication**
-: Integration with CADC (Canadian Astronomy Data Centre) for secure access control.
+: Integration with CADC (Canadian Astronomy Data Centre) for secure access control and group management.
 
 ## 🐳 Understanding Containers
 
-Containers are the key to CANFAR's power and flexibility. Think of them as "software packages" that include everything needed to run specific tools.
+Containers are at the heart of CANFAR's flexibility and power. If you're familiar with virtual machines, containers serve a similar purpose but are much more lightweight and efficient. While a virtual machine includes an entire operating system, containers share the host's kernel and only package the application and its dependencies. This makes them start faster, use fewer resources, and easier to distribute.
 
-### What's in a Container?
+Think of containers as complete, portable software environments that include everything needed to run specific applications. Unlike traditional software installation where you might struggle with dependencies, conflicting versions, or missing libraries, containers provide a consistent environment that works the same way regardless of where they run.
 
-A typical astronomy container includes:
+CANFAR provides a rich ecosystem of containers maintained by both the platform team and the community. You can use these containers directly for immediate productivity, or use them as starting points to build your own specialized environments. Whether you need a quick analysis environment or a highly customized workflow, containers adapt to your research needs.
 
-- **Operating System** (usually Ubuntu Linux)
-- **Astronomy Software** (CASA, DS9, Python astronomy packages)
-- **Programming Languages** (Python, IDL, C++ compilers)
-- **System Libraries** and dependencies
-- **Environment Configuration** (paths, variables)
+### What Might Be in a Container?
+
+The contents of containers vary significantly depending on their purpose and complexity. A minimal container might include just a specific tool and its immediate dependencies, while comprehensive research environments can include extensive software suites. Here are examples of what you might find in different types of astronomy containers:
+
+A general-purpose astronomy container could include an operating system base (typically Ubuntu Linux), core astronomy software packages like CASA or DS9, programming languages such as Python with scientific libraries, essential system libraries and dependencies, and pre-configured environment settings for optimal performance.
+
+However, specialized containers might be much more focused. A container designed for a specific data reduction pipeline might only include the necessary tools for that workflow, while a visualization container might emphasize graphical applications and display capabilities.
+
+The beauty of the container ecosystem is that you're not limited to what others have built. While CANFAR provides many ready-to-use containers, you can also create your own containers tailored to your exact research needs, building upon existing containers or starting from scratch.
 
 ### Popular CANFAR Containers
 
-| Container | Purpose | Key Software |
-|-----------|---------|--------------|
-| **astroml** | General astronomy analysis | Python, NumPy, SciPy, Astropy, Matplotlib |
-| **casa** | Radio interferometry | CASA, Python, common astronomy tools |
-| **desktop** | GUI applications | Full Ubuntu desktop, Firefox, terminals |
-| **carta** | Radio astronomy visualization | CARTA viewer, analysis tools |
-| **notebook** | Interactive computing | JupyterLab, Python scientific stack |
+CANFAR offers several well-maintained containers that cover common astronomical research scenarios. The **astroml** container provides a comprehensive environment for general astronomy analysis, including Python with NumPy, SciPy, Astropy, and Matplotlib. For radio interferometry work, the **casa** container includes CASA software along with Python and common astronomy tools. The **desktop** container offers a full Ubuntu desktop environment with Firefox and terminal access, perfect when you need GUI applications. Radio astronomy visualization is well-served by the **carta** container with its specialized CARTA viewer and analysis tools, while the **notebook** container provides JupyterLab with the complete Python scientific stack for interactive computing.
+
+These represent just a starting point. The community continuously contributes new containers, and you can always build upon these foundations to create environments perfectly suited to your research workflow.
 
 ### Container Lifecycle
 
-```mermaid
-sequenceDiagram
-    participant You
-    participant Portal as Science Portal
-    participant K8s as Kubernetes
-    participant Registry as Container Registry
-    
-    You->>Portal: Request session (e.g., "astroml")
-    Portal->>K8s: Create session with container
-    K8s->>Registry: Pull container image (if needed)
-    Registry->>K8s: Download image layers
-    K8s->>K8s: Start container with your storage
-    K8s->>Portal: Session ready
-    Portal->>You: Connect to running session
-```
+Understanding how containers work behind the scenes helps you use them more effectively. When you request a session through the Science Portal, several steps happen automatically. The portal communicates with Kubernetes to create your session using your chosen container. If the container hasn't been used recently on that computing node, Kubernetes pulls the container image from the registry, downloading the necessary layers efficiently. Once downloaded, Kubernetes starts the container and connects it to your storage systems, making your files and data available within the container environment.
 
-**First Launch:** 2-3 minutes (downloading container)  
-**Subsequent Launches:** 30-60 seconds (container cached)
+The first time you launch a particular container type, this process typically takes 2-3 minutes as the system downloads and caches the container image. Subsequent launches of the same container are much faster, usually taking only 30-60 seconds, since the image is already cached locally.
 
 ## ☸️ Kubernetes & Sessions
 
@@ -150,7 +135,7 @@ Different session types provide different interfaces to the same underlying comp
 : Specialized for radio astronomy visualization and analysis.
 
 **🔥 Firefly Sessions**
-: LSST table and image visualization tools.
+: Table and image visualization tools.
 
 **⚙️ Contributed Sessions**
 : Custom applications contributed by the community.
@@ -168,9 +153,9 @@ CANFAR provides REST APIs for programmatic access, allowing you to:
 
 | Service | Purpose | Documentation |
 |---------|---------|---------------|
-| **Skaha** | Session management | [ws-uv.canfar.net](https://ws-uv.canfar.net) |
+| **skaha** | Session management | [skaha](https://ws-uv.canfar.net/skaha) |
 | **VOSpace** | File operations | [VOSpace API](../storage/vospace-api.md) |
-| **CADC** | Authentication | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca) |
+| **Access Control** | Authentication and Authorization| [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
 ## 💾 VOSpace Concepts
 

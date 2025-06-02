@@ -2,946 +2,459 @@
 
 **Working with astronomy software containers on CANFAR**
 
-Containers are pre-packaged software environments that include everything needed to run astronomy applications. This section covers using existing containers, understanding the container ecosystem, building custom containers, and publishing them for the CANFAR community.
+Containers provide pre-packaged software environments that include everything needed to run astronomy applications. On CANFAR, containers eliminate the "works on my machine" problem by ensuring consistent, reproducible computational environments across different sessions and workflows.
 
-## 🎯 Container Fundamentals
+## Understanding CANFAR Containers
 
-### What are Containers?
+Think of containers as complete software packages that bundle an operating system (typically Ubuntu Linux), astronomy software like CASA or Python packages, programming tools, system libraries, and environment configuration into a single portable unit. When you launch a session on CANFAR, you're essentially starting up one of these pre-configured environments with your data and home directory automatically mounted and accessible.
 
-Think of containers as **complete software packages** that include:
+The container ecosystem on CANFAR follows a layered approach. Base containers provide fundamental tools and the conda package manager, while specialized containers build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.
 
-- **Operating System** (usually Ubuntu Linux)
-- **Astronomy Software** (CASA, Python astronomy packages, etc.)
-- **Programming Tools** (Python, IDL, compilers)
-- **System Libraries** and dependencies
-- **Environment Configuration** (paths, variables)
+### Runtime Environment
 
-### Why Use Containers?
-
-**🚫 Without Containers:**
-- Software installation conflicts
-- Dependency management nightmares  
-- "Works on my machine" problems
-- Platform-specific issues
-
-**✅ With Containers:**
-- Consistent software environments
-- No installation required
-- Reproducible research
-- Easy sharing and collaboration
-
-### Container Lifecycle on CANFAR
-
-```mermaid
-sequenceDiagram
-    participant You
-    participant Portal as Science Portal
-    participant Harbor as Harbor Registry
-    participant K8s as Kubernetes
-    
-    You->>Portal: Select container (e.g., "astroml")
-    Portal->>Harbor: Check image availability
-    Harbor->>Portal: Image details and tags
-    Portal->>K8s: Launch session with image
-    K8s->>Harbor: Pull image (if not cached)
-    Harbor->>K8s: Download image layers
-    K8s->>K8s: Start container with storage mounted
-    K8s->>You: Session ready with software environment
-```
-
-## 📦 Available Container Types
-
-CANFAR provides containers optimized for different astronomy workflows:
-
-### Core Astronomy Containers
-
-| Container | Session Types | Purpose | Key Software |
-|-----------|---------------|---------|--------------|
-| **astroml** | notebook, desktop | General astronomy analysis | Python, Astropy, SciPy, Jupyter |
-| **casa** | notebook, desktop | Radio interferometry | CASA, Python astronomy stack |
-| **carta** | carta | Radio astronomy visualization | CARTA viewer, analysis tools |
-| **desktop** | desktop | GUI applications | Full Ubuntu desktop, Firefox |
-| **notebook** | notebook | Lightweight Jupyter | Basic Python scientific stack |
-
-### Specialized Containers
-
-| Container | Purpose | Key Features |
-|-----------|---------|--------------|
-| **firefly** | LSST data visualization | Firefly viewer, table tools |
-| **topcat** | Table analysis | TOPCAT, Java astronomy tools |
-| **ds9** | FITS image analysis | DS9 viewer, region analysis |
-| **pluto** | Interactive Julia computing | Pluto.jl reactive notebooks |
-| **phosphoros** | Photometric redshifts | SED fitting, redshift analysis |
-
-### Container Architecture
-
-```mermaid
-graph TD
-    Ubuntu[🐧 Ubuntu LTS Base]
-    Base[📦 base container<br/>Core tools, Conda]
-    AstroML[🔬 astroml<br/>Astronomy + ML]
-    Specialized[⚙️ Specialized containers]
-    
-    Ubuntu --> Base
-    Base --> AstroML
-    Base --> Specialized
-    
-    AstroML --> |General analysis| AstroML[astroml]
-    Specialized --> |Desktop GUI| Desktop[desktop]
-    Specialized --> |CARTA viewer| CARTA[carta]
-    Specialized --> |Firefly viewer| Firefly[firefly]
-    Specialized --> |Table analysis| TopCat[topcat]
-    Specialized --> |Image analysis| DS9[ds9]
-    Specialized --> |Julia computing| Pluto[pluto]
-```
-
-## 🚀 Using Containers
-
-### Choosing the Right Container
-
-**👩‍🔬 For General Astronomy:**
-```
-Container: astroml
-Session: notebook or desktop
-Use case: Most Python-based astronomy work
-```
-
-**📡 For Radio Astronomy:**
-```
-Container: casa
-Session: notebook or desktop  
-Use case: ALMA/VLA data reduction, CASA tasks
-```
-
-**🖥️ For GUI Applications:**
-```
-Container: desktop
-Session: desktop
-Use case: Legacy tools, image viewers, IDL
-```
-
-**⚡ For GPU Computing:**
-```
-Container: astroml-cuda
-Session: notebook
-Use case: Machine learning, image processing
-```
-
-### Launching Containers
-
-#### Through the Web Portal
-
-1. **Access CANFAR Portal:** [https://www.canfar.net](https://www.canfar.net)
-2. **Navigate to Science Portal**
-3. **Select session type** (notebook, desktop, carta, etc.)
-4. **Choose container** from dropdown
-5. **Configure resources** (CPU, memory, GPU if needed)
-6. **Launch session**
-
-#### Via API
+When containers run on CANFAR, they operate in a carefully configured environment designed for security and data access. The container always runs as your CADC user account, never as root or as a generic container user. Your home directory from `/arc/home/[username]` becomes the container's home directory, and project directories under `/arc/projects/` are mounted and accessible. Additionally, `/scratch/` provides high-speed temporary storage for intensive computations.
 
 ```bash
-# Get authentication token
-TOKEN=$(curl -s https://ws-cadc.canfar.net/ac/login \
-  -d "username=myuser" -d "password=mypass" | tr -d '"')
-
-# Launch notebook session with astroml container
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=my-analysis" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "type=notebook" \
-  https://ws-uv.canfar.net/skaha/v0/session
+# Inside a running container, check your environment
+echo $USER                      # Your CADC username
+echo $HOME                      # /arc/home/[username]
+ls /arc/projects/               # Available project directories
+ls /scratch/                    # Temporary high-speed storage
 ```
 
-### Working with Containers
+This runtime setup means there's an important compatibility consideration between code packaged in the container image and code stored on the `/arc` filesystem. Best practice involves keeping stable, tested code within the container image while placing development scripts and analysis notebooks in your `/arc/home` or project directories where they can be easily modified and version controlled.
 
-#### Understanding the Environment
+## Container Categories
 
-```bash
-# Check which container you're running
-echo $SKAHA_IMAGE
+CANFAR containers fall into three main categories, each serving different purposes and maintained by different groups.
 
-# See available software
-conda list                    # Python packages
-which casa                   # CASA installation
-jupyter --version           # Jupyter version
+### CANFAR-Supported Containers
 
-# Check system resources
-nproc                       # Available CPUs
-free -h                     # Available memory
-nvidia-smi                  # GPU status (if available)
-```
-
-#### Container File System
+These are officially maintained by the CANFAR team and provide the foundation for most astronomy work. The core offerings include **astroml** for general astronomy analysis with Python, Astropy, and machine learning libraries; **casa** for radio interferometry work; **notebook** for lightweight Jupyter environments; and **desktop** for full Ubuntu desktop sessions with GUI applications.
 
 ```bash
-# Your data (persistent across sessions)
-ls /arc/projects/myproject   # Shared project data
-ls /arc/home/$USER          # Personal files
+# Browse available CANFAR containers
+curl -s https://images.canfar.net/api/v2.0/projects/skaha/repositories | \
+  jq -r '.[] | .name' | sort
 
-# Temporary space (wiped at session end)
-ls /scratch                 # Fast temporary storage
-
-# Container system (read-only)
-ls /opt/casa                # CASA installation
-ls /opt/conda               # Conda environment
-```
-
-#### Software Management
-
-```bash
-# Install additional Python packages (session-only)
-pip install --user astroplan
-pip install --user aplpy
-
-# Install system packages (requires sudo, session-only)
-sudo apt update
-sudo apt install vim git
-
-# Make installations persistent
-# Save to /arc/home/$USER/.local/bin or create custom container
-```
-
-## 🔬 Container Registry (Harbor)
-
-CANFAR uses Harbor to store and manage container images.
-
-### Accessing Harbor
-
-**Harbor URL:** [https://images.canfar.net](https://images.canfar.net)
-
-**Login credentials:** Your CADC username and password
-
-### Browsing Containers
-
-```bash
-# List available images
-docker search images.canfar.net/skaha
-
-# Pull image locally (for development)
-docker pull images.canfar.net/skaha/astroml:latest
-
-# Inspect image details
+# Check container details
 docker inspect images.canfar.net/skaha/astroml:latest
 ```
 
-### Container Tags and Versioning
+For specialized visualization needs, CANFAR provides **carta** for radio astronomy data visualization and **firefly** for optical and infrared data exploration. These containers receive regular updates and official support from the CANFAR team.
 
-| Tag Pattern | Purpose | Example |
-|-------------|---------|---------|
-| `latest` | Most recent stable build | `astroml:latest` |
-| `YYYY.MM` | Monthly releases | `astroml:2024.03` |
-| `git-HASH` | Specific git commit | `astroml:git-a1b2c3d` |
-| `dev` | Development builds | `astroml:dev` |
+### Community-Maintained Containers
 
-## 🛠️ Building Custom Containers
+The astronomy community contributes specialized containers for emerging tools and workflows. Examples include **marimo** for modern reproducible notebook environments, **vscode** for browser-based code development, and **pluto** for interactive Julia computing. These containers are maintained by community members with oversight from CANFAR.
 
-### When to Build Custom Containers
+### Team and Individual Containers
 
-**✅ Build a custom container when:**
-- You need specific software not in existing containers
-- You want to standardize environments for your team
-- You need reproducible computational environments
-- You're developing tools for the community
+Research groups and individuals can create custom containers for specific projects or workflows. These might include proprietary software, custom analysis pipelines, or specialized configurations needed for particular research programs. While these containers use CANFAR infrastructure, they are maintained by their creators.
 
-**❌ Don't build custom containers for:**
-- Installing a few Python packages (use `pip install --user`)
-- Temporary software needs
-- One-off analyses
-
-### Container Development Workflow
-
-```mermaid
-graph LR
-    A[Write Dockerfile] --> B[Build Locally]
-    B --> C[Test Container]
-    C --> D[Fix Issues]
-    D --> B
-    C --> E[Tag for Harbor]
-    E --> F[Push to Registry]
-    F --> G[Test on CANFAR]
-    G --> H[Production Ready]
+```bash
+# Example team container structure
+images.canfar.net/myproject/custom-pipeline:latest
+images.canfar.net/myteam/analysis-env:v2.1
+images.canfar.net/user123/specialized-tool:dev
 ```
 
-### Container Types and Requirements
+## Container Types and Session Integration
 
-CANFAR supports different container types optimized for specific use cases:
+CANFAR containers are designed to work with different session types, each optimized for specific workflows and interaction patterns.
 
-#### 🪐 Notebook Containers
+### Notebook Containers
 
-**Purpose**: Interactive Jupyter environments for data analysis
+Notebook containers provide interactive Jupyter environments accessed through your web browser. These containers must include Jupyter Lab and are optimized for data analysis, visualization, and interactive computing. The **astroml** container exemplifies this type, offering a comprehensive Python astronomy stack with popular packages like Astropy, SciPy, and scikit-learn.
 
-- **Base Images**: `jupyter/scipy-notebook` or similar
-- **Access**: Web browser interface
-- **Requirements**: Must have `jupyter lab` executable available
-- **Use Cases**: Data analysis, visualization, interactive computing
+```python
+# Example notebook session - check available packages
+import astropy
+import numpy as np
+import matplotlib.pyplot as plt
+from astroquery import vizier
 
-**Basic Structure**:
+print(f"Astropy version: {astropy.__version__}")
+print(f"NumPy version: {np.__version__}")
+
+# Access your data
+import os
+data_path = f"/arc/projects/{os.environ.get('PROJECT_NAME', 'myproject')}"
+print(f"Project data at: {data_path}")
+```
+
+For GPU-accelerated computing, **astroml-cuda** includes the CUDA toolkit alongside the standard astronomy libraries, enabling machine learning and image processing workflows that leverage GPU acceleration.
+
+```python
+# Check GPU availability in astroml-cuda container
+import torch
+import tensorflow as tf
+
+print(f"PyTorch CUDA available: {torch.cuda.is_available()}")
+if torch.cuda.is_available():
+    print(f"GPU device: {torch.cuda.get_device_name(0)}")
+    
+print(f"TensorFlow GPU devices: {len(tf.config.list_physical_devices('GPU'))}")
+```
+
+### Desktop-App Containers
+
+While CANFAR maintains the base **desktop** container that provides the Ubuntu desktop environment, users can create **desktop-app** containers that package specific GUI applications to run within desktop sessions. These containers focus on single applications or related tool suites rather than providing complete desktop environments.
+
 ```dockerfile
-# Start with Jupyter base image
-ARG ROOT_CONTAINER=jupyter/scipy-notebook:latest
-FROM ${ROOT_CONTAINER}
+# Example desktop-app container for DS9 image viewer
+FROM ubuntu:22.04
 
-LABEL maintainer="Your Name <your.email@institution.ca>"
+# Install DS9 and dependencies
+RUN apt-get update && apt-get install -y \
+    saods9 \
+    x11-apps \
+    libx11-6 \
+    libxft2 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
+# Create startup script
+RUN echo '#!/bin/bash\nds9 "$@"' > /usr/local/bin/start-ds9 && \
+    chmod +x /usr/local/bin/start-ds9
+
+# Default command for desktop session
+CMD ["/usr/local/bin/start-ds9"]
+```
+
+Desktop-app containers are particularly useful for legacy astronomy software, specialized visualization tools, or applications that require specific library versions or configurations. When launched in a desktop session, these applications integrate seamlessly with the desktop environment while maintaining their isolated software dependencies.
+
+### Headless Containers
+
+Headless containers run without graphical interfaces and are designed for batch processing and automated workflows. These containers execute through the batch job system and are optimized for non-interactive processing tasks like data reduction pipelines, large-scale analysis, or scheduled computations.
+
+```dockerfile
+# Example headless processing container
+FROM images.canfar.net/skaha/astroml:latest
+
+# Install additional processing tools
 USER root
-WORKDIR /tmp
-
-# System package updates
-RUN apt-get update --yes --quiet --fix-missing \
-    && apt-get upgrade --yes --quiet
-
-# Install system packages
-COPY packages.apt .
-RUN apt-get install --yes --quiet $(cat packages.apt) \
-    && apt-get clean --yes \
-    && apt-get autoremove --purge --quiet --yes \
-    && rm -rf /var/lib/apt/lists/* /var/tmp/*
-
-# Configure system for CANFAR
-ADD nsswitch.conf /etc/
+RUN apt-get update && apt-get install -y \
+    parallel \
+    rsync \
+    && apt-get clean
 
 USER ${NB_USER}
 
-# Update conda environment
-COPY env.yml .
-RUN mamba env update --quiet -n base --file env.yml \
-    && mamba update --quiet --all --yes \
-    && mamba clean --all --quiet --force --yes \
-    && fix-permissions ${CONDA_DIR} \
-    && fix-permissions /home/${NB_USER}
-
-WORKDIR ${HOME}
-```
-
-#### 🖥️ Desktop-App Containers
-
-**Purpose**: GUI applications requiring X11 display
-
-- **Base Images**: Desktop environments with VNC support
-- **Access**: VNC client or web-based noVNC interface
-- **Requirements**: X11 support, VNC server, default executable is `xterm`
-- **Use Cases**: Legacy GUI tools, IDL, specialized visualization software
-
-**VNC-Based Structure**:
-```dockerfile
-FROM ubuntu:22.04
-
-# Install desktop environment and VNC
-RUN apt-get update && apt-get install -y \
-    xfce4 \
-    xfce4-terminal \
-    tigervnc-standalone-server \
-    tigervnc-viewer \
-    novnc \
-    websockify \
-    supervisor \
-    curl \
-    wget \
-    && apt-get clean
-
-# Install application-specific software
-RUN apt-get install -y your-gui-application
-
-# Configure VNC environment
-ENV DISPLAY=:1 \
-    VNC_PORT=5901 \
-    NO_VNC_PORT=6901 \
-    VNC_RESOLUTION=1280x1024 \
-    VNC_PW=vncpassword
-
-# System configuration for CANFAR
-RUN apt-get install -y sssd-client acl
-COPY nsswitch.conf /etc/
-RUN echo "Set disable_coredump false" > /etc/sudo.conf
-RUN dbus-uuidgen --ensure
-
-# Set up startup scripts
-COPY startup.sh /skaha/startup.sh
-RUN chmod +x /skaha/startup.sh
-
-EXPOSE $VNC_PORT $NO_VNC_PORT
-
-CMD ["/skaha/startup.sh"]
-```
-
-#### ⚡ Headless Containers
-
-**Purpose**: Batch processing and automation without GUI
-
-- **Base Images**: Any Linux distribution
-- **Access**: Command-line execution through batch jobs
-- **Requirements**: Must be labeled as `headless` in Harbor registry
-- **Use Cases**: Automated data processing, pipelines, scheduled analysis
-
-**Basic Structure**:
-```dockerfile
-FROM ubuntu:22.04
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    python3 \
-    python3-pip \
-    curl \
-    wget \
-    && apt-get clean
-
-# Install your processing software
-COPY requirements.txt .
-RUN pip3 install -r requirements.txt
-
-# Configure for CANFAR
-RUN apt-get install -y sssd-client acl
-COPY nsswitch.conf /etc/
-RUN echo "Set disable_coredump false" > /etc/sudo.conf
-
 # Copy processing scripts
-COPY src/ /opt/processing/
+COPY scripts/ /opt/processing/
 RUN chmod +x /opt/processing/*.sh
 
-# Default command (will be overridden by skaha)
-CMD ["/bin/bash"]
+# Default processing command
+CMD ["/opt/processing/batch_process.sh"]
 ```
 
-#### 🌐 Contributed Containers
+## Working with Existing Containers
 
-**Purpose**: Community-developed tools and specialized applications
+Most astronomy work on CANFAR can be accomplished using existing containers without requiring custom builds. The **astroml** container covers the majority of Python-based astronomy analysis needs, while **casa** handles radio astronomy workflows. For GUI applications, the **desktop** container provides a complete environment with Firefox, file managers, and terminal access.
 
-- **Base Images**: Various, depending on the tool
-- **Access**: Web interface typically on port 5000
-- **Requirements**: Web service configuration
-- **Use Cases**: Custom web applications, specialized analysis tools
+Choosing the right container depends on your specific workflow requirements. General Python astronomy work benefits from **astroml** in either notebook or desktop terminal sessions. Radio astronomy tasks requiring CASA tools work best with the **casa** container in notebook or desktop modes. Legacy GUI applications or IDL-based workflows should use **desktop** sessions with the desktop container.
 
-### Universal Container Requirements
+```bash
+# Launch different session types via API
+TOKEN=$(curl -s https://ws-cadc.canfar.net/ac/login \
+  -d "username=myuser" -d "password=mypass" | tr -d '"')
 
-All CANFAR containers must meet these minimum requirements:
+# Notebook session with astroml
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "name=analysis-session" \
+  -d "image=images.canfar.net/skaha/astroml:latest" \
+  -d "type=notebook" \
+  -d "cores=2" -d "ram=4" \
+  https://ws-uv.canfar.net/skaha/v0/session
 
-- **Architecture**: Linux x86_64 distribution
-- **User Context**: Containers run as the CADC user, never as root
-- **Runtime Root**: If root access needed, configure sudo for specific actions during build
-- **File System**: `/arc` filesystem automatically mounted for data access
-- **System Integration**: Proper user lookup configuration for CANFAR infrastructure
-
-**Required System Configuration**:
-
-Create `nsswitch.conf` for proper user lookup:
-```
-passwd:     files sss
-group:      files sss
-shadow:     files sss
-hosts:      files dns
-networks:   files
-protocols:  files
-services:   files sss
-netgroup:   files sss
-automount:  files sss
+# Desktop session with CASA
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "name=casa-desktop" \
+  -d "image=images.canfar.net/skaha/casa:latest" \
+  -d "type=desktop" \
+  -d "cores=4" -d "ram=8" \
+  https://ws-uv.canfar.net/skaha/v0/session
 ```
 
-**Standard System Packages** (`packages.apt`):
-```
-sssd-client
-acl
-vim
-curl
-wget
-```
-    Local[💻 Local Development]
-    Test[🧪 Test Locally]
-    Push[📤 Push to Harbor]
-    Deploy[🚀 Test on CANFAR]
-    Share[🌍 Share with Team]
-    
-    Local --> Test
-    Test --> Push
-    Push --> Deploy
-    Deploy --> |Iterate| Local
-    Deploy --> Share
+When working within containers, remember that software installations using `pip install --user` or `apt` commands are temporary and lost when the session ends. For persistent software needs, consider building a custom container or storing installation scripts in your `/arc/home` directory.
+
+```bash
+# Temporary package installation (lost at session end)
+pip install --user astroplan photutils
+
+# Persistent installation script approach
+cat > ~/install_packages.sh << 'EOF'
+#!/bin/bash
+pip install --user astroplan photutils aplpy
+pip install --user git+https://github.com/myteam/custom-tools.git
+EOF
+chmod +x ~/install_packages.sh
+
+# Run at start of each session
+~/install_packages.sh
 ```
 
-### Building a Custom Container
+## Building Custom Containers
 
-#### 1. Create Dockerfile
+Custom container development becomes necessary when existing containers don't meet specific software requirements or when creating standardized environments for research teams. The process involves creating a Dockerfile that defines the software stack, building and testing the container locally, and pushing it to the Harbor registry for use on CANFAR.
+
+### Development Workflow
+
+Successful container development follows an iterative workflow starting with local development and testing. Begin by extending existing CANFAR base images rather than starting from scratch, as this ensures compatibility with the CANFAR runtime environment and includes necessary system configurations.
+
+```bash
+# Local development workflow
+git clone https://github.com/myteam/custom-container.git
+cd custom-container
+
+# Build container locally
+docker build -t myteam/analysis-env:latest .
+
+# Test locally with mounted data
+docker run -it --rm \
+  -v $(pwd)/test-data:/arc/projects/test \
+  -v $(pwd)/home:/arc/home/testuser \
+  myteam/analysis-env:latest \
+  /bin/bash
+```
+
+Create your Dockerfile starting from an appropriate base image like `images.canfar.net/skaha/astroml:latest` for astronomy work. Install additional system packages as needed, then switch to the non-root user context for application installations. Python packages should be installed using `pip` or `mamba`, while system-level software requires `apt` or similar package managers during the build process.
+
+### Container Architecture Considerations
+
+All CANFAR containers run on Linux x86_64 architecture and must support the CANFAR user context system. Containers execute as the user who submitted the job, never as root, though they can be configured with sudo access for specific operations during the build process.
+
+The container filesystem integrates with CANFAR storage at runtime. The `/arc` filesystem containing home and project directories is mounted automatically, providing access to persistent data and development code. Temporary high-speed storage is available under `/scratch/` for intensive processing tasks.
+
+When designing containers, separate stable production code that belongs in the container image from development and analysis code that should reside on the `/arc` filesystem. This separation enables easier maintenance and allows users to modify analysis scripts without rebuilding containers.
+
+### Building and Testing Process
+
+Local testing ensures containers work correctly before deployment. Build your container using Docker and test core functionality locally. For notebook containers, verify that Jupyter Lab starts correctly and that key Python packages import properly. Desktop-app containers should be tested to ensure the target application launches and functions as expected.
 
 ```dockerfile
-# Start from CANFAR base image
+# Example notebook container extension
 FROM images.canfar.net/skaha/astroml:latest
 
-# Install additional system packages
+# Install additional system dependencies
 USER root
 RUN apt-get update && apt-get install -y \
     gfortran \
     libcfitsio-dev \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Switch back to non-root user
-USER $NB_UID
+# Switch to user context for application installs
+USER ${NB_USER}
 
-# Install Python packages
+# Install specialized astronomy packages
 RUN pip install --no-cache-dir \
     astroplan \
     photutils \
     reproject
 
-# Install custom software
-RUN git clone https://github.com/myteam/analysis-tools.git /opt/analysis-tools && \
-    cd /opt/analysis-tools && \
-    pip install -e .
+# Set up custom analysis tools
+RUN git clone https://github.com/myteam/analysis-tools.git /tmp/analysis-tools && \
+    cd /tmp/analysis-tools && \
+    pip install --no-cache-dir -e . && \
+    rm -rf /tmp/analysis-tools
 
-# Set up environment
-ENV PATH=/opt/analysis-tools/bin:$PATH
-
-# Create workspace directory
-RUN mkdir -p /arc/home/$NB_USER/workspace
-
-WORKDIR /arc/home/$NB_USER
+WORKDIR ${HOME}
 ```
-
-#### 2. Build and Test Locally
-
-```bash
-# Build the container
-docker build -t myproject/custom-astro:latest .
-
-# Test the container locally
-docker run -it --rm \
-  -v $(pwd):/arc/projects/myproject \
-  myproject/custom-astro:latest \
-  /bin/bash
-
-# Test specific functionality
-docker run --rm myproject/custom-astro:latest python -c "import astroplan; print('Success!')"
-```
-
-#### 3. Push to Harbor Registry
-
-```bash
-# Login to Harbor
-docker login images.canfar.net
-
-# Tag for Harbor
-docker tag myproject/custom-astro:latest \
-  images.canfar.net/myproject/custom-astro:latest
-
-# Push to registry
-docker push images.canfar.net/myproject/custom-astro:latest
-```
-
-### Container Testing and Deployment
-
-#### Local Testing
-
-**1. Build the container:**
-
-```bash
-docker build -t my-container:test .
-```
-
-**2. Test notebook containers:**
-
-```bash
-# Test Jupyter interface
-docker run -p 8888:8888 my-container:test
-
-# Verify Python packages
-docker run --rm my-container:test python -c "import astropy; print('Success!')"
-```
-
-**3. Test desktop containers:**
-
-```bash
-# Test VNC interface
-docker run -p 6901:6901 my-container:test
-# Access via http://localhost:6901/?password=vncpassword
-```
-
-**4. Test headless containers:**
-
-```bash
-# Test command execution
-docker run -it my-container:test /bin/bash
-
-# Test with mounted storage simulation
-docker run --rm -v $(pwd):/arc/projects/test my-container:test ls /arc/projects/test
-```
-
-#### Publishing to Harbor
-
-**1. Tag for Harbor:**
-
-```bash
-docker tag my-container:test images.canfar.net/myproject/my-container:1.0
-```
-
-**2. Login to Harbor:**
-
-```bash
-docker login images.canfar.net
-```
-
-**3. Push to registry:**
-
-```bash
-docker push images.canfar.net/myproject/my-container:1.0
-```
-
-**4. Label in Harbor UI:**
-
-- Go to [Harbor Registry](https://images.canfar.net)
-- Navigate to your image
-- Add appropriate labels: `notebook`, `desktop-app`, or `headless`
-
-### Container Best Practices
-
-#### Dockerfile Optimization
-
-**Layer Management:**
 
 ```dockerfile
-# ✅ Good - Combine related operations
+# Example headless processing container
+FROM images.canfar.net/skaha/astroml:latest
+
+USER root
+
+# Install processing dependencies
+RUN apt-get update && apt-get install -y \
+    parallel \
+    imagemagick \
+    ffmpeg \
+    && apt-get clean
+
+USER ${NB_USER}
+
+# Install Python processing packages
+RUN pip install --no-cache-dir \
+    dask[complete] \
+    zarr \
+    xarray
+
+# Copy processing scripts
+COPY --chown=${NB_USER}:${NB_GID} scripts/ /opt/processing/
+RUN chmod +x /opt/processing/*.py
+
+# Environment variables for processing
+ENV PROCESSING_THREADS=4
+ENV OUTPUT_FORMAT=fits
+
+# Default processing entry point
+CMD ["python", "/opt/processing/main.py"]
+```
+
+```dockerfile
+# Example desktop-app container for IRAF
+FROM ubuntu:22.04
+
+# Install IRAF and dependencies
+USER root
+RUN apt-get update && apt-get install -y \
+    iraf \
+    saods9 \
+    xgterm \
+    tcsh \
+    libx11-6 \
+    libxaw7 \
+    && apt-get clean
+
+# Create IRAF user setup
+RUN useradd -m -s /bin/tcsh iraf
+COPY iraf-setup.cl /home/iraf/
+
+# Setup script for CANFAR desktop session
+RUN echo '#!/bin/bash\n\
+export IRAFARCH=linux64\n\
+export TERM=xgterm\n\
+cd /arc/home/$USER\n\
+exec xgterm -sb -sl 1000 -j -ls -fn 9x15 -title "IRAF" &\n\
+exec ds9 &\n\
+wait\n' > /usr/local/bin/start-iraf && \
+    chmod +x /usr/local/bin/start-iraf
+
+CMD ["/usr/local/bin/start-iraf"]
+```
+
+After local testing succeeds, tag the container for the Harbor registry and push it for use on CANFAR:
+
+```bash
+# Tag for Harbor registry
+docker tag myteam/analysis-env:latest \
+  images.canfar.net/myteam/analysis-env:latest
+
+# Login and push to Harbor
+docker login images.canfar.net
+docker push images.canfar.net/myteam/analysis-env:latest
+
+# Test on CANFAR
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "name=test-custom" \
+  -d "image=images.canfar.net/myteam/analysis-env:latest" \
+  -d "type=notebook" \
+  https://ws-uv.canfar.net/skaha/v0/session
+```
+
+## Container Management and Best Practices
+
+Effective container management involves following established patterns for reproducibility, maintainability, and performance. Use specific version tags rather than `latest` for production workflows to ensure consistent environments over time. Layer Docker commands efficiently to minimize image size and build time.
+
+```dockerfile
+# Good layering practices
+FROM images.canfar.net/skaha/astroml:latest
+
+# Combine related operations
+USER root
 RUN apt-get update && apt-get install -y \
     package1 \
     package2 \
     package3 \
     && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
-
-# ❌ Bad - Separate RUN commands create more layers
-RUN apt-get update
-RUN apt-get install -y package1
-RUN apt-get install -y package2
-```
-
-**Security Practices:**
-
-```dockerfile
-# ✅ Use specific versions for reproducibility
-FROM ubuntu:22.04
-
-# ✅ Don't run as root
-USER ${NB_USER}
-
-# ✅ Clean up after installations
-RUN apt-get update && apt-get install -y \
-    my-package \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /var/tmp/*
-```
 
-#### Performance Optimization
-
-**Multi-Stage Builds** for complex applications:
-
-```dockerfile
-# Build stage
-FROM ubuntu:22.04 as builder
-RUN apt-get update && apt-get install -y build-essential
-COPY src/ /build/
-RUN make -C /build install
-
-# Runtime stage  
-FROM ubuntu:22.04
-COPY --from=builder /build/bin/* /usr/local/bin/
-# ... rest of runtime configuration
-```
-
-**BuildKit Features:**
-
-```bash
-# Enable BuildKit for faster builds
-export DOCKER_BUILDKIT=1
-docker build --progress=plain -t my-container:latest .
-```
-
-### Headless Container Best Practices
-
-For batch processing containers:
-
-- **Stateless Design**: Single-use execution patterns
-- **Logging**: Write output to stdout/stderr for monitoring
-- **Exit Codes**: Return proper codes (0 for success, non-zero for failure)  
-- **Environment Variables**: Check required variables in startup scripts
-- **Scratch Storage**: Use `/scratch/` for temporary high-speed processing
-
-**Example Processing Script:**
-
-```bash
-#!/bin/bash
-set -e  # Exit on error
-
-# Check required environment variables
-if [ -z "$INPUT_FILE" ] || [ -z "$OUTPUT_DIR" ]; then
-    echo "Error: INPUT_FILE and OUTPUT_DIR must be set"
-    exit 1
-fi
-
-# Activate conda environment if needed
-mamba activate base
-
-# Run processing
-echo "Processing $INPUT_FILE..."
-python /opt/processing/analyze.py \
-    --input "$INPUT_FILE" \
-    --output "$OUTPUT_DIR/results.fits" \
-    --verbose
-
-echo "Processing complete!"
-exit 0
-```
-
-### Common Issues and Solutions
-
-#### Permission Problems
-
-**Symptoms**: "Permission denied" errors when accessing `/arc` storage
-
-**Solutions:**
-
-- Ensure containers don't run as root in production
-- Use proper file permissions for `/skaha` scripts
-- Configure sudo only for specific operations during build
-
-```dockerfile
-# ✅ Correct approach
 USER ${NB_USER}
-RUN chmod +x /skaha/startup.sh
-```
 
-#### Environment Variable Issues
+# Pin package versions for reproducibility
+RUN pip install --no-cache-dir \
+    astroplan==0.8 \
+    photutils==1.8.0 \
+    reproject==0.10.0
 
-**Symptoms**: Applications can't find configuration or data
-
-**Solutions:**
-
-- Don't hardcode paths - use environment variables
-- Check for required variables in startup scripts
-- Use `/arc` paths for persistent data access
-
-```bash
-# ✅ Good - Check environment
-if [ -z "$CANFAR_DATA_PATH" ]; then
-    echo "Error: CANFAR_DATA_PATH not set"
-    exit 1
-fi
-```
-
-#### Resource Management
-
-**Symptoms**: Large image sizes, slow builds
-
-**Solutions:**
-
-- Remove unnecessary packages to keep images smaller
-- Clean package caches and temporary files
-- Use specific package versions for reproducibility
-
-```dockerfile
-# ✅ Clean approach
-RUN apt-get update && apt-get install -y \
-    required-package \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /var/tmp/* \
-    && pip cache purge
-```
-
-### Advanced Container Features
-
-### Container Best Practices
-
-#### Dockerfile Guidelines
-
-```dockerfile
-# Use specific base image versions for reproducibility
-FROM images.canfar.net/skaha/astroml:2024.03
-
-# Combine RUN commands to reduce layers
-RUN apt-get update && apt-get install -y \
-    package1 \
-    package2 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Use --no-cache-dir for pip to reduce image size
-RUN pip install --no-cache-dir package1 package2
-
-# Create non-root user for security
-USER $NB_UID
-
-# Set appropriate working directory
-WORKDIR /arc/home/$NB_USER
-
-# Document the container
-LABEL maintainer="your.email@institution.edu"
-LABEL description="Custom astronomy container for project XYZ"
-LABEL version="1.0"
-```
-
-#### Performance Optimization
-
-```dockerfile
-# Use multi-stage builds for smaller images
-FROM ubuntu:20.04 as builder
-RUN apt-get update && apt-get install -y build-essential
-COPY source/ /src/
-RUN cd /src && make
+# Use multi-stage builds for complex installations
+FROM images.canfar.net/skaha/astroml:latest as builder
+COPY source/ /build/
+RUN cd /build && make install
 
 FROM images.canfar.net/skaha/astroml:latest
-COPY --from=builder /src/bin/* /usr/local/bin/
-
-# Use .dockerignore to exclude unnecessary files
-# Create .dockerignore file:
-# .git
-# *.md
-# tests/
-# docs/
+COPY --from=builder /build/bin/* /usr/local/bin/
 ```
-
-## 🌍 Publishing Containers for CANFAR
-
-### Making Containers Community Available
-
-To make your container available to the broader CANFAR community:
-
-#### 1. Prepare Documentation
-
-Create clear documentation including:
-- **Purpose and use cases**
-- **Installation instructions**
-- **Usage examples**
-- **Dependencies and requirements**
-- **Maintenance contact**
-
-#### 2. Follow CANFAR Standards
-
-Ensure your container follows CANFAR conventions:
-
-```dockerfile
-# Use CANFAR base images
-FROM images.canfar.net/skaha/astroml:latest
-
-# Include required labels
-LABEL ca.nrc.cadc.skaha.session.type="notebook,desktop"
-LABEL ca.nrc.cadc.skaha.session.app="Custom Analysis Tool"
-
-# Maintain user permissions
-USER $NB_UID
-WORKDIR /arc/home/$NB_USER
-
-# Support multiple session types
-# Ensure Jupyter works for notebook sessions
-# Ensure X11 apps work for desktop sessions
-```
-
-#### 3. Submit for Review
-
-Contact [support@canfar.net](mailto:support@canfar.net) with:
-- Container repository and documentation
-- Use case description
-- Target user community
-- Maintenance commitment
-
-#### 4. Community Integration
-
-Once approved, your container will be:
-- Added to the official container catalog
-- Made available in the Science Portal interface
-- Listed in the documentation
-- Included in community support
-
-### Container Maintenance
-
-#### Version Management
 
 ```bash
-# Tag releases appropriately
-docker tag myproject/tool:latest myproject/tool:1.0
+# Version management
+docker tag myproject/tool:latest myproject/tool:v1.2.3
 docker tag myproject/tool:latest myproject/tool:2024.03
 
-# Maintain version history
-git tag v1.0
-git push origin v1.0
+# Automated builds with GitHub Actions
+cat > .github/workflows/build.yml << 'EOF'
+name: Build Container
+on:
+  push:
+    tags: ['v*']
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build and push
+      run: |
+        docker build -t images.canfar.net/myproject/tool:${{ github.ref_name }} .
+        docker login images.canfar.net -u ${{ secrets.HARBOR_USER }} -p ${{ secrets.HARBOR_TOKEN }}
+        docker push images.canfar.net/myproject/tool:${{ github.ref_name }}
+EOF
 ```
 
-#### Regular Updates
+Keep containers focused on their primary purpose rather than creating monolithic images that attempt to solve every possible use case. This approach makes containers easier to maintain and debug while providing clearer upgrade paths.
 
-```dockerfile
-# Update base images regularly
-FROM images.canfar.net/skaha/astroml:latest  # Check for updates monthly
+For team containers, establish clear documentation including purpose, usage examples, and maintenance responsibilities. Version containers systematically and maintain compatibility with CANFAR's evolving infrastructure through regular updates and testing.
 
-# Update software dependencies
-RUN pip install --upgrade astropy numpy scipy
+```yaml
+# Container documentation template (README.md)
+# Custom Astronomy Analysis Container
 
-# Test after updates
-RUN python -c "import astropy; print(f'Astropy version: {astropy.__version__}')"
+## Purpose
+This container provides a specialized environment for X-ray astronomy analysis.
+
+## Usage
+```bash
+# Launch notebook session
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "image=images.canfar.net/myteam/xray-analysis:latest" \
+  -d "type=notebook" \
+  https://ws-uv.canfar.net/skaha/v0/session
 ```
 
-## 🔧 Advanced Container Topics
+## Included Software
+- XSPEC 12.12.1
+- PyXspec
+- Custom analysis tools v2.1
 
-### Session Type Configuration
-
-Different session types require specific container configurations:
-
-#### Notebook Sessions
-```dockerfile
-# Ensure Jupyter is properly configured
-RUN jupyter labextension install @jupyter-widgets/jupyterlab-manager
-
-# Set up custom kernels
-RUN python -m ipykernel install --user --name=custom-env --display-name="Custom Environment"
+## Maintenance
+- Maintainer: team@institution.edu
+- Update schedule: Monthly
+- Source: https://github.com/myteam/xray-container
 ```
 
-#### Desktop Sessions
-```dockerfile
-# Ensure X11 support
-RUN apt-get install -y x11-apps
+Regular maintenance includes updating base images, refreshing software dependencies, and testing compatibility with new CANFAR features. Community-maintained containers benefit from collaborative development practices including shared repositories and issue tracking.
 
-# Test X11 functionality
-RUN echo 'export DISPLAY=:1' >> /etc/bash.bashrc
-```
+## Harbor Registry and Distribution
 
-#### Contributed Sessions
-```dockerfile
-# Web applications typically run on port 5000
-EXPOSE 5000
+The Harbor registry at `images.canfar.net` serves as the central repository for CANFAR containers. Users can browse available containers, examine metadata and documentation, and access containers for their sessions through the registry interface.
 
-# Set up web server
-COPY webapp/ /opt/webapp/
-CMD ["python", "/opt/webapp/app.py"]
-```
+Container versioning follows semantic patterns with `latest` tags for current stable releases, dated tags like `2024.03` for monthly snapshots, and specific commit hashes for development builds. This versioning strategy supports both reproducible research requiring fixed environments and ongoing development needing current software versions.
 
-### GPU Support
+Access to containers varies by category. CANFAR-supported containers are publicly available to all users. Community-maintained containers may have broader access depending on their purpose and licensing. Team and individual containers can be configured with specific access controls to support proprietary or sensitive work.
 
-```dockerfile
-# Start from CUDA-enabled base
-FROM images.canfar.net/skaha/astroml-cuda:latest
+## Integration with CANFAR Workflows
 
-# Install GPU-accelerated packages
-RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+Containers integrate seamlessly with CANFAR's interactive sessions and batch processing systems. Interactive sessions launch containers with full access to mounted storage and appropriate resource allocations. Batch jobs use headless containers for automated processing with results written back to persistent storage.
 
-# Test GPU availability
-RUN python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-```
+The container system supports different resource configurations including CPU, memory, and GPU allocations based on computational requirements. GPU-enabled containers like **astroml-cuda** automatically gain access to GPU resources when launched on appropriate hardware nodes.
 
-### Integration with CANFAR Storage
+Session persistence allows users to return to running containers across browser sessions while maintaining computational state. However, containers themselves are ephemeral - when sessions end, any changes made within the container filesystem are lost. This design encourages proper separation between stable container environments and dynamic analysis code.
 
-```dockerfile
-# Ensure proper permissions for ARC storage
-RUN chmod g+s /arc/projects
-
-# Set up VOSpace tools
-RUN pip install vostools
-
-# Configure environment for storage access
-ENV VOSPACE_WEBSERVICE=https://ws-cadc.canfar.net/vospace
-```
-
-## 🔗 What's Next?
-
-Now that you understand CANFAR containers:
-
-- **[Interactive Sessions →](../interactive-sessions/index.md)** - Use containers in different session types
-- **[Batch Jobs →](../batch-jobs/index.md)** - Run containers in headless mode
-- **[Storage Guide →](../storage/index.md)** - Access data from containers
+Understanding this integration helps optimize workflows by leveraging container strengths while working within system constraints. Plan computational workflows to use containers for consistent software environments while storing results, code, and data on the persistent `/arc` filesystem.
 
 ---
 
-!!! tip "Container Success Strategy"
-    Start with existing containers like `astroml` for most work. Only build custom containers when you have specific, persistent needs that can't be met with temporary package installations. When you do build custom containers, base them on CANFAR's standard images for maximum compatibility and maintenance ease.
+*Continue exploring CANFAR capabilities through [Interactive Sessions](../interactive-sessions/index.md) for hands-on container usage, [Batch Jobs](../batch-jobs/index.md) for automated processing, or [Storage Management](../storage/index.md) for data organization strategies.*
