@@ -18,11 +18,11 @@ Contributed applications are web-based tools that:
 
 | Category | Examples | Use Cases |
 |----------|----------|-----------|
-| **Data Visualization** | Custom plotters, 3D viewers | Specialized data presentation |
-| **Analysis Tools** | Statistical packages, fitting tools | Domain-specific analysis |
-| **Simulation Interfaces** | Parameter exploration, result viewers | Computational astronomy |
-| **Pipeline Managers** | Workflow controllers, job schedulers | Automated data processing |
-| **Educational Tools** | Interactive tutorials, demonstrations | Teaching and outreach |
+| **Interactive Computing** | Pluto.jl notebooks | Reactive Julia analysis, package development |
+| **Table Analysis** | TopCat, STILTS tools | Catalog crossmatching, statistical analysis |
+| **Image Analysis** | DS9, specialized viewers | FITS inspection, region analysis |
+| **Photometric Analysis** | Phosphoros, SED fitting | Redshift estimation, stellar population analysis |
+| **Radio Astronomy** | Specialized CASA tools | Advanced interferometry workflows |
 
 ## 🚀 Launching Contributed Applications
 
@@ -42,12 +42,12 @@ The container dropdown will show available contributed applications:
 
 **Currently Available Applications:**
 
-| Application | Container | Purpose |
-|-------------|-----------|---------|
-| **Custom Plotter** | `myproject/plotter:latest` | Advanced data visualization |
-| **Survey Explorer** | `community/survey-tool:v2.1` | Large dataset exploration |
-| **Simulation Viewer** | `simteam/viewer:stable` | Simulation result analysis |
-| **Pipeline Controller** | `workflows/manager:latest` | Automated processing control |
+| Application | Container | Purpose | Key Features |
+|-------------|-----------|---------|--------------|
+| **Pluto.jl** | `images.canfar.net/skaha/pluto:latest` | Interactive Julia notebooks | Reactive notebooks, package management |
+| **TopCat** | `images.canfar.net/skaha/topcat:latest` | Table analysis and visualization | FITS/VOTable support, crossmatching |
+| **DS9** | `images.canfar.net/skaha/ds9:latest` | FITS image display and analysis | Advanced FITS viewer, region analysis |
+| **Phosphoros** | `images.canfar.net/skaha/phosphoros:latest` | Photometric redshift estimation | SED fitting, redshift analysis |
 
 !!! note "Dynamic Application List"
     The available applications change as the community contributes new tools. Contact [support@canfar.net](mailto:support@canfar.net) to add your application to the catalog.

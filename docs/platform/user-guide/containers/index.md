@@ -59,17 +59,19 @@ CANFAR provides containers optimized for different astronomy workflows:
 |-----------|---------------|---------|--------------|
 | **astroml** | notebook, desktop | General astronomy analysis | Python, Astropy, SciPy, Jupyter |
 | **casa** | notebook, desktop | Radio interferometry | CASA, Python astronomy stack |
-| **carta** | carta, desktop | Radio astronomy visualization | CARTA viewer, analysis tools |
+| **carta** | carta | Radio astronomy visualization | CARTA viewer, analysis tools |
 | **desktop** | desktop | GUI applications | Full Ubuntu desktop, Firefox |
+| **notebook** | notebook | Lightweight Jupyter | Basic Python scientific stack |
 
 ### Specialized Containers
 
 | Container | Purpose | Key Features |
 |-----------|---------|--------------|
-| **astroml-cuda** | GPU computing | CUDA acceleration, ML frameworks |
 | **firefly** | LSST data visualization | Firefly viewer, table tools |
-| **notebook** | Lightweight Jupyter | Minimal Python scientific stack |
 | **topcat** | Table analysis | TOPCAT, Java astronomy tools |
+| **ds9** | FITS image analysis | DS9 viewer, region analysis |
+| **pluto** | Interactive Julia computing | Pluto.jl reactive notebooks |
+| **phosphoros** | Photometric redshifts | SED fitting, redshift analysis |
 
 ### Container Architecture
 
@@ -84,11 +86,13 @@ graph TD
     Base --> AstroML
     Base --> Specialized
     
-    AstroML --> |GPU enabled| AstroMLCUDA[astroml-cuda]
-    AstroML --> |Radio astronomy| CASA[casa]
-    Specialized --> Desktop[desktop]
-    Specialized --> CARTA[carta]
-    Specialized --> Firefly[firefly]
+    AstroML --> |General analysis| AstroML[astroml]
+    Specialized --> |Desktop GUI| Desktop[desktop]
+    Specialized --> |CARTA viewer| CARTA[carta]
+    Specialized --> |Firefly viewer| Firefly[firefly]
+    Specialized --> |Table analysis| TopCat[topcat]
+    Specialized --> |Image analysis| DS9[ds9]
+    Specialized --> |Julia computing| Pluto[pluto]
 ```
 
 ## 🚀 Using Containers

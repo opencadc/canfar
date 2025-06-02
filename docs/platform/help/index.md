@@ -212,13 +212,22 @@ Join our Discord server for peer support and community interaction:
 - **Collaboration**: Find research partners and collaborators
 - **Announcements**: Stay updated on new features and maintenance
 
-**Discord invite**: [Join CANFAR Discord](#) <!-- TODO: Add actual invite link -->
+**Discord invite**: [Join CANFAR Discord](https://discord.gg/vcCQ8QBvBa)
 
-**Discord etiquette**:
+**Community guidelines**:
 - Search previous messages before asking
-- Use appropriate channels (#general, #technical-help, #jobs)
+- Use appropriate channels and threads
 - Be respectful and helpful to other users
 - Don't share sensitive data or credentials
+
+### GitHub Issues
+
+For bug reports and feature requests, use our GitHub repositories:
+
+- **Platform issues**: Report technical problems
+- **Documentation**: Suggest improvements
+- **Feature requests**: Propose new capabilities
+- **Community contributions**: Submit code and examples
 
 ### Office Hours
 
@@ -247,7 +256,7 @@ Join our Discord server for peer support and community interaction:
 
 **Ways to help other users**:
 
-- **Answer questions**: Respond to Discord and forum posts
+- **Answer questions**: Respond to Discord and community discussions
 - **Share tutorials**: Create workflow examples
 - **Report bugs**: Help improve platform stability
 - **Suggest features**: Propose improvements
@@ -433,7 +442,7 @@ Your contributions help make CANFAR better for the entire astronomy community!
 **Planned maintenance**: Announced 48+ hours in advance via email and Discord
 
 **Unplanned outages**: 
-- Check [status.canfar.net](#) for current status
+- Check status.canfar.net for current status (when available)
 - Follow [@CANFAR_ACFC](https://twitter.com/CANFAR_ACFC) for real-time updates
 - Email [support@canfar.net](mailto:support@canfar.net) if status unclear
 
@@ -612,9 +621,9 @@ Your contributions help make CANFAR better for the entire astronomy community!
 | Need | Contact | Response Time |
 |------|---------|---------------|
 | General support | [support@canfar.net](mailto:support@canfar.net) | 1-2 business days |
-| Quick questions | Discord community | Minutes to hours |
+| Quick questions | [Discord Community](https://discord.gg/vcCQ8QBvBa) | Minutes to hours |
 | Security issues | [security@canfar.net](mailto:security@canfar.net) | Same day |
 | Documentation | [support@canfar.net](mailto:support@canfar.net) | 1-2 business days |
-| Office hours | Discord or video link | Thursdays 2-3 PM PT |
+| Office hours | Video conference | Thursdays 2-3 PM PT |
 
 Remember: The CANFAR team is here to help you succeed in your research. Don't hesitate to reach out with questions, no matter how basic they might seem!

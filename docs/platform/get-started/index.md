@@ -84,7 +84,7 @@ Ready to dive deeper?
 
 ## 💬 Need Help?
 
-- **[💬 Discord Community](https://discord.gg/YOUR_INVITE_LINK)** - Chat with other users
+- **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** - Chat with other users
 - **[📧 Email Support](mailto:support@canfar.net)** - Direct technical support
 - **[❓ FAQ](../faq/index.md)** - Common questions and solutions
 
