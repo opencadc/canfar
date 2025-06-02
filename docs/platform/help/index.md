@@ -317,7 +317,6 @@ Our documentation follows a clear structure designed for different user needs:
   - `radio-astronomy/`: CASA and radio-specific workflows
 - **`faq/`**: Frequently asked questions and troubleshooting
 - **`help/`**: Support resources and community information
-- **`developer-guide/`**: Legacy developer documentation
 
 ### ✍️ Writing Guidelines
 
@@ -537,7 +536,6 @@ Our documentation follows a clear structure designed for different user needs:
   - `radio-astronomy/`: CASA and radio-specific workflows
 - **`faq/`**: Frequently asked questions and troubleshooting
 - **`help/`**: Support resources and community information
-- **`developer-guide/`**: Legacy developer documentation
 
 ### ✍️ Writing Guidelines
 

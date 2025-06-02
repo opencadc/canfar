@@ -173,6 +173,55 @@ casa
 The desktop environment allows you to use CASA's plotting and visualization 
 tools that aren't available in command-line mode.
 
+## Desktop Session Tips
+
+### Copy & Paste Between Containers
+
+Since different containers (e.g., CASA and terminal windows) in a desktop session may run on different remote computers, copying and pasting text between containers requires using the **Clipboard** application.
+
+#### Accessing the Clipboard
+
+1. **Open the Clipboard**: Click the arrow at the far left of the desktop to open the application menu
+2. **Find Clipboard**: Look for "Clipboard" in the middle of the application list and click it
+
+> ![Desktop with Clipboard Menu](../images/clipboard/2_desktop_with_clipboard_menu.png)
+
+#### Using the Clipboard
+
+The Clipboard serves as an intermediary for transferring text between containers:
+
+1. **Copy text**: Highlight text in the source container and use `Ctrl+Shift+C`
+2. **Transfer via Clipboard**: The text should appear in the Clipboard application
+3. **Select in Clipboard**: Highlight the text in the Clipboard and press `Ctrl+Shift+C`
+4. **Paste to target**: Click in the destination container and use `Ctrl+Shift+V`
+
+> ![Copying Text Between Containers](../images/clipboard/4_text_into_clipboard.png)
+
+!!! tip "Keyboard Shortcuts"
+    - **Copy**: `Ctrl+Shift+C`
+    - **Paste**: `Ctrl+Shift+V`
+    - These shortcuts work consistently across all desktop containers
+
+### Adjusting Font Size
+
+Desktop containers support adjustable font sizes for better readability:
+
+#### Changing Terminal Font Size
+
+1. **Access font menu**: Hold `Ctrl` and right-click anywhere in a terminal window
+2. **Select size**: Choose from the available font size options (Small, Medium, Large)
+3. **Apply immediately**: Font changes take effect instantly
+
+> ![Font Size Adjustment](../images/font/2_fontsize_popup.png)
+
+This feature works in:
+- Terminal windows
+- CASA command-line interface
+- Text-based applications
+
+!!! note "Font Persistence"
+    Font size changes apply only to the current session. You'll need to readjust when starting new sessions.
+
 ## File Management
 
 ### Storage Access
