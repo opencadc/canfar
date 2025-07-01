@@ -9,25 +9,28 @@ This section covers the fundamental concepts you need to understand to effective
 The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platform is a cloud-based computing environment designed specifically for astronomical research. It provides:
 
 - **On-demand computing resources** without needing your own servers
-- **Pre-built software environments** with astronomy packages ready to use  
+- **Pre-built software environments** with astronomy packages ready to use
 - **Shared storage systems** for collaborative research
 - **Scalable infrastructure** that grows with your project needs
 
 ### Why Use CANFAR?
 
 **For Individual Researchers:**
+
 - By default, there is little to no software installation headaches - you might be lucky with a pre-configured container which you can also modify when getting more familiar.
 - Access powerful computing resources without owning hardware
 - Work from anywhere with just a web browser
 - Automatic backups and data protection
 
 **For Research Teams:**
+
 - Share data and analysis environments seamlessly
 - Standardized software stacks across the team
 - Collaborative workspaces and session sharing
 - Centralized project management
 
 **For Large Projects:**
+
 - Scale computing resources up or down as needed
 - Batch processing for large datasets
 - Custom software environments for specialized workflows
@@ -39,24 +42,25 @@ CANFAR is built on modern cloud-native technologies designed for scalability and
 
 ```mermaid
 graph TB
-    User[👤 You] --> Portal[🌐 Science Portal<br/>www.canfar.net]
+    User[👤 You] --> Portal[🌐 Science Portal<br/>canfar.net]
     Portal --> Auth[🔐 CADC Authentication]
     Portal --> Sessions[🖥️ Session Manager<br/>Skaha]
-    
+
     Sessions --> K8s[☸️ Kubernetes Cluster]
     K8s --> Containers[🐳 Container Images<br/>Harbor Registry]
     K8s --> Storage[💾 Storage Systems]
-    
-    Storage --> [📁 `arc` Storage<br/>Shared Filesystem]
-    Storage --> VOSpace[☁️ `vault` VOSpace<br/>Long-term Storage]
+
+    Storage --> arc[📁 arc Posix Storage<br/>Shared Filesystem]
+    Storage --> VOSpace[☁️ VOSpace Object Store <br/>Long-term Storage]
     Storage --> Scratch[⚡ Scratch<br/>Temporary SSDs]
-    
+
     Sessions --> Types[Session Types]
     Types --> Notebook[📓 Jupyter Notebooks]
     Types --> Desktop[🖥️ Desktop Environment]
     Types --> CARTA[📊 CARTA Viewer]
     Types --> Firefly[🔥 Firefly Viewer]
     Types --> Contrib[⚙️ Contributed Apps]
+    Types --> Batch[🏭 Batch Jobs]
 ```
 
 ### Key Components
@@ -115,7 +119,8 @@ CANFAR uses Kubernetes to manage your computing sessions. You don't need to unde
 **Sessions are temporary:** Each time you launch a session, Kubernetes creates a new container instance. When you stop the session, the container is destroyed.
 
 **Data persistence:** Your files persist through a storage system, not in the container itself. This means:
-- ✅ Files in `/arc/projects/` and `/arc/home/` are saved permanently  
+
+- ✅ Files in `/arc/projects/` and `/arc/home/` are saved permanently
 - ❌ Files in `/tmp/` or container system directories are lost when session ends
 - ⚡ Files in `/scratch/` are wiped when session ends
 
@@ -128,7 +133,7 @@ Different session types provide different interfaces to the same underlying comp
 **📓 Notebook Sessions**
 : JupyterLab interface for interactive analysis, perfect for data exploration and visualization.
 
-**🖥️ Desktop Sessions** 
+**🖥️ Desktop Sessions**
 : Full Linux desktop environment for GUI applications like CASA, DS9, and image viewers.
 
 **📊 CARTA Sessions**
@@ -145,17 +150,17 @@ Different session types provide different interfaces to the same underlying comp
 CANFAR provides REST APIs for programmatic access, allowing you to:
 
 - Launch and manage sessions from scripts
-- Transfer files programmatically  
+- Transfer files programmatically
 - Integrate CANFAR into automated workflows
 - Build custom applications using CANFAR resources
 
 ### Key API Endpoints
 
-| Service | Purpose | Documentation |
-|---------|---------|---------------|
-| **skaha** | Session management | [skaha](https://ws-uv.canfar.net/skaha) |
-| **VOSpace** | File operations | [VOSpace API](../storage/vospace-api.md) |
-| **Access Control** | Authentication and Authorization| [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
+| Service            | Purpose                          | Documentation                                                    |
+| ------------------ | -------------------------------- | ---------------------------------------------------------------- |
+| **skaha**          | Session management               | [skaha](https://ws-uv.canfar.net/skaha)                          |
+| **VOSpace**        | File operations                  | [VOSpace API](../storage/vospace-api.md)                         |
+| **Access Control** | Authentication and Authorization | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
 ## 💾 VOSpace Concepts
 
@@ -173,24 +178,24 @@ VOSpace is CANFAR's web-accessible storage system, based on the International Vi
 
 ### VOSpace vs. File System Storage
 
-| Feature | VOSpace (`vos:`) | ARC Storage (`/arc/`) |
-|---------|------------------|----------------------|
-| **Access Method** | Web APIs, command tools | POSIX file system |
-| **Speed** | Medium (network-based) | Fast (direct access) |
-| **Best For** | Archives, sharing, backups | Active analysis, large computations |
-| **Quota** | User/project based | Group-based |
-| **Backup** | Geo-redundant | Daily snapshots |
+| Feature           | VOSpace (`vos:`)           | ARC Storage (`/arc/`)               |
+| ----------------- | -------------------------- | ----------------------------------- |
+| **Access Method** | Web APIs, command tools    | POSIX file system                   |
+| **Speed**         | Medium (network-based)     | Fast (direct access)                |
+| **Best For**      | Archives, sharing, backups | Active analysis, large computations |
+| **Quota**         | User/project based         | Group-based                         |
+| **Backup**        | Geo-redundant              | Daily snapshots                     |
 
 ## 🔗 What's Next?
 
 Now that you understand the core concepts, dive into specific areas:
 
 - **[Accounts & Permissions →](../accounts-permissions/index.md)** - Manage users and access
-- **[Storage Systems →](../storage/index.md)** - Master data management  
+- **[Storage Systems →](../storage/index.md)** - Master data management
 - **[Container Usage →](../containers/index.md)** - Work with software environments
 - **[Interactive Sessions →](../interactive-sessions/index.md)** - Start analyzing data
 
 ---
 
 !!! tip "Key Takeaway"
-    CANFAR provides the computing power of a research institution without the infrastructure overhead. Focus on your science - let CANFAR handle the computers, software, and data management.
+CANFAR provides the computing power of a research institution without the infrastructure overhead. Focus on your science - let CANFAR handle the computers, software, and data management.
