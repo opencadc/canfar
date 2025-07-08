@@ -22,6 +22,9 @@ The [analysisUtils package](https://casaguides.nrao.edu/index.php/Analysis_Utili
 `import analysisUtils as au`
 to load it.
 
+## ADMIT
+[ADMIT (ALMA Data Mining Tool)](https://casaguides.nrao.edu/index.php/ADMIT_Products_and_Usage_CASA_6) is pre-installed on CASA containers where possible (CASA versions 4.5 and higher) and should be ready to use, although it has not been tested.  Note that the newest CASA containers (6.6.1-pipeline and regular versions 6.6.4 and higher) exclude ADMIT because it does not properly compile.
+
 ## Firefox
 The Firefox web-browser, needed for CASA commands where you are interacting with the weblogs, should available for CASA versions 6.1.0 to 6.4.3.  Error messages will pop up in your terminal window, but minimal testing suggests that it is sufficiently functional.
 
