@@ -1,5 +1,49 @@
 # Changelog
 
+## [1.8.0](https://github.com/shinybrar/skaha/compare/v1.7.0...v1.8.0) (2025-07-09)
+
+
+### Features
+
+* **auth:** added oidc device flow logic ([1013cf5](https://github.com/shinybrar/skaha/commit/1013cf551dceaafeeed25a2e1fdd11a8c375c9d5))
+* **auth:** added x509 cert get logic ([657a97d](https://github.com/shinybrar/skaha/commit/657a97de3c455e8ab26c1eb84a4dd794f4ebd5eb))
+* **auth:** server info is now saved for each auth config ([1788c1e](https://github.com/shinybrar/skaha/commit/1788c1e35a93142b47a20c2d71c5f8609a40d05b))
+* **cli:** added feat to auto discover skaha servers ([46eb565](https://github.com/shinybrar/skaha/commit/46eb565e00e3bf4ff95020d87f15a93d64f16d4a))
+* **client:** significant improvements to the base skaha client to support context managers ([a197553](https://github.com/shinybrar/skaha/commit/a19755376984a338e8ea56d73f9bec71463c7a34))
+* **config:** updated auth config to provide valid & expired checks for all auth types and added tests ([4dc6929](https://github.com/shinybrar/skaha/commit/4dc6929b7538d3a230a9c1d4c3a134ec9835ec7c))
+* **discover:** added functionality to discover skaha servers from registries and also added tests ([5857772](https://github.com/shinybrar/skaha/commit/5857772563d354ad0ad5a90c0620b4689f904b54))
+* **garble:** added fernet and rot13 ciphers to encrypt/obsfucate sensitive info ([7204879](https://github.com/shinybrar/skaha/commit/72048791e297c46cd4a2d738ae4a25dc545348ff))
+* **hooks:** added cli tool typer hook for multiple command aliases ([6c5bc15](https://github.com/shinybrar/skaha/commit/6c5bc150f969bf49edd14273a4aaef80f31fa57b))
+* **logging:** added comprehensive rich based logger for the project ([a48c520](https://github.com/shinybrar/skaha/commit/a48c520390db965825a0053722789cdb31812dab))
+* **models:** all client models have been moved to skaha.models ([a07c676](https://github.com/shinybrar/skaha/commit/a07c6760ff824a6dcc647a67be2a9abcc27cf52d))
+* **oidc:** added tests and made the oidc auth flow async ([0059e12](https://github.com/shinybrar/skaha/commit/0059e128015e737ec3f008bf01afb5aa2b667392))
+
+
+### Bug Fixes
+
+* **auth:** added comprehensive login support ([bd11fe4](https://github.com/shinybrar/skaha/commit/bd11fe4f27e473a7461112d4f9e881bf6858dbb7))
+* **cli:** updated the discover logic to be cleaner ([ebff177](https://github.com/shinybrar/skaha/commit/ebff177eab097de019cc13bb7876abf59b850762))
+* **lint:** major improvements to standards ([264b9b5](https://github.com/shinybrar/skaha/commit/264b9b5b73bea1bee4e077004e8c6f6057c97556))
+* **logging:** moved all modules to use the new logging facility ([e05399f](https://github.com/shinybrar/skaha/commit/e05399fb848251aa0f309f14615236a833944559))
+* **models:** fixes model import errors for pydantic ([fd264d4](https://github.com/shinybrar/skaha/commit/fd264d410544b1896bc4857fec44f95c1f77b7f2))
+* **models:** typo ([4c7dbe6](https://github.com/shinybrar/skaha/commit/4c7dbe6159fb90b9e798a5b293a3877ac3855fe3))
+* **mypy:** setting extra checks to true ([0a29305](https://github.com/shinybrar/skaha/commit/0a29305d8ea88115db535c4655529b17e73f4f58))
+* **pre-commit:** added jwt to mypy ([f787507](https://github.com/shinybrar/skaha/commit/f7875070c35f1cbbfda33b1d1716896524edf9b0))
+* **pre-commit:** updates ([fa1b1c4](https://github.com/shinybrar/skaha/commit/fa1b1c49465899c3db08f1669b2a468905291b1f))
+* **registry:** added swedish skaha server ([cfad0ef](https://github.com/shinybrar/skaha/commit/cfad0ef49b076355b0491037fe3557d1aaace975))
+* **security:** private init ([0fada02](https://github.com/shinybrar/skaha/commit/0fada023ce59c2a30001a9486964309616eb67b5))
+* **security:** removed secret info ([dccb1c2](https://github.com/shinybrar/skaha/commit/dccb1c241006109bc9cea6a7cea949854135915e))
+* **style:** lint ([248565f](https://github.com/shinybrar/skaha/commit/248565f2c48a4d1d220a2f4c5d302b812af5d422))
+* **tests:** fix for stdout ([6c25d3e](https://github.com/shinybrar/skaha/commit/6c25d3e816a969954fda46d7edf765627182d685))
+* **tests:** import ([54ed5fc](https://github.com/shinybrar/skaha/commit/54ed5fc492375a21292c556fb162542d90f5fc0f))
+* **wip:** lint/style/type-hinting ([ced042d](https://github.com/shinybrar/skaha/commit/ced042d425d657bbfb1e7375305aebdd304cb855))
+
+
+### Documentation
+
+* **bug-reports:** added issue template and docs for reporting bugs ([1e177ea](https://github.com/shinybrar/skaha/commit/1e177ea5eee695a103d6b359f38d90626d1166a0))
+* **tests:** updated info about slow tests ([a4401a3](https://github.com/shinybrar/skaha/commit/a4401a3ef7680f5b23ddc9bc7a0a8ce6dda156e2))
+
 ## [1.7.0](https://github.com/shinybrar/skaha/compare/v1.6.1...v1.7.0) (2025-05-28)
 
 
