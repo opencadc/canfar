@@ -11,19 +11,14 @@ import webbrowser
 from typing import Any
 
 import httpx
-import jwt
 import segno
+from pydantic import SecretStr
 from rich.console import Console
 from rich.progress import BarColumn, Progress, TextColumn, TimeRemainingColumn
 
 from skaha import get_logger
-from skaha.models.auth import (
-    OIDC,
-    OIDCClient,
-    OIDCTokens,
-    OIDCUrls,
-    Server,
-)
+from skaha.models.auth import OIDC
+from skaha.utils import jwt
 
 console = Console()
 log = get_logger(__name__)
@@ -42,8 +37,8 @@ async def discover(url: str, client: httpx.AsyncClient | None = None) -> dict[st
 
     Args:
         url (str): OIDC Discovery URL.
-        client (httpx.AsyncClient | None): Optional async HTTP client.
-            If None, creates a new one.
+        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+            If None, creates a new one. Defaults to None.
 
     Returns:
         dict[str, Any]: OIDC provider configuration.
@@ -67,8 +62,8 @@ async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[st
 
     Args:
         url (str): OIDC Registration URL.
-        client (httpx.AsyncClient | None): Optional async HTTP client.
-            If None, creates a new one.
+        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+            If None, creates a new one. Defaults to None.
 
     Returns:
         dict[str, Any]: Client registration details.
@@ -143,6 +138,110 @@ async def _poll_token(
     raise ValueError(msg)
 
 
+async def refresh(
+    url: str,
+    identity: str,
+    secret: str,
+    token: str,
+) -> SecretStr:
+    """Refresh OIDC access token using refresh token.
+
+    Args:
+        url (str): Token endpoint URL.
+        identity (str): Client ID.
+        secret (str): Client secret.
+        token (str): Refresh token.
+
+    Returns:
+        pydantic.SecretStr: New access token.
+
+    Raises:
+        httpx.HTTPStatusError: For HTTP errors.
+        KeyError: If refresh token is invalid or expired.
+        Exception: For other errors.
+    """
+    payload: dict[str, Any] = {
+        "grant_type": "refresh_token",
+        "refresh_token": token,
+        "client_id": identity,
+        "client_secret": secret,
+    }
+
+    try:
+        async with httpx.AsyncClient() as client:
+            log.debug("Refreshing OIDC access token")
+            response = await client.post(url, data=payload, auth=(identity, secret))
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+            log.debug("refresh http request successful")
+            access: SecretStr = SecretStr(data["access_token"])
+            return access
+    except httpx.HTTPStatusError as error:
+        msg = "HTTP error while refreshing OIDC access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+    except KeyError as error:
+        msg = "server response does not contain access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+    except Exception as error:
+        msg = "Failed to refresh OIDC access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+
+
+def sync_refresh(
+    url: str,
+    identity: str,
+    secret: str,
+    token: str,
+) -> SecretStr:
+    """Refresh OIDC access token using refresh token.
+
+    Args:
+        url (str): Token endpoint URL.
+        identity (str): Client ID.
+        secret (str): Client secret.
+        token (str): Refresh token.
+
+    Returns:
+        pydantic.SecretStr: New access token.
+
+    Raises:
+        httpx.HTTPStatusError: For HTTP errors.
+        KeyError: If refresh token is invalid or expired.
+        Exception: For other errors.
+    """
+    payload: dict[str, Any] = {
+        "grant_type": "refresh_token",
+        "refresh_token": token,
+        "client_id": identity,
+        "client_secret": secret,
+    }
+
+    try:
+        with httpx.Client() as client:
+            log.debug("Refreshing OIDC access token")
+            response = client.post(url, data=payload, auth=(identity, secret))
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+            log.debug("refresh http request successful")
+            access: SecretStr = SecretStr(data["access_token"])
+            return access
+    except httpx.HTTPStatusError as error:
+        msg = "HTTP error while refreshing OIDC access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+    except KeyError as error:
+        msg = "server response does not contain access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+    except Exception as error:
+        msg = "Failed to refresh OIDC access token"
+        log.exception(msg)
+        raise ValueError(msg) from error
+
+
 async def authflow(
     device_auth_url: str,
     token_url: str,
@@ -157,8 +256,8 @@ async def authflow(
         token_url (str): Token endpoint.
         identity (str): Client identity.
         secret (str): Client secret.
-        client (httpx.AsyncClient | None): Optional async HTTP client.
-            If None, creates a new one.
+        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+            If None, creates a new one. Defaults to None.
 
     Returns:
         dict[str, Any]: OIDC tokens including access and refresh tokens.
@@ -339,7 +438,6 @@ async def authenticate(oidc: OIDC) -> OIDC:
 
     Args:
         oidc (OIDC): OIDC configuration.
-        console (Console): Rich console for output.
 
     Returns:
         OIDC: Updated OIDC configuration with tokens.
@@ -376,9 +474,8 @@ async def authenticate(oidc: OIDC) -> OIDC:
 
         oidc.token.access = tokens["access_token"]
         oidc.token.refresh = tokens["refresh_token"]
-        oidc.token.expiry = jwt.decode(  # type: ignore [attr-defined]
-            str(oidc.token.refresh), options={"verify_signature": False}
-        ).get("exp")
+        oidc.expiry.refresh = jwt.expiry(str(oidc.token.refresh))
+        oidc.expiry.access = jwt.expiry(str(oidc.token.access))
 
         console.print("[green]✓[/green] OIDC device authenticated successfully")
 
@@ -395,12 +492,8 @@ async def authenticate(oidc: OIDC) -> OIDC:
 
 
 if __name__ == "__main__":
-    config = OIDC(
-        endpoints=OIDCUrls(
-            discovery="https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
-        ),
-        client=OIDCClient(),
-        token=OIDCTokens(),
-        server=Server(),
+    oidc_config = OIDC()  # type: ignore [call-arg]
+    oidc_config.endpoints.discovery = (
+        "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
     )
-    asyncio.run(authenticate(config))
+    asyncio.run(authenticate(oidc_config))

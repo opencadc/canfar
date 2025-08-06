@@ -6,7 +6,7 @@ from pydantic import ValidationError
 from skaha.models.registry import ContainerRegistry
 
 
-def test_valid_container_registry():
+def test_valid_container_registry() -> None:
     """Test valid container registry."""
     valid = {
         "url": "https://images.canfar.net",
@@ -19,21 +19,21 @@ def test_valid_container_registry():
     assert registry.secret == "ghp_1234567890"  # nosec
 
 
-def test_invalid_container_registry_missing_username():
+def test_invalid_container_registry_missing_username() -> None:
     """Test invalid container registry missing username."""
     invalid_data = {"url": "images.canfar.net", "secret": "ghp_1234567890"}  # nosec
     with pytest.raises(ValidationError):
         ContainerRegistry(**invalid_data)
 
 
-def test_invalid_container_registry_missing_secret():
+def test_invalid_container_registry_missing_secret() -> None:
     """Test invalid container registry missing secret."""
     invalid_data = {"server": "images.canfar.net", "username": "test"}  # nosec
     with pytest.raises(ValidationError):
         ContainerRegistry(**invalid_data)
 
 
-def test_invalid_container_registry_wrong_server():
+def test_invalid_container_registry_wrong_server() -> None:
     """Test invalid container registry wrong server."""
     invalid_data = {
         "url": "invalid.server.net",
@@ -44,7 +44,7 @@ def test_invalid_container_registry_wrong_server():
         ContainerRegistry(**invalid_data)
 
 
-def test_base64_encoding():
+def test_base64_encoding() -> None:
     """Test base64 encoding."""
     registry = ContainerRegistry(username="test", secret="supersecret")  # nosec
     # Encoding basedon https://www.base64encode.org/

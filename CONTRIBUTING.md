@@ -41,6 +41,9 @@ uv sync --all-extras --dev
 
 These commands will install the Python version, create a virtual environment, and install all dependencies required for development.
 
+!!! note "Alternative Tooling"
+    While this project uses *uv* for dependency and virtual environment management, you are welcome to use other tools like *pip*, *conda*, or *virtualenv*. The `pyproject.toml` file contains all the necessary information for these tools to create a compatible environment.
+
 Skaha uses *pre-commit* to manage the development workflow. To install the pre-commit hooks, simply run:
 
 ```bash

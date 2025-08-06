@@ -11,7 +11,7 @@ from skaha.hooks.httpx.errors import acatch, catch
 class TestCatch:
     """Test the catch function."""
 
-    def test_catch_successful_response(self):
+    def test_catch_successful_response(self) -> None:
         """Test catch with successful response."""
         # Create mock response that doesn't raise an error
         mock_response = Mock(spec=httpx.Response)
@@ -25,7 +25,7 @@ class TestCatch:
         mock_response.read.assert_called_once()
         mock_response.raise_for_status.assert_called_once()
 
-    def test_catch_http_error_response(self):
+    def test_catch_http_error_response(self) -> None:
         """Test catch with HTTP error response."""
         # Create mock response that raises HTTPError
         mock_response = Mock(spec=httpx.Response)
@@ -48,7 +48,7 @@ class TestCatch:
         mock_response.read.assert_called_once()
         mock_response.raise_for_status.assert_called_once()
 
-    def test_catch_other_http_error(self):
+    def test_catch_other_http_error(self) -> None:
         """Test catch with other HTTPError types."""
         mock_response = Mock(spec=httpx.Response)
         mock_response.read.return_value = b"error content"
@@ -71,7 +71,7 @@ class TestACatch:
     """Test the acatch function."""
 
     @pytest.mark.asyncio
-    async def test_acatch_successful_response(self):
+    async def test_acatch_successful_response(self) -> None:
         """Test acatch with successful response."""
         # Create mock response that doesn't raise an error
         mock_response = Mock(spec=httpx.Response)
@@ -86,7 +86,7 @@ class TestACatch:
         mock_response.raise_for_status.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_acatch_http_error_response(self):
+    async def test_acatch_http_error_response(self) -> None:
         """Test acatch with HTTP error response."""
         # Create mock response that raises HTTPError
         mock_response = Mock(spec=httpx.Response)
@@ -110,7 +110,7 @@ class TestACatch:
         mock_response.raise_for_status.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_acatch_other_http_error(self):
+    async def test_acatch_other_http_error(self) -> None:
         """Test acatch with other HTTPError types."""
         mock_response = Mock(spec=httpx.Response)
         mock_response.aread = AsyncMock(return_value=b"error content")
@@ -129,7 +129,7 @@ class TestACatch:
             )
 
     @pytest.mark.asyncio
-    async def test_acatch_timeout_error(self):
+    async def test_acatch_timeout_error(self) -> None:
         """Test acatch with timeout error."""
         mock_response = Mock(spec=httpx.Response)
         mock_response.aread = AsyncMock(return_value=b"")

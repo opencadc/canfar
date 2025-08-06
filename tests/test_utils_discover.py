@@ -16,7 +16,7 @@ async def discover():
 
 
 @pytest.mark.asyncio
-async def test_discover(discover: Discover):
+async def test_discover(discover: Discover) -> None:
     """Test discover."""
     assert discover is not None
     assert discover.config is not None
@@ -24,7 +24,7 @@ async def test_discover(discover: Discover):
 
 
 @pytest.mark.asyncio
-async def test_functionality(discover: Discover):
+async def test_functionality(discover: Discover) -> None:
     """Test functionality."""
     results = await discover.servers()
     assert results is not None

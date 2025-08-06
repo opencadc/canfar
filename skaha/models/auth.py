@@ -2,73 +2,84 @@
 
 from __future__ import annotations
 
+import math
 import time
-from pathlib import Path
-from typing import Annotated
+from pathlib import Path  # noqa: TC003
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
 
 from skaha import get_logger
+from skaha.auth import x509
+from skaha.models.http import Server
 
 log = get_logger(__name__)
 
 
-class Server(BaseModel):
-    """Server information for authentication configuration."""
-
-    name: str | None = Field(default=None, description="Server display name")
-    uri: str | None = Field(default=None, description="Server URI identifier")
-    url: str | None = Field(default=None, description="Server URL endpoint")
-
-
-class OIDCUrls(BaseModel):
+class Endpoint(BaseModel):
     """OIDC URL configuration."""
 
-    discovery: str | None = Field(default=None, description="OIDC discovery URL")
-    device: str | None = Field(
-        default=None, description="OIDC device authorization URL"
-    )
-    registration: str | None = Field(
-        default=None, description="OIDC client registration URL"
-    )
-    token: str | None = Field(default=None, description="OIDC token endpoint URL")
+    discovery: Annotated[str | None, Field(description="OIDC discovery URL")] = None
+    device: Annotated[
+        str | None, Field(description="OIDC device authorization URL")
+    ] = None
+    registration: Annotated[
+        str | None, Field(description="OIDC client registration URL")
+    ] = None
+    token: Annotated[str | None, Field(description="OIDC token endpoint URL")] = None
 
 
-class OIDCClient(BaseModel):
+class Client(BaseModel):
     """OIDC client configuration."""
 
-    identity: str | None = Field(default=None, description="OIDC client ID")
-    secret: str | None = Field(default=None, description="OIDC client secret")
+    identity: Annotated[str | None, Field(description="OIDC client ID")] = None
+    secret: Annotated[str | None, Field(description="OIDC client secret")] = None
 
 
-class OIDCTokens(BaseModel):
+class Token(BaseModel):
     """OIDC token configuration."""
 
-    access: str | None = Field(default=None, description="Access token")
-    refresh: str | None = Field(default=None, description="Refresh token")
-    expiry: float | None = Field(default=None, description="Refresh Token expiry ctime")
+    access: Annotated[str | None, Field(description="Access token")] = None
+    refresh: Annotated[str | None, Field(description="Refresh token")] = None
+
+
+class Expiry(BaseModel):
+    """OIDC token expiry times."""
+
+    access: Annotated[
+        float | None, Field(description="Access token expiry in ctime")
+    ] = None
+    refresh: Annotated[
+        float | None, Field(description="Refresh token expiry in ctime")
+    ] = None
 
 
 class OIDC(BaseModel):
     """Complete OIDC configuration."""
 
+    mode: Literal["oidc"] = "oidc"
     endpoints: Annotated[
-        OIDCUrls, Field(default_factory=OIDCUrls, description="OIDC URLs")
+        Endpoint,
+        Field(default_factory=Endpoint, description="OIDC Endpoints."),
     ]
     client: Annotated[
-        OIDCClient,
-        Field(default_factory=OIDCClient, description="OIDC client credentials"),
+        Client,
+        Field(default_factory=Client, description="OIDC Client Credentials."),
     ]
     token: Annotated[
-        OIDCTokens,
-        Field(default_factory=OIDCTokens, description="OIDC tokens"),
+        Token,
+        Field(default_factory=Token, description="OIDC Tokens"),
     ]
     server: Annotated[
         Server,
-        Field(default_factory=Server, description="OIDC server information"),
+        Field(default_factory=Server, description="Science Platform Server."),
+    ]
+    expiry: Annotated[
+        Expiry,
+        Field(default_factory=Expiry, description="OIDC Token Expiry."),
     ]
 
+    @property
     def valid(self) -> bool:
         """Check if all required information for getting new access tokens exists.
 
@@ -81,12 +92,11 @@ class OIDC(BaseModel):
             self.client.identity,
             self.client.secret,
             self.token.refresh,
-            self.token.expiry,
         ]
 
         # Check if all required fields are defined
         if not all(required):
-            log.debug("Missing required OIDC configuration.")
+            log.warning("Missing required OIDC configuration.")
             return False
 
         return True
@@ -98,23 +108,37 @@ class OIDC(BaseModel):
         Returns:
             bool: True if the access token is active, False otherwise.
         """
-        if self.token.refresh is None:
+        if self.expiry.access is None:
+            log.warning("OIDC access token expiry is not set.")
             return True
-        if self.token.expiry is None:
-            return True
-        return self.token.expiry < time.time()
+        return self.expiry.access < time.time()
 
 
 class X509(BaseModel):
     """X.509 certificate configuration."""
 
-    path: str | None = Field(default=None, description="Path to PEM certificate file")
-    expiry: float | None = Field(default=None, description="Certificate expiry ctime")
-    server: Annotated[
-        Server,
-        Field(default_factory=Server, description="X509 server information"),
+    mode: Literal["x509"] = "x509"
+    path: Annotated[
+        Path | None,
+        Field(
+            title="x509 Certificate",
+            description="Pathlike to PEM certificate",
+        ),
+    ] = None
+    expiry: Annotated[
+        float,
+        Field(
+            default=0.0,
+            title="x509 Expiry Time",
+            description="ctime of cert expiration",
+        ),
     ]
+    server: Annotated[
+        Server | None,
+        Field(description="X509 server information"),
+    ] = None
 
+    @property
     def valid(self) -> bool:
         """Check if the certificate filepath is defined and expiry is in the future.
 
@@ -123,9 +147,13 @@ class X509(BaseModel):
         """
         if self.path is None:
             return False
-        if not Path(self.path).exists():
+        try:
+            x509.valid(self.path)
+        except (FileNotFoundError, ValueError) as err:
+            msg = "Failed to validate x509 certificate: %s", err
+            log.exception(msg)
             return False
-        return self.expiry is not None
+        return True
 
     @property
     def expired(self) -> bool:
@@ -134,58 +162,27 @@ class X509(BaseModel):
         Returns:
             bool: True if the certificate is expired, False otherwise.
         """
-        if self.expiry is None:
+        if self.path is None:
             return True
+        if math.isclose(self.expiry, 0.0, abs_tol=1e-9):
+            self.expiry = x509.expiry(self.path)
+            log.debug("Computed expiry from certificate file.")
         return self.expiry < time.time()
 
 
-class AuthConfig(BaseSettings):
-    """Authentication configuration."""
+class TokenAuth(BaseModel):
+    """Token authentication configuration."""
 
-    mode: Annotated[str | None, Field(default=None, description="Authentication mode")]
-    oidc: Annotated[
-        OIDC,
+    mode: Literal["token"] = "token"
+    token: Annotated[
+        str | None,
         Field(
-            default_factory=lambda: OIDC(
-                endpoints=OIDCUrls(),
-                client=OIDCClient(),
-                token=OIDCTokens(),
-                server=Server(),
-            ),
-            description="OIDC settings",
+            default=None,
+            title="Authentication Token",
+            description="Authentication token for the server.",
         ),
-    ]
-    x509: Annotated[
-        X509,
-        Field(
-            default_factory=lambda: X509(server=Server()),
-            description="X.509 certificate settings",
-        ),
-    ]
-
-    def valid(self) -> bool:
-        """Validate that the selected authentication mode has valid configuration.
-
-        Returns:
-            AuthConfig: The validated configuration.
-
-        Raises:
-            ValueError: If the selected mode's configuration is invalid.
-        """
-        if self.mode == "oidc":
-            return self.oidc.valid()
-        if self.mode == "x509":
-            return self.x509.valid()
-        return False
-
-    def expired(self) -> bool:
-        """Check if the authentication configuration is expired.
-
-        Returns:
-            bool: True if the authentication configuration is expired, False otherwise.
-        """
-        if self.mode == "oidc":
-            return self.oidc.expired
-        if self.mode == "x509":
-            return self.x509.expired
-        return True
+    ] = None
+    server: Annotated[
+        Server | None,
+        Field(description="Token server information"),
+    ] = None

@@ -6,6 +6,8 @@ using the cadcutils.net.auth library as the backbone for X509 authentication.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+from os import R_OK, access
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -13,8 +15,12 @@ from cadcutils.net.auth import Subject, get_cert  # type: ignore[import-untyped]
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
+from skaha import CERT_PATH, get_logger
+
 if TYPE_CHECKING:
     from skaha.models import auth
+
+log = get_logger(__name__)
 
 
 def gather(
@@ -29,9 +35,11 @@ def gather(
 
     Args:
         username (str, optional): Username for authentication. Will prompt if None.
-        days_valid (int): Number of days the certificate should be valid. Default 10.
+            Defaults to None.
+        days_valid (int): Number of days the certificate should be valid.
+            Defaults to 10.
         cert_path (Path, optional): Path to save certificate.
-            Default ~/.ssl/cadcproxy.pem.
+            Defaults to ~/.ssl/cadcproxy.pem.
 
     Returns:
         dict[str, Any]: Dictionary with certificate info for skaha.config.auth.X509:
@@ -51,6 +59,7 @@ def gather(
 
     # Set default path
     if cert_path is None:
+        log.debug("Using default certificate path: ~/.ssl/cadcproxy.pem")
         cert_path = Path.home() / ".ssl" / "cadcproxy.pem"
 
     try:
@@ -78,12 +87,12 @@ def gather(
         raise ValueError(msg) from e
 
 
-def inspect(path: Path | None = None) -> dict[str, Any]:
+def inspect(path: Path = CERT_PATH) -> dict[str, Any]:
     """Inspect X509 certificate and return info for skaha.config.auth.X509.
 
     Args:
         path (Path, optional): Path to certificate file.
-            Default ~/.ssl/cadcproxy.pem.
+            Defaults to skaha.CERT_PATH, which is ~/.ssl/cadcproxy.pem.
 
     Returns:
         dict[str, Any]: Dictionary with certificate info for skaha.config.auth.X509:
@@ -97,29 +106,79 @@ def inspect(path: Path | None = None) -> dict[str, Any]:
         >>> info = inspect()
         >>> print(f"Certificate for {info['username']} expires at {info['expiry']}")
     """
-    # Set default path
-    if path is None:
-        path = Path.home() / ".ssl" / "cadcproxy.pem"
+    return {"path": valid(path), "expiry": expiry(path)}
 
+
+def valid(path: Path = CERT_PATH) -> str:
+    """Check if certificate exists and is readable.
+
+    Args:
+        path (Path, optional): Path to certificate file.
+            Defaults to skaha.CERT_PATH, which is ~/.ssl/cadcproxy.pem.
+
+    Returns:
+        str: Absolute path to certificate file.
+
+    Raises:
+        FileNotFoundError: If certificate file does not exist.
+        ValueError: If certificate file is not a file.
+        PermissionError: If certificate file is not readable.
+    """
     try:
-        # Check if file exists and is readable
-        assert path.exists(), f"{path} does not exist"
-        assert path.is_file(), f"{path} is not a file"
+        destination = path.resolve(strict=True)
+    except FileNotFoundError as err:
+        msg = f"{path.as_posix()} does not exist."
+        raise FileNotFoundError(msg) from err
 
-        # Load and parse the certificate
-        data = path.read_text(encoding="utf-8").encode("utf-8")
+    if not destination.is_file():
+        msg = f"{destination} is not a file."
+        raise ValueError(msg)
+
+    if not access(destination, R_OK):
+        msg = f"{destination} is not readable."
+        raise PermissionError(msg)
+
+    return destination.absolute().as_posix()
+
+
+def expiry(path: Path = CERT_PATH) -> float:
+    """Get the expiry time for the certificate.
+
+    Expiry time is returned as a Unix timestamp (seconds since epoch).
+
+    Args:
+        path (Path, optional): Path to certificate file.
+            Defaults to skaha.CERT_PATH, which is ~/.ssl/cadcproxy.pem.
+
+    Returns:
+        float: Expiry time as Unix timestamp (seconds since epoch).
+
+    Raises:
+        ValueError: If certificate is expired, not yet valid, or cannot be parsed.
+    """
+    try:
+        destination = path.resolve(strict=True)
+        data = destination.read_bytes()
         cert = x509.load_pem_x509_certificate(data, default_backend())
+        now_utc = datetime.now(timezone.utc)
 
-        # Get expiry as Unix timestamp
-        expiry = cert.not_valid_after_utc.timestamp()
+        if cert.not_valid_after_utc <= now_utc:
+            msg = f"{destination} has expired."
+            raise ValueError(msg)  # noqa: TRY301
 
-        return {
-            "path": path.absolute().as_posix(),
-            "expiry": expiry,
-        }
+        if cert.not_valid_before_utc >= now_utc:
+            msg = f"{destination} is not yet valid."
+            raise ValueError(msg)  # noqa: TRY301
 
+        return cert.not_valid_after_utc.timestamp()
+    except FileNotFoundError as err:
+        msg = f"x509 cert not found: {err}"
+        log.debug(msg)
+        return 0.0
     except Exception as err:
-        msg = f"Failed to inspect certificate: {err}"
+        if isinstance(err, ValueError):
+            raise  # Re-raise ValueError for expired/not-yet-valid certificates
+        msg = f"Unable to load PEM file. {err}"
         raise ValueError(msg) from err
 
 
@@ -127,10 +186,10 @@ def authenticate(config: auth.X509) -> auth.X509:
     """Authenticate using X509 certificate.
 
     Args:
-        config (X509Config): X509 configuration.
+        config (auth.X509): X509 configuration.
 
     Returns:
-        X509Config: X509 configuration.
+        auth.X509: X509 configuration.
 
     Raises:
         ValueError: If certificate cannot be read or parsed.
@@ -142,5 +201,5 @@ def authenticate(config: auth.X509) -> auth.X509:
     except Exception as err:
         msg = f"Failed to authenticate with X509 certificate: {err}"
         raise ValueError(msg) from err
-    else:
-        return config
+
+    return config

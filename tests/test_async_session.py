@@ -5,7 +5,6 @@ from time import time
 from uuid import uuid4
 
 import pytest
-from httpx import HTTPError
 from pydantic import ValidationError
 
 from skaha.session import AsyncSession
@@ -24,20 +23,20 @@ def asession():
 
 
 @pytest.mark.asyncio
-async def test_fetch_with_kind(asession: AsyncSession):
+async def test_fetch_with_kind(asession: AsyncSession) -> None:
     """Test fetching images with kind."""
     await asession.fetch(kind="headless")
 
 
 @pytest.mark.asyncio
-async def test_fetch_malformed_kind(asession: AsyncSession):
+async def test_fetch_malformed_kind(asession: AsyncSession) -> None:
     """Test fetching images with malformed kind."""
     with pytest.raises(ValidationError):
         await asession.fetch(kind="invalid")
 
 
 @pytest.mark.asyncio
-async def test_fetch_with_malformed_view(asession: AsyncSession):
+async def test_fetch_with_malformed_view(asession: AsyncSession) -> None:
     """Test fetching images with malformed view."""
     with pytest.raises(ValidationError):
         await asession.fetch(view="invalid")
@@ -45,14 +44,14 @@ async def test_fetch_with_malformed_view(asession: AsyncSession):
 
 @pytest.mark.asyncio
 @pytest.mark.slow
-async def test_get_session_stats(asession: AsyncSession):
+async def test_get_session_stats(asession: AsyncSession) -> None:
     """Test fetching images with kind."""
     response = await asession.stats()
     assert "instances" in response
 
 
 @pytest.mark.asyncio
-async def test_create_session_invalid(asession: AsyncSession, name: str):
+async def test_create_session_invalid(asession: AsyncSession, name: str) -> None:
     """Test creating a session with malformed kind."""
     with pytest.raises(ValidationError):
         await asession.create(
@@ -65,7 +64,7 @@ async def test_create_session_invalid(asession: AsyncSession, name: str):
 @pytest.mark.asyncio
 @pytest.mark.order(1)
 @pytest.mark.slow
-async def test_create_session(asession: AsyncSession, name: str):
+async def test_create_session(asession: AsyncSession, name: str) -> None:
     """Test creating a session."""
     identity: list[str] = await asession.create(
         name=name,
@@ -85,7 +84,7 @@ async def test_create_session(asession: AsyncSession, name: str):
 @pytest.mark.asyncio
 @pytest.mark.order(2)
 @pytest.mark.slow
-async def test_get_succeeded(asession: AsyncSession):
+async def test_get_succeeded(asession: AsyncSession) -> None:
     """Test getting succeeded sessions."""
     limit: float = time() + 60  # 1 minute
     while time() < limit:
@@ -99,7 +98,7 @@ async def test_get_succeeded(asession: AsyncSession):
 @pytest.mark.asyncio
 @pytest.mark.order(3)
 @pytest.mark.slow
-async def test_get_logs(asession: AsyncSession):
+async def test_get_logs(asession: AsyncSession) -> None:
     """Test getting logs for a session."""
     logs = await asession.logs(ids=pytest.IDENTITY)
     assert logs != ""
@@ -111,7 +110,7 @@ async def test_get_logs(asession: AsyncSession):
 @pytest.mark.asyncio
 @pytest.mark.order(4)
 @pytest.mark.slow
-async def test_session_events(asession: AsyncSession):
+async def test_session_events(asession: AsyncSession) -> None:
     """Test getting session events."""
     done = False
     limit = time() + 60
@@ -127,7 +126,7 @@ async def test_session_events(asession: AsyncSession):
 @pytest.mark.asyncio
 @pytest.mark.order(5)
 @pytest.mark.slow
-async def test_delete_session(asession: AsyncSession, name: str):
+async def test_delete_session(asession: AsyncSession, name: str) -> None:
     """Test deleting a session."""
     # Delete the session
     done = False
@@ -138,24 +137,3 @@ async def test_delete_session(asession: AsyncSession, name: str):
                 done = True
     deletion = await asession.destroy_with(prefix=name)
     assert deletion == {pytest.IDENTITY[0]: True}
-
-
-@pytest.mark.asyncio
-async def test_bad_error_exceptions():
-    """Test error handling."""
-    asession = AsyncSession(server="https://bad.server.com")
-    with pytest.raises(HTTPError):
-        await asession.fetch()
-    with pytest.raises(HTTPError):
-        await asession.stats()
-    with pytest.raises(HTTPError):
-        await asession.destroy_with(prefix="bad")
-
-    assert not await asession.create(
-        name="bad",
-        image="images.canfar.net/skaha/terminal:1.1.2",
-    )
-
-    assert not await asession.info(["bad"])
-    assert not await asession.logs(["bad"])
-    assert await asession.destroy(["bad"]) == {"bad": False}

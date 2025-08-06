@@ -30,14 +30,18 @@ jobs:
         run: |
           echo "Client Payload: ${{ toJson(github.event.client_payload) }}"
       - uses: astral-sh/setup-uv@caf0cab7a618c569241d31dcd442f54681755d39 # v3.2.4
+      - name: Set up Python
+        run: uv python install
+      - name: Install dependencies
+        run: uv sync --group docs
       - if: env.RELEASES_CREATED == 'true'
         run: |
-          uv python install
+          echo "Deploying Release Docs for ${{ env.TAG }}"
           uv run mike deploy --push --update-aliases "${{ env.TAG }}" latest -F mkdocs.yml
           uv run mike set-default --push latest -F mkdocs.yml
       - if: env.RELEASES_CREATED == 'false'
         run: |
-          uv python install
+          echo "Deploying Edge Docs for ${{ env.SHA }}"
           uv run mike deploy --push --update-aliases edge -F mkdocs.yml
       - run: |
           uv run mike list

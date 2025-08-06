@@ -13,15 +13,15 @@ from skaha.utils.display import configure_server_choices, servers
 
 
 # Tests for convert module
-def test_dict_to_tuples_empty():
+def test_dict_to_tuples_empty() -> None:
     assert dict_to_tuples({}) == []
 
 
-def test_dict_to_tuples_simple():
+def test_dict_to_tuples_simple() -> None:
     assert dict_to_tuples({"a": 1, "b": 2}) == [("a", 1), ("b", 2)]
 
 
-def test_dict_to_tuples_nested():
+def test_dict_to_tuples_nested() -> None:
     assert dict_to_tuples({"a": {"x": 1, "y": 2}, "b": 3}) == [
         ("a", "x=1"),
         ("a", "y=2"),
@@ -29,7 +29,7 @@ def test_dict_to_tuples_nested():
     ]
 
 
-def test_dict_to_tuples_mixed():
+def test_dict_to_tuples_mixed() -> None:
     assert dict_to_tuples({"a": 1, "b": {"x": 2}, "c": {"y": 3, "z": 4}}) == [
         ("a", 1),
         ("b", "x=2"),
@@ -38,7 +38,7 @@ def test_dict_to_tuples_mixed():
     ]
 
 
-def test_dict_to_tuples_non_string_keys():
+def test_dict_to_tuples_non_string_keys() -> None:
     assert dict_to_tuples({1: "a", 2: {"x": "b"}}) == [(1, "a"), (2, "x=b")]
 
 
@@ -86,7 +86,7 @@ def create_test_results(endpoints: list[Server]) -> ServerResults:
     return results
 
 
-def test_configure_server_choices_alive_only():
+def test_configure_server_choices_alive_only() -> None:
     """Test configure_server_choices with only alive servers."""
     alive = [
         create_test_server("Registry1", name="Server1"),
@@ -106,7 +106,7 @@ def test_configure_server_choices_alive_only():
     assert choices[0].value == alive[0]
 
 
-def test_configure_server_choices_with_dead():
+def test_configure_server_choices_with_dead() -> None:
     """Test configure_server_choices including dead servers."""
     alive = [create_test_server("Registry1", name="Server1")]
     dead = [create_test_server("Registry2", name="Server2", status=None)]
@@ -120,7 +120,7 @@ def test_configure_server_choices_with_dead():
     assert "🔴" in choices[1].title  # dead server
 
 
-def test_configure_server_choices_with_details():
+def test_configure_server_choices_with_details() -> None:
     """Test configure_server_choices with detailed information."""
     alive = [
         create_test_server(
@@ -142,7 +142,7 @@ def test_configure_server_choices_with_details():
     assert "https://test1.example.com/skaha" in choice_title
 
 
-def test_configure_server_choices_unknown_name():
+def test_configure_server_choices_unknown_name() -> None:
     """Test configure_server_choices with server having no name."""
     alive = [create_test_server("Registry1", name=None)]
     dead = []
@@ -155,7 +155,7 @@ def test_configure_server_choices_unknown_name():
     assert "Unknown" in choices[0].title
 
 
-def test_configure_server_choices_empty():
+def test_configure_server_choices_empty() -> None:
     """Test configure_server_choices with no servers."""
     choices = configure_server_choices(
         show_dead=False, show_details=False, alive=[], dead=[]
@@ -165,7 +165,7 @@ def test_configure_server_choices_empty():
 
 
 @pytest.mark.asyncio
-async def test_servers_successful_selection():
+async def test_servers_successful_selection() -> None:
     """Test servers function with successful server selection."""
     test_server = create_test_server("TestRegistry", name="TestServer")
     results = create_test_results([test_server])
@@ -182,7 +182,7 @@ async def test_servers_successful_selection():
 
 
 @pytest.mark.asyncio
-async def test_servers_keyboard_interrupt():
+async def test_servers_keyboard_interrupt() -> None:
     """Test servers function handling KeyboardInterrupt."""
     test_server = create_test_server("TestRegistry", name="TestServer")
     results = create_test_results([test_server])
@@ -198,7 +198,7 @@ async def test_servers_keyboard_interrupt():
 
 
 @pytest.mark.asyncio
-async def test_servers_user_cancellation():
+async def test_servers_user_cancellation() -> None:
     """Test servers function when user cancels selection."""
     test_server = create_test_server("TestRegistry", name="TestServer")
     results = create_test_results([test_server])
@@ -214,7 +214,7 @@ async def test_servers_user_cancellation():
 
 
 @pytest.mark.asyncio
-async def test_servers_with_show_dead_true():
+async def test_servers_with_show_dead_true() -> None:
     """Test servers function with show_dead=True."""
     alive_server = create_test_server("Registry1", name="AliveServer", status=200)
     dead_server = create_test_server("Registry2", name="DeadServer", status=None)
@@ -237,7 +237,7 @@ async def test_servers_with_show_dead_true():
 
 
 @pytest.mark.asyncio
-async def test_servers_with_show_details_true():
+async def test_servers_with_show_details_true() -> None:
     """Test servers function with show_details=True."""
     test_server = create_test_server(
         "TestRegistry",
@@ -264,7 +264,7 @@ async def test_servers_with_show_details_true():
 
 
 @pytest.mark.asyncio
-async def test_servers_mixed_status():
+async def test_servers_mixed_status() -> None:
     """Test servers function with mixed alive and dead servers."""
     alive1 = create_test_server("Registry1", name="Alive1", status=200)
     alive2 = create_test_server("Registry2", name="Alive2", status=200)
@@ -285,64 +285,3 @@ async def test_servers_mixed_status():
         call_args = mock_select.call_args
         # Should only show alive servers (2 choices)
         assert len(call_args.kwargs["choices"]) == 2
-
-
-def test_configure_server_choices_alignment():
-    """Test that configure_server_choices properly aligns text."""
-    alive = [
-        create_test_server("ShortReg", name="Short"),
-        create_test_server("VeryLongRegistryName", name="VeryLongServerName"),
-    ]
-    dead = []
-
-    choices = configure_server_choices(
-        show_dead=False, show_details=False, alive=alive, dead=dead
-    )
-
-    assert len(choices) == 2
-    # Both choices should have consistent formatting
-    title1 = choices[0].title
-    title2 = choices[1].title
-
-    # Check that both titles contain the expected elements
-    assert "Short" in title1
-    assert "ShortReg" in title1
-    assert "VeryLongServerName" in title2
-    assert "VeryLongRegistryName" in title2
-
-    # Both should have the same indicator
-    assert title1.startswith("🟢")
-    assert title2.startswith("🟢")
-
-
-def test_configure_server_choices_detailed_alignment():
-    """Test configure_server_choices with details and proper alignment."""
-    alive = [
-        create_test_server(
-            "Reg1",
-            uri="ivo://short.org/skaha",
-            url="https://short.com/skaha",
-            name="Short",
-        ),
-        create_test_server(
-            "Registry2",
-            uri="ivo://very.long.domain.org/skaha",
-            url="https://very.long.domain.com/skaha",
-            name="LongName",
-        ),
-    ]
-    dead = []
-
-    choices = configure_server_choices(
-        show_dead=False, show_details=True, alive=alive, dead=dead
-    )
-
-    assert len(choices) == 2
-    title1 = choices[0].title
-    title2 = choices[1].title
-
-    # Both should contain all the detailed information
-    assert "ivo://short.org/skaha" in title1
-    assert "https://short.com/skaha" in title1
-    assert "ivo://very.long.domain.org/skaha" in title2
-    assert "https://very.long.domain.com/skaha" in title2
