@@ -94,16 +94,9 @@ class ServerResults(BaseModel):
 
 
 class ContainerRegistry(BaseModel):
-    """Authentication details for private container registry.
+    """Authentication details for private container registry."""
 
-    Args:
-        BaseModel (pydantic.BaseModel): Pydantic BaseModel.
-
-    Returns:
-        object: Pydantic BaseModel object.
-    """
-
-    url: str | None = Field(default=None, description="Container Registry URL")
+    url: AnyHttpUrl | None = Field(default=None, description="Container Registry URL")
     username: str | None = Field(
         default=None,
         description="Username for the container registry",
@@ -124,14 +117,12 @@ class ContainerRegistry(BaseModel):
         """Check if the container registry is configured correctly.
 
         Raises:
-            ValueError: _description_
-            ValueError: _description_
+            ValueError: If the secret is provided without a username.
+            ValueError: If the username is provided without a secret.
 
         Returns:
-            Self: _description_
+            Self: The validated model instance.
         """
-        if self.url:
-            self.url = AnyHttpUrl(self.url).encoded_string()
         if self.username and not self.secret:
             msg = "container registry secret is required."
             raise ValueError(msg)

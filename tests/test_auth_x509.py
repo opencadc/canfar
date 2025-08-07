@@ -1,340 +1,286 @@
-"""Comprehensive tests for the X509 authentication module."""
+"""Tests for the skaha.auth.x509 module."""
 
 from __future__ import annotations
 
 import datetime
+import math
 import tempfile
-import time
 from pathlib import Path
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 import pytest
 from cryptography import x509
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from skaha.auth.x509 import gather, inspect
+from skaha.auth import x509 as x509_auth
+from skaha.models.auth import X509
 
 
-class TestX509Module:
-    """Test cases for the X509 authentication module."""
+# Helper function to generate a self-signed certificate for testing
+def generate_cert(
+    cert_path: Path,
+    valid_for_days: int = 1,
+    not_before_days: int = 0,
+    expired: bool = False,
+) -> None:
+    """Generates a self-signed PEM certificate for testing purposes."""
+    private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
 
-    @pytest.fixture
-    def mock_cert_content(self) -> str:
-        """Create a mock X509 certificate content for testing."""
-        # Generate a private key
-        private_key = rsa.generate_private_key(
-            public_exponent=65537, key_size=2048, backend=default_backend()
-        )
+    subject = issuer = x509.Name(
+        [
+            x509.NameAttribute(NameOID.COUNTRY_NAME, "CA"),
+            x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "BC"),
+            x509.NameAttribute(NameOID.LOCALITY_NAME, "Victoria"),
+            x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Test Inc"),
+            x509.NameAttribute(NameOID.COMMON_NAME, "test.example.com"),
+        ]
+    )
 
-        # Create a self-signed certificate
-        subject = issuer = x509.Name(
-            [
-                x509.NameAttribute(NameOID.COUNTRY_NAME, "CA"),
-                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "BC"),
-                x509.NameAttribute(NameOID.LOCALITY_NAME, "Victoria"),
-                x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Test Org"),
-                x509.NameAttribute(NameOID.COMMON_NAME, "testuser"),
-            ]
-        )
+    now = datetime.datetime.now(datetime.timezone.utc)
 
-        # Certificate valid for 1 hour from now
-        now = datetime.datetime.now(datetime.timezone.utc)
-        cert = (
-            x509.CertificateBuilder()
-            .subject_name(subject)
-            .issuer_name(issuer)
-            .public_key(private_key.public_key())
-            .serial_number(x509.random_serial_number())
-            .not_valid_before(now)
-            .not_valid_after(now + datetime.timedelta(hours=1))
-            .add_extension(
-                x509.SubjectAlternativeName(
-                    [
-                        x509.DNSName("localhost"),
-                    ]
-                ),
-                critical=False,
+    if expired:
+        not_valid_before = now - datetime.timedelta(days=30)
+        not_valid_after = now - datetime.timedelta(days=15)
+    else:
+        not_valid_before = now + datetime.timedelta(days=not_before_days)
+        not_valid_after = not_valid_before + datetime.timedelta(days=valid_for_days)
+
+    builder = (
+        x509.CertificateBuilder()
+        .subject_name(subject)
+        .issuer_name(issuer)
+        .public_key(private_key.public_key())
+        .serial_number(x509.random_serial_number())
+        .not_valid_before(not_valid_before)
+        .not_valid_after(not_valid_after)
+        .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
+    )
+
+    certificate = builder.sign(private_key, hashes.SHA256())
+
+    with cert_path.open("wb") as f:
+        f.write(
+            private_key.private_bytes(
+                encoding=serialization.Encoding.PEM,
+                format=serialization.PrivateFormat.TraditionalOpenSSL,
+                encryption_algorithm=serialization.NoEncryption(),
             )
-            .sign(private_key, hashes.SHA256(), default_backend())
         )
+        f.write(certificate.public_bytes(serialization.Encoding.PEM))
 
-        # Return PEM-encoded certificate
-        return cert.public_bytes(serialization.Encoding.PEM).decode("utf-8")
 
-    @pytest.fixture
-    def temp_cert_file(self, mock_cert_content: str) -> Path:
-        """Create a temporary certificate file for testing."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False) as f:
-            f.write(mock_cert_content)
-            temp_path = Path(f.name)
+# --- Tests for skaha.auth.x509.valid --- #
 
-        yield temp_path
 
-        # Cleanup
-        if temp_path.exists():
-            temp_path.unlink()
+def test_valid_happy_path() -> None:
+    """Test that `valid` returns the correct path for a valid certificate."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path)
+        result = x509_auth.valid(cert_path)
+        assert Path(result).resolve() == cert_path.resolve()
 
-    def test_gather_with_username_and_defaults(self) -> None:
-        """Test gather function with username provided and default parameters."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
 
-        with (
-            patch("skaha.auth.x509.Subject") as mock_subject,
-            patch("skaha.auth.x509.get_cert") as mock_get_cert,
-            patch("skaha.auth.x509.inspect") as mock_inspect,
-            patch("pathlib.Path.mkdir") as mock_mkdir,
-            patch("pathlib.Path.write_text") as mock_write_text,
-            patch("pathlib.Path.chmod") as mock_chmod,
-        ):
-            # Setup mocks
-            mock_get_cert.return_value = mock_cert_content
-            mock_inspect.return_value = {
-                "path": "/home/user/.ssl/cadcproxy.pem",
-                "expiry": time.time() + 3600,
-            }
+def test_valid_file_not_found() -> None:
+    """Test that `valid` raises FileNotFoundError for a non-existent file."""
+    non_existent_path = Path("/this/path/does/not.exist")
+    with pytest.raises(FileNotFoundError):
+        x509_auth.valid(non_existent_path)
 
-            # Call function
-            result = gather(username="testuser", days_valid=10)
 
-            # Verify calls
-            mock_subject.assert_called_once_with(username="testuser")
-            mock_get_cert.assert_called_once_with(
-                subject=mock_subject.return_value, days_valid=10
-            )
-            mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
-            mock_write_text.assert_called_once_with(mock_cert_content)
-            mock_chmod.assert_called_once_with(0o600)
+def test_valid_not_a_file() -> None:
+    """Test that `valid` raises ValueError for a path that is a directory."""
+    with tempfile.TemporaryDirectory() as temp_dir:
+        dir_path = Path(temp_dir)
+        with pytest.raises(ValueError, match="is not a file"):
+            x509_auth.valid(dir_path)
 
-            # Verify result
-            assert "path" in result
-            assert "expiry" in result
 
-    def test_gather_without_username_prompts_input(self) -> None:
-        """Test gather function prompts for username when not provided."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
+def test_valid_not_readable(tmp_path) -> None:
+    """Test that `valid` raises PermissionError for an unreadable file."""
+    cert_path = tmp_path / "cert.pem"
+    generate_cert(cert_path)
+    cert_path.chmod(0o000)  # Make the file unreadable
+    with pytest.raises(PermissionError, match="is not readable"):
+        x509_auth.valid(cert_path)
+    cert_path.chmod(0o600)  # Clean up permissions
 
-        with (
-            patch("builtins.input", return_value="prompted_user") as mock_input,
-            patch("skaha.auth.x509.Subject") as mock_subject,
-            patch("skaha.auth.x509.get_cert") as mock_get_cert,
-            patch("skaha.auth.x509.inspect") as mock_inspect,
-            patch("pathlib.Path.mkdir"),
-            patch("pathlib.Path.write_text"),
-            patch("pathlib.Path.chmod"),
-        ):
-            # Setup mocks
-            mock_get_cert.return_value = mock_cert_content
-            mock_inspect.return_value = {
-                "path": "/home/user/.ssl/cadcproxy.pem",
-                "expiry": time.time() + 3600,
-            }
 
-            # Call function without username
-            gather()
+# --- Tests for skaha.auth.x509.expiry --- #
 
-            # Verify input was called
-            mock_input.assert_called_once_with("Username: ")
-            mock_subject.assert_called_once_with(username="prompted_user")
 
-    def test_gather_with_custom_cert_path(self) -> None:
-        """Test gather function with custom certificate path."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
-        custom_path = Path("/custom/path/cert.pem")
+def test_expiry_happy_path() -> None:
+    """Test that `expiry` returns the correct expiry timestamp for a valid cert."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path, valid_for_days=5)
+        expiry_ts = x509_auth.expiry(cert_path)
+        assert isinstance(expiry_ts, float)
+        assert expiry_ts > datetime.datetime.now(datetime.timezone.utc).timestamp()
 
-        with (
-            patch("skaha.auth.x509.Subject"),
-            patch("skaha.auth.x509.get_cert") as mock_get_cert,
-            patch("skaha.auth.x509.inspect") as mock_inspect,
-            patch("pathlib.Path.mkdir"),
-            patch("pathlib.Path.write_text"),
-            patch("pathlib.Path.chmod"),
-        ):
-            # Setup mocks
-            mock_get_cert.return_value = mock_cert_content
-            mock_inspect.return_value = {
-                "path": str(custom_path.absolute()),
-                "expiry": time.time() + 3600,
-            }
 
-            # Call function with custom path
-            gather(username="testuser", cert_path=custom_path)
+def test_expiry_is_expired() -> None:
+    """Test that `expiry` raises ValueError for an expired certificate."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path, expired=True)
+        with pytest.raises(ValueError, match="has expired"):
+            x509_auth.expiry(cert_path)
 
-            # Verify custom path was used
-            mock_inspect.assert_called_once_with(custom_path)
 
-    def test_gather_handles_get_cert_failure(self) -> None:
-        """Test gather function handles get_cert failure properly."""
-        with (
-            patch("skaha.auth.x509.Subject"),
-            patch("skaha.auth.x509.get_cert", side_effect=Exception("Auth failed")),
-            pytest.raises(
-                ValueError, match="Failed to obtain X509 certificate: Auth failed"
-            ),
-        ):
-            gather(username="testuser")
+def test_expiry_not_yet_valid() -> None:
+    """Test that `expiry` raises ValueError for a certificate that is not yet valid."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path, not_before_days=2)
+        with pytest.raises(ValueError, match="is not yet valid."):
+            x509_auth.expiry(cert_path)
 
-    def test_gather_handles_file_write_failure(self) -> None:
-        """Test gather function handles file write failure properly."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
 
-        with (
-            patch("skaha.auth.x509.Subject"),
-            patch("skaha.auth.x509.get_cert", return_value=mock_cert_content),
-            patch("pathlib.Path.mkdir"),
-            patch(
-                "pathlib.Path.write_text",
-                side_effect=PermissionError("Permission denied"),
-            ),
-            pytest.raises(
-                ValueError, match="Failed to obtain X509 certificate: Permission denied"
-            ),
-        ):
-            gather(username="testuser")
+def test_expiry_with_invalid_content() -> None:
+    """Test that `expiry` raises ValueError for a file with invalid content."""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".pem") as temp_cert:
+        temp_cert.write("this is not a valid certificate")
+        temp_cert.flush()
+        cert_path = Path(temp_cert.name)
+        with pytest.raises(ValueError, match="Unable to load PEM file."):
+            x509_auth.expiry(cert_path)
 
-    def test_inspect_with_valid_certificate(self, temp_cert_file: Path) -> None:
-        """Test inspect function with a valid certificate file."""
-        result = inspect(temp_cert_file)
+
+# --- Tests for skaha.auth.x509.inspect --- #
+
+
+def test_inspect_happy_path() -> None:
+    """Test that `inspect` returns the correct path and expiry."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path)
+
+        result = x509_auth.inspect(cert_path)
 
         assert "path" in result
         assert "expiry" in result
-        assert result["path"] == temp_cert_file.absolute().as_posix()
+        assert Path(result["path"]).resolve() == cert_path.resolve()
         assert isinstance(result["expiry"], float)
-        assert result["expiry"] > time.time()  # Should be in the future
-
-    def test_inspect_with_default_path(self) -> None:
-        """Test inspect function with default certificate path."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
+        assert (
+            result["expiry"] > datetime.datetime.now(datetime.timezone.utc).timestamp()
         )
 
-        with (
-            patch("pathlib.Path.exists", return_value=True),
-            patch("pathlib.Path.is_file", return_value=True),
-            patch("pathlib.Path.read_text", return_value=mock_cert_content),
-            patch("skaha.auth.x509.x509.load_pem_x509_certificate") as mock_load_cert,
-        ):
-            # Create a mock certificate with expiry
-            mock_cert = Mock()
-            mock_cert.not_valid_after_utc.timestamp.return_value = time.time() + 3600
-            mock_load_cert.return_value = mock_cert
 
-            result = inspect()
+def test_inspect_with_expired_cert() -> None:
+    """Test that `inspect` fails when the certificate is expired."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path, expired=True)
+        with pytest.raises(ValueError, match="has expired"):
+            x509_auth.inspect(cert_path)
 
-            assert "path" in result
-            assert "expiry" in result
-            # Should use default path
-            expected_path = Path.home() / ".ssl" / "cadcproxy.pem"
-            assert result["path"] == expected_path.absolute().as_posix()
 
-    def test_inspect_file_does_not_exist(self) -> None:
-        """Test inspect function when certificate file doesn't exist."""
-        non_existent_path = Path("/nonexistent/cert.pem")
+# --- Tests for skaha.auth.x509.authenticate --- #
 
-        with pytest.raises(ValueError, match="Failed to inspect certificate"):
-            inspect(non_existent_path)
 
-    def test_inspect_path_is_not_file(self) -> None:
-        """Test inspect function when path exists but is not a file."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            dir_path = Path(temp_dir)
+@patch("skaha.auth.x509.gather")
+def test_authenticate_happy_path(mock_gather) -> None:
+    """Test that `authenticate` correctly updates the config on success."""
+    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
+        cert_path = Path(temp_cert.name)
+        generate_cert(cert_path)
 
-            with pytest.raises(ValueError, match="Failed to inspect certificate"):
-                inspect(dir_path)
+        mock_gather.return_value = {
+            "path": str(cert_path.resolve()),
+            "expiry": datetime.datetime.now(datetime.timezone.utc).timestamp() + 1000,
+        }
 
-    def test_inspect_invalid_certificate_content(self) -> None:
-        """Test inspect function with invalid certificate content."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".pem", delete=False) as f:
-            f.write("INVALID CERTIFICATE CONTENT")
-            temp_path = Path(f.name)
+        config = X509()
+        updated_config = x509_auth.authenticate(config)
 
-        try:
-            with pytest.raises(ValueError, match="Failed to inspect certificate"):
-                inspect(temp_path)
-        finally:
-            temp_path.unlink()
+        assert updated_config.path == str(cert_path.resolve())
+        assert updated_config.expiry == mock_gather.return_value["expiry"]
+        mock_gather.assert_called_once()
 
-    def test_inspect_certificate_encoding_handling(self) -> None:
-        """Test inspect function properly handles certificate encoding."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
 
-        with (
-            patch("pathlib.Path.exists", return_value=True),
-            patch("pathlib.Path.is_file", return_value=True),
-            patch("pathlib.Path.read_text") as mock_read_text,
-            patch("skaha.auth.x509.x509.load_pem_x509_certificate") as mock_load_cert,
-        ):
-            mock_read_text.return_value = mock_cert_content
-            mock_cert = Mock()
-            mock_cert.not_valid_after_utc.timestamp.return_value = time.time() + 3600
-            mock_load_cert.return_value = mock_cert
+@patch("skaha.auth.x509.gather")
+def test_authenticate_gather_fails(mock_gather) -> None:
+    """Test that `authenticate` raises a ValueError if `gather` fails."""
+    mock_gather.side_effect = ValueError("Failed to retrieve certificate")
 
-            inspect(Path("/test/cert.pem"))
+    config = X509()
+    with pytest.raises(ValueError, match="Failed to authenticate"):
+        x509_auth.authenticate(config)
 
-            # Verify encoding is specified
-            mock_read_text.assert_called_once_with(encoding="utf-8")
-            # Verify content is encoded to bytes for cryptography
-            mock_load_cert.assert_called_once_with(
-                mock_cert_content.encode("utf-8"), default_backend()
-            )
 
-    def test_gather_creates_directory_structure(self) -> None:
-        """Test that gather creates the necessary directory structure."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
-        custom_path = Path("/deep/nested/path/cert.pem")
+# --- Tests for skaha.auth.x509.gather --- #
 
-        with (
-            patch("skaha.auth.x509.Subject"),
-            patch("skaha.auth.x509.get_cert", return_value=mock_cert_content),
-            patch("skaha.auth.x509.inspect") as mock_inspect,
-            patch("pathlib.Path.mkdir") as mock_mkdir,
-            patch("pathlib.Path.write_text"),
-            patch("pathlib.Path.chmod"),
-        ):
-            mock_inspect.return_value = {
-                "path": str(custom_path),
-                "expiry": time.time() + 3600,
-            }
 
-            gather(username="testuser", cert_path=custom_path)
+@patch("skaha.auth.x509.get_cert")
+@patch("skaha.auth.x509.inspect")
+def test_gather_happy_path(mock_inspect, mock_get_cert, tmp_path) -> None:
+    """Test the happy path for `gather` with a username provided."""
+    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
+    cert_path = tmp_path / "test.pem"
+    mock_inspect.return_value = {"path": str(cert_path), "expiry": 12345.67}
 
-            # Verify parent directory creation
-            mock_mkdir.assert_called_once_with(parents=True, exist_ok=True)
+    result = x509_auth.gather(username="testuser", cert_path=cert_path)
 
-    def test_gather_sets_secure_file_permissions(self) -> None:
-        """Test that gather sets secure file permissions (600)."""
-        mock_cert_content = (
-            "-----BEGIN CERTIFICATE-----\nMOCK_CERT\n-----END CERTIFICATE-----"
-        )
+    assert result["path"] == str(cert_path)
+    assert math.isclose(result["expiry"], 12345.67, abs_tol=1e-9)
+    mock_get_cert.assert_called_once()
+    assert cert_path.exists()
+    assert cert_path.read_text() == "---BEGIN CERT---...---END CERT---"
 
-        with (
-            patch("skaha.auth.x509.Subject"),
-            patch("skaha.auth.x509.get_cert", return_value=mock_cert_content),
-            patch("skaha.auth.x509.inspect") as mock_inspect,
-            patch("pathlib.Path.mkdir"),
-            patch("pathlib.Path.write_text"),
-            patch("pathlib.Path.chmod") as mock_chmod,
-        ):
-            mock_inspect.return_value = {
-                "path": "/test/cert.pem",
-                "expiry": time.time() + 3600,
-            }
 
-            gather(username="testuser")
+@patch("builtins.input")
+@patch("skaha.auth.x509.get_cert")
+@patch("skaha.auth.x509.inspect")
+def test_gather_prompts_for_username(
+    mock_inspect, mock_get_cert, mock_input, tmp_path
+) -> None:
+    """Test that `gather` prompts for a username if not provided."""
+    mock_input.return_value = "prompted_user"
+    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
+    cert_path = tmp_path / "test.pem"
+    mock_inspect.return_value = {"path": str(cert_path), "expiry": 12345.67}
 
-            # Verify secure permissions are set
-            mock_chmod.assert_called_once_with(0o600)
+    x509_auth.gather(cert_path=cert_path)
+
+    mock_input.assert_called_once_with("Username: ")
+    subject_arg = mock_get_cert.call_args[1]["subject"]
+    assert subject_arg.username == "prompted_user"
+
+
+@patch("pathlib.Path.home")
+@patch("skaha.auth.x509.get_cert")
+@patch("skaha.auth.x509.inspect")
+def test_gather_uses_default_path(
+    mock_inspect, mock_get_cert, mock_home, tmp_path
+) -> None:
+    """Test that `gather` uses the default certificate path if none is provided."""
+    # Point Path.home() to the pytest temporary directory
+    mock_home.return_value = tmp_path
+    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
+
+    expected_path = tmp_path / ".ssl" / "cadcproxy.pem"
+    mock_inspect.return_value = {"path": str(expected_path), "expiry": 12345.67}
+
+    # Run the function without a path
+    result = x509_auth.gather(username="testuser")
+
+    # Verify the result from the mocked inspect call
+    assert result["path"] == str(expected_path)
+
+    # Verify that the file was actually created with the correct content and permissions
+    assert expected_path.exists()
+    assert expected_path.read_text() == "---BEGIN CERT---...---END CERT---"
+    assert (expected_path.stat().st_mode & 0o777) == 0o600
+
+
+@patch("skaha.auth.x509.get_cert")
+def test_gather_get_cert_fails(mock_get_cert, tmp_path) -> None:
+    """Test that `gather` raises a ValueError if `get_cert` fails."""
+    mock_get_cert.side_effect = Exception("Network error")
+    cert_path = tmp_path / "test.pem"
+
+    with pytest.raises(ValueError, match="Failed to obtain X509 certificate"):
+        x509_auth.gather(username="testuser", cert_path=cert_path)

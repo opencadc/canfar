@@ -1,7 +1,7 @@
 # Images API
 
-The Image API allows you to get information about the **publicly available** images on the CANFAR Science Platform through
-the CANFAR Harbor Registry. It can be used to get information about all images, or filter by a specific image kind.
+!!! info "Overview"
+    The Image API allows you to get information about the **publicly available** images on the CANFAR Science Platform through the CANFAR Harbor Registry. It can be used to get information about all images, or filter by a specific image kind.
 
 ## Getting Image Information
 

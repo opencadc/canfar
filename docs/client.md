@@ -1,18 +1,103 @@
 # Skaha Client
 
-The `skaha.client` module provides a client for the Skaha server. The client is based of the
-[`httpx`](https://www.python-httpx.org/) library and provides a simple interface to the Skaha server. The client configures the
-authorization headers for user authentication and container registry access.
+The `skaha.client` module provides a comprehensive HTTP client for interacting with CANFAR Science Platform services. Built on the powerful [`httpx`](https://www.python-httpx.org/) library, it offers both synchronous and asynchronous interfaces with advanced authentication capabilities.
+
+
+
+## Features
+
+!!! tip "Key Capabilities"
+    - **Multiple Authentication Methods**: X.509 certificates, OIDC tokens, and bearer tokens
+    - **Automatic SSL Configuration**: Seamless certificate-based authentication
+    - **Async/Sync Support**: Both synchronous and asynchronous HTTP clients
+    - **Connection Pooling**: Optimized for concurrent requests
+    - **Debug Logging**: Comprehensive logging for troubleshooting
+    - **Context Managers**: Proper resource management
+
+*This is a low-level client that is used by all other API clients in Skaha. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.*
+
+## Authentication Modes
+
+The client supports multiple authentication modes that can be configured through the authentication system:
+
+### Debug Logging
+
+```python
+import logging
+
+# Enable debug logging to see client creation details
+client = SkahaClient(loglevel=logging.DEBUG)
+
+# This will log:
+# - Authentication mode selection
+# - SSL context creation
+# - Header generation
+# - Client configuration
+```
+
+## Configuration
+
+The client inherits from the `Configuration` class and supports all configuration options:
+
+```python
+from skaha.client import SkahaClient
+
+client = SkahaClient(
+    timeout=60,           # Request timeout in seconds
+    concurrency=64,       # Max concurrent connections
+    loglevel=20,         # Logging level (INFO)
+)
+```
+
+## Authentication Expiry
+
+The client provides an `expiry` property that returns the expiry time for the current authentication method:
+
+```python
+import time
+
+client = SkahaClient()
+
+if client.expiry:
+    time_left = client.expiry - time.time()
+    print(f"Authentication expires in {time_left:.0f} seconds")
+else:
+    print("No expiry tracking (user-provided credentials)")
+```
+
+!!! note "Expiry Tracking"
+    The `expiry` property returns `None` for user-provided certificates or tokens since the client cannot track their expiry automatically.
+
+## Error Handling
+
+The client includes built-in error handling for HTTP responses:
+
+```python
+from httpx import HTTPStatusError
+
+try:
+    response = client.client.get("/invalid-endpoint")
+    response.raise_for_status()
+except HTTPStatusError as e:
+    print(f"HTTP error: {e.response.status_code}")
+```
+
+## API Reference
 
 ::: skaha.client.SkahaClient
     handler: python
-    selection:
+    options:
       members:
         - __init__
-        - _check_server
-        - _check_certificate
-        - __attrs_post_init__
-    rendering:
+        - client
+        - asynclient
+        - expiry
+        - _create_client
+        - _create_asynclient
+        - _get_headers
+        - _get_ssl_context
       show_root_heading: true
-      show_source: true
-      heading_level: 2
+      show_source: false
+      heading_level: 3
+      docstring_style: google
+      show_signature_annotations: true

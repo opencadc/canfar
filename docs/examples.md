@@ -29,9 +29,9 @@ print(session_ids)
     When spawning sessions with the Skaha API, it adds two additional environment variables to each container:
 
     - `REPLICA_COUNT`: An integer representing the total number of replicas spawned, e.g. 3 for the example above.
-    - `REPLICA_ID`: An integer representing the unique ID of the replica, e.g. 0, 1, 2 for the example above.
+    - `REPLICA_ID`: An integer representing the unique ID of the replica using **1-based indexing**, e.g. 1, 2, 3 for the example above.
 
-    These environment variables can be used to configure your application to run in a distributed manner. For example, you can use the `REPLICA_COUNT` to configure the number of workers and the `REPLICA_ID` to configure the rank of the worker.
+    These environment variables can be used to configure your application to run in a distributed manner. The Skaha distributed helpers (`chunk` and `stripe`) automatically handle the conversion from 1-based REPLICA_ID values to appropriate data partitioning. For example, you can use the `REPLICA_COUNT` to configure the number of workers and the `REPLICA_ID` to configure the rank of the worker.
 
 !!! warning "Private Container Registry Access"
     If you are using a private container image from the CANFAR Harbor Registry, you need to provide your harbor `username` and the `CLI Secret` through a `ContainerRegistry` object.

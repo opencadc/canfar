@@ -10,6 +10,7 @@ from .utils.logging import configure_logging, get_logger, set_log_level
 # Root path to the Skaha Project
 BASE_PATH: Path = Path(__file__).absolute().parent.parent
 CONFIG_PATH: Path = Path.home() / ".skaha" / "config.yaml"
+CERT_PATH: Path = Path.home() / ".ssl" / "cadcproxy.pem"
 LOG_LEVEL: str = "INFO"
 
 configure_logging(loglevel=LOG_LEVEL, filelog=False)

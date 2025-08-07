@@ -69,9 +69,7 @@ def callback(
         "typer",
         "rich",
         "pydantic",
-        "authlib",
         "cadcutils",
-        "pyjwt",
     ]
 
     for dep in key_deps:

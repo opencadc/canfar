@@ -1,8 +1,7 @@
 # Session API
 
-The bread and butter of Skaha is the Session API. This API allows you to create, destroy, and get information about your sessions on the CANFAR Science Platform.
-
----
+!!! info "Overview"
+    The `Session` API is the core of Skaha, enabling you to create, manage, and destroy sessions on the CANFAR Science Platform.
 
 ::: skaha.session.Session
     handler: python

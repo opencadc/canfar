@@ -40,13 +40,13 @@ classifiers = [
 ]
 
 dependencies = [
-    "authlib>=1.6.0",
     "cadcutils>=1.5.4",
     "defusedxml>=0.7.1",
     "httpx[http2]>=0.28.1",
+    "humanize>=4.12.3",
     "pydantic>=2.9.2",
     "pydantic-settings>=2.9.1",
-    "pyjwt>=2.10.1",
+    "pyyaml>=6.0.2",
     "questionary>=2.1.0",
     "rich>=13.9.4",
     "segno>=1.6.6",
@@ -57,6 +57,7 @@ dependencies = [
 [tool.uv]
 dev-dependencies = [
     "bandit[toml]>=1.7.5",
+    "ipython>=8.37.0",
     "mypy>=1.15.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
@@ -74,13 +75,14 @@ dev-dependencies = [
     "vulture>=2.11",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 docs = [
-    "mkdocs>=1.6.0",
-    "mkdocs-material>=9.5.41",
-    "mkdocs-git-revision-date-localized-plugin>=1.2.9",
-    "mkdocstrings[python]>=0.25.0",
     "mike>=2.1.3",
+    "mkdocs-git-revision-date-localized-plugin>=1.4.7",
+    "mkdocs-material>=9.6.14",
+    "mkdocstrings[python]>=0.29.1",
+    "mkdocstrings[python]>=0.25.0",
+    "termynal>=0.13.0",
 ]
 
 [project.urls]
@@ -92,6 +94,8 @@ Issues = "https://github.com/shinybrar/skaha/issues"
 
 [project.scripts]
 skaha = "skaha.cli.main:main"
+canfar = "skaha.cli.main:main"
+cf = "skaha.cli.main:main"
 
 # Ruff configuration - handles formatting, linting, and import sorting
 [tool.ruff]
@@ -208,6 +212,7 @@ ignore = [
     "S108",    # Probable insecure usage of temporary file/directory
 ]
 "docs/**/*.py" = ["INP001"]
+"skaha/models/session.py" = ["N815"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["skaha"]
@@ -349,7 +354,7 @@ ignore-setters = false
 fail-under = 80
 exclude = ["setup.py", "docs", "build"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
-verbose = 0
+verbose = 3
 quiet = false
 whitelist-regex = []
 color = true

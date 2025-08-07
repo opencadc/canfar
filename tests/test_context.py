@@ -13,6 +13,6 @@ def context():
     del context
 
 
-def test_context(context):
+def test_context(context) -> None:
     """Test context fetch."""
     assert "cores" in context.resources()

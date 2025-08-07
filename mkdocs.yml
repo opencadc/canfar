@@ -1,4 +1,4 @@
-site_name: Skaha API
+site_name: Skaha
 site_url: https://shinybrar.github.io/skaha/
 site_author: Shiny Brar
 site_description: Python Client for Skaha Science Platform
@@ -41,7 +41,7 @@ theme:
     - navigation.indexes
     - content.code.annotate
     - toc.follow
-    - toc.integrate
+    # - toc.integrate
     - navigation.top
 
 plugins:
@@ -50,11 +50,18 @@ plugins:
   - git-revision-date-localized:
         type: date
         fallback_to_build_date: true
+  - termynal
 
 extra:
   version:
     provider: mike
     default: latest
+
+extra_css:
+  - stylesheets/asciinema-player.css
+
+extra_javascript:
+  - javascripts/asciinema-player.min.js
 
 # Extensions
 markdown_extensions:
@@ -96,20 +103,31 @@ markdown_extensions:
 
 nav:
   - Skaha: index.md
-
-  - Get Started: get-started.md
-  - Examples: examples.md
-  - API Reference:
-    - AsyncSession: async_session.md
-    - Session: session.md
-    - Images: images.md
-    - Context: context.md
-    - Overview: overview.md
-    - Client: client.md
-  - Change Log: changelog.md
-  - Code of Conduct: conduct.md
-  - Contributing: contributing.md
-  - Bug Reports: bug-reports.md
-  - Security: security.md
-  - License: license.md
-  - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/shinybrar/skaha
+  - What's New:
+    - Updates: updates.md
+    - Changelog: changelog.md
+  - Get Started:
+    - 5-Minute Tutorial: quick-start.md
+    - Installation & Setup: get-started.md
+    - Authentication Guide: authentication-contexts.md
+  - Examples:
+    - Basic: examples.md
+    - Advanced: advanced-examples.md
+  - Reference:
+    - CLI: cli-help.md
+    - Python API:
+      - AsyncSession: async_session.md
+      - Session: session.md
+      - Images: images.md
+      - Context: context.md
+      - Overview: overview.md
+      - Client: client.md
+  - FAQ: faq.md
+  - Contributor Guide:
+    - Contributing: contributing.md
+    - Code of Conduct: conduct.md
+    - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/shinybrar/skaha
+    - License: license.md
+  - Bug Reports:
+    - Bugs: bug-reports.md
+    - Security Issues: security.md

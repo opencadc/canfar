@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from skaha.models.session import CreateSpec, FetchSpec
+from skaha.models.session import CreateRequest, FetchRequest
 from skaha.utils import convert
 
 if TYPE_CHECKING:
@@ -25,7 +25,7 @@ def fetch_parameters(
     # Kind is an alias for type in the API.
     # It is renamed as kind to avoid conflicts with the built-in type function.
     # by_alias=true, returns, {"type": "headless"} instead of {"kind": "headless"}
-    return FetchSpec(**values).model_dump(exclude_none=True, by_alias=True)
+    return FetchRequest(**values).model_dump(exclude_none=True, by_alias=True)
 
 
 def create_parameters(
@@ -41,7 +41,7 @@ def create_parameters(
     replicas: int = 1,
 ) -> list[list[tuple[str, Any]]]:
     """Build parameters for creating sessions."""
-    specification: CreateSpec = CreateSpec(
+    specification: CreateRequest = CreateRequest(
         name=name,
         image=image,
         cores=cores,
@@ -59,7 +59,10 @@ def create_parameters(
     if "env" not in data:
         data["env"] = {}
     for replica in range(replicas):
-        data["name"] = name + "-" + str(replica + 1)
+        if replicas == 1:
+            data["name"] = name
+        else:
+            data["name"] = name + "-" + str(replica + 1)
         data["env"]["REPLICA_ID"] = str(replica + 1)
         data["env"]["REPLICA_COUNT"] = str(replicas)
         payload = convert.dict_to_tuples(data)
