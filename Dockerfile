@@ -1,4 +1,4 @@
-FROM python:3.13-alpine@sha256:18159b2be11db91f84b8f8f655cd860f805dbd9e49a583ddaac8ab39bf4fe1a7 AS base
+FROM python:3.13.6-alpine@sha256:7f9d4ab05a18a368db663461919926cd869343de781199a6748b61a60f28dd0a AS base
 
 FROM base AS builder
 COPY . /skaha
