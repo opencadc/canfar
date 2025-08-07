@@ -2,6 +2,12 @@
 
 **Launch and manage interactive computing environments on CANFAR**
 
+!!! abstract "🎯 What You'll Learn"
+    - The differences between session types and when to use each
+    - How to launch and connect to sessions quickly
+    - How to size resources (RAM/CPU/GPU) appropriately
+    - How to manage, share, and troubleshoot sessions
+
 Interactive sessions provide web-based access to powerful computing resources with different interfaces optimized for specific workflows. Whether you're analyzing data in Jupyter notebooks, visualizing radio astronomy images, or running GUI applications, CANFAR's interactive sessions make it easy to get started.
 
 ## 🎯 Session Types Overview
@@ -51,6 +57,11 @@ Select the interface that best matches your workflow:
 ### Step 3: Configure Resources
 
 **Session Name:** Choose a descriptive name (e.g., "galaxy-photometry", "alma-reduction")
+
+!!! tip "Choosing Resources"
+    - Start with defaults (2 cores, 8 GB RAM). Scale up only if needed
+    - Large data cubes or catalogs benefit from 32GB+ RAM
+    - GPU is only needed for ML or specialized GPU-enabled workflows
 
 **Memory (RAM):**
 - 8GB: Light analysis, small datasets

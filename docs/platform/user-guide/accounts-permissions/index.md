@@ -4,42 +4,47 @@
 
 This section covers everything you need to know about user management, group permissions, and access control on the CANFAR platform. Whether you're setting up a new collaboration or managing an existing team, this guide will help you understand and configure permissions effectively.
 
-## 🎯 Overview
+!!! abstract "🎯 What You'll Learn"
+    By the end of this guide, you'll understand:
+    - How CANFAR's permission system works
+    - How to create and manage research groups
+    - How to control access to files and containers
+    - How to use APIs for programmatic access
 
-CANFAR's permission system is built on several layers:
+## 🔓 Permissions System
 
-1. **CADC Accounts** - Your base identity for accessing Canadian astronomy services
-2. **Groups** - Collections of users for collaborative access 
-3. **Harbor Permissions** - Container registry access control
-4. **ACL (Access Control Lists)** - File-level permissions on `/arc` shared file system.
-5. **API Authentication** - Programmatic access control
+CANFAR's permission system is built on several layers that work together to provide secure, flexible access control:
 
-## 👥 Groups and User Management
+!!! info "Permission Layers"
+    - **CADC Accounts** - Your base identity for accessing Canadian astronomy services
+    - **Groups** - Collections of users for collaborative access 
+    - **Harbor Permissions** - Container registry access control
+    - **ACL (Access Control Lists)** - File-level permissions on `/arc` shared file system
+    - **API Authentication** - Programmatic access control
 
-### Understanding Groups
+## 👥 Group Management
 
-Groups are the foundation of collaboration on CANFAR. A group defines:
-
-- **Who** can access shared resources
-- **What** projects and storage they can use
-- **How** they can interact (read, write, admin)
+**_Groups are the foundation of collaboration on CANFAR. A group defines who can access shared resources, what projects and storage they can use, and how they can interact._**
 
 ### Group Hierarchy
 
 ```mermaid
 graph TD
-    Admin[👑 Group Administrator]
-    Members[👤 Group Members]
-    Resources[💾 Shared Resources]
+    Admin["👑 Group Administrator"]
+    Members["👤 Group Members"]
+    Resources["💾 Shared Resources"]
     
-    Admin --> |Manages| Members
-    Admin --> |Controls access to| Resources
-    Members --> |Access| Resources
+    Admin --> |"Manages"| Members
+    Admin --> |"Controls access to"| Resources
+    Members --> |"Access"| Resources
     
-    Resources --> Projects[📁 /arc/projects/groupname/]
-    Resources --> Storage[💾 Storage Quotas]
-    Resources --> Containers[🐳 Container Access]
+    Resources --> Projects["📁 /arc/projects/groupname/"]
+    Resources --> Storage["💾 Storage Quotas"]
+    Resources --> Containers["🐳 Container Access"]
 ```
+
+!!! success "Key Concept"
+    Groups enable collaborative research by providing shared access to storage, computing resources, and container images while maintaining security boundaries.
 
 ### Creating and Managing Groups
 
@@ -78,13 +83,14 @@ graph TD
 | **Administrator** | Full group management, resource allocation | Project PIs, senior team members |
 | **Member** | Access shared resources, collaborate | Researchers, grad students |
 
-## 🔐 Harbor Registry Permissions
+## 🔐 Harbor Permissions
 
 Harbor is CANFAR's container registry where container images are stored and managed.
 
-### Access Levels
+!!! info "Registry Access"
+    **Registry URL:** [https://images.canfar.net](https://images.canfar.net)
 
-**Registry URL:** [https://images.canfar.net](https://images.canfar.net)
+### Access Levels
 
 | Permission Level | Can Do | Cannot Do |
 |------------------|--------|-----------|
@@ -113,11 +119,14 @@ docker pull images.canfar.net/skaha/astroml:latest
 docker push images.canfar.net/myproject/custom-container:v1.0
 ```
 
-## 🛡️ Access Control Lists (ACL) {#acl-access-control-lists}
+## 🛡️ Access Control Lists {#acl-access-control-lists}
 
 ### What are ACLs?
 
 **Access Control Lists (ACLs)** provide fine-grained file and directory permissions beyond traditional POSIX permissions. While POSIX permissions only support owner/group/other with read/write/execute, ACLs allow you to grant specific permissions to individual users and groups.
+
+!!! warning "Important Distinction"
+    ACLs extend traditional POSIX permissions, allowing multiple users and groups to have different permissions on the same file or directory.
 
 ### Why ACLs Matter in Astronomy
 
@@ -131,6 +140,9 @@ docker push images.canfar.net/myproject/custom-container:v1.0
 - Grant specific researchers read access to your dataset
 - Allow collaborators to write to specific directories
 - Maintain security while enabling flexible collaboration
+
+!!! success "Research Collaboration"
+    ACLs enable flexible data sharing across research groups while maintaining security boundaries - perfect for multi-institutional astronomy projects.
 
 ### ACL vs POSIX Comparison
 
@@ -195,18 +207,20 @@ setfacl -b /arc/projects/myproject/temp_data/
     └── (ACL: user:collaborator:r, group:external-team:r)
 ```
 
-**🔒 Security Guidelines:**
-
-1. **Principle of least privilege** - Grant minimum necessary access
-2. **Regular audits** - Review ACLs periodically with `getfacl`
-3. **Document permissions** - Keep notes on why specific ACLs were set
-4. **Use groups when possible** - Easier to manage than individual user ACLs
+!!! tip "ACL Best Practices"
+    - **Principle of least privilege** - Grant minimum necessary access
+    - **Regular audits** - Review ACLs periodically with `getfacl`
+    - **Document permissions** - Keep notes on why specific ACLs were set
+    - **Use groups when possible** - Easier to manage than individual user ACLs
 
 ## 🔌 API Authentication
 
 ### Overview
 
 CANFAR provides REST APIs for programmatic access to platform features. All API calls require proper authentication.
+
+!!! info "API Access"
+    APIs enable automation and integration with external tools and workflows.
 
 ### Authentication Methods
 
@@ -284,7 +298,10 @@ curl -X PUT \
 | **VOSpace** | [CADC VOSpace](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/vospace/) | File operations |
 | **CADC Auth** | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/netrc) | Authentication |
 
-## 🚨 Common Permission Issues
+## 🚨 Common Issues
+
+!!! warning "Troubleshooting Guide"
+    These are the most common permission issues and their solutions.
 
 ### Problem: "Permission Denied" accessing `/arc/projects/`
 

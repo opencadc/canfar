@@ -2,6 +2,12 @@
 
 **The LSST table and image visualizer for astronomical data exploration**
 
+!!! abstract "🎯 What You'll Learn"
+    - How to launch a Firefly session and choose the right version
+    - How to load images, tables, and access CANFAR storage
+    - How to perform catalog overlays, plotting, and cutouts
+    - Performance tips for large surveys and troubleshooting guidance
+
 Firefly is a powerful web-based visualization tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogs, and analyzing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
 
 ## 🎯 What is Firefly?
@@ -62,7 +68,8 @@ Select RAM based on your data size:
 - **32GB**: Large catalogs, multiple images
 - **64GB**: Very large survey datasets
 
-![Choose Firefly Memory](images/firefly/4_choose_firefly_ram.png)
+!!! tip "Memory Planning"
+    Tables with millions of rows and multi-image layouts benefit from 32GB+ RAM. Start with 8GB and scale up if you hit browser or session limits.
 
 #### CPU Cores
 Most Firefly work is I/O bound rather than CPU intensive:
@@ -91,10 +98,10 @@ Firefly's interface consists of several main areas:
 graph TD
     Interface[Firefly Interface]
     
-    Interface --> Upload[📁 File Upload Area]
-    Interface --> Images[🖼️ Image Display]
-    Interface --> Tables[📊 Table Viewer]
-    Interface --> Tools[🔧 Analysis Tools]
+    Interface --> Upload["📁 File Upload Area"]
+    Interface --> Images["🖼️ Image Display"]
+    Interface --> Tables["📊 Table Viewer"]
+    Interface --> Tools["🔧 Analysis Tools"]
     
     Upload --> Local[Local Files]
     Upload --> URLs[Remote URLs]

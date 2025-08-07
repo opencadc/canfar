@@ -2,11 +2,11 @@
 
 **Quick start guide to get you up and running with CANFAR Science Platform in minutes**
 
-CANFAR provides cloud-based astronomy computing with interactive sessions, shared storage, and pre-built software containers. Perfect for grad students, astronomers, and project managers who need powerful computing resources for data analysis.
+## 🚀 Quick Setup
 
-## 🚀 Quick Setup (10 minutes)
+This guide will walk you through the complete process of getting started with CANFAR, from account setup to your first analysis session.
 
-### Step 1: Get Access
+### Step 1: Get Your CADC Account
 
 **First time user?** You need a Canadian Astronomy Data Centre (CADC) account:
 
@@ -14,6 +14,8 @@ CANFAR provides cloud-based astronomy computing with interactive sessions, share
 
 !!! info "Account Processing Time"
     CADC accounts are typically approved within 1-2 business days.
+
+### Step 2: Join or Create Your Research Group
 
 **Once you have a CADC account:**
 
@@ -28,27 +30,32 @@ CANFAR provides cloud-based astronomy computing with interactive sessions, share
     - Storage requirements
     - Timeline
 
-### Step 2: First Login
+### Step 3: First Login and Setup
 
-1. **Access the portal:** [https://www.canfar.net](https://www.canfar.net)
-2. **Login** with your CADC credentials
-3. **Accept** the platform terms of service
+1. **Login to CANFAR** - Visit [canfar.net](https://www.canfar.net) with your CADC credentials
+2. **Accept Terms of Service** - Complete the initial setup
+3. **Access Image Registry** - Login to [images.canfar.net](https://images.canfar.net) (required for private containers)
 
-### Step 3: Launch Your First Session
+!!! tip "Pro Tip"
+    Ask your group administrator to grant you read access to private container images if your collaboration uses custom software.
+
+### Step 4: Launch Your First Session
 
 Try launching a Jupyter notebook to start analyzing data:
 
-1. Click **"Science Portal"** from the main menu
-2. Select **"notebook"** from the session types
-3. Choose **"astroml"** container (default astronomy environment)
-4. Click **"Launch"**
-5. Wait ~30 seconds for your session to start
+1. Click **_Science Portal_** from the main menu
+2. Use the **_default_** settings as is
+3. Click **_Launch_**
+4. Wait **_~30s_** and click to open your session
 
 🎉 **You're ready to go!** Your session includes Python, common astronomy packages, and access to shared storage.
 
-## 📁 Understanding Storage
+!!! tip "Recommended Starting Point"
+    Start with the default `astroml` container - it includes most common astronomy packages and is regularly updated with the latest software.
 
-CANFAR provides different storage areas for different needs:
+## 📁 Understanding Your Workspace
+
+Now that you're logged in, here's how CANFAR organizes your data:
 
 | Location | Purpose | Persistence | Best For |
 |----------|---------|-------------|----------|
@@ -90,5 +97,4 @@ Ready to dive deeper?
 
 ---
 
-!!! tip "Pro Tip"
-    Start with the default `astroml` container - it includes most common astronomy packages and is regularly updated with the latest software.
+

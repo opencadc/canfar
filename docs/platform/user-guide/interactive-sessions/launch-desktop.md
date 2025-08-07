@@ -2,6 +2,12 @@
 
 Desktop sessions provide a full Linux graphical environment in your browser, giving you access to traditional astronomy software with familiar desktop interfaces. This guide walks you through launching and using desktop sessions on the CANFAR Science Platform.
 
+!!! abstract "🎯 What You'll Learn"
+    - How to launch, connect, and size desktop sessions
+    - What software is available and how to launch it
+    - How to manage files and storage within desktop sessions
+    - Tips for collaboration, performance, and troubleshooting
+
 ## Overview
 
 Desktop sessions offer:
@@ -232,6 +238,9 @@ Your desktop session provides access to:
 - **`/arc/home/[username]/`**: Personal persistent storage
 - **`/home/[username]/`**: Session-local home directory
 - **`/tmp/`**: Temporary scratch space
+
+!!! warning "Persistence Reminder"
+    Use `/arc/projects/` or `/arc/home/` for important files. The session-local home and `/tmp/` are not guaranteed to persist after the session ends.
 
 ### File Operations
 

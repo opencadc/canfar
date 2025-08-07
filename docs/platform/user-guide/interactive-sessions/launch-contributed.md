@@ -2,9 +2,15 @@
 
 **Access community-developed tools and specialized research applications**
 
+!!! abstract "🎯 What You'll Learn"
+    - What contributed applications are and when to use them
+    - How to launch and size contributed application sessions
+    - How these apps integrate with CANFAR storage and authentication
+    - Best practices for collaboration, performance, and security
+
 Contributed applications represent an exciting expansion of CANFAR's capabilities beyond the standard notebook and desktop environments. These specialized tools have been developed by the CANFAR community and external collaborators to address specific astronomical workflows and research needs that aren't well-served by conventional interfaces.
 
-## 🎯 Understanding Contributed Applications
+## 🎯 Contributed Apps
 
 Think of contributed applications as purpose-built web tools that seamlessly integrate with CANFAR's infrastructure while offering unique capabilities. Unlike the general-purpose notebook or desktop sessions you might be familiar with, these applications are crafted for specific tasks and often provide interfaces that would be difficult or impossible to replicate in standard environments.
 
@@ -12,11 +18,14 @@ These applications extend CANFAR's reach by providing specialized interfaces for
 
 ### The Landscape of Contributed Applications
 
+!!! info "Current Ecosystem"
+    The catalog evolves regularly. Expect reactive notebooks (Pluto.jl, Marimo), browser IDEs (VSCode), and specialized computational interfaces contributed by the community.
+
 The current ecosystem of contributed applications focuses on interactive computing environments that offer alternatives to traditional Jupyter notebooks. You'll find reactive notebook systems that provide real-time feedback as you modify code, browser-based development environments that give you the full power of modern IDEs without local installation, and specialized computational interfaces designed for specific programming languages or workflows.
 
 Rather than trying to be everything to everyone, each contributed application excels in its particular domain. This focused approach means you can choose the tool that best matches your specific research workflow, whether you're doing exploratory data analysis, developing complex algorithms, or collaborating on code with distributed teams.
 
-## 🚀 Getting Started with Contributed Applications
+## 🚀 Getting Started
 
 ### Accessing the Application Catalog
 
@@ -37,6 +46,9 @@ Once you've selected the contributed session type, the container dropdown reveal
 **Marimo** (`images.canfar.net/skaha/marimo:latest`) brings reactive computing to Python, offering a modern alternative to Jupyter notebooks. Marimo notebooks are stored as pure Python files, making them easy to version control and share. The reactive execution model ensures your notebook stays consistent as you develop and modify your analysis.
 
 **VSCode Browser** (`images.canfar.net/skaha/code-browser:latest`) provides the full Visual Studio Code experience directly in your web browser. This application is particularly valuable for software development projects, complex multi-file analyses, and situations where you need the rich editing capabilities and extensions ecosystem that VSCode provides.
+
+!!! tip "Session Sizing"
+    Start with 16GB RAM and 2-4 CPU cores for most contributed apps. Increase memory for large datasets or memory-intensive reactive notebooks.
 
 The beauty of this system lies in its dynamic nature. As the community develops new tools and contributes them to the platform, the available applications expand to meet emerging research needs. If you have ideas for applications that would benefit the astronomy community, the CANFAR team encourages you to reach out to [support@canfar.net](mailto:support@canfar.net).
 
@@ -66,7 +78,7 @@ Once the session is running, clicking the session icon will open the application
 
 ![Launch Contributed Session](images/contributed/5_launch_contributed.png)
 
-## 🔧 Working Effectively with Contributed Applications
+## 🔧 Working Effectively
 
 ### Understanding Application Interfaces
 
@@ -75,6 +87,9 @@ Most contributed applications follow modern web application conventions, but eac
 The typical structure you'll encounter includes a navigation or menu area that provides access to the application's main features, a central content area where your work happens, and various panels or sidebars for configuration, file management, and tool access. Status information and feedback usually appear in designated areas that don't interfere with your primary workflow.
 
 ### Integrating with CANFAR Storage
+
+!!! warning "Persistence Reminder"
+    Save important results to `/arc/projects/` or `/arc/home/`. Temporary paths and in-app caches may not persist after the session ends.
 
 One of the most powerful aspects of contributed applications is their seamless integration with CANFAR's storage infrastructure. Your applications can directly access your project data through `/arc/projects/yourproject/`, your personal files via `/arc/home/yourusername/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
 
@@ -86,7 +101,7 @@ The integration with CANFAR's authentication system means you don't need to mana
 
 This seamless authentication enables powerful collaboration patterns. You can share session URLs with collaborators who have appropriate permissions, work together in real-time on analysis projects, and maintain consistent access controls across different tools and workflows.
 
-## 🛠️ Real-World Application Examples
+## 🛠️ Real-World Examples
 
 ### Interactive Data Exploration with Pluto.jl
 
@@ -106,7 +121,7 @@ If you've experienced frustration with traditional Jupyter notebooks becoming in
 
 The reactive execution model means that when you modify a function or variable definition, all dependent computations automatically update. This eliminates the common notebook problem where cells are executed out of order, leaving you with inconsistent results. The fact that notebooks are stored as Python files also makes them easy to version control with Git and share with colleagues who might not be using notebook environments.
 
-## 🔒 Security and Best Practices
+## 🔒 Best Practices
 
 ### Understanding Application Permissions
 
@@ -120,7 +135,7 @@ The web-based nature of contributed applications introduces some unique security
 
 For researchers working with sensitive or proprietary data, it's worth understanding how each application handles data processing and whether any information might be cached or logged. Most contributed applications are designed with these concerns in mind, but understanding the data flow helps you make informed decisions about which tools to use for different types of work.
 
-## 🧑‍💻 Contributing Your Own Applications
+## 🧑‍💻 Contributing Your Apps
 
 ### Understanding the Technical Framework
 
@@ -170,7 +185,7 @@ The most successful contributed applications solve real problems that multiple r
 
 When you're ready to contribute your application, contact [support@canfar.net](mailto:support@canfar.net) with information about your application's purpose, target user community, and key features. The CANFAR team will work with you to integrate your application into the platform and ensure it meets the technical and security requirements.
 
-## 🆘 Troubleshooting Common Issues
+## 🆘 Troubleshooting
 
 ### Application Startup Problems
 
@@ -190,7 +205,7 @@ If your contributed application feels slow or unresponsive, consider whether you
 
 You can often improve performance by closing unnecessary browser tabs, ensuring you have sufficient memory allocated to your session, and monitoring your resource usage through the browser's developer tools if available.
 
-## 📚 The Evolving Application Ecosystem
+## 📚 Evolving Ecosystem
 
 ### Current Applications and Their Strengths
 
@@ -204,7 +219,7 @@ The contributed applications ecosystem continues to evolve as the community iden
 
 The key to this ecosystem's success is community engagement. As more researchers use these tools and provide feedback, applications improve and new ideas emerge. If you have suggestions for improvements to existing applications or ideas for entirely new tools, the CANFAR team encourages you to share them.
 
-## 🔗 Integration with Your Research Workflow
+## 🔗 Research Integration
 
 ### Building Comprehensive Workflows
 

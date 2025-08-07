@@ -27,6 +27,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 ### Documentation
 
 **User Guide Sections**:
+
 - **[Concepts](../user-guide/concepts/index.md)**: Understanding the platform architecture
 - **[Storage](../user-guide/storage/index.md)**: Managing your data effectively
 - **[Containers](../user-guide/containers/index.md)**: Using and building software environments
@@ -35,6 +36,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 - **[Radio Astronomy](../user-guide/radio-astronomy/index.md)**: CASA and radio-specific workflows
 
 **Tutorials**:
+
 - **[Data Analysis Examples](../user-guide/interactive-sessions/index.md)**: Common astronomy workflows
 - **[Radio Astronomy Guide](../user-guide/radio-astronomy/index.md)**: CASA and interferometry
 - **[Container Building](../user-guide/containers/index.md)**: Create custom environments
@@ -42,12 +44,14 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 ### Video Resources
 
 **Getting Started Videos** (coming soon):
+
 - Platform overview and navigation
 - Creating your first session
 - Data management basics
 - Collaboration features
 
 **Workflow Demonstrations**:
+
 - Optical photometry pipeline
 - Radio interferometry reduction
 - Multi-wavelength analysis
@@ -58,7 +62,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 When you encounter issues, try these steps first:
 
-1. **Check system status**: Look for maintenance announcements
+1. **Check System status**: Look for maintenance announcements
 2. **Try a different browser**: Chrome and Firefox work best
 3. **Clear browser cache**: Remove cookies and cached data
 4. **Try incognito mode**: Eliminates browser extension conflicts

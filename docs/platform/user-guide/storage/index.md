@@ -1,21 +1,38 @@
-# Storage
+# CANFAR Storage Systems
 
 **Master CANFAR's storage systems for efficient data management**
 
+!!! abstract "🎯 What You'll Learn"
+
+    By the end of this guide, you'll understand:
+    - The different storage systems available on CANFAR
+    - When and how to use each storage type for your research
+    - Best practices for data management, transfer, and backup
+    - How to optimize your workflow for performance and data safety
+
 CANFAR provides multiple storage systems optimized for different stages of your research workflow. Understanding when and how to use each storage type is crucial for efficient data analysis and collaboration.
 
-## 🎯 Storage Overview
+## 📊 Types Comparison
+
+| Storage | Mount Path | Speed | Persistence | Backup | Quota | Best For |
+|---------|------------|-------|-------------|--------|-------|----------|
+| **ARC Projects** | `/arc/projects/group/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | Project-based | Active research, shared data |
+| **ARC Home** | `/arc/home/username/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | 10GB default | Personal configs, keys |
+| **Scratch** | `/scratch/` | Fastest NVMe | ❌ **Wiped at session end** | ❌ No backup | Unlimited | Temporary processing |
+| **VOSpace** | `vos:username/` | Medium | ✅ Permanent | ✅ Geo-redundant | User/project based | Archives, public data |
+
+## 🗺️ Storage Lifecycle Overview
 
 CANFAR's storage architecture is designed around the astronomy research lifecycle:
 
 ```mermaid
 graph LR
-    Archive[📦 External Archives<br/>ALMA, HST, etc.] 
-    Download[⬇️ Download]
-    Scratch[⚡ Scratch Storage<br/>Fast processing]
-    Process[🔄 Data Processing]
-    ARC[📁 ARC Projects<br/>Shared results]
-    VOSpace[☁️ VOSpace<br/>Long-term archive]
+    Archive["📦 External Archives<br/>ALMA, HST, etc."] 
+    Download["⬇️ Download"]
+    Scratch["⚡ Scratch Storage<br/>Fast processing"]
+    Process["🔄 Data Processing"]
+    ARC["📁 ARC Projects<br/>Shared results"]
+    VOSpace["☁️ VOSpace<br/>Long-term archive"]
     
     Archive --> Download
     Download --> Scratch
@@ -25,17 +42,7 @@ graph LR
     ARC -.-> |Backup| Process
 ```
 
-## 📊 Storage Types Comparison
-
-| Storage | Mount Path | Speed | Persistence | Backup | Quota | Best For |
-|---------|------------|-------|-------------|--------|-------|----------|
-| **ARC Projects** | `/arc/projects/group/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | Project-based | Active research, shared data |
-| **ARC Home** | `/arc/home/username/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | 10GB default | Personal configs, keys |
-| **Scratch** | `/scratch/` | Fastest NVMe | ❌ **Wiped at session end** | ❌ No backup | Unlimited | Temporary processing |
-| **VOSpace** | `vos:username/` | Medium | ✅ Permanent | ✅ Geo-redundant | User/project based | Archives, public data |
-
-!!! warning "Important: Scratch Storage Lifecycle"
-    **Scratch storage is wiped at the end of each session**, not nightly as some older documentation stated. When your interactive session ends or your batch job completes, all files in `/scratch/` are permanently deleted.
+---
 
 ## 📁 ARC Storage
 
@@ -43,18 +50,20 @@ ARC (Advanced Research Computing) storage provides high-performance, persistent 
 
 ### `/arc/projects/groupname/` - Shared Research Storage
 
-**✅ Perfect for:**
-- Raw and processed datasets
-- Analysis scripts and notebooks  
-- Results and publications
-- Shared team resources
-- Collaborative workflows
+!!! success "When to Use ARC Projects"
+
+    - Raw and processed datasets
+    - Analysis scripts and notebooks  
+    - Results and publications
+    - Shared team resources
+    - Collaborative workflows
 
 **🔧 Features:**
-- **Shared access** - All group members can read/write
-- **Fast SSD storage** - Optimized for data analysis
-- **Daily backups** - 30-day retention policy
-- **ACL support** - Fine-grained permission control
+
+  - **Shared access** - All group members can read/write
+  - **Fast SSD storage** - Optimized for data analysis
+  - **Daily backups** - 30-day retention policy
+  - **ACL support** - Fine-grained permission control
 
 **📂 Recommended Structure:**
 
@@ -83,16 +92,17 @@ ARC (Advanced Research Computing) storage provides high-performance, persistent 
 
 ### `/arc/home/username/` - Personal Space  
 
-**✅ Perfect for:**
-- Personal configuration files (`.bashrc`, `.jupyter/`)
-- SSH keys and authentication credentials
-- Personal scripts and utilities
-- Small reference files
+!!! info "When to Use ARC Home"
+    - Personal configuration files (`.bashrc`, `.jupyter/`)
+    - SSH keys and authentication credentials
+    - Personal scripts and utilities
+    - Small reference files
 
 **⚠️ Limitations:**
-- **10GB default quota** (contact support for increases)
-- Personal access only (not shared)
-- Not suitable for large datasets
+
+  - **10GB default quota** (contact support for increases)
+  - Personal access only (not shared)
+  - Not suitable for large datasets
 
 ### Managing ARC Storage {#storage-management}
 
@@ -125,8 +135,10 @@ chmod g+s /arc/projects/myproject/  # Inherit group ownership
 
 #### Backup and Recovery
 
+!!! tip "ARC Backup"
+    ARC storage is automatically backed up daily with a 30-day retention policy. You can also restore files from snapshots if needed.
+
 ```bash
-# ARC storage is automatically backed up, but you can also create snapshots
 # List available snapshots (if enabled)
 ls /arc/projects/myproject/.snapshots/
 
@@ -135,9 +147,14 @@ cp /arc/projects/myproject/.snapshots/daily.2024-03-15/important_file.fits \
    /arc/projects/myproject/restored_file.fits
 ```
 
+---
+
 ## ⚡ Scratch Storage
 
 Scratch provides the fastest storage available on CANFAR, but files are **temporary**.
+
+!!! warning "Important: Scratch Storage Lifecycle"
+    **Scratch storage is wiped at the end of each session**, not nightly as some older documentation stated. When your interactive session ends or your batch job completes, all files in `/scratch/` are permanently deleted.
 
 ### When to Use Scratch
 
@@ -214,13 +231,20 @@ cp *.uvfits /arc/projects/myproject/data/2019.1.00123.S/
 echo "Processed $(date): 2019.1.00123.S" >> /arc/projects/myproject/processing_log.txt
 ```
 
+---
+
 ## ☁️ VOSpace
 
 VOSpace provides web-accessible, long-term archive storage based on IVOA standards.
 
-### VOSpace Characteristics
+!!! info "When to Use VOSpace"
+    - Archives and public data
+    - Long-term preservation
+    - Sharing data with external collaborators
+    - Metadata-rich datasets
 
 **🔧 Features:**
+
 - **Web-based access** - Upload/download via browser or command line
 - **Metadata support** - Store astronomical metadata with files
 - **Version control** - Track changes to datasets
@@ -228,6 +252,7 @@ VOSpace provides web-accessible, long-term archive storage based on IVOA standar
 - **Geographic redundancy** - Multiple backup locations
 
 **⚠️ Considerations:**
+
 - **Slower access** than ARC storage (network-based)
 - **Better for archives** than active analysis
 - **Command-line tools required** for advanced features
@@ -280,20 +305,24 @@ import vos
 client = vos.Client()
 
 # Upload file with metadata
-client.copy('local_file.fits', 'vos:myproject/survey_data.fits')
+client.copy("local_file.fits", "vos:myproject/survey_data.fits")
 
 # Set metadata
-node = client.get_node('vos:myproject/survey_data.fits')
-node.props['TELESCOPE'] = 'ALMA'
-node.props['OBJECT'] = 'NGC1365'
+node = client.get_node("vos:myproject/survey_data.fits")
+node.props["TELESCOPE"] = "ALMA"
+node.props["OBJECT"] = "NGC1365"
 client.update(node)
 
 # Download with progress
-client.copy('vos:myproject/large_file.fits', 'local_copy.fits', 
-           send_md5=True)
+client.copy("vos:myproject/large_file.fits", "local_copy.fits", send_md5=True)
 ```
 
-## 🔄 Data Transfer Between Storage Systems {#data-transfer-strategies}
+---
+
+## 🔄 Data Transfers {#data-transfer-strategies}
+
+!!! tip "Data Transfer Best Practice"
+    Always move important results from `/scratch/` to `/arc/projects/` or VOSpace before ending your session. Use the right tool for your file size and workflow.
 
 ### Transfer Strategies by Data Size
 
@@ -382,6 +411,8 @@ umount ~/canfar
     # Mount using SSHFS-Win GUI or command line
     ```
 
+---
+
 ## 🛠️ Advanced Storage Operations
 
 ### Full VOSpace API Usage
@@ -420,14 +451,11 @@ Access subsections of large files without downloading the entire dataset:
 import requests
 
 # Get cutout from FITS file in VOSpace
-cutout_url = 'https://ws-cadc.canfar.net/vospace/data/myproject/large_image.fits'
-params = {
-    'cutout': '[1:100,1:100]',  # Section to extract
-    'format': 'fits'
-}
+cutout_url = "https://ws-cadc.canfar.net/vospace/data/myproject/large_image.fits"
+params = {"cutout": "[1:100,1:100]", "format": "fits"}  # Section to extract
 
 response = requests.get(cutout_url, params=params)
-with open('cutout.fits', 'wb') as f:
+with open("cutout.fits", "wb") as f:
     f.write(response.content)
 ```
 
@@ -443,42 +471,47 @@ import shutil
 import vos
 from pathlib import Path
 
+
 def process_dataset(dataset_id):
     """Process a dataset using optimal storage strategy"""
-    
+
     # 1. Download to scratch for fast processing
-    scratch_dir = Path(f'/scratch/{dataset_id}')
+    scratch_dir = Path(f"/scratch/{dataset_id}")
     scratch_dir.mkdir(exist_ok=True)
-    
+
     # Download from VOSpace to scratch
     client = vos.Client()
-    client.copy(f'vos:archive/{dataset_id}.fits', 
-                str(scratch_dir / 'raw_data.fits'))
-    
+    client.copy(f"vos:archive/{dataset_id}.fits", str(scratch_dir / "raw_data.fits"))
+
     # 2. Process data (using scratch for speed)
     os.chdir(scratch_dir)
     # ... processing code here ...
-    
+
     # 3. Save results to ARC projects
-    results_dir = Path(f'/arc/projects/myproject/results/{dataset_id}')
+    results_dir = Path(f"/arc/projects/myproject/results/{dataset_id}")
     results_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Copy important results
-    shutil.copy('processed_image.fits', results_dir)
-    shutil.copy('measurements.csv', results_dir)
-    shutil.copy('processing.log', results_dir)
-    
+    shutil.copy("processed_image.fits", results_dir)
+    shutil.copy("measurements.csv", results_dir)
+    shutil.copy("processing.log", results_dir)
+
     # 4. Archive final products to VOSpace
-    client.copy(str(results_dir / 'processed_image.fits'),
-                f'vos:myproject/processed/{dataset_id}_final.fits')
-    
+    client.copy(
+        str(results_dir / "processed_image.fits"),
+        f"vos:myproject/processed/{dataset_id}_final.fits",
+    )
+
     # Scratch cleanup happens automatically at session end
     print(f"Processed {dataset_id} successfully")
 
+
 # Process multiple datasets
-for dataset in ['obs001', 'obs002', 'obs003']:
+for dataset in ["obs001", "obs002", "obs003"]:
     process_dataset(dataset)
 ```
+
+---
 
 ## 🔗 What's Next?
 

@@ -1,10 +1,18 @@
-# Concepts
+# CANFAR Platform Concepts
 
-**Understanding the CANFAR Science Platform architecture and core concepts**
+**Understanding the architecture and core concepts behind the CANFAR Science Platform**
 
 This section covers the fundamental concepts you need to understand to effectively use CANFAR. Whether you are a student starting your first analysis or a project manager setting up a team workspace, these concepts will help you understand how the platform works.
 
-## 🎯 What is CANFAR?
+!!! abstract "🎯 What You'll Learn"
+    By the end of this guide, you'll understand:
+    
+    - How CANFAR's cloud architecture works
+    - The role of containers in your research workflow
+    - How sessions and storage systems interact
+    - When to use different platform features
+
+## 🚀 What is CANFAR?
 
 The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platform is a cloud-based computing environment designed specifically for astronomical research. It provides:
 
@@ -13,139 +21,262 @@ The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platfo
 - **Shared storage systems** for collaborative research
 - **Scalable infrastructure** that grows with your project needs
 
-### Why Use CANFAR?
+!!! success "Key Benefit"
+    CANFAR eliminates the traditional barriers of software installation, hardware management, and infrastructure setup, letting you focus entirely on your research.
 
-**For Individual Researchers:**
+### Who Benefits from CANFAR?
 
-- By default, there is little to no software installation headaches - you might be lucky with a pre-configured container which you can also modify when getting more familiar.
-- Access powerful computing resources without owning hardware
-- Work from anywhere with just a web browser
-- Automatic backups and data protection
+=== "Individual Researchers"
+    - **No software installation headaches** - pre-configured containers ready to use
+    - Access powerful computing resources without owning hardware
+    - Work from anywhere with just a web browser
+    - Automatic backups and data protection
 
-**For Research Teams:**
+=== "Research Teams"
+    - Share data and analysis environments seamlessly
+    - Standardized software stacks across the team
+    - Collaborative workspaces and session sharing
+    - Centralized project management
 
-- Share data and analysis environments seamlessly
-- Standardized software stacks across the team
-- Collaborative workspaces and session sharing
-- Centralized project management
+=== "Large Projects"
+    - Scale computing resources up or down as needed
+    - Batch processing for large datasets
+    - Custom software environments for specialized workflows
+    - Integration with astronomy data archives
 
-**For Large Projects:**
+## 🏗️ Architecture
 
-- Scale computing resources up or down as needed
-- Batch processing for large datasets
-- Custom software environments for specialized workflows
-- Integration with astronomy data archives
-
-## 🏗️ Platform Architecture
-
-CANFAR is built on modern cloud-native technologies designed for scalability and reliability:
+CANFAR is built on modern cloud-native technologies designed for scalability and reliability. Here's how the components work together:
 
 ```mermaid
-graph TB
-    User[👤 You] --> Portal[🌐 Science Portal<br/>canfar.net]
-    Portal --> Auth[🔐 CADC Authentication]
-    Portal --> Sessions[🖥️ Session Manager<br/>Skaha]
-
-    Sessions --> K8s[☸️ Kubernetes Cluster]
-    K8s --> Containers[🐳 Container Images<br/>Harbor Registry]
-    K8s --> Storage[💾 Storage Systems]
-
-    Storage --> arc[📁 arc Posix Storage<br/>Shared Filesystem]
-    Storage --> VOSpace[☁️ VOSpace Object Store <br/>Long-term Storage]
-    Storage --> Scratch[⚡ Scratch<br/>Temporary SSDs]
-
-    Sessions --> Types[Session Types]
-    Types --> Notebook[📓 Jupyter Notebooks]
-    Types --> Desktop[🖥️ Desktop Environment]
-    Types --> CARTA[📊 CARTA Viewer]
-    Types --> Firefly[🔥 Firefly Viewer]
-    Types --> Contrib[⚙️ Contributed Apps]
-    Types --> Batch[🏭 Batch Jobs]
+%%{init: {'flowchart': {'curve': 'linear'}}}%%
+graph LR
+    %% User Entry Point
+    User["👤 You"]:::user
+    
+    %% Portal Layer
+    Portal["🌐 Science Portal<br/>canfar.net"]:::portal
+    Auth["🔐 CADC Authentication"]:::auth
+    Sessions["🖥️ Session Manager<br/>Skaha"]:::sessions
+    
+    %% Infrastructure Layer
+    K8s["☸️ Kubernetes Cluster"]:::k8s
+    Containers["🐳 Container Images<br/>Harbor Registry"]:::containers
+    Storage["💾 Storage Systems"]:::storage
+    
+    %% Storage Systems
+    arc["📁 arc Posix Storage<br/>Shared Filesystem"]:::arc
+    VOSpace["☁️ VOSpace Object Store<br/>Long-term Storage"]:::vospace
+    Scratch["⚡ Scratch<br/>Temporary SSDs"]:::scratch
+    
+    %% Session Types
+    Types["Session Types"]:::types
+    Notebook["📓 Jupyter Notebooks"]:::notebooks
+    Desktop["🖥️ Desktop Environment"]:::desktop
+    CARTA["📊 CARTA Viewer"]:::carta
+    Firefly["🔥 Firefly Viewer"]:::firefly
+    Contrib["⚙️ Contributed Apps"]:::contrib
+    Batch["🏭 Batch Jobs"]:::batch
+    
+    %% Connections
+    User --> Portal
+    Portal --> Auth
+    Portal --> Sessions
+    
+    Auth --> K8s
+    Sessions --> K8s
+    
+    K8s --> Containers
+    K8s --> Storage
+    
+    Storage --> arc
+    Storage --> VOSpace
+    Storage --> Scratch
+    
+    Sessions --> Types
+    Types --> Notebook
+    Types --> Desktop
+    Types --> CARTA
+    Types --> Firefly
+    Types --> Contrib
+    Types --> Batch
+    
+    %% Styling
+    classDef user fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef portal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef auth fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    classDef sessions fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef k8s fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000
+    classDef containers fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    classDef storage fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef arc fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
+    classDef vospace fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
+    classDef scratch fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef types fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
+    classDef notebooks fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef desktop fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef carta fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef firefly fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef contrib fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef batch fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
 ```
 
-### Key Components
+!!! info "Architecture Key Points"
+    - **Science Portal**: Your web interface - no software installation required
+    - **Kubernetes**: Manages your computing requirements automatically
+    - **Containers**: Pre-built software environments with astronomy tools
+    - **Storage Systems**: Multiple types optimized for different use cases
+    - **Authentication**: Secure access via CADC integration
 
-**🌐 Science Portal**
-: Web interface where you log in and manage sessions. No software installation required.
+## 🐳 Containers
 
-**☸️ Kubernetes**
-: Container orchestration system that manages your computing sessions automatically.
+Containers are at the heart of CANFAR's flexibility and power. Think of them as complete, portable software environments that include everything needed to run specific applications.
 
-**🐳 Containers**
-: Pre-built software environments containing astronomy tools, Python packages, and dependencies that you can use as-is or customize for your needs.
+!!! warning "Important Distinction"
+    Unlike virtual machines that include entire operating systems, containers share the host's kernel and only package the application and its dependencies. This makes them faster, more efficient, and easier to distribute.
 
-**💾 Storage Systems**
-: Multiple storage types optimized for different use cases from active research to long-term archival storage.
+### Why Containers Matter for Astronomy
 
-**🔐 Authentication**
-: Integration with CADC (Canadian Astronomy Data Centre) for secure access control and group management.
+**Traditional Software Installation:**
 
-## 🐳 Understanding Containers
+- Struggle with dependencies and conflicting versions
+- Missing libraries and system requirements
+- Different behavior across different machines
+- Time-consuming setup and configuration
 
-Containers are at the heart of CANFAR's flexibility and power. If you're familiar with virtual machines, containers serve a similar purpose but are much more lightweight and efficient. While a virtual machine includes an entire operating system, containers share the host's kernel and only package the application and its dependencies. This makes them start faster, use fewer resources, and easier to distribute.
+**CANFAR Containers:**
 
-Think of containers as complete, portable software environments that include everything needed to run specific applications. Unlike traditional software installation where you might struggle with dependencies, conflicting versions, or missing libraries, containers provide a consistent environment that works the same way regardless of where they run.
+- Consistent environment that works the same everywhere
+- Pre-configured with astronomy packages
+- No installation headaches
+- Easy to share and reproduce results
 
-CANFAR provides a rich ecosystem of containers maintained by both the platform team and the community. You can use these containers directly for immediate productivity, or use them as starting points to build your own specialized environments. Whether you need a quick analysis environment or a highly customized workflow, containers adapt to your research needs.
-
-### What Might Be in a Container?
-
-The contents of containers vary significantly depending on their purpose and complexity. A minimal container might include just a specific tool and its immediate dependencies, while comprehensive research environments can include extensive software suites. Here are examples of what you might find in different types of astronomy containers:
-
-A general-purpose astronomy container could include an operating system base (typically Ubuntu Linux), core astronomy software packages like CASA or DS9, programming languages such as Python with scientific libraries, essential system libraries and dependencies, and pre-configured environment settings for optimal performance.
-
-However, specialized containers might be much more focused. A container designed for a specific data reduction pipeline might only include the necessary tools for that workflow, while a visualization container might emphasize graphical applications and display capabilities.
-
-The beauty of the container ecosystem is that you're not limited to what others have built. While CANFAR provides many ready-to-use containers, you can also create your own containers tailored to your exact research needs, building upon existing containers or starting from scratch.
+!!! success "Research Reproducibility"
+    Containers ensure your analysis runs the same way for you, your collaborators, and future researchers. This is crucial for reproducible science.
 
 ### Popular CANFAR Containers
 
-CANFAR offers several well-maintained containers that cover common astronomical research scenarios. The **astroml** container provides a comprehensive environment for general astronomy analysis, including Python with NumPy, SciPy, Astropy, and Matplotlib. For radio interferometry work, the **casa** container includes CASA software along with Python and common astronomy tools. The **desktop** container offers a full Ubuntu desktop environment with Firefox and terminal access, perfect when you need GUI applications. Radio astronomy visualization is well-served by the **carta** container with its specialized CARTA viewer and analysis tools, while the **notebook** container provides JupyterLab with the complete Python scientific stack for interactive computing.
+| Container | Purpose | Best For |
+|-----------|---------|----------|
+| **astroml** | General astronomy analysis | Python, NumPy, SciPy, Astropy, Matplotlib |
+| **casa** | Radio interferometry | CASA software, Python, astronomy tools |
+| **desktop** | GUI applications | Full Ubuntu desktop, Firefox, terminal |
+| **carta** | Radio astronomy visualization | CARTA viewer, analysis tools |
+| **notebook** | Interactive computing | JupyterLab, Python scientific stack |
 
-These represent just a starting point. The community continuously contributes new containers, and you can always build upon these foundations to create environments perfectly suited to your research workflow.
+!!! tip "Getting Started"
+    Start with the **astroml** container for general astronomy work. It includes most common packages and is regularly updated.
 
 ### Container Lifecycle
 
-Understanding how containers work behind the scenes helps you use them more effectively. When you request a session through the Science Portal, several steps happen automatically. The portal communicates with Kubernetes to create your session using your chosen container. If the container hasn't been used recently on that computing node, Kubernetes pulls the container image from the registry, downloading the necessary layers efficiently. Once downloaded, Kubernetes starts the container and connects it to your storage systems, making your files and data available within the container environment.
+When you launch a session, here's what happens behind the scenes:
 
-The first time you launch a particular container type, this process typically takes 2-3 minutes as the system downloads and caches the container image. Subsequent launches of the same container are much faster, usually taking only 30-60 seconds, since the image is already cached locally.
+1. **Request**: You choose a container type in the Science Portal
+2. **Download**: Kubernetes pulls the container image (first time: 2-3 minutes)
+3. **Launch**: Container starts with your storage connected
+4. **Work**: You use the pre-configured environment
+5. **Cleanup**: Container is destroyed when session ends (files persist in storage)
 
-## ☸️ Kubernetes & Sessions
+!!! info "Performance Note"
+    Subsequent launches of the same container are much faster (30-60 seconds) since the image is cached locally.
+
+## ☸️ Sessions and Computing Resources
 
 CANFAR uses Kubernetes to manage your computing sessions. You don't need to understand Kubernetes deeply, but here are the key concepts:
 
-### Session Management
-
-**Sessions are temporary:** Each time you launch a session, Kubernetes creates a new container instance. When you stop the session, the container is destroyed.
-
-**Data persistence:** Your files persist through a storage system, not in the container itself. This means:
-
-- ✅ Files in `/arc/projects/` and `/arc/home/` are saved permanently
-- ❌ Files in `/tmp/` or container system directories are lost when session ends
-- ⚡ Files in `/scratch/` are wiped when session ends
-
-**Resource limits:** Each session has CPU, memory, and storage limits based on your group's allocation.
+!!! abstract "Session Fundamentals"
+    - **Temporary**: Each session creates a new container instance
+    - **Persistent Data**: Files persist through storage systems, not containers
+    - **Resource Limits**: CPU, memory, and storage based on your request
 
 ### Session Types
 
 Different session types provide different interfaces to the same underlying computing resources:
 
-**📓 Notebook Sessions**
-: JupyterLab interface for interactive analysis, perfect for data exploration and visualization.
+=== "📓 Notebook Sessions"
+    **JupyterLab Interface** for interactive analysis
 
-**🖥️ Desktop Sessions**
-: Full Linux desktop environment for GUI applications like CASA, DS9, and image viewers.
+    - Perfect for data exploration and visualization
+    - Python, R, and other kernels available
+    - Rich text, code, and visualization in one interface
 
-**📊 CARTA Sessions**
-: Specialized for radio astronomy visualization and analysis.
+=== "🖥️ Desktop Sessions"
+    **Full Linux desktop environment** for GUI applications
 
-**🔥 Firefly Sessions**
-: Table and image visualization tools.
+    - CASA, DS9, and image viewers
+    - Traditional desktop workflow
+    - Multiple applications running simultaneously
 
-**⚙️ Contributed Sessions**
-: Custom applications contributed by the community.
+=== "📊 CARTA Sessions"
+    **Specialized for radio astronomy** visualization and analysis
 
-## 🌐 REST Web Services
+    - CARTA viewer for FITS files
+    - Radio astronomy workflows
+    - Interactive data exploration
+
+=== "🔥 Firefly Sessions"
+    **Table and image visualization** tools
+
+    - Astronomical table viewing
+    - Image display and analysis
+    - Web-based interface
+
+=== "⚙️ Contributed Sessions"
+    **Custom applications** contributed by the community
+    
+    - Specialized tools and workflows
+    - Community-maintained software
+    - Experimental features
+
+## 💾 Storage Systems
+
+### Data Persistence Rules
+
+CANFAR provides multiple storage systems optimized for different use cases:
+
+!!! warning "Critical: Where Your Files Are Saved"
+    Understanding where your files persist is crucial for not losing work:
+
+| Location | Persistence | Best For |
+|----------|-------------|----------|
+| `/arc/projects/yourgroup/` | ✅ **Permanent, backed up** | Datasets, results, shared code |
+| `/arc/home/yourusername/` | ✅ **Permanent, backed up** | Personal configs, small files |
+| `/scratch/` | ❌ **Wiped at session end** | Large computations, temporary files |
+| `/tmp/` | ❌ **Lost when session ends** | Temporary processing only |
+
+### ARC Storage (`/arc/`)
+
+**High-performance POSIX file system** for active research:
+
+- **Speed**: Fast, direct access for large computations
+- **Sharing**: Group-based access control
+- **Backup**: Daily snapshots
+- **Best For**: Active analysis, large datasets, collaborative work
+
+### VOSpace (`vos:`)
+
+**Web-accessible object store** for long-term storage:
+
+- **IVOA**: Based on the International Virtual Observatory Alliance (IVOA) standard
+- **Access**: Web APIs and command-line tools
+- **Metadata**: Astronomical metadata support
+- **Versioning**: Track changes to datasets
+- **Best For**: Archives, sharing, backups, metadata-rich data
+
+!!! tip "Storage Strategy"
+    Use **ARC storage** for active analysis and **VOSpace** for long-term archival and sharing.
+
+### Storage Comparison
+
+| Feature | ARC Storage (`/arc/`) | VOSpace (`vos:`) |
+|---------|----------------------|------------------|
+| **Access Method** | POSIX file system | Web APIs, command tools |
+| **Speed** | Fast (direct access) | Medium (network-based) |
+| **Best For** | Active analysis, large computations | Archives, sharing, backups |
+| **Quota** | Group-based | User/project based |
+| **Backup** | Daily snapshots | Geo-redundant |
+
+## 🌐 Programmatic Access
 
 CANFAR provides REST APIs for programmatic access, allowing you to:
 
@@ -156,35 +287,14 @@ CANFAR provides REST APIs for programmatic access, allowing you to:
 
 ### Key API Endpoints
 
-| Service            | Purpose                          | Documentation                                                    |
-| ------------------ | -------------------------------- | ---------------------------------------------------------------- |
-| **skaha**          | Session management               | [skaha](https://ws-uv.canfar.net/skaha)                          |
-| **VOSpace**        | File operations                  | [VOSpace API](../storage/vospace-api.md)                         |
+| Service | Purpose | Documentation |
+|---------|---------|---------------|
+| **CANFAR Python Client** | Session management | [TBD](TBD) |
+| **VOSpace** | File operations | [VOSpace API](../storage/vospace-api.md) |
 | **Access Control** | Authentication and Authorization | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
-## 💾 VOSpace Concepts
-
-VOSpace is CANFAR's web-accessible storage system, based on the International Virtual Observatory Alliance (IVOA) standard.
-
-### Key Features
-
-**Web-based Access:** Upload, download, and manage files through web interfaces or command-line tools.
-
-**Metadata Support:** Store astronomical metadata alongside your files.
-
-**Version Control:** Track changes to important datasets.
-
-**Sharing Controls:** Fine-grained permissions for collaborative projects.
-
-### VOSpace vs. File System Storage
-
-| Feature           | VOSpace (`vos:`)           | ARC Storage (`/arc/`)               |
-| ----------------- | -------------------------- | ----------------------------------- |
-| **Access Method** | Web APIs, command tools    | POSIX file system                   |
-| **Speed**         | Medium (network-based)     | Fast (direct access)                |
-| **Best For**      | Archives, sharing, backups | Active analysis, large computations |
-| **Quota**         | User/project based         | Group-based                         |
-| **Backup**        | Geo-redundant              | Daily snapshots                     |
+!!! info "Advanced Users"
+    The REST APIs enable automation and integration with external tools and workflows.
 
 ## 🔗 What's Next?
 
@@ -197,5 +307,5 @@ Now that you understand the core concepts, dive into specific areas:
 
 ---
 
-!!! tip "Key Takeaway"
-CANFAR provides the computing power of a research institution without the infrastructure overhead. Focus on your science - let CANFAR handle the computers, software, and data management.
+!!! success "Key Takeaway"
+    CANFAR provides the computing power of a research institution without the infrastructure overhead. Focus on your science - let CANFAR handle the computers, software, and data management.

@@ -2,6 +2,12 @@
 
 CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialized image visualization and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.
 
+!!! abstract "🎯 What You'll Learn"
+    - How to launch a CARTA session and choose the right version
+    - How to size RAM/CPU for your datasets
+    - How to load data from `/arc` and work with radio data cubes
+    - Tips for analysis features, performance, and troubleshooting
+
 ## Overview
 
 CARTA provides advanced features for:
@@ -48,6 +54,9 @@ reasonable for your needs, as resources are shared among all users:
 - **8GB**: Small images and simple analysis
 - **16GB (default)**: Most radio astronomy datasets
 - **32GB+**: Large data cubes or complex multi-image analysis
+
+!!! tip "Choosing Resources"
+    Start with 8GB RAM and 2 CPU cores. Increase memory for very large FITS or CASA images and increase cores for CPU-intensive operations like moment map generation.
 
 > ![image](../images/carta/4_choose_carta_ram.png)
 
@@ -197,6 +206,9 @@ CARTA supports multiple astronomical image formats:
 - **Use appropriate data types**: Float32 vs Float64
 - **Enable GPU acceleration**: For supported operations
 - **Adjust cache settings**: Balance memory vs speed
+
+!!! warning "Large Data Cubes"
+    Very large cubes can consume significant memory. Load subregions, work with decimated data, or increase RAM to avoid crashes.
 
 ### Large Dataset Handling
 

@@ -2,6 +2,13 @@
 
 The CANFAR Science Platform provides comprehensive support for radio astronomy data processing, with specialized containers and workflows optimized for radio interferometry, single-dish observations, and VLBI analysis.
 
+!!! abstract "🎯 What You'll Learn"
+    - The radio astronomy software stack available on CANFAR (CASA, CARTA, tools)
+    - How to choose session types and containers for common workflows
+    - Typical interferometry, single-dish, and VLBI workflows
+    - Strategies for large-scale processing, storage, and performance
+    - Troubleshooting tips and best practices for reliable pipelines
+
 ## Overview
 
 Radio astronomy on CANFAR includes:
@@ -37,6 +44,9 @@ CANFAR provides multiple CASA versions and configurations:
 - **UVFITS**: Legacy interferometry format
 - **HDF5**: Large dataset storage
 - **MIRIAD**: Legacy format support
+
+!!! tip "Choosing a Container"
+    For interactive analysis, start with `casa:6.5-notebook` or `casa:6.5-desktop`. Use `carta` for visualization. For pipelines, use a headless CASA container via batch jobs.
 
 ## Common Radio Astronomy Workflows
 
@@ -84,6 +94,9 @@ graph TD
 - **AIPS integration**: For legacy VLBI workflows
 - **Custom scripts**: Institution-specific pipelines
 
+!!! warning "Large Datasets"
+    Radio data can be very large. Use `/scratch/` for temporary processing and save results promptly to `/arc/projects/`. Plan resource allocations (RAM/CPU) accordingly.
+
 ## Getting Started with Radio Astronomy
 
 ### Choosing the Right Session Type
@@ -96,6 +109,9 @@ graph TD
 **For large-scale processing**:
 - **[Batch jobs](../batch-jobs/index.md)**: Automated pipeline execution
 - **API submissions**: Programmatic job control
+
+!!! info "Resource Sizing"
+    Start with 16GB RAM and 2-4 cores for interactive work; increase for imaging and large cubes. Batch jobs can request more resources but may queue longer.
 
 ### Container Selection
 
@@ -125,15 +141,13 @@ import casa_tools as tools
 import casa_tasks as tasks
 
 # List observation details
-tasks.listobs(vis='observation.ms', verbose=True)
+tasks.listobs(vis="observation.ms", verbose=True)
 
 # Plot UV coverage
-tasks.plotuv(vis='observation.ms')
+tasks.plotuv(vis="observation.ms")
 
 # Check data quality
-tasks.plotms(vis='observation.ms', 
-             xaxis='time', yaxis='amp',
-             coloraxis='antenna1')
+tasks.plotms(vis="observation.ms", xaxis="time", yaxis="amp", coloraxis="antenna1")
 ```
 
 ### Calibration Pipeline
@@ -144,83 +158,90 @@ import os
 from casa_tasks import *
 
 # Set up paths
-msname = 'observation.ms'
-caldir = 'calibration/'
+msname = "observation.ms"
+caldir = "calibration/"
 os.makedirs(caldir, exist_ok=True)
 
 # 1. Flagging
-flagdata(vis=msname, mode='manual', antenna='ant5')  # Bad antenna
-flagdata(vis=msname, mode='tfcrop', datacolumn='data')  # RFI
+flagdata(vis=msname, mode="manual", antenna="ant5")  # Bad antenna
+flagdata(vis=msname, mode="tfcrop", datacolumn="data")  # RFI
 
 # 2. Set flux scale for calibrator
-setjy(vis=msname, field='3C273', standard='Perley-Butler-2017')
+setjy(vis=msname, field="3C273", standard="Perley-Butler-2017")
 
 # 3. Bandpass calibration
-bandpass(vis=msname,
-         caltable=caldir+'bandpass.bcal',
-         field='3C273',
-         refant='ant1',
-         solint='inf')
+bandpass(
+    vis=msname,
+    caltable=caldir + "bandpass.bcal",
+    field="3C273",
+    refant="ant1",
+    solint="inf",
+)
 
 # 4. Gain calibration
-gaincal(vis=msname,
-        caltable=caldir+'phase.gcal',
-        field='3C273',
-        calmode='p',
-        refant='ant1',
-        solint='int')
+gaincal(
+    vis=msname,
+    caltable=caldir + "phase.gcal",
+    field="3C273",
+    calmode="p",
+    refant="ant1",
+    solint="int",
+)
 
-gaincal(vis=msname,
-        caltable=caldir+'amp.gcal',
-        field='3C273',
-        calmode='ap',
-        refant='ant1',
-        solint='10min',
-        gaintable=[caldir+'bandpass.bcal', caldir+'phase.gcal'])
+gaincal(
+    vis=msname,
+    caltable=caldir + "amp.gcal",
+    field="3C273",
+    calmode="ap",
+    refant="ant1",
+    solint="10min",
+    gaintable=[caldir + "bandpass.bcal", caldir + "phase.gcal"],
+)
 
 # 5. Apply calibration
-applycal(vis=msname,
-         field='target',
-         gaintable=[caldir+'bandpass.bcal', 
-                   caldir+'phase.gcal', 
-                   caldir+'amp.gcal'])
+applycal(
+    vis=msname,
+    field="target",
+    gaintable=[caldir + "bandpass.bcal", caldir + "phase.gcal", caldir + "amp.gcal"],
+)
 ```
 
 ### Imaging
 
 ```python
 # Create images with tclean
-tclean(vis='observation.ms',
-       imagename='target_image',
-       field='target',
-       imsize=1024,
-       cell='0.1arcsec',
-       weighting='briggs',
-       robust=0.0,
-       niter=1000,
-       threshold='0.1mJy',
-       interactive=False)
+tclean(
+    vis="observation.ms",
+    imagename="target_image",
+    field="target",
+    imsize=1024,
+    cell="0.1arcsec",
+    weighting="briggs",
+    robust=0.0,
+    niter=1000,
+    threshold="0.1mJy",
+    interactive=False,
+)
 
 # Create moment maps for spectral line data
-immoments(imagename='target_image.image',
-          moments=[0, 1, 2],
-          outfile='target_moments')
+immoments(imagename="target_image.image", moments=[0, 1, 2], outfile="target_moments")
 ```
 
 ### Spectral Line Analysis
 
 ```python
 # Extract spectral profiles
-imval(imagename='datacube.image',
-      region='circle[[12h30m45s, -30d15m30s], 5arcsec]')
+imval(imagename="datacube.image", region="circle[[12h30m45s, -30d15m30s], 5arcsec]")
 
 # Create position-velocity diagrams
-impv(imagename='datacube.image',
-     outfile='pv_diagram.image',
-     mode='coords',
-     start='12h30m40s -30d15m30s',
-     end='12h30m50s -30d15m30s',
-     width='2arcsec')
+impv(
+    imagename="datacube.image",
+    outfile="pv_diagram.image",
+    mode="coords",
+    start="12h30m40s -30d15m30s",
+    end="12h30m50s -30d15m30s",
+    width="2arcsec",
+)
 ```
 
 ## CARTA for Radio Data
@@ -267,64 +288,62 @@ import os
 import glob
 from casa_tasks import *
 
+
 def process_observation(msname):
     """Process a single measurement set"""
-    
+
     print(f"Processing {msname}")
-    
+
     # Create output directories
     caldir = f"{msname}.cal/"
     imgdir = f"{msname}.img/"
     os.makedirs(caldir, exist_ok=True)
     os.makedirs(imgdir, exist_ok=True)
-    
+
     try:
         # Calibration
         calibrate_data(msname, caldir)
-        
+
         # Imaging
         image_data(msname, imgdir)
-        
+
         print(f"Completed {msname}")
-        
+
     except Exception as e:
         print(f"Error processing {msname}: {e}")
 
+
 def calibrate_data(msname, caldir):
     """Standard calibration pipeline"""
-    
+
     # Flagging
-    flagdata(vis=msname, mode='tfcrop')
-    
+    flagdata(vis=msname, mode="tfcrop")
+
     # Calibration steps (simplified)
     bandpass(vis=msname, caltable=f"{caldir}/bandpass.bcal")
     gaincal(vis=msname, caltable=f"{caldir}/phase.gcal")
     applycal(vis=msname, gaintable=[f"{caldir}/bandpass.bcal"])
 
+
 def image_data(msname, imgdir):
     """Create standard images"""
-    
+
     # Continuum image
-    tclean(vis=msname,
-           imagename=f"{imgdir}/continuum",
-           niter=1000,
-           threshold='0.1mJy')
-    
+    tclean(vis=msname, imagename=f"{imgdir}/continuum", niter=1000, threshold="0.1mJy")
+
     # Spectral cube (if line data)
-    tclean(vis=msname,
-           imagename=f"{imgdir}/cube",
-           specmode='cube',
-           niter=500)
+    tclean(vis=msname, imagename=f"{imgdir}/cube", specmode="cube", niter=500)
+
 
 # Main processing loop
 if __name__ == "__main__":
-    
+
     # Find all measurement sets
     ms_files = glob.glob("/arc/projects/survey/data/*.ms")
-    
+
     for msname in ms_files:
         process_observation(msname)
-    
+
     print("Batch processing complete")
 ```
 
@@ -341,17 +360,19 @@ Parallel radio data processing
 from multiprocessing import Pool
 import functools
 
+
 def process_with_casa(msname):
     """Process single MS with CASA"""
-    
+
     # Import CASA tools in subprocess
     import casa_tasks as tasks
-    
+
     # Your processing code here
-    tasks.flagdata(vis=msname, mode='tfcrop')
+    tasks.flagdata(vis=msname, mode="tfcrop")
     # ... rest of processing
-    
+
     return f"Processed {msname}"
+
 
 def main():
     # List of measurement sets
@@ -360,17 +381,21 @@ def main():
         "/arc/projects/survey/data/obs2.ms",
         "/arc/projects/survey/data/obs3.ms",
     ]
-    
+
     # Process in parallel
     with Pool(processes=4) as pool:
         results = pool.map(process_with_casa, ms_files)
-    
+
     for result in results:
         print(result)
+
 
 if __name__ == "__main__":
     main()
 ```
+
+!!! tip "Batch vs Interactive"
+    Use interactive sessions for development and QA of pipelines, then switch to batch jobs for production processing of many datasets.
 
 ## Data Management for Radio Astronomy
 
@@ -418,6 +443,9 @@ Radio astronomy data requires careful storage planning:
     └── analysis/
 ```
 
+!!! tip "Data Hygiene"
+    Maintain clear directory structures, version your scripts, and document parameters for reproducibility.
+
 ### Data Transfer
 
 For large radio datasets:
@@ -443,19 +471,23 @@ Radio data processing is memory-intensive:
 import psutil
 import os
 
+
 def check_memory():
     """Check current memory usage"""
     process = psutil.Process(os.getpid())
     memory_gb = process.memory_info().rss / 1024**3
     print(f"Memory usage: {memory_gb:.1f} GB")
 
+
 # Use memory-efficient processing
 check_memory()
-tclean(vis='large_dataset.ms', 
-       imagename='output',
-       # Use smaller chunk sizes for large data
-       parallel=True,
-       pbcor=False)  # Skip if not needed
+tclean(
+    vis="large_dataset.ms",
+    imagename="output",
+    # Use smaller chunk sizes for large data
+    parallel=True,
+    pbcor=False,
+)  # Skip if not needed
 check_memory()
 ```
 
@@ -467,18 +499,17 @@ import tempfile
 import shutil
 
 # Create temporary directory in scratch space
-with tempfile.TemporaryDirectory(dir='/tmp') as tmpdir:
-    
+with tempfile.TemporaryDirectory(dir="/tmp") as tmpdir:
+
     # Copy data to scratch for processing
     scratch_ms = f"{tmpdir}/working.ms"
-    shutil.copytree('original.ms', scratch_ms)
-    
+    shutil.copytree("original.ms", scratch_ms)
+
     # Process on fast scratch storage
     tclean(vis=scratch_ms, imagename=f"{tmpdir}/temp_image")
-    
+
     # Copy results back to persistent storage
-    shutil.copy(f"{tmpdir}/temp_image.image", 
-                "/arc/projects/myproject/results/")
+    shutil.copy(f"{tmpdir}/temp_image.image", "/arc/projects/myproject/results/")
 ```
 
 ## Troubleshooting Radio Workflows

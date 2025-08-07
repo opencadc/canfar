@@ -2,6 +2,12 @@
 
 Batch jobs enable automated, non-interactive processing of astronomical data at scale. This section covers headless execution, API access, job scheduling, and workflow automation on the CANFAR Science Platform.
 
+!!! abstract "🎯 What You'll Learn"
+    - The difference between headless and interactive containers
+    - How to submit jobs via API and Python client
+    - Resource planning, queue behavior, and monitoring
+    - Best practices for automation, logging, and data management
+
 ## What is Batch Processing?
 
 Batch processing refers to the execution of computational tasks without user interaction, typically running in the background to process large datasets or perform repetitive analysis tasks. In the context of the CANFAR Science Platform, batch jobs run as **headless containers** - containerized environments that execute your code without graphical interfaces or interactive terminals.
@@ -25,6 +31,11 @@ Batch processing is essential for:
 - **Parameter studies**: Execute multiple analysis runs with different parameters
 - **Resource optimization**: Run during off-peak hours for better performance
 - **Reproducible science**: Documented, automated workflows
+
+!!! tip "When to Use Batch Jobs"
+    - Use interactive sessions to develop and test
+    - Switch to headless jobs for production-scale runs
+    - Schedule jobs during off-peak hours for faster starts
 
 ## Batch Processing Methods
 
@@ -184,6 +195,9 @@ Choose appropriate resources based on your workload:
 | ML model training | 8-16 | 32-64GB | 200GB | 4-24 hours |
 | Large simulations | 16-32 | 64-128GB | 1TB | Days-weeks |
 
+!!! info "Queue Behavior"
+    Small jobs (≤4 cores, ≤16GB) start faster. Large jobs (≥16 cores, ≥64GB) may queue longer. Off-peak hours often improve start times.
+
 ### Queue Management
 
 Understand job priorities and scheduling:
@@ -243,7 +257,7 @@ curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}/logs" \
 
 ```bash
 curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}/stats" \
-  -H "Authorization: Bearer $TOKEN"
+  -H "Authorization: Bearer $TOKEN" | jq .
 ```
 
 ### Method 2: Python skaha Client
@@ -317,6 +331,9 @@ job_id = session.create(
     registry_auth=auth_string
 )
 ```
+
+!!! warning "Private Images"
+    For private Harbor projects, ensure your CLI credentials are valid and your account has access to the project repository.
 
 #### Job Monitoring and Management
 
@@ -408,184 +425,6 @@ print(logs)
 session.delete(job_id)
 ```
 
-## Workflow Examples
-
-### Example 1: Automated Data Reduction
-
-```python
-#!/usr/bin/env python3
-"""
-Automated optical imaging reduction pipeline
-Usage: python reduce_images.py --night 20240115
-"""
-
-import argparse
-import os
-import sys
-from pathlib import Path
-from astropy.io import fits
-from photutils import detect_sources, source_properties
-
-def main():
-    parser = argparse.ArgumentParser(description='Reduce nightly observations')
-    parser.add_argument('--night', required=True, help='Night to process (YYYYMMDD)')
-    parser.add_argument('--filter', default='all', help='Filter to process')
-    args = parser.parse_args()
-    
-    # Set up paths
-    data_dir = Path(f"/arc/projects/survey/data/{args.night}")
-    output_dir = Path(f"/arc/projects/survey/reduced/{args.night}")
-    output_dir.mkdir(exist_ok=True)
-    
-    # Find raw images
-    if args.filter == 'all':
-        images = list(data_dir.glob("*.fits"))
-    else:
-        images = list(data_dir.glob(f"*{args.filter}*.fits"))
-    
-    print(f"Processing {len(images)} images for {args.night}")
-    
-    for image_path in images:
-        try:
-            # Load and process image
-            with fits.open(image_path) as hdul:
-                data = hdul[0].data
-                header = hdul[0].header
-            
-            # Perform calibration (simplified)
-            calibrated = calibrate_image(data, header)
-            
-            # Extract sources
-            sources = extract_sources(calibrated)
-            
-            # Save results
-            output_path = output_dir / f"reduced_{image_path.name}"
-            save_reduced_image(calibrated, header, output_path)
-            
-            # Save catalog
-            catalog_path = output_dir / f"catalog_{image_path.stem}.fits"
-            save_catalog(sources, catalog_path)
-            
-            print(f"Processed {image_path.name}: {len(sources)} sources")
-            
-        except Exception as e:
-            print(f"Error processing {image_path.name}: {e}")
-            continue
-    
-    print(f"Reduction complete. Results in {output_dir}")
-
-def calibrate_image(data, header):
-    """Apply bias, dark, and flat field corrections"""
-    # Implementation would go here
-    return data
-
-def extract_sources(data):
-    """Extract and measure sources"""
-    # Implementation would go here
-    return []
-
-def save_reduced_image(data, header, output_path):
-    """Save calibrated image"""
-    fits.writeto(output_path, data, header, overwrite=True)
-
-def save_catalog(sources, output_path):
-    """Save source catalog"""
-    # Implementation would go here
-    pass
-
-if __name__ == "__main__":
-    main()
-```
-
-### Example 2: Parameter Study
-
-```python
-#!/usr/bin/env python3
-"""
-Run parameter study for photometric analysis
-"""
-
-import json
-import requests
-import time
-from itertools import product
-
-# Parameter grid
-aperture_sizes = [3, 5, 7, 10]  # pixels
-sky_annuli = [(10, 15), (15, 20), (20, 25)]
-detection_thresholds = [3.0, 5.0, 7.0]
-
-# API configuration
-API_BASE = "https://ws-uv.canfar.net/skaha/v0"
-TOKEN = "your-token-here"
-
-def submit_job(params):
-    """Submit a single parameter combination job"""
-    
-    cmd = (f"python /arc/projects/survey/scripts/photometry.py "
-           f"--aperture {params['aperture']} "
-           f"--sky-inner {params['sky_inner']} "
-           f"--sky-outer {params['sky_outer']} "
-           f"--threshold {params['threshold']} "
-           f"--output /arc/projects/survey/results/param_study_{params['job_id']}.fits")
-    
-    payload = {
-        'name': f"photometry-study-{params['job_id']}",
-        'image': 'images.canfar.net/skaha/astroml:latest',
-        'cores': 2,
-        'ram': 8,
-        'kind': 'headless',
-        'cmd': cmd
-    }
-    
-    response = requests.post(
-        f"{API_BASE}/session",
-        headers={"Authorization": f"Bearer {TOKEN}"},
-        data=payload
-    )
-    
-    if response.status_code == 200:
-        return response.json()['sessionId']
-    else:
-        print(f"Failed to submit job {params['job_id']}: {response.text}")
-        return None
-
-def main():
-    """Submit all parameter combinations"""
-    
-    job_ids = []
-    job_id = 0
-    
-    # Generate all parameter combinations
-    for aperture, (sky_inner, sky_outer), threshold in product(
-        aperture_sizes, sky_annuli, detection_thresholds
-    ):
-        params = {
-            'job_id': job_id,
-            'aperture': aperture,
-            'sky_inner': sky_inner,
-            'sky_outer': sky_outer,
-            'threshold': threshold
-        }
-        
-        session_id = submit_job(params)
-        if session_id:
-            job_ids.append((job_id, session_id))
-            print(f"Submitted job {job_id}: {params}")
-        
-        job_id += 1
-        time.sleep(1)  # Rate limiting
-    
-    print(f"Submitted {len(job_ids)} jobs")
-    
-    # Save job tracking info
-    with open('/arc/projects/survey/param_study_jobs.json', 'w') as f:
-        json.dump(job_ids, f)
-
-if __name__ == "__main__":
-    main()
-```
-
 ## Monitoring and Debugging
 
 ### Log Analysis
@@ -644,6 +483,9 @@ curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
 - **Output organization**: Use consistent naming and directory structures
 - **Cleanup**: Remove temporary files to save storage
 - **Metadata**: Include processing parameters in output headers
+
+!!! warning "Persistence Reminder"
+    Headless containers do not persist changes to the container filesystem. Always write outputs to `/arc/projects/` or `/arc/home/`.
 
 ### Security and Efficiency
 

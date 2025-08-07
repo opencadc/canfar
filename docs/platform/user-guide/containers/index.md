@@ -2,7 +2,18 @@
 
 **Working with astronomy software containers on CANFAR**
 
+!!! abstract "🎯 What You'll Learn"
+    - What containers are and how they run on CANFAR
+    - How container types map to session types (Notebook, Desktop, Headless)
+    - How to choose and use existing containers effectively
+    - How containers are categorized (CANFAR-supported, community, team)
+    - How to build, manage, version, and distribute custom containers
+    - How containers integrate with CANFAR storage and workflows
+
 Containers provide pre-packaged software environments that include everything needed to run astronomy applications. On CANFAR, containers eliminate the "works on my machine" problem by ensuring consistent, reproducible computational environments across different sessions and workflows.
+
+!!! success "Key Concept: Reproducible Environments"
+    Containers provide consistent, reproducible software environments for astronomy work across sessions and teams.
 
 ## Understanding CANFAR Containers
 
@@ -12,7 +23,11 @@ The container ecosystem on CANFAR follows a layered approach. Base containers pr
 
 ### Runtime Environment
 
-When containers run on CANFAR, they operate in a carefully configured environment designed for security and data access. The container always runs as your CADC user account, never as root or as a generic container user. Your home directory from `/arc/home/[username]` becomes the container's home directory, and project directories under `/arc/projects/` are mounted and accessible. Additionally, `/scratch/` provides high-speed temporary storage for intensive computations.
+!!! info "How Containers Run on CANFAR"
+    - Containers run as your CADC user (not root)
+    - `/arc/home/[username]` is the container's home directory
+    - Project directories under `/arc/projects/` are mounted and accessible
+    - `/scratch/` provides high-speed temporary storage
 
 ```bash
 # Inside a running container, check your environment
@@ -24,39 +39,10 @@ ls /scratch/                    # Temporary high-speed storage
 
 This runtime setup means there's an important compatibility consideration between code packaged in the container image and code stored on the `/arc` filesystem. Best practice involves keeping stable, tested code within the container image while placing development scripts and analysis notebooks in your `/arc/home` or project directories where they can be easily modified and version controlled.
 
-## Container Categories
+!!! warning "Persistence Reminder"
+    Software installed inside a running container (e.g., `pip install --user`) is temporary and lost when the session ends. Keep stable software in the image; keep notebooks/scripts on `/arc`.
 
-CANFAR containers fall into three main categories, each serving different purposes and maintained by different groups.
-
-### CANFAR-Supported Containers
-
-These are officially maintained by the CANFAR team and provide the foundation for most astronomy work. The core offerings include **astroml** for general astronomy analysis with Python, Astropy, and machine learning libraries; **casa** for radio interferometry work; **notebook** for lightweight Jupyter environments; and **desktop** for full Ubuntu desktop sessions with GUI applications.
-
-```bash
-# Browse available CANFAR containers
-curl -s https://images.canfar.net/api/v2.0/projects/skaha/repositories | \
-  jq -r '.[] | .name' | sort
-
-# Check container details
-docker inspect images.canfar.net/skaha/astroml:latest
-```
-
-For specialized visualization needs, CANFAR provides **carta** for radio astronomy data visualization and **firefly** for optical and infrared data exploration. These containers receive regular updates and official support from the CANFAR team.
-
-### Community-Maintained Containers
-
-The astronomy community contributes specialized containers for emerging tools and workflows. Examples include **marimo** for modern reproducible notebook environments, **vscode** for browser-based code development, and **pluto** for interactive Julia computing. These containers are maintained by community members with oversight from CANFAR.
-
-### Team and Individual Containers
-
-Research groups and individuals can create custom containers for specific projects or workflows. These might include proprietary software, custom analysis pipelines, or specialized configurations needed for particular research programs. While these containers use CANFAR infrastructure, they are maintained by their creators.
-
-```bash
-# Example team container structure
-images.canfar.net/myproject/custom-pipeline:latest
-images.canfar.net/myteam/analysis-env:v2.1
-images.canfar.net/user123/specialized-tool:dev
-```
+---
 
 ## Container Types and Session Integration
 
@@ -78,6 +64,7 @@ print(f"NumPy version: {np.__version__}")
 
 # Access your data
 import os
+
 data_path = f"/arc/projects/{os.environ.get('PROJECT_NAME', 'myproject')}"
 print(f"Project data at: {data_path}")
 ```
@@ -92,7 +79,7 @@ import tensorflow as tf
 print(f"PyTorch CUDA available: {torch.cuda.is_available()}")
 if torch.cuda.is_available():
     print(f"GPU device: {torch.cuda.get_device_name(0)}")
-    
+
 print(f"TensorFlow GPU devices: {len(tf.config.list_physical_devices('GPU'))}")
 ```
 
@@ -148,6 +135,8 @@ RUN chmod +x /opt/processing/*.sh
 CMD ["/opt/processing/batch_process.sh"]
 ```
 
+---
+
 ## Working with Existing Containers
 
 Most astronomy work on CANFAR can be accomplished using existing containers without requiring custom builds. The **astroml** container covers the majority of Python-based astronomy analysis needs, while **casa** handles radio astronomy workflows. For GUI applications, the **desktop** container provides a complete environment with Firefox, file managers, and terminal access.
@@ -176,23 +165,59 @@ curl -H "Authorization: Bearer $TOKEN" \
   https://ws-uv.canfar.net/skaha/v0/session
 ```
 
-When working within containers, remember that software installations using `pip install --user` or `apt` commands are temporary and lost when the session ends. For persistent software needs, consider building a custom container or storing installation scripts in your `/arc/home` directory.
+!!! tip "Best Practice: Code Placement"
+    Keep stable, tested code inside the container image. Keep frequently edited analysis code and notebooks in `/arc/home` or project directories.
+
+!!! warning "Temporary Installs"
+    Software installations using `pip install --user` or `apt` inside a running container are temporary and will be lost when the session ends.
+
+---
+
+## Container Categories
+
+CANFAR containers fall into three main categories, each serving different purposes and maintained by different groups.
+
+### CANFAR-Supported Containers
+
+These are officially maintained by the CANFAR team and provide the foundation for most astronomy work. The core offerings include **astroml** for general astronomy analysis with Python, Astropy, and machine learning libraries; **casa** for radio interferometry work; **notebook** for lightweight Jupyter environments; and **desktop** for full Ubuntu desktop sessions with GUI applications.
 
 ```bash
-# Temporary package installation (lost at session end)
-pip install --user astroplan photutils
+# Browse available CANFAR containers
+curl -s https://images.canfar.net/api/v2.0/projects/skaha/repositories | \
+  jq -r '.[] | .name' | sort
 
-# Persistent installation script approach
-cat > ~/install_packages.sh << 'EOF'
-#!/bin/bash
-pip install --user astroplan photutils aplpy
-pip install --user git+https://github.com/myteam/custom-tools.git
-EOF
-chmod +x ~/install_packages.sh
-
-# Run at start of each session
-~/install_packages.sh
+# Check container details
+docker inspect images.canfar.net/skaha/astroml:latest
 ```
+
+For specialized visualization needs, CANFAR provides **carta** for radio astronomy data visualization and **firefly** for optical and infrared data exploration. These containers receive regular updates and official support from the CANFAR team.
+
+### Community-Maintained Containers
+
+The astronomy community contributes specialized containers for emerging tools and workflows. Examples include **marimo** for modern reproducible notebook environments, **vscode** for browser-based code development, and **pluto** for interactive Julia computing. These containers are maintained by community members with oversight from CANFAR.
+
+### Team and Individual Containers
+
+Research groups and individuals can create custom containers for specific projects or workflows. These might include proprietary software, custom analysis pipelines, or specialized configurations needed for particular research programs. While these containers use CANFAR infrastructure, they are maintained by their creators.
+
+```bash
+# Example team container structure
+images.canfar.net/myproject/custom-pipeline:latest
+images.canfar.net/myteam/analysis-env:v2.1
+images.canfar.net/user123/specialized-tool:dev
+```
+
+---
+
+## Harbor Registry and Distribution
+
+The Harbor registry at `images.canfar.net` serves as the central repository for CANFAR containers. Users can browse available containers, examine metadata and documentation, and access containers for their sessions through the registry interface.
+
+Container versioning follows semantic patterns with `latest` tags for current stable releases, dated tags like `2024.03` for monthly snapshots, and specific commit hashes for development builds. This versioning strategy supports both reproducible research requiring fixed environments and ongoing development needing current software versions.
+
+Access to containers varies by category. CANFAR-supported containers are publicly available to all users. Community-maintained containers may have broader access depending on their purpose and licensing. Team and individual containers can be configured with specific access controls to support proprietary or sensitive work.
+
+---
 
 ## Building Custom Containers
 
@@ -327,24 +352,7 @@ wait\n' > /usr/local/bin/start-iraf && \
 CMD ["/usr/local/bin/start-iraf"]
 ```
 
-After local testing succeeds, tag the container for the Harbor registry and push it for use on CANFAR:
-
-```bash
-# Tag for Harbor registry
-docker tag myteam/analysis-env:latest \
-  images.canfar.net/myteam/analysis-env:latest
-
-# Login and push to Harbor
-docker login images.canfar.net
-docker push images.canfar.net/myteam/analysis-env:latest
-
-# Test on CANFAR
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=test-custom" \
-  -d "image=images.canfar.net/myteam/analysis-env:latest" \
-  -d "type=notebook" \
-  https://ws-uv.canfar.net/skaha/v0/session
-```
+---
 
 ## Container Management and Best Practices
 
@@ -437,13 +445,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 
 Regular maintenance includes updating base images, refreshing software dependencies, and testing compatibility with new CANFAR features. Community-maintained containers benefit from collaborative development practices including shared repositories and issue tracking.
 
-## Harbor Registry and Distribution
-
-The Harbor registry at `images.canfar.net` serves as the central repository for CANFAR containers. Users can browse available containers, examine metadata and documentation, and access containers for their sessions through the registry interface.
-
-Container versioning follows semantic patterns with `latest` tags for current stable releases, dated tags like `2024.03` for monthly snapshots, and specific commit hashes for development builds. This versioning strategy supports both reproducible research requiring fixed environments and ongoing development needing current software versions.
-
-Access to containers varies by category. CANFAR-supported containers are publicly available to all users. Community-maintained containers may have broader access depending on their purpose and licensing. Team and individual containers can be configured with specific access controls to support proprietary or sensitive work.
+---
 
 ## Integration with CANFAR Workflows
 

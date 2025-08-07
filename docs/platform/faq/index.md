@@ -365,8 +365,8 @@ response = requests.post(
         "cores": 4,
         "ram": 16,
         "kind": "headless",
-        "cmd": "python /arc/projects/myproject/analyze.py"
-    }
+        "cmd": "python /arc/projects/myproject/analyze.py",
+    },
 )
 ```
 

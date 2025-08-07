@@ -1,6 +1,12 @@
 # Launching Jupyter Notebook Sessions
 
-Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualization, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.
+**Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualization, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.**
+
+!!! abstract "🎯 What You'll Learn"
+    - How to launch a Jupyter notebook session on CANFAR
+    - How to choose the right container and resources
+    - How storage works inside notebooks and what persists
+    - Tips for performance, collaboration, and troubleshooting
 
 ## Overview
 
@@ -79,6 +85,9 @@ Click the **Launch** button to create your Notebook session. The system will:
 3. Initialize your environment
 4. Start Jupyter Lab
 
+!!! info "First Launch Timing"
+    The first launch of a specific container may take 2-3 minutes while the image is downloaded and cached. Subsequent launches are typically 30-60 seconds.
+
 > ![image](../images/notebook/7_launch_notebook.png)
 
 ### Step 5: Connect to Your Session
@@ -104,7 +113,10 @@ Your notebook session automatically mounts:
 
 - **`/arc/projects/[group]/`**: Shared project storage
 - **`/arc/home/[username]/`**: Personal storage
-- **`/tmp/`**: Temporary scratch space (cleared when session ends)
+- **`/tmp/`**: Temporary space (cleared when session ends)
+
+!!! warning "Save to Persistent Storage"
+    Files in `/tmp/` do not persist when the session ends. Save important work to `/arc/projects/` or `/arc/home/`. For heavy I/O, use `/scratch/` if available and copy results to `/arc` when done.
 
 ### Example: Astronomy Analysis
 
@@ -117,15 +129,15 @@ from astropy.io import fits
 from astropy.wcs import WCS
 
 # Load a FITS file
-hdul = fits.open('/arc/projects/myproject/data/image.fits')
+hdul = fits.open("/arc/projects/myproject/data/image.fits")
 data = hdul[0].data
 header = hdul[0].header
 
 # Display the image
 plt.figure(figsize=(10, 8))
-plt.imshow(data, origin='lower', cmap='viridis')
-plt.colorbar(label='Flux')
-plt.title('Astronomical Image')
+plt.imshow(data, origin="lower", cmap="viridis")
+plt.colorbar(label="Flux")
+plt.title("Astronomical Image")
 plt.show()
 ```
 
@@ -141,13 +153,15 @@ import casa_tools as tools
 import casa_tasks as tasks
 
 # Create measurement set summary
-tasks.listobs(vis='/arc/projects/myproject/data/observation.ms')
+tasks.listobs(vis="/arc/projects/myproject/data/observation.ms")
 
 # Image the data
-tasks.tclean(vis='/arc/projects/myproject/data/observation.ms',
-             imagename='my_image',
-             imsize=1024,
-             cell='0.1arcsec')
+tasks.tclean(
+    vis="/arc/projects/myproject/data/observation.ms",
+    imagename="my_image",
+    imsize=1024,
+    cell="0.1arcsec",
+)
 ```
 
 ## Session Management

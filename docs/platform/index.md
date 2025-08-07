@@ -1,16 +1,18 @@
-# CANFAR Science Platform Documentation
+# CANFAR Science Platform
 
-*Cloud-based astronomy data analysis platform with interactive computing and shared storage*
+*A scalable, cloud-native workspace with interactive computing and shared storage for astronomy research.*
 
-Welcome to the CANFAR Science Platform - your gateway to powerful cloud-based astronomy computing. This platform provides access to interactive computing sessions, shared storage, and specialized astronomy software through containerized applications.
+Whether you're an observational astronomer, a data scientist, or an enthusiastic student, CANFAR offers everything you need to explore, analyze, and share your discoveries — without worrying about hardware or software installations.
 
 ---
 
 ## 🚀 Quick Start
 
-New to CANFAR? Get up and running in just 10 minutes: **[📖 Getting Started Guide →](get-started/index.md)**
+New to CANFAR? Get up and running within 10 minutes with our,
 
-Already have an account? Launch your work:
+[📖 Getting Started Guide](get-started/index.md){.md-button}
+
+Already have an account? Manage your workspace with,
 
 - **[🌐 CANFAR Portal](https://www.canfar.net/science-portal/)** - Launch sessions
 - **[📁 File Manager](https://www.canfar.net/storage/arc/list)** - Access and manage storage  
@@ -18,7 +20,7 @@ Already have an account? Launch your work:
 
 ---
 
-## 📖 [User Guide](user-guide/index.md)
+## 📖 [User Guides](user-guide/index.md)
 
 **Comprehensive documentation** organized by topic:
 
@@ -32,12 +34,6 @@ Already have an account? Launch your work:
 
 ---
 
-## ❓ [FAQ](faq/index.md)
+## ❓Need Help?
 
-**Common questions and troubleshooting**
-
----
-
-## 🆘 [Help & Support](help/index.md)
-
-**Support resources and community**
+Check out our [FAQ](faq/index.md) and [Help & Support](help/index.md) pages.
