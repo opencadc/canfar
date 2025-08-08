@@ -14,7 +14,7 @@ jobs:
         with:
           egress-policy: audit
       -
-        name: Create release
+        name: Create A Release
         id: release-please
         uses: googleapis/release-please-action@7987652d64b4581673a76e33ad5e98e3dd56832f # v4.1.3
         with:
@@ -24,7 +24,7 @@ jobs:
         if: always()
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
-          repository: shinybrar/skaha
+          repository: opencadc/canfar
           event-type: edge-build
           token: ${{ secrets.GITHUB_TOKEN }}
           client-payload: |-
@@ -38,7 +38,7 @@ jobs:
         if: ${{ steps.release-please.outputs.release_created }}
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
-          repository: shinybrar/skaha
+          repository: opencadc/canfar
           event-type: release-build
           token: ${{ secrets.GITHUB_TOKEN }}
           client-payload: |-
@@ -48,11 +48,12 @@ jobs:
               "sha": "${{ steps.release-please.outputs.sha }}"
             }
       -
+        #! TODO: Enable the PYPI build, once confguration is confirmed.
         name: Dispatch PYPI Release
-        if: ${{ steps.release-please.outputs.release_created }}
+        if: ${{ steps.release-please.outputs.release_created }} && false
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
-          repository: shinybrar/skaha
+          repository: opencadc/canfar
           event-type: pypi-release
           token: ${{ secrets.GITHUB_TOKEN }}
           client-payload: |-
@@ -66,7 +67,7 @@ jobs:
         if: always()
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
-          repository: shinybrar/skaha
+          repository: opencadc/canfar
           event-type: docs-publish
           token: ${{ secrets.GITHUB_TOKEN }}
           client-payload: |-

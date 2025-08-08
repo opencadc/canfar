@@ -63,7 +63,7 @@ jobs:
         uv venv --python ${{ matrix.python-version }}
         uv sync --all-extras --dev
     -
-      name: Login to Canfar
+      name: Login to CANFAR
       env:
         CANFAR_BASEURL: ${{ secrets.CANFAR_BASEURL }}
         CANFAR_USERNAME: ${{ secrets.CANFAR_USERNAME }}
@@ -77,7 +77,7 @@ jobs:
       run: |
         uv run pytest tests --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
     -
-      name: Remove Canfar Cert
+      name: Remove CANFAR Certificate
       if: always()
       run: |
         rm -rf ~/.ssl/

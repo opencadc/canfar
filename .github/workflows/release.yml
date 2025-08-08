@@ -6,8 +6,7 @@ on:
 
 env:
   GHCR_REGISTRY: ghcr.io
-  DOCKERHUB_REGISTRY: docker.io
-  IMAGE_NAME: shinybrar/skaha
+  IMAGE_NAME: opencadc/canfar
   IMAGE_TAG_LATEST: latest
   IMAGE_TAG_RELEASE: ${{ github.event.client_payload.tag_name }}
 
@@ -42,12 +41,6 @@ jobs:
         with:
           install: true
       -
-        name: Perform Dockerhub Login
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      -
         name: Perform GHCR Login
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
@@ -75,8 +68,6 @@ jobs:
             org.opencontainers.image.licenses=AGPL-3.0
             org.opencontainers.image.source=https://github.com/shinybrar/skaha
           tags: |
-            ${{ env.DOCKERHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_RELEASE }}
-            ${{ env.DOCKERHUB_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
             ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_RELEASE }}
             ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}
       -
@@ -84,12 +75,5 @@ jobs:
         uses: actions/attest-build-provenance@ef244123eb79f2f7a7e75d99086184180e6d0018 # v1.4.4
         with:
           subject-name: ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}
-          subject-digest: ${{ steps.build.outputs.digest }}
-          push-to-registry: true
-      -
-        name: Attest Dockerhub Container Image
-        uses: actions/attest-build-provenance@ef244123eb79f2f7a7e75d99086184180e6d0018 # v1.4.4
-        with:
-          subject-name: ${{ env.DOCKERHUB_REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
