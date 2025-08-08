@@ -12,13 +12,13 @@
         <meta name="author" content="Shiny Brar">
       
       
-        <link rel="canonical" href="https://shinybrar.github.io/skaha/edge/get-started/">
+        <link rel="canonical" href="https://shinybrar.github.io/skaha/edge/authentication-contexts/">
       
       
-        <link rel="prev" href="../quick-start/">
+        <link rel="prev" href="../get-started/">
       
       
-        <link rel="next" href="../authentication-contexts/">
+        <link rel="next" href="../examples/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
@@ -26,7 +26,7 @@
     
     
       
-        <title>Installation & Setup - Skaha</title>
+        <title>Authentication Guide - Skaha</title>
       
     
     
@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation-setup" class="md-skip">
+        <a href="#authentication-guide" class="md-skip">
           Skip to content
         </a>
       
@@ -124,7 +124,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Installation & Setup
+              Authentication Guide
             
           </span>
         </div>
@@ -607,6 +607,29 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Installation & Setup
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -624,7 +647,7 @@
   
   
   <span class="md-ellipsis">
-    Installation & Setup
+    Authentication Guide
     
   </span>
   
@@ -637,7 +660,7 @@
   
   
   <span class="md-ellipsis">
-    Installation & Setup
+    Authentication Guide
     
   </span>
   
@@ -660,46 +683,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#authentication-overview" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Authentication Overview
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication-setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Authentication Setup
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Authentication Setup">
+    <nav class="md-nav" aria-label="Authentication Overview">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#quick-authentication" class="md-nav__link">
+  <a href="#what-is-an-authentication-context" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick Authentication
+      What is an Authentication Context?
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#using-skaha-programmatically" class="md-nav__link">
+  <a href="#authentication-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Using Skaha Programmatically
+      Authentication Methods
     </span>
   </a>
   
@@ -711,20 +716,152 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#private-container-images" class="md-nav__link">
+  <a href="#cli-authentication-management" class="md-nav__link">
     <span class="md-ellipsis">
-      Private Container Images
+      CLI Authentication Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Authentication Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-login-skaha-auth-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initial Login (skaha auth login)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#managing-multiple-contexts" class="md-nav__link">
     <span class="md-ellipsis">
-      Next Steps
+      Managing Multiple Contexts
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Managing Multiple Contexts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#listing-contexts-skaha-auth-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      Listing Contexts (skaha auth list)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switching-contexts-skaha-auth-switch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switching Contexts (skaha auth switch)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removing-contexts-skaha-auth-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing Contexts (skaha auth remove)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#purging-all-contexts-skaha-auth-purge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Purging All Contexts (skaha auth purge)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#programmatic-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programmatic Authentication
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Programmatic Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-active-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Active Context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication Priority
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-authentication-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Authentication Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting Help
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -732,29 +869,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    Authentication Guide
-    
-  </span>
-  
-
-      </a>
     </li>
   
 
@@ -1036,46 +1150,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#authentication-overview" class="md-nav__link">
     <span class="md-ellipsis">
-      Prerequisites
+      Authentication Overview
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#authentication-setup" class="md-nav__link">
-    <span class="md-ellipsis">
-      Authentication Setup
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Authentication Setup">
+    <nav class="md-nav" aria-label="Authentication Overview">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#quick-authentication" class="md-nav__link">
+  <a href="#what-is-an-authentication-context" class="md-nav__link">
     <span class="md-ellipsis">
-      Quick Authentication
+      What is an Authentication Context?
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#using-skaha-programmatically" class="md-nav__link">
+  <a href="#authentication-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Using Skaha Programmatically
+      Authentication Methods
     </span>
   </a>
   
@@ -1087,20 +1183,152 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#private-container-images" class="md-nav__link">
+  <a href="#cli-authentication-management" class="md-nav__link">
     <span class="md-ellipsis">
-      Private Container Images
+      CLI Authentication Management
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CLI Authentication Management">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#initial-login-skaha-auth-login" class="md-nav__link">
+    <span class="md-ellipsis">
+      Initial Login (skaha auth login)
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#managing-multiple-contexts" class="md-nav__link">
     <span class="md-ellipsis">
-      Next Steps
+      Managing Multiple Contexts
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="Managing Multiple Contexts">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#listing-contexts-skaha-auth-list" class="md-nav__link">
+    <span class="md-ellipsis">
+      Listing Contexts (skaha auth list)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#switching-contexts-skaha-auth-switch" class="md-nav__link">
+    <span class="md-ellipsis">
+      Switching Contexts (skaha auth switch)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#removing-contexts-skaha-auth-remove" class="md-nav__link">
+    <span class="md-ellipsis">
+      Removing Contexts (skaha auth remove)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#purging-all-contexts-skaha-auth-purge" class="md-nav__link">
+    <span class="md-ellipsis">
+      Purging All Contexts (skaha auth purge)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#programmatic-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Programmatic Authentication
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Programmatic Authentication">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#using-active-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      Using Active Context
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#authentication-priority" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication Priority
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Troubleshooting">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-authentication-issues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Authentication Issues
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#debug-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debug Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#getting-help" class="md-nav__link">
+    <span class="md-ellipsis">
+      Getting Help
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1123,126 +1351,214 @@
   
 
 
-<h1 id="installation-setup">Installation &amp; Setup<a class="headerlink" href="#installation-setup" title="Permanent link">&para;</a></h1>
-<p>This guide covers everything you need to install and configure Skaha for use with Science Platform servers worldwide.</p>
-<div class="admonition tip">
-<p class="admonition-title">New to Skaha?</p>
-<p>If you want to jump right in with a hands-on tutorial, check out our <a href="../quick-start/">5-Minute Quick Start</a> guide first!</p>
-</div>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>Before you can use Skaha, you need:</p>
+<h1 id="authentication-guide">Authentication Guide<a class="headerlink" href="#authentication-guide" title="Permanent link">&para;</a></h1>
+<p>Skaha is designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic setup to advanced scenarios.</p>
+<h2 id="authentication-overview">Authentication Overview<a class="headerlink" href="#authentication-overview" title="Permanent link">&para;</a></h2>
+<p>Skaha uses an <strong>Authentication Context</strong> system to manage connections to different Science Platform servers. This system supports multiple authentication methods and makes it easy to switch between servers.</p>
+<h3 id="what-is-an-authentication-context">What is an Authentication Context?<a class="headerlink" href="#what-is-an-authentication-context" title="Permanent link">&para;</a></h3>
+<p>Think of an authentication context (<em>context</em> for short) as a saved profile that contains:</p>
 <ul>
-<li><strong>Python 3.10+</strong> installed on your system</li>
-<li><strong>A Science Platform account</strong> - For CANFAR, <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">request an account with CADC</a></li>
+<li><strong>Server information</strong> (URL, capabilities)</li>
+<li><strong>Authentication credentials</strong> (X.509 certificate, OIDC tokens, etc.)</li>
+<li><strong>User preferences</strong> for that specific server</li>
 </ul>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Install Skaha using <code>pip</code>:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>skaha<span class="w"> </span>--upgrade
-</code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Virtual Environments</p>
-<p>We recommend using a virtual environment to avoid conflicts with other packages:
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>skaha-env
-<span class="nb">source</span><span class="w"> </span>skaha-env/bin/activate<span class="w">  </span><span class="c1"># On Windows: skaha-env\Scripts\activate</span>
-pip<span class="w"> </span>install<span class="w"> </span>skaha
-</code></pre></div></p>
+<p>When you use Skaha, one context is always <strong>active</strong>, and all commands and API calls are directed to that server.</p>
+<h3 id="authentication-methods">Authentication Methods<a class="headerlink" href="#authentication-methods" title="Permanent link">&para;</a></h3>
+<p>Skaha supports several authentication methods:</p>
+<div class="admonition info">
+<p class="admonition-title">Authentication Methods</p>
+<ul>
+<li><strong>X.509 Certificates</strong> - Most common, uses <code>.pem</code> certificate files</li>
+<li><strong>OIDC Tokens</strong> - OpenID Connect for modern authentication flows</li>
+<li><strong>Bearer Tokens</strong> - Direct token authentication for API access</li>
+</ul>
 </div>
-<h2 id="authentication-setup">Authentication Setup<a class="headerlink" href="#authentication-setup" title="Permanent link">&para;</a></h2>
-<p>Skaha uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI login command.</p>
-<h3 id="quick-authentication">Quick Authentication<a class="headerlink" href="#quick-authentication" title="Permanent link">&para;</a></h3>
-<p>To authenticate with a Science Platform server:</p>
+<div class="admonition tip">
+<p class="admonition-title">Automatic Configuration</p>
+<p>Starting with v1.7, Skaha automatically configures the appropriate authentication method based on the server's capabilities and your configuration.</p>
+</div>
+<hr />
+<h2 id="cli-authentication-management">CLI Authentication Management<a class="headerlink" href="#cli-authentication-management" title="Permanent link">&para;</a></h2>
+<p>The Skaha CLI provides comprehensive commands for managing your authentication contexts.</p>
+<h3 id="initial-login-skaha-auth-login">Initial Login (<code>skaha auth login</code>)<a class="headerlink" href="#initial-login-skaha-auth-login" title="Permanent link">&para;</a></h3>
+<p>The <code>login</code> command is your starting point for connecting to any Science Platform server:</p>
 <div class="highlight"><pre><span></span><code>skaha<span class="w"> </span>auth<span class="w"> </span>login
 </code></pre></div>
-<p>This command will:</p>
+<p><strong>What happens during login:</strong></p>
 <ol>
-<li><strong>Discover available servers</strong> worldwide</li>
-<li><strong>Guide you through server selection</strong></li>
-<li><strong>Handle the authentication process</strong> (X.509 or OIDC)</li>
-<li><strong>Save your credentials</strong> for future use</li>
+<li><strong>Server Discovery</strong> - Automatically finds available Science Platform servers worldwide</li>
+<li><strong>Server Selection</strong> - Interactive prompt to choose your target server</li>
+<li><strong>Authentication Flow</strong> - Guides you through the server's authentication method</li>
+<li><strong>Context Creation</strong> - Saves your credentials and server configuration</li>
+<li><strong>Activation</strong> - Sets the new context as active for immediate use</li>
 </ol>
 <div class="admonition example">
-<p class="admonition-title">Example Login Flow</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>skaha<span class="w"> </span>auth<span class="w"> </span>login
-Starting<span class="w"> </span>Science<span class="w"> </span>Platform<span class="w"> </span>Login
-Discovery<span class="w"> </span>completed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">2</span>.1s<span class="w"> </span><span class="o">(</span><span class="m">5</span>/18<span class="w"> </span>active<span class="o">)</span>
+<p class="admonition-title">Login Options</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Basic login with server discovery</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login
 
-Select<span class="w"> </span>a<span class="w"> </span>Skaha<span class="w"> </span>Server:
-»<span class="w"> </span>🟢<span class="w"> </span>CANFAR<span class="w">  </span>CADC
-<span class="w">  </span>🟢<span class="w"> </span>Canada<span class="w">  </span>SRCnet
-<span class="w">  </span>🟢<span class="w"> </span>UK-CAM<span class="w">  </span>SRCnet
+<span class="c1"># Include development/testing servers</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--dev
 
-X509<span class="w"> </span>Certificate<span class="w"> </span>Authentication
-Username:<span class="w"> </span>your-username
-Password:<span class="w"> </span>***********
-✓<span class="w"> </span>Login<span class="w"> </span>completed<span class="w"> </span>successfully!
+<span class="c1"># Include non-responsive servers in discovery</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--dead
+
+<span class="c1"># Show detailed server information during selection</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--details
+
+<span class="c1"># Force re-authentication for existing context</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--force
 </code></pre></div>
 </div>
-<h3 id="using-skaha-programmatically">Using Skaha Programmatically<a class="headerlink" href="#using-skaha-programmatically" title="Permanent link">&para;</a></h3>
-<p>Once authenticated via CLI, you can use Skaha in your Python code:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">skaha.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">skaha.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
-
-<span class="c1"># Uses your active authentication context</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
-
-<span class="c1"># List available images</span>
-<span class="n">container_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">container_images</span><span class="p">)</span><span class="si">}</span><span class="s2"> container images&quot;</span><span class="p">)</span>
-
-<span class="c1"># Create a notebook session</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/base-notebook:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created session: </span><span class="si">{</span><span class="n">session_info</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<h3 id="managing-multiple-contexts">Managing Multiple Contexts<a class="headerlink" href="#managing-multiple-contexts" title="Permanent link">&para;</a></h3>
+<p>Once you have one or more authentication contexts, you can easily manage them:</p>
+<h4 id="listing-contexts-skaha-auth-list">Listing Contexts (<code>skaha auth list</code>)<a class="headerlink" href="#listing-contexts-skaha-auth-list" title="Permanent link">&para;</a></h4>
+<p>View all your saved authentication contexts:</p>
+<div class="highlight"><pre><span></span><code>skaha<span class="w"> </span>auth<span class="w"> </span>list
 </code></pre></div>
-<h2 id="private-container-images">Private Container Images<a class="headerlink" href="#private-container-images" title="Permanent link">&para;</a></h2>
-<p>To access private container images from registries like CANFAR Harbor, provide registry credentials:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">skaha.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
+<p><strong>Example Output:</strong>
+<div class="highlight"><pre><span></span><code>                  Available Authentication Contexts                  
+
+  Active   Name          Auth Mode   Server URL                      
+ ─────────────────────────────────────────────────────────────────── 
+    ✅     CADC-CANFAR     x509      https://ws-uv.canfar.net/skaha  
+
+           SRCnet-Sweden   oidc      https://services.swesrc.chalmers.se/skaha
+</code></pre></div></p>
+<p>The active context (marked with ✅) determines where your commands are sent.</p>
+<h4 id="switching-contexts-skaha-auth-switch">Switching Contexts (<code>skaha auth switch</code>)<a class="headerlink" href="#switching-contexts-skaha-auth-switch" title="Permanent link">&para;</a></h4>
+<p>Switch between your saved contexts safely:</p>
+<div class="highlight"><pre><span></span><code>skaha<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>&lt;CONTEXT_NAME&gt;
+</code></pre></div>
+<div class="admonition example">
+<p class="admonition-title">Switching Examples</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Switch to a different server</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>SRCnet-Sweden
+
+<span class="c1"># Switch back to CANFAR</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>CADC-CANFAR
+</code></pre></div>
+</div>
+<p>All subsequent commands will use the newly active context.</p>
+<h4 id="removing-contexts-skaha-auth-remove">Removing Contexts (<code>skaha auth remove</code>)<a class="headerlink" href="#removing-contexts-skaha-auth-remove" title="Permanent link">&para;</a></h4>
+<p>Remove contexts you no longer need:</p>
+<div class="highlight"><pre><span></span><code>skaha<span class="w"> </span>auth<span class="w"> </span>remove<span class="w"> </span>&lt;CONTEXT_NAME&gt;
+</code></pre></div>
+<div class="admonition warning">
+<p class="admonition-title">Safety Features</p>
+<ul>
+<li>You cannot remove the currently active context</li>
+<li>Switch to a different context first, then remove the unwanted one</li>
+<li>Removed contexts cannot be recovered (you'll need to login again)</li>
+</ul>
+</div>
+<h4 id="purging-all-contexts-skaha-auth-purge">Purging All Contexts (<code>skaha auth purge</code>)<a class="headerlink" href="#purging-all-contexts-skaha-auth-purge" title="Permanent link">&para;</a></h4>
+<p>Remove <strong>all</strong> authentication contexts and credentials:</p>
+<div class="highlight"><pre><span></span><code>skaha<span class="w"> </span>auth<span class="w"> </span>purge
+</code></pre></div>
+<div class="admonition danger">
+<p class="admonition-title">Complete Removal</p>
+<p>This command permanently deletes:</p>
+<ul>
+<li>All saved authentication contexts</li>
+<li>Your entire Skaha configuration file (<code>~/.config/skaha/config.yaml</code>)</li>
+<li>You'll need to login again to use Skaha</li>
+</ul>
+</div>
+<p><strong>Options:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Skip confirmation prompt</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--yes
+
+<span class="c1"># Interactive confirmation (default)</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>purge
+</code></pre></div></p>
+<hr />
+<h2 id="programmatic-authentication">Programmatic Authentication<a class="headerlink" href="#programmatic-authentication" title="Permanent link">&para;</a></h2>
+<p>Once you have authentication contexts set up via the CLI, you can use them programmatically in your Python code.</p>
+<h3 id="using-active-context">Using Active Context<a class="headerlink" href="#using-active-context" title="Permanent link">&para;</a></h3>
+<p>The simplest approach uses your currently active authentication context:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">skaha.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="c1"># Uses the active authentication context automatically</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<span class="c1"># Check which context is being used</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active context: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">active</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auth Context: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">context</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="authentication-priority">Authentication Priority<a class="headerlink" href="#authentication-priority" title="Permanent link">&para;</a></h3>
+<p>When creating a Session, Skaha follows this priority order:</p>
+<ol>
+<li><strong>User-provided token</strong> (highest priority)</li>
+<li><strong>User-provided certificate</strong></li>
+<li><strong>Active authentication context</strong></li>
+<li><strong>Default certificate location</strong> (<code>~/.ssl/cadcproxy.pem</code>)</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecretStr</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">skaha.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Configure registry access</span>
-<span class="n">registry</span> <span class="o">=</span> <span class="n">ContainerRegistry</span><span class="p">(</span>
-    <span class="n">username</span><span class="o">=</span><span class="s2">&quot;your-username&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;**************&quot;</span>
-<span class="p">)</span>
+<span class="c1"># Priority 1: Direct token (overrides everything)</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">SecretStr</span><span class="p">(</span><span class="s2">&quot;your-bearer-token&quot;</span><span class="p">))</span>
 
-<span class="c1"># Use with session</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
+<span class="c1"># Priority 2: Direct certificate (overrides context)</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">certificate</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/cert.pem&quot;</span><span class="p">))</span>
 
-<span class="c1"># Now you can use private images</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/private/my-image:latest&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">2</span>
-<span class="p">)</span>
+<span class="c1"># Priority 3: Uses active context (most common)</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 </code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Registry Credentials</p>
-<p>The registry credentials are base64 encoded and passed to the server via the <code>X-Skaha-Registry-Auth</code> header.</p>
-</div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
-<p>Now that you have Skaha installed and configured:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Try our <a href="../quick-start/">5-Minute Quick Start</a> for a hands-on introduction to creating and managing sessions.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Learn about <a href="../authentication-contexts/">Authentication Contexts</a> for managing multiple servers and advanced authentication scenarios.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Explore <a href="../examples/">Basic Examples</a> and <a href="../advanced-examples/">Advanced Examples</a> for common use cases.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Check out the <a href="../session/">Python API Reference</a> for detailed documentation of all available methods.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Refer to the <a href="../faq/">FAQ</a> for answers to common questions.</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Getting Help</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="common-authentication-issues">Common Authentication Issues<a class="headerlink" href="#common-authentication-issues" title="Permanent link">&para;</a></h3>
+<div class="admonition question">
+<p class="admonition-title">Login Problems</p>
+<p><strong>No servers found during discovery</strong></p>
 <ul>
-<li>📖 <a href="../cli-help/">Complete CLI Reference</a></li>
-<li>💬 <a href="https://github.com/shinybrar/skaha/discussions">Community Discussions</a></li>
-<li>🐛 <a href="../bug-reports/">Report Issues</a></li>
+<li>Check your internet connection</li>
+<li>Try <code>skaha auth login --dead</code> to include non-responsive servers</li>
+<li>Verify you're not behind a restrictive firewall</li>
+</ul>
+<p><strong>Authentication failed</strong></p>
+<ul>
+<li>Verify your username and password are correct</li>
+<li>Check if your account is active on the Science Platform</li>
+<li>Try logging into the web interface first</li>
+</ul>
+<p><strong>Certificate expired</strong></p>
+<ul>
+<li>X.509 certificates typically last 10 days</li>
+<li>Run <code>skaha auth login --force</code> to refresh</li>
+<li>Check expiry with your authentication status code above</li>
 </ul>
 </div>
+<div class="admonition question">
+<p class="admonition-title">Context Management Issues</p>
+<p><strong>No active context found</strong></p>
+<ul>
+<li>Run <code>skaha auth list</code> to see available contexts</li>
+<li>Use <code>skaha auth switch &lt;context&gt;</code> to activate one</li>
+<li>If no contexts exist, run <code>skaha auth login</code></li>
+</ul>
+<p><strong>Cannot remove active context</strong></p>
+<ul>
+<li>Switch to a different context first: <code>skaha auth switch &lt;other&gt;</code></li>
+<li>Then remove the unwanted context: <code>skaha auth remove &lt;unwanted&gt;</code></li>
+</ul>
+</div>
+<h3 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h3>
+<p>Enable detailed authentication logging:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># CLI debug mode</span>
+skaha<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--debug
+</code></pre></div>
+<h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Support Resources</p>
+<ul>
+<li>📖 <a href="../cli-help/">CLI Reference</a> - Complete command documentation</li>
+<li>💬 <a href="https://github.com/shinybrar/skaha/discussions">Community Discussions</a> - Ask questions</li>
+<li>🐛 <a href="../bug-reports/">Report Issues</a> - Bug reports and feature requests</li>
+</ul>
+</div>
+<p>```</p>
 
 
 
