@@ -14,7 +14,7 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
-from pydantic import SecretStr, ValidationError
+from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
 from skaha.client import SkahaClient
 from skaha.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
@@ -300,8 +300,6 @@ class TestBaseURLConstruction:
 
     def test_configured_url_from_context(self, skaha_client_fixture) -> None:
         """Test base URL construction from configuration context."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         # Create a custom context with specific server settings
         custom_context = X509(
             path=Path("/test/cert.pem"),
@@ -462,8 +460,6 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_oidc_context_headers(self, skaha_client_fixture) -> None:
         """Test headers for OIDC context authentication."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         # Create a real OIDC context
         oidc_context = OIDC(
             server=Server(
@@ -491,8 +487,6 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_x509_context_headers(self, skaha_client_fixture) -> None:
         """Test headers for X509 context authentication."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         # Create a real X509 context
         x509_context = X509(
             path=Path("/test/cert.pem"),
@@ -551,8 +545,6 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_oidc_refresh_hook_added(self, skaha_client_fixture) -> None:
         """Test that OIDC refresh hook is added for OIDC contexts."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         # Create a real OIDC context
         oidc_context = OIDC(
             server=Server(
