@@ -17,7 +17,6 @@ from cryptography.x509.oid import NameOID
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
 from skaha.client import SkahaClient
-from skaha.exceptions.context import AuthExpiredError
 from skaha.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
 from skaha.models.config import Configuration
 from skaha.models.http import Server
@@ -379,7 +378,6 @@ class TestCertificateValidation:
             pytest.raises(PermissionError),
         ):
             SkahaClient(certificate=cert_path, url="https://example.com")
-
 
     def test_certificate_valid(self, tmp_path) -> None:
         """Test certificate validation with valid certificate."""

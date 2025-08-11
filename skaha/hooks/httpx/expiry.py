@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Callable, Awaitable
+from typing import TYPE_CHECKING, Callable
 
 from skaha.exceptions.context import AuthExpiredError
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable
+
     import httpx
 
     from skaha.client import SkahaClient
@@ -20,7 +22,7 @@ def check(client: SkahaClient) -> Callable[[httpx.Request], None]:
 
     """
 
-    def hook(request: httpx.Request) -> None:
+    def hook(request: httpx.Request) -> None:  # noqa: ARG001
         """Check if the authentication context is expired.
 
         Args:
@@ -31,8 +33,12 @@ def check(client: SkahaClient) -> Callable[[httpx.Request], None]:
 
         """
         if client.config.context.expired:
-            raise AuthExpiredError(context=client.config.context.mode, reason="auth expired")
+            raise AuthExpiredError(
+                context=client.config.context.mode, reason="auth expired"
+            )
+
     return hook
+
 
 def acheck(client: SkahaClient) -> Callable[[httpx.Request], Awaitable[None]]:
     """Create an async hook to check for authentication expiry.
@@ -43,7 +49,7 @@ def acheck(client: SkahaClient) -> Callable[[httpx.Request], Awaitable[None]]:
         client (SkahaClient): The Skaha client.
     """
 
-    async def hook(request: httpx.Request) -> None:
+    async def hook(request: httpx.Request) -> None:  # noqa: ARG001
         """Check if the authentication context is expired.
 
         Args:
@@ -52,8 +58,9 @@ def acheck(client: SkahaClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Raises:
             AuthExpiredError: If the authentication context is expired.
         """
-
         if client.config.context.expired:
-            raise AuthExpiredError(context=client.config.context.mode, reason="auth expired")
+            raise AuthExpiredError(
+                context=client.config.context.mode, reason="auth expired"
+            )
 
     return hook
