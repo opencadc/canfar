@@ -106,6 +106,8 @@ cli.add_typer(
     rich_help_panel="Session Management",
 )
 
+# Aliases
+
 cli.add_typer(
     create,
     name="run | launch",
@@ -115,16 +117,8 @@ cli.add_typer(
 )
 
 cli.add_typer(
-    ps,
-    name="get | ls | ps",
-    help="Aliases for ps.",
-    no_args_is_help=False,
-    rich_help_panel="Aliases",
-)
-
-cli.add_typer(
     delete,
-    name="del | rm",
+    name="del",
     help="Aliases for delete.",
     no_args_is_help=True,
     rich_help_panel="Aliases",

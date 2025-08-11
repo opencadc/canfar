@@ -21,14 +21,14 @@ from skaha.session import AsyncSession
 console = Console()
 
 ps = typer.Typer(
-    name="list",
+    name="ps",
     no_args_is_help=False,
     cls=AliasGroup,
 )
 
 
 @ps.callback(invoke_without_command=True)
-def list_sessions(
+def show(
     everything: Annotated[
         bool,
         typer.Option(
@@ -67,7 +67,7 @@ def list_sessions(
         ),
     ] = False,
 ) -> None:
-    """List sessions."""
+    """Show sessions."""
 
     async def _list_sessions() -> None:
         """Asynchronous function to list sessions."""
