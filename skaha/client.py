@@ -23,7 +23,7 @@ from typing_extensions import Self
 from skaha import __version__, get_logger, set_log_level
 from skaha.auth import x509
 from skaha.exceptions.context import AuthContextError
-from skaha.hooks.httpx import auth, errors
+from skaha.hooks.httpx import auth, errors, expiry
 from skaha.models.config import Configuration
 
 if TYPE_CHECKING:
@@ -237,11 +237,11 @@ class SkahaClient(BaseSettings):
         Returns:
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
+        checker = expiry.acheck(self) if asynchronous else expiry.check(self)
+        catcher = errors.acatch if asynchronous else errors.catch
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
-            "event_hooks": {
-                "response": [errors.acatch if asynchronous else errors.catch]
-            },
+            "event_hooks": {"request": [checker], "response": [catcher]},
             "base_url": self._get_base_url(),
         }
         # Configure connection pooling for async clients
@@ -267,7 +267,7 @@ class SkahaClient(BaseSettings):
         if ctx.mode == "oidc":
             assert ctx.valid, "Invalid OIDC context provided."
             refresher = auth.ahook(self) if asynchronous else auth.hook(self)
-            kwargs["event_hooks"]["request"] = [refresher]
+            kwargs["event_hooks"]["request"].append(refresher)
             return kwargs
 
         if ctx.mode in {"x509", "default"}:

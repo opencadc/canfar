@@ -166,7 +166,7 @@ class X509(BaseModel):
             return True
         if math.isclose(self.expiry, 0.0, abs_tol=1e-9):
             self.expiry = x509.expiry(self.path)
-            log.debug("Computed expiry from certificate file.")
+            log.debug("computed expiry from cert: %s", self.expiry)
         return self.expiry < time.time()
 
 

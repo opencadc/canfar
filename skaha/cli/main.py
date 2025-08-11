@@ -17,7 +17,7 @@ from skaha.cli.prune import prune
 from skaha.cli.ps import ps
 from skaha.cli.stats import stats
 from skaha.cli.version import version
-from skaha.exceptions.context import AuthContextError
+from skaha.exceptions.context import AuthContextError, AuthExpiredError
 from skaha.hooks.typer.aliases import AliasGroup
 
 console = Console()
@@ -152,6 +152,11 @@ def main() -> None:
     """Main entry point."""
     try:
         cli()
+    except AuthExpiredError:
+        console.print(
+            "[bold red]Auth Expired:[/bold red] "
+            "Please re-authenticate using [italic cyan]canfar auth login[/italic cyan]"
+        )
     except AuthContextError as err:
         console.print(err)
 

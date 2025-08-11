@@ -162,10 +162,6 @@ def expiry(path: Path = CERT_PATH) -> float:
         cert = x509.load_pem_x509_certificate(data, default_backend())
         now_utc = datetime.now(timezone.utc)
 
-        if cert.not_valid_after_utc <= now_utc:
-            msg = f"{destination} has expired."
-            raise ValueError(msg)  # noqa: TRY301
-
         if cert.not_valid_before_utc >= now_utc:
             msg = f"{destination} is not yet valid."
             raise ValueError(msg)  # noqa: TRY301
