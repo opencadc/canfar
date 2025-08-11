@@ -1701,7 +1701,7 @@ wheels = [
 
 [[package]]
 name = "skaha"
-version = "1.7.0"
+version = "0.8.0"
 source = { editable = "." }
 dependencies = [
     { name = "cadcutils" },
