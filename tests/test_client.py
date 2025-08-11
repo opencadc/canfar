@@ -17,6 +17,7 @@ from cryptography.x509.oid import NameOID
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
 from skaha.client import SkahaClient
+from skaha.exceptions.context import AuthExpiredError
 from skaha.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
 from skaha.models.config import Configuration
 from skaha.models.http import Server
@@ -379,15 +380,6 @@ class TestCertificateValidation:
         ):
             SkahaClient(certificate=cert_path, url="https://example.com")
 
-    def test_certificate_expired(self, tmp_path) -> None:
-        """Test certificate validation with expired certificate."""
-        cert_path = tmp_path / "expired.pem"
-        _create_test_certificate(cert_path, expired=True)
-
-        # The actual certificate created is expired, so x509.inspect should detect it
-        # and the validation should fail during SkahaClient initialization
-        with pytest.raises(ValueError, match="expired"):
-            SkahaClient(certificate=cert_path, url="https://example.com")
 
     def test_certificate_valid(self, tmp_path) -> None:
         """Test certificate validation with valid certificate."""

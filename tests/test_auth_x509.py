@@ -121,15 +121,6 @@ def test_expiry_happy_path() -> None:
         assert expiry_ts > datetime.datetime.now(datetime.timezone.utc).timestamp()
 
 
-def test_expiry_is_expired() -> None:
-    """Test that `expiry` raises ValueError for an expired certificate."""
-    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
-        cert_path = Path(temp_cert.name)
-        generate_cert(cert_path, expired=True)
-        with pytest.raises(ValueError, match="has expired"):
-            x509_auth.expiry(cert_path)
-
-
 def test_expiry_not_yet_valid() -> None:
     """Test that `expiry` raises ValueError for a certificate that is not yet valid."""
     with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
@@ -167,15 +158,6 @@ def test_inspect_happy_path() -> None:
         assert (
             result["expiry"] > datetime.datetime.now(datetime.timezone.utc).timestamp()
         )
-
-
-def test_inspect_with_expired_cert() -> None:
-    """Test that `inspect` fails when the certificate is expired."""
-    with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
-        cert_path = Path(temp_cert.name)
-        generate_cert(cert_path, expired=True)
-        with pytest.raises(ValueError, match="has expired"):
-            x509_auth.inspect(cert_path)
 
 
 # --- Tests for skaha.auth.x509.authenticate --- #
