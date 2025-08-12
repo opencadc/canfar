@@ -1,9 +1,9 @@
-site_name: Skaha
-site_url: https://shinybrar.github.io/skaha/
+site_name: CANFAR
+site_url: https://opencadc.github.io/canfar/
 site_author: Shiny Brar
-site_description: Python Client for Skaha Science Platform
-repo_url: https://github.com/shinybrar/skaha/
-repo_name: shinybrar/skaha
+site_description: CANFAR Python Client
+repo_url: https://github.com/opencadc/canfar/
+repo_name: opencadc/canfar
 edit_uri: blob/main/docs/
 copyright: Copyright &copy; 1986-2024 Canadian Astronomy Data Centre
 remote_branch: gh-pages
@@ -102,9 +102,10 @@ markdown_extensions:
   - pymdownx.tilde
 
 nav:
-  - Skaha: index.md
+  - CANFAR: index.md
   - What's New:
     - Updates: updates.md
+    - Migration Guide: migration.md
     - Changelog: changelog.md
   - Get Started:
     - 5-Minute Tutorial: quick-start.md
@@ -126,7 +127,7 @@ nav:
   - Contributor Guide:
     - Contributing: contributing.md
     - Code of Conduct: conduct.md
-    - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/shinybrar/skaha
+    - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
     - License: license.md
   - Bug Reports:
     - Bugs: bug-reports.md

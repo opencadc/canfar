@@ -5,7 +5,7 @@ import time
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from skaha.models.auth import (
+from canfar.models.auth import (
     OIDC,
     X509,
     Client,
@@ -13,7 +13,7 @@ from skaha.models.auth import (
     Expiry,
     Token,
 )
-from skaha.models.http import Server
+from canfar.models.http import Server
 
 
 class TestOIDCURLConfig:

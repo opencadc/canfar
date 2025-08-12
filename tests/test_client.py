@@ -1,4 +1,4 @@
-"""Test Skaha Client API."""
+"""Test CANFAR Python Client API."""
 # ruff: noqa: SLF001
 
 import ssl
@@ -16,20 +16,20 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
-from skaha.client import SkahaClient
-from skaha.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
-from skaha.models.config import Configuration
-from skaha.models.http import Server
-from skaha.models.registry import ContainerRegistry
+from canfar.client import HTTPClient
+from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
+from canfar.models.config import Configuration
+from canfar.models.http import Server
+from canfar.models.registry import ContainerRegistry
 
 
 # Test Fixtures
 @pytest.fixture
-def skaha_client_fixture():
-    """Fixture that yields a SkahaClient instance for testing."""
+def canfar_client_fixture():
+    """Fixture that yields a HTTPClient instance for testing."""
 
     def _create_client(**kwargs):
-        return SkahaClient(**kwargs)
+        return HTTPClient(**kwargs)
 
     return _create_client
 
@@ -51,17 +51,17 @@ def mock_httpx_async_client():
 @pytest.fixture
 def mock_cryptography():
     """Mock cryptography functions for certificate validation."""
-    with patch("skaha.auth.x509.inspect") as mock_inspect:
+    with patch("canfar.auth.x509.inspect") as mock_inspect:
         mock_inspect.return_value = {"expiry": 9999999999}  # Far future
         yield mock_inspect
 
 
 class TestInitializationAndConfiguration:
-    """Test SkahaClient initialization and configuration loading."""
+    """Test HTTPClient initialization and configuration loading."""
 
-    def test_default_initialization(self, skaha_client_fixture) -> None:
+    def test_default_initialization(self, canfar_client_fixture) -> None:
         """Test default initialization with no arguments."""
-        client = skaha_client_fixture()
+        client = canfar_client_fixture()
         assert client.timeout == 30
         assert client.concurrency == 32
         assert client.loglevel == "INFO"
@@ -70,10 +70,10 @@ class TestInitializationAndConfiguration:
         assert client.url is None
         assert isinstance(client.config, Configuration)
 
-    def test_constructor_arguments(self, skaha_client_fixture) -> None:
+    def test_constructor_arguments(self, canfar_client_fixture) -> None:
         """Test initialization with explicit constructor arguments."""
         config = Configuration()
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             timeout=60,
             concurrency=64,
             token=SecretStr("test-token"),
@@ -91,15 +91,15 @@ class TestInitializationAndConfiguration:
         assert client.config is config
         assert client.loglevel == "DEBUG"
 
-    def test_environment_variables(self, skaha_client_fixture, monkeypatch) -> None:
+    def test_environment_variables(self, canfar_client_fixture, monkeypatch) -> None:
         """Test that environment variables are picked up correctly."""
-        monkeypatch.setenv("SKAHA_TIMEOUT", "45")
-        monkeypatch.setenv("SKAHA_CONCURRENCY", "16")
-        monkeypatch.setenv("SKAHA_TOKEN", "env-token")
-        monkeypatch.setenv("SKAHA_URL", "https://env.example.com")
-        monkeypatch.setenv("SKAHA_LOGLEVEL", "WARNING")
+        monkeypatch.setenv("CANFAR_TIMEOUT", "45")
+        monkeypatch.setenv("CANFAR_CONCURRENCY", "16")
+        monkeypatch.setenv("CANFAR_TOKEN", "env-token")
+        monkeypatch.setenv("CANFAR_URL", "https://env.example.com")
+        monkeypatch.setenv("CANFAR_LOGLEVEL", "WARNING")
 
-        client = skaha_client_fixture()
+        client = canfar_client_fixture()
         assert client.timeout == 45
         assert client.concurrency == 16
         assert client.token.get_secret_value() == "env-token"
@@ -108,13 +108,13 @@ class TestInitializationAndConfiguration:
         assert client.loglevel == "WARNING"
 
     def test_precedence_constructor_over_env(
-        self, skaha_client_fixture, monkeypatch
+        self, canfar_client_fixture, monkeypatch
     ) -> None:
         """Test that constructor arguments take precedence over env variables."""
-        monkeypatch.setenv("SKAHA_TIMEOUT", "45")
-        monkeypatch.setenv("SKAHA_TOKEN", "env-token")
+        monkeypatch.setenv("CANFAR_TIMEOUT", "45")
+        monkeypatch.setenv("CANFAR_TOKEN", "env-token")
 
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             timeout=90,
             token=SecretStr("constructor-token"),
             url="https://example.com",  # Need URL when using token
@@ -122,23 +122,23 @@ class TestInitializationAndConfiguration:
         assert client.timeout == 90
         assert client.token.get_secret_value() == "constructor-token"
 
-    def test_client_has_session_attribute(self, skaha_client_fixture) -> None:
-        """Test if SkahaClient object contains httpx.Client attribute."""
-        client = skaha_client_fixture(
+    def test_client_has_session_attribute(self, canfar_client_fixture) -> None:
+        """Test if HTTPClient object contains httpx.Client attribute."""
+        client = canfar_client_fixture(
             token=SecretStr("test_token"), url="https://example.com"
         )
         assert hasattr(client, "client")
         assert isinstance(client.client, httpx.Client)
 
-    def test_bad_server_no_schema(self, skaha_client_fixture) -> None:
+    def test_bad_server_no_schema(self, canfar_client_fixture) -> None:
         """Test server URL without schema."""
         with pytest.raises(ValidationError):
-            skaha_client_fixture(url="ws-uv.canfar.net")
+            canfar_client_fixture(url="ws-uv.canfar.net")
 
-    def test_default_certificate(self, skaha_client_fixture) -> None:
+    def test_default_certificate(self, canfar_client_fixture) -> None:
         """Test validation with default certificate value."""
         try:
-            skaha_client_fixture()
+            canfar_client_fixture()
         except ValidationError as err:
             raise AssertionError from err
         assert True
@@ -147,30 +147,32 @@ class TestInitializationAndConfiguration:
 class TestRuntimeCredentialHandling:
     """Test runtime credential handling including mutual exclusivity and validation."""
 
-    def test_token_only(self, skaha_client_fixture) -> None:
+    def test_token_only(self, canfar_client_fixture) -> None:
         """Test instantiation with token only."""
-        client = skaha_client_fixture(token=SecretStr("abc"), url="https://example.com")
+        client = canfar_client_fixture(
+            token=SecretStr("abc"), url="https://example.com"
+        )
         assert client.token.get_secret_value() == "abc"
         assert client.certificate is None
 
-    def test_certificate_only(self, skaha_client_fixture, tmp_path) -> None:
+    def test_certificate_only(self, canfar_client_fixture, tmp_path) -> None:
         """Test instantiation with certificate only."""
         cert_path = tmp_path / "test.pem"
         _create_test_certificate(cert_path)
 
-        client = skaha_client_fixture(certificate=cert_path, url="https://example.com")
+        client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
         assert client.certificate == cert_path
         assert client.token is None
 
     def test_both_token_and_certificate_token_precedence(
-        self, skaha_client_fixture, tmp_path
+        self, canfar_client_fixture, tmp_path
     ) -> None:
         """Test that token takes precedence when both are provided."""
         cert_path = tmp_path / "test.pem"
         _create_test_certificate(cert_path)
 
-        with patch("skaha.client.log") as mock_log:
-            client = skaha_client_fixture(
+        with patch("canfar.client.log") as mock_log:
+            client = canfar_client_fixture(
                 token=SecretStr("test-token"),
                 certificate=cert_path,
                 url="https://example.com",
@@ -183,16 +185,16 @@ class TestRuntimeCredentialHandling:
             # Should log warnings about precedence
             mock_log.warning.assert_called()
 
-    def test_token_without_url_raises_error(self, skaha_client_fixture) -> None:
+    def test_token_without_url_raises_error(self, canfar_client_fixture) -> None:
         """Test that token without URL raises ValueError."""
         with pytest.raises(
             ValueError,
             match="Server URL must be provided when using runtime credentials",
         ):
-            skaha_client_fixture(token=SecretStr("test-token"))
+            canfar_client_fixture(token=SecretStr("test-token"))
 
     def test_certificate_without_url_raises_error(
-        self, skaha_client_fixture, tmp_path
+        self, canfar_client_fixture, tmp_path
     ) -> None:
         """Test that certificate without URL raises ValueError."""
         cert_path = tmp_path / "test.pem"
@@ -202,19 +204,21 @@ class TestRuntimeCredentialHandling:
             ValueError,
             match="Server URL must be provided when using runtime credentials",
         ):
-            skaha_client_fixture(certificate=cert_path)
+            canfar_client_fixture(certificate=cert_path)
 
-    def test_invalid_certificate_path_raises_error(self, skaha_client_fixture) -> None:
+    def test_invalid_certificate_path_raises_error(self, canfar_client_fixture) -> None:
         """Test that non-existent certificate path raises FileNotFoundError."""
         with pytest.raises(FileNotFoundError):
-            skaha_client_fixture(
+            canfar_client_fixture(
                 certificate=Path("/nonexistent/path.pem"), url="https://example.com"
             )
 
-    def test_token_setup_headers(self, skaha_client_fixture) -> None:
+    def test_token_setup_headers(self, canfar_client_fixture) -> None:
         """Test token setup creates correct headers."""
         token = "abcdef"
-        client = skaha_client_fixture(token=SecretStr(token), url="https://example.com")
+        client = canfar_client_fixture(
+            token=SecretStr(token), url="https://example.com"
+        )
         assert client.token.get_secret_value() == token
         assert client.client.headers["Authorization"] == f"Bearer {token}"
 
@@ -290,15 +294,15 @@ def _create_test_certificate(
 class TestBaseURLConstruction:
     """Test base URL construction based on precedence."""
 
-    def test_runtime_url_precedence(self, skaha_client_fixture) -> None:
+    def test_runtime_url_precedence(self, canfar_client_fixture) -> None:
         """Test that runtime URL takes precedence."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://runtime.com/api"
         )
         base_url = client._get_base_url()
         assert str(base_url) == "https://runtime.com/api"
 
-    def test_configured_url_from_context(self, skaha_client_fixture) -> None:
+    def test_configured_url_from_context(self, canfar_client_fixture) -> None:
         """Test base URL construction from configuration context."""
         # Create a custom context with specific server settings
         custom_context = X509(
@@ -306,7 +310,7 @@ class TestBaseURLConstruction:
             expiry=9999999999.0,
             server=Server(
                 name="Test Server",
-                uri=AnyUrl("ivo://test.org/skaha"),
+                uri=AnyUrl("ivo://test.org/canfar"),
                 url=AnyHttpUrl("https://config.example.com"),
                 version="v1",
             ),
@@ -314,11 +318,11 @@ class TestBaseURLConstruction:
 
         config = Configuration(active="test", contexts={"test": custom_context})
 
-        client = skaha_client_fixture(config=config)
+        client = canfar_client_fixture(config=config)
         base_url = client._get_base_url()
         assert str(base_url) == "https://config.example.com//v1"
 
-    def test_no_server_in_context_raises_error(self, skaha_client_fixture) -> None:
+    def test_no_server_in_context_raises_error(self, canfar_client_fixture) -> None:
         """Test that missing server in context raises ValueError."""
         # Create a context without server
         custom_context = X509(
@@ -327,7 +331,7 @@ class TestBaseURLConstruction:
 
         config = Configuration(active="test", contexts={"test": custom_context})
 
-        client = skaha_client_fixture(config=config)
+        client = canfar_client_fixture(config=config)
         with pytest.raises(ValueError, match="Server not found in auth context"):
             client._get_base_url()
 
@@ -342,7 +346,7 @@ class TestCertificateValidation:
         _create_test_certificate(cert_path)
 
         # Even with a valid certificate, when token is provided, it should use the token
-        client = SkahaClient(
+        client = HTTPClient(
             token=SecretStr("test-token"),
             certificate=cert_path,
             url="https://example.com",
@@ -361,7 +365,7 @@ class TestCertificateValidation:
         cert_path = tmp_path / "nonexistent.pem"
 
         with pytest.raises(FileNotFoundError):
-            SkahaClient(certificate=cert_path, url="https://example.com")
+            HTTPClient(certificate=cert_path, url="https://example.com")
 
     def test_certificate_not_readable(self, tmp_path) -> None:
         """Test certificate validation when file is not readable."""
@@ -372,12 +376,12 @@ class TestCertificateValidation:
         # Mock the x509.inspect to raise PermissionError
         with (
             patch(
-                "skaha.auth.x509.inspect",
+                "canfar.auth.x509.inspect",
                 side_effect=PermissionError("Permission denied"),
             ),
             pytest.raises(PermissionError),
         ):
-            SkahaClient(certificate=cert_path, url="https://example.com")
+            HTTPClient(certificate=cert_path, url="https://example.com")
 
     def test_certificate_valid(self, tmp_path) -> None:
         """Test certificate validation with valid certificate."""
@@ -385,16 +389,16 @@ class TestCertificateValidation:
         _create_test_certificate(cert_path)
 
         # Should not raise an error
-        client = SkahaClient(certificate=cert_path, url="https://example.com")
+        client = HTTPClient(certificate=cert_path, url="https://example.com")
         assert client.certificate == cert_path
 
 
 class TestHTTPClientCreationAndHeaders:
     """Test HTTP client creation and header generation."""
 
-    def test_lazy_client_initialization(self, skaha_client_fixture) -> None:
+    def test_lazy_client_initialization(self, canfar_client_fixture) -> None:
         """Test that httpx clients are created only on first access."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -412,9 +416,9 @@ class TestHTTPClientCreationAndHeaders:
         assert client._asynclient is not None
         assert isinstance(async_client, httpx.AsyncClient)
 
-    def test_default_headers_present(self, skaha_client_fixture) -> None:
+    def test_default_headers_present(self, canfar_client_fixture) -> None:
         """Test that common headers are present."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
         headers = client._get_http_headers()
@@ -425,11 +429,11 @@ class TestHTTPClientCreationAndHeaders:
         assert "Date" in headers
         assert headers["Content-Type"] == "application/x-www-form-urlencoded"
         assert headers["Accept"] == "application/json"
-        assert "python-skaha" in headers["User-Agent"]
+        assert "python-canfar" in headers["User-Agent"]
 
-    def test_runtime_token_headers(self, skaha_client_fixture) -> None:
+    def test_runtime_token_headers(self, canfar_client_fixture) -> None:
         """Test headers for runtime token authentication."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
         headers = client._get_http_headers()
@@ -437,18 +441,18 @@ class TestHTTPClientCreationAndHeaders:
         assert headers["Authorization"] == "Bearer test-token"
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-TOKEN"
 
-    def test_runtime_certificate_headers(self, skaha_client_fixture, tmp_path) -> None:
+    def test_runtime_certificate_headers(self, canfar_client_fixture, tmp_path) -> None:
         """Test headers for runtime certificate authentication."""
         cert_path = tmp_path / "test.pem"
         _create_test_certificate(cert_path)
 
-        client = skaha_client_fixture(certificate=cert_path, url="https://example.com")
+        client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
         headers = client._get_http_headers()
 
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-X509"
         assert "Authorization" not in headers
 
-    def test_oidc_context_headers(self, skaha_client_fixture) -> None:
+    def test_oidc_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for OIDC context authentication."""
         # Create a real OIDC context
         oidc_context = OIDC(
@@ -469,13 +473,13 @@ class TestHTTPClientCreationAndHeaders:
 
         config = Configuration(active="oidc", contexts={"oidc": oidc_context})
 
-        client = skaha_client_fixture(config=config)
+        client = canfar_client_fixture(config=config)
         headers = client._get_http_headers()
 
         assert headers["Authorization"] == "Bearer oidc-access-token"
         assert headers["X-Skaha-Authentication-Type"] == "OIDC"
 
-    def test_x509_context_headers(self, skaha_client_fixture) -> None:
+    def test_x509_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for X509 context authentication."""
         # Create a real X509 context
         x509_context = X509(
@@ -491,28 +495,28 @@ class TestHTTPClientCreationAndHeaders:
 
         config = Configuration(active="x509", contexts={"x509": x509_context})
 
-        client = skaha_client_fixture(config=config)
+        client = canfar_client_fixture(config=config)
         headers = client._get_http_headers()
 
         assert headers["X-Skaha-Authentication-Type"] == "X509"
         assert "Authorization" not in headers
 
-    def test_registry_headers(self, skaha_client_fixture) -> None:
+    def test_registry_headers(self, canfar_client_fixture) -> None:
         """Test headers with registry authentication."""
         registry = ContainerRegistry(username="test", secret="test")
         config = Configuration()
         config.registry = registry
 
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com", config=config
         )
         headers = client._get_http_headers()
 
         assert "X-Skaha-Registry-Auth" in headers
 
-    def test_client_kwargs_timeout_and_concurrency(self, skaha_client_fixture) -> None:
+    def test_client_kwargs_timeout_and_concurrency(self, canfar_client_fixture) -> None:
         """Test that httpx clients are initialized with correct timeout and limits."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"),
             url="https://example.com",
             timeout=45,
@@ -533,7 +537,7 @@ class TestHTTPClientCreationAndHeaders:
         assert "limits" in async_kwargs
         assert async_kwargs["limits"].max_connections == 16
 
-    def test_oidc_refresh_hook_added(self, skaha_client_fixture) -> None:
+    def test_oidc_refresh_hook_added(self, canfar_client_fixture) -> None:
         """Test that OIDC refresh hook is added for OIDC contexts."""
         # Create a real OIDC context
         oidc_context = OIDC(
@@ -554,7 +558,7 @@ class TestHTTPClientCreationAndHeaders:
 
         config = Configuration(active="oidc", contexts={"oidc": oidc_context})
 
-        client = skaha_client_fixture(config=config)
+        client = canfar_client_fixture(config=config)
 
         # Test sync client kwargs
         sync_kwargs = client._get_client_kwargs(asynchronous=False)
@@ -570,9 +574,9 @@ class TestHTTPClientCreationAndHeaders:
 class TestContextManagerBehavior:
     """Test context manager functionality."""
 
-    def test_sync_context_manager_enter_exit(self, skaha_client_fixture) -> None:
+    def test_sync_context_manager_enter_exit(self, canfar_client_fixture) -> None:
         """Test synchronous context manager entry and exit."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -585,9 +589,9 @@ class TestContextManagerBehavior:
         # After exit, client should be closed
         assert client._client is None
 
-    def test_sync_session_context(self, skaha_client_fixture) -> None:
+    def test_sync_session_context(self, canfar_client_fixture) -> None:
         """Test synchronous session context manager."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -597,9 +601,9 @@ class TestContextManagerBehavior:
         # After exit, client should be closed
         assert client._client is None
 
-    def test_close_sync_client(self, skaha_client_fixture) -> None:
+    def test_close_sync_client(self, canfar_client_fixture) -> None:
         """Test closing synchronous client."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -611,9 +615,9 @@ class TestContextManagerBehavior:
         client._close()
         assert client._client is None
 
-    def test_close_sync_client_when_none(self, skaha_client_fixture) -> None:
+    def test_close_sync_client_when_none(self, canfar_client_fixture) -> None:
         """Test closing synchronous client when it's None."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -624,9 +628,11 @@ class TestContextManagerBehavior:
         client._close()
         assert client._client is None
 
-    async def test_async_context_manager_enter_exit(self, skaha_client_fixture) -> None:
+    async def test_async_context_manager_enter_exit(
+        self, canfar_client_fixture
+    ) -> None:
         """Test asynchronous context manager entry and exit."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -639,9 +645,9 @@ class TestContextManagerBehavior:
         # After exit, asynclient should be closed
         assert client._asynclient is None
 
-    async def test_async_session_context(self, skaha_client_fixture) -> None:
+    async def test_async_session_context(self, canfar_client_fixture) -> None:
         """Test asynchronous session context manager."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -651,9 +657,9 @@ class TestContextManagerBehavior:
         # After exit, asynclient should be closed
         assert client._asynclient is None
 
-    async def test_aclose_async_client(self, skaha_client_fixture) -> None:
+    async def test_aclose_async_client(self, canfar_client_fixture) -> None:
         """Test closing asynchronous client."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -665,9 +671,9 @@ class TestContextManagerBehavior:
         await client._aclose()
         assert client._asynclient is None
 
-    async def test_aclose_async_client_when_none(self, skaha_client_fixture) -> None:
+    async def test_aclose_async_client_when_none(self, canfar_client_fixture) -> None:
         """Test closing asynchronous client when it's None."""
-        client = skaha_client_fixture(
+        client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
 
@@ -683,26 +689,26 @@ class TestSSLContextAndClientKwargs:
     """Test SSL context creation and client kwargs generation."""
 
     def test_get_client_kwargs_with_certificate(
-        self, skaha_client_fixture, tmp_path
+        self, canfar_client_fixture, tmp_path
     ) -> None:
         """Test client kwargs with certificate authentication."""
         cert_path = tmp_path / "test.pem"
         _create_test_certificate(cert_path)
 
-        client = skaha_client_fixture(certificate=cert_path, url="https://example.com")
+        client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
         kwargs = client._get_client_kwargs(asynchronous=False)
 
         assert "verify" in kwargs
         assert isinstance(kwargs["verify"], ssl.SSLContext)
 
     def test_get_ssl_context_valid_certificate(
-        self, skaha_client_fixture, tmp_path
+        self, canfar_client_fixture, tmp_path
     ) -> None:
         """Test SSL context creation with valid certificate."""
         cert_path = tmp_path / "test.pem"
         _create_test_certificate(cert_path)
 
-        client = skaha_client_fixture(certificate=cert_path, url="https://example.com")
+        client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
         ssl_context = client._get_ssl_context(cert_path)
 
         assert isinstance(ssl_context, ssl.SSLContext)
@@ -716,4 +722,4 @@ def test_non_readable_certfile() -> None:
     # Change the permissions
     Path(temp_path).chmod(0o000)
     with pytest.raises(PermissionError):
-        SkahaClient(certificate=temp_path, url="https://example.com")
+        HTTPClient(certificate=temp_path, url="https://example.com")

@@ -6,7 +6,7 @@
 ## Getting Image Information
 
 ```python title="Get image information"
-from skaha.images import Images
+from canfar.images import Images
 
 images = Images()
 images.fetch()
@@ -43,7 +43,7 @@ images.fetch(kind="headless")
 
 ## API Reference
 
-::: skaha.images.Images
+::: canfar.images.Images
     handler: python
     selection:
       members:

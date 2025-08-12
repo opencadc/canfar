@@ -1,4 +1,4 @@
-name: Publish Skaha to PyPI
+name: Publish CANFAR to PyPI
 
 on:
   repository_dispatch:
@@ -15,7 +15,7 @@ jobs:
       attestations: write # Attest the build provenance
     environment:
       name: pypi-release
-      url: https://pypi.org/p/skaha
+      url: https://pypi.org/p/canfar
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2
@@ -57,7 +57,7 @@ jobs:
         with:
           subject-path: |
             dist/*.whl
-          subject-name: skaha-wheel
+          subject-name: canfar-wheel
           show-summary: true
       -
         name: Attestations for PYPI Source
@@ -65,5 +65,5 @@ jobs:
         with:
           subject-path: |
             dist/*.tar.gz
-          subject-name: skaha-source
+          subject-name: canfar-source
           show-summary: true

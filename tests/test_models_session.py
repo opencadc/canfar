@@ -5,7 +5,7 @@ import warnings
 import pytest
 from pydantic import ValidationError
 
-from skaha.models.session import CreateRequest, FetchRequest
+from canfar.models.session import CreateRequest, FetchRequest
 
 
 class TestCreateSpec:

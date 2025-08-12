@@ -1,6 +1,6 @@
-# Skaha Client
+# Canfar Client
 
-The `skaha.client` module provides a comprehensive HTTP client for interacting with CANFAR Science Platform services. Built on the powerful [`httpx`](https://www.python-httpx.org/) library, it offers both synchronous and asynchronous interfaces with advanced authentication capabilities.
+The `canfar.client` module provides a comprehensive HTTP client for interacting with CANFAR Science Platform services. Built on the powerful [`httpx`](https://www.python-httpx.org/) library, it offers both synchronous and asynchronous interfaces with advanced authentication capabilities.
 
 
 
@@ -14,7 +14,7 @@ The `skaha.client` module provides a comprehensive HTTP client for interacting w
     - **Debug Logging**: Comprehensive logging for troubleshooting
     - **Context Managers**: Proper resource management
 
-*This is a low-level client that is used by all other API clients in Skaha. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.*
+*This is a low-level client that is used by all other API clients in Canfar. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.*
 
 ## Authentication Modes
 
@@ -24,9 +24,10 @@ The client supports multiple authentication modes that can be configured through
 
 ```python
 import logging
+from canfar.client import HTTPClient
 
 # Enable debug logging to see client creation details
-client = SkahaClient(loglevel=logging.DEBUG)
+client = HTTPClient(loglevel=logging.DEBUG)
 
 # This will log:
 # - Authentication mode selection
@@ -40,9 +41,9 @@ client = SkahaClient(loglevel=logging.DEBUG)
 The client inherits from the `Configuration` class and supports all configuration options:
 
 ```python
-from skaha.client import SkahaClient
+from canfar.client import HTTPClient
 
-client = SkahaClient(
+client = HTTPClient(
     timeout=60,           # Request timeout in seconds
     concurrency=64,       # Max concurrent connections
     loglevel=20,         # Logging level (INFO)
@@ -56,7 +57,7 @@ The client provides an `expiry` property that returns the expiry time for the cu
 ```python
 import time
 
-client = SkahaClient()
+client = HTTPClient()
 
 if client.expiry:
     time_left = client.expiry - time.time()
@@ -84,7 +85,7 @@ except HTTPStatusError as e:
 
 ## API Reference
 
-::: skaha.client.SkahaClient
+::: canfar.client.HTTPClient
     handler: python
     options:
       members:

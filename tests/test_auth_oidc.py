@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import httpx
 import pytest
 
-from skaha.auth.oidc import (
+from canfar.auth.oidc import (
     AuthPendingError,
     SlowDownError,
     _cancel_pending_tasks,
@@ -19,7 +19,7 @@ from skaha.auth.oidc import (
     register,
     sync_refresh,
 )
-from skaha.models.auth import OIDC, Client, Endpoint, Token
+from canfar.models.auth import OIDC, Client, Endpoint, Token
 
 
 class TestDiscoverFunction:
@@ -248,7 +248,7 @@ class TestPollWithBackoff:
         """Test successful polling with backoff."""
         mock_client = AsyncMock(spec=httpx.AsyncClient)
 
-        with patch("skaha.auth.oidc._poll_token") as mock_poll:
+        with patch("canfar.auth.oidc._poll_token") as mock_poll:
             mock_poll.return_value = {"access_token": "test_token"}
 
             result = await _poll_with_backoff(
@@ -270,7 +270,7 @@ class TestPollWithBackoff:
         """Test polling with backoff timeout."""
         mock_client = AsyncMock(spec=httpx.AsyncClient)
 
-        with patch("skaha.auth.oidc._poll_token") as mock_poll:
+        with patch("canfar.auth.oidc._poll_token") as mock_poll:
             mock_poll.side_effect = AuthPendingError()
             with patch("time.time") as mock_time:
                 # Simulate time progression to trigger timeout
@@ -298,7 +298,7 @@ class TestPollWithBackoff:
         mock_client = AsyncMock(spec=httpx.AsyncClient)
 
         with (
-            patch("skaha.auth.oidc._poll_token") as mock_poll,
+            patch("canfar.auth.oidc._poll_token") as mock_poll,
             patch("asyncio.sleep") as mock_sleep,
         ):
             # First call raises SlowDownError, second succeeds
@@ -342,7 +342,7 @@ class TestAuthflowFunction:
         mock_client.post.return_value = device_response
 
         with (
-            patch("skaha.auth.oidc._poll_with_backoff") as mock_poll,
+            patch("canfar.auth.oidc._poll_with_backoff") as mock_poll,
             patch("webbrowser.get") as mock_browser,
             patch("segno.make") as mock_qr,
             patch("rich.progress.Progress") as mock_progress,
@@ -386,7 +386,7 @@ class TestAuthflowFunction:
             mock_client.post.return_value = device_response
 
             with (
-                patch("skaha.auth.oidc._poll_with_backoff") as mock_poll,
+                patch("canfar.auth.oidc._poll_with_backoff") as mock_poll,
                 patch("webbrowser.get") as mock_browser,
                 patch("segno.make") as mock_qr,
                 patch("rich.progress.Progress") as mock_progress,
@@ -461,8 +461,8 @@ class TestAuthenticateFunction:
             mock_client.post.side_effect = [register_response]
 
             with (
-                patch("skaha.auth.oidc.authflow") as mock_authflow,
-                patch("skaha.utils.jwt.expiry") as mock_jwt_decode,
+                patch("canfar.auth.oidc.authflow") as mock_authflow,
+                patch("canfar.utils.jwt.expiry") as mock_jwt_decode,
             ):
                 mock_authflow.return_value = {
                     "access_token": "test_access_token",
@@ -724,7 +724,7 @@ class TestIntegration:
                 )
 
                 # For the authflow, mock the polling to succeed immediately
-                with patch("skaha.auth.oidc._poll_token") as mock_poll_token:
+                with patch("canfar.auth.oidc._poll_token") as mock_poll_token:
                     mock_poll_token.return_value = {
                         "access_token": "test_access_token",
                         "refresh_token": "test_refresh_token",

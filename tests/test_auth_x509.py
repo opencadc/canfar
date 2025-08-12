@@ -1,4 +1,4 @@
-"""Tests for the skaha.auth.x509 module."""
+"""Tests for the canfar.auth.x509 module."""
 
 from __future__ import annotations
 
@@ -14,8 +14,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
-from skaha.auth import x509 as x509_auth
-from skaha.models.auth import X509
+from canfar.auth import x509 as x509_auth
+from canfar.models.auth import X509
 
 
 # Helper function to generate a self-signed certificate for testing
@@ -71,7 +71,7 @@ def generate_cert(
         f.write(certificate.public_bytes(serialization.Encoding.PEM))
 
 
-# --- Tests for skaha.auth.x509.valid --- #
+# --- Tests for canfar.auth.x509.valid --- #
 
 
 def test_valid_happy_path() -> None:
@@ -108,7 +108,7 @@ def test_valid_not_readable(tmp_path) -> None:
     cert_path.chmod(0o600)  # Clean up permissions
 
 
-# --- Tests for skaha.auth.x509.expiry --- #
+# --- Tests for canfar.auth.x509.expiry --- #
 
 
 def test_expiry_happy_path() -> None:
@@ -140,7 +140,7 @@ def test_expiry_with_invalid_content() -> None:
             x509_auth.expiry(cert_path)
 
 
-# --- Tests for skaha.auth.x509.inspect --- #
+# --- Tests for canfar.auth.x509.inspect --- #
 
 
 def test_inspect_happy_path() -> None:
@@ -160,10 +160,10 @@ def test_inspect_happy_path() -> None:
         )
 
 
-# --- Tests for skaha.auth.x509.authenticate --- #
+# --- Tests for canfar.auth.x509.authenticate --- #
 
 
-@patch("skaha.auth.x509.gather")
+@patch("canfar.auth.x509.gather")
 def test_authenticate_happy_path(mock_gather) -> None:
     """Test that `authenticate` correctly updates the config on success."""
     with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
@@ -183,7 +183,7 @@ def test_authenticate_happy_path(mock_gather) -> None:
         mock_gather.assert_called_once()
 
 
-@patch("skaha.auth.x509.gather")
+@patch("canfar.auth.x509.gather")
 def test_authenticate_gather_fails(mock_gather) -> None:
     """Test that `authenticate` raises a ValueError if `gather` fails."""
     mock_gather.side_effect = ValueError("Failed to retrieve certificate")
@@ -193,11 +193,11 @@ def test_authenticate_gather_fails(mock_gather) -> None:
         x509_auth.authenticate(config)
 
 
-# --- Tests for skaha.auth.x509.gather --- #
+# --- Tests for canfar.auth.x509.gather --- #
 
 
-@patch("skaha.auth.x509.get_cert")
-@patch("skaha.auth.x509.inspect")
+@patch("canfar.auth.x509.get_cert")
+@patch("canfar.auth.x509.inspect")
 def test_gather_happy_path(mock_inspect, mock_get_cert, tmp_path) -> None:
     """Test the happy path for `gather` with a username provided."""
     mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
@@ -214,8 +214,8 @@ def test_gather_happy_path(mock_inspect, mock_get_cert, tmp_path) -> None:
 
 
 @patch("builtins.input")
-@patch("skaha.auth.x509.get_cert")
-@patch("skaha.auth.x509.inspect")
+@patch("canfar.auth.x509.get_cert")
+@patch("canfar.auth.x509.inspect")
 def test_gather_prompts_for_username(
     mock_inspect, mock_get_cert, mock_input, tmp_path
 ) -> None:
@@ -233,8 +233,8 @@ def test_gather_prompts_for_username(
 
 
 @patch("pathlib.Path.home")
-@patch("skaha.auth.x509.get_cert")
-@patch("skaha.auth.x509.inspect")
+@patch("canfar.auth.x509.get_cert")
+@patch("canfar.auth.x509.inspect")
 def test_gather_uses_default_path(
     mock_inspect, mock_get_cert, mock_home, tmp_path
 ) -> None:
@@ -258,7 +258,7 @@ def test_gather_uses_default_path(
     assert (expected_path.stat().st_mode & 0o777) == 0o600
 
 
-@patch("skaha.auth.x509.get_cert")
+@patch("canfar.auth.x509.get_cert")
 def test_gather_get_cert_fails(mock_get_cert, tmp_path) -> None:
     """Test that `gather` raises a ValueError if `get_cert` fails."""
     mock_get_cert.side_effect = Exception("Network error")

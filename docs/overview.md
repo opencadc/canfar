@@ -1,7 +1,7 @@
 !!! info "Overview API"
     The Overview API provides information about the availability of the CANFAR Science Platform.
 
-::: skaha.overview.Overview
+::: canfar.overview.Overview
     handler: python
     selection:
       members:

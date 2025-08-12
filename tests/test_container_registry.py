@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from skaha.models.registry import ContainerRegistry
+from canfar.models.registry import ContainerRegistry
 
 
 def test_valid_container_registry() -> None:

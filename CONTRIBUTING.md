@@ -1,15 +1,15 @@
-# Contributing to Skaha
+# Contributing to CANFAR
 
-Thank you for considering contributing to the Skaha project! We welcome contributions from everyone. Please follow the guidelines below to help us maintain a high-quality codebase.
+Thank you for considering contributing to the canfar project! We welcome contributions from everyone. Please follow the guidelines below to help us maintain a high-quality codebase.
 
-We follow the [Contributor Convenant of Code of Conduct](https://github.com/shinybrar/skaha/blob/main/CODE_OF_CONDUCT.md). If you wish to contribute to Skaha, please make sure to familiarize yourself with it.
+We follow the [Contributor Convenant of Code of Conduct](https://github.com/opencadc/canfar/blob/main/CODE_OF_CONDUCT.md). If you wish to contribute to canfar, please make sure to familiarize yourself with it.
 
 Contributions are not limited to just code. You can help us by:
 
-- Answering questions on the [Discussions board](https://github.com/shinybrar/skaha/discussions)
-- Improving the [Documentation](https://github.com/shinybrar/skaha/tree/main/docs)
-- Reporting bugs and suggesting features via [GitHub Issues](https://github.com/shinybrar/skaha/issues) (see our [Bug Reporting Guide](https://shinybrar.github.io/skaha/bug-reports/) for detailed instructions)
-- Spreading the word about Skaha
+- Answering questions on the [Discussions board](https://github.com/opencadc/canfar/discussions)
+- Improving the [Documentation](https://github.com/opencadc/canfar/tree/main/docs)
+- Reporting bugs and suggesting features via [GitHub Issues](https://github.com/opencadc/canfar/issues) (see our [Bug Reporting Guide](https://opencadc.github.io/canfar/bug-reports/) for detailed instructions)
+- Spreading the word about CANFAR
 
 ## How to Contribute Code
 
@@ -22,13 +22,13 @@ Start by forking the repository on GitHub. This will create a copy of the projec
 Clone your forked repository to your local machine:
 
 ```bash
-git clone https://github.com/your-username/skaha.git
-cd skaha
+git clone https://github.com/your-username/canfar.git
+cd canfar
 ```
 
 ### 3. Set Up Your Development Environment
 
-- Skaha uses *uv* for for package, project and dependency management. To install *uv*, please refer to the [astral-uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
+- CANFAR uses *uv* for for package, project and dependency management. To install *uv*, please refer to the [astral-uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
 - You need a valid CANFAR account and access to the CANFAR Science Platform. To request access, [please request an account with the Canadian Astronomy Data Centre (CADC)](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
 
 To setup the development environment, simply run:

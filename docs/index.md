@@ -1,12 +1,12 @@
-# Skaha
+# CANFAR Python Client
 
-!!! note "Skaha Overview"
+!!! note "CANFAR Overview"
 
     A lightweight python interface to the CANFAR Science Platform.
 
 !!! example "Session Creation Example"
     ```python title="Python Session Creation"
-    from skaha.session import AsyncSession
+    from canfar.sessions import AsyncSession
 
     session = AsyncSession()
     sessions = await session.create(
@@ -23,5 +23,5 @@
     ```
 
 [Quick Start :material-coffee:](quick-start.md){: .md-button .md-button--primary }
-[Go to GitHub :fontawesome-brands-github:](https://github.com/shinybrar/skaha){: .md-button .md-button--primary }
+[Go to GitHub :fontawesome-brands-github:](https://github.com/opencadc/canfar){: .md-button .md-button--primary }
 [Changelog :material-vector-polyline-remove:](changelog.md){: .md-button .md-button--primary }

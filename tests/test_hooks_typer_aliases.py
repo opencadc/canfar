@@ -1,4 +1,4 @@
-"""Tests for the AliasGroup class in skaha.hooks.typer.aliases."""
+"""Tests for the AliasGroup class in canfar.hooks.typer.aliases."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 import pytest
 from click.core import Command, Context
 
-from skaha.hooks.typer.aliases import AliasGroup
+from canfar.hooks.typer.aliases import AliasGroup
 
 
 class TestAliasGroup:

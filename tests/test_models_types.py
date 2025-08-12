@@ -2,7 +2,7 @@
 
 from typing import get_args
 
-from skaha.models.types import Kind, Mode, Status, View
+from canfar.models.types import Kind, Mode, Status, View
 
 
 class TestKindType:
@@ -224,7 +224,7 @@ class TestTypeAliasesIntegration:
     def test_import_accessibility(self) -> None:
         """Test that all type aliases can be imported."""
         # This test ensures the imports work correctly
-        from skaha.models.types import Kind, Mode, Status, View
+        from canfar.models.types import Kind, Mode, Status, View
 
         # All should be accessible
         assert Kind is not None

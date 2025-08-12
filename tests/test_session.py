@@ -1,4 +1,4 @@
-"""Test Skaha Session API."""
+"""Test Canfar Session API."""
 
 from time import sleep, time
 from typing import Any
@@ -7,8 +7,8 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from skaha.models.session import CreateRequest
-from skaha.session import Session
+from canfar.models.session import CreateRequest
+from canfar.sessions import Session
 
 pytest.IDENTITY: list[str] = []
 

@@ -6,7 +6,7 @@ import math
 import pytest
 from pydantic import ValidationError
 
-from skaha.models.registry import (
+from canfar.models.registry import (
     ContainerRegistry,
     IVOARegistry,
     IVOARegistrySearch,

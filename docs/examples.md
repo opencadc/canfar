@@ -1,9 +1,9 @@
-# Skaha Usage Examples
+# Canfar Usage Examples
 
 ## Creating a Session
 
 ```python title="Create a session"
-from skaha.session import Session
+from canfar.session import Session
 
 session = Session()
 session_ids = session.create(
@@ -26,18 +26,18 @@ print(session_ids)
 ```
 
 !!! tip "Container Replicas"
-    When spawning sessions with the Skaha API, it adds two additional environment variables to each container:
+    When spawning sessions with the Canfar API, it adds two additional environment variables to each container:
 
     - `REPLICA_COUNT`: An integer representing the total number of replicas spawned, e.g. 3 for the example above.
     - `REPLICA_ID`: An integer representing the unique ID of the replica using **1-based indexing**, e.g. 1, 2, 3 for the example above.
 
-    These environment variables can be used to configure your application to run in a distributed manner. The Skaha distributed helpers (`chunk` and `stripe`) automatically handle the conversion from 1-based REPLICA_ID values to appropriate data partitioning. For example, you can use the `REPLICA_COUNT` to configure the number of workers and the `REPLICA_ID` to configure the rank of the worker.
+    These environment variables can be used to configure your application to run in a distributed manner. The canfar distributed helpers (`chunk` and `stripe`) automatically handle the conversion from 1-based REPLICA_ID values to appropriate data partitioning. For example, you can use the `REPLICA_COUNT` to configure the number of workers and the `REPLICA_ID` to configure the rank of the worker.
 
 !!! warning "Private Container Registry Access"
     If you are using a private container image from the CANFAR Harbor Registry, you need to provide your harbor `username` and the `CLI Secret` through a `ContainerRegistry` object.
     ```python
-    from skaha.models import ContainerRegistry
-    from skaha.session import Session
+    from canfar.models import ContainerRegistry
+    from canfar.session import Session
 
     registry = ContainerRegistry(username="username", password="sUp3rS3cr3t")
     session = Session(registry=registry)
@@ -82,7 +82,7 @@ events = session.events(session_ids, verbose=True)
 
 ```
 TYPE     REASON      MESSAGE                                                                                              FIRST-TIME             LAST-TIME
-Normal   Scheduled   Successfully assigned skaha-workload/skaha-headless-user-gvfusmzo-kdqkz to keel-prod-k8s-node-x04   <nil>                  <nil>
+Normal   Scheduled   Successfully assigned skaha-workload/skaha-headless-user-uuid to cluster-node                        <nil>                  <nil>
 Normal   Pulled      Container image "images.canfar.net/skaha/terminal:1.1.1" already present on machine                  2025-05-27T22:02:08Z   2025-05-27T22:02:08Z
 Normal   Created     Created container backup-original-passwd-groups                                                      2025-05-27T22:02:08Z   2025-05-27T22:02:08Z
 Normal   Started     Started container backup-original-passwd-groups                                                      2025-05-27T22:02:10Z   2025-05-27T22:02:10Z
@@ -90,8 +90,8 @@ Normal   Pulled      Container image "redis:7.4.2-alpine3.21" already present on
 Normal   Created     Created container init-users-groups                                                                  2025-05-27T22:02:11Z   2025-05-27T22:02:11Z
 Normal   Started     Started container init-users-groups                                                                  2025-05-27T22:02:12Z   2025-05-27T22:02:12Z
 Normal   Pulled      Container image "images.canfar.net/skaha/terminal:1.1.1" already present on machine                  2025-05-27T22:02:14Z   2025-05-27T22:02:14Z
-Normal   Created     Created container skaha-headless-user-gvfusmzo                                                      2025-05-27T22:02:14Z   2025-05-27T22:02:14Z
-Normal   Started     Started container skaha-headless-user-gvfusmzo
+Normal   Created     Created container skaha-headless-user-uuid                                                           2025-05-27T22:02:14Z   2025-05-27T22:02:14Z
+Normal   Started     Started container skaha-headless-user-uuid
 ```
 
 ## Getting Session Logs

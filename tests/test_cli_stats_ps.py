@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from typer.testing import CliRunner
 
-from skaha.cli.main import cli
+from canfar.cli.main import cli
 
 runner = CliRunner()
 

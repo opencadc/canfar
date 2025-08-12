@@ -3,13 +3,13 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "skaha"
+name = "canfar"
 version = "0.8.0"
 requires-python = ">=3.10"
 description = "Python Client for CANFAR Science Platform"
 license = { file = "LICENSE" }
 readme = "README.md"
-keywords = ["skaha", "canfar", "python", "client", "container", "platform", "api"]
+keywords = ["canfar", "python", "client", "container", "platform", "api", "canfar"]
 authors = [
     { name = "Shiny Brar", email = "shiny.brar@nrc-cnrc.gc.ca" }
 ]
@@ -86,14 +86,14 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://shinybrar.github.io/skaha/"
-Repository = "https://github.com/shinybrar/skaha"
-Documentation = "https://shinybrar.github.io/skaha/"
-Changelog = "https://shinybrar.github.io/skaha/changelog/"
-Issues = "https://github.com/shinybrar/skaha/issues"
+Homepage = "https://opencadc.github.io/canfar/"
+Repository = "https://github.com/opencadc/canfar"
+Documentation = "https://opencadc.github.io/canfar/"
+Changelog = "https://opencadc.github.io/canfar/changelog/"
+Issues = "https://github.com/opencadc/canfar/issues"
 
 [project.scripts]
-canfar = "skaha.cli.main:main"
+canfar = "canfar.cli.main:main"
 
 # Ruff configuration - handles formatting, linting, and import sorting
 [tool.ruff]
@@ -210,10 +210,10 @@ ignore = [
     "S108",    # Probable insecure usage of temporary file/directory
 ]
 "docs/**/*.py" = ["INP001"]
-"skaha/models/session.py" = ["N815"]
+"canfar/models/session.py" = ["N815"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["skaha"]
+known-first-party = ["canfar"]
 
 
 [tool.ruff.lint.pydocstyle]
@@ -265,7 +265,7 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=skaha",
+    "--cov=canfar",
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html",
     "--cov-report=xml",
@@ -289,7 +289,7 @@ filterwarnings = [
 
 # Coverage configuration
 [tool.coverage.run]
-source = ["skaha"]
+source = ["canfar"]
 omit = [
     "tests/*",
     "setup.py",
@@ -335,7 +335,7 @@ skips = ["B101", "B601"]  # Skip assert_used and shell_injection_process_functio
 # Additional tool configurations for completeness
 [tool.vulture]
 min_confidence = 80
-paths = ["skaha", "tests"]
+paths = ["canfar", "tests"]
 exclude = ["venv/", ".venv/"]
 
 [tool.interrogate]

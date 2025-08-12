@@ -11,10 +11,10 @@ import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
-from skaha.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
-from skaha.models.config import Configuration
-from skaha.models.http import Server
-from skaha.models.registry import ContainerRegistry
+from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
+from canfar.models.config import Configuration
+from canfar.models.http import Server
+from canfar.models.registry import ContainerRegistry
 
 
 class TestConfigurationDefaults:
@@ -62,7 +62,7 @@ class TestConfigurationDefaults:
             Configuration(invalid_field="value")  # type: ignore[call-arg]
 
         # Test case insensitive environment variable handling
-        with patch.dict(os.environ, {"SKAHA_ACTIVE": "test"}):
+        with patch.dict(os.environ, {"CANFAR_ACTIVE": "test"}):
             # This should work even though we use lowercase in the model
             config = Configuration(contexts={"test": X509(expiry=1234567890.0)})
             assert config.active == "test"
@@ -199,7 +199,7 @@ class TestConfigurationSerialization:
 
         # Save to temporary file
         temp_config_path = tmp_path / "config.yaml"
-        with patch("skaha.models.config.CONFIG_PATH", temp_config_path):
+        with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             original_config.save()
 
             # Load from temporary file
@@ -242,7 +242,7 @@ class TestConfigurationSerialization:
         config = Configuration()
         nested_path = tmp_path / "nested" / "config.yaml"
 
-        with patch("skaha.models.config.CONFIG_PATH", nested_path):
+        with patch("canfar.models.config.CONFIG_PATH", nested_path):
             config.save()
 
         assert nested_path.exists()
@@ -256,7 +256,7 @@ class TestConfigurationSerialization:
         )
 
         temp_config_path = tmp_path / "config.yaml"
-        with patch("skaha.models.config.CONFIG_PATH", temp_config_path):
+        with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config.save()
 
         # Read and verify YAML content
@@ -342,10 +342,10 @@ class TestConfigurationSettingsPrecedence:
             yaml.dump(config_data, f)
 
         # Set environment variable to override
-        monkeypatch.setenv("SKAHA_ACTIVE", "env_override")
+        monkeypatch.setenv("CANFAR_ACTIVE", "env_override")
 
         # Load configuration
-        with patch("skaha.models.config.CONFIG_PATH", temp_config_path):
+        with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration()
 
         # Environment variable should take precedence
@@ -386,10 +386,10 @@ class TestConfigurationSettingsPrecedence:
             yaml.dump(config_data, f)
 
         # Set environment variable
-        monkeypatch.setenv("SKAHA_ACTIVE", "env_override")
+        monkeypatch.setenv("CANFAR_ACTIVE", "env_override")
 
         # Load configuration with init args
-        with patch("skaha.models.config.CONFIG_PATH", temp_config_path):
+        with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration(active="init_override")
 
         # Init args should take highest precedence
@@ -417,7 +417,7 @@ class TestConfigurationSettingsPrecedence:
         with temp_config_path.open("w", encoding="utf-8") as f:
             yaml.dump(config_data, f)
 
-        with patch("skaha.models.config.CONFIG_PATH", temp_config_path):
+        with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration()
 
         assert config.active == "yaml_context"
@@ -437,7 +437,7 @@ class TestConfigurationErrorHandling:
         config_path = tmp_path / "blocked" / "config.yaml"
 
         with (
-            patch("skaha.models.config.CONFIG_PATH", config_path),
+            patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied")),
             pytest.raises(OSError, match="Permission denied"),
         ):
@@ -453,7 +453,7 @@ class TestConfigurationErrorHandling:
 
         error_msg = f"Failed to save configuration to {config_path}"
         with (
-            patch("skaha.models.config.CONFIG_PATH", config_path),
+            patch("canfar.models.config.CONFIG_PATH", config_path),
             pytest.raises(OSError, match=error_msg),
         ):
             config.save()
@@ -466,7 +466,7 @@ class TestConfigurationErrorHandling:
         # Mock yaml.dump to raise an error
         error_msg = f"Failed to save configuration to {config_path}"
         with (
-            patch("skaha.models.config.CONFIG_PATH", config_path),
+            patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("yaml.dump", side_effect=TypeError("Mock YAML error")),
             pytest.raises(OSError, match=error_msg),
         ):
