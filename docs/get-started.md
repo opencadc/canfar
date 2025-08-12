@@ -1,43 +1,43 @@
 # Installation & Setup
 
-This guide covers everything you need to install and configure Skaha for use with Science Platform servers worldwide.
+This guide covers everything you need to install and start using CANFAR Science Platform servers worldwide.
 
-!!! tip "New to Skaha?"
+!!! tip "New to Canfar?"
     If you want to jump right in with a hands-on tutorial, check out our [5-Minute Quick Start](quick-start.md) guide first!
 
 ## Prerequisites
 
-Before you can use Skaha, you need:
+Before you can use canfar, you need:
 
 - **Python 3.10+** installed on your system
 - **A Science Platform account** - For CANFAR, [request an account with CADC](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
 
 ## Installation
 
-Install Skaha using `pip`:
+Install canfar using `pip`:
 
 ```bash
-pip install skaha --upgrade
+pip install canfar --upgrade
 ```
 
 !!! tip "Virtual Environments"
     We recommend using a virtual environment to avoid conflicts with other packages:
     ```bash
-    python -m venv skaha-env
-    source skaha-env/bin/activate  # On Windows: skaha-env\Scripts\activate
-    pip install skaha
+    python -m venv canfar-env
+    source canfar-env/bin/activate  # On Windows: canfar-env\Scripts\activate
+    pip install canfar
     ```
 
 ## Authentication Setup
 
-Skaha uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI login command.
+Canfar uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI login command.
 
 ### Quick Authentication
 
 To authenticate with a Science Platform server:
 
 ```bash
-skaha auth login
+canfar auth login
 ```
 
 This command will:
@@ -49,11 +49,11 @@ This command will:
 
 !!! example "Example Login Flow"
     ```bash
-    $ skaha auth login
+    $ canfar auth login
     Starting Science Platform Login
     Discovery completed in 2.1s (5/18 active)
 
-    Select a Skaha Server:
+    Select a Canfar Server:
     » 🟢 CANFAR  CADC
       🟢 Canada  SRCnet
       🟢 UK-CAM  SRCnet
@@ -64,13 +64,13 @@ This command will:
     ✓ Login completed successfully!
     ```
 
-### Using Skaha Programmatically
+### Using Canfar Programmatically
 
-Once authenticated via CLI, you can use Skaha in your Python code:
+Once authenticated via CLI, you can use Canfar in your Python code:
 
 ```python
-from skaha.session import Session
-from skaha.images import Images
+from canfar.session import Session
+from canfar.images import Images
 
 # Uses your active authentication context
 session = Session()
@@ -96,8 +96,8 @@ print(f"Created session: {session_info.id}")
 To access private container images from registries like CANFAR Harbor, provide registry credentials:
 
 ```python
-from skaha.models import ContainerRegistry
-from skaha.session import Session
+from canfar.models import ContainerRegistry
+from canfar.session import Session
 
 # Configure registry access
 registry = ContainerRegistry(
@@ -122,7 +122,7 @@ session_info = session.create(
 
 ## Next Steps
 
-Now that you have Skaha installed and configured:
+Now that you have canfar installed and configured:
 
 - [x] Try our [5-Minute Quick Start](quick-start.md) for a hands-on introduction to creating and managing sessions.
 - [x] Learn about [Authentication Contexts](authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.
@@ -132,5 +132,5 @@ Now that you have Skaha installed and configured:
 
 !!! tip "Getting Help"
     - 📖 [Complete CLI Reference](cli-help.md)
-    - 💬 [Community Discussions](https://github.com/shinybrar/skaha/discussions)
+    - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions)
     - 🐛 [Report Issues](bug-reports.md)

@@ -1,8 +1,8 @@
-"""Test Skaha Context API."""
+"""Test Canfar Context API."""
 
 import pytest
 
-from skaha.context import Context
+from canfar.context import Context
 
 
 @pytest.fixture(scope="session")

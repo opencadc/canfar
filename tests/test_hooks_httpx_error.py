@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, Mock, patch
 import httpx
 import pytest
 
-from skaha.hooks.httpx.errors import acatch, catch
+from canfar.hooks.httpx.errors import acatch, catch
 
 """Tests for httpx error hooks."""
 
@@ -37,7 +37,7 @@ class TestCatch:
         mock_response.reason_phrase = "Not Found"
         mock_response.text = "Not Found"
 
-        with patch("skaha.hooks.httpx.errors.log") as mock_log:
+        with patch("canfar.hooks.httpx.errors.log") as mock_log:
             with pytest.raises(httpx.HTTPStatusError):
                 catch(mock_response)
 
@@ -57,7 +57,7 @@ class TestCatch:
         mock_response.reason_phrase = "Internal Server Error"
         mock_response.text = "Server Error"
 
-        with patch("skaha.hooks.httpx.errors.log") as mock_log:
+        with patch("canfar.hooks.httpx.errors.log") as mock_log:
             with pytest.raises(httpx.RequestError):
                 catch(mock_response)
 
@@ -98,7 +98,7 @@ class TestACatch:
         mock_response.reason_phrase = "Unauthorized"
         mock_response.text = "Unauthorized"
 
-        with patch("skaha.hooks.httpx.errors.log") as mock_log:
+        with patch("canfar.hooks.httpx.errors.log") as mock_log:
             with pytest.raises(httpx.HTTPStatusError):
                 await acatch(mock_response)
 
@@ -119,7 +119,7 @@ class TestACatch:
         mock_response.reason_phrase = "Service Unavailable"
         mock_response.text = "Service Unavailable"
 
-        with patch("skaha.hooks.httpx.errors.log") as mock_log:
+        with patch("canfar.hooks.httpx.errors.log") as mock_log:
             with pytest.raises(httpx.RequestError):
                 await acatch(mock_response)
 
@@ -140,7 +140,7 @@ class TestACatch:
         mock_response.reason_phrase = "Request Timeout"
         mock_response.text = "Request Timeout"
 
-        with patch("skaha.hooks.httpx.errors.log") as mock_log:
+        with patch("canfar.hooks.httpx.errors.log") as mock_log:
             with pytest.raises(httpx.TimeoutException):
                 await acatch(mock_response)
 

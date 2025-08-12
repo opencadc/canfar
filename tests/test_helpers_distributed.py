@@ -1,4 +1,4 @@
-"""Tests for skaha.helpers.distributed module."""
+"""Tests for canfar.helpers.distributed module."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 
-from skaha.helpers.distributed import chunk, stripe
+from canfar.helpers.distributed import chunk, stripe
 
 
 # Test data fixtures
@@ -1327,10 +1327,10 @@ def test_chunk_stripe_integration_consistency_across_scenarios() -> None:
             )
 
 
-def test_skaha_environment_integration_realistic_scenarios() -> None:
-    """Test chunk function with realistic Skaha container environment scenarios.
+def test_environment_integration_realistic_scenarios() -> None:
+    """Test chunk function with realistic canfar container environment scenarios.
 
-    This test simulates real-world Skaha container environments where REPLICA_ID
+    This test simulates real-world canfar container environments where REPLICA_ID
     and REPLICA_COUNT are set as string environment variables with 1-based indexing.
     """
     # Scenario 1: Processing 100 astronomical images across 10 containers
@@ -1369,8 +1369,8 @@ def test_skaha_environment_integration_realistic_scenarios() -> None:
     )
 
 
-def test_skaha_environment_integration_sparse_distribution() -> None:
-    """Test chunk function with sparse distribution in Skaha environment.
+def test_environment_integration_sparse_distribution() -> None:
+    """Test chunk function with sparse distribution in canfar environment.
 
     This simulates scenarios where there are fewer data items than containers,
     which can happen with small datasets or many parallel containers.
@@ -1409,8 +1409,8 @@ def test_skaha_environment_integration_sparse_distribution() -> None:
     assert processed_files == large_files, "All files should be processed correctly"
 
 
-def test_skaha_environment_integration_uneven_distribution() -> None:
-    """Test chunk function with uneven distribution in Skaha environment.
+def test_environment_integration_uneven_distribution() -> None:
+    """Test chunk function with uneven distribution in canfar environment.
 
     This tests scenarios where data doesn't divide evenly across containers.
     """
@@ -1444,8 +1444,8 @@ def test_skaha_environment_integration_uneven_distribution() -> None:
     )
 
 
-def test_skaha_environment_integration_edge_cases() -> None:
-    """Test edge cases that might occur in real Skaha environments."""
+def test_environment_integration_edge_cases() -> None:
+    """Test edge cases that might occur in real canfar environments."""
     # Edge case 1: Single file, multiple containers
     single_file = ["important_config.json"]
 
@@ -1486,10 +1486,10 @@ def test_skaha_environment_integration_edge_cases() -> None:
         assert result == all_data, "Single container should process all data"
 
 
-def test_skaha_environment_integration_string_conversion() -> None:
+def test_environment_integration_string_conversion() -> None:
     """Test that environment variables are properly converted from strings.
 
-    Skaha sets environment variables as strings, so we need to ensure
+    Canfar sets environment variables as strings, so we need to ensure
     proper string-to-integer conversion works correctly.
     """
     data = list(range(20))
@@ -1521,8 +1521,8 @@ def test_skaha_environment_integration_string_conversion() -> None:
                 )
 
 
-def test_skaha_environment_integration_performance_characteristics() -> None:
-    """Test performance characteristics with realistic Skaha workloads."""
+def test_environment_integration_performance_characteristics() -> None:
+    """Test performance characteristics with realistic Canfar workloads."""
     import time
 
     # Large dataset simulation (10,000 items across 20 containers)
@@ -1553,8 +1553,8 @@ def test_skaha_environment_integration_performance_characteristics() -> None:
     )
 
 
-def test_skaha_environment_integration_error_conditions() -> None:
-    """Test error conditions that might occur in Skaha environments."""
+def test_environment_integration_error_conditions() -> None:
+    """Test error conditions that might occur in canfar environments."""
     data = list(range(10))
 
     # Test invalid REPLICA_ID (0-based indexing attempt)
@@ -1582,7 +1582,7 @@ def test_skaha_environment_integration_error_conditions() -> None:
             list(chunk(data, replica=replica, total=total))
 
 
-def test_skaha_environment_integration_real_world_workflow() -> None:
+def test_environment_integration_real_world_workflow() -> None:
     """Test a complete real-world workflow simulation.
 
     This simulates a typical astronomical data processing workflow where

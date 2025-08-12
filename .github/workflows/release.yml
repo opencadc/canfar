@@ -1,4 +1,4 @@
-name: Publish Skaha to Container Registries
+name: Publish CANFAR to Container Registries
 
 on:
   repository_dispatch:
@@ -62,11 +62,11 @@ jobs:
           sbom: true
           push: true
           labels: |
-            org.opencontainers.image.title=skaha
+            org.opencontainers.image.title=canfar
             org.opencontainers.image.version=${{ env.IMAGE_TAG_RELEASE }}
             org.opencontainers.image.description='Python Client for CANFAR Science Portal'
             org.opencontainers.image.licenses=AGPL-3.0
-            org.opencontainers.image.source=https://github.com/shinybrar/skaha
+            org.opencontainers.image.source=https://github.com/opencadc/canfar
           tags: |
             ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_RELEASE }}
             ${{ env.GHCR_REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG_LATEST }}

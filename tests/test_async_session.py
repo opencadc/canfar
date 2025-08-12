@@ -7,7 +7,7 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 
-from skaha.session import AsyncSession
+from canfar.sessions import AsyncSession
 
 
 @pytest.fixture(scope="module")

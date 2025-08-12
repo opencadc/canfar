@@ -1,14 +1,14 @@
-"""Tests for the `skaha auth` CLI commands."""
+"""Tests for the `canfar auth` CLI commands."""
 
 from typer.testing import CliRunner
 
-from skaha.cli.auth import auth
+from canfar.cli.auth import auth
 
 runner = CliRunner()
 
 
 def test_auth_commands():
-    """Test `skaha auth` commands."""
+    """Test `canfar auth` commands."""
     result = runner.invoke(auth, ["--help"])
     assert result.exit_code == 0
     results = runner.invoke(auth, ["login", "--help"])

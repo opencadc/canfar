@@ -1,17 +1,17 @@
 # CLI Reference
 
-The Skaha CLI provides a comprehensive command-line interface for interacting with the Science Platform. This reference covers all available commands and their options.
+The Canfar CLI provides a comprehensive command-line interface for interacting with the Science Platform. This reference covers all available commands and their options.
 
 !!! info "Getting Started"
-    The CLI can be accessed using the `skaha` command in your uv environment:
+    The CLI can be accessed using the `canfar` command in your uv environment:
     ```bash
-    uv run skaha --help
+    uv run canfar --help
     ```
 
 ## Main Command
 
 ```bash
-skaha [OPTIONS] COMMAND [ARGS]...
+canfar [OPTIONS] COMMAND [ARGS]...
 ```
 
 **Description:** Command Line Interface for Science Platform.
@@ -27,23 +27,23 @@ skaha [OPTIONS] COMMAND [ARGS]...
 !!! tip "Shell Completion"
     Enable shell completion for a better CLI experience by running:
     ```bash
-    skaha --install-completion
+    canfar --install-completion
     ```
 
 ---
 
 ## 🔐 Authentication Commands
 
-### `skaha auth`
+### `canfar auth`
 
 Authenticate with Science Platform.
 
-#### `skaha auth login`
+#### `canfar auth login`
 
 Login to Science Platform with automatic server discovery.
 
 ```bash
-skaha auth login [OPTIONS]
+canfar auth login [OPTIONS]
 ```
 
 **Description:** This command guides you through the authentication process, automatically discovering the upstream server and choosing the appropriate authentication method based on the server's configuration.
@@ -61,33 +61,33 @@ skaha auth login [OPTIONS]
 
 !!! example "Basic Login"
     ```bash
-    skaha auth login
+    canfar auth login
     ```
 
 !!! example "Login with Debug Information"
     ```bash
-    skaha auth login --debug --details
+    canfar auth login --debug --details
     ```
 
-#### `skaha auth list` / `skaha auth ls`
+#### `canfar auth list` / `canfar auth ls`
 
 Show all available authentication contexts.
 
 ```bash
-skaha auth list [OPTIONS]
+canfar auth list [OPTIONS]
 ```
 
 !!! example
     ```bash
-    skaha auth list
+    canfar auth list
     ```
 
-#### `skaha auth switch` / `skaha auth use`
+#### `canfar auth switch` / `canfar auth use`
 
 Switch the active authentication context.
 
 ```bash
-skaha auth switch CONTEXT
+canfar auth switch CONTEXT
 ```
 
 **Arguments:**
@@ -95,15 +95,15 @@ skaha auth switch CONTEXT
 
 !!! example
     ```bash
-    skaha auth switch production
+    canfar auth switch production
     ```
 
-#### `skaha auth remove` / `skaha auth rm`
+#### `canfar auth remove` / `canfar auth rm`
 
 Remove a specific authentication context.
 
 ```bash
-skaha auth remove CONTEXT
+canfar auth remove CONTEXT
 ```
 
 **Arguments:**
@@ -112,12 +112,12 @@ skaha auth remove CONTEXT
 !!! warning "Permanent Action"
     This action permanently removes the authentication context and cannot be undone.
 
-#### `skaha auth purge`
+#### `canfar auth purge`
 
 Remove all authentication contexts.
 
 ```bash
-skaha auth purge [OPTIONS]
+canfar auth purge [OPTIONS]
 ```
 
 ##### Options
@@ -133,12 +133,12 @@ skaha auth purge [OPTIONS]
 
 ## 🚀 Session Management Commands
 
-### `skaha create`
+### `canfar create`
 
 Create a new session on the Science Platform.
 
 ```bash
-skaha create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
+canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 ```
 
 **Arguments:**
@@ -161,20 +161,20 @@ skaha create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 
 !!! example "Create a Jupyter Notebook"
     ```bash
-    skaha create --cpu 4 -m 8notebook skaha/scipy-notebook:latest
+    canfar create --cpu 4 -m 8notebook skaha/scipy-notebook:latest
     ```
 
 !!! example "Create a Headless Session with Custom Command"
     ```bash
-    uv run skaha create headless skaha/terminal:1.1.2 -- env
+    uv run canfar create headless skaha/terminal:1.1.2 -- env
     ```
 
-### `skaha ps`
+### `canfar ps`
 
 Show running sessions.
 
 ```bash
-skaha ps [OPTIONS]
+canfar ps [OPTIONS]
 ```
 
 #### Options
@@ -189,20 +189,20 @@ skaha ps [OPTIONS]
 
 !!! example "List All Sessions"
     ```bash
-    skaha ps --all
+    canfar ps --all
     ```
 
 !!! example "List Only Notebook Sessions"
     ```bash
-    skaha ps --kind notebook
+    canfar ps --kind notebook
     ```
 
-### `skaha events`
+### `canfar events`
 
 Show session events for debugging and monitoring.
 
 ```bash
-skaha events [OPTIONS] SESSION_IDS...
+canfar events [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
@@ -216,15 +216,15 @@ skaha events [OPTIONS] SESSION_IDS...
 
 !!! example
     ```bash
-    skaha events abc123 def456
+    canfar events abc123 def456
     ```
 
-### `skaha info`
+### `canfar info`
 
 Show detailed information about sessions.
 
 ```bash
-skaha info [OPTIONS] SESSION_IDS...
+canfar info [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
@@ -238,15 +238,15 @@ skaha info [OPTIONS] SESSION_IDS...
 
 !!! example
     ```bash
-    skaha info abc123
+    canfar info abc123
     ```
 
-### `skaha open`
+### `canfar open`
 
 Open sessions in a web browser.
 
 ```bash
-skaha open [OPTIONS] SESSION_IDS...
+canfar open [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
@@ -263,15 +263,15 @@ skaha open [OPTIONS] SESSION_IDS...
 
 !!! example
     ```bash
-    skaha open abc123 def456
+    canfar open abc123 def456
     ```
 
-### `skaha logs`
+### `canfar logs`
 
 Show session logs for troubleshooting.
 
 ```bash
-skaha logs [OPTIONS] SESSION_IDS...
+canfar logs [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
@@ -285,15 +285,15 @@ skaha logs [OPTIONS] SESSION_IDS...
 
 !!! example
     ```bash
-    skaha logs abc123
+    canfar logs abc123
     ```
 
-### `skaha delete`
+### `canfar delete`
 
 Delete one or more sessions.
 
 ```bash
-skaha delete [OPTIONS] SESSION_IDS...
+canfar delete [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
@@ -311,20 +311,20 @@ skaha delete [OPTIONS] SESSION_IDS...
 
 !!! example "Delete with Confirmation"
     ```bash
-    skaha delete abc123
+    canfar delete abc123
     ```
 
 !!! example "Force Delete Multiple Sessions"
     ```bash
-    skaha delete abc123 def456 --force
+    canfar delete abc123 def456 --force
     ```
 
-### `skaha prune`
+### `canfar prune`
 
 Prune sessions by criteria for bulk cleanup.
 
 ```bash
-skaha prune [OPTIONS] NAME [KIND] [STATUS]
+canfar prune [OPTIONS] NAME [KIND] [STATUS]
 ```
 
 **Arguments:**
@@ -341,7 +341,7 @@ skaha prune [OPTIONS] NAME [KIND] [STATUS]
 
 !!! example "Prune Completed Headless Sessions"
     ```bash
-    skaha prune "test-" headless Running
+    canfar prune "test-" headless Running
     ```
 
 !!! tip "Bulk Cleanup"
@@ -351,12 +351,12 @@ skaha prune [OPTIONS] NAME [KIND] [STATUS]
 
 ## 📊 Cluster Information Commands
 
-### `skaha stats`
+### `canfar stats`
 
 Show cluster statistics and resource usage.
 
 ```bash
-skaha stats [OPTIONS]
+canfar stats [OPTIONS]
 ```
 
 #### Options
@@ -367,7 +367,7 @@ skaha stats [OPTIONS]
 
 !!! example
     ```bash
-    skaha stats
+    canfar stats
     ```
 
 !!! info "Resource Monitoring"
@@ -377,45 +377,45 @@ skaha stats [OPTIONS]
 
 ## ⚙️ Client Configuration Commands
 
-### `skaha config`
+### `canfar config`
 
 Manage client configuration settings.
 
-#### `skaha config show` / `skaha config list` / `skaha config ls`
+#### `canfar config show` / `canfar config list` / `canfar config ls`
 
 Display the current configuration.
 
 ```bash
-skaha config show [OPTIONS]
+canfar config show [OPTIONS]
 ```
 
 !!! example
     ```bash
-    skaha config ls
+    canfar config ls
     ```
 
-#### `skaha config path`
+#### `canfar config path`
 
 Display the path to the configuration file.
 
 ```bash
-skaha config path [OPTIONS]
+canfar config path [OPTIONS]
 ```
 
 !!! example
     ```bash
-    skaha config path
+    canfar config path
     ```
 
 !!! tip "Configuration Location"
     Use this command to find where your configuration file is stored for manual editing if needed.
 
-### `skaha version`
+### `canfar version`
 
 View client version and system information.
 
 ```bash
-skaha version [OPTIONS]
+canfar version [OPTIONS]
 ```
 
 #### Options
@@ -426,10 +426,10 @@ skaha version [OPTIONS]
 
 !!! example "Basic Version Info"
     ```bash
-    skaha version
+    canfar version
     ```
 
 !!! example "Detailed Debug Information"
     ```bash
-    skaha version --debug
+    canfar version --debug
     ```

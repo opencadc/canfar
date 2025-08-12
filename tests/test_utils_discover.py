@@ -1,9 +1,9 @@
-"""Test Skaha Discover API."""
+"""Test Canfar Discover API."""
 
 import pytest
 
-from skaha.models.registry import IVOARegistrySearch
-from skaha.utils.discover import Discover
+from canfar.models.registry import IVOARegistrySearch
+from canfar.utils.discover import Discover
 
 
 @pytest.fixture

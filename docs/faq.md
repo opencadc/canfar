@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-Common questions and answers about using Skaha with the CANFAR Science Platform.
+Common questions and answers about using the CANFAR Science Platform.
 
 ## Getting Started
 
@@ -36,14 +36,14 @@ cadc-get-cert -u your-username
 ```
 or 
 ```
-skaha auth login
+canfar auth login
 ```
 ```bash title="Choose CANFAR CADC Server"
 Starting Science Platform Login
 Fetched CADC in 0.14s
 Fetched SRCnet in 1.09s
 Discovery completed in 4.62s (6/18 active)
-? Select a Skaha Server: (Use arrow keys)
+? Select a Canfar Server: (Use arrow keys)
    🟢 Canada  SRCnet
    🟢 UK-CAM  SRCnet
    🟢 Swiss   SRCnet
@@ -58,14 +58,14 @@ Certificates are valid for 10 days and need to be renewed regularly.
 Yes, OIDC (OpenID Connect) tokens are supported for advanced users and programmatic access accessing the Science Platform through the Square Kilometer Array (SKA) Science Regional Network (SRCNet). To setup OIDC authentication, use
 
 ```
-skaha auth login
+canfar auth login
 ```
 ```bash title="Choose SRCNet Server"
 Starting Science Platform Login
 Fetched CADC in 0.14s
 Fetched SRCnet in 1.09s
 Discovery completed in 4.62s (6/18 active)
-? Select a Skaha Server: (Use arrow keys)
+? Select a canfar Server: (Use arrow keys)
  » 🟢 Canada  SRCnet
    🟢 UK-CAM  SRCnet
    🟢 Swiss   SRCnet
@@ -90,7 +90,7 @@ See the [Session Types Guide](session-types.md) for detailed information.
 Limits vary based on the underlying hardware and current load on the system. You can see the current statistics with,
 
 ```
-skaha stats
+canfar stats
 ```
 
 ### How long do sessions run?
@@ -115,7 +115,7 @@ Common causes:
 
 You can check the events for a session to see the pending reason with,
 ```
-skaha events <session-id>
+canfar events <session-id>
 ```
 
 ## Images and Software
@@ -147,21 +147,21 @@ Yes, you can run multiple sessions simultaneously with upto 3 Notebook sessions,
 ### I can't connect to my session URL. Help!
 
 Troubleshooting steps:
-1. **Wait for "Running" status**: Check `skaha ps`
+1. **Wait for "Running" status**: Check `canfar ps`
 2. **Check VPN**: Some VPNs block CANFAR connections
 3. **Try different browser**: Clear cache or use incognito mode
 
 ### How do I get help with errors?
 
 1. **Check this FAQ**
-2. **Search GitHub issues**: [github.com/shinybrar/skaha/issues](https://github.com/shinybrar/skaha/issues)
+2. **Search GitHub issues**: [github.com/opencadc/canfar/issues](https://github.com/opencadc/canfar/issues)
 3. **Ask the Community**: [Discord Server](https://discord.gg/vcCQ8QBvBa)
 
 ## Advanced Usage
 
 ### Can I automate session management?
 
-Yes, Skaha is designed for automation:
+Yes, canfar is designed for automation:
 ```python
 # Automated workflow
 session = Session()
@@ -197,8 +197,8 @@ Yes, quotas vary by user and allocation, but generally there are quotas on:
 
 ### How do I report bugs or request features?
 
-- **Bugs**: [Report on GitHub](https://github.com/shinybrar/skaha/issues)
-- **Feature requests**: [GitHub Discussions](https://github.com/shinybrar/skaha/discussions)
+- **Bugs**: [Report on GitHub](https://github.com/opencadc/canfar/issues)
+- **Feature requests**: [GitHub Discussions](https://github.com/opencadc/canfar/discussions)
 - **Security issues**: [Security reporting](security.md)
 
 ### Is there a user community?
@@ -212,4 +212,4 @@ Yes! Join the community:
 ---
 
 !!! question "Didn't find your answer?"
-    Check the [troubleshooting guide](troubleshooting.md) or ask the community on [GitHub Discussions](https://github.com/shinybrar/skaha/discussions).
+    Check the [troubleshooting guide](troubleshooting.md) or ask the community on [GitHub Discussions](https://github.com/opencadc/canfar/discussions).

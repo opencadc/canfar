@@ -3,7 +3,7 @@
 import pytest
 from cryptography.fernet import InvalidToken
 
-from skaha.utils import garble
+from canfar.utils import garble
 
 
 def test_derive_returns_bytes() -> None:

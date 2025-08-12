@@ -1,14 +1,14 @@
 # Testing
 
-This document provides comprehensive information about testing in the Skaha project.
+This document provides comprehensive information about testing [opencadc/canfar](https://github.com/opencadc/canfar).
 
 ## Overview
 
-Skaha uses [pytest](https://pytest.org/) as its testing framework. The test suite includes unit tests, integration tests, and end-to-end tests that verify the functionality of the Skaha client library.
+Canfar uses [pytest](https://pytest.org/) as its testing framework. The test suite includes unit tests, integration tests, and end-to-end tests that verify the functionality of the client library.
 
 ## Prerequisites
 
-To run tests for Skaha, you need:
+To run tests for Canfar, you need:
 
 1. **Valid CANFAR Account**: Access to the CANFAR Science Platform
 2. **X.509 Certificate**: For authentication with CANFAR services
@@ -37,7 +37,7 @@ uv run pytest --cov
 
 ### Test Categories
 
-Skaha tests are organized with markers to help you run specific subsets:
+Canfar tests are organized with markers to help you run specific subsets:
 
 #### Slow Tests
 
@@ -77,13 +77,13 @@ Tests are organized in the `tests/` directory and follow a specific naming conve
 
 The naming convention is as follows:
 
-- If the source file is `skaha/path/to/file.py`, the corresponding test file will be `tests/test_path_to_file.py`.
-- If the source file is `skaha/module.py`, the corresponding test file will be `tests/test_module.py`.
+- If the source file is `canfar/path/to/file.py`, the corresponding test file will be `tests/test_path_to_file.py`.
+- If the source file is `canfar/module.py`, the corresponding test file will be `tests/test_module.py`.
 
 For example:
 
-- The tests for `skaha/client.py` are located in `tests/test_client.py`.
-- The tests for `skaha/auth/oidc.py` are located in `tests/test_auth_oidc.py`.
+- The tests for `canfar/client.py` are located in `tests/test_client.py`.
+- The tests for `canfar/auth/oidc.py` are located in `tests/test_auth_oidc.py`.
 
 This structure makes it straightforward to find the tests associated with a particular module or file.
 

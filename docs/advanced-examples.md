@@ -1,21 +1,21 @@
 # Advanced Examples
 
-Complex use cases and power-user examples for Skaha and the CANFAR Science Platform.
+Complex use cases and power-user examples for CANFAR Science Platform.
 
 # Quick Start
 
 !!! info
-    Skaha automatically sets these environment variables in each container:
+    Canfar automatically sets these environment variables in each container:
 
     - `REPLICA_ID`: Current container ID (1, 2, 3, ...)
     - `REPLICA_COUNT`: Total number of containers
 
 ## Massively Parallel Processing
 
-Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different Skaha sessions.
+Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different canfar sessions.
 
 ```python title="batch_processing.py"
-from skaha.helpers import distributed
+from canfar.helpers import distributed
 from glob import glob
 from your.code import process_datafile
 
@@ -31,7 +31,7 @@ for datafile in distributed.chunk(datafiles):
 ### Launching Analysis with Python API
 
 ```python title="Large-Scale Parallel Processing"
-from skaha.session import AsyncSession
+from canfar.session import AsyncSession
 
 async with AsyncSession() as session:
     sessions = await session.create(
@@ -50,19 +50,19 @@ async with AsyncSession() as session:
 ### Launching Analysis with CLI
 
 ```bash title="Large-Scale Parallel Processing"
-skaha create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
+canfar create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
 ```
 
 ## Distributed Processing Strategies
 
-Skaha provides two main strategies for distributing data across replicas:
+Canfar provides two main strategies for distributing data across replicas:
 
 ### Chunking Strategy (`distributed.chunk`)
 
-The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching Skaha's `REPLICA_ID` environment variable):
+The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching canfar's `REPLICA_ID` environment variable):
 
 ```python title="Chunking Example"
-from skaha.helpers import distributed
+from canfar.helpers import distributed
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0-9
@@ -80,7 +80,7 @@ for datafile in distributed.chunk(datafiles):
 The `stripe` function distributes data in a round-robin fashion, which is useful when file sizes vary significantly:
 
 ```python title="Striping Example"
-from skaha.helpers import distributed
+from canfar.helpers import distributed
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0, 100, 200, 300, ...
@@ -104,7 +104,7 @@ for datafile in distributed.stripe(datafiles):
 import os
 import json
 from pathlib import Path
-from skaha.helpers.distributed import chunk
+from canfar.helpers.distributed import chunk
 
 def process_observations():
     """Process FITS files across multiple containers."""
@@ -182,7 +182,7 @@ Create multiple containers for distributed processing:
 
 ```bash
 # Create 5 containers for distributed analysis
-skaha create headless images.canfar.net/skaha/astronomy:latest -r 5 -- python3 /scripts/process_data.py
+canfar create headless images.canfar.net/skaha/astronomy:latest -r 5 -- python3 /scripts/process_data.py
 ```
 
 ## Common Issues

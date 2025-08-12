@@ -4,7 +4,7 @@
     The Context API allows the user to get information about the resources available to be requested for a session on the CANFAR Science Platform. This information can be used to configure the session to request the appropriate resources for your session.
 
 ```python title="Get context information"
-from skaha.context import Context
+from canfar.context import Context
 
 context = Context()
 context.resources()
@@ -32,7 +32,7 @@ context.resources()
 }
 ```
 
-::: skaha.context.Context
+::: canfar.context.Context
     handler: python
     selection:
       members:

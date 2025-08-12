@@ -7,9 +7,9 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import questionary
 
-from skaha.models.registry import Server, ServerResults
-from skaha.utils.convert import dict_to_tuples
-from skaha.utils.display import configure_server_choices, servers
+from canfar.models.registry import Server, ServerResults
+from canfar.utils.convert import dict_to_tuples
+from canfar.utils.display import configure_server_choices, servers
 
 
 # Tests for convert module
@@ -50,7 +50,7 @@ def create_test_server(
     status: int | None = 200,
     name: str | None = "Test Server",
 ) -> Server:
-    """Create a test SkahaServer instance.
+    """Create a test Server instance.
 
     Args:
         registry: Registry name
@@ -60,7 +60,7 @@ def create_test_server(
         name: Server name
 
     Returns:
-        SkahaServer: Test server instance
+        Server: Test server instance
     """
     return Server(
         registry=registry,
@@ -72,13 +72,13 @@ def create_test_server(
 
 
 def create_test_results(endpoints: list[Server]) -> ServerResults:
-    """Create test SkahaServerResults instance.
+    """Create test ServerResults instance.
 
     Args:
         endpoints: List of server endpoints
 
     Returns:
-        SkahaServerResults: Test results instance
+        ServerResults: Test results instance
     """
     results = ServerResults()
     for endpoint in endpoints:

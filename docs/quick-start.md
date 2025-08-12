@@ -13,7 +13,7 @@
 
 <!-- termynal -->
 ```
-> pip install skaha --upgrade
+> pip install canfar --upgrade
 ---> 100%
 Installed
 ```
@@ -22,18 +22,18 @@ Installed
 
 <!-- termynal -->
 ```
-$ skaha auth login
+$ canfar auth login
 Starting Science Platform Login
 Fetched CADC in 0.12s
 Fetched SRCnet in 1.15s
 Discovery completed in 3.32s (5/18 active)
-$ Select a Skaha Server: (Use arrow keys)
+$ Select a Canfar Server: (Use arrow keys)
    🟢 Canada  SRCnet
    🟢 UK-CAM  SRCnet
    🟢 Swiss   SRCnet
    🟢 Spain   SRCnet
  » 🟢 CANFAR  CADC
-$ Selected a Skaha Server: 🟢 CANFAR  CADC
+$ Selected a Canfar Server: 🟢 CANFAR  CADC
 X509 Certificate Authentication
 $ Username: username
 username@ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
@@ -43,7 +43,7 @@ Login completed successfully!
 ```
 
 !!! info "What just happened?"
-    - Skaha discovered all available Science Platform servers around the world
+    - Canfar discovered all available Science Platform servers around the world
     - You selected the CADC CANFAR Server
     - You logged into the Science Platform using your CADC credentials
     - The Science Platform generated a certificate for you valid for 10 days
@@ -55,14 +55,14 @@ Lets launch a Jupyter notebook with astronomy tools pre-installed,
 
 <!-- termynal -->
 ```
-$ skaha create notebook skaha/astroml-notebook:latest
+$ canfar create notebook skaha/astroml-notebook:latest
 Creating notebook session 'scare-monster'...
 Successfully created session 'scare-monster' (ID: tcgle3m3)
 ```
 
 !!! success "What just happened?"
-    - Skaha connected to CANFAR using your certificate
-    - Skaha defaulted the container image to `images.canfar.net/skaha/astroml-notebook:latest`
+    - We connected to CANFAR using your certificate
+    - The CLI defaulted the container image to `images.canfar.net/skaha/astroml-notebook:latest`
     - A Jupyter notebook was launched with the container image
     - A random name was generated for your session, `scare-monster` in this case
     - The Science Platform allocated resources for your notebook and started it.
@@ -71,12 +71,12 @@ Successfully created session 'scare-monster' (ID: tcgle3m3)
 
 <!-- termynal -->
 ```
-$ skaha events $(skaha ps -q)
+$ canfar events $(canfar ps -q)
 ```
 
 !!! success "What just happened?"
-    - Skaha connected to CANFAR using your certificate
-    - We queried the Science Platform for all running sessions via `skaha ps -q`
+    - We connected to CANFAR using your certificate
+    - We queried the Science Platform for all running sessions via `canfar ps -q`
     - We fetched the events (actions performed by the Science Platform to start your session) for your session
     - The events show the progress of your session being created
 
@@ -84,8 +84,8 @@ $ skaha events $(skaha ps -q)
 
 <!-- termynal -->
 ```
-$ skaha ps
-                                           Skaha Sessions                                            
+$ canfar ps
+                                           Canfar Sessions                                            
                                                                                                      
  SESSION ID NAME          KIND     STATUS  IMAGE                                           CREATED   
  ─────────────────────────────────────────────────────────────────────────────────────────────────── 
@@ -93,7 +93,7 @@ $ skaha ps
 ```
 
 !!! success "What just happened?"
-    - Skaha connected to CANFAR using your certificate
+    - We connected to CANFAR using your certificate
     - The status of your session was checked
     - The session is in `Running` state, ready to use
 
@@ -101,8 +101,8 @@ $ skaha ps
 
 <!-- termynal -->
 ```
-$ skaha info $(skaha ps -q)
-                                         Skaha Session Info for tcgle3m3
+$ canfar info $(canfar ps -q)
+                                         Canfar Session Info for tcgle3m3
 
   Session ID    zkm7yly7
   Name          alert-connect
@@ -123,7 +123,7 @@ $ skaha info $(skaha ps -q)
 ```
 
 !!! success "What just happened?"
-    - Skaha connected to CANFAR using your certificate
+    - We connected to CANFAR using your certificate
     - The information for your session was fetched
     - When we created a your session, we never specified a name, cpu or memory, so the default values were used
     - The default values are 1 core, 2GB of RAM, and 4 days of lifetime
@@ -135,13 +135,13 @@ Check the status and get the URL to access your notebook:
 
 <!-- termynal -->
 ```
-$ skaha open $(skaha ps -q)
+$ canfar open $(canfar ps -q)
 Opening session tcgle3m3 in a new tab.
 ```
 
 !!! success "What just happened?"
-    - Skaha connected to CANFAR using your certificate
-    - `skaha ps -q` returns only the session ID of your session
+    - We connected to CANFAR using your certificate
+    - `canfar ps -q` returns only the session ID of your session
     - Your browser opened the notebook in a new tab
 
 !!! tip "Pro Tip"
@@ -178,7 +178,7 @@ When you're done, clean up your session to free up resources for others:
 
 <!-- termynal -->
 ```
-$ skaha delete $(skaha ps -q)
+$ canfar delete $(canfar ps -q)
 Confirm deletion of 1 session(s)? [y/n] (n): y
 Successfully deleted {'tcgle3m3': True} session(s).
 ```
@@ -201,9 +201,9 @@ You now have a fully-equipped astronomy computing environment running in the clo
 !!! warning "Common Issues"
 
     - **Notebook won't start?**
-        - Check available resources: `skaha stats`
+        - Check available resources: `canfar stats`
         - Try a smaller configuration (fewer cores/RAM)
-        - Check session status: `skaha ps`
+        - Check session status: `canfar ps`
     - **Can't access notebook URL?**
       - Wait 1-2 minutes for full startup
       - Check if you're on a VPN that might block the connection
@@ -212,7 +212,7 @@ You now have a fully-equipped astronomy computing environment running in the clo
 ## Need Help?
 
 - 📖 [Complete Documentation](get-started.md)
-- 💬 [Community Support](https://github.com/shinybrar/skaha/discussions)
+- 💬 [Community Support](https://github.com/opencadc/canfar/discussions)
 - 🐛 [Report Issues](bug-reports.md)
 
 ---

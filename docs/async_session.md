@@ -1,9 +1,9 @@
 # Asynchronous Sessions
 
 !!! info "Overview"
-    Skaha now supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
+    CANFAR now supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
 
-::: skaha.session.AsyncSession
+::: canfar.sessions.AsyncSession
     handler: python
     selection:
       members:

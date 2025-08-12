@@ -3,7 +3,7 @@
 import pytest
 from pydantic import ValidationError
 
-from skaha.models.http import Connection, Server
+from canfar.models.http import Connection, Server
 
 
 class TestServer:
@@ -226,7 +226,7 @@ class TestConnection:
         connection = Connection()
 
         # Verify the model config is set correctly
-        assert connection.model_config["env_prefix"] == "SKAHA_CONNECTION_"
+        assert connection.model_config["env_prefix"] == "CANFAR_CONNECTION_"
         assert connection.model_config["case_sensitive"] is False
         assert connection.model_config["extra"] == "forbid"
 

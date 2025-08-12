@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from skaha.utils.jwt import expiry
+from canfar.utils.jwt import expiry
 
 
 def test_expiry_with_valid_jwt() -> None:

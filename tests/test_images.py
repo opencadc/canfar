@@ -1,8 +1,8 @@
-"""Test Skaha Images API."""
+"""Test Canfar Images API."""
 
 import pytest
 
-from skaha.images import Images
+from canfar.images import Images
 
 
 @pytest.fixture(scope="session")

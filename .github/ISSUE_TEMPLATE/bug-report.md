@@ -25,12 +25,12 @@ assignees: shinybrar
 ## System Information
 
 <!--
-REQUIRED: Please run `skaha version --debug` and paste the complete output below.
+REQUIRED: Please run `canfar version --debug` and paste the complete output below.
 This information is crucial for debugging your issue.
 -->
 
 ```
-Paste the complete output of `skaha version --debug` here
+Paste the complete output of `canfar version --debug` here
 ```
 
 ## Error Messages and Logs
@@ -62,8 +62,8 @@ Add any other context about the problem here, such as:
 
 **Before submitting:**
 - [ ] I have searched existing issues to ensure this bug hasn't been reported
-- [ ] I have included the complete output of `skaha version --debug`
+- [ ] I have included the complete output of `canfar version --debug`
 - [ ] I have provided clear steps to reproduce the issue
 - [ ] I have included relevant error messages or logs
 
-For more information on creating effective bug reports, see our [Bug Reporting Guide](https://shinybrar.github.io/skaha/bug-reports/).
+For more information on creating effective bug reports, see our [Bug Reporting Guide](https://opencadc.github.io/canfar/bug-reports/).

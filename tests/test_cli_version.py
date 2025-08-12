@@ -3,7 +3,7 @@
 import pytest
 from typer.testing import CliRunner
 
-from skaha.cli.version import (
+from canfar.cli.version import (
     version,
 )
 
@@ -21,13 +21,13 @@ class TestVersionCLI:
         result = runner.invoke(version, [])
 
         assert result.exit_code == 0
-        assert "Skaha Client" in result.stdout
+        assert "CANFAR Python Client" in result.stdout
 
     def test_version_debug_output(self, runner: CliRunner) -> None:
         """Test detailed debug output with --debug flag."""
         result = runner.invoke(version, ["--debug"])
         assert result.exit_code == 0
-        assert "Skaha Client Debug Information" in result.stdout
+        assert "CANFAR Python Client Debug Information" in result.stdout
         assert "Client Version" in result.stdout
         assert "Python Version" in result.stdout
         assert "Python Executable" in result.stdout
