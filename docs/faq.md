@@ -1,215 +1,171 @@
 # Frequently Asked Questions
 
-Common questions and answers about using the CANFAR Science Platform.
+This unified FAQ covers the CANFAR Science Platform across three areas: Platform, Client, and CLI.
 
-## Getting Started
+## Platform
 
 ### What is the CANFAR Science Platform?
+The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, contributed applications (e.g., CARTA, Firefly), batch jobs, and direct access to CADC data holdings.
 
-The CANFAR Science Platform is a national cloud computing infrastructure for astronomy research. It allows you to launch Jupyter notebooks, desktop applications, and batch processing jobs in the cloud.
+### Who can use it and what does it cost?
+CANFAR is free for academic research. Canadian astronomers and collaborators can use it subject to fair‑use and allocation limits. For larger needs, request additional resources via the Digital Research Alliance of Canada (DRAC) Resource Allocation Competition.
 
-### Do I need a CADC account?
+### How do I get access?
+1. Request a CADC/CANFAR account and provide research justification.
+2. Wait for approval (typically 1–2 business days).
+3. Ask your PI to add you to the appropriate project groups.
 
-Yes, you need a Canadian Astronomy Data Centre (CADC) account to use the Science Platform. You can [request an account here](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
+### What session types are available and when should I use them?
+- Notebook: Jupyter Lab for interactive analysis and prototyping.
+- Desktop: Full Linux desktop for GUI workflows and multi‑app sessions.
+- CARTA: Specialized image/cube visualization.
+- Headless: Non‑GUI batch processing and automation.
 
-### How much does it cost?
+### How long can sessions run?
+- Interactive sessions: up to 7 days of continuous runtime, with auto‑shutdown after prolonged inactivity; resumable if not deleted.
+- Batch jobs: no strict time limit; queue priority depends on resource usage.
 
-The CANFAR Science Platform access is free for Canadian astronomers and their international collaborators. Resource usage is subject to fair-use policies and allocation limits. If you require significantly more resources, you can request additional resources through the Digital Research Alliance of Canada (DRAC) [Resource Allocation Competition](https://alliancecan.ca/en/services/advanced-research-computing/accessing-resources/resource-allocation-competition) and they can be used on the CANFAR Science Platform.
+### Can I run GPU‑accelerated workloads?
+Yes. Request GPUs in the session configuration (e.g., NVIDIA Tesla/RTX). Ensure your chosen container supports GPU computing.
 
-### What's the difference between the Science Platform and other cloud platforms?
+### How much storage do I get and where should I put data?
+- Personal: `/arc/home/[username]/` (e.g., 10 GB typical).
+- Project/group: `/arc/projects/[group]/` (hundreds of GB to TBs, varies by project).
+- Temporary: `/tmp/` inside sessions (cleared when the session ends).
+Suggested layout: raw → `/arc/projects/[group]/raw/`, working → `/arc/projects/[group]/data/`, results → `/arc/projects/[group]/results/`, scripts → `/arc/projects/[group]/scripts/`.
 
-The Science Platform is specifically designed for astronomy research with:
-- Hundreds of community contributed and staff maintained container images
-- Support for availaible astronomy software (Firefly, CARTA, etc.)
-- Direct access to 6PB+ of CADC data archives
-- No setup or configuration required
-- Co-located with with Canadian Astronomy Infrastructure, e.g. YouCat, CAOM, DOI, Vault Storage, etc.
+### How do I transfer large datasets?
+- For files <1 GB, the Science Portal file manager is convenient.
+- For larger transfers, use `rsync`/`scp` or VOSpace for very large files (>10 GB).
 
-## Authentication
-
-### How do I get authenticated?
-
-Use X.509 certificates (recommended for most users):
-
+Example:
 ```bash
-cadc-get-cert -u your-username
+rsync -avz --progress source/ username@canfar.net:/arc/projects/mygroup/
+cadc-data put largefile.fits vos:myproject/data/
 ```
-or 
+
+### What software/containers are available?
+Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, full Linux desktops, and specialized tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at `platform/containers.md`.
+
+### Can I install additional software?
+- Temporary (inside a running session): `pip install --user ...` or system packages if permitted.
+- Permanent: build a custom container with your required stack (see `platform/containers.md`).
+
+### Collaboration and sharing
+- Share sessions for real‑time collaboration (view or full access).
+- Share data via project groups and `/arc/projects/[group]/` with appropriate permissions.
+- Share code via Git and group storage; document workflows.
+
+### Troubleshooting slow or failing sessions
+- Resource constraints: try fewer cores/less RAM, different time of day, or a different container.
+- Container issues: verify name/version; try a maintained baseline image.
+- Account/group issues: confirm group membership and active account status.
+- Performance: process data in fast scratch (e.g., `/tmp/`), parallelize where appropriate, monitor with `htop`, `df -h`, `iotop`.
+
+### Where are my files?
+- Personal: `/arc/home/$(whoami)/`
+- Group: `/arc/projects/`
+- Temporary: session‑local `/tmp/` (deleted at end of session)
+
+### Getting help and community
+- Documentation: start at `platform/home.md` and `platform/guides/index.md`.
+- Help & Support: `platform/help.md` (how to contact support and what to include).
+- Community: Discord for Q&A and announcements; workshops and office hours are announced there.
+
+
+## Client
+
+### Can I automate session management with the Python client?
+Yes. The Python client supports creating, monitoring, and cleaning up sessions programmatically.
+
+Example:
+```python
+import time
+from canfar import Session
+
+session = Session()
+sid = session.create(name="automated", kind="headless", cmd="python", args=["script.py"])
+
+while session.info(sid)[0]["status"] != "Completed":
+    time.sleep(60)
+
+session.logs([sid])
+session.destroy([sid])
 ```
+
+### How do I call the REST API directly?
+You can use REST endpoints for jobs and sessions if you prefer low‑level control.
+
+Example:
+```python
+import requests
+
+response = requests.post(
+    "https://ws-uv.canfar.net/skaha/v0/session",
+    headers={"Authorization": f"Bearer {token}"},
+    data={
+        "name": "automated-analysis",
+        "image": "images.canfar.net/skaha/astroml:latest",
+        "cores": 4,
+        "ram": 16,
+        "kind": "headless",
+        "cmd": "python /arc/projects/myproject/analyze.py",
+    },
+)
+response.raise_for_status()
+```
+
+### How do I access VOSpace programmatically?
+Use CADC client libraries to interact with VOSpace objects.
+
+Example:
+```python
+from cadcdata import CadcDataClient
+
+client = CadcDataClient()
+client.put_file("local_file.fits", "vos:myproject/data/file.fits")
+```
+
+### Authentication options for programs
+- X.509 certificates (typical for many users).
+- OIDC tokens via SRCNet for advanced and cross‑site workflows. See `cli/authentication-contexts.md` for options and flows.
+
+
+## CLI
+
+### How do I authenticate?
+- Certificates:
+```bash
+cadc-get-cert -u <username>
+```
+- OIDC (SRCNet‑aware):
+```bash
 canfar auth login
 ```
-```bash title="Choose CANFAR CADC Server"
-Starting Science Platform Login
-Fetched CADC in 0.14s
-Fetched SRCnet in 1.09s
-Discovery completed in 4.62s (6/18 active)
-? Select a Canfar Server: (Use arrow keys)
-   🟢 Canada  SRCnet
-   🟢 UK-CAM  SRCnet
-   🟢 Swiss   SRCnet
-   🟢 Italy   SRCnet
- » 🟢 CANFAR  CADC
-```
 
-Certificates are valid for 10 days and need to be renewed regularly.
+Certificates typically last ~10 days; renew as needed.
 
-### Can I use OIDC tokens instead of certificates?
-
-Yes, OIDC (OpenID Connect) tokens are supported for advanced users and programmatic access accessing the Science Platform through the Square Kilometer Array (SKA) Science Regional Network (SRCNet). To setup OIDC authentication, use
-
-```
-canfar auth login
-```
-```bash title="Choose SRCNet Server"
-Starting Science Platform Login
-Fetched CADC in 0.14s
-Fetched SRCnet in 1.09s
-Discovery completed in 4.62s (6/18 active)
-? Select a canfar Server: (Use arrow keys)
- » 🟢 Canada  SRCnet
-   🟢 UK-CAM  SRCnet
-   🟢 Swiss   SRCnet
-   🟢 Italy   SRCnet
-   🟢 CANFAR  CADC
-```
-
-## Sessions and Resources
-
-### What session types are available?
-
-- **Notebook**: Interactive Jupyter Lab environment
-- **Desktop**: Full Linux desktop with GUI applications
-- **Headless**: Command-line only for batch processing
-- **Firefly**: Advanced image visualization tool
-- **CARTA**: Image visualization tool
-
-See the [Session Types Guide](session-types.md) for detailed information.
-
-### How much CPU and RAM can I request?
-
-Limits vary based on the underlying hardware and current load on the system. You can see the current statistics with,
-
-```
+### How do I check platform status and quotas from the CLI?
+```bash
 canfar stats
 ```
 
-### How long do sessions run?
-
-Sessions run until,
-  - You destroy the session.
-  - The session reaches a natural termination point (e.g. batch job completes).
-  - The session exceeds the maximum runtime (typically 30 days).
-
-In very rare cases, sessions may be terminated early if,
-- Resources are needed for higher-priority work
-- System maintenance is required
-- Fair-use policies are misused
-
 ### Why is my session stuck in "Pending"?
-
-Common causes:
-- Insufficient resources available to fulfill request
-- Image not found or inaccessible
-- Resource quota exceeded
-- System maintenance
-
-You can check the events for a session to see the pending reason with,
-```
+Possible reasons: insufficient resources, image issues, quota limits, or maintenance windows. Inspect events:
+```bash
 canfar events <session-id>
 ```
 
-## Images and Software
+### I can’t connect to my session URL
+1. Ensure the session is Running (`canfar ps`).
+2. Check for VPN/firewall interference.
+3. Try another browser or clear cache/private mode.
 
-### Can I use my own container images?
+### Can I run multiple sessions at once?
+Yes. You can run multiple sessions concurrently subject to fair‑use and any configured limits per session type. Prefer batch/headless for automation.
 
-Yes, you can use:
-- **Public images**: Any publicly accessible container
-- **Private images**: From CANFAR Harbor registry (requires credentials)
-- **Custom images**: Build and push to CANFAR Harbor
+### Where can I find more CLI help?
+- Quick start: `cli/quick-start.md`
+- Auth contexts: `cli/authentication-contexts.md`
+- Command reference: `cli/cli-help.md`
 
-## Data Access
-
-### How do I access my data?
-
-Your data is available in several locations:
-- **Home directory**: `/arc/home/username/` (persistent, slow storage)
-- **Shared data**: `/arc/projects/project-name/` (project-specific storage)
-- **Scratch space**: `/scratch/` (temporary, high-performance)
-
-## Performance and Optimization
-
-### Can I run multiple sessions simultaneously?
-
-Yes, you can run multiple sessions simultaneously with upto 3 Notebook sessions, 1 Desktop session, and `unlimited` Headless session.
-
-## Troubleshooting
-
-### I can't connect to my session URL. Help!
-
-Troubleshooting steps:
-1. **Wait for "Running" status**: Check `canfar ps`
-2. **Check VPN**: Some VPNs block CANFAR connections
-3. **Try different browser**: Clear cache or use incognito mode
-
-### How do I get help with errors?
-
-1. **Check this FAQ**
-2. **Search GitHub issues**: [github.com/opencadc/canfar/issues](https://github.com/opencadc/canfar/issues)
-3. **Ask the Community**: [Discord Server](https://discord.gg/vcCQ8QBvBa)
-
-## Advanced Usage
-
-### Can I automate session management?
-
-Yes, canfar is designed for automation:
-```python
-# Automated workflow
-session = Session()
-session_id = session.create(name="automated", kind="headless", cmd="python", args=["script.py"])
-
-# Monitor until completion
-while session.info(session_id)[0]['status'] != 'Completed':
-    time.sleep(60)
-
-# Get results and cleanup
-session.logs([session_id])
-session.destroy([session_id])
-```
-
-## Policies and Limits
-
-### What are the fair-use policies?
-
-- **Resource sharing**: Don't monopolize resources unnecessarily
-- **Session cleanup**: Destroy sessions when finished
-- **Appropriate use**: Use for astronomy research and education
-- **Data management**: Don't store unnecessary data long-term
-
-### Are there usage quotas?
-
-Yes, quotas vary by user and allocation, but generally there are quotas on:
-- **Concurrent sessions**: Hard limits on notebooks, desktop, firefly, and carta and no limit on headless
-- **Total resources**: No hard limits, but fair-use applies
-- **Storage**: Hard limits on `/arc` and `/arc/projects`
-- **Time limits**: No hard limits, but fair-use applies
-
-## Getting Help
-
-### How do I report bugs or request features?
-
-- **Bugs**: [Report on GitHub](https://github.com/opencadc/canfar/issues)
-- **Feature requests**: [GitHub Discussions](https://github.com/opencadc/canfar/discussions)
-- **Security issues**: [Security reporting](security.md)
-
-### Is there a user community?
-
-Yes! Join the community:
-- **GitHub Discussions**: Ask questions and share experiences
-- **CANFAR Forums**: Official CANFAR community forums
-- **Workshops**: Regular training workshops and webinars
-- **Documentation**: Contribute to documentation improvements
-
----
-
-!!! question "Didn't find your answer?"
-    Check the [troubleshooting guide](troubleshooting.md) or ask the community on [GitHub Discussions](https://github.com/opencadc/canfar/discussions).

@@ -1,7 +1,7 @@
 site_name: CANFAR
 site_url: https://opencadc.github.io/canfar/
 site_author: Shiny Brar
-site_description: CANFAR Python Client
+site_description: CANFAR Science Platform
 repo_url: https://github.com/opencadc/canfar/
 repo_name: opencadc/canfar
 edit_uri: blob/main/docs/
@@ -39,10 +39,23 @@ theme:
     - navigation.sections
     - navigation.tracking
     - navigation.indexes
-    - content.code.annotate
+    - navigation.expand
+    - navigation.instant.prefetch
     - toc.follow
     # - toc.integrate
     - navigation.top
+    - announce.dismiss
+    - content.code.annotate
+    - content.action.edit
+    - content.action.view
+    - content.code.copy
+    - content.code.select
+    - content.footnote.tooltips
+    - content.tabs.link
+    - content.tooltips
+    - search.highlight
+    - search.share
+    - search.suggest
 
 plugins:
   - search
@@ -56,12 +69,10 @@ extra:
   version:
     provider: mike
     default: latest
+  social:
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/vcCQ8QBvBa
 
-extra_css:
-  - stylesheets/asciinema-player.css
-
-extra_javascript:
-  - javascripts/asciinema-player.min.js
 
 # Extensions
 markdown_extensions:
@@ -72,6 +83,7 @@ markdown_extensions:
   - markdown.extensions.meta
   - markdown.extensions.toc:
       permalink: true
+      toc_depth: 2
   - pymdownx.arithmatex:
       generic: true
   - pymdownx.betterem:
@@ -95,34 +107,63 @@ markdown_extensions:
   - pymdownx.smartsymbols
   - pymdownx.snippets:
       check_paths: true
-  - pymdownx.superfences
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tabbed
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.tilde
 
 nav:
-  - CANFAR: index.md
-  - What's New:
-    - Updates: updates.md
-    - Migration Guide: migration.md
-    - Changelog: changelog.md
-  - Get Started:
-    - 5-Minute Tutorial: quick-start.md
-    - Installation & Setup: get-started.md
-    - Authentication Guide: authentication-contexts.md
-  - Examples:
-    - Basic: examples.md
-    - Advanced: advanced-examples.md
-  - Reference:
-    - CLI: cli-help.md
-    - Python API:
-      - AsyncSession: async_session.md
-      - Session: session.md
-      - Images: images.md
-      - Context: context.md
-      - Overview: overview.md
-      - Client: client.md
+  - Home: index.md
+  - Platform Concepts:
+    - Home: platform/home.md
+    - Getting Started: platform/get-started.md
+    - User Guides:
+      - Intro: platform/guides/index.md
+      - Concepts: platform/concepts.md
+      - Accounts: platform/accounts.md
+      - Storage: platform/guides/storage/index.md
+      - VOSpace API: platform/guides/storage/vospace-api.md
+      - Containers: platform/containers.md
+      - Interactive Sessions:
+        - Home: platform/guides/interactive-sessions/index.md
+        - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
+        - Desktop Sessions: platform/guides/interactive-sessions/launch-desktop.md
+        - CARTA Visualization: platform/guides/interactive-sessions/launch-carta.md
+        - Firefly Table Viewer: platform/guides/interactive-sessions/launch-firefly.md
+        - Contributed Applications: platform/guides/interactive-sessions/launch-contributed.md
+      - Batch Jobs: platform/batch-jobs.md
+      - Radio Astronomy:
+        - Home: platform/guides/radio-astronomy/index.md
+        - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
+    - Help & Support: platform/help.md
+  - Python Client:
+    - Home: client/home.md
+    - What's New:
+      - Updates: client/updates.md
+      - Migration Guide: client/migration.md
+    - Get Started:
+      - 5-Minute Tutorial: client/quick-start.md
+      - Installation & Setup: client/get-started.md
+    - Examples:
+      - Basic: client/examples.md
+      - Advanced: client/advanced-examples.md
+    - Reference:
+      - Python API:
+        - AsyncSession: client/async_session.md
+        - Session: client/session.md
+        - Images: client/images.md
+        - Context: client/context.md
+        - Overview: client/overview.md
+        - Client: client/client.md
+  - CLI:
+    - 5-Minute Tutorial: cli/quick-start.md
+    - Authentication: cli/authentication-contexts.md
+    - Reference: cli/cli-help.md
   - FAQ: faq.md
   - Contributor Guide:
     - Contributing: contributing.md
@@ -132,3 +173,4 @@ nav:
   - Bug Reports:
     - Bugs: bug-reports.md
     - Security Issues: security.md
+  - CHANGELOG: changelog.md
