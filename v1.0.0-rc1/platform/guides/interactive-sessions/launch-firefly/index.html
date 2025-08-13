@@ -1,0 +1,2098 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CANFAR Science Platform">
+      
+      
+        <meta name="author" content="Shiny Brar">
+      
+      
+        <link rel="canonical" href="https://opencadc.github.io/canfar/v1.0.0-rc1/platform/guides/interactive-sessions/launch-firefly/">
+      
+      
+        <link rel="prev" href="../launch-carta/">
+      
+      
+        <link rel="next" href="../launch-contributed/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Firefly Table Viewer - CANFAR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../../termynal.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#launching-a-firefly-session" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CANFAR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Firefly Table Viewer
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Hello darkness, my old friend"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Hello darkness, my old friend" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Flash the neon lights"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Flash the neon lights" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6m0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4M7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platform Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../client/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Python Client
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../cli/quick-start/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  CLI
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../faq/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  FAQ
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../contributing/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contributor Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../bug-reports/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Bug Reports
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../../../changelog/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  CHANGELOG
+
+      </a>
+    </li>
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    CANFAR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Platform Concepts
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Platform Concepts
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../home/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    User Guides
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_3" id="__nav_2_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            User Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../accounts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Accounts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Storage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/vospace-api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    VOSpace API
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../containers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_7" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Interactive Sessions
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_3_7" id="__nav_2_3_7_label" tabindex="0">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_7_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            Interactive Sessions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../launch-notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jupyter Notebooks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../launch-desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Desktop Sessions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../launch-carta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CARTA Visualization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Firefly Table Viewer
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Firefly Table Viewer
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 What is Firefly?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launching-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Launching Firefly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔥 Using Firefly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Common Workflows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-canfar" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Integration with CANFAR
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Performance Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🆘 Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 External Resources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 What's Next?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../launch-contributed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributed Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../batch-jobs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Batch Jobs
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../radio-astronomy/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Radio Astronomy
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../help/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Help & Support
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../../client/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Python Client
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../../cli/quick-start/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    CLI
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../../contributing/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Contributor Guide
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../../bug-reports/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Bug Reports
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../changelog/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CHANGELOG
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#what-is-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎯 What is Firefly?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#launching-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🚀 Launching Firefly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#using-firefly" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔥 Using Firefly
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Common Workflows
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-canfar" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Integration with CANFAR
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Performance Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🆘 Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#external-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 External Resources
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whats-next" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 What's Next?
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/platform/guides/interactive-sessions/launch-firefly.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/platform/guides/interactive-sessions/launch-firefly.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+    </a>
+  
+
+
+<h1 id="launching-a-firefly-session">Launching a Firefly Session<a class="headerlink" href="#launching-a-firefly-session" title="Permanent link">&para;</a></h1>
+<p><strong>The LSST table and image visualizer for astronomical data exploration</strong></p>
+<div class="admonition abstract">
+<p class="admonition-title">🎯 What You'll Learn</p>
+<ul>
+<li>How to launch a Firefly session and choose the right version</li>
+<li>How to load images, tables, and access CANFAR storage</li>
+<li>How to perform catalog overlays, plotting, and cutouts</li>
+<li>Performance tips for large surveys and troubleshooting guidance</li>
+</ul>
+</div>
+<p>Firefly is a powerful web-based visualization tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogs, and analyzing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.</p>
+<h2 id="what-is-firefly">🎯 What is Firefly?<a class="headerlink" href="#what-is-firefly" title="Permanent link">&para;</a></h2>
+<p>Firefly offers specialized tools for:</p>
+<ul>
+<li><strong>Image visualization</strong> with advanced stretch and color controls</li>
+<li><strong>Catalog overlay</strong> and source analysis tools  </li>
+<li><strong>Table viewer</strong> with filtering, plotting, and statistical tools</li>
+<li><strong>Multi-wavelength data</strong> comparison and analysis</li>
+<li><strong>Large survey datasets</strong> like LSST, HSC, and WISE</li>
+</ul>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Capability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Image Display</strong></td>
+<td>FITS images with WCS support, multiple panels</td>
+</tr>
+<tr>
+<td><strong>Catalog Overlay</strong></td>
+<td>Plot sources on images, interactive selection</td>
+</tr>
+<tr>
+<td><strong>Table Analysis</strong></td>
+<td>Sort, filter, plot columns, statistical analysis</td>
+</tr>
+<tr>
+<td><strong>Multi-band</strong></td>
+<td>RGB color composites, band switching</td>
+</tr>
+<tr>
+<td><strong>Cutout Services</strong></td>
+<td>Extract subimages from large surveys</td>
+</tr>
+<tr>
+<td><strong>Coordinate Systems</strong></td>
+<td>Support for all standard astronomical coordinates</td>
+</tr>
+</tbody>
+</table>
+<h2 id="launching-firefly">🚀 Launching Firefly<a class="headerlink" href="#launching-firefly" title="Permanent link">&para;</a></h2>
+<h3 id="step-1-create-new-session">Step 1: Create New Session<a class="headerlink" href="#step-1-create-new-session" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Login</strong> to the <a href="https://www.canfar.net/science-portal">CANFAR Science Portal</a></li>
+<li><strong>Click</strong> the plus sign (<strong>+</strong>) to create a new session</li>
+<li><strong>Select</strong> <code>firefly</code> as your session type</li>
+</ol>
+<p><img alt="Select Firefly Session" src="../images/firefly/1_select_firefly_session.png" /></p>
+<h3 id="step-2-choose-container">Step 2: Choose Container<a class="headerlink" href="#step-2-choose-container" title="Permanent link">&para;</a></h3>
+<p>The container selection updates automatically after choosing the session type. Select the Firefly container version you need:</p>
+<ul>
+<li><strong>firefly:latest</strong> - Most recent stable version (recommended)</li>
+<li><strong>firefly:X.X</strong> - Specific version for reproducible analysis</li>
+</ul>
+<p><img alt="Choose Firefly Container" src="../images/firefly/2_select_firefly_container.png" /></p>
+<h3 id="step-3-configure-session">Step 3: Configure Session<a class="headerlink" href="#step-3-configure-session" title="Permanent link">&para;</a></h3>
+<h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
+<p>Choose a descriptive name that helps identify your work:
+- <code>lsst-photometry</code>
+- <code>hsc-catalog-analysis</code> 
+- <code>multiband-survey</code></p>
+<p><img alt="Name Firefly Session" src="../images/firefly/3_choose_firefly_name.png" /></p>
+<h4 id="memory-requirements">Memory Requirements<a class="headerlink" href="#memory-requirements" title="Permanent link">&para;</a></h4>
+<p>Select RAM based on your data size:</p>
+<ul>
+<li><strong>8GB</strong>: Small catalogs, single images</li>
+<li><strong>16GB</strong>: Default, suitable for most work</li>
+<li><strong>32GB</strong>: Large catalogs, multiple images</li>
+<li><strong>64GB</strong>: Very large survey datasets</li>
+</ul>
+<div class="admonition tip">
+<p class="admonition-title">Memory Planning</p>
+<p>Tables with millions of rows and multi-image layouts benefit from 32GB+ RAM. Start with 8GB and scale up if you hit browser or session limits.</p>
+</div>
+<h4 id="cpu-cores">CPU Cores<a class="headerlink" href="#cpu-cores" title="Permanent link">&para;</a></h4>
+<p>Most Firefly work is I/O bound rather than CPU intensive:</p>
+<ul>
+<li><strong>2 cores</strong>: Default, sufficient for most visualization tasks</li>
+<li><strong>4 cores</strong>: Large table operations, complex filtering</li>
+</ul>
+<p><img alt="Choose Firefly Cores" src="../images/firefly/5_choose_firefly_cores.png" /></p>
+<h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Click</strong> "Launch" button</li>
+<li><strong>Wait</strong> for container initialization (~30-60 seconds)</li>
+<li><strong>Session appears</strong> on your portal dashboard</li>
+<li><strong>Click</strong> the session icon to access Firefly</li>
+</ol>
+<p><img alt="Launch Firefly" src="../images/firefly/6_launch_firefly.png" /></p>
+<h2 id="using-firefly">🔥 Using Firefly<a class="headerlink" href="#using-firefly" title="Permanent link">&para;</a></h2>
+<h3 id="interface-overview">Interface Overview<a class="headerlink" href="#interface-overview" title="Permanent link">&para;</a></h3>
+<p>Firefly's interface consists of several main areas:</p>
+<pre class="mermaid"><code>graph TD
+    Interface[Firefly Interface]
+
+    Interface --&gt; Upload["📁 File Upload Area"]
+    Interface --&gt; Images["🖼️ Image Display"]
+    Interface --&gt; Tables["📊 Table Viewer"]
+    Interface --&gt; Tools["🔧 Analysis Tools"]
+
+    Upload --&gt; Local[Local Files]
+    Upload --&gt; URLs[Remote URLs]
+    Upload --&gt; VOSpace[VOSpace Files]
+
+    Images --&gt; Display[Image Canvas]
+    Images --&gt; Controls[Display Controls]
+    Images --&gt; Overlays[Catalog Overlays]
+
+    Tables --&gt; Browse[Data Browser]
+    Tables --&gt; Filter[Filtering Tools]
+    Tables --&gt; Plot[Plotting Tools]</code></pre>
+<h3 id="loading-data">Loading Data<a class="headerlink" href="#loading-data" title="Permanent link">&para;</a></h3>
+<h4 id="upload-local-files">Upload Local Files<a class="headerlink" href="#upload-local-files" title="Permanent link">&para;</a></h4>
+<p><strong>FITS Images:</strong>
+<div class="highlight"><pre><span></span><code>1. Click &quot;Images&quot; tab
+2. Select &quot;Upload&quot; 
+3. Choose FITS file from your computer
+4. Image loads automatically with WCS if available
+</code></pre></div></p>
+<p><strong>Catalog Tables:</strong>
+<div class="highlight"><pre><span></span><code>1. Click &quot;Tables&quot; tab
+2. Select &quot;Upload&quot;
+3. Choose CSV, FITS table, or VOTable
+4. Table opens in browser interface
+</code></pre></div></p>
+<h4 id="access-canfar-storage">Access CANFAR Storage<a class="headerlink" href="#access-canfar-storage" title="Permanent link">&para;</a></h4>
+<p><strong>From <code>arc</code> Projects:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Files in your project directory are accessible via:</span>
+<span class="c1"># /arc/projects/yourproject/data/image.fits</span>
+<span class="c1"># /arc/projects/yourproject/catalogs/sources.csv</span>
+</code></pre></div></p>
+<p><strong>From VOSpace:</strong>
+<div class="highlight"><pre><span></span><code>1. In Firefly, use &quot;File&quot; → &quot;Open&quot;
+2. Navigate to VOSpace URLs
+3. Access: vos://cadc.nrc.ca~vault/yourproject/
+</code></pre></div></p>
+<h4 id="remote-data-access">Remote Data Access<a class="headerlink" href="#remote-data-access" title="Permanent link">&para;</a></h4>
+<p><strong>Survey Archives:</strong>
+<div class="highlight"><pre><span></span><code># Example URLs for Firefly
+https://archive.stsci.edu/hlsp/data.fits
+https://irsa.ipac.caltech.edu/data/WISE/cutouts/
+</code></pre></div></p>
+<h3 id="image-analysis">Image Analysis<a class="headerlink" href="#image-analysis" title="Permanent link">&para;</a></h3>
+<h4 id="basic-image-display">Basic Image Display<a class="headerlink" href="#basic-image-display" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>1. Load FITS image
+2. Adjust stretch (log, linear, sqrt)
+3. Set scale limits (min/max values)
+4. Choose color table (heat, cool, rainbow)
+</code></pre></div>
+<h4 id="multi-band-rgb">Multi-band RGB<a class="headerlink" href="#multi-band-rgb" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>1. Load three images (e.g., g, r, i bands)
+2. Select &quot;RGB&quot; mode
+3. Assign each image to R, G, or B channel
+4. Adjust relative scaling
+</code></pre></div>
+<h4 id="coordinate-systems">Coordinate Systems<a class="headerlink" href="#coordinate-systems" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code># Firefly supports standard coordinate systems:
+- Equatorial (RA/Dec) - J2000, B1950
+- Galactic coordinates
+- Ecliptic coordinates  
+- Pixel coordinates
+</code></pre></div>
+<h3 id="catalog-analysis">Catalog Analysis<a class="headerlink" href="#catalog-analysis" title="Permanent link">&para;</a></h3>
+<h4 id="table-operations">Table Operations<a class="headerlink" href="#table-operations" title="Permanent link">&para;</a></h4>
+<p><strong>Basic Navigation:</strong>
+<div class="highlight"><pre><span></span><code>- Sort columns by clicking headers
+- Filter rows using search box
+- Select multiple rows with Ctrl+click
+- Pan/zoom table with mouse wheel
+</code></pre></div></p>
+<p><strong>Advanced Filtering:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1">// Example filters (use in filter box):</span>
+<span class="nx">magnitude</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">20.5</span><span class="w">                    </span><span class="c1">// Bright sources</span>
+<span class="nx">color_g_r</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">color_g_r</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.5</span><span class="w">  </span><span class="c1">// Color selection</span>
+<span class="nx">distance</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">100</span><span class="w">                      </span><span class="c1">// Distance constraint</span>
+</code></pre></div></p>
+<h4 id="plotting-tools">Plotting Tools<a class="headerlink" href="#plotting-tools" title="Permanent link">&para;</a></h4>
+<p><strong>Column Plots:</strong>
+<div class="highlight"><pre><span></span><code>1. Select table columns for X and Y axes
+2. Choose plot type (scatter, histogram, line)
+3. Apply color coding by third column
+4. Add error bars if available
+</code></pre></div></p>
+<p><strong>Image-Catalog Overlay:</strong>
+<div class="highlight"><pre><span></span><code>1. Load image and catalog table
+2. Match coordinate columns (RA, Dec)
+3. Select overlay symbol (circle, cross, diamond)
+4. Adjust symbol size and color
+5. Sources appear overlaid on image
+</code></pre></div></p>
+<h3 id="advanced-features">Advanced Features<a class="headerlink" href="#advanced-features" title="Permanent link">&para;</a></h3>
+<h4 id="cutout-services">Cutout Services<a class="headerlink" href="#cutout-services" title="Permanent link">&para;</a></h4>
+<p>Extract subimages from large surveys:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Using Firefly&#39;s cutout interface</span>
+<span class="mf">1.</span> <span class="n">Right</span><span class="o">-</span><span class="n">click</span> <span class="n">on</span> <span class="n">image</span> <span class="n">location</span>
+<span class="mf">2.</span> <span class="n">Select</span> <span class="s2">&quot;Create Cutout&quot;</span>
+<span class="mf">3.</span> <span class="n">Specify</span> <span class="n">size</span> <span class="p">(</span><span class="n">arcmin</span><span class="p">)</span>
+<span class="mf">4.</span> <span class="n">Choose</span> <span class="nb">format</span> <span class="p">(</span><span class="n">FITS</span><span class="p">,</span> <span class="n">JPEG</span><span class="p">,</span> <span class="n">PNG</span><span class="p">)</span>
+<span class="mf">5.</span> <span class="n">Download</span> <span class="ow">or</span> <span class="n">save</span> <span class="n">to</span> <span class="n">VOSpace</span>
+</code></pre></div>
+<h4 id="multi-wavelength-analysis">Multi-wavelength Analysis<a class="headerlink" href="#multi-wavelength-analysis" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>1. Load images in different bands
+2. Use &quot;Blink&quot; mode to compare
+3. Create RGB composite
+4. Overlay catalog with color-magnitude selection
+5. Identify sources across wavelengths
+</code></pre></div>
+<h4 id="data-export">Data Export<a class="headerlink" href="#data-export" title="Permanent link">&para;</a></h4>
+<p><strong>Save Results:</strong>
+<div class="highlight"><pre><span></span><code>- Modified tables → CSV, FITS, VOTable formats
+- Image displays → PNG, PDF for publications  
+- Analysis plots → Vector formats for papers
+- Session state → Save/restore workspace
+</code></pre></div></p>
+<h2 id="common-workflows">🛠️ Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
+<h3 id="survey-photometry">Survey Photometry<a class="headerlink" href="#survey-photometry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. Load survey image (HSC, LSST, etc.)
+2. Upload photometric catalog
+3. Overlay sources on image
+4. Filter by magnitude and color
+5. Create color-magnitude diagram
+6. Export selected sources
+</code></pre></div>
+<h3 id="multi-object-analysis">Multi-object Analysis<a class="headerlink" href="#multi-object-analysis" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. Load target list (CSV with coordinates)
+2. Create cutouts around each target
+3. Measure properties in each cutout
+4. Compile results in table
+5. Plot trends and correlations
+6. Save analysis products
+</code></pre></div>
+<h3 id="time-series-visualization">Time Series Visualization<a class="headerlink" href="#time-series-visualization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>1. Load time-series table (time, magnitude, error)
+2. Create light curve plot
+3. Apply period folding if needed
+4. Identify outliers and trends
+5. Export cleaned data
+</code></pre></div>
+<h2 id="integration-with-canfar">🔧 Integration with CANFAR<a class="headerlink" href="#integration-with-canfar" title="Permanent link">&para;</a></h2>
+<h3 id="storage-access">Storage Access<a class="headerlink" href="#storage-access" title="Permanent link">&para;</a></h3>
+<p><strong>ARC Projects:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Your project data appears in Firefly file browser</span>
+/arc/projects/yourproject/
+├──<span class="w"> </span>images/<span class="w">           </span><span class="c1"># FITS images</span>
+├──<span class="w"> </span>catalogs/<span class="w">         </span><span class="c1"># Source tables  </span>
+├──<span class="w"> </span>results/<span class="w">          </span><span class="c1"># Analysis products</span>
+└──<span class="w"> </span>plots/<span class="w">            </span><span class="c1"># Exported figures</span>
+</code></pre></div></p>
+<p><strong>VOSpace Integration:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Access archived data</span>
+vos://cadc.nrc.ca~vault/yourproject/
+├──<span class="w"> </span>published_data/<span class="w">   </span><span class="c1"># Public datasets</span>
+├──<span class="w"> </span>working_data/<span class="w">     </span><span class="c1"># Analysis in progress</span>
+└──<span class="w"> </span>final_products/<span class="w">   </span><span class="c1"># Paper-ready results</span>
+</code></pre></div></p>
+<h3 id="collaborative-features">Collaborative Features<a class="headerlink" href="#collaborative-features" title="Permanent link">&para;</a></h3>
+<p><strong>Session Sharing:</strong>
+<div class="highlight"><pre><span></span><code>1. Copy Firefly session URL
+2. Share with team members (same CANFAR group)
+3. Collaborate on analysis in real-time
+4. Each user sees same data and visualizations
+</code></pre></div></p>
+<p><strong>Data Sharing:</strong>
+<div class="highlight"><pre><span></span><code>1. Save analysis results to shared project space
+2. Export publication-quality figures
+3. Share VOSpace links for external collaborators
+4. Version control important datasets
+</code></pre></div></p>
+<h2 id="performance-tips">📊 Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<h3 id="large-dataset-handling">Large Dataset Handling<a class="headerlink" href="#large-dataset-handling" title="Permanent link">&para;</a></h3>
+<p><strong>Memory Management:</strong>
+<div class="highlight"><pre><span></span><code>- Load subsets of large catalogs first
+- Use server-side filtering when possible
+- Close unused tables and images
+- Monitor memory usage in browser
+</code></pre></div></p>
+<p><strong>Network Optimization:</strong>
+<div class="highlight"><pre><span></span><code>- Use compressed file formats (gzip FITS)
+- Access local files when possible (/arc/projects)
+- Cache frequently used data locally
+- Use cutout services for large images
+</code></pre></div></p>
+<h3 id="visualization-performance">Visualization Performance<a class="headerlink" href="#visualization-performance" title="Permanent link">&para;</a></h3>
+<p><strong>Image Display:</strong>
+<div class="highlight"><pre><span></span><code>- Use appropriate image size for screen resolution
+- Apply reasonable stretch limits
+- Close unused image panels
+- Use PNG format for screenshots
+</code></pre></div></p>
+<p><strong>Table Operations:</strong>
+<div class="highlight"><pre><span></span><code>- Filter large tables before plotting
+- Use sampling for very large datasets
+- Index frequently used columns
+- Batch operations when possible
+</code></pre></div></p>
+<h2 id="troubleshooting">🆘 Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
+<p><strong>Firefly Won't Load:</strong>
+<div class="highlight"><pre><span></span><code>- Check browser compatibility (Chrome, Firefox recommended)
+- Clear browser cache and cookies
+- Disable browser extensions that might interfere
+- Try incognito/private browsing mode
+</code></pre></div></p>
+<p><strong>Images Not Displaying:</strong>
+<div class="highlight"><pre><span></span><code>- Verify FITS file format and WCS headers
+- Check file permissions and accessibility
+- Try loading smaller test image first
+- Ensure sufficient memory allocation
+</code></pre></div></p>
+<p><strong>Tables Not Loading:</strong>
+<div class="highlight"><pre><span></span><code>- Verify file format (CSV, FITS table, VOTable)
+- Check column headers and data types
+- Ensure proper delimiter in CSV files
+- Try loading subset of data first
+</code></pre></div></p>
+<p><strong>Performance Issues:</strong>
+<div class="highlight"><pre><span></span><code>- Reduce number of overlay sources
+- Close unused browser tabs
+- Increase session memory allocation
+- Use more efficient file formats
+</code></pre></div></p>
+<h2 id="external-resources">🔗 External Resources<a class="headerlink" href="#external-resources" title="Permanent link">&para;</a></h2>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><a href="https://firefly-help.ipac.caltech.edu/">Firefly User Guide</a></strong> - Comprehensive documentation</li>
+<li><strong><a href="https://pipelines.lsst.io/">LSST Science Pipelines</a></strong> - Integration with LSST tools</li>
+<li><strong><a href="https://irsa.ipac.caltech.edu/docs/tutorials/">IRSA Tutorials</a></strong> - Survey data tutorials</li>
+</ul>
+<h3 id="data-archives">Data Archives<a class="headerlink" href="#data-archives" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong><a href="https://data.lsst.cloud/">LSST Data Portal</a></strong> - LSST survey data</li>
+<li><strong><a href="https://hsc.mtk.nao.ac.jp/">HSC Archive</a></strong> - Hyper Suprime-Cam data</li>
+<li><strong><a href="https://irsa.ipac.caltech.edu/">IRSA</a></strong> - Infrared survey data</li>
+</ul>
+<h2 id="whats-next">🔗 What's Next?<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
+<p>Firefly works great with other CANFAR tools:</p>
+<ul>
+<li><strong><a href="../../storage/vospace-api/">Table Analysis →</a></strong> - Advanced catalog management</li>
+<li><strong><a href="../launch-desktop/">Desktop Sessions →</a></strong> - Use Firefly with other GUI tools</li>
+<li><strong><a href="../../../batch-jobs/">Batch Processing →</a></strong> - Automate large survey analysis</li>
+<li><strong><a href="../../../containers/">Container Guide →</a></strong> - Customize Firefly environment</li>
+</ul>
+<hr />
+<div class="admonition tip">
+<p class="admonition-title">Firefly Best Practices</p>
+<ol>
+<li><strong>Start with small datasets</strong> to learn the interface before tackling large surveys</li>
+<li><strong>Use appropriate memory</strong> - large catalogs need more RAM than single images  </li>
+<li><strong>Save your work frequently</strong> - export important results to <code>/arc/projects/</code></li>
+<li><strong>Collaborate effectively</strong> - share session URLs for real-time teamwork</li>
+<li><strong>Optimize performance</strong> - close unused data and use efficient file formats</li>
+</ol>
+</div>
+
+
+
+
+
+
+
+  
+    
+  
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+  </span>
+
+    
+    
+    
+    
+  </aside>
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 1986-2024 Canadian Astronomy Data Centre
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/vcCQ8QBvBa" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.instant.progress", "navigation.prune", "navigation.sections", "navigation.tracking", "navigation.indexes", "navigation.expand", "navigation.instant.prefetch", "toc.follow", "navigation.top", "announce.dismiss", "content.code.annotate", "content.action.edit", "content.action.view", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "search.highlight", "search.share", "search.suggest"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+        <script src="../../../../termynal.js"></script>
+      
+    
+  </body>
+</html>
