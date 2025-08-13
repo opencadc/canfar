@@ -375,5 +375,5 @@ For best performance:
 
 - **[CASA Desktop Workflows](../radio-astronomy/casa-workflows.md)**: Advanced CASA usage
 - **[Radio Astronomy Guide](../radio-astronomy/index.md)**: Desktop-based radio analysis workflows
-- **[Batch Processing](../batch-jobs/index.md)**: Scale up desktop workflows
+- **[Batch Processing](../../batch-jobs.md)**: Scale up desktop workflows
 - **[Notebook Sessions](launch-notebook.md)**: Alternative analysis environment

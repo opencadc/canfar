@@ -519,8 +519,8 @@ Now that you understand CANFAR's storage systems:
 
 - **[VOSpace API Guide →](vospace-api.md)** - Advanced programmatic access and detailed transfer methods
 - **[Interactive Sessions →](../interactive-sessions/index.md)** - Access storage from sessions
-- **[Batch Jobs →](../batch-jobs/index.md)** - Automated storage workflows
-- **[Container Guide →](../containers/index.md)** - Storage access in containers
+- **[Batch Jobs →](../../batch-jobs.md)** - Automated storage workflows
+- **[Container Guide →](../../containers.md)** - Storage access in containers
 
 ---
 

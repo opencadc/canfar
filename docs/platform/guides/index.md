@@ -1,27 +1,14 @@
-# User Guide
+# User Guides
 
-*Comprehensive documentation for the CANFAR Science Platform*
-
-This guide provides detailed information for astronomers, grad students, and project managers using CANFAR for research. Whether you're analyzing radio astronomy data, building custom software environments, or managing large collaborative projects, this guide has you covered.
-
-## What is CANFAR?
-
-CANFAR provides **cloud-based astronomy computing** with:
-
-- 🖥️ **Interactive sessions** (Jupyter Lab, CARTA, Firefly, Desktop environments)
-- 💾 **Shared storage** for collaborative datasets (shared file system, VOSpace long term, scratch)
-- 🐳 **Pre-built software containers** with astronomy tools
-- 🔧 **User container support** for specialized workflows
-- ⚡ **Batch processing** for automated analysis
-- 👥 **Collaboration tools** with group-based permissions
+This guides provides detailed information for astronomers, grad students, and project managers using CANFAR for research. Whether you're analyzing radio astronomy data, building custom software environments, or managing large collaborative projects, this guide has you covered.
 
 ## 📖 Guide Structure
 
-### [🧠 Concepts](concepts/index.md)
+### [🧠 Concepts](../concepts.md)
 
 Understand the fundamentals: platform architecture, containers, Kubernetes, REST services, and VOSpace.
 
-### [👥 Accounts & Permissions](accounts-permissions/index.md)
+### [👥 Accounts & Permissions](../accounts.md)
 
 Manage users, groups, Harbor permissions, ACLs, and API access.
 
@@ -29,7 +16,7 @@ Manage users, groups, Harbor permissions, ACLs, and API access.
 
 Master `/arc`, VOSpace `vault`, and scratch storage systems. Learn data transfers, `sshfs`, and the full VOSpace API.
 
-### [🐳 Containers](containers/index.md)
+### [🐳 Containers](../containers.md)
 
 Work with astronomy software containers, build custom environments, and upload to CANFAR Science Platform.
 
@@ -37,7 +24,7 @@ Work with astronomy software containers, build custom environments, and upload t
 
 Launch Jupyter notebooks, CARTA, Firefly, desktop environments, and contributed applications.
 
-### [⚡ Batch Jobs](batch-jobs/index.md)
+### [⚡ Batch Jobs](../batch-jobs.md)
 
 Run "headless" containers, understand batch systems, manage logs, and use APIs for automation.
 
@@ -53,9 +40,9 @@ Specialized workflows for CASA, ALMA data reduction, CARTA visualization, and ot
 
 **First time using CANFAR?**
 
-Start with our [Getting Started Guide](../get-started/index.md) for a structured learning path, then:
+Start with our [Getting Started Guide](../get-started.md) for a structured learning path, then:
 
-1. [Concepts](concepts/index.md) - Understand the platform
+1. [Concepts](../concepts.md) - Understand the platform
 2. [Storage](storage/index.md) - Manage your data
 3. [Interactive Sessions](interactive-sessions/index.md) - Start analyzing
 
@@ -72,9 +59,9 @@ Start with our [Getting Started Guide](../get-started/index.md) for a structured
 
 **Looking for development and automation?**
 
-- **[🐳 Container Usage](containers/index.md)** - Work with and build custom containers
-- **[⚙️ Batch Processing](batch-jobs/index.md)** - Automated workflows and APIs
-- **[🔐 Access Control](accounts-permissions/index.md)** - Groups and permissions management
+- **[🐳 Container Usage](../containers.md)** - Work with and build custom containers
+- **[⚙️ Batch Processing](../batch-jobs.md)** - Automated workflows and APIs
+- **[🔐 Access Control](../accounts.md)** - Groups and permissions management
 
 ---
 
@@ -95,8 +82,7 @@ Start with our [Getting Started Guide](../get-started/index.md) for a structured
 ### Support
 
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** - Community support
-- **[📧 Email](mailto:support@canfar.net)** - Technical support
-- **[FAQ](../faq/index.md)** - Common solutions
+- **[FAQ](../../faq.md)** - Common solutions
 
 ---
 

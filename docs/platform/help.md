@@ -12,7 +12,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 ### Having Problems?
 
-- **[FAQ](../faq/index.md)**: Common questions and solutions
+- **[FAQ](platform/faq.md)**: Common questions and solutions
 - **[Troubleshooting](#troubleshooting)**: Diagnostic steps for common issues
 - **[Contact Support](#contact-support)**: Direct help from CANFAR staff
 
@@ -28,11 +28,11 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 **User Guide Sections**:
 
-- **[Concepts](../user-guide/concepts/index.md)**: Understanding the platform architecture
+- **[Concepts](../user-guide/platform/concepts.md)**: Understanding the platform architecture
 - **[Storage](../user-guide/storage/index.md)**: Managing your data effectively
 - **[Containers](../user-guide/containers/index.md)**: Using and building software environments
 - **[Interactive Sessions](../user-guide/interactive-sessions/index.md)**: Jupyter, Desktop, CARTA
-- **[Batch Jobs](../user-guide/batch-jobs/index.md)**: Automated and large-scale processing
+- **[Batch Jobs](../user-guiplatform/batch-jobs.md)**: Automated and large-scale processing
 - **[Radio Astronomy](../user-guide/radio-astronomy/index.md)**: CASA and radio-specific workflows
 
 **Tutorials**:

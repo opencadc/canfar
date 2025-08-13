@@ -91,7 +91,6 @@ Select the interface that best matches your workflow:
 stateDiagram-v2
     [*] --> Launching: Click Launch
     Launching --> Running: Session ready
-    Running --> Running: Working
     Running --> Suspended: Close browser
     Suspended --> Running: Reconnect
     Running --> Terminated: Delete session
@@ -327,8 +326,8 @@ Detailed guides for each session type:
 Once you're comfortable with interactive sessions:
 
 - **[Storage Guide →](../storage/index.md)** - Manage data across sessions
-- **[Batch Jobs →](../batch-jobs/index.md)** - Automate workflows  
-- **[Container Guide →](../containers/index.md)** - Customize software environments
+- **[Batch Jobs →](../../batch-jobs.md)** - Automate workflows  
+- **[Container Guide →](../../containers.md)** - Customize software environments
 - **[Radio Astronomy →](../radio-astronomy/index.md)** - Specialized workflows
 
 ---

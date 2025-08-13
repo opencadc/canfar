@@ -187,14 +187,6 @@ Successfully deleted {'tcgle3m3': True} session(s).
 
 You now have a fully-equipped astronomy computing environment running in the cloud. No software installation, no environment conflicts, no waiting for local resources.
 
-## Next Steps
-
-=== "⚡ Scale Your Analysis"
-    - [Massively Parallel Processing](advanced-examples.md#Massively-Parallel-Processing)
-
-=== "🛠️ Advanced Setup"
-    - [Authentication Contexts](authentication-contexts.md)
-    - [Session Types Guide](session-types.md)
 
 ## Troubleshooting
 
@@ -211,9 +203,8 @@ You now have a fully-equipped astronomy computing environment running in the clo
 
 ## Need Help?
 
-- 📖 [Complete Documentation](get-started.md)
 - 💬 [Community Support](https://github.com/opencadc/canfar/discussions)
-- 🐛 [Report Issues](bug-reports.md)
+- 🐛 [Report Issues](../bug-reports.md)
 
 ---
 

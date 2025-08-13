@@ -440,7 +440,6 @@ vls vos:CANFAR/project_name/
 
 ## Next Steps
 
-- **[Storage Guide →](index.md)** - Basic storage concepts and web interface
-- **[Batch Jobs →](../batch-jobs/index.md)** - Automate VOSpace workflows
-- **[Containers →](../containers/index.md)** - Include VOSpace tools in custom containers
+- **[Batch Jobs →](../../batch-jobs.md)** - Automate VOSpace workflows
+- **[Containers →](../../containers.md)** - Include VOSpace tools in custom containers
 - **[Radio Astronomy →](../radio-astronomy/index.md)** - Specialized data workflows

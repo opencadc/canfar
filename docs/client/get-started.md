@@ -125,12 +125,11 @@ session_info = session.create(
 Now that you have canfar installed and configured:
 
 - [x] Try our [5-Minute Quick Start](quick-start.md) for a hands-on introduction to creating and managing sessions.
-- [x] Learn about [Authentication Contexts](authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.
+- [x] Learn about [Authentication Contexts](../cli/authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.
 - [x] Explore [Basic Examples](examples.md) and [Advanced Examples](advanced-examples.md) for common use cases.
 - [x] Check out the [Python API Reference](session.md) for detailed documentation of all available methods.
-- [x] Refer to the [FAQ](faq.md) for answers to common questions.
+- [x] Refer to the [FAQ](../faq.md) for answers to common questions.
 
 !!! tip "Getting Help"
-    - 📖 [Complete CLI Reference](cli-help.md)
     - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions)
-    - 🐛 [Report Issues](bug-reports.md)
+    - 🐛 [Report Issues](../bug-reports.md)

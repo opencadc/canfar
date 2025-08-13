@@ -1,6 +1,7 @@
 # Context API
 
-!!! "Overview"
+!!! info "Overview"
+
     The Context API allows the user to get information about the resources available to be requested for a session on the CANFAR Science Platform. This information can be used to configure the session to request the appropriate resources for your session.
 
 ```python title="Get context information"

@@ -432,8 +432,8 @@ Firefly works great with other CANFAR tools:
 
 - **[Table Analysis →](../storage/vospace-api.md)** - Advanced catalog management
 - **[Desktop Sessions →](launch-desktop.md)** - Use Firefly with other GUI tools
-- **[Batch Processing →](../batch-jobs/index.md)** - Automate large survey analysis
-- **[Container Guide →](../containers/index.md)** - Customize Firefly environment
+- **[Batch Processing →](../../batch-jobs.md)** - Automate large survey analysis
+- **[Container Guide →](../../containers.md)** - Customize Firefly environment
 
 ---
 

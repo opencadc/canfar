@@ -2,7 +2,9 @@
 
 Stay up to date with the latest features, improvements, and changes in CANFAR.
 
-> Migrating from `skaha` to `canfar`? See the Migration Guide: [Migration from skaha → canfar](migration.md).
+!!! failure "v1.0"
+
+    Package Rename: [Migration from skaha → canfar](migration.md).
 
 ## Recent Updates
 
@@ -107,10 +109,9 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
 
 ## Previous Versions
 
-For a complete history of changes, see the [Changelog](changelog.md).
+For a complete history of changes, see the [Changelog](../changelog.md).
 
 ## Stay Updated
 
 - 📢 [GitHub Releases](https://github.com/opencadc/canfar/releases)
-- 📝 [Changelog](changelog.md)
 - 💬 [Discussions](https://github.com/opencadc/canfar/discussions)

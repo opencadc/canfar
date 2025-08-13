@@ -340,10 +340,10 @@ curl -X PUT \
 
 Now that you understand permissions and access control:
 
-- **[Storage Guide →](../storage/index.md)** - Apply permissions to manage data
-- **[Container Guide →](../containers/index.md)** - Access and build container images  
-- **[API Guide →](../batch-jobs/index.md#api-access)** - Use programmatic access
-- **[Help & Support →](../../help/index.md)** - Get assistance with user management
+- **[Storage Guide →](guides/storage/index.md)** - Apply permissions to manage data
+- **[Container Guide →](containers.md)** - Access and build container images  
+- **[API Guide →](batch-jobs.md#api-access)** - Use programmatic access
+- **[Help & Support →](help.md)** - Get assistance with user management
 
 ---
 

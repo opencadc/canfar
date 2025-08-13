@@ -56,7 +56,7 @@ Make your changes. Please make sure to add tests for your changes if applicable.
 
 ### 5. Run the Tests
 
-To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the [get started](get-started.md) section.
+To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the [get started](client/get-started.md) section.
 
 ```bash
 uv run pytest

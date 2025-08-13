@@ -459,4 +459,4 @@ Understanding this integration helps optimize workflows by leveraging container 
 
 ---
 
-*Continue exploring CANFAR capabilities through [Interactive Sessions](../interactive-sessions/index.md) for hands-on container usage, [Batch Jobs](../batch-jobs/index.md) for automated processing, or [Storage Management](../storage/index.md) for data organization strategies.*
+*Continue exploring CANFAR capabilities through [Interactive Sessions](guides/interactive-sessions/index.md) for hands-on container usage, [Batch Jobs](batch-jobs.md) for automated processing, or [Storage Management](guides/storage/index.md) for data organization strategies.*

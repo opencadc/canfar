@@ -289,8 +289,8 @@ CANFAR provides REST APIs for programmatic access, allowing you to:
 
 | Service | Purpose | Documentation |
 |---------|---------|---------------|
-| **CANFAR Python Client** | Session management | [TBD](TBD) |
-| **VOSpace** | File operations | [VOSpace API](../storage/vospace-api.md) |
+| **CANFAR Python Client** | Session management | [`canfar`](../client/home.md) |
+| **VOSpace** | File operations | [VOSpace API](guides/storage/vospace-api.md) |
 | **Access Control** | Authentication and Authorization | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
 !!! info "Advanced Users"
@@ -300,10 +300,10 @@ CANFAR provides REST APIs for programmatic access, allowing you to:
 
 Now that you understand the core concepts, dive into specific areas:
 
-- **[Accounts & Permissions →](../accounts-permissions/index.md)** - Manage users and access
-- **[Storage Systems →](../storage/index.md)** - Master data management
-- **[Container Usage →](../containers/index.md)** - Work with software environments
-- **[Interactive Sessions →](../interactive-sessions/index.md)** - Start analyzing data
+- **[Accounts & Permissions →](accounts.md)** - Manage users and access
+- **[Storage Systems →](guides/storage/index.md)** - Master data management
+- **[Container Usage →](containers.md)** - Work with software environments
+- **[Interactive Sessions →](guides/interactive-sessions/index.md)** - Start analyzing data
 
 ---
 

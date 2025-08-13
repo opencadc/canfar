@@ -620,10 +620,3 @@ def robust_casa_operation(operation_func, *args, max_retries=3, **kwargs):
 # Usage
 robust_casa_operation(tclean, vis="data.ms", imagename="output", niter=1000)
 ```
-
-## Next Steps
-
-- **[Radio Astronomy Guide →](../radio-astronomy/index.md)** - Complete radio astronomy workflows
-- **[CARTA Integration →](../interactive-sessions/launch-carta.md)** - Advanced visualization
-- **[Batch Processing →](../batch-jobs/index.md)** - Automate CASA workflows
-- **[Storage Management →](../storage/index.md)** - Organize large datasets

@@ -319,8 +319,8 @@ job_id = session.create(
 # For private images, set registry authentication
 import base64
 
-username = "your_username"
-cli_secret = "your_cli_secret"
+username = "username"
+cli_secret = "************"
 auth_string = base64.b64encode(f"{username}:{cli_secret}".encode()).decode()
 
 job_id = session.create(
@@ -503,7 +503,7 @@ curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
 
 ## Next Steps
 
-- **[Container Development](../containers/index.md)**: Build custom containers for your workflows
-- **[Storage Optimization](../storage/index.md)**: Efficient data management strategies
-- **[Interactive Sessions](../interactive-sessions/index.md)**: Develop and test scripts interactively
-- **[Radio Astronomy Workflows](../radio-astronomy/index.md)**: Specialized batch processing for radio data
+- **[Container Development](containers.md)**: Build custom containers for your workflows
+- **[Storage Optimization](guides/storage/index.md)**: Efficient data management strategies
+- **[Interactive Sessions](guides/interactive-sessions/index.md)**: Develop and test scripts interactively
+- **[Radio Astronomy Workflows](guides/radio-astronomy/index.md)**: Specialized batch processing for radio data

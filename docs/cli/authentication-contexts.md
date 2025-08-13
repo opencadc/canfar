@@ -1,10 +1,10 @@
 # Authentication Guide
 
-Canfar is designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic setup to advanced scenarios.
+CANFAR Python Client and CLI are designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic setup to advanced scenarios.
 
 ## Authentication Overview
 
-Canfar uses an **Authentication Context** system to manage connections to different Science Platform servers. This system supports multiple authentication methods and makes it easy to switch between servers.
+CANFAR clients use an **Authentication Context** system to manage connections to different Science Platform servers. This system supports multiple authentication methods and makes it easy to switch between servers.
 
 ### What is an Authentication Context?
 
@@ -245,5 +245,5 @@ canfar auth login --debug
 !!! tip "Support Resources"
     - 📖 [CLI Reference](cli-help.md) - Complete command documentation
     - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions) - Ask questions
-    - 🐛 [Report Issues](bug-reports.md) - Bug reports and feature requests
+    - 🐛 [Report Issues](../bug-reports.mdbug-reports.md) - Bug reports and feature requests
 ```

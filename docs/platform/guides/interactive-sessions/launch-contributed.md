@@ -235,7 +235,7 @@ This democratization of access to specialized tools can significantly impact how
 
 ## 🔗 What's Next?
 
-Contributed applications represent just one facet of CANFAR's comprehensive research platform. To make the most of these tools, consider exploring how they integrate with CANFAR's other capabilities. The [Storage Guide](../storage/index.md) will help you effectively manage data for use with contributed applications. Understanding [Notebook Sessions](launch-notebook.md) can help you prepare data for specialized processing in contributed applications. For automated workflows, [Batch Processing](../batch-jobs/index.md) can complement the interactive analysis you do in contributed applications. And if you're interested in developing your own tools, the [Container Development](../containers/index.md) guide provides the technical foundation for creating contributed applications.
+Contributed applications represent just one facet of CANFAR's comprehensive research platform. To make the most of these tools, consider exploring how they integrate with CANFAR's other capabilities. The [Storage Guide](../storage/index.md) will help you effectively manage data for use with contributed applications. Understanding [Notebook Sessions](launch-notebook.md) can help you prepare data for specialized processing in contributed applications. For automated workflows, [Batch Processing](../../batch-jobs.md) can complement the interactive analysis you do in contributed applications. And if you're interested in developing your own tools, the [Container Development](../../containers.md) guide provides the technical foundation for creating contributed applications.
 
 ---
 

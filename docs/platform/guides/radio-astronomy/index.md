@@ -107,7 +107,7 @@ graph TD
 - **[CARTA sessions](../interactive-sessions/launch-carta.md)**: Data cube visualization
 
 **For large-scale processing**:
-- **[Batch jobs](../batch-jobs/index.md)**: Automated pipeline execution
+- **[Batch jobs](../../batch-jobs.md)**: Automated pipeline execution
 - **API submissions**: Programmatic job control
 
 !!! info "Resource Sizing"
@@ -576,10 +576,3 @@ with tempfile.TemporaryDirectory(dir="/tmp") as tmpdir:
 - **Sanity checks**: Verify results at each stage
 - **Backup strategies**: Protect critical intermediate products
 - **Error handling**: Robust error recovery in automated pipelines
-
-## Next Steps
-
-- **[Interactive Sessions](../interactive-sessions/index.md)**: Get started with CASA and CARTA
-- **[Batch Processing](../batch-jobs/index.md)**: Scale up to large datasets
-- **[Container Development](../containers/index.md)**: Customize your radio astronomy environment
-- **[Storage Guide](../storage/index.md)**: Optimize data management strategies

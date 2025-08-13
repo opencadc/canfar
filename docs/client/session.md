@@ -3,7 +3,7 @@
 !!! info "Overview"
     The `Session` API is the core of canfar, enabling you to create, manage, and destroy sessions on the CANFAR Science Platform.
 
-::: canfar.session.Session
+::: canfar.sessions.Session
     handler: python
     selection:
       members:

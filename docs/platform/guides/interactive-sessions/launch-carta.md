@@ -265,6 +265,6 @@ For very large files:
 ## Next Steps
 
 - **[Radio Astronomy Workflows](../radio-astronomy/index.md)**: CARTA in radio astronomy pipelines
-- **[Batch Processing](../batch-jobs/index.md)**: Automate CARTA operations
+- **[Batch Processing](../../batch-jobs.md)**: Automate CARTA operations
 - **[CASA Integration](../radio-astronomy/casa-workflows.md)**: Combine CARTA with CASA analysis
 - **[Desktop Sessions](launch-desktop.md)**: Full desktop environment with CARTA
