@@ -52,7 +52,6 @@ curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
   -d "image=images.canfar.net/skaha/astroml:latest" \
   -d "cores=4" \
   -d "ram=16" \
-  -d "kind=headless" \
   -d "cmd=python /arc/projects/myproject/scripts/reduce_data.py"
 ```
 
@@ -77,7 +76,6 @@ curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
   -d "image=$IMAGE" \
   -d "cores=8" \
   -d "ram=32" \
-  -d "kind=headless" \
   -d "cmd=$CMD"
 ```
 
@@ -102,7 +100,6 @@ data_path = f"/arc/projects/survey/data/{datetime.now().strftime('%Y%m%d')}"
 job_id = session.create(
     name=job_name,
     image=image,
-    kind="headless",
     cores=8,
     ram=32,
     cmd="python",
@@ -221,7 +218,6 @@ curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
   -d "image=images.canfar.net/skaha/astroml:latest" \
   -d "cores=4" \
   -d "ram=16" \
-  -d "kind=headless" \
   -d "cmd=python /arc/projects/myproject/analysis.py"
 ```
 
