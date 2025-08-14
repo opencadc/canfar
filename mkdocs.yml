@@ -11,17 +11,24 @@ remote_branch: gh-pages
 theme:
   name: material
   palette:
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/link
+        name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
       scheme: default
+      primary: indigo
+      accent: indigo
       toggle:
         icon: material/toggle-switch
-        name: Hello darkness, my old friend
-    # Palette toggle for dark mode
+        name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
+      primary: black
+      accent: indigo
       toggle:
-        icon: material/toggle-switch-off-outline
-        name: Flash the neon lights
+        icon: material/toggle-switch-off
+        name: Switch to system preference
   font:
     text: Roboto
     code: Roboto Mono
@@ -58,11 +65,30 @@ theme:
     - search.suggest
 
 plugins:
-  - search
-  - mkdocstrings
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - mkdocstrings:
+      handlers:
+      python:
+        options:
+          show_symbol_type_toc: true
+          show_signature: true
+          separate_signature: true
+          line_length: 88
+          annotations_path: brief
+          docstring_style: google
+          docstring_section_style: spacy
+          docstring_options:
+            ignore_init_summary: true
+            trim_doctest_flags: true
   - git-revision-date-localized:
         type: date
+        enable_creation_date: true
         fallback_to_build_date: true
+  - git-committers:
+      enabled: true
+      repository: opencadc/canfar
+      branch: main
   - termynal
 
 extra:
@@ -72,7 +98,22 @@ extra:
   social:
     - icon: fontawesome/brands/discord
       link: https://discord.gg/vcCQ8QBvBa
-
+    - icon: fontawesome/brands/github
+      link: https://github.com/opencadc/canfar
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/canfar
+  analytics:
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: This page was helpful
+          data: 1
+          note: Thanks for your feedback!
+        - icon: material/emoticon-sad-outline
+          name: This page could be improved
+          data: 0
+          note: Let us know how we can improve this page.
 
 # Extensions
 markdown_extensions:
@@ -170,7 +211,7 @@ nav:
     - Code of Conduct: conduct.md
     - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
     - License: license.md
-  - Bug Reports:
-    - Bugs: bug-reports.md
-    - Security Issues: security.md
-  - CHANGELOG: changelog.md
+    - Bug Reports:
+      - Bugs: bug-reports.md
+      - Security Issues: security.md
+    - Changelog: changelog.md
