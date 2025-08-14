@@ -245,5 +245,5 @@ canfar auth login --debug
 !!! tip "Support Resources"
     - 📖 [CLI Reference](cli-help.md) - Complete command documentation
     - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions) - Ask questions
-    - 🐛 [Report Issues](../bug-reports.mdbug-reports.md) - Bug reports and feature requests
+    - 🐛 [Report Issues](../bug-reports.md) - Bug reports and feature requests
 ```
