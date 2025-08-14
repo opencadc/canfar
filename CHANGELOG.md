@@ -1,5 +1,31 @@
 # Changelog
 
+## [1.0.0](https://github.com/opencadc/canfar/compare/v0.8.0...v1.0.0) (2025-08-14)
+
+
+### ⚠ BREAKING CHANGES
+
+* **project:** - The configuration directory has moved from `~/.skaha` to `~/.canfar`.
+
+### Features
+
+* **client:** added logic to catch AuthExpiryError when the auth context is expired ([49c106e](https://github.com/opencadc/canfar/commit/49c106e6c0594197c1dd03c4b47daeafb768f790))
+* **docs:** importing science container docs with history ([f388602](https://github.com/opencadc/canfar/commit/f3886023eef48f8b4d99ee32dbc102a791602dc6))
+* **docs:** reorg from scicon docs ([85ca36c](https://github.com/opencadc/canfar/commit/85ca36c1c1a96b08ad14726f38658112be1921df))
+* **docs:** updates to documentation theme and features ([5289571](https://github.com/opencadc/canfar/commit/5289571f84fd4d81f723f31d688f0a70d2f6e0b8))
+* **project:** This commit renames the project from `skaha` to `canfar` to align with the official support from CADC and create a unified naming scheme for the science platform ([ecf55fb](https://github.com/opencadc/canfar/commit/ecf55fb6c1d91d9b455a7b96d51e0b98c220895e))
+
+
+### Bug Fixes
+
+* **cli:** deprecated skaha & cf as entrypoints ([6ea71de](https://github.com/opencadc/canfar/commit/6ea71dec27e8f81505f1db3e525b9e5357553bf0))
+* **cli:** remove canfar list, and canfar rm as aliases due to conflicts with linux commands ([e1a4742](https://github.com/opencadc/canfar/commit/e1a47421e18ed749ab10b11210ff3252d2086488))
+
+
+### Documentation
+
+* **pacakge:** major updates for docs, merged in science container docs ([3b9c12a](https://github.com/opencadc/canfar/commit/3b9c12ac3861aba5441ef7402cb0500a51acd983))
+
 ## [0.8.0](https://github.com/opencadc/canfar/compare/v0.7.0...v0.8.0) (2025-08-08)
 
 
