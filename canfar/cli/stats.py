@@ -88,9 +88,7 @@ def get_stats(
         table.add_row(instances_table, cores_table, ram_table)
 
         console.print(table)
-        console.print(
-            f"[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM"
-        )
+        console.print("[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM")
         console.print(
             "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
         )
