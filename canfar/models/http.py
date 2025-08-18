@@ -5,6 +5,8 @@ from __future__ import annotations
 from pydantic import AnyHttpUrl, AnyUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from canfar.utils import vosi
+
 
 class Server(BaseSettings):
     """Science Platform Server Details."""
@@ -55,6 +57,15 @@ class Server(BaseSettings):
         min_length=2,
         max_length=8,
     )
+    auths: list[str] | None = Field(
+        default=None,
+        title="Supported Auth Modes",
+        description="Authentication modes supported by the Server",
+        examples=["oidc", "token", "x509"],
+    )
+
+    def capabilities(self) -> list[dict[str, object]]:
+        return vosi.capabilities(url=f"{self.url}/capabilities")
 
 
 class Connection(BaseSettings):
