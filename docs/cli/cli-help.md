@@ -3,9 +3,9 @@
 The Canfar CLI provides a comprehensive command-line interface for interacting with the Science Platform. This reference covers all available commands and their options.
 
 !!! info "Getting Started"
-    The CLI can be accessed using the `canfar` command in your uv environment:
+    The CLI can be accessed using the `canfar` command in your environment:
     ```bash
-    uv run canfar --help
+    canfar --help
     ```
 
 ## Main Command
@@ -161,12 +161,12 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 
 !!! example "Create a Jupyter Notebook"
     ```bash
-    canfar create --cpu 4 -m 8notebook skaha/scipy-notebook:latest
+    canfar create --cpu 4 --memory 8 notebook skaha/astroml-notebook:latest
     ```
 
 !!! example "Create a Headless Session with Custom Command"
     ```bash
-    uv run canfar create headless skaha/terminal:1.1.2 -- env
+    canfar create headless skaha/terminal:1.1.2 -- env
     ```
 
 ### `canfar ps`
