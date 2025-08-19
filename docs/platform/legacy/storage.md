@@ -7,8 +7,7 @@ Access to VOSpace requires a CADC account (registration).
 
 There are two ways to interact with VOSpace. The first is with your browser via the web user interface. The web interface is familiar for most people to use and interactive. To access a VOSpace in scripts, the Python-based `vos` module and command line clients are available. Some users might also find the VOSpace filesystem `vofs`, the FS view is based on FUSE and not recommended for serious data processing, but does provide a convenient interactive interface for exploring a repository.
 
-## The web user interface
-<https://www.canfar.net/storage/vault/list>
+[:material-database: Web Storage Interface ](https://www.canfar.net/storage/vault/list){: .md-button .md-button--primary }
 
 ## The vos Python module and command line client
 The VOSpace can also be accessed via some commands on a terminal or a script. They are part of the `vos` command line client.
@@ -17,7 +16,7 @@ The VOSpace can also be accessed via some commands on a terminal or a script. Th
 1. Ensure Python is up-to-date (at least 3.7)
 2. Install the vos module using pip:
 
-```bash
+```bash title="Install vos"
 pip install -U vos
 
 # or if you didn't use conda or a user install is required:

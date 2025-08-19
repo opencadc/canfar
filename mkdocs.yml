@@ -129,7 +129,7 @@ nav:
       - Storage: platform/guides/storage/index.md
       - VOSpace API: platform/guides/storage/vospace-api.md
       - Containers: platform/containers.md
-      - Publication (DOIs): platform/publication.md
+      - Publications (DOIs): platform/publication.md
       - Interactive Sessions:
         - Home: platform/guides/interactive-sessions/index.md
         - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md

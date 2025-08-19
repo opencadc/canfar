@@ -1,46 +1,47 @@
-# Data Publication
+# The CANFAR Data Publication Service
 
-## The CANFAR Data Publication Service
-
-### Purpose
+## Purpose
 The purpose of the CANFAR Data Publication Service (DPS) is to support linking a research paper to the actual data that were used to produce the conclusions of that paper. The DPS provides storage space and the ability to register (publish) a Digital Object Identifier (DOI) with the DataCite system. That DOI will point to the published data on a permanent basis.
 
-### Access
+## Access
 There are 2 ways to access the DPS:
 
 - From the CANFAR portal (select Data Publication at <https://www.canfar.net/>)
 - Through direct link - <https://www.canfar.net/citation/>
 
-### Account Requirements
+## Account Requirements
 The author of the paper will need to have a CADC account. This will allow you to access the CANFAR Data Publication Service (DPS) interface and, later, to access the user-managed storage service where the author will deposit the data to be published.
 
 ---
 
-## How to Publish a DOI using the CANFAR Data Publication Service (DPS)
+## DOI Guide
 
-### Overview
-Steps to follow to publish data using the DPS:
+!!! abstract "🎯 What You'll Learn"
 
-1. Request a DOI  
-2. Upload the data package  
-3. Refereeing  
-4. Publish DOI with DataCite  
+    - Request a DOI
+    - Upload the data package
+    - Refereeing
+    - Publish DOI with DataCite  
 
 ---
 
 ### 1. Request a DOI
-In this step:
 
-- A DOI number is reserved for the data package associated with the paper (e.g. `10.11570/20.0006`).
+  - A DOI number is reserved for the data package associated with the paper (e.g. `10.11570/20.0006`).
 
-- A Data Directory is created to house the data package. This is a VOSpace folder accessible via the User Storage UI or vos Python tools.  
-  Example: <https://www.canfar.net/storage/list/AstroDataCitationDOI/CISTI.CANFAR/20.0006/data>
+  - A Data Directory is created to house the data package. This is a VOSpace folder accessible via the User Storage UI or vos Python tools. [Check out this example.](https://www.canfar.net/storage/list/AstroDataCitationDOI/CISTI.CANFAR/20.0006/data)
 
-- A landing page is generated for the DOI.  
-  Example: <https://www.canfar.net/citation/landing?doi=20.0006>
+  - A [landing page](https://www.canfar.net/citation/landing?doi=20.0006) is generated for the DOI.
 
 ### 2. Upload the data package
-How this is done depends on the size and volume of files. (See **Uploading a Data Package** later in this document for more details.)
+
+There are two ways to upload a data package. Which method you use depends on the size and complexity of the data being uploaded.
+
+- For a smaller number of small-sized files, the User Storage UI is a good choice. Documentation: User Storage documentation
+
+- For very large files, or for large numbers of files, the Python vcp tools are a better choice. Full instructions for using vcp can also be found under ‘The vos Python module and command line client’ in the User Storage documentation
+
+For more details, see [DOI Data Package](#doi-data-package)
 
 ### 3. Refereeing
 At the request of the DOI owner, a CADC account is generated with read-only access to the data package. The author can share it with a journal editor or referee. The account is disabled after refereeing is complete.
@@ -48,10 +49,6 @@ At the request of the DOI owner, a CADC account is generated with read-only acce
 ### 4. Publish DOI with DataCite
 Through the CANFAR DPS, the DOI is “Published” with DataCite and the Data Directory is locked.  
 Further changes to the data package or metadata (e.g. adding a Publication DOI) require a request to [CANFAR support](mailto:support@canfar.net).
-
-Post-publication steps can include:
-
-- Addition of publication DOI to the landing page.
 
 ---
 
@@ -65,15 +62,14 @@ From here, a DOI can be requested, viewed, edited, or published depending on sta
 ### Requesting a new DOI
 From either the DOI list or request page, a 'New' button will be available. Click this to generate a new DOI request. The request form can be found at <https://www.canfar.net/citation/request>.
 
-Minimum information needed:
+!!!question "Required Information"
+    - First Author  
+    - Title  
 
-- First Author  
-- Title  
-
-Optional (Both of these can be added later, prior to publishing the DOI):
-
-- Journal reference (journal name, volume, page). This is typically not known initially.  
-- Additional Authors  
+!!! note "Optional Information"
+    - Journal reference (journal name, volume, page). This is typically not known initially.  
+    - Additional Authors  
+    - _Can be edited at a later stage_
 
 Once the information is entered, push the 'Request' button. The DOI Reference number is assigned automatically and is displayed once the page refreshes.
 
@@ -122,7 +118,7 @@ A DOI request can be deleted prior to publication using the 'Delete' action on t
 
 **NOTE:** For published DOIs, no 'Delete' action is available.
 
-## DOI Data Package
+## [DOI Data Package](#data-package)
 DPS provides a Data Directory for the data package to reside in. The Data Directory is hosted by CANFAR in the Vault VOSpace impelmentation. A folder (literally called ‘data’) is created in the main folder for a DOI. The structure below that point is up to the DOI owner.
 
 example: <https://www.canfar.net/storage/vault/list/AstroDataCitationDOI/CISTI.CANFAR/21.0002/data>
