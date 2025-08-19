@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Annotated
+from typing import Annotated, NoReturn
 
 import typer
 from pydantic import AnyHttpUrl, AnyUrl
@@ -14,6 +14,7 @@ from rich.table import Table
 
 from canfar import CONFIG_PATH, get_logger, set_log_level
 from canfar.auth import oidc, x509
+from canfar.exceptions.context import AuthContextError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.auth import (
     OIDC,
@@ -25,6 +26,7 @@ from canfar.models.auth import (
 )
 from canfar.models.config import AuthContext, Configuration
 from canfar.models.http import Server
+from canfar.utils import display
 from canfar.utils.discover import servers
 
 console = Console()
@@ -41,10 +43,11 @@ auth = typer.Typer(
 
 
 @auth.command("login")
-def login(
+def login(  # noqa: PLR0915 too many statements
     force: Annotated[
         bool,
         typer.Option(
+            "-f",
             "--force",
             help="Force re-authentication",
         ),
@@ -77,11 +80,13 @@ def login(
             help="Include server details in discovery",
         ),
     ] = False,
+    timeout: Annotated[
+        int, typer.Option("-t", "--timeout", help="Timeout for server response.")
+    ] = 2,
     discovery_url: Annotated[
         str,
         typer.Option(
             "--discovery-url",
-            "-d",
             help="OIDC Discovery URL",
         ),
     ] = "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration",
@@ -109,24 +114,53 @@ def login(
             return
 
         # Run discovery and get selected server
-        selected = asyncio.run(servers(dev=dev, dead=dead, details=details))
-        log.debug("Selected server: %s", selected)
+        selected = asyncio.run(
+            servers(dev=dev, dead=dead, details=details, timeout=timeout)
+        )
+
+        # Inspect the Server Configuration
+        log.debug("selected server: %s", selected)
         server: Server = Server(
             name=f"{selected.registry}-{selected.name}",
             uri=AnyUrl(selected.uri),
             url=AnyHttpUrl(selected.url),
-            version="v0",
         )
+        console.print(f"Discovering capabilities for {server.url}")
+        capabilities = server.capabilities()
+        log.debug("server caps: %s", capabilities)
+
+        # Initialize selection variables for consistent typing
+        version: str | None = None
+        auth_choice: str
+
+        # Helper to raise unsupported auth selection
+        def _unsupported() -> NoReturn:
+            raise AuthContextError(  # noqa: TRY301
+                context=auth_choice, reason="not supported"
+            )
+
+        if dev:
+            version, auth_choice = asyncio.run(display.capabilities(capabilities))
+            server.version = version
+        else:
+            version = capabilities[0]["version"]
+            first_modes = capabilities[0].get("auth_modes", [])
+            auth_choice = str(first_modes[0]) if first_modes else "x509"
+
+        if not dev and selected.registry.upper() == "CADC":
+            log.debug("CADC currently only supports x509 auth in production")
+            auth_choice = "x509"
+        log.debug("server info: %s, %s", version, auth_choice)
 
         # Step 7-8: Choose authentication method based on registry
         context: AuthContext
-        if selected.registry.upper() == "CADC":
+        if auth_choice == "x509":
             console.print("[bold blue]X509 Certificate Authentication[/bold blue]")
             # Create new X509 context with server information
             x509_context = X509(server=server, expiry=0.0)
             # Authenticate and get updated context
             context = x509.authenticate(x509_context)
-        else:
+        elif auth_choice == "oidc":
             console.print(
                 f"[bold blue]OIDC Authentication for {selected.url}[/bold blue]"
             )
@@ -140,12 +174,12 @@ def login(
             )
             # Authenticate and get updated context
             context = asyncio.run(oidc.authenticate(oidc_context))
+        else:
+            _unsupported()
 
-        # Add the new context to the configuration
         name = server.name or f"{selected.registry}-{selected.name}"
         config.contexts[name] = context
         config.active = name
-
         console.print("[green]✓[/green] Saving configuration")
         config.save()
         console.print("[bold green]Login completed successfully![/bold green]")

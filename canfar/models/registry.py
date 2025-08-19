@@ -19,7 +19,9 @@ class IVOARegistrySearch(BaseModel):
         default={
             "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCnet",
             "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
-            "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC@keel-dev",
+            (
+                "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+            ): "CADC@keel-dev",
         }
     )
 

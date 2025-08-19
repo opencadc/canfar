@@ -2,10 +2,15 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from pydantic import AnyHttpUrl, AnyUrl, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from canfar.utils import vosi
+
+if TYPE_CHECKING:  # pragma: no cover - import for typing only
+    from canfar.utils.vosi import Capability
 
 
 class Server(BaseSettings):
@@ -64,7 +69,8 @@ class Server(BaseSettings):
         examples=["oidc", "token", "x509"],
     )
 
-    def capabilities(self) -> list[dict[str, object]]:
+    def capabilities(self) -> list[Capability]:
+        """Fetch and parse the server's VOSI capabilities."""
         return vosi.capabilities(url=f"{self.url}/capabilities")
 
 

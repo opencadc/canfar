@@ -105,7 +105,6 @@ class Discover:
 
             if url.endswith("/skaha/capabilities") and uri.endswith("/skaha"):
                 url = url.replace("/capabilities", "")
-
                 # Apply exclusion filters
                 if not dev and any(
                     word in uri.lower() or word in url.lower()
@@ -116,7 +115,6 @@ class Discover:
                 # Apply omit filters
                 if (registry.name, uri) in self.config.omit:
                     continue
-
                 endpoint = Server(
                     registry=registry.name,
                     uri=uri,
@@ -154,7 +152,6 @@ class Discover:
         for registry_result in registry_results:
             endpoints = await self.extract(registry_result, dev)
             all_endpoints.extend(endpoints)
-
         results.found = len(all_endpoints)
 
         if not all_endpoints:
@@ -187,7 +184,7 @@ async def servers(
     dev: bool = False,
     dead: bool = False,
     details: bool = False,
-    timeout: int = 2,
+    timeout: int = 3,
 ) -> Server:
     """Find and select a Canfar Server.
 

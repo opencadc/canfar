@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import re
-import xml.etree.ElementTree as ET
 from collections import OrderedDict
+from typing import TypedDict, cast
 
 import httpx
+from defusedxml import ElementTree
 
 # --- Constants & helpers ------------------------------------------------------
 
@@ -19,11 +20,19 @@ AUTH_RENAME = {
 
 # Preferred ordering (after rename)
 AUTH_PRIORITY = {
-    "oidc": 0,
-    "x509": 1,
+    "x509": 0,
+    "oidc": 1,
 }
 
 _VSEG_RE = re.compile(r"/(v[0-9]+(?:\.[0-9]+)*)\b")
+
+
+class Capability(TypedDict):
+    """Parsed Sessions capability family entry."""
+
+    baseurl: str
+    version: str | None
+    auth_modes: list[str]
 
 
 def _normalize_auth_id(standard_id: str) -> str:
@@ -111,10 +120,7 @@ def _version_sort_key(v: str | None) -> tuple[int, tuple[int, ...]]:
     return (0, tup)
 
 
-# --- Main API ----------------------------------------------------------------
-
-
-def capabilities(url: str) -> list[dict[str, object]]:
+def capabilities(url: str) -> list[Capability]:  # noqa: PLR0912 too many branches (clarity)
     """Parse sessions capabilities into a list of endpoint families.
 
     Rules:
@@ -143,8 +149,8 @@ def capabilities(url: str) -> list[dict[str, object]]:
         ]
     """
     xml = httpx.get(url).text
-    root = ET.fromstring(xml)
-    buckets: OrderedDict[tuple[str, str | None], dict[str, object]] = OrderedDict()
+    root = ElementTree.fromstring(xml)
+    buckets: OrderedDict[tuple[str, str | None], Capability] = OrderedDict()
 
     for cap in root.findall(".//{*}capability"):
         std_id = cap.get("standardID")
@@ -162,7 +168,9 @@ def capabilities(url: str) -> list[dict[str, object]]:
             if not base_urls:
                 continue
 
-            baseurl, url_major = _split_base_and_version_from_url(base_urls[0].text)
+            # Element.text is Optional[str]; guarded above, cast for type-checking
+            base_text = cast("str", base_urls[0].text)
+            baseurl, url_major = _split_base_and_version_from_url(base_text)
 
             if std_major == "v0":
                 version: str | None = "v0"
@@ -174,7 +182,7 @@ def capabilities(url: str) -> list[dict[str, object]]:
             key = (baseurl, version)
             bucket = buckets.get(key)
             if not bucket:
-                bucket = {"baseurl": baseurl, "version": version, "auth_modes": []}
+                bucket = Capability(baseurl=baseurl, version=version, auth_modes=[])
                 buckets[key] = bucket
 
             for sec in iface.findall("{*}securityMethod"):
@@ -190,12 +198,12 @@ def capabilities(url: str) -> list[dict[str, object]]:
     for b in buckets.values():
         b["auth_modes"] = _sort_auth(b["auth_modes"])
 
-    items = list(buckets.values())
+    items: list[Capability] = list(buckets.values())
 
-    def sort_key(item: dict[str, object]) -> tuple[int, tuple[int, ...], str]:
-        v = item.get("version") if isinstance(item.get("version"), str) else None
+    def sort_key(item: Capability) -> tuple[int, tuple[int, ...], str]:
+        v = item.get("version")
         marker, tup = _version_sort_key(v)
-        return (marker, tup, item["baseurl"])  # type: ignore[index]
+        return (marker, tup, item["baseurl"])
 
     items.sort(key=sort_key, reverse=True)
     return items
