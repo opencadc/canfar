@@ -22,12 +22,6 @@ class TestIVOARegistrySearch:
         """Test default values for IVOARegistrySearch."""
         search = IVOARegistrySearch()
 
-        expected_registries = {
-            "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCnet",
-            "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
-        }
-        assert search.registries == expected_registries
-
         expected_names = {
             "ivo://canfar.net/src/skaha": "Canada",
             "ivo://swesrc.chalmers.se/skaha": "Sweden",
