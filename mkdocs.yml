@@ -123,28 +123,27 @@ nav:
   - Legacy:
     - Storage: platform/legacy/storage.md
     - OpenStack Cloud Portal: platform/legacy/openstack.md
-  - Client: client/home.md
-  - CLI: cli/home.md
   - Platform Concepts:
     - Home: platform/home.md
     - Getting Started: platform/get-started.md
-    - Intro: platform/guides/index.md
-    - Concepts: platform/concepts.md
-    - Accounts: platform/accounts.md
-    - Storage: platform/guides/storage/index.md
-    - VOSpace API: platform/guides/storage/vospace-api.md
-    - Containers: platform/containers.md
-    - Interactive Sessions:
-      - Home: platform/guides/interactive-sessions/index.md
-      - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
-      - Desktop Sessions: platform/guides/interactive-sessions/launch-desktop.md
-      - CARTA Visualization: platform/guides/interactive-sessions/launch-carta.md
-      - Firefly Table Viewer: platform/guides/interactive-sessions/launch-firefly.md
-      - Contributed Applications: platform/guides/interactive-sessions/launch-contributed.md
-    - Batch Jobs: platform/batch-jobs.md
-    - Radio Astronomy:
-      - Home: platform/guides/radio-astronomy/index.md
-      - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
+    - User Guides:
+      - Intro: platform/guides/index.md
+      - Concepts: platform/concepts.md
+      - Accounts: platform/accounts.md
+      - Storage: platform/guides/storage/index.md
+      - VOSpace API: platform/guides/storage/vospace-api.md
+      - Containers: platform/containers.md
+      - Interactive Sessions:
+        - Home: platform/guides/interactive-sessions/index.md
+        - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
+        - Desktop Sessions: platform/guides/interactive-sessions/launch-desktop.md
+        - CARTA Visualization: platform/guides/interactive-sessions/launch-carta.md
+        - Firefly Table Viewer: platform/guides/interactive-sessions/launch-firefly.md
+        - Contributed Applications: platform/guides/interactive-sessions/launch-contributed.md
+      - Batch Jobs: platform/batch-jobs.md
+      - Radio Astronomy:
+        - Home: platform/guides/radio-astronomy/index.md
+        - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
     - Help & Support: platform/help.md
   - Python Client:
     - Home: client/home.md
