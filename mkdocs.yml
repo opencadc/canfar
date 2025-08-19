@@ -119,10 +119,6 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Publication (DOIs): platform/publication.md
-  - Legacy:
-    - Storage: platform/legacy/storage.md
-    - OpenStack Cloud Portal: platform/legacy/openstack.md
   - Platform Concepts:
     - Home: platform/home.md
     - Getting Started: platform/get-started.md
@@ -133,6 +129,7 @@ nav:
       - Storage: platform/guides/storage/index.md
       - VOSpace API: platform/guides/storage/vospace-api.md
       - Containers: platform/containers.md
+      - Publication (DOIs): platform/publication.md
       - Interactive Sessions:
         - Home: platform/guides/interactive-sessions/index.md
         - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
@@ -144,6 +141,9 @@ nav:
       - Radio Astronomy:
         - Home: platform/guides/radio-astronomy/index.md
         - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
+      - Legacy:
+        - Storage: platform/legacy/storage.md
+        - OpenStack Cloud Portal: platform/legacy/openstack.md
     - Help & Support: platform/help.md
   - Python Client:
     - Home: client/home.md
