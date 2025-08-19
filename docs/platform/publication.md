@@ -73,20 +73,17 @@ From either the DOI list or request page, a 'New' button will be available. Clic
 
 Once the information is entered, push the 'Request' button. The DOI Reference number is assigned automatically and is displayed once the page refreshes.
 
-### Viewing DOI details
-From the DOI list page, select the number or title to see more details on the DOI request page.  
+### DOI Details
 
-Example: <https://www.canfar.net/citation/request?doi=20.0016> (requires authentication)
+From the web interface, select the number or title to see more details on the DOI request page, e.g. [DOI.20.0016](https://www.canfar.net/citation/request?doi=20.0016) which includes,
 
-Details on the page include:
-
-- DOI number  
-- Title  
-- First and Additional Authors  
-- Journal Reference  
-- DOI status  
-- Landing page link  
-- Data Directory link (lock icon displayed if locked)  
+  - DOI number  
+  - Title  
+  - First and Additional Authors  
+  - Journal Reference  
+  - DOI status  
+  - Landing page link  
+  - Data Directory link (:lock: if frozen)
 
 ### Editing DOI details
 On the DOI request page, if a DOI is **NOT published**, details can be edited by an authenticated user.  
