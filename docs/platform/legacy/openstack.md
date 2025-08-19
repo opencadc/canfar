@@ -4,7 +4,7 @@ All the cloud services used by CANFAR are the Digital Research Alliance Canada (
 
 The Digital Research Alliance Canada allocation resources are currently shared between all CANFAR users. Currently the main difference between the Digital Research Alliance Canada cloud and the CANFAR access are the following:
 
-- Access to the cloud portals are with the CADC <span style="color: blue;">[username]</span> and password, not the Digital Research Alliance Canada
+- Access to the cloud portals are with the CADC <span style="color:#4DA6FF">[username]</span> and <span style="color:#4DA6FF">[password]</span>, not the Digital Research Alliance Canada
 - The access is with [arbutus-canfar](https://arbutus-canfar.cloud.computecanada.ca/) instead of [arbutus](https://arbutus.cloud.computecanada.ca/)
 - CANFAR will give reasonable resources for interactive analysis and very large for batch processing on the clouds.
 
