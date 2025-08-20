@@ -129,7 +129,6 @@ nav:
       - Storage: platform/guides/storage/index.md
       - VOSpace API: platform/guides/storage/vospace-api.md
       - Containers: platform/containers.md
-      - Publications (DOIs): platform/publication.md
       - Interactive Sessions:
         - Home: platform/guides/interactive-sessions/index.md
         - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
@@ -142,8 +141,9 @@ nav:
         - Home: platform/guides/radio-astronomy/index.md
         - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
       - Legacy:
-        - Storage: platform/legacy/storage.md
-        - OpenStack Cloud Portal: platform/legacy/openstack.md
+        - Publication Proto: platform/legacy/publication-proto.md
+        - Cloud Services Proto: platform/legacy/cloud-services-proto.md
+        - Storage Proto: platform/legacy/storage-proto.md
     - Help & Support: platform/help.md
   - Python Client:
     - Home: client/home.md
