@@ -33,3 +33,18 @@ def test_auth_commands():
     assert results.exit_code == 0
     result = runner.invoke(auth, ["purge", "-y"])
     assert result.exit_code == 0
+
+def test_auth_login():
+    """Test `canfar auth login` command."""
+    result = runner.invoke(auth, ["login"])
+    assert result.exit_code == 0
+
+def test_auth_list():
+    """Test `canfar auth list` command."""
+    result = runner.invoke(auth, ["list"])
+    assert result.exit_code == 0
+
+def test_auth_switch():
+    """Test `canfar auth switch` command."""
+    result = runner.invoke(auth, ["switch", "default"])
+    assert result.exit_code == 0
