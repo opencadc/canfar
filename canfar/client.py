@@ -123,7 +123,7 @@ class HTTPClient(BaseSettings):
         """
         if not self._client:
             self._client = self._create_sync_client()
-            log.debug("Synchronous HTTPx client created successfully")
+            log.debug("Synchronous HTTPx client created")
         return self._client
 
     @property
@@ -131,7 +131,7 @@ class HTTPClient(BaseSettings):
         """Get the asynchronous HTTPx Async Client."""
         if not self._asynclient:
             self._asynclient = self._create_async_client()
-            log.debug("Asynchronous HTTPx client created successfully")
+            log.debug("Asynchronous HTTPx client created")
         return self._asynclient
 
     @field_validator("loglevel", mode="before")
@@ -196,6 +196,7 @@ class HTTPClient(BaseSettings):
             AsyncClient: The asynchronous HTTPx client.
         """
         kwargs = self._get_client_kwargs(asynchronous=True)
+        log.debug("HTTPx async client kwargs: %s", kwargs)
         headers = self._get_http_headers()
         client = AsyncClient(**kwargs)
         client.headers.update(headers)
@@ -208,6 +209,7 @@ class HTTPClient(BaseSettings):
             Client: The synchronous HTTPx client.
         """
         kwargs = self._get_client_kwargs(asynchronous=False)
+        log.debug("HTTPx sync client kwargs: %s", kwargs)
         headers = self._get_http_headers()
         client = Client(**kwargs)
         client.headers.update(headers)
@@ -264,10 +266,13 @@ class HTTPClient(BaseSettings):
             return kwargs
 
         # No user-provided credentials, use configured context
+        # Note: The refresh hook must be the first request hook to run, since it may
+        #       update the context and headers. The expiry hook will then check the
+        #       updated context for expiry.
         if ctx.mode == "oidc":
             assert ctx.valid, "Invalid OIDC context provided."
-            refresher = auth.ahook(self) if asynchronous else auth.hook(self)
-            kwargs["event_hooks"]["request"].append(refresher)
+            refresher = auth.arefresh(self) if asynchronous else auth.refresh(self)
+            kwargs["event_hooks"]["request"].insert(0, refresher)
             return kwargs
 
         if ctx.mode in {"x509", "default"}:

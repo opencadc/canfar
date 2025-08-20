@@ -52,7 +52,7 @@ class AuthenticationError(Exception):
     """Exception raised when authentication refresh fails."""
 
 
-def hook(client: HTTPClient) -> Callable[[httpx.Request], None]:
+def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
     """Create an authentication refresh hook for httpx clients.
 
     Args:
@@ -62,7 +62,7 @@ def hook(client: HTTPClient) -> Callable[[httpx.Request], None]:
         Callable[[httpx.Request], None]: The auth hook function.
     """
 
-    def refresh(request: httpx.Request) -> None:
+    def hook(request: httpx.Request) -> None:
         """Synchronous refresh hook for httpx clients.
 
         Args:
@@ -121,10 +121,10 @@ def hook(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.exception(msg)
             raise AuthenticationError(msg) from err
 
-    return refresh
+    return hook
 
 
-def ahook(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
+def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     """Create an asynchronous authentication refresh hook for httpx clients.
 
     Args:
@@ -134,7 +134,7 @@ def ahook(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Callable[[httpx.Request], Awaitable[None]]: The async auth hook.
     """
 
-    async def refresh(request: httpx.Request) -> None:
+    async def ahook(request: httpx.Request) -> None:
         """Asynchronous refresh hook for httpx clients.
 
         Args:
@@ -187,4 +187,4 @@ def ahook(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
             log.exception(msg)
             raise AuthenticationError(msg) from err
 
-    return refresh
+    return ahook
