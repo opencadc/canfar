@@ -25,7 +25,7 @@ log = get_logger(__name__)
 
 def gather(
     username: str | None = None,
-    days_valid: int = 10,
+    days_valid: int = 30,
     cert_path: Path | None = None,
 ) -> dict[str, Any]:
     """Gather user credentials and obtain X509 certificate.
@@ -37,7 +37,7 @@ def gather(
         username (str, optional): Username for authentication. Will prompt if None.
             Defaults to None.
         days_valid (int): Number of days the certificate should be valid.
-            Defaults to 10.
+            Defaults to 30.
         cert_path (Path, optional): Path to save certificate.
             Defaults to ~/.ssl/cadcproxy.pem.
 
@@ -50,7 +50,7 @@ def gather(
         ValueError: If certificate retrieval fails.
 
     Examples:
-        >>> info = gather(username="myuser", days_valid=10)
+        >>> info = gather(username="myuser", days_valid=30)
         >>> print(f"Certificate saved to {info['path']}")
     """
     # Get credentials if not provided

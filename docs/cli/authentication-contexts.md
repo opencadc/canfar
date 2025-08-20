@@ -26,7 +26,7 @@ Canfar supports several authentication methods:
     - **Bearer Tokens** - Direct token authentication for API access
 
 !!! tip "Automatic Configuration"
-    Starting with v1.7, Canfar automatically configures the appropriate authentication method based on the server's capabilities and your configuration.
+    Canfar automatically configures the appropriate authentication method based on the server's capabilities and your configuration.
 
 ---
 

@@ -40,7 +40,7 @@ def get_stats(
 
         # Main table
         table = Table(
-            title="CANFAR Cluster Usage Statistics",
+            title="CANFAR Platform Load",
             box=box.SIMPLE,
             show_header=True,
             header_style="bold blue",
@@ -73,27 +73,22 @@ def get_stats(
         cores_table = Table(box=box.MINIMAL, show_header=False)
         cores_table.add_column("Metric", justify="left")
         cores_table.add_column("Value", justify="left")
-        cores_table.add_row("Requested", f"{cores.get('requestedCPUCores', 'N/A')}")
-        cores_table.add_row("Available", f"{cores.get('cpuCoresAvailable', 'N/A')}")
+        cores_table.add_row("Usage", f"{int(cores.get('requestedCPUCores', -1))}")
+        cores_table.add_row("Total", f"{int(cores.get('cpuCoresAvailable', -1))}")
 
         # Nested table for RAM
         ram = data.get("ram", {})
         ram_table = Table(box=box.MINIMAL, show_header=False)
         ram_table.add_column("Metric", justify="left")
         ram_table.add_column("Value", justify="left")
-        ram_table.add_row("Requested", f"{ram.get('requestedRAM', 'N/A')}")
-        ram_table.add_row("Available", f"{ram.get('ramAvailable', 'N/A')}")
+        ram_table.add_row("Usage", f"{ram.get('requestedRAM', 'N/A')}")
+        ram_table.add_row("Total", f"{ram.get('ramAvailable', 'N/A')}")
 
         # Add the first row with nested tables
         table.add_row(instances_table, cores_table, ram_table)
 
-        # Add the second row with max session size
-        max_cpu = cores.get("maxCPUCores", {}).get("cpuCores", "N/A")
-        max_ram = ram.get("maxRAM", {}).get("ram", "N/A")
         console.print(table)
-        console.print(
-            f"[bold]Maximum Requests Size:[/bold] {max_cpu} Cores or {max_ram} RAM"
-        )
+        console.print("[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM")
         console.print(
             "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
         )

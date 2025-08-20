@@ -7,12 +7,12 @@
 !!! info "Installation"
 
     ```bash
-    pip intall canfar
+    pip install canfar
     ```
 
 !!! example "Session Creation Example"
 
-    ```python title="Python Session Creation"
+    ```python title="Creat Python Session"
     from canfar.sessions import AsyncSession
 
     session = AsyncSession()

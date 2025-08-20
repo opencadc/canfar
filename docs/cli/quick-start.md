@@ -1,11 +1,11 @@
 # 5-Minute Quick Start
 
 !!! success "Goal"
-    By the end of this guide, you'll have a Jupyter Notebook running on CANFAR with astronomy tools ready to use.
+    By the end of this guide, you'll have a Jupyter Notebook Session on CANFAR with astronomy tools ready to use.
 
 !!! tip "Prerequisites"
     - A CADC Account (Canadian Astronomy Data Centre) - [Sign up here](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-    - Logged into the [CANFAR Science Platform](https://canfar.net) and [Harbor Container Registry](https://images.canfar.net) at least once.
+    - You have atleast once logged into the [CANFAR Science Platform](https://canfar.net) and [Harbor Container Registry](https://images.canfar.net).
     - Python 3.10+
     - Basic familiarity with Python and Jupyter notebooks
 
@@ -19,6 +19,10 @@ Installed
 ```
 
 ## Authentication
+
+```bash title='Login to CANFAR Science Platform'
+canfar auth login
+```
 
 <!-- termynal -->
 ```
@@ -42,12 +46,48 @@ $ Password: ***********
 Login completed successfully!
 ```
 
-!!! info "What just happened?"
-    - Canfar discovered all available Science Platform servers around the world
-    - You selected the CADC CANFAR Server
+
+!!! note "Login Pathways"
+
+    === "CADC Users with Existing `~/.ssl/cadcproxy.pem`"
+    
+        If you’re using the [CADC CANFAR Science Platform](https://canfar.net) already have a valid certificate at `~/.ssl/cadcproxy.pem`, the CLI will log you in automatically
+
+        ```bash
+        Starting Science Platform Login
+        ✓ Credentials valid
+        ✓ Authenticated with CADC-CANFAR @ https://ws-uv.canfar.net/skaha
+        Use --force to re-authenticate.
+        ```
+
+    === "SRCnet Users"
+
+        If you are a SRCnet user, you will be required to go through the OpenID Connect login process in your web browser.
+
+        ```bash
+        Starting Science Platform Login
+        Fetched CADC in 0.13s
+        Fetched SRCnet in 1.03s
+        Discovery completed in 3.20s (13/19 active)
+        ? Select a Canfar Server: 🟢 Canada  SRCnet
+        Discovering capabilities for https://src.canfar.net/skaha
+        OIDC Authentication for https://src.canfar.net/skaha
+        Starting OIDC Device Authentication
+        ✓ OIDC Configuration discovered successfully
+        ✓ OIDC device registered successfully
+        ✓ Follow the link below to authorize:
+        ```
+
+```bash title="Force Re-Login"
+canfar auth login --force
+```
+
+!!! success "What just happened?"
+    - `canfar` discovered all available Science Platform servers around the world
+    - You selected the `CADC CANFAR Server`
     - You logged into the Science Platform using your CADC credentials
-    - The Science Platform generated a certificate for you valid for 10 days
-    - The certificate is Stored in `~/.ssl/cadcproxy.pem`
+    - The Science Platform generated a certificate for you valid for 30 days
+    - The certificate is stored in `~/.ssl/cadcproxy.pem`
 
 ## Launch Your First Notebook
 
@@ -55,9 +95,9 @@ Lets launch a Jupyter notebook with astronomy tools pre-installed,
 
 <!-- termynal -->
 ```
+# Launch a notebook session
 $ canfar create notebook skaha/astroml-notebook:latest
-Creating notebook session 'scare-monster'...
-Successfully created session 'scare-monster' (ID: tcgle3m3)
+Successfully created session 'finish-inmate' (ID: d1tsqexh)
 ```
 
 !!! success "What just happened?"
@@ -71,6 +111,7 @@ Successfully created session 'scare-monster' (ID: tcgle3m3)
 
 <!-- termynal -->
 ```
+# Timeline of events taken to launch the notebook session
 $ canfar events $(canfar ps -q)
 ```
 
@@ -85,11 +126,11 @@ $ canfar events $(canfar ps -q)
 <!-- termynal -->
 ```
 $ canfar ps
-                                           Canfar Sessions                                            
-                                                                                                     
- SESSION ID NAME          KIND     STATUS  IMAGE                                           CREATED   
- ─────────────────────────────────────────────────────────────────────────────────────────────────── 
- tcgle3m3   scare-monster notebook Running images.canfar.net/skaha/astroml-notebook:latest 2 minutes 
+                                                CANFAR Sessions
+
+SESSION ID  NAME          KIND         STATUS    IMAGE                           CREATED
+──────────────────────────────────────────────────────────────────────────────────────────
+d1tsqexh    finish-inmate notebook     Running   skaha/astroml-notebook:latest   7 minutes
 ```
 
 !!! success "What just happened?"
@@ -102,20 +143,19 @@ $ canfar ps
 <!-- termynal -->
 ```
 $ canfar info $(canfar ps -q)
-                                         Canfar Session Info for tcgle3m3
 
-  Session ID    zkm7yly7
-  Name          alert-connect
+  Session ID    d1tsqexh
+  Name          finish-inmate
   Status        Running
   Type          notebook
   Image         images.canfar.net/skaha/astroml-notebook:latest
   User ID       brars
-  Start Time    12 seconds ago
-  Expiry Time   3 days and 24.00 hours
-  Connect URL   https://workload-uv.canfar.net/session/notebook/redacted
-  UID           12345
-  GID           12345
-  Groups        [54321, 54312, 54123, 51234, 12345]
+  Start Time    13 minutes ago
+  Expiry Time   3 days and 23.77 hours
+  Connect URL   https://connect.to/notebook/here
+  UID           123456789
+  GID           123456789
+  Groups        [12345, 67890]
   App ID        <none>
   CPU Usage     0% of 1 core(s)
   RAM Usage     0% of 2G GB
@@ -153,8 +193,10 @@ Once your notebook is running, click the URL to open it in your browser. You'll 
 
 - **Jupyter Lab** with a full Python environment
 - **Pre-installed astronomy libraries**: AstroPy, Matplotlib, SciPy, PyTorch, etc.
-- **Persistent storage**: Your work is automatically saved at `/arc/home/username/`
-- **Ephemeral storage**: For temporary data staging, use `/scratch/`
+- **Storages**
+    - **Persistent**: Your work is automatically saved at `/arc/home/username/`
+    - **Project**: Large datasets shared within your project at `/arc/projects/name`
+    - **Ephemeral**: For temporary data staging, use `/scratch/`
 
 !!! example "Try This First"
     In JupyterLab, open a new Notebook and run the following code to verify your environment:

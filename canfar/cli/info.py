@@ -52,6 +52,8 @@ def _format(field: str, value: Any) -> str:
 
 def _utilization(used: float | str, requested: float | str, unit: str) -> str:
     """Calculate and format resource utilization."""
+    if requested == "<none>":
+        requested = 0
     req_val = float(str(requested).replace("G", ""))
     if req_val == 0:
         return "[italic]Not Requested[/italic]"

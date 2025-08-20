@@ -19,6 +19,9 @@ class IVOARegistrySearch(BaseModel):
         default={
             "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCnet",
             "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
+            (
+                "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+            ): "CADC@keel-dev",
         }
     )
 
@@ -43,7 +46,7 @@ class IVOARegistrySearch(BaseModel):
     )
 
     excluded: tuple[str, ...] = Field(
-        default=("dev", "development", "test", "demo", "stage", "staging")
+        default=("dev", "development", "test", "demo", "stage", "staging", "rc-")
     )
 
 
