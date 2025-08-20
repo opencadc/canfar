@@ -1096,13 +1096,13 @@
 <h1 id="5-minute-quick-start">5-Minute Quick Start<a class="headerlink" href="#5-minute-quick-start" title="Permanent link">&para;</a></h1>
 <div class="admonition success">
 <p class="admonition-title">Goal</p>
-<p>By the end of this guide, you'll have a Jupyter Notebook running on CANFAR with astronomy tools ready to use.</p>
+<p>By the end of this guide, you'll have a Jupyter Notebook Session on CANFAR with astronomy tools ready to use.</p>
 </div>
 <div class="admonition tip">
 <p class="admonition-title">Prerequisites</p>
 <ul>
 <li>A CADC Account (Canadian Astronomy Data Centre) - <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">Sign up here</a></li>
-<li>Logged into the <a href="https://canfar.net">CANFAR Science Platform</a> and <a href="https://images.canfar.net">Harbor Container Registry</a> at least once.</li>
+<li>You have atleast once logged into the <a href="https://canfar.net">CANFAR Science Platform</a> and <a href="https://images.canfar.net">Harbor Container Registry</a>.</li>
 <li>Python 3.10+</li>
 <li>Basic familiarity with Python and Jupyter notebooks</li>
 </ul>
@@ -1111,21 +1111,55 @@
 <div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty>&gt; pip install canfar --upgrade</span><span data-ty="progress"></span><span data-ty>Installed<br></span></div>
 
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
+<div class="highlight"><span class="filename">Login to CANFAR Science Platform</span><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
+</code></pre></div>
 <div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar auth login</span><span data-ty>Starting Science Platform Login<br>Fetched CADC in 0.12s<br>Fetched SRCnet in 1.15s<br>Discovery completed in 3.32s (5/18 active)</span><span data-ty="input" data-ty-prompt="$">Select a Canfar Server: (Use arrow keys)</span><span data-ty>   🟢 Canada  SRCnet<br>   🟢 UK-CAM  SRCnet<br>   🟢 Swiss   SRCnet<br>   🟢 Spain   SRCnet<br> » 🟢 CANFAR  CADC</span><span data-ty="input" data-ty-prompt="$">Selected a Canfar Server: 🟢 CANFAR  CADC</span><span data-ty>X509 Certificate Authentication</span><span data-ty="input" data-ty-prompt="$">Username: username</span><span data-ty>username@ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca</span><span data-ty="input" data-ty-prompt="$">Password: ***********</span><span data-ty>✓ Saving configuration<br>Login completed successfully!<br></span></div>
 
-<div class="admonition info">
+<div class="admonition note">
+<p class="admonition-title">Login Pathways</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">CADC Users with Existing <code>~/.ssl/cadcproxy.pem</code></label><label for="__tabbed_1_2">SRCnet Users</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>If you’re using the <a href="https://canfar.net">CADC CANFAR Science Platform</a> already have a valid certificate at <code>~/.ssl/cadcproxy.pem</code>, the CLI will log you in automatically</p>
+<div class="highlight"><pre><span></span><code>Starting<span class="w"> </span>Science<span class="w"> </span>Platform<span class="w"> </span>Login
+✓<span class="w"> </span>Credentials<span class="w"> </span>valid
+✓<span class="w"> </span>Authenticated<span class="w"> </span>with<span class="w"> </span>CADC-CANFAR<span class="w"> </span>@<span class="w"> </span>https://ws-uv.canfar.net/skaha
+Use<span class="w"> </span>--force<span class="w"> </span>to<span class="w"> </span>re-authenticate.
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<p>If you are a SRCnet user, you will be required to go through the OpenID Connect login process in your web browser.</p>
+<div class="highlight"><pre><span></span><code>Starting<span class="w"> </span>Science<span class="w"> </span>Platform<span class="w"> </span>Login
+Fetched<span class="w"> </span>CADC<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">0</span>.13s
+Fetched<span class="w"> </span>SRCnet<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">1</span>.03s
+Discovery<span class="w"> </span>completed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">3</span>.20s<span class="w"> </span><span class="o">(</span><span class="m">13</span>/19<span class="w"> </span>active<span class="o">)</span>
+?<span class="w"> </span>Select<span class="w"> </span>a<span class="w"> </span>Canfar<span class="w"> </span>Server:<span class="w"> </span>🟢<span class="w"> </span>Canada<span class="w">  </span>SRCnet
+Discovering<span class="w"> </span>capabilities<span class="w"> </span><span class="k">for</span><span class="w"> </span>https://src.canfar.net/skaha
+OIDC<span class="w"> </span>Authentication<span class="w"> </span><span class="k">for</span><span class="w"> </span>https://src.canfar.net/skaha
+Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w"> </span>Authentication
+✓<span class="w"> </span>OIDC<span class="w"> </span>Configuration<span class="w"> </span>discovered<span class="w"> </span>successfully
+✓<span class="w"> </span>OIDC<span class="w"> </span>device<span class="w"> </span>registered<span class="w"> </span>successfully
+✓<span class="w"> </span>Follow<span class="w"> </span>the<span class="w"> </span>link<span class="w"> </span>below<span class="w"> </span>to<span class="w"> </span>authorize:
+</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="highlight"><span class="filename">Force Re-Login</span><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--force
+</code></pre></div>
+<div class="admonition success">
 <p class="admonition-title">What just happened?</p>
 <ul>
-<li>Canfar discovered all available Science Platform servers around the world</li>
-<li>You selected the CADC CANFAR Server</li>
+<li><code>canfar</code> discovered all available Science Platform servers around the world</li>
+<li>You selected the <code>CADC CANFAR Server</code></li>
 <li>You logged into the Science Platform using your CADC credentials</li>
-<li>The Science Platform generated a certificate for you valid for 10 days</li>
-<li>The certificate is Stored in <code>~/.ssl/cadcproxy.pem</code></li>
+<li>The Science Platform generated a certificate for you valid for 30 days</li>
+<li>The certificate is stored in <code>~/.ssl/cadcproxy.pem</code></li>
 </ul>
 </div>
 <h2 id="launch-your-first-notebook">Launch Your First Notebook<a class="headerlink" href="#launch-your-first-notebook" title="Permanent link">&para;</a></h2>
 <p>Lets launch a Jupyter notebook with astronomy tools pre-installed, </p>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar create notebook skaha/astroml-notebook:latest</span><span data-ty>Creating notebook session 'scare-monster'...<br>Successfully created session 'scare-monster' (ID: tcgle3m3)<br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span class="termynal-comment" data-ty># Launch a notebook session</span><span data-ty="input" data-ty-prompt="$">canfar create notebook skaha/astroml-notebook:latest</span><span data-ty>Successfully created session 'finish-inmate' (ID: d1tsqexh)<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1138,7 +1172,7 @@
 </ul>
 </div>
 <h2 id="peek-under-the-hood">Peek Under the Hood<a class="headerlink" href="#peek-under-the-hood" title="Permanent link">&para;</a></h2>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar events $(canfar ps -q)</span><span data-ty></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span class="termynal-comment" data-ty># Timeline of events taken to launch the notebook session</span><span data-ty="input" data-ty-prompt="$">canfar events $(canfar ps -q)</span><span data-ty></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1150,7 +1184,7 @@
 </ul>
 </div>
 <h2 id="check-status">Check Status<a class="headerlink" href="#check-status" title="Permanent link">&para;</a></h2>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar ps</span><span data-ty>                                           Canfar Sessions                                            <br>                                                                                                     <br> SESSION ID NAME          KIND     STATUS  IMAGE                                           CREATED   <br> ─────────────────────────────────────────────────────────────────────────────────────────────────── <br> tcgle3m3   scare-monster notebook Running images.canfar.net/skaha/astroml-notebook:latest 2 minutes <br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar ps</span><span data-ty>                                                CANFAR Sessions<br><br>SESSION ID  NAME          KIND         STATUS    IMAGE                           CREATED<br>──────────────────────────────────────────────────────────────────────────────────────────<br>d1tsqexh    finish-inmate notebook     Running   skaha/astroml-notebook:latest   7 minutes<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1161,7 +1195,7 @@
 </ul>
 </div>
 <h2 id="get-session-information">Get Session Information<a class="headerlink" href="#get-session-information" title="Permanent link">&para;</a></h2>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar info $(canfar ps -q)</span><span data-ty>                                         Canfar Session Info for tcgle3m3<br><br>  Session ID    zkm7yly7<br>  Name          alert-connect<br>  Status        Running<br>  Type          notebook<br>  Image         images.canfar.net/skaha/astroml-notebook:latest<br>  User ID       brars<br>  Start Time    12 seconds ago<br>  Expiry Time   3 days and 24.00 hours<br>  Connect URL   https://workload-uv.canfar.net/session/notebook/redacted<br>  UID           12345<br>  GID           12345<br>  Groups        [54321, 54312, 54123, 51234, 12345]<br>  App ID        &lt;none&gt;<br>  CPU Usage     0% of 1 core(s)<br>  RAM Usage     0% of 2G GB<br>  GPU Usage     Not Requested<br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar info $(canfar ps -q)</span><span data-ty><br>  Session ID    d1tsqexh<br>  Name          finish-inmate<br>  Status        Running<br>  Type          notebook<br>  Image         images.canfar.net/skaha/astroml-notebook:latest<br>  User ID       brars<br>  Start Time    13 minutes ago<br>  Expiry Time   3 days and 23.77 hours<br>  Connect URL   https://connect.to/notebook/here<br>  UID           123456789<br>  GID           123456789<br>  Groups        [12345, 67890]<br>  App ID        &lt;none&gt;<br>  CPU Usage     0% of 1 core(s)<br>  RAM Usage     0% of 2G GB<br>  GPU Usage     Not Requested<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1193,8 +1227,12 @@
 <ul>
 <li><strong>Jupyter Lab</strong> with a full Python environment</li>
 <li><strong>Pre-installed astronomy libraries</strong>: AstroPy, Matplotlib, SciPy, PyTorch, etc.</li>
-<li><strong>Persistent storage</strong>: Your work is automatically saved at <code>/arc/home/username/</code></li>
-<li><strong>Ephemeral storage</strong>: For temporary data staging, use <code>/scratch/</code></li>
+<li><strong>Storages</strong><ul>
+<li><strong>Persistent</strong>: Your work is automatically saved at <code>/arc/home/username/</code></li>
+<li><strong>Project</strong>: Large datasets shared within your project at <code>/arc/projects/name</code></li>
+<li><strong>Ephemeral</strong>: For temporary data staging, use <code>/scratch/</code></li>
+</ul>
+</li>
 </ul>
 <div class="admonition example">
 <p class="admonition-title">Try This First</p>
@@ -1265,7 +1303,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 19, 2025 22:22:50 UTC">August 19, 2025</span>
   </span>
 
     

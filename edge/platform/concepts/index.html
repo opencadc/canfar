@@ -1378,7 +1378,9 @@
 <p>CANFAR eliminates the traditional barriers of software installation, hardware management, and infrastructure setup, letting you focus entirely on your research.</p>
 </div>
 <h3 id="who-benefits-from-canfar">Who Benefits from CANFAR?<a class="headerlink" href="#who-benefits-from-canfar" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><label for="__tabbed_1_1">Individual Researchers</label><div class="tabbed-content">
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Individual Researchers</label><label for="__tabbed_1_2">Research Teams</label><label for="__tabbed_1_3">Large Projects</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <ul>
 <li><strong>No software installation headaches</strong> - pre-configured containers ready to use</li>
 <li>Access powerful computing resources without owning hardware</li>
@@ -1386,7 +1388,7 @@
 <li>Automatic backups and data protection</li>
 </ul>
 </div>
-<input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><label for="__tabbed_1_2">Research Teams</label><div class="tabbed-content">
+<div class="tabbed-block">
 <ul>
 <li>Share data and analysis environments seamlessly</li>
 <li>Standardized software stacks across the team</li>
@@ -1394,13 +1396,14 @@
 <li>Centralized project management</li>
 </ul>
 </div>
-<input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><label for="__tabbed_1_3">Large Projects</label><div class="tabbed-content">
+<div class="tabbed-block">
 <ul>
 <li>Scale computing resources up or down as needed</li>
 <li>Batch processing for large datasets</li>
 <li>Custom software environments for specialized workflows</li>
 <li>Integration with astronomy data archives</li>
 </ul>
+</div>
 </div>
 </div>
 <h2 id="architecture">🏗️ Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
@@ -1576,7 +1579,9 @@ graph LR
 </div>
 <h3 id="session-types">Session Types<a class="headerlink" href="#session-types" title="Permanent link">&para;</a></h3>
 <p>Different session types provide different interfaces to the same underlying computing resources:</p>
-<div class="tabbed-set" data-tabs="2:5"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><label for="__tabbed_2_1">📓 Notebook Sessions</label><div class="tabbed-content">
+<div class="tabbed-set tabbed-alternate" data-tabs="2:5"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">📓 Notebook Sessions</label><label for="__tabbed_2_2">🖥️ Desktop Sessions</label><label for="__tabbed_2_3">📊 CARTA Sessions</label><label for="__tabbed_2_4">🔥 Firefly Sessions</label><label for="__tabbed_2_5">⚙️ Contributed Sessions</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
 <p><strong>JupyterLab Interface</strong> for interactive analysis</p>
 <ul>
 <li>Perfect for data exploration and visualization</li>
@@ -1584,7 +1589,7 @@ graph LR
 <li>Rich text, code, and visualization in one interface</li>
 </ul>
 </div>
-<input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><label for="__tabbed_2_2">🖥️ Desktop Sessions</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p><strong>Full Linux desktop environment</strong> for GUI applications</p>
 <ul>
 <li>CASA, DS9, and image viewers</li>
@@ -1592,7 +1597,7 @@ graph LR
 <li>Multiple applications running simultaneously</li>
 </ul>
 </div>
-<input id="__tabbed_2_3" name="__tabbed_2" type="radio" /><label for="__tabbed_2_3">📊 CARTA Sessions</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p><strong>Specialized for radio astronomy</strong> visualization and analysis</p>
 <ul>
 <li>CARTA viewer for FITS files</li>
@@ -1600,7 +1605,7 @@ graph LR
 <li>Interactive data exploration</li>
 </ul>
 </div>
-<input id="__tabbed_2_4" name="__tabbed_2" type="radio" /><label for="__tabbed_2_4">🔥 Firefly Sessions</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p><strong>Table and image visualization</strong> tools</p>
 <ul>
 <li>Astronomical table viewing</li>
@@ -1608,13 +1613,14 @@ graph LR
 <li>Web-based interface</li>
 </ul>
 </div>
-<input id="__tabbed_2_5" name="__tabbed_2" type="radio" /><label for="__tabbed_2_5">⚙️ Contributed Sessions</label><div class="tabbed-content">
+<div class="tabbed-block">
 <p><strong>Custom applications</strong> contributed by the community</p>
 <ul>
 <li>Specialized tools and workflows</li>
 <li>Community-maintained software</li>
 <li>Experimental features</li>
 </ul>
+</div>
 </div>
 </div>
 <h2 id="storage-systems">💾 Storage Systems<a class="headerlink" href="#storage-systems" title="Permanent link">&para;</a></h2>
