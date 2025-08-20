@@ -120,7 +120,7 @@ def _version_sort_key(v: str | None) -> tuple[int, tuple[int, ...]]:
     return (0, tup)
 
 
-def capabilities(url: str) -> list[Capability]:  # noqa: PLR0912 too many branches (clarity)
+def capabilities(url: str | None = None, xml: str | None = None) -> list[Capability]:  # noqa: PLR0912 too many branches (clarity)
     """Parse sessions capabilities into a list of endpoint families.
 
     Rules:
@@ -136,6 +136,7 @@ def capabilities(url: str) -> list[Capability]:  # noqa: PLR0912 too many branch
 
     Args:
         url: A VOSI capabilities XML payload as a string.
+        xml: A VOSI capabilities XML payload as a string.
 
     Returns:
         A list of dictionaries of the form:
@@ -148,7 +149,13 @@ def capabilities(url: str) -> list[Capability]:  # noqa: PLR0912 too many branch
             ...
         ]
     """
-    xml = httpx.get(url).text
+    if xml:
+        root = ElementTree.fromstring(xml)
+    elif url:
+        xml = httpx.get(url).text
+    else:
+        msg = "Either url or xml must be provided"
+        raise ValueError(msg)
     root = ElementTree.fromstring(xml)
     buckets: OrderedDict[tuple[str, str | None], Capability] = OrderedDict()
 
