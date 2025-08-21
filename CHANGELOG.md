@@ -241,7 +241,7 @@
 
 * **index:** updated the landing page ([e7dbac2](https://github.com/opencadc/canfar/commit/e7dbac2049e4bc9e24886c83d1d971c04119c0a8))
 
-## [0.4.0] (2024-10-25)
+## [0.4.0](https://github.com/opencadc/canfar/commit/b68cefc0f9abf356fea1fdeb42034ba75b4bf42e) (2024-10-25)
 
 
 ### Features

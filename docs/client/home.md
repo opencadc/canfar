@@ -1,34 +1,43 @@
-# CANFAR Python Client
+# CANFAR Clients
 
-!!! note "Overview"
+A powerful Python interface and CLI for the CANFAR Science Platform.
 
-    A lightweight python interface to the CANFAR Science Platform.
+=== ":fontawesome-solid-wand-magic-sparkles: Client"
 
-!!! info "Installation"
+    !!! example ":material-language-python: API"
 
-    ```bash
-    pip install canfar
-    ```
+        ```python title="Create a Session"
+        from canfar.sessions import AsyncSession
 
-!!! example "Session Creation Example"
+        with AsyncSession() as session:
+            await session.create(
+                name="test",
+                image="images.canfar.net/skaha/base-notebook:latest",
+                kind="headless",
+                cmd="env",
+                env={"KEY": "VALUE"},
+                replicas=3,
+            )
+        ```
 
-    ```python title="Creat Python Session"
-    from canfar.sessions import AsyncSession
+    !!! example ":simple-gnubash: CLI"
 
-    session = AsyncSession()
-    sessions = await session.create(
-        name="test",
-        image="images.canfar.net/skaha/base-notebook:latest",
-        cores=2,
-        ram=8,
-        gpu=1,
-        kind="headless",
-        cmd="env",
-        env={"KEY": "VALUE"},
-        replicas=3,
-    )
-    ```
+        ```bash title="Create a Session"
+        canfar create headless --env KEY=VALUE --replicas 3images.canfar.net/skaha/base-notebook:latest 
+        ```
 
-[Quick Start :material-coffee:](quick-start.md){: .md-button .md-button--primary }
-[Go to GitHub :fontawesome-brands-github:](https://github.com/opencadc/canfar){: .md-button .md-button--primary }
-[Changelog :material-vector-polyline-remove:](../changelog.md){: .md-button .md-button--primary }
+=== ":material-download: Download"
+
+    !!! info "Installation"
+
+        ```bash title="Install from PyPI"
+        pip install canfar
+        ```
+
+        ```bash title="Add as Dependency"
+        uv add canfar
+        ```
+
+[:simple-python: Python Client](quick-start.md){: .md-button .md-button--primary }
+[:simple-gnubash: Explore the CLI](../cli/quick-start.md){: .md-button .md-button--primary }
+[:fontawesome-brands-github: Codebase](https://github.com/opencadc/canfar){: .md-button .md-button--primary }

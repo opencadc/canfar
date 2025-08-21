@@ -142,14 +142,14 @@ nav:
         - Home: platform/guides/radio-astronomy/index.md
         - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
     - Help & Support: platform/help.md
-  - Python Client:
+  - Client:
     - Home: client/home.md
     - What's New:
       - Updates: client/updates.md
       - Migration Guide: client/migration.md
     - Get Started:
-      - 5-Minute Tutorial: client/quick-start.md
       - Installation & Setup: client/get-started.md
+      - 5-Minute Tutorial: client/quick-start.md
     - Examples:
       - Basic: client/examples.md
       - Advanced: client/advanced-examples.md
@@ -160,18 +160,19 @@ nav:
         - Images: client/images.md
         - Context: client/context.md
         - Overview: client/overview.md
-        - Client: client/client.md
-  - CLI:
-    - 5-Minute Tutorial: cli/quick-start.md
-    - Authentication: cli/authentication-contexts.md
-    - Reference: cli/cli-help.md
+        - HTTPClient: client/client.md
+        - Helpers: client/helpers.md
+    - CLI:
+      - 5-Minute Tutorial: cli/quick-start.md
+      - Authentication: cli/authentication-contexts.md
+      - Reference: cli/cli-help.md
   - FAQ: faq.md
   - Contributor Guide:
     - Contributing: contributing.md
     - Code of Conduct: conduct.md
     - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
     - License: license.md
-  - Bug Reports:
-    - Bugs: bug-reports.md
-    - Security Issues: security.md
-  - CHANGELOG: changelog.md
+    - Bug Reports:
+      - Bugs: bug-reports.md
+      - Security Issues: security.md
+    - CHANGELOG: changelog.md

@@ -1,117 +1,183 @@
-# Canfar Usage Examples
+# Python Client Examples
 
-## Creating a Session
+These examples use the asynchronous API for best performance and scalability.
 
-```python title="Create a session"
-from canfar.session import Session
+!!! note "Assumption"
+      ```bash title="Authenticated via CLI"
+      canfar auth login
+      ```
 
-session = Session()
-session_ids = session.create(
-    name="test",
-    image="images.canfar.net/skaha/terminal:1.1.1",
-    cores=2,
-    ram=8,
-    kind="headless",
-    cmd="env",
-    env={"TEST": "test"},
-    replicas=3,
-)
+!!! tip "Synchronous API"
+    The synchronous API is also available for simple scripts and interactive use. Simply replace `AsyncSession` with `Session` and remove `async`/`await`.
+
+## Create Sessions
+
+### Notebook
+```python title="Create a notebook session (async)"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main():
+    session = AsyncSession()
+    ids = await session.create(
+        name="my-notebook",
+        image="images.canfar.net/skaha/base-notebook:latest",
+        kind="notebook",
+        cores=2,
+        ram=4,
+    )
+    print(ids)  # ["d1tsqexh"]
+
+asyncio.run(main())
 ```
 
-This will create three headless containers, each with 2 cores and 8GB of RAM, and run the command `env` in each container. The environment variable `TEST` will be set to `test` in each container. The response will be a list of session IDs created.
+### Headless
 
-```python
-print(session_ids)
-["mrjdtbn9", "ov6doae7", "g9b4p1p4"]
+- Headless sessions are are containers that execute a command and exit when complete without user interaction.
+- They are useful for batch processing and distributed computing.
+
+```python title="Replicated Headless Sessions"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main():
+    session = AsyncSession()
+    ids = await session.create(
+        name="env-check",
+        image="images.canfar.net/skaha/terminal:1.1.1",
+        kind="headless",
+        cmd="env",
+        env={"TEST": "value"},
+        replicas=3,
+    )
+    print(ids)  # ["mrjdtbn9", "ov6doae7", "g9b4p1p4"]
+
+asyncio.run(main())
 ```
 
-!!! tip "Container Replicas"
-    When spawning sessions with the Canfar API, it adds two additional environment variables to each container:
+!!! example "Replica Environment Variables"
+    All containers receive the following environment variables:
+    - `REPLICA_COUNT` — common total number of replicas
+    - `REPLICA_ID` — 1-based index of the replica (1..N)
 
-    - `REPLICA_COUNT`: An integer representing the total number of replicas spawned, e.g. 3 for the example above.
-    - `REPLICA_ID`: An integer representing the unique ID of the replica using **1-based indexing**, e.g. 1, 2, 3 for the example above.
-
-    These environment variables can be used to configure your application to run in a distributed manner. The canfar distributed helpers (`chunk` and `stripe`) automatically handle the conversion from 1-based REPLICA_ID values to appropriate data partitioning. For example, you can use the `REPLICA_COUNT` to configure the number of workers and the `REPLICA_ID` to configure the rank of the worker.
+    Use these to partition work deterministically. See [Helpers API Reference](helpers.md) for `chunk` and `stripe`.
 
 !!! warning "Private Container Registry Access"
-    If you are using a private container image from the CANFAR Harbor Registry, you need to provide your harbor `username` and the `CLI Secret` through a `ContainerRegistry` object.
+    Use a private Harbor image by providing registry credentials via configuration.
     ```python
-    from canfar.models import ContainerRegistry
-    from canfar.session import Session
+    import asyncio
+    from canfar.sessions import AsyncSession
+    from canfar.models.registry import ContainerRegistry
+    from canfar.models.config import Configuration
 
-    registry = ContainerRegistry(username="username", password="sUp3rS3cr3t")
-    session = Session(registry=registry)
+    async def main():
+        cfg = Configuration(registry=ContainerRegistry(username="username", secret="CLI_SECRET"))
+        session = AsyncSession(config=cfg)
+        ids = await session.create(
+            name="private-job",
+            image="images.canfar.net/your/private-image:latest",
+            kind="headless",
+            cmd="python",
+            args=["/app/run.py"],
+        )
+        print(ids)
+
+    asyncio.run(main())
     ```
 
-## Getting Session Information
+## Discover and Filter Sessions
 
-```python title="Get session information"
-session.info(session_id)
+```python title="Fetch & Filter Sessions"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main():
+    session = AsyncSession()
+    # All sessions
+    all_sessions = await session.fetch()
+    # Only running notebooks
+    running_notebooks = await session.fetch(kind="notebook", status="Running")
+    print(len(all_sessions), len(running_notebooks))
+
+asyncio.run(main())
 ```
 
-```bash title="Session Information"
-[{'id': 'g9b4p1p4',
-  'userid': 'brars',
-  'runAsUID': '166169204',
-  'runAsGID': '166169204',
-  'supplementalGroups': [34241, 34337, 35124, 36227, 1454823273, 1025424273],
-  'appid': '<none>',
-  'image': 'images.canfar.net/skaha/terminal:1.1.1',
-  'type': 'headless',
-  'status': 'Pending',
-  'name': '2a74d03-1',
-  'startTime': '2024-10-21T21:39:01Z',
-  'expiryTime': '2024-11-04T21:39:01Z',
-  'connectURL': 'not-applicable',
-  'requestedRAM': '1G',
-  'requestedCPUCores': '1',
-  'requestedGPUCores': '0',
-  'ramInUse': '<none>',
-  'gpuRAMInUse': '<none>',
-  'cpuCoresInUse': '<none>',
-  'gpuUtilization': '<none>'}]
+## Inspect Sessions
+
+```python title="Session Info"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main(ids: list[str]):
+    session = AsyncSession()
+    info = await session.info(ids)
+    print(info[0].get("connectURL"))  # notebook URL if applicable
+
+asyncio.run(main(["d1tsqexh"]))
 ```
 
-## Getting Deployment Information
+## Events and Logs
 
-Deployment information, about that events that occurred during the deployment of a session, can be retrieved using the `events` method.
+```python title="Timeline of Events"
+import asyncio
+from canfar.sessions import AsyncSession
 
-```python title="Get deployment information"
-events = session.events(session_ids, verbose=True)
+async def main(ids: list[str]):
+    session = AsyncSession()
+    # When verbose=True, logs are printed to stdout
+    await session.events(ids, verbose=True)
+
+asyncio.run(main(["d1tsqexh"]))
 ```
 
-```
-TYPE     REASON      MESSAGE                                                                                              FIRST-TIME             LAST-TIME
-Normal   Scheduled   Successfully assigned skaha-workload/skaha-headless-user-uuid to cluster-node                        <nil>                  <nil>
-Normal   Pulled      Container image "images.canfar.net/skaha/terminal:1.1.1" already present on machine                  2025-05-27T22:02:08Z   2025-05-27T22:02:08Z
-Normal   Created     Created container backup-original-passwd-groups                                                      2025-05-27T22:02:08Z   2025-05-27T22:02:08Z
-Normal   Started     Started container backup-original-passwd-groups                                                      2025-05-27T22:02:10Z   2025-05-27T22:02:10Z
-Normal   Pulled      Container image "redis:7.4.2-alpine3.21" already present on machine                                  2025-05-27T22:02:11Z   2025-05-27T22:02:11Z
-Normal   Created     Created container init-users-groups                                                                  2025-05-27T22:02:11Z   2025-05-27T22:02:11Z
-Normal   Started     Started container init-users-groups                                                                  2025-05-27T22:02:12Z   2025-05-27T22:02:12Z
-Normal   Pulled      Container image "images.canfar.net/skaha/terminal:1.1.1" already present on machine                  2025-05-27T22:02:14Z   2025-05-27T22:02:14Z
-Normal   Created     Created container skaha-headless-user-uuid                                                           2025-05-27T22:02:14Z   2025-05-27T22:02:14Z
-Normal   Started     Started container skaha-headless-user-uuid
+```python title="Session Logs"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main(ids: list[str]):
+    session = AsyncSession()
+    await session.logs(ids, verbose=True)  # prints to stdout when verbose=True
+
+asyncio.run(main(["d1tsqexh"]))
 ```
 
-## Getting Session Logs
+## Cluster Stats
 
-To get the logs of a session, you can use the `logs` method. The response will be a dictionary with the session IDs as keys and the logs as values.
-The logs are plain text format and can be printed to the console.
+```python title="Cluster Statistics"
+import asyncio
+from canfar.sessions import AsyncSession
 
-```python title="Get session logs"
-session.logs(session_ids)
+async def main():
+    session = AsyncSession()
+    stats = await session.stats()
+    print(stats)
+
+asyncio.run(main())
 ```
 
-## Destroying a Session
+## Cleanup Sessions
 
-When you are done with your session, you can destroy it using the `destroy` method.
-The response will be a dictionary with the session IDs as keys and a boolean value indicating whether the session was destroyed or not.
+```python title="Destroy Sessions"
+import asyncio
+from canfar.sessions import AsyncSession
 
-```python title="Destroy a session"
-session.destroy(session_ids)
+async def main(ids: list[str]):
+    session = AsyncSession()
+    result = await session.destroy(ids)
+    print(result)  # {"id": True, ...}
+
+asyncio.run(main(["mrjdtbn9", "ov6doae7"]))
 ```
 
-```python
-{"mrjdtbn9": True, "ov6doae7": True, "ayv4553m": True}
+```python title="Bulk Destroy"
+import asyncio
+from canfar.sessions import AsyncSession
+
+async def main():
+    session = AsyncSession()
+    # Destroy sessions with names starting with "test-" that are Succeeded and headless
+    result = await session.destroy_with(prefix="test-", kind="headless", status="Succeeded")
+    print(result)
+
+asyncio.run(main())
 ```
