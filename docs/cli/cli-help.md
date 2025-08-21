@@ -57,7 +57,8 @@ canfar auth login [OPTIONS]
 | `--dead` | Flag | - | Include dead servers in discovery |
 | `--dev` | Flag | - | Include dev servers in discovery |
 | `--details` | Flag | - | Include server details in discovery |
-| `--discovery-url`, `-d` | TEXT | `https://ska-iam.stfc.ac.uk/.well-known/openid-configuration` | OIDC Discovery URL |
+| `--timeout`, `-t` | INTEGER | 2 | Timeout for server response |
+| `--discovery-url` | TEXT | `https://ska-iam.stfc.ac.uk/.well-known/openid-configuration` | OIDC Discovery URL |
 
 !!! example "Basic Login"
     ```bash
@@ -138,11 +139,11 @@ canfar auth purge [OPTIONS]
 Create a new session on the Science Platform.
 
 ```bash
-canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
+canfar create [OPTIONS] desktop|notebook|carta|headless|firefly|desktop-app|contributed IMAGE [-- CMD [ARGS]...]
 ```
 
 **Arguments:**
-- `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`
+- `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`
 - `IMAGE` (required): Container image to use
 - `CMD [ARGS]...` (optional): Runtime command and arguments
 
@@ -183,8 +184,8 @@ canfar ps [OPTIONS]
 |--------|-------|------|-------------|
 | `--all` | `-a` | Flag | Show all sessions (default shows just running) |
 | `--quiet` | `-q` | Flag | Only show session IDs |
-| `--kind` | `-k` | Choice | Filter by session kind: `desktop`, `notebook`, `carta`, `headless`, `firefly` |
-| `--status` | `-s` | Choice | Filter by status: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error` |
+| `--kind` | `-k` | Choice | Filter by session kind: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed` |
+| `--status` | `-s` | Choice | Filter by status: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed` |
 | `--debug` | - | Flag | Enable debug logging |
 
 !!! example "List All Sessions"
@@ -324,13 +325,13 @@ canfar delete [OPTIONS] SESSION_IDS...
 Prune sessions by criteria for bulk cleanup.
 
 ```bash
-canfar prune [OPTIONS] NAME [KIND] [STATUS]
+canfar prune [OPTIONS] NAME KIND STATUS
 ```
 
 **Arguments:**
 - `NAME` (required): Prefix to match session names
-- `KIND` (optional): Session kind - default: `headless`
-- `STATUS` (optional): Session status - default: `Succeeded`
+- `KIND` (optional): Session kind - default: `headless` (one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`)
+- `STATUS` (optional): Session status - default: `Succeeded` (one of: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed`)
 
 #### Options
 

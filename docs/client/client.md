@@ -1,4 +1,4 @@
-# Canfar Client
+#  HTTPClient
 
 The `canfar.client` module provides a comprehensive HTTP client for interacting with CANFAR Science Platform services. Built on the powerful [`httpx`](https://www.python-httpx.org/) library, it offers both synchronous and asynchronous interfaces with advanced authentication capabilities.
 

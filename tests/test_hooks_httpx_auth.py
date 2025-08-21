@@ -8,7 +8,7 @@ import pytest
 from pydantic import SecretStr
 
 from canfar.client import HTTPClient
-from canfar.hooks.httpx.auth import AuthenticationError, ahook, hook
+from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
 from canfar.models.auth import OIDC, X509
 from canfar.models.config import Configuration
 from canfar.models.http import Server
@@ -58,7 +58,7 @@ class TestSyncHook:
         oidc_client,
     ) -> None:
         """Verify a successful token refresh updates state and headers."""
-        hook_func = hook(oidc_client)
+        hook_func = refresh(oidc_client)
         request = httpx.Request("GET", "https://oidc.example.com")
 
         hook_func(request)
@@ -91,7 +91,7 @@ class TestSyncHook:
         )
         config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
         client = HTTPClient(config=config)
-        hook_func = hook(client)
+        hook_func = refresh(client)
         request = httpx.Request("GET", "/")
 
         hook_func(request)
@@ -101,7 +101,7 @@ class TestSyncHook:
     def test_skip_if_runtime_credentials_used(self, mock_refresh) -> None:
         """Verify the hook does nothing if runtime credentials are provided."""
         client = HTTPClient(token=SecretStr("runtime-token"), url="https://runtime.com")
-        hook_func = hook(client)
+        hook_func = refresh(client)
         request = httpx.Request("GET", "/")
 
         hook_func(request)
@@ -111,7 +111,7 @@ class TestSyncHook:
     def test_skip_if_token_not_expired(self, mock_refresh, oidc_client) -> None:
         """Verify the hook does nothing if the access token is not expired."""
         oidc_client.config.context.expiry.access = time.time() + 3600  # Make it valid
-        hook_func = hook(oidc_client)
+        hook_func = refresh(oidc_client)
         request = httpx.Request("GET", "/")
 
         hook_func(request)
@@ -120,7 +120,7 @@ class TestSyncHook:
     @patch("canfar.auth.oidc.sync_refresh", side_effect=Exception("Network Error"))
     def test_refresh_failure_raises_error(self, mock_refresh, oidc_client) -> None:  # noqa: ARG002
         """Verify that a failure during refresh raises AuthenticationError."""
-        hook_func = hook(oidc_client)
+        hook_func = refresh(oidc_client)
         request = httpx.Request("GET", "/")
 
         with pytest.raises(AuthenticationError, match="Failed to refresh OIDC token"):
@@ -141,7 +141,7 @@ class TestAsyncHook:
         oidc_client,
     ) -> None:
         """Verify a successful async token refresh updates state and headers."""
-        hook_func = ahook(oidc_client)
+        hook_func = arefresh(oidc_client)
         request = httpx.Request("GET", "https://oidc.example.com")
 
         await hook_func(request)
@@ -171,7 +171,7 @@ class TestAsyncHook:
         )
         config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
         client = HTTPClient(config=config)
-        hook_func = ahook(client)
+        hook_func = arefresh(client)
         request = httpx.Request("GET", "/")
 
         await hook_func(request)
@@ -184,7 +184,7 @@ class TestAsyncHook:
         oidc_client,
     ) -> None:
         """Verify a failure during async refresh raises AuthenticationError."""
-        hook_func = ahook(oidc_client)
+        hook_func = arefresh(oidc_client)
         request = httpx.Request("GET", "/")
 
         with pytest.raises(AuthenticationError, match="Failed to refresh OIDC token"):

@@ -19,5 +19,4 @@ Whether you're an observational astronomer, a data scientist, or an enthusiastic
 
 
 [:material-book-outline: Platform Concepts ](platform/home.md){: .md-button .md-button--primary }
-[:material-language-python: Python Client ](client/home.md){: .md-button .md-button--primary }
-[:simple-gnubash: Command Line Interface](cli/home.md){: .md-button .md-button--primary }
+[:material-connection: CANFAR Client](client/home.md){: .md-button .md-button--primary }
