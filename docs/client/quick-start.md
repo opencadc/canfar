@@ -38,23 +38,41 @@ canfar auth login --force
     - You authenticated and obtained a certificate/token
     - The active context was saved for the Python client to use
 
-## Your First Session (Notebook)
+## Your First Notebook Session
 
 Launch a Jupyter notebook session programmatically.
 
-```python title="Create a notebook session"
-from canfar.sessions import Session
+=== "Notebook Session"
 
-session = Session()
-session_ids = session.create(
-    name="my-notebook",
-    image="images.canfar.net/skaha/astroml-notebook:latest",
-    kind="notebook",
-    cores=2,
-    ram=4,
-)
-print(session_ids)  # e.g., ["d1tsqexh"]
-```
+    ```python
+    from canfar.sessions import Session
+
+    session = Session()
+    session_ids = session.create(
+        name="my-first-notebook",
+        image="images.canfar.net/skaha/astroml-notebook:latest",
+        kind="notebook",
+        cores=2,
+        ram=4,
+    )
+    print(session_ids)  # e.g., ["d1tsqexh"]
+    ```
+
+=== "`async`"
+
+    ```python
+    from canfar.sessions import AsyncSession
+
+    session = AsyncSession()
+    ids = await session.create(
+        name="my-first-notebook",
+        image="images.canfar.net/skaha/astroml-notebook:latest",
+        kind="notebook",
+        cores=2,
+        ram=4,
+    )
+    print(ids)  # e.g., ["d1tsqexh"]
+    ```
 
 !!! success "What just happened?"
     - We connected to CANFAR using your active auth context
@@ -65,63 +83,82 @@ print(session_ids)  # e.g., ["d1tsqexh"]
 
 Fetch details and extract the connect URL to open your notebook.
 
-```python title="Fetch session info"
-from webbrowser import open
+=== "Connect to Session"
 
-info = session.info(session_ids)  # list[dict]
-open(info[0]["connectURL"])
-```
+    ```python
+    session.connect(ids)
+    ```
+
+=== "`async`"
+
+    ```python
+    await session.connect(ids)
+    ```
 
 ## Peek Under the Hood
 
-View deployment events to understand startup progress.
+When a session is created, it goes through a series of steps to be fully deployed. You can inspect the events to understand the progress, or capture them for monitoring.
 
-```python title="Deployment Events"
-session.events(session_ids, verbose=True)
-```
+=== "Deployment Events"
 
-Fetch logs (printed with color when verbose=True).
+    ```python
+    session.events(ids, verbose=True)
+    ```
 
-```python title="Session logs"
-session.logs(session_ids, verbose=True)
-```
+=== "`async`"
+
+    ```python
+    await session.events(ids, verbose=True)
+    ```
+
+At any point, you can also inspect the logs from the session. This is especially useful when launching long-running batch jobs.
+
+=== "Session Logs"
+
+    ```python
+    session.logs(ids, verbose=True)
+    ```
+
+=== "`async`"
+
+    ```python
+    await session.logs(ids, verbose=True)
+    ```
 
 ## Clean Up
 
-When you're done, delete your session(s) to free resources.
+When you're done, delete your session(s) to free resources for other users. :simple-happycow:
 
-```python title="Destroy session(s)"
-session.destroy(session_ids)
-# {"d1tsqexh": True}
-```
+=== "Destroy Session(s)"
 
-## Async Option (Advanced)
+    ```python
+    session.destroy(ids)
+    ```
 
-Prefer asyncio? Use the 1:1 compatible `AsyncSession`.
+=== "`async`"
 
-```python title="Asynchronous Sessions"
-import asyncio
-from canfar.sessions import AsyncSession
-
-async def main():
-    asession = AsyncSession()
-    sids = await asession.create(
-        name="my-notebook",
-        image="images.canfar.net/skaha/astroml-notebook:latest",
-        kind="notebook",
-        cores=2,
-        ram=4,
-    )
-    print(sids)
-
-asyncio.run(main())
-```
+    ```python
+    await session.destroy(ids)
+    ```
 
 ## Troubleshooting
 
 - Session won't start?
-  - Check events/logs: `session.events(ids, verbose=True)`, `session.logs(ids, verbose=True)`
-  - Try smaller cores/RAM or a different image
-- Auth issues?
-  - Re-run: `canfar auth login --force`
-  - Ensure `~/.ssl/cadcproxy.pem` exists or OIDC login completed
+
+ 
+    ```python title="Check available resources"
+    session.stats()
+    ```
+    ```python title="Check events/logs"
+    session.events(ids, verbose=True)
+    session.logs(ids, verbose=True)
+    ```
+    ```python title="Try smaller resources or different image"
+    session.create(..., cores=1, ram=2, image="images.canfar.net/skaha/base-notebook:latest")
+    ```
+
+- Authentication issues?
+
+    ```bash title="Force re-authentication"
+    canfar auth login --force --debug
+    ```

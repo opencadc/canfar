@@ -2,9 +2,32 @@
 
 Stay up to date with the latest features, improvements, and changes in CANFAR.
 
-!!! failure "v1.0"
+!!! success "v1.0"
 
-    Package Rename: [Migration from skaha → canfar](migration.md).
+    :fontawesome-solid-exclamation-triangle: **Breaking Changes**
+
+      - Deprecation of support for Python 3.8 and 3.9.
+      - The Python package has been renamed from `skaha` to `canfar`.
+      - The `skaha.session` API has been deprecated in favor of `canfar.sessions`.
+      - See [Migration guide to migrate from skaha → canfar](migration.md).
+
+    :simple-gnubash: **CLI Support**
+    
+      - Comprehensive CLI support has been added to the client under the `canfar` entry point. See [CLI Reference](../cli/home.md) for more information.
+      - The `canfar` CLI is the recommended way to manage authentication. See [Authentication Contexts](../cli/authentication-contexts.md) for more information.
+    
+    **🌎 SRCnet Support**
+    
+      - CANFAR now supports launching sessions on all the SRCnet CANFAR Science Platform instances worldwide.
+    
+    **:fontawesome-brands-connectdevelop:** OIDC Authentication
+
+      - OpenID Connect (OIDC) authentication is now supported for all SRCnet Science Platform servers where applicable.
+    
+    **:material-book-outline: Documentation**
+    
+      - Complete overhaul to bring all documentation sources under a single roof.
+      - Significant improvements to the Python client and brand new CLI documentation.
 
 ## Recent Updates
 

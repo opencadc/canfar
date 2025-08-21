@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from typing import TYPE_CHECKING, Any
+from webbrowser import open_new_tab
 
 from httpx import HTTPError, Response
 
@@ -352,6 +353,25 @@ class Session(HTTPClient):
             session["id"] for session in sessions if session["name"].startswith(prefix)
         ]
         return self.destroy(ids)
+
+    def connect(self, ids: list[str] | str) -> None:
+        """Open session[s] in a web browser.
+
+        Args:
+            ids (Union[List[str], str]): Session ID[s].
+
+        Examples:
+            >>> from canfar.session import Session
+            >>> session = Session()
+            >>> session.browse(id="hjko98yghj")
+            >>> session.browse(id=["hjko98yghj", "ikvp1jtp"])
+        """
+        if isinstance(ids, str):
+            ids = [ids]
+        for value in ids:
+            info = self.info(value)
+            connect_url = info[0]["connectURL"]
+            open_new_tab(connect_url)
 
 
 class AsyncSession(HTTPClient):
@@ -762,3 +782,23 @@ class AsyncSession(HTTPClient):
             if session["name"].startswith(prefix)
         ]
         return await self.destroy(ids)
+
+    async def connect(self, ids: list[str] | str) -> None:
+        """Connect to a session[s] in a web browser.
+
+        Args:
+            ids (Union[List[str], str]): Session ID[s].
+
+        Examples:
+            >>> from canfar.sessions import AsyncSession
+            >>> session = AsyncSession()
+            >>> await session.connect(id="hjko98yghj")
+            >>> await session.connect(id=["hjko98yghj", "ikvp1jtp"])
+        """
+        if isinstance(ids, str):
+            ids = [ids]
+        info = await self.info(ids)
+        for session in info:
+            connect_url = session.get("connectURL")
+            if connect_url:
+                open_new_tab(connect_url)
