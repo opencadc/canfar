@@ -15,10 +15,10 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/client/quick-start/">
       
       
-        <link rel="prev" href="../migration/">
+        <link rel="prev" href="../get-started/">
       
       
-        <link rel="next" href="../get-started/">
+        <link rel="next" href="../examples/">
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -82,6 +82,11 @@
     <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
+      
+        
+        <a href="#5-minute-quick-start-python-client" class="md-skip">
+          Skip to content
+        </a>
       
     </div>
     <div data-md-component="announce">
@@ -292,29 +297,7 @@
   
     
   
-  Python Client
-
-        </a>
-      </li>
-    
-  
-
-      
-        
-  
-  
-  
-  
-    
-    
-      <li class="md-tabs__item">
-        <a href="../../cli/quick-start/" class="md-tabs__link">
-          
-  
-  
-    
-  
-  CLI
+  Client
 
         </a>
       </li>
@@ -515,6 +498,8 @@
       
         
       
+        
+      
     
     
     
@@ -541,7 +526,7 @@
   
   
   <span class="md-ellipsis">
-    Python Client
+    Client
     
   </span>
   
@@ -552,7 +537,7 @@
         <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3">
             <span class="md-nav__icon md-icon"></span>
-            Python Client
+            Client
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
@@ -749,37 +734,6 @@
                 
   
   
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    5-Minute Tutorial
-    
-  </span>
-  
-
-      </a>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
   
   
     <li class="md-nav__item">
@@ -794,6 +748,134 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    5-Minute Tutorial
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    5-Minute Tutorial
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-session-notebook" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your First Session (Notebook)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peek-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      Peek Under the Hood
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clean-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean Up
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#async-option-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      Async Option (Advanced)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -992,6 +1074,8 @@
       
         
       
+        
+      
     
     
     
@@ -1042,15 +1126,8 @@
 
               
             
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
+              
+                
   
   
   
@@ -1070,22 +1147,25 @@
       
       
         
-      
-    
-    
-      
-        
+          
+          
         
       
     
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
-  
-  
-  
-    <a href="../../cli/quick-start/" class="md-nav__link">
-      
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_6" id="__nav_3_6_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -1094,12 +1174,95 @@
   </span>
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_6">
+            <span class="md-nav__icon md-icon"></span>
+            CLI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5-Minute Tutorial
+    
+  </span>
   
 
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Authentication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/cli-help/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -1206,6 +1369,79 @@
   
   
   
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#installation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Installation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      Authentication
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#your-first-session-notebook" class="md-nav__link">
+    <span class="md-ellipsis">
+      Your First Session (Notebook)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#peek-under-the-hood" class="md-nav__link">
+    <span class="md-ellipsis">
+      Peek Under the Hood
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#clean-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Clean Up
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#async-option-advanced" class="md-nav__link">
+    <span class="md-ellipsis">
+      Async Option (Advanced)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1237,9 +1473,111 @@
   
 
 
-  <h1>5-Minute Tutorial</h1>
+<h1 id="5-minute-quick-start-python-client">5-Minute Quick Start (Python Client)<a class="headerlink" href="#5-minute-quick-start-python-client" title="Permanent link">&para;</a></h1>
+<div class="admonition success">
+<p class="admonition-title">Goal</p>
+<p>By the end of this guide, you'll authenticate, launch a compute Session on CANFAR programmatically, inspect it, read logs/events, and clean it up — all from Python.</p>
+</div>
+<div class="admonition tip">
+<p class="admonition-title">Prerequisites</p>
+<ul>
+<li>CADC Account — <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">Sign up</a></li>
+<li>You have logged in at least once to the <a href="https://canfar.net">CANFAR Science Platform</a> and the <a href="https://images.canfar.net">Harbor Container Registry</a></li>
+<li>Python 3.10+</li>
+</ul>
+</div>
+<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty>&gt; pip install canfar --upgrade</span><span data-ty="progress"></span><span data-ty>Installed<br></span></div>
 
+<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
+<p>The Python client automatically uses your active authentication context created by the CLI.</p>
+<div class="highlight"><span class="filename">Login to CANFAR Science Platform</span><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Login Pathways</p>
+<ul>
+<li>If you already have a valid CADC X509 certificate at <code>~/.ssl/cadcproxy.pem</code>, the CLI will reuse it automatically.</li>
+<li>If you're an SRCnet user, you'll be guided through an OIDC device flow in your browser.</li>
+</ul>
+</div>
+<div class="highlight"><span class="filename">Force Re-Login (optional)</span><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--force
+</code></pre></div>
+<div class="admonition success">
+<p class="admonition-title">What just happened?</p>
+<ul>
+<li>The CLI discovered available CANFAR/SRCnet servers</li>
+<li>You authenticated and obtained a certificate/token</li>
+<li>The active context was saved for the Python client to use</li>
+</ul>
+</div>
+<h2 id="your-first-session-notebook">Your First Session (Notebook)<a class="headerlink" href="#your-first-session-notebook" title="Permanent link">&para;</a></h2>
+<p>Launch a Jupyter notebook session programmatically.</p>
+<div class="highlight"><span class="filename">Create a notebook session</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">session_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml-notebook:latest&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">session_ids</span><span class="p">)</span>  <span class="c1"># e.g., [&quot;d1tsqexh&quot;]</span>
+</code></pre></div>
+<div class="admonition success">
+<p class="admonition-title">What just happened?</p>
+<ul>
+<li>We connected to CANFAR using your active auth context</li>
+<li>A notebook container was requested with 2 CPU cores and 4 GB RAM</li>
+<li>The API returned the newly created session ID(s)</li>
+</ul>
+</div>
+<h3 id="get-connection-url">Get Connection URL<a class="headerlink" href="#get-connection-url" title="Permanent link">&para;</a></h3>
+<p>Fetch details and extract the connect URL to open your notebook.</p>
+<div class="highlight"><span class="filename">Fetch session info</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">webbrowser</span><span class="w"> </span><span class="kn">import</span> <span class="nb">open</span>
+
+<span class="n">info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">session_ids</span><span class="p">)</span>  <span class="c1"># list[dict]</span>
+<span class="nb">open</span><span class="p">(</span><span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;connectURL&quot;</span><span class="p">])</span>
+</code></pre></div>
+<h2 id="peek-under-the-hood">Peek Under the Hood<a class="headerlink" href="#peek-under-the-hood" title="Permanent link">&para;</a></h2>
+<p>View deployment events to understand startup progress.</p>
+<div class="highlight"><span class="filename">Deployment Events</span><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">session_ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>Fetch logs (printed with color when verbose=True).</p>
+<div class="highlight"><span class="filename">Session logs</span><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">session_ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="clean-up">Clean Up<a class="headerlink" href="#clean-up" title="Permanent link">&para;</a></h2>
+<p>When you're done, delete your session(s) to free resources.</p>
+<div class="highlight"><span class="filename">Destroy session(s)</span><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">session_ids</span><span class="p">)</span>
+<span class="c1"># {&quot;d1tsqexh&quot;: True}</span>
+</code></pre></div>
+<h2 id="async-option-advanced">Async Option (Advanced)<a class="headerlink" href="#async-option-advanced" title="Permanent link">&para;</a></h2>
+<p>Prefer asyncio? Use the 1:1 compatible <code>AsyncSession</code>.</p>
+<div class="highlight"><span class="filename">Asynchronous Sessions</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">asession</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">()</span>
+    <span class="n">sids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asession</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml-notebook:latest&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sids</span><span class="p">)</span>
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Session won't start?</li>
+<li>Check events/logs: <code>session.events(ids, verbose=True)</code>, <code>session.logs(ids, verbose=True)</code></li>
+<li>Try smaller cores/RAM or a different image</li>
+<li>Auth issues?</li>
+<li>Re-run: <code>canfar auth login --force</code></li>
+<li>Ensure <code>~/.ssl/cadcproxy.pem</code> exists or OIDC login completed</li>
+</ul>
 
 
 
@@ -1262,7 +1600,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 00:30:56 UTC">August 21, 2025</span>
   </span>
 
     
