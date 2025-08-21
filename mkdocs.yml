@@ -182,6 +182,10 @@ nav:
       - Radio Astronomy:
         - Home: platform/guides/radio-astronomy/index.md
         - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
+      - Publications: platform/legacy/publication.md
+      - Legacy:
+        - Cloud Services: platform/legacy/cloud-services.md
+        - VOS Storage: platform/legacy/storage.md
     - Help & Support: platform/help.md
   - Client:
     - Home: client/home.md

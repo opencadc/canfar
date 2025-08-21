@@ -32,6 +32,10 @@ Run "headless" containers, understand batch systems, manage logs, and use APIs f
 
 Specialized workflows for CASA, ALMA data reduction, CARTA visualization, and other radio astronomy tools.
 
+### [🗂️ Legacy Documentation]()
+
+In addition to the core modules (Accounts, Storage, Containers, Interactive Sessions, etc.), a set of legacy documents is also available. These cover earlier CANFAR service portals and workflows - [Cloud Services](../legacy/cloud-services.md), which historically paralleled features such as Group Management, Science Portal, and CADC Search.  
+
 ---
 
 ## 🎯 Choose Your Path
