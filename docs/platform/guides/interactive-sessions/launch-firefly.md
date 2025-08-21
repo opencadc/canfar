@@ -1,6 +1,6 @@
 # Launching a Firefly Session
 
-**The LSST table and image visualizer for astronomical data exploration**
+**The LSST table and image visualiser for astronomical data exploration**
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch a Firefly session and choose the right version
@@ -8,14 +8,14 @@
     - How to perform catalog overlays, plotting, and cutouts
     - Performance tips for large surveys and troubleshooting guidance
 
-Firefly is a powerful web-based visualization tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogs, and analyzing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
+Firefly is a powerful web-based visualisation tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogues, and analysing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
 
 ## 🎯 What is Firefly?
 
-Firefly offers specialized tools for:
+Firefly offers specialised tools for:
 
-- **Image visualization** with advanced stretch and color controls
-- **Catalog overlay** and source analysis tools  
+- **Image visualisation** with advanced stretch and colour controls
+- **Catalogue overlay** and source analysis tools  
 - **Table viewer** with filtering, plotting, and statistical tools
 - **Multi-wavelength data** comparison and analysis
 - **Large survey datasets** like LSST, HSC, and WISE
@@ -25,9 +25,9 @@ Firefly offers specialized tools for:
 | Feature | Capability |
 |---------|------------|
 | **Image Display** | FITS images with WCS support, multiple panels |
-| **Catalog Overlay** | Plot sources on images, interactive selection |
+| **Catalogue Overlay** | Plot sources on images, interactive selection |
 | **Table Analysis** | Sort, filter, plot columns, statistical analysis |
-| **Multi-band** | RGB color composites, band switching |
+| **Multi-band** | RGB colour composites, band switching |
 | **Cutout Services** | Extract subimages from large surveys |
 | **Coordinate Systems** | Support for all standard astronomical coordinates |
 
@@ -97,7 +97,6 @@ Firefly's interface consists of several main areas:
 ```mermaid
 graph TD
     Interface[Firefly Interface]
-    
     Interface --> Upload["📁 File Upload Area"]
     Interface --> Images["🖼️ Image Display"]
     Interface --> Tables["📊 Table Viewer"]
@@ -141,15 +140,15 @@ graph TD
 **From `arc` Projects:**
 ```bash
 # Files in your project directory are accessible via:
-# /arc/projects/yourproject/data/image.fits
-# /arc/projects/yourproject/catalogs/sources.csv
+# /arc/projects/[projectname]/data/image.fits
+# /arc/projects/yourpr[projectname]/data/image_sources.csv
 ```
 
 **From VOSpace:**
 ```
 1. In Firefly, use "File" → "Open"
 2. Navigate to VOSpace URLs
-3. Access: vos://cadc.nrc.ca~vault/yourproject/
+3. Access: vos://cadc.nrc.ca~vault/yourp[projectname]/
 ```
 
 #### Remote Data Access
@@ -221,9 +220,9 @@ distance < 100                      // Distance constraint
 4. Add error bars if available
 ```
 
-**Image-Catalog Overlay:**
+**Image-Catalogue Overlay:**
 ```
-1. Load image and catalog table
+1. Load image and catalogue table
 2. Match coordinate columns (RA, Dec)
 3. Select overlay symbol (circle, cross, diamond)
 4. Adjust symbol size and color
@@ -271,10 +270,10 @@ Extract subimages from large surveys:
 
 ```
 1. Load survey image (HSC, LSST, etc.)
-2. Upload photometric catalog
+2. Upload photometric catalogue
 3. Overlay sources on image
-4. Filter by magnitude and color
-5. Create color-magnitude diagram
+4. Filter by magnitude and colour
+5. Create colour-magnitude diagram
 6. Export selected sources
 ```
 
@@ -289,7 +288,7 @@ Extract subimages from large surveys:
 6. Save analysis products
 ```
 
-### Time Series Visualization
+### Time Series Visualisation
 
 ```
 1. Load time-series table (time, magnitude, error)
@@ -329,7 +328,7 @@ vos://cadc.nrc.ca~vault/yourproject/
 1. Copy Firefly session URL
 2. Share with team members (same CANFAR group)
 3. Collaborate on analysis in real-time
-4. Each user sees same data and visualizations
+4. Each user sees same data and visualisations
 ```
 
 **Data Sharing:**
@@ -346,13 +345,13 @@ vos://cadc.nrc.ca~vault/yourproject/
 
 **Memory Management:**
 ```
-- Load subsets of large catalogs first
+- Load subsets of large catalogues first
 - Use server-side filtering when possible
 - Close unused tables and images
 - Monitor memory usage in browser
 ```
 
-**Network Optimization:**
+**Network Optimisation:**
 ```
 - Use compressed file formats (gzip FITS)
 - Access local files when possible (/arc/projects)
@@ -360,7 +359,7 @@ vos://cadc.nrc.ca~vault/yourproject/
 - Use cutout services for large images
 ```
 
-### Visualization Performance
+### Visualisation Performance
 
 **Image Display:**
 ```
@@ -439,7 +438,7 @@ Firefly works great with other CANFAR tools:
 
 !!! tip "Firefly Best Practices"
     1. **Start with small datasets** to learn the interface before tackling large surveys
-    2. **Use appropriate memory** - large catalogs need more RAM than single images  
+    2. **Use appropriate memory** - large catalogues need more RAM than single images  
     3. **Save your work frequently** - export important results to `/arc/projects/`
     4. **Collaborate effectively** - share session URLs for real-time teamwork
     5. **Optimize performance** - close unused data and use efficient file formats

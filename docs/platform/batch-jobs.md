@@ -178,9 +178,192 @@ rule source_extract:
 - Instrument simulation
 - Survey planning
 
+### Performance Optimization
+
+#### Resource Allocation Strategy
+
+**Right-sizing your jobs** is crucial for performance and queue times:
+
+```bash
+# Start small and scale up based on monitoring
+# Test job with minimal resources first
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "name=test-small" \
+  -d "cores=2" -d "ram=4" \
+  -d "image=images.canfar.net/skaha/astroml:latest" \
+  -d "kind=headless" \
+  -d "cmd=python /arc/projects/myproject/test_script.py" \
+  https://ws-uv.canfar.net/skaha/v0/session
+
+# Monitor resource usage in the job logs
+# Scale up for production runs if needed
+```
+
+**Memory Optimization:**
+```python
+# Memory-efficient data processing patterns
+import numpy as np
+from astropy.io import fits
+
+def process_large_cube(filename):
+    """Process large data cube efficiently"""
+    
+    # Memory-map large files instead of loading fully
+    with fits.open(filename, memmap=True) as hdul:
+        data = hdul[0].data
+        
+        # Process in chunks to control memory usage
+        chunk_size = 100  # Adjust based on available RAM
+        results = []
+        
+        for i in range(0, data.shape[0], chunk_size):
+            chunk = data[i:i+chunk_size]
+            # Process chunk and collect lightweight results
+            result = np.mean(chunk, axis=(1,2))  # Example operation
+            results.append(result)
+            
+            # Explicit cleanup for large chunks
+            del chunk
+            
+        return np.concatenate(results)
+```
+
+**Storage Performance:**
+```bash
+# Use /scratch/ for I/O intensive operations
+#!/bin/bash
+set -e
+
+# Copy data to fast scratch storage
+echo "Copying data to scratch..."
+rsync -av /arc/projects/myproject/large_dataset/ /scratch/working/
+
+# Process on fast storage
+cd /scratch/working
+python intensive_processing.py
+
+# Save results back to permanent storage
+echo "Saving results..."
+mkdir -p /arc/projects/myproject/results/$(date +%Y%m%d)
+cp *.fits /arc/projects/myproject/results/$(date +%Y%m%d)/
+cp *.log /arc/projects/myproject/logs/
+
+echo "Processing complete"
+```
+
+#### Parallel Processing
+
+**Multi-core CPU Usage:**
+```python
+from multiprocessing import Pool, cpu_count
+import numpy as np
+from functools import partial
+
+def process_file(filename, parameters):
+    """Process a single file"""
+    # Your processing logic here
+    return result
+
+def parallel_processing():
+    """Process multiple files in parallel"""
+    
+    # Get available CPU cores (leave 1 for system)
+    n_cores = max(1, cpu_count() - 1)
+    
+    files = glob.glob('/scratch/input/*.fits')
+    parameters = {'param1': value1, 'param2': value2}
+    
+    # Create partial function with fixed parameters
+    process_func = partial(process_file, parameters=parameters)
+    
+    # Process files in parallel
+    with Pool(n_cores) as pool:
+        results = pool.map(process_func, files)
+    
+    return results
+```
+
+**GPU Acceleration (when available):**
+```python
+import numpy as np
+try:
+    import cupy as cp  # GPU arrays
+    gpu_available = True
+except ImportError:
+    import numpy as cp  # Fallback to CPU
+    gpu_available = False
+
+def gpu_accelerated_processing(data):
+    """Use GPU acceleration when available"""
+    
+    if gpu_available:
+        print(f"Using GPU acceleration")
+        # Convert to GPU array
+        gpu_data = cp.asarray(data)
+        
+        # GPU-accelerated operations
+        result = cp.fft.fft2(gpu_data)
+        result = cp.abs(result)
+        
+        # Convert back to CPU for saving
+        return cp.asnumpy(result)
+    else:
+        print("Using CPU fallback")
+        # CPU-only operations
+        return np.abs(np.fft.fft2(data))
+```
+
+#### Job Monitoring and Logging
+
+**Comprehensive Logging:**
+```python
+import logging
+import psutil
+import time
+from datetime import datetime
+
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('/arc/projects/myproject/logs/processing.log'),
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
+
+def log_system_status():
+    """Log current system resource usage"""
+    cpu_percent = psutil.cpu_percent(interval=1)
+    memory = psutil.virtual_memory()
+    disk = psutil.disk_usage('/scratch')
+    
+    logger.info(f"CPU: {cpu_percent:.1f}%, "
+                f"Memory: {memory.percent:.1f}% "
+                f"({memory.used//1024**3:.1f}GB used), "
+                f"Scratch: {disk.percent:.1f}% used")
+
+def timed_processing(func, *args, **kwargs):
+    """Wrapper to time and log function execution"""
+    start_time = time.time()
+    logger.info(f"Starting {func.__name__}")
+    log_system_status()
+    
+    try:
+        result = func(*args, **kwargs)
+        elapsed = time.time() - start_time
+        logger.info(f"Completed {func.__name__} in {elapsed:.2f} seconds")
+        return result
+    except Exception as e:
+        elapsed = time.time() - start_time
+        logger.error(f"Failed {func.__name__} after {elapsed:.2f} seconds: {e}")
+        raise
+```
+
 ## Resource Planning
 
-### Job Sizing
+### Job Sizing Guidelines
 
 Choose appropriate resources based on your workload:
 
@@ -192,8 +375,11 @@ Choose appropriate resources based on your workload:
 | ML model training | 8-16 | 32-64GB | 200GB | 4-24 hours |
 | Large simulations | 16-32 | 64-128GB | 1TB | Days-weeks |
 
-!!! info "Queue Behavior"
-    Small jobs (≤4 cores, ≤16GB) start faster. Large jobs (≥16 cores, ≥64GB) may queue longer. Off-peak hours often improve start times.
+!!! tip "Queue Optimization"
+    - **Small jobs** (≤4 cores, ≤16GB) start faster
+    - **Large jobs** (≥16 cores, ≥64GB) may queue longer  
+    - **Off-peak hours** (evenings, weekends) often have shorter wait times
+    - **Resource requests** should match actual usage to avoid waste
 
 ### Queue Management
 

@@ -111,7 +111,7 @@ Wait for the Notebook icon to appear on your dashboard, then click it to access 
 
 Your notebook session automatically mounts:
 
-- **`/arc/projects/[group]/`**: Shared project storage
+- **`/arc/projects/[groupname]/`**: Shared project storage
 - **`/arc/home/[username]/`**: Personal storage
 - **`/tmp/`**: Temporary space (cleared when session ends)
 
@@ -129,7 +129,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 
 # Load a FITS file
-hdul = fits.open("/arc/projects/myproject/data/image.fits")
+hdul = fits.open("/arc/projects/[groupname]/data/image.fits")
 data = hdul[0].data
 header = hdul[0].header
 
@@ -153,11 +153,11 @@ import casa_tools as tools
 import casa_tasks as tasks
 
 # Create measurement set summary
-tasks.listobs(vis="/arc/projects/myproject/data/observation.ms")
+tasks.listobs(vis="/arc/projects/[groupname]/data/observation.ms")
 
 # Image the data
 tasks.tclean(
-    vis="/arc/projects/myproject/data/observation.ms",
+    vis="/arc/projects/[groupname]/data/observation.ms",
     imagename="my_image",
     imsize=1024,
     cell="0.1arcsec",
@@ -165,15 +165,6 @@ tasks.tclean(
 ```
 
 ## Session Management
-
-### Sharing Sessions
-
-Share your session with collaborators:
-
-1. Click the session menu in Jupyter Lab
-2. Select "Share Session"
-3. Add collaborator usernames
-4. Set permissions (read-only or read-write)
 
 ### Saving Your Work
 
@@ -220,7 +211,7 @@ Always properly shut down your session to free resources:
 - Contact support if persistent
 
 **Can't access files**
-- Verify file paths in `/arc/projects/[group]/`
+- Verify file paths in `/arc/projects/[groupname]/`
 - Check group permissions
 - Ensure files were uploaded correctly
 

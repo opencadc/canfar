@@ -6,20 +6,20 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 ### New to CANFAR?
 
-- **[Get Started Guide](../get-started/index.md)**: 10-minute quick start
-- **[First Login](../user-guide/accounts-permissions/index.md)**: Account setup and access
-- **[Choose Your Interface](../user-guide/interactive-sessions/index.md)**: Pick the right session type
+- **[Get Started Guide](get-started.md)**: 10-minute quick start
+- **[First Login](accounts.md)**: Account setup and access
+- **[Choose Your Interface](guides/interactive-sessions/index.md)**: Pick the right session type
 
 ### Having Problems?
 
-- **[FAQ](platform/faq.md)**: Common questions and solutions
+- **[FAQ](../faq.md)**: Common questions and solutions
 - **[Troubleshooting](#troubleshooting)**: Diagnostic steps for common issues
 - **[Contact Support](#contact-support)**: Direct help from CANFAR staff
 
 ### Want to Learn More?
 
-- **[User Guide](../user-guide/index.md)**: Comprehensive platform documentation
-- **[Radio Astronomy Guide](../user-guide/radio-astronomy/index.md)**: Specialized astronomy workflows
+- **[User Guide](guides/index.md)**: Comprehensive platform documentation
+- **[Radio Astronomy Guide](guides/radio-astronomy/index.md)**: Specialized astronomy workflows
 - **[Community](#community-support)**: Connect with other users
 
 ## Self-Help Resources
@@ -28,18 +28,18 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 **User Guide Sections**:
 
-- **[Concepts](../user-guide/platform/concepts.md)**: Understanding the platform architecture
-- **[Storage](../user-guide/storage/index.md)**: Managing your data effectively
-- **[Containers](../user-guide/containers/index.md)**: Using and building software environments
-- **[Interactive Sessions](../user-guide/interactive-sessions/index.md)**: Jupyter, Desktop, CARTA
-- **[Batch Jobs](../user-guiplatform/batch-jobs.md)**: Automated and large-scale processing
-- **[Radio Astronomy](../user-guide/radio-astronomy/index.md)**: CASA and radio-specific workflows
+- **[Concepts](concepts.md)**: Understanding the platform architecture
+- **[Storage](guides/storage/index.md)**: Managing your data effectively
+- **[Containers](containers.md)**: Using and building software environments
+- **[Interactive Sessions](guides/interactive-sessions/index.md)**: Jupyter, Desktop, CARTA
+- **[Batch Jobs](batch-jobs.md)**: Automated and large-scale processing
+- **[Radio Astronomy](guides/radio-astronomy/index.md)**: CASA and radio-specific workflows
 
 **Tutorials**:
 
-- **[Data Analysis Examples](../user-guide/interactive-sessions/index.md)**: Common astronomy workflows
-- **[Radio Astronomy Guide](../user-guide/radio-astronomy/index.md)**: CASA and interferometry
-- **[Container Building](../user-guide/containers/index.md)**: Create custom environments
+- **[Data Analysis Examples](guides/interactive-sessions/index.md)**: Common astronomy workflows
+- **[Radio Astronomy Guide](guides/radio-astronomy/index.md)**: CASA and interferometry
+- **[Container Building](containers.md)**: Create custom environments
 
 ### Video Resources
 

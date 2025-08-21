@@ -13,7 +13,7 @@ This section covers everything you need to know about user management, group per
 
 ## 🔓 Permissions System
 
-CANFAR's permission system is built on several layers that work together to provide secure, flexible access control:
+CANFAR permission system is built on several layers that work together to provide secure, flexible access control:
 
 !!! info "Permission Layers"
     - **CADC Accounts** - Your base identity for accessing Canadian astronomy services
@@ -38,7 +38,7 @@ graph TD
     Admin --> |"Controls access to"| Resources
     Members --> |"Access"| Resources
     
-    Resources --> Projects["📁 /arc/projects/groupname/"]
+    Resources --> Projects["📁 /arc/projects/[groupname]/"]
     Resources --> Storage["💾 Storage Quotas"]
     Resources --> Containers["🐳 Container Access"]
 ```
@@ -63,7 +63,7 @@ graph TD
 
 1. Find your group in the list
 2. Click **"Edit"** in the Membership column
-3. Type the name (not username) of your collaborator
+3. Type the name (or the CADC username if you know it) of your collaborator
 4. Select from the search results
 5. Click **"Add member"**
 
@@ -80,8 +80,8 @@ graph TD
 
 | Role | Permissions | Best For |
 |------|-------------|----------|
-| **Administrator** | Full group management, resource allocation | Project PIs, senior team members |
-| **Member** | Access shared resources, collaborate | Researchers, grad students |
+| **Administrator** | Full group management, resource allocation | Project PIs, team responsibility |
+| **Member** | Access shared resources, collaborate | Collaborators |
 
 ## 🔐 Harbor Permissions
 
@@ -231,8 +231,8 @@ CANFAR provides REST APIs for programmatic access to platform features. All API 
 ```bash
 # Get a 48-hour token
 curl https://ws-cadc.canfar.net/ac/login \
-  -d "username=your_username" \
-  -d "password=your_password"
+  -d "username=[username]" \
+  -d "password=[password]"
 
 # Use token in API calls
 curl -H "Authorization: Bearer YOUR_TOKEN" \
@@ -248,7 +248,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" \
 pip install cadcutils
 
 # Generate proxy certificate
-cadc-get-cert -u your_username
+cadc-get-cert -u [username]
 
 # Certificate stored in ~/.ssl/cadcproxy.pem
 # Valid for 10 days, automatically used by CADC tools
@@ -294,7 +294,7 @@ curl -X PUT \
 
 | Service | Documentation | Purpose |
 |---------|---------------|---------|
-| **Skaha** | [ws-uv.canfar.net](https://ws-uv.canfar.net) | Session management |
+| **skaha** | [ws-uv.canfar.net](https://ws-uv.canfar.net) | Session management |
 | **VOSpace** | [CADC VOSpace](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/vospace/) | File operations |
 | **CADC Auth** | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/netrc) | Authentication |
 
@@ -303,7 +303,7 @@ curl -X PUT \
 !!! warning "Troubleshooting Guide"
     These are the most common permission issues and their solutions.
 
-### Problem: "Permission Denied" accessing `/arc/projects/`
+### Problem: "Permission Denied" accessing `/arc/projects/[projectname]`
 
 **Cause:** Not a member of the project group
 

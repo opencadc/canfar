@@ -19,7 +19,7 @@ These applications extend CANFAR's reach by providing specialized interfaces for
 ### The Landscape of Contributed Applications
 
 !!! info "Current Ecosystem"
-    The catalog evolves regularly. Expect reactive notebooks (Pluto.jl, Marimo), browser IDEs (VSCode), and specialized computational interfaces contributed by the community.
+    The catalogue evolves regularly. Expect reactive notebooks (Pluto.jl, Marimo), browser IDEs (VSCode), and specialized computational interfaces contributed by the community.
 
 The current ecosystem of contributed applications focuses on interactive computing environments that offer alternatives to traditional Jupyter notebooks. You'll find reactive notebook systems that provide real-time feedback as you modify code, browser-based development environments that give you the full power of modern IDEs without local installation, and specialized computational interfaces designed for specific programming languages or workflows.
 
@@ -27,15 +27,15 @@ Rather than trying to be everything to everyone, each contributed application ex
 
 ## 🚀 Getting Started
 
-### Accessing the Application Catalog
+### Accessing the Application Catalogue
 
-Beginning your journey with contributed applications starts just like any other CANFAR session. After logging into the [CANFAR Science Portal](https://www.canfar.net), you'll click the familiar plus sign (**+**) to create a new session. The key difference comes when you select `contributed` as your session type, which opens up the specialized application catalog.
+Beginning your journey with contributed applications starts just like any other CANFAR session. After logging into the [CANFAR Science Portal](https://www.canfar.net), you'll click the familiar plus sign (**+**) to create a new session. The key difference comes when you select `contributed` as your session type, which opens up the specialized application catalogue.
 
 ![Select Contributed Session](images/contributed/1_select_contributed_session.png)
 
 ### Exploring Available Applications
 
-Once you've selected the contributed session type, the container dropdown reveals the current catalog of available applications. This list represents the cutting edge of community-developed tools, and it evolves as new applications are contributed and existing ones are updated.
+Once you've selected the contributed session type, the container dropdown reveals the current catalogue of available applications. This list represents the cutting edge of community-developed tools, and it evolves as new applications are contributed and existing ones are updated.
 
 ![Choose Contributed App](images/contributed/2_select_contributed_container.png)
 
@@ -45,12 +45,10 @@ Once you've selected the contributed session type, the container dropdown reveal
 
 **Marimo** (`images.canfar.net/skaha/marimo:latest`) brings reactive computing to Python, offering a modern alternative to Jupyter notebooks. Marimo notebooks are stored as pure Python files, making them easy to version control and share. The reactive execution model ensures your notebook stays consistent as you develop and modify your analysis.
 
-**VSCode Browser** (`images.canfar.net/skaha/code-browser:latest`) provides the full Visual Studio Code experience directly in your web browser. This application is particularly valuable for software development projects, complex multi-file analyses, and situations where you need the rich editing capabilities and extensions ecosystem that VSCode provides.
+**VSCode Browser** (`images.canfar.net/skaha/vscode:latest`) provides the full Visual Studio Code experience directly in your web browser. This application is particularly valuable for software development projects, complex multi-file analyses, and situations where you need the rich editing capabilities and extensions ecosystem that VSCode provides.
 
-!!! tip "Session Sizing"
-    Start with 16GB RAM and 2-4 CPU cores for most contributed apps. Increase memory for large datasets or memory-intensive reactive notebooks.
 
-The beauty of this system lies in its dynamic nature. As the community develops new tools and contributes them to the platform, the available applications expand to meet emerging research needs. If you have ideas for applications that would benefit the astronomy community, the CANFAR team encourages you to reach out to [support@canfar.net](mailto:support@canfar.net).
+ As the community develops new tools and contributes them to the platform, the available applications expand to meet emerging research needs. If you have ideas for applications that would benefit the astronomy community, the CANFAR team encourages you to reach out to [support@canfar.net](mailto:support@canfar.net).
 
 ### Configuring Your Session
 
@@ -59,16 +57,6 @@ The beauty of this system lies in its dynamic nature. As the community develops 
 When setting up your contributed application session, choose a name that reflects both the application you're using and the purpose of your work. Names like `pluto-galaxy-analysis-2024`, `marimo-pipeline-development`, or `vscode-survey-processing` help you quickly identify the session's purpose when you return to your work later.
 
 ![Name Contributed Session](images/contributed/3_choose_contributed_name.png)
-
-#### Resource Planning
-
-The resource requirements for contributed applications can vary significantly depending on the nature of your work and the specific application you're using. Web-based development environments like VSCode Browser typically run comfortably with 8-16GB of memory and 2-4 CPU cores, while reactive notebook environments processing large datasets might benefit from 16-32GB of memory.
-
-For memory allocation, consider starting with 16GB as a reasonable default for most contributed applications. If you're working with large datasets or computationally intensive visualizations, you might want to increase this to 32GB or more. The reactive nature of some applications means they might use more memory than traditional notebooks since they maintain the state of all computations simultaneously.
-
-CPU requirements are generally modest for most contributed applications, with 2-4 cores being sufficient for typical workflows. However, if your work involves parallel processing or you're running multiple computational tasks simultaneously, additional cores can significantly improve performance.
-
-![Configure Contributed Resources](images/contributed/4_choose_contributed_resources.png)
 
 ### Launching and Connecting
 
@@ -89,9 +77,9 @@ The typical structure you'll encounter includes a navigation or menu area that p
 ### Integrating with CANFAR Storage
 
 !!! warning "Persistence Reminder"
-    Save important results to `/arc/projects/` or `/arc/home/`. Temporary paths and in-app caches may not persist after the session ends.
+    Save important results to `/arc/projects/[projectname]` or `/arc/home/[username]`. Temporary paths and in-app caches may not persist after the session ends.
 
-One of the most powerful aspects of contributed applications is their seamless integration with CANFAR's storage infrastructure. Your applications can directly access your project data through `/arc/projects/yourproject/`, your personal files via `/arc/home/yourusername/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
+One of the  aspects of contributed applications is their seamless integration with CANFAR storage infrastructure. Your applications can directly access your project data through `/arc/projects/[projectname]]/`, your personal files via `/arc/home/[username]/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
 
 Understanding these storage patterns helps you organize your work effectively. You might use your personal home directory for notebooks and scripts under development, project directories for shared data and collaborative work, and scratch space for temporary files and intermediate processing results that don't need long-term storage.
 
@@ -99,25 +87,23 @@ Understanding these storage patterns helps you organize your work effectively. Y
 
 The integration with CANFAR's authentication system means you don't need to manage separate credentials for each application. Your existing CANFAR account provides access to all contributed applications, and the same group-based permissions that govern your access to shared storage also apply within applications.
 
-This seamless authentication enables powerful collaboration patterns. You can share session URLs with collaborators who have appropriate permissions, work together in real-time on analysis projects, and maintain consistent access controls across different tools and workflows.
-
 ## 🛠️ Real-World Examples
 
 ### Interactive Data Exploration with Pluto.jl
 
-Imagine you're working with a large astronomical catalog and want to explore correlations between different measured parameters. Traditional notebook approaches require you to re-run cells manually as you adjust parameters or add new visualizations. With Pluto.jl, you can create sliders and interactive controls that automatically update all dependent visualizations and calculations in real-time.
+Imagine you're working with a large astronomical catalogue and want to explore correlations between different measured parameters. Traditional notebook approaches require you to re-run cells manually as you adjust parameters or add new visualizations. With Pluto.jl, you can create sliders and interactive controls that automatically update all dependent visualizations and calculations in real-time.
 
-You might start by loading your catalog data and creating a basic scatter plot. As you add interactive controls for magnitude cuts, color selections, or coordinate ranges, the plot updates automatically. When you decide to add a histogram showing the distribution of selected objects, it immediately reflects your current filter settings. This reactive approach makes exploratory data analysis feel more like an interactive conversation with your data.
+You might start by loading your catalogue data and creating a basic scatter plot. As you add interactive controls for magnitude cuts, color selections, or coordinate ranges, the plot updates automatically. When you decide to add a histogram showing the distribution of selected objects, it immediately reflects your current filter settings. This reactive approach makes exploratory data analysis feel more like an interactive conversation with your data.
 
 ### Collaborative Development with VSCode Browser
 
-Consider a scenario where you're collaborating with colleagues on a complex data processing pipeline that involves multiple Python modules, configuration files, and documentation. Using VSCode Browser, you can work in a full-featured development environment that includes syntax highlighting, debugging capabilities, integrated terminal access, and extension support for specialized astronomical tools.
+Consider a scenario where you are collaborating with colleagues on a complex data processing pipeline that involves multiple Python modules, configuration files, and documentation. Using VSCode Browser, you can work in a full-featured development environment that includes syntax highlighting, debugging capabilities, integrated terminal access, and extension support for specialized astronomical tools.
 
 The browser-based nature means your collaborators can access the same development environment without worrying about local software installation or version compatibility issues. Everyone works with the same tools, the same Python environment, and the same file system, eliminating the "works on my machine" problem that often plagues collaborative software development.
 
 ### Modern Python Notebooks with Marimo
 
-If you've experienced frustration with traditional Jupyter notebooks becoming inconsistent as you develop and modify your analysis, Marimo offers a refreshing alternative. Because Marimo notebooks are reactive and stored as standard Python files, you can develop complex analyses that remain consistent and reproducible.
+If you have experienced frustration with traditional Jupyter notebooks becoming inconsistent as you develop and modify your analysis, Marimo offers a modern alternative. Because Marimo notebooks are reactive and stored as standard Python files, you can develop complex analyses that remain consistent and reproducible.
 
 The reactive execution model means that when you modify a function or variable definition, all dependent computations automatically update. This eliminates the common notebook problem where cells are executed out of order, leaving you with inconsistent results. The fact that notebooks are stored as Python files also makes them easy to version control with Git and share with colleagues who might not be using notebook environments.
 
@@ -125,15 +111,9 @@ The reactive execution model means that when you modify a function or variable d
 
 ### Understanding Application Permissions
 
-Contributed applications operate within the same security framework as other CANFAR services, inheriting your account permissions and access controls. This means they can access your home directory, project directories where you're a member, and VOSpace areas where you have appropriate permissions. However, they cannot access other users' private data or perform system administration functions.
+Contributed applications operate within the same security framework as other CANFAR services, inheriting your account permissions and access controls. This means they can access your home directory, project directories on `/arc/`  you are a member of, and vault VOSpace areas where you have appropriate permissions. However, they cannot access other users private data or perform system administration functions at run time.
 
 When working with contributed applications, it's important to understand what data the application might access and how it processes that information. Most applications are designed to work locally with your data and don't transmit information to external services, but it's always good practice to review the documentation for any application you're using for the first time.
-
-### Data Security Considerations
-
-The web-based nature of contributed applications introduces some unique security considerations. Always use HTTPS connections when accessing applications, be cautious about uploading sensitive credentials or tokens to applications unless specifically required, and use CANFAR's group-based permissions to manage access to shared data appropriately.
-
-For researchers working with sensitive or proprietary data, it's worth understanding how each application handles data processing and whether any information might be cached or logged. Most contributed applications are designed with these concerns in mind, but understanding the data flow helps you make informed decisions about which tools to use for different types of work.
 
 ## 🧑‍💻 Contributing Your Apps
 
@@ -177,13 +157,13 @@ The `exec` command is crucial because it ensures proper signal handling when the
 
 Developing a contributed application typically follows an iterative process. You'll start by building and testing your application locally using Docker, ensuring it works correctly in a containerized environment. Once you have a working container, you can test it on CANFAR by pushing it to a container registry and launching it as a contributed application session.
 
-During development, pay particular attention to how your application integrates with CANFAR's storage systems and authentication. Test that your application can access the expected file system paths and that it behaves correctly when running under the CANFAR user account rather than as root.
+During development, pay particular attention to how your application integrates with CANFAR storage systems and authentication. Test that your application can access the expected file system paths and that it behaves correctly when running under the CANFAR user account rather than as root.
 
 ### Community Integration
 
 The most successful contributed applications solve real problems that multiple researchers face and provide capabilities that aren't easily replicated with existing tools. Before beginning development, consider reaching out to the CANFAR community through the support channels to discuss your ideas and gather feedback on potential use cases.
 
-When you're ready to contribute your application, contact [support@canfar.net](mailto:support@canfar.net) with information about your application's purpose, target user community, and key features. The CANFAR team will work with you to integrate your application into the platform and ensure it meets the technical and security requirements.
+When you are ready to contribute your application, contact [support@canfar.net](mailto:support@canfar.net) with information about your application's purpose, target user community, and key features. The CANFAR team will work with you to integrate your application into the platform and ensure it meets the technical and security requirements.
 
 ## 🆘 Troubleshooting
 
@@ -199,19 +179,11 @@ Problems accessing data usually stem from incorrect file paths or permission iss
 
 If you're having trouble accessing shared project data, check your group membership and ensure that the project directory has the correct permissions. Sometimes data access issues are actually authentication problems in disguise.
 
-### Performance and Resource Issues
-
-If your contributed application feels slow or unresponsive, consider whether you've allocated sufficient resources for your workload. Web-based applications can be more memory-intensive than you might expect, especially reactive notebook environments that maintain state for all computations.
-
-You can often improve performance by closing unnecessary browser tabs, ensuring you have sufficient memory allocated to your session, and monitoring your resource usage through the browser's developer tools if available.
-
 ## 📚 Evolving Ecosystem
 
 ### Current Applications and Their Strengths
 
-The current catalog of contributed applications represents different approaches to interactive scientific computing, each with its own strengths and ideal use cases. Pluto.jl excels in situations where you want immediate feedback on how changes affect your analysis and is particularly powerful for teaching and exploration. Marimo brings similar reactive capabilities to Python while maintaining compatibility with standard Python tooling and version control systems.
-
-VSCode Browser provides the most comprehensive development environment, making it ideal for complex software projects, multi-file analyses, and situations where you need advanced editing capabilities or specific extensions. It's particularly valuable when you're developing tools that others will use or when you need the debugging and profiling capabilities that come with a full IDE.
+The current catalogue of contributed applications represents different approaches to interactive scientific computing, each with its own strengths and ideal use cases.  Marimo brings similar reactive capabilities to Python while maintaining compatibility with standard Python tooling and version control systems. VSCode Browser provides the most comprehensive development environment, making it ideal for complex software projects, multi-file analyses, and situations where you need advanced editing capabilities or specific extensions. It's particularly valuable when you're developing tools that others will use or when you need the debugging and profiling capabilities that come with a full IDE. Pluto.jl excels in situations where you want immediate feedback on how changes affect your analysis and is particularly powerful for teaching and exploration with the Julia language.
 
 ### Looking Forward
 

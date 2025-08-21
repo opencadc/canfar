@@ -1,6 +1,7 @@
+
 # Launching Desktop Sessions
 
-Desktop sessions provide a full Linux graphical environment in your browser, giving you access to traditional astronomy software with familiar desktop interfaces. This guide walks you through launching and using desktop sessions on the CANFAR Science Platform.
+Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. While a few applications are native to the desktop, most astronomy software is launched in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This guide explains how to launch and use desktop sessions, including CANFAR-supported and user-contributed astronomy software.
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch, connect, and size desktop sessions
@@ -10,61 +11,38 @@ Desktop sessions provide a full Linux graphical environment in your browser, giv
 
 ## Overview
 
+
 Desktop sessions offer:
 
-- **Full Linux desktop**: Complete graphical environment in your browser
-- **Multi-application workflow**: Run multiple programs simultaneously
-- **Traditional interfaces**: Use software with graphical user interfaces
+- **Full Linux desktop**: Accessed in your browser, with CANFAR storage integration
+- **Multi-application workflow**: Run multiple programs and containers simultaneously
+- **Traditional interfaces**: Use graphical astronomy software and desktop tools
 - **File management**: Visual file browser and management tools
 - **Session persistence**: Resume work exactly where you left off
 
 Common use cases include:
 
-- Running GUI-based astronomy software (DS9, SAOImage, IRAF)
-- Complex multi-step workflows requiring multiple applications
-- Teaching and demonstration scenarios
-- Legacy software that requires a desktop environment
+- Running astronomy software in containers (DS9, Aladin, TOPCAT, CASA, etc.)
+- Multi-step workflows with several applications
+- Teaching, demonstrations, and collaborative analysis
+- Legacy or specialised software requiring a desktop environment
 
 ## Creating a Desktop Session
 
-### Step 1: Select Session Type
+### Step 1: Select Session Type and a Name
 
 From the Science Portal dashboard, click the **plus sign (+)** to create a new session, 
 then select **desktop** as your session type.
 
 > ![image](../images/desktop/1_launch_desktop.png)
 
-### Step 2: Choose Container
-
-The desktop container includes a comprehensive set of astronomy software. Currently, 
-there's one main desktop environment available with pre-installed tools.
-
-> ![image](../images/desktop/2_select_container.png)
-
-### Step 3: Configure Session
-
-#### Session Name
-
 Give your session a descriptive name that will help you identify it later 
 (e.g., "data-reduction", "teaching-session", "multi-instrument-analysis").
 
 > ![image](../images/desktop/3_choose_name.png)
 
-#### Resource Configuration
 
-Desktop sessions typically require more resources than other session types:
-
-**Memory (RAM)**:
-- **16GB (recommended)**: Standard desktop usage
-- **32GB**: Multiple applications or large datasets
-- **64GB**: Intensive workflows with large data
-
-**CPU Cores**:
-- **2 cores**: Basic desktop operations
-- **4 cores (recommended)**: Multiple applications
-- **8+ cores**: Compute-intensive desktop workflows
-
-### Step 4: Launch Session
+### Step 2: Launch Session
 
 Click the **Launch** button and wait for your session to initialize. Desktop sessions 
 may take slightly longer to start than other session types.
@@ -86,14 +64,18 @@ Click the **Connect** button to access your desktop environment.
 
 > ![image](../images/desktop/6_connect_desktop.png)
 
+
 ### Desktop Environment
 
-You'll see a full Linux desktop environment with:
+When you connect, you'll see a full Linux desktop in your browser. Key features include:
 
 - **Taskbar**: Application launcher and system controls
-- **File manager**: Browse your storage and files
+- **File manager**: Browse CANFAR storage and files
 - **Terminal**: Command-line access
-- **Pre-installed software**: Astronomy applications ready to use
+- **Shortcut icons**: Quick launch for DS9, Aladin, TOPCAT, and Firefox
+- **Astro Software menu**: Access CANFAR-supported and user-contributed astronomy containers
+
+Most applications are launched in containers and connect to your desktop session using X11 protocols. Only a few tools are native to the desktop itself.
 
 > ![image](../images/desktop/7_desktop_connected.png)
 
@@ -103,17 +85,17 @@ When your session becomes inactive, you'll be returned to the connection page.
 Click **Connect** again to resume exactly where you left off - all your applications 
 and work remain open.
 
+
 ## Available Software
 
 ### Astronomy Applications
 
-Your desktop session includes:
+The desktop session provides access to astronomy software in two ways:
 
-- **DS9**: Advanced FITS image viewer and analyzer
-- **SAOImage**: Astronomical image display
-- **CASA**: Complete radio astronomy suite with GUI
-- **Python environments**: With Jupyter, AstroPy, and other libraries
-- **IRAF/PyRAF**: Legacy optical astronomy reduction (if needed)
+- **Shortcut icons**: DS9, Aladin, TOPCAT, and Firefox are available directly on the desktop for quick access.
+- **Astro Software menu**: Find CANFAR-supported and user-contributed astronomy containers under Applications → Astro Software. These containers run on separate worker nodes and connect to your desktop session.
+
+You can also access other tools and environments, including Python (with AstroPy, Jupyter), CASA, IRAF/PyRAF, and more, depending on the available containers and desktop configuration.
 
 ### Development Tools
 
@@ -129,29 +111,23 @@ Your desktop session includes:
 - **System monitor**: Resource usage monitoring
 - **Network tools**: File transfer and connectivity utilities
 
+
 ## Working with Applications
 
 ### Launching Applications
 
-**Method 1: Application Menu**
-1. Click the applications menu in the taskbar
-2. Browse categories (Graphics, Science, Development)
-3. Click to launch your chosen application
+**Method 1: Astro Software Menu**
+1. Click the Applications menu in the taskbar
+2. Select "Astro Software" to browse CANFAR-supported and user-contributed astronomy containers
+3. Choose your desired application to launch it in a dedicated container
 
-**Method 2: Terminal**
-```bash
-# Launch DS9
-ds9 &
+**Method 2: Desktop Shortcuts**
+- Click the shortcut icon for DS9, Aladin, TOPCAT, or Firefox on the main desktop to launch these applications quickly
 
-# Launch CASA with GUI
-casa --gui &
-
-# Launch Python with astronomy libraries
-ipython --pylab
-```
+**Note:** Most astronomy applications are launched in containers and connect to your desktop session. You cannot start a terminal and simply run `ds9 &` or similar commands, as these applications are not installed natively in the desktop environment.
 
 **Method 3: File Association**
-- Double-click FITS files to open in DS9
+- Double-click FITS files to open in DS9 (if available)
 - Right-click files for "Open with" options
 
 ### Example: Multi-Application Workflow
@@ -164,20 +140,10 @@ Here's a typical desktop workflow for optical astronomy:
 4. **Documentation**: Use text editor for notes and scripts
 5. **Results**: Save plots and analysis outputs
 
+
 ### CASA Desktop Usage
 
-To use CASA with its graphical interface:
-
-```bash
-# Launch CASA with GUI
-casa --gui
-
-# Or use the interactive shell
-casa
-```
-
-The desktop environment allows you to use CASA's plotting and visualization 
-tools that aren't available in command-line mode.
+To use CASA with its graphical interface, launch it from the Astro Software menu. CASA runs in a dedicated container and connects to your desktop session, allowing access to its full plotting and visualisation tools.
 
 ## Desktop Session Tips
 
@@ -234,10 +200,9 @@ This feature works in:
 
 Your desktop session provides access to:
 
-- **`/arc/projects/[group]/`**: Shared project storage
+- **`/arc/projects/[groupname]/`**: Shared project storage
 - **`/arc/home/[username]/`**: Personal persistent storage
-- **`/home/[username]/`**: Session-local home directory
-- **`/tmp/`**: Temporary scratch space
+- **`/scratch/`**: Temporary scratch space, unique to each application.
 
 !!! warning "Persistence Reminder"
     Use `/arc/projects/` or `/arc/home/` for important files. The session-local home and `/tmp/` are not guaranteed to persist after the session ends.
@@ -251,37 +216,6 @@ Use the graphical file manager for:
 - **Batch operations**: Select multiple files for operations
 - **Permissions**: Set file and directory permissions
 
-### Data Transfer
-
-Transfer files to/from your desktop session:
-
-- **Browser upload**: Use Science Portal file manager
-- **Command line**: `scp`, `rsync`, `wget`
-- **Cloud storage**: Mount external storage systems
-- **USB/local**: Upload through browser interface
-
-## Session Management
-
-### Resource Monitoring
-
-Monitor your session resources:
-
-```bash
-# Check memory usage
-free -h
-
-# Monitor CPU usage
-htop
-
-# Check disk space
-df -h /arc /tmp
-```
-
-### Performance Optimization
-
-- **Close unused applications**: Free up memory and CPU
-- **Use virtual desktops**: Organize workflows across multiple desktops
-- **Monitor network**: Large file transfers can affect responsiveness
 
 ### Ending Sessions
 
@@ -291,26 +225,6 @@ To properly end your desktop session:
 2. **Close applications**: Exit programs cleanly
 3. **Disconnect**: Close the browser tab
 4. **Delete session**: Use Science Portal to free resources
-
-## Collaboration Features
-
-### Screen Sharing
-
-Share your desktop session with collaborators:
-
-1. Access session sharing from Science Portal
-2. Add collaborator usernames
-3. Set permissions (view-only or full control)
-4. Collaborators see your full desktop in real-time
-
-### Teaching and Demonstration
-
-Desktop sessions are ideal for:
-
-- **Live demonstrations**: Show software usage to groups
-- **Hands-on training**: Students can follow along
-- **Collaborative debugging**: Work together on problems
-- **Code review**: Visual examination of code and results
 
 ## Troubleshooting
 
@@ -326,13 +240,14 @@ Desktop sessions are ideal for:
 - Close unnecessary applications
 - Consider increasing session memory
 
+
 **Applications won't start**
-- Check for error messages in terminal
-- Verify sufficient memory available
-- Try launching from command line for error details
+- Ensure you are launching applications from the Astro Software menu or desktop shortcuts
+- Verify sufficient memory is available
+- If issues persist, check for error messages in the application window or contact support
 
 **File access problems**
-- Verify paths to `/arc/projects/[group]/`
+- Verify paths to `/arc/projects/[groupname]/`
 - Check group permissions
 - Ensure files aren't locked by other processes
 
@@ -351,25 +266,6 @@ For best performance:
 - **Community**: Join our Discord for desktop tips
 - **Documentation**: Check software-specific guides for DS9, CASA, etc.
 
-## Best Practices
-
-### Resource Management
-
-- **Plan resource needs**: Estimate memory for your workflow
-- **Monitor usage**: Check system resources regularly
-- **Clean up**: Remove temporary files when finished
-
-### Workflow Organization
-
-- **Organize windows**: Use multiple desktops for complex workflows
-- **Save frequently**: Desktop sessions can be terminated for maintenance
-- **Document work**: Keep notes on your analysis steps
-
-### Data Management
-
-- **Use persistent storage**: Save important work to `/arc/`
-- **Organize files**: Create clear directory structures
-- **Backup results**: Important outputs should be backed up
 
 ## Next Steps
 

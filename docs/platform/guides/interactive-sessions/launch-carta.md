@@ -4,7 +4,6 @@ CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialized image vi
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch a CARTA session and choose the right version
-    - How to size RAM/CPU for your datasets
     - How to load data from `/arc` and work with radio data cubes
     - Tips for analysis features, performance, and troubleshooting
 
@@ -46,30 +45,7 @@ Give your session a descriptive name that will help you identify it later
 
 > ![image](../images/carta/3_choose_carta_name.png)
 
-#### Memory Configuration
-
-Select the maximum amount of RAM for your analysis. Choose the smallest value 
-reasonable for your needs, as resources are shared among all users:
-
-- **8GB**: Small images and simple analysis
-- **16GB (default)**: Most radio astronomy datasets
-- **32GB+**: Large data cubes or complex multi-image analysis
-
-!!! tip "Choosing Resources"
-    Start with 8GB RAM and 2 CPU cores. Increase memory for very large FITS or CASA images and increase cores for CPU-intensive operations like moment map generation.
-
-> ![image](../images/carta/4_choose_carta_ram.png)
-
-#### CPU Cores
-
-Select the number of computing cores. CARTA can benefit from multiple cores 
-for certain operations:
-
-- **1 core**: Basic image viewing
-- **2 cores (default)**: Recommended for most tasks
-- **4+ cores**: Large data processing and animations
-
-> ![image](../images/carta/5_choose_carta_cores.png)
+You may want to stay with a "flexible" session first, and switch to a fixed resourced one if necessary.
 
 ### Step 4: Launch Session
 

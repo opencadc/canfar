@@ -12,15 +12,15 @@ Interactive sessions provide web-based access to powerful computing resources wi
 
 ## 🎯 Session Types Overview
 
-CANFAR supports multiple session types, each optimized for different research workflows:
+CANFAR supports multiple interactive session types, each optimized for different research workflows:
 
 | Session Type | Interface | Best For | Key Features |
 |--------------|-----------|----------|--------------|
 | **[📓 Notebook](launch-notebook.md)** | JupyterLab | Data analysis, coding, documentation | Interactive Python, visualization, markdown |
-| **[🖥️ Desktop](launch-desktop.md)** | Linux desktop | GUI applications, legacy software | Full desktop environment, X11 apps |
-| **[📊 CARTA](launch-carta.md)** | CARTA viewer | Radio astronomy visualization | Cube analysis, region tools, catalogs |
-| **[🔥 Firefly](launch-firefly.md)** | Firefly viewer | Optical data, table visualization | Image viewer, catalog overlay, cutouts |
-| **[⚙️ Contributed](launch-contributed.md)** | Various | Community applications | Specialized tools, custom interfaces |
+| **[🖥️ Desktop](launch-desktop.md)** | Linux desktop | Desktop GUI applications, legacy software | Full desktop environment, X11 apps |
+| **[📊 CARTA](launch-carta.md)** | CARTA viewer | FITS/HDF5 astronomy visualization | Cube analysis, region tools, catalogues |
+| **[🔥 Firefly](launch-firefly.md)** | Firefly viewer | Optical data, catalogue visualization | Image viewer, catalogue overlay, cutouts |
+| **[⚙️ Contributed](launch-contributed.md)** | Various | Contributed web applications | Specialized tools, custom interfaces |
 
 ## 🚀 Quick Start Guide
 
@@ -39,42 +39,35 @@ Select the interface that best matches your workflow:
     **Container:** `astroml`  
     **Use Case:** Python analysis, Jupyter notebooks, data exploration
 
-=== "📡 Radio Astronomy" 
+=== "📡 Visualize Astronomy Data" 
     **Session Type:** `carta`  
     **Container:** `carta`  
-    **Use Case:** Radio cube visualization, source analysis, imaging
+    **Use Case:** FITS/HDF5 data visualization, source analysis popular for radio astronomy
 
-=== "🖥️ GUI Applications"
+=== "🖥️ GUI Desktop Applications"
     **Session Type:** `desktop`  
-    **Container:** `desktop` or `astroml`  
-    **Use Case:** CASA, DS9, image viewers, legacy tools
+    **Container:** `desktop`
+    **Use Case:** CASA, DS9, TOPCAT, image viewers, legacy astronomy software tools
 
-=== "🔬 Table Analysis"
+=== "🔬 Catalogue Analysis"
     **Session Type:** `firefly`  
     **Container:** `firefly`  
-    **Use Case:** Optical data, catalog overlays, image cutouts
+    **Use Case:** Optical data, catalogue overlays, image cutouts
 
 ### Step 3: Configure Resources
 
 **Session Name:** Choose a descriptive name (e.g., "galaxy-photometry", "alma-reduction")
 
 !!! tip "Choosing Resources"
-    - Start with defaults (2 cores, 8 GB RAM). Scale up only if needed
-    - Large data cubes or catalogs benefit from 32GB+ RAM
-    - GPU is only needed for ML or specialized GPU-enabled workflows
-
-**Memory (RAM):**
-- 8GB: Light analysis, small datasets
-- 16GB: Default, suitable for most work
-- 32GB+: Large datasets, memory-intensive tasks
-
-**CPU Cores:**
-- 2 cores: Default, recommended for most tasks
-- 4+ cores: Parallel processing, intensive computations
-
-**GPU (if available):**
-- None: Standard CPU-only work
-- 1 GPU: Machine learning, image processing
+    - Start with default: flexible
+    - If you know the number of cores and memory you need, choose fixed. 
+    - **Memory (RAM):**
+        - 8GB: Light analysis, small datasets
+        - 16GB: Default, suitable for most work
+        - 32GB+: Larger datasets, memory-intensive tasks
+    - **CPU Cores:**
+        - 2 cores: Default, recommended for most tasks
+        - 4+ cores: Parallel processing, intensive computations
 
 ### Step 4: Launch and Connect
 
@@ -107,7 +100,7 @@ stateDiagram-v2
 | **Concurrent sessions** | 3 active sessions | Across all interactive session types |
 | **Session duration** | 4 days maximum | Can be renewed indefinitely |
 | **Idle timeout** | None | Sessions run until manually deleted |
-| **Storage** | Persistent | Files saved to `/arc/` persist |
+| **Storage** | Persistent | Files saved to `/arc/` will persist |
 
 ### Managing Active Sessions
 
@@ -122,73 +115,10 @@ stateDiagram-v2
 
 ```bash
 # List your active sessions
-curl -H "Authorization: Bearer $TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session
+canfar list
 
-# Delete specific session
-curl -X DELETE \
-  -H "Authorization: Bearer $TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session/SESSION_ID
-```
-
-### Session Sharing
-
-Share running sessions with collaborators in your group:
-
-1. **Copy session URL** from browser address bar
-2. **Share with team member** (must be in same CANFAR group)
-3. **Collaborate in real-time** - both can see and modify the same session
-
-!!! warning "Security Note"
-    Only share session URLs with trusted collaborators. Anyone with the URL and proper group membership can access your session.
-
-## 🔧 Advanced Session Features
-
-### Resource Allocation
-
-#### Memory Management
-
-```bash
-# Check memory usage in session
-free -h
-htop
-
-# Monitor specific process
-ps aux | grep python
-```
-
-**Memory Tips:**
-- Start with default 16GB, increase if needed
-- Large datasets may require 32GB+ 
-- Memory is shared - be considerate of other users
-
-#### CPU Usage
-
-```bash
-# Check CPU cores available
-nproc
-
-# Monitor CPU usage
-top
-htop
-
-# Run parallel processing
-python -c "import multiprocessing; print(f'CPUs: {multiprocessing.cpu_count()}')"
-```
-
-### GPU Access
-
-For containers with GPU support (e.g., `astroml-cuda`):
-
-```bash
-# Check GPU availability
-nvidia-smi
-
-# Test GPU in Python
-python -c "import torch; print(f'CUDA available: {torch.cuda.is_available()}')"
-
-# Monitor GPU usage
-watch -n 1 nvidia-smi
+# Delete specific session ID
+canfar delete <ID>
 ```
 
 ### Persistent Configuration
@@ -207,19 +137,6 @@ echo "alias ll='ls -la'" >> /arc/home/$USER/.bashrc
 pip install --user astroplan # in some containers, the --user may not be needed
 ```
 
-### Session Networking
-
-#### Port Forwarding
-
-For custom web applications running in sessions:
-
-```bash
-# In session: Run application on specific port
-python -m http.server 8080
-
-# Application accessible at: https://SESSION_URL/proxy/8080/
-```
-
 #### External Access
 
 Sessions are accessible from anywhere with proper authentication:
@@ -235,8 +152,7 @@ Sessions are accessible from anywhere with proper authentication:
 **✅ Do:**
 - Save important work to `/arc/projects/` or `/arc/home/`
 - Use group permissions for collaborative data
-- Regularly save and backup critical results
-- Log out of shared computers
+- Regularly save and backup critical results in vault storage (`/arc` is not backed up)
 
 **❌ Don't:**
 - Store sensitive data in `/scratch/` (wiped at session end)
@@ -246,27 +162,14 @@ Sessions are accessible from anywhere with proper authentication:
 
 ### Performance Optimization
 
-#### Session Performance
-
-```bash
-# Close unused applications to free memory
-# Kill runaway processes
-kill -9 PID
-
-# Clean temporary files
-rm -rf /scratch/temp_*
-```
-
 #### Storage Performance
 
 ```bash
 # Use /scratch/ for intensive I/O
-cp /arc/projects/data.fits /scratch/
+cp /arc/projects/myproject/data.fits /scratch/
 # ... process in /scratch/ ...
-cp /scratch/results.fits /arc/projects/
+cp /scratch/results.fits /arc/projects/myproject/
 
-# Compress large files
-gzip large_dataset.fits
 ```
 
 ### Troubleshooting Common Issues
@@ -276,7 +179,7 @@ gzip large_dataset.fits
 **Problem:** Session stuck in "Launching" state
 
 **Solutions:**
-1. Check resource availability - try lower memory/CPU
+1. Check resource availability - try a fixed session with lower memory/CPU
 2. Wait 2-3 minutes for container download
 3. Try different container image
 4. Contact support if persistent
@@ -301,15 +204,180 @@ gzip large_dataset.fits
 3. Use `/scratch/` for temporary files
 4. Optimize code for memory efficiency
 
+## 🔧 Troubleshooting Sessions
+
+### Session Won't Start
+
+**Problem:** Session creation fails or hangs
+
+**Common Causes & Solutions:**
+
+=== "Container Issues"
+    **Solutions:**
+    - Try a different container image (e.g., switch from custom to `astroml`)
+    - Check if container is available: `docker pull images.canfar.net/container:tag`
+    - Use `latest` tag instead of specific versions
+
+=== "Network Problems"
+    **Solutions:**
+    - Check internet connection stability
+    - Try different browser (Chrome/Firefox recommended)
+    - Clear browser cache and cookies
+    - Disable browser extensions temporarily
+
+### Cannot Access Files
+
+**Problem:** Files missing or permission denied
+
+**Diagnostic Steps:**
+```bash
+# Check file locations
+ls -la /arc/home/$(whoami)/     # Personal storage
+ls -la /arc/projects/           # Available projects
+
+# Check group membership  
+groups
+
+# Check permissions on specific files
+ls -la /arc/projects/myproject/problematic_file
+```
+
+**Solutions:**
+- Verify you're in the correct group via [Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
+- Check file paths are correct (case-sensitive)
+- Contact group administrator for access
+- Try copying files to your home directory first
+
+### Session Performance Issues
+
+#### Memory Problems
+
+**Problem:** Session crashes or becomes unresponsive
+
+**Solutions:**
+```bash
+# Monitor memory usage
+free -h
+top -o %MEM
+
+# Find memory-hungry processes
+ps aux --sort=-%mem | head -10
+```
+
+**Best Practices:**
+1. Close unused applications and browser tabs
+2. Process data in smaller chunks
+3. Use `/scratch/` for temporary files
+4. Optimize code for memory efficiency
+5. Request more memory when launching session
+
 #### Slow Performance
 
 **Problem:** Session responding slowly
 
+**Diagnostic Commands:**
+```bash
+# Check system resources
+htop           # Interactive process viewer
+iostat 5       # I/O statistics
+df -h          # Disk usage
+```
+
 **Solutions:**
-1. Check system resources (`htop`, `free -h`)
-2. Close unnecessary applications
-3. Use `/scratch/` for I/O intensive tasks
-4. Consider launching session with more resources
+1. Close unnecessary applications
+2. Use `/scratch/` for I/O intensive tasks  
+3. Consider requesting more CPU cores
+4. Check for runaway processes
+5. Restart session if persistent
+
+### Connection Issues
+
+#### Browser Problems
+
+**Problem:** Can't connect to session or interface not loading
+
+**Solutions:**
+1. **Try incognito/private mode** - Eliminates extension conflicts
+2. **Different browser** - Test Chrome, Firefox, Safari
+3. **Clear browser data:**
+   ```bash
+   # Clear CANFAR-specific cookies and cache
+   # In browser developer tools:
+   Application -> Storage -> Clear site data
+   ```
+4. **Check browser requirements:**
+   - JavaScript enabled
+   - Cookies enabled
+   - WebSocket support
+
+#### Network Timeouts
+
+**Problem:** Connection drops or times out
+
+**Solutions:**
+- Check stable internet connection
+- Try wired connection instead of WiFi
+- Contact network administrator about firewall/proxy
+- Use VPN if on restricted network
+
+### Storage Issues
+
+#### Disk Space Problems
+
+**Problem:** "No space left on device" errors
+
+**Diagnostic Commands:**
+```bash
+# Check quotas and usage
+df -h /arc/home/$USER
+df -h /arc/projects/myproject
+du -sh /arc/home/$USER/*
+
+# Find large files
+find /arc/home/$USER -type f -size +100M
+```
+
+**Solutions:**
+1. Clean up large temporary files
+2. Compress old data: `gzip large_file.fits`
+3. Move old data to vault for archival
+4. Use `/scratch/` for temporary processing
+5. If necessary, request quota increase from support
+
+#### File Transfer Problems
+
+**Problem:** Uploads/downloads fail or are slow
+
+**Solutions:**
+```bash
+# For large files, use rsync for reliability
+rsync -av --progress source/ destination/
+
+# Check network and resume transfers
+wget -c https://example.com/large_file.fits
+
+# Use vault VOSpace
+vcp local_file.fits vos:myproject/
+```
+
+### Getting Help
+
+When troubleshooting fails:
+
+1. **Check logs** - Look for error messages in session logs
+2. **System status** - Check [CANFAR status page](https://www.canfar.net) for maintenance
+3. **Community help** - Ask on [Discord](https://discord.gg/vcCQ8QBvBa)
+4. **Contact support** - Email [support@canfar.net](mailto:support@canfar.net) with:
+   - Session ID
+   - Container image used
+   - Error messages
+   - Steps to reproduce
+
+!!! tip "Before Contacting Support"
+    1. Try basic troubleshooting steps above
+    2. Check if problem persists with default settings
+    3. Test with different browser/device
+    4. Gather specific error messages
 
 ## 🔗 Session-Specific Guides
 
@@ -333,8 +401,7 @@ Once you're comfortable with interactive sessions:
 ---
 
 !!! tip "Session Success Tips"
-    1. **Start small** - Use default resources and scale up if needed
-    2. **Save frequently** - Important work should go in `/arc/` directories  
-    3. **Share wisely** - Session URLs are powerful - only share with trusted collaborators
-    4. **Monitor resources** - Keep an eye on memory and CPU usage with `htop`
-    5. **Clean up** - Delete finished sessions to free resources for others
+    1. **Save frequently** - Important work should go in `/arc/` directories  
+    2. **Share wisely** - Session URLs are powerful - only share with trusted collaborators
+    3. **Monitor resources** - Keep an eye on memory and CPU usage with `htop`
+    4. **Clean up** - Delete finished sessions to free resources for others
