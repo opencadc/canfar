@@ -91,11 +91,6 @@ except HTTPStatusError as e:
       members:
         - client
         - asynclient
-        - expiry
-        - _create_client
-        - _create_asynclient
-        - _get_headers
-        - _get_ssl_context
       show_root_heading: true
       show_source: false
       heading_level: 3

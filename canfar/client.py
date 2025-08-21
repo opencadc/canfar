@@ -43,6 +43,7 @@ class HTTPClient(BaseSettings):
     variables, or a configuration file.
 
     The client prioritizes credentials in the following order:
+
     1.  **Runtime Arguments/Environment Variables**: A `token` or `certificate`
         provided at instantiation (e.g., `CANFAR_TOKEN="..."`).
     2.  **Active Configuration Context**: The context specified by `active_context`
