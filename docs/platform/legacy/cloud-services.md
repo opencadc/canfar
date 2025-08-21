@@ -1,4 +1,4 @@
-# Cloud Services Overview {#cloud-services-overview}
+# CANFAR Cloud Services {#cloud-services-overview}
 
 !!! abstract "🎯 What You'll Learn"
     - What cloud services power CANFAR (via Digital Research Alliance Canada OpenStack)  
@@ -7,42 +7,42 @@
     - Where to find the correct cloud portals (Arbutus, Arbutus-CANFAR)  
     - Best practices for using shared cloud allocation resources  
 
-All CANFAR cloud services are hosted on the Digital Research Alliance Canada (DRAC) OpenStack infrastructure.  
-Access is integrated with CADC credentials and customized portals, ensuring consistency and security across CANFAR workflows.  
-When you request access, the CANFAR team will review it and arrange your registration with the Digital Research Alliance Canada (DRAC) infrastructure.
+- All CANFAR cloud services are hosted on the Digital Research Alliance Canada (DRAC) OpenStack Infrastructure.  
+- Access is integrated with CADC credentials and customized portals, ensuring consistency and security across CANFAR workflows.  
+- When you request access, the CANFAR team will review it and arrange your registration with the DRAC.
 
 For a typical workflow with OpenStack Cloud Services and batch processing on CANFAR, see the tutorial below.
 
 ## Key differences from DRAC defaults {#key-differences}
-- **Credentials**: sign in with **CADC** `<USERNAME>` and password (not a DRAC account).
-- **Portal**: use [:material-open-in-new: arbutus-canfar](https://arbutus-canfar.cloud.computecanada.ca/) (instead of [arbutus](https://arbutus.cloud.computecanada.ca/)).
+- **Credentials**: Sign in with **CADC Username/Password** (not a DRAC account).
+- **Portal**: [:material-open-in-new: Use the arbutus-canfar portal](https://arbutus-canfar.cloud.computecanada.ca/) (instead of [arbutus](https://arbutus.cloud.computecanada.ca/)).
 - **Resource policy**: interactive analysis gets reasonable quotas; **batch processing** can scale to large footprints.
 
-## Registration & allocation {#registration}
+## Registration & Allocation {#registration}
 A CADC account is required to access cloud services.
 
 1. Register a CADC account.
 2. Email CANFAR support with:
-   - CADC account `<USERNAME>`
-   - Estimated resources (storage, compute; whether you need batch)
-   - A short description of your use case (2–3 sentences)
+    - Project Name
+    - CADC Account `Username`
+    - Estimated resources (storage, compute; whether you need batch)
+    - A short description of your use case (2–3 sentences)
 
 CANFAR will review and coordinate project/quotas on the DRAC side.
 
 ---
 
-## Batch tutorial {#batch-tutorial}
-This tutorial builds a basic **source detection** pipeline for CFHT MegaCam images on a CANFAR VM with fast access to the CADC archive and VOSpace, then runs it on the CANFAR batch system.
+## Batch Tutorial {#batch-tutorial}
+This tutorial builds a basic **source detection** pipeline for CFHT MegaCam images on a CANFAR VM with fast access to the CADC archive and VOSpace, that runs it on the CANFAR batch system.
 
-**You will:**
-- Create/manage VMs on DRAC OpenStack / CANFAR
-- Access CADC VOSpace
-- Submit batch jobs that run your pipeline
+!!! note "You will learn to"
+    - Create/manage VMs on DRAC OpenStack / CANFAR
+    - Access CADC VOSpace
+    - Submit batch jobs that run your pipeline
 
 !!! tip "Only need persistent (non-batch) VMs?"
-    If you just need persistent VMs, follow DRAC VM docs and skip the batch sections here.
-
-Throughout: `<USERNAME>` = CADC username; `<VOSPACE>` = your VOSpace; `<PROJECT>` = OpenStack project.
+    - If you just need persistent VMs, follow DRAC VM docs and skip the batch sections here.
+    - Throughout the guide, `<USERNAME>` refers to your CADC username; `<VOSPACE>` maps to your VOSpace; `<PROJECT>` is the OpenStack Project.
 
 
 ## Create and Connect to a VM

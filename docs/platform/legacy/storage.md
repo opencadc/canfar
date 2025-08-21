@@ -47,7 +47,7 @@ Access requires a CADC account.
 
 !!! tip "Related"
     - Python client & CLI examples are below.
-    - Publications/DOIs: see [Publications](../../publication/).
+    - [Publications/DOIs](publication.md).
 
 ## The `vos` CLI {#vos-cli}
 Use the `vos` command-line client for scripts and terminals.

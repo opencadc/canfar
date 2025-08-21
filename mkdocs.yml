@@ -140,10 +140,10 @@ nav:
       - Radio Astronomy:
         - Home: platform/guides/radio-astronomy/index.md
         - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
+      - Publications: platform/legacy/publication.md
       - Legacy:
-        - Publication Proto: platform/legacy/publication-proto.md
-        - Cloud Services Proto: platform/legacy/cloud-services-proto.md
-        - Storage Proto: platform/legacy/storage-proto.md
+        - Cloud Services: platform/legacy/cloud-services.md
+        - VOS Storage: platform/legacy/storage.md
     - Help & Support: platform/help.md
   - Python Client:
     - Home: client/home.md

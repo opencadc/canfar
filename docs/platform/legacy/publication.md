@@ -1,35 +1,34 @@
 # Publications (DOIs) {#publications-dois}
 
+## Purpose {#purpose}
+The **CANFAR Data Publication Service (DPS)** links a paper to the **data package** used in the research. DPS provides storage and registers a **DOI** with **DataCite**; the DOI permanently resolves to your landing page and data directory.
+
+## Access {#access}
+- [CANFAR Science Portal](https://www.canfar.net/) → **Data Publication**
+- [Data Publication Service](https://www.canfar.net/citation/)
+
+## Account requirements {#account}
+The first author needs a CADC account to access the DPS UI and, later, the user‑managed storage (VOSpace).
+
 !!! abstract "What you'll learn"
     - Request a DOI
     - Upload the data package
     - (Optional) Provide referee access
     - Publish via DataCite
-
-## Purpose {#purpose}
-The **CANFAR Data Publication Service (DPS)** links a paper to the **data package** used in the research. DPS provides storage and registers a **DOI** with **DataCite**; the DOI permanently resolves to your landing page and data directory.
-
-## Access {#access}
-- Portal: [canfar.net](https://www.canfar.net/) → **Data Publication**
-- Direct: [DPS](https://www.canfar.net/citation/)
-
-## Account requirements {#account}
-The first author needs a CADC account to access the DPS UI and, later, the user‑managed storage (VOSpace).
-
 ---
 
 ## DOI guide {#doi-guide}
 
 ### 1) Request a DOI {#request}
 - A DOI is reserved for your package (e.g., [10.11570/20.0006](http://doi.org/10.11570/20.0006)).
-- A **Data Directory** (VOSpace folder) is created and accessible via the Web UI or `vos` tools. Example: [example Data Directory](https://www.canfar.net/storage/vault/list/AstroDataCitationDOI/CISTI.CANFAR/20.0006/data)
-- A **landing page** is generated, e.g., [example landing page](https://www.canfar.net/citation/landing?doi=20.0006).
+- A [**Data Directory** (VOSpace)](https://www.canfar.net/storage/vault/list/AstroDataCitationDOI/CISTI.CANFAR/20.0006/data) is created and accessible via the Web UI or `vos` tools.
+- A [**landing page**](https://www.canfar.net/citation/landing?doi=20.0006) is generated.
 
 ### 2) Upload the data package {#upload}
 Choose a method based on size and file count:
 
-- Few/small files → Web Storage UI (see [Storage](guides/storage/))
-- Large or many files → `vcp`/`vos` CLI (see [Storage → The `vos` CLI](guides/storage/#vos-cli))
+- Few/small files → [Use the Web Storage UI](storage.md)
+- Large or many files → [Use the `vos, vcp` CLI tools](storage.md/#vos-cli)
 
 More details: [DOI Data Package](#data-package).
 
@@ -59,8 +58,9 @@ Use **New** from the list or go to the [request page](https://www.canfar.net/cit
 
 After submission, a **DOI Reference** number is assigned and displayed.
 
-### DOI details {#details}
+### DOI Details {#details}
 On the details page (e.g., [DOI.20.0016](https://www.canfar.net/citation/request?doi=20.0016)) you’ll find:
+
 - DOI number / Title
 - Authors / Journal reference
 - DOI status
@@ -101,8 +101,8 @@ Example: [Data Directory](https://www.canfar.net/storage/vault/list/AstroDataCit
 You decide what to include: data, figures, software, etc. We recommend a top‑level `README` describing layout and usage.
 
 ### Uploading {#uploading}
-- Few/small files: Web Storage UI (see [Storage](guides/storage/)).
-- Large/many files: `vcp`/CLI (see [Storage → The `vos` CLI](guides/storage/#vos-cli)).
+- Few/small files: [Web Storage UI](storage.md).
+- Large/many files: [Use `vcp`, `vos` CLI Tools](./storage.md#vos-cli).
 
 ### Refereeing access {#ref-access}
 Contact support to obtain a read‑only account and share with the editor/referee. They may request changes prior to publication.
@@ -114,8 +114,3 @@ After acceptance, click **Publish** to mint the DOI. The directory and metadata 
 Finally, link the **data package DOI** to the **journal DOI** (currently manual):
 - Email support with the publication DOI and updated reference details.
 - Provide the data package DOI to the journal so it appears in the paper.
-
----
-
-## Need help? {#help}
-Questions or feedback? Contact [CANFAR support](mailto:support@canfar.net).
