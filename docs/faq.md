@@ -8,16 +8,17 @@ This unified FAQ covers the CANFAR Science Platform across three areas: Platform
 The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, contributed applications (e.g., CARTA, Firefly), batch jobs, and direct access to CADC data holdings.
 
 ### Who can use it and what does it cost?
-CANFAR is free for academic research. Canadian astronomers and collaborators can use it subject to fair‑use and allocation limits. For larger needs, request additional resources via the Digital Research Alliance of Canada (DRAC) Resource Allocation Competition.
+CANFAR is free for astronomical research. Canadian astronomers and their collaborators can use it subject to fair‑use and allocation limits. For larger needs, request additional resources via the Digital Research Alliance of Canada (DRAC) Resource Allocation Competition.
 
 ### How do I get access?
-1. Request a CADC/CANFAR account and provide research justification.
-2. Wait for approval (typically 1–2 business days).
-3. Ask your PI to add you to the appropriate project groups.
+1. To start, you must have a CADC account. If you don't have a CADC account, you can request one at: [https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
+2. To get CANFAR access, send a short e-mail to support@canfar.net with a short note about who you are, your research and what you plan to do with CANFAR. Include your CADC username. Turnaround is typically 1-2 business days. This can be done in parallel with requesting a CADC account.
+3. Alternatively, if you already have a CADC account and you are part of a research group that is already using CANFAR, you can ask your PI to add you to the appropriate project groups.
 
 ### What session types are available and when should I use them?
 - Notebook: Jupyter Lab for interactive analysis and prototyping.
 - Desktop: Full Linux desktop for GUI workflows and multi‑app sessions.
+- Firefly: Interactive database access and visualization.
 - CARTA: Specialized image/cube visualization.
 - Headless: Non‑GUI batch processing and automation.
 
@@ -30,7 +31,7 @@ Yes. Request GPUs in the session configuration (e.g., NVIDIA Tesla/RTX). Ensure 
 
 ### How much storage do I get and where should I put data?
 - Personal: `/arc/home/[username]/` (e.g., 10 GB typical).
-- Project/group: `/arc/projects/[group]/` (hundreds of GB to TBs, varies by project).
+- Project/group: `/arc/projects/[group]/` (hundreds of GB to TBs, varies by project). If you don't already have a project space, you can request one by e-mailing suport@canfar.net.
 - Temporary: `/tmp/` inside sessions (cleared when the session ends).
 Suggested layout: raw → `/arc/projects/[group]/raw/`, working → `/arc/projects/[group]/data/`, results → `/arc/projects/[group]/results/`, scripts → `/arc/projects/[group]/scripts/`.
 
