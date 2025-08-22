@@ -1,16 +1,18 @@
 # CANFAR Clients
 
-A powerful Python interface and CLI for the CANFAR Science Platform.
+A powerful Python API and CLI for the CANFAR Science Platform.
 
 === ":fontawesome-solid-wand-magic-sparkles: Client"
 
     !!! example ":material-language-python: API"
 
-        ```python title="Create a Session"
-        from canfar.sessions import AsyncSession
+        === "`sync`"
 
-        with AsyncSession() as session:
-            await session.create(
+            ```python
+            from canfar.sessions import Session
+
+            session = Session()
+            ids = session.create(
                 name="test",
                 image="images.canfar.net/skaha/base-notebook:latest",
                 kind="headless",
@@ -18,12 +20,47 @@ A powerful Python interface and CLI for the CANFAR Science Platform.
                 env={"KEY": "VALUE"},
                 replicas=3,
             )
-        ```
+            print(ids)
+            ```
+
+        === "`async`"
+
+            ```python
+            from canfar.sessions import AsyncSession
+            
+            session = AsyncSession()
+            ids = await session.create(
+                name="test",
+                image="images.canfar.net/skaha/base-notebook:latest",
+                kind="headless",
+                cmd="env",
+                env={"KEY": "VALUE"},
+                replicas=3,
+            )
+            print(ids)
+            ```
+        
+        === "`async context`"
+
+            ```python
+            from canfar.sessions import AsyncSession
+            
+            async with AsyncSession() as session:
+                ids = await session.create(
+                    name="test",
+                    image="images.canfar.net/skaha/base-notebook:latest",
+                    kind="headless",
+                    cmd="env",
+                    env={"KEY": "VALUE"},
+                    replicas=3,
+                )
+                print(ids)
+            ```
 
     !!! example ":simple-gnubash: CLI"
 
         ```bash title="Create a Session"
-        canfar create headless --env KEY=VALUE --replicas 3images.canfar.net/skaha/base-notebook:latest 
+        canfar launch headless --env KEY=VALUE --replicas 3 images.canfar.net/skaha/base-notebook:latest 
         ```
 
 === ":material-download: Download"

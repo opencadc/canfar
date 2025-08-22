@@ -12,12 +12,12 @@ Complex use cases and power-user examples for CANFAR Science Platform.
 
 ## Massively Parallel Processing
 
-Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different canfar sessions.
+Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different canfar sessions, with each container processing a subset of the files. This is a common pattern for distributed computing on canfar, and can be achieved with a few lines of code.
 
-```python title="batch_processing.py"
+```python title="Batch Processing Script"
 from canfar.helpers import distributed
 from glob import glob
-from your.code import process_datafile
+from your.code import analysis
 
 # Find all FITS files to process
 datafiles = glob("/path/to/data/files/*.fits")
@@ -25,39 +25,41 @@ datafiles = glob("/path/to/data/files/*.fits")
 # Each replica processes its assigned chunk of files
 # The chunk function automatically handles 1-based REPLICA_ID values
 for datafile in distributed.chunk(datafiles):
-    process_datafile(datafile)
+    analysis(datafile)
 ```
 
-### Launching Analysis with Python API
+### Large Scale Parallel Processing
 
-```python title="Large-Scale Parallel Processing"
-from canfar.session import AsyncSession
+=== ":material-language-python: API"
 
-async with AsyncSession() as session:
-    sessions = await session.create(
-        name="fits-processing",
-        image="images.canfar.net/your/analysis-container:latest",
-        kind="headless",
-        cores=8,
-        ram=32,
-        cmd="python",
-        args=["/path/to/batch_processing.py"],
-        replicas=100,
-    )
-    return sessions
-```
+    ```python
+    from canfar.session import AsyncSession
 
-### Launching Analysis with CLI
+    async with AsyncSession() as session:
+        sessions = await session.create(
+            name="fits-processing",
+            image="images.canfar.net/your/analysis-container:latest",
+            kind="headless",
+            cores=8,
+            ram=32,
+            cmd="python",
+            args=["/path/to/batch_processing.py"],
+            replicas=100,
+        )
+        return sessions
+    ```
 
-```bash title="Large-Scale Parallel Processing"
-canfar create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
-```
+=== ":simple-gnubash: CLI"
+
+    ```bash
+    canfar create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
+    ```
 
 ## Distributed Processing Strategies
 
-Canfar provides two main strategies for distributing data across replicas:
+The `canfar.helpers.distributed` module provides two main strategies for distributing data across replicas:
 
-### Chunking Strategy (`distributed.chunk`)
+### Chunking (`distributed.chunk`)
 
 The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching canfar's `REPLICA_ID` environment variable):
 
@@ -75,7 +77,7 @@ for datafile in distributed.chunk(datafiles):
     process_datafile(datafile)
 ```
 
-### Striping Strategy (`distributed.stripe`)
+### Striping (`distributed.stripe`)
 
 The `stripe` function distributes data in a round-robin fashion, which is useful when file sizes vary significantly:
 
@@ -174,15 +176,6 @@ def combine_results():
 
     with open("/results/final_results.json", 'w') as f:
         json.dump(all_results, f, indent=2)
-```
-
-## Creating Distributed Sessions
-
-Create multiple containers for distributed processing:
-
-```bash
-# Create 5 containers for distributed analysis
-canfar create headless images.canfar.net/skaha/astronomy:latest -r 5 -- python3 /scripts/process_data.py
 ```
 
 ## Common Issues

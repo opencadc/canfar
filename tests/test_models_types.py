@@ -224,8 +224,6 @@ class TestTypeAliasesIntegration:
     def test_import_accessibility(self) -> None:
         """Test that all type aliases can be imported."""
         # This test ensures the imports work correctly
-        from canfar.models.types import Kind, Mode, Status, View
-
         # All should be accessible
         assert Kind is not None
         assert Status is not None

@@ -25,30 +25,20 @@ log = get_logger(__name__)
 
 
 def catch(response: httpx.Response) -> None:
-    """Logs the response & re-raises an HTTPStatusError.
+    """Reads the response body and raises HTTPStatusError for error responses.
 
     Args:
         response: An httpx.Response object.
     """
     response.read()
-    try:
-        response.raise_for_status()
-    except httpx.HTTPError:
-        msg = f"{response.status_code} {response.reason_phrase}: {response.text}"
-        log.exception(msg)
-        raise
+    response.raise_for_status()
 
 
 async def acatch(response: httpx.Response) -> None:  # Renamed function
-    """Logs the response & re-raises an HTTPStatusError (async).
+    """Reads the response body and raises HTTPStatusError for error responses (async).
 
     Args:
         response: An httpx.Response object.
     """
     await response.aread()
-    try:
-        response.raise_for_status()
-    except httpx.HTTPError:
-        msg = f"{response.status_code} {response.reason_phrase}: {response.text}"
-        log.exception(msg)
-        raise
+    response.raise_for_status()

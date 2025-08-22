@@ -130,7 +130,6 @@ def login(  # noqa: PLR0915 too many statements
         log.debug("server caps: %s", capabilities)
 
         # Initialize selection variables for consistent typing
-        version: str | None = None
         auth_choice: str
 
         # Helper to raise unsupported auth selection
@@ -139,18 +138,23 @@ def login(  # noqa: PLR0915 too many statements
                 context=auth_choice, reason="not supported"
             )
 
+        # Assign server auth modes based on capabilities
+        server.auths = capabilities[0].get("auth_modes", ["x509"])
+
         if dev:
-            version, auth_choice = asyncio.run(display.capabilities(capabilities))
-            server.version = version
+            server.version, auth_choice = asyncio.run(
+                display.capabilities(capabilities)
+            )
         else:
-            version = capabilities[0]["version"]
-            first_modes = capabilities[0].get("auth_modes", [])
-            auth_choice = str(first_modes[0]) if first_modes else "x509"
+            server.version = capabilities[0].get("version", None)
+            auth_choice = server.auths[0]
+
+        log.debug("server: %s", server.model_dump_json(indent=2))
+        log.debug("auth choice: %s", auth_choice)
 
         if not dev and selected.registry.upper() == "CADC":
-            log.debug("CADC currently only supports x509 auth in production")
+            log.debug("cadc only supports x509 auth in prod")
             auth_choice = "x509"
-        log.debug("server info: %s, %s", version, auth_choice)
 
         # Step 7-8: Choose authentication method based on registry
         context: AuthContext
