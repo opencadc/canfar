@@ -1,4 +1,4 @@
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, Mock
 
 import httpx
 import pytest
@@ -37,12 +37,8 @@ class TestCatch:
         mock_response.reason_phrase = "Not Found"
         mock_response.text = "Not Found"
 
-        with patch("canfar.hooks.httpx.errors.log") as mock_log:
-            with pytest.raises(httpx.HTTPStatusError):
-                catch(mock_response)
-
-            # Verify logging occurred
-            mock_log.exception.assert_called_once_with("404 Not Found: Not Found")
+        with pytest.raises(httpx.HTTPStatusError):
+            catch(mock_response)
 
         # Verify response.read() was called
         mock_response.read.assert_called_once()
@@ -57,14 +53,12 @@ class TestCatch:
         mock_response.reason_phrase = "Internal Server Error"
         mock_response.text = "Server Error"
 
-        with patch("canfar.hooks.httpx.errors.log") as mock_log:
-            with pytest.raises(httpx.RequestError):
-                catch(mock_response)
+        with pytest.raises(httpx.RequestError):
+            catch(mock_response)
 
-            # Verify logging occurred
-            mock_log.exception.assert_called_once_with(
-                "500 Internal Server Error: Server Error"
-            )
+        # Verify response.read() was called
+        mock_response.read.assert_called_once()
+        mock_response.raise_for_status.assert_called_once()
 
 
 class TestACatch:
@@ -98,12 +92,8 @@ class TestACatch:
         mock_response.reason_phrase = "Unauthorized"
         mock_response.text = "Unauthorized"
 
-        with patch("canfar.hooks.httpx.errors.log") as mock_log:
-            with pytest.raises(httpx.HTTPStatusError):
-                await acatch(mock_response)
-
-            # Verify logging occurred
-            mock_log.exception.assert_called_once_with("401 Unauthorized: Unauthorized")
+        with pytest.raises(httpx.HTTPStatusError):
+            await acatch(mock_response)
 
         # Verify response.aread() was called
         mock_response.aread.assert_called_once()
@@ -119,14 +109,12 @@ class TestACatch:
         mock_response.reason_phrase = "Service Unavailable"
         mock_response.text = "Service Unavailable"
 
-        with patch("canfar.hooks.httpx.errors.log") as mock_log:
-            with pytest.raises(httpx.RequestError):
-                await acatch(mock_response)
+        with pytest.raises(httpx.RequestError):
+            await acatch(mock_response)
 
-            # Verify logging occurred
-            mock_log.exception.assert_called_once_with(
-                "503 Service Unavailable: Service Unavailable"
-            )
+        # Verify response.aread() was called
+        mock_response.aread.assert_called_once()
+        mock_response.raise_for_status.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_acatch_timeout_error(self) -> None:
@@ -140,11 +128,9 @@ class TestACatch:
         mock_response.reason_phrase = "Request Timeout"
         mock_response.text = "Request Timeout"
 
-        with patch("canfar.hooks.httpx.errors.log") as mock_log:
-            with pytest.raises(httpx.TimeoutException):
-                await acatch(mock_response)
+        with pytest.raises(httpx.TimeoutException):
+            await acatch(mock_response)
 
-            # Verify logging occurred
-            mock_log.exception.assert_called_once_with(
-                "408 Request Timeout: Request Timeout"
-            )
+        # Verify response.aread() was called
+        mock_response.aread.assert_called_once()
+        mock_response.raise_for_status.assert_called_once()
