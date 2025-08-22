@@ -35,8 +35,7 @@ def catch(response: httpx.Response) -> None:
         response.raise_for_status()
     except httpx.HTTPError:
         msg = f"{response.status_code} {response.reason_phrase}: {response.text}"
-        log.exception(msg)
-        raise
+        raise httpx.HTTPError(msg) from None
 
 
 async def acatch(response: httpx.Response) -> None:  # Renamed function
@@ -50,5 +49,5 @@ async def acatch(response: httpx.Response) -> None:  # Renamed function
         response.raise_for_status()
     except httpx.HTTPError:
         msg = f"{response.status_code} {response.reason_phrase}: {response.text}"
-        log.exception(msg)
-        raise
+        log.debug(msg)
+        raise httpx.HTTPError(msg) from None
