@@ -5,7 +5,7 @@
     *A scalable, cloud-native workspace with interactive computing and shared storage for astronomy research.
     Built on [IVOA standards](https://www.ivoa.net/documents/), based on [F.A.I.R. principles](https://www.go-fair.org/fair-principles/).*
 
-Whether you're an observational astronomer, a data scientist, or an enthusiastic student, the Canadian Advanced Network for Astronomical Research (CANFAR) provides everything you need to explore, analyze, and share your discoveries — without worrying about hardware or software installations.
+Whether you're an astronomer be it a professor, a post-doc or a student, the Canadian Advanced Network for Astronomical Research (CANFAR) provides everything you need to explore, analyze, and share your discoveries — without worrying about hardware or software installations.
 
 **CANFAR delivers:**
 
