@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import time
 from typing import Any
 from unittest.mock import patch
 
@@ -1523,8 +1524,6 @@ def test_environment_integration_string_conversion() -> None:
 
 def test_environment_integration_performance_characteristics() -> None:
     """Test performance characteristics with realistic Canfar workloads."""
-    import time
-
     # Large dataset simulation (10,000 items across 20 containers)
     large_dataset = list(range(10000))
 

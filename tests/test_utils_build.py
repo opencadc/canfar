@@ -1,7 +1,5 @@
 """Tests for the build utilities module."""
 
-import pytest
-
 from canfar.utils.build import create_parameters, fetch_parameters
 
 
@@ -30,22 +28,21 @@ class TestCreateParameters:
     def test_create_parameters_basic(self) -> None:
         """Test create_parameters with basic required parameters."""
         result = create_parameters(
-            name="test-session",
-            image="images.canfar.net/skaha/terminal:1.1.1"
+            name="test-session", image="images.canfar.net/skaha/terminal:1.1.1"
         )
-        
+
         assert len(result) == 1  # Single replica
         payload = result[0]
-        
+
         # Convert list of tuples to dict for easier testing
         payload_dict = dict(payload)
-        
+
         assert payload_dict["name"] == "test-session"
         assert payload_dict["image"] == "images.canfar.net/skaha/terminal:1.1.1"
         assert payload_dict["type"] == "headless"  # default kind becomes type
         assert payload_dict["cores"] == 2  # default
         assert payload_dict["ram"] == 4  # default
-        
+
         # Check environment variables - they are stored as list of "KEY=VALUE" strings
         env_items = [item for key, item in payload if key == "env"]
         env_vars = dict([item.split("=", 1) for item in env_items])
@@ -57,9 +54,9 @@ class TestCreateParameters:
         result = create_parameters(
             name="test-session",
             image="images.canfar.net/skaha/terminal:1.1.1",
-            env=None  # Explicitly no env
+            env=None,  # Explicitly no env
         )
-        
+
         assert len(result) == 1
         payload = result[0]
 
@@ -74,7 +71,7 @@ class TestCreateParameters:
         result = create_parameters(
             name="test-session",
             image="images.canfar.net/skaha/terminal:1.1.1",
-            replicas=3
+            replicas=3,
         )
 
         assert len(result) == 3  # Three replicas
@@ -96,7 +93,7 @@ class TestCreateParameters:
         result = create_parameters(
             name="test-session",
             image="images.canfar.net/skaha/terminal:1.1.1",
-            replicas=1
+            replicas=1,
         )
 
         assert len(result) == 1
@@ -112,7 +109,7 @@ class TestCreateParameters:
         result = create_parameters(
             name="test-session",
             image="images.canfar.net/skaha/terminal:1.1.1",
-            env=custom_env
+            env=custom_env,
         )
 
         assert len(result) == 1
@@ -138,7 +135,7 @@ class TestCreateParameters:
             cmd="python",
             args="script.py --verbose",
             env={"FOO": "BAR"},
-            replicas=2
+            replicas=2,
         )
 
         assert len(result) == 2  # Two replicas

@@ -101,7 +101,9 @@ def test_expiry_with_valid_jwt_no_exp() -> None:
         base64.urlsafe_b64encode(json.dumps(payload).encode()).decode().rstrip("=")
     )
     signature_encoded = (
-        base64.urlsafe_b64encode(json.dumps(signature_data).encode()).decode().rstrip("=")
+        base64.urlsafe_b64encode(json.dumps(signature_data).encode())
+        .decode()
+        .rstrip("=")
     )
 
     token = f"{header_encoded}.{payload_encoded}.{signature_encoded}"
