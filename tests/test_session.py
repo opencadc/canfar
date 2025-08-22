@@ -2,6 +2,7 @@
 
 from time import sleep, time
 from typing import Any
+from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import pytest
@@ -188,3 +189,91 @@ def test_bad_repica_requests(session: Session) -> None:
             image="images.canfar.net/skaha/terminal:1.1.2",
             replicas=513,
         )
+
+
+# Unit tests for connect method (covers lines 369-374)
+class TestSessionConnect:
+    """Test the Session.connect method."""
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(Session, "info")
+    def test_connect_single_session_string(self, mock_info, mock_open_tab) -> None:
+        """Test connect with single session ID as string."""
+        session = Session()
+
+        # Mock the info method to return session data with connectURL
+        mock_info.return_value = [{"connectURL": "https://example.com/connect"}]
+
+        session.connect("session-123")
+
+        # Verify info was called with the session ID
+        mock_info.assert_called_once_with("session-123")
+
+        # Verify open_new_tab was called with the connectURL
+        mock_open_tab.assert_called_once_with("https://example.com/connect")
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(Session, "info")
+    def test_connect_multiple_sessions_list(self, mock_info, mock_open_tab) -> None:
+        """Test connect with multiple session IDs as list."""
+        session = Session()
+
+        # Mock the info method to return session data for each ID
+        def mock_info_side_effect(session_id):
+            if session_id == "session-1":
+                return [{"connectURL": "https://example.com/connect1"}]
+            if session_id == "session-2":
+                return [{"connectURL": "https://example.com/connect2"}]
+            return []
+
+        mock_info.side_effect = mock_info_side_effect
+
+        session.connect(["session-1", "session-2"])
+
+        # Verify info was called for each session ID
+        assert mock_info.call_count == 2
+        mock_info.assert_any_call("session-1")
+        mock_info.assert_any_call("session-2")
+
+        # Verify open_new_tab was called for each connectURL
+        assert mock_open_tab.call_count == 2
+        mock_open_tab.assert_any_call("https://example.com/connect1")
+        mock_open_tab.assert_any_call("https://example.com/connect2")
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(Session, "info")
+    def test_connect_empty_info_response(self, mock_info, mock_open_tab) -> None:
+        """Test connect when info returns empty list (covers error path)."""
+        session = Session()
+
+        # Mock the info method to return empty list
+        mock_info.return_value = []
+
+        # Should raise IndexError when trying to access info[0]
+        with pytest.raises(IndexError):
+            session.connect("session-123")
+
+        # Verify info was called
+        mock_info.assert_called_once_with("session-123")
+
+        # Verify open_new_tab was not called
+        mock_open_tab.assert_not_called()
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(Session, "info")
+    def test_connect_missing_connect_url(self, mock_info, mock_open_tab) -> None:
+        """Test connect when session info lacks connectURL (covers error path)."""
+        session = Session()
+
+        # Mock the info method to return session without connectURL
+        mock_info.return_value = [{"sessionId": "session-123", "status": "Running"}]
+
+        # Should raise KeyError when trying to access info[0]["connectURL"]
+        with pytest.raises(KeyError):
+            session.connect("session-123")
+
+        # Verify info was called
+        mock_info.assert_called_once_with("session-123")
+
+        # Verify open_new_tab was not called
+        mock_open_tab.assert_not_called()
