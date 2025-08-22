@@ -5,6 +5,8 @@ import time
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
+from pydantic import AnyHttpUrl, AnyUrl
+
 from canfar.models.auth import (
     OIDC,
     X509,
@@ -232,8 +234,6 @@ class TestServerInfo:
 
     def test_with_values(self) -> None:
         """Test ServerInfo with custom values."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         server = Server(
             name="Test Server",
             uri=AnyUrl("ivo://test.example.com/skaha"),
@@ -264,8 +264,6 @@ class TestOIDCWithServer:
 
     def test_with_server_info(self) -> None:
         """Test OIDC with server information."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         server_info = Server(
             name="Canada",
             uri=AnyUrl("ivo://canfar.net/src/skaha"),
@@ -278,8 +276,6 @@ class TestOIDCWithServer:
 
     def test_server_field_serialization(self) -> None:
         """Test that OIDC server field is properly serialized."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         server_info = Server(
             name="Test Server",
             uri=AnyUrl("ivo://test.example.com/skaha"),
@@ -305,8 +301,6 @@ class TestX509WithServer:
 
     def test_with_server_info(self) -> None:
         """Test X509 with server information."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         server_info = Server(
             name="CANFAR",
             uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
@@ -319,8 +313,6 @@ class TestX509WithServer:
 
     def test_server_field_serialization(self) -> None:
         """Test that X509 server field is properly serialized."""
-        from pydantic import AnyHttpUrl, AnyUrl
-
         server_info = Server(
             name="Test Server",
             uri=AnyUrl("ivo://test.example.com/skaha"),

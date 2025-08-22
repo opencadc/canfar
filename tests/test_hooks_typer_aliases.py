@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 import pytest
 from click.core import Command, Context
+from typer.core import TyperGroup
 
 from canfar.hooks.typer.aliases import AliasGroup
 
@@ -32,8 +33,6 @@ class TestAliasGroup:
         self, alias_group: AliasGroup
     ) -> None:
         """Test that AliasGroup inherits from TyperGroup."""
-        from typer.core import TyperGroup
-
         assert isinstance(alias_group, TyperGroup)
 
     def test_cmd_split_pattern_regex(self, alias_group: AliasGroup) -> None:

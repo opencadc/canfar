@@ -50,7 +50,9 @@ class TestCheck:
         """Test check hook with real HTTPClient that has expired context."""
         # Create a real OIDC context that is expired
         oidc_context = OIDC(
-            server=Server(name="TestOIDC", url="https://oidc.example.com", version="v1"),
+            server=Server(
+                name="TestOIDC", url="https://oidc.example.com", version="v1"
+            ),
             endpoints={
                 "discovery": "https://oidc.example.com/.well-known/openid-configuration",
                 "token": "https://oidc.example.com/token",
@@ -114,7 +116,9 @@ class TestACheck:
         """Test acheck hook with real HTTPClient that has expired context."""
         # Create a real OIDC context that is expired
         oidc_context = OIDC(
-            server=Server(name="TestOIDC", url="https://oidc.example.com", version="v1"),
+            server=Server(
+                name="TestOIDC", url="https://oidc.example.com", version="v1"
+            ),
             endpoints={
                 "discovery": "https://oidc.example.com/.well-known/openid-configuration",
                 "token": "https://oidc.example.com/token",

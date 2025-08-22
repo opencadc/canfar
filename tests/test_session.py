@@ -2,7 +2,7 @@
 
 from time import sleep, time
 from typing import Any
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest

@@ -2,7 +2,7 @@
 
 from asyncio import sleep
 from time import time
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -147,7 +147,9 @@ class TestAsyncSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(AsyncSession, "info")
     @pytest.mark.asyncio
-    async def test_connect_single_session_string(self, mock_info, mock_open_tab) -> None:
+    async def test_connect_single_session_string(
+        self, mock_info, mock_open_tab
+    ) -> None:
         """Test connect with single session ID as string."""
         asession = AsyncSession()
 
@@ -165,14 +167,16 @@ class TestAsyncSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(AsyncSession, "info")
     @pytest.mark.asyncio
-    async def test_connect_multiple_sessions_list(self, mock_info, mock_open_tab) -> None:
+    async def test_connect_multiple_sessions_list(
+        self, mock_info, mock_open_tab
+    ) -> None:
         """Test connect with multiple session IDs as list."""
         asession = AsyncSession()
 
         # Mock the info method to return session data for all IDs
         mock_info.return_value = [
             {"sessionId": "session-1", "connectURL": "https://example.com/connect1"},
-            {"sessionId": "session-2", "connectURL": "https://example.com/connect2"}
+            {"sessionId": "session-2", "connectURL": "https://example.com/connect2"},
         ]
 
         await asession.connect(["session-1", "session-2"])
@@ -188,7 +192,9 @@ class TestAsyncSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(AsyncSession, "info")
     @pytest.mark.asyncio
-    async def test_connect_session_without_connect_url(self, mock_info, mock_open_tab) -> None:
+    async def test_connect_session_without_connect_url(
+        self, mock_info, mock_open_tab
+    ) -> None:
         """Test connect when some sessions don't have connectURL."""
         asession = AsyncSession()
 
@@ -196,7 +202,7 @@ class TestAsyncSessionConnect:
         mock_info.return_value = [
             {"sessionId": "session-1", "connectURL": "https://example.com/connect1"},
             {"sessionId": "session-2", "status": "Running"},  # No connectURL
-            {"sessionId": "session-3", "connectURL": "https://example.com/connect3"}
+            {"sessionId": "session-3", "connectURL": "https://example.com/connect3"},
         ]
 
         await asession.connect(["session-1", "session-2", "session-3"])
@@ -213,7 +219,9 @@ class TestAsyncSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(AsyncSession, "info")
     @pytest.mark.asyncio
-    async def test_connect_string_to_list_conversion(self, mock_info, mock_open_tab) -> None:
+    async def test_connect_string_to_list_conversion(
+        self, mock_info, mock_open_tab
+    ) -> None:
         """Test that single string ID is converted to list internally."""
         asession = AsyncSession()
 
