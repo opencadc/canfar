@@ -1,23 +1,23 @@
 # CANFAR Science Platform
 
-!!! success "CANFAR"
+!!! info "Canadian Advanced Network for Astronomical Research"
     
     *A scalable, cloud-native workspace with interactive computing and shared storage for astronomy research.
     Built on [IVOA standards](https://www.ivoa.net/documents/), based on [F.A.I.R. principles](https://www.go-fair.org/fair-principles/).*
 
 Whether you're an observational astronomer, a data scientist, or an enthusiastic student, the Canadian Advanced Network for Astronomical Research (CANFAR) Science Platform provides everything you need to explore, analyze, and share your discoveries — without worrying about hardware or software installations.
 
-**CANFAR features:**
+<div class="grid cards" markdown>
 
-- 🖥️ **Interactive Sessions** including Jupyter Lab, Desktop environments, and more
-- 💾 **Shared Storage** for collaborative datasets and research workflows
-- 🐳 **Pre-built Software Containers** with astronomy tools and libraries
-- 🔧 **Support** for specialized research workflows
-- ⚡ **Batch Processing** for automated analysis and large-scale computations
-- 👥 **Collaboration Tools** with group-based permissions and project management
-- :material-language-python: **Python API** for programmatic access and automation
-- :simple-gnubash: **Command Line Interface** for direct platform interaction
+- [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md) 
+- [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/guides/storage/index.md)
+- [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/batch-jobs.md)
+- [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers.md)
+- [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/accounts.md)
+- [:material-wrench: __Expert Support__ <small>for research workflows</small>](platform/help.md)
+- [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
+- [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
 
+</div>
 
-[:material-book-outline: Platform Concepts ](platform/home.md){: .md-button .md-button--primary }
-[:material-connection: CANFAR Client](client/home.md){: .md-button .md-button--primary }
+###### Built on **[IVOA standards](https://www.ivoa.net/documents/)**, based on **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
