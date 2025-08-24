@@ -1,5 +1,59 @@
 # Changelog
 
+## [1.0.0](https://github.com/opencadc/canfar/compare/v0.8.0...v1.0.0) (2025-08-24)
+
+
+### ⚠ BREAKING CHANGES
+
+* **project:** - The configuration directory has moved from `~/.skaha` to `~/.canfar`.
+
+### Features
+
+* **cli:** added capability to discover vosi capabilities of a server ([da70dde](https://github.com/opencadc/canfar/commit/da70ddeb3d419c5aa2ecb60786af0b4dd3de0676))
+* **client:** added logic to catch AuthExpiryError when the auth context is expired ([49c106e](https://github.com/opencadc/canfar/commit/49c106e6c0594197c1dd03c4b47daeafb768f790))
+* **docs:** added docs about canfar ([76b69b1](https://github.com/opencadc/canfar/commit/76b69b13b840dc7ca61cbbaca7fa322ecacb4e8c))
+* **docs:** importing science container docs with history ([f388602](https://github.com/opencadc/canfar/commit/f3886023eef48f8b4d99ee32dbc102a791602dc6))
+* **docs:** reorg from scicon docs ([85ca36c](https://github.com/opencadc/canfar/commit/85ca36c1c1a96b08ad14726f38658112be1921df))
+* **docs:** significant updates for client docs to provide sync/async variations of most python calls ([c86ae6b](https://github.com/opencadc/canfar/commit/c86ae6b4ccbe21d18104f2c6cca6028a5e08e180))
+* **docs:** updated README, and the cleaned up the main landing page significantly ([2745b60](https://github.com/opencadc/canfar/commit/2745b60f5a23c8058e9a14c3b63cf690f9cbade0))
+* **docs:** updates to documentation theme and features ([5289571](https://github.com/opencadc/canfar/commit/5289571f84fd4d81f723f31d688f0a70d2f6e0b8))
+* **models:** added supported auth tracking to upstream servers model ([7098327](https://github.com/opencadc/canfar/commit/7098327a5d984031433996d216453c3ccf163004))
+* **project:** This commit renames the project from `skaha` to `canfar` to align with the official support from CADC and create a unified naming scheme for the science platform ([ecf55fb](https://github.com/opencadc/canfar/commit/ecf55fb6c1d91d9b455a7b96d51e0b98c220895e))
+
+
+### Bug Fixes
+
+* **api:** httpx error catching hook now re-raises the errors rather than execessive printing in stdout ([827205f](https://github.com/opencadc/canfar/commit/827205f92922be7b0c71eaf4f0a0a6bd24c739b0))
+* **auth:** default x509 cert expiry is now 30 days, similar to cadc-get-cert ([f0bd2a7](https://github.com/opencadc/canfar/commit/f0bd2a70b1987c971f94970501b123dd61505ded))
+* **cli:** auth now search for dev registries only when running with --dev flag ([c490b46](https://github.com/opencadc/canfar/commit/c490b469cf7a0152c38b4c993a5d8d93c0e9d382))
+* **cli:** deprecated skaha & cf as entrypoints ([6ea71de](https://github.com/opencadc/canfar/commit/6ea71dec27e8f81505f1db3e525b9e5357553bf0))
+* **cli:** desktop-app info problems ([6b37351](https://github.com/opencadc/canfar/commit/6b37351a3adab0ca7f6edc2ef8f46d94620b9c0c))
+* **client:** http client now properly adds the refresh hook before the expiry hook ([b340308](https://github.com/opencadc/canfar/commit/b340308bdb0b092d010da5a4486c4aaa6b0fe7d9))
+* **cli:** fixed the max request sizes in stat output ([1f55f1e](https://github.com/opencadc/canfar/commit/1f55f1e01e0d7a35ad4093c6a10cf614165aa002))
+* **cli:** fixed version selection issue on login ([79f3ca8](https://github.com/opencadc/canfar/commit/79f3ca8a133e288b1285d3416b3e4229cee00582))
+* **cli:** remove canfar list, and canfar rm as aliases due to conflicts with linux commands ([e1a4742](https://github.com/opencadc/canfar/commit/e1a47421e18ed749ab10b11210ff3252d2086488))
+* **cli:** stats now report usage instead of requested, and the output is much more aligned with the platform ui ([71662ed](https://github.com/opencadc/canfar/commit/71662ed823bac049d1d1d97458a68fa59a2d523f))
+* **docs:** changed the location of legacy docs ([0ef7e43](https://github.com/opencadc/canfar/commit/0ef7e436de5e892a7a3e08c28c6f67ffc6b215ea))
+* **docs:** cli ([a24287d](https://github.com/opencadc/canfar/commit/a24287da0386f8c6f83ac84874f294790e26aafa))
+* **docs:** formatting ([62ca659](https://github.com/opencadc/canfar/commit/62ca659b5043af7b3294e937815a6e14ed1aa0a0))
+* **docs:** updated legacy docs with link fixes and moved around the toc ([662b9bd](https://github.com/opencadc/canfar/commit/662b9bdf68c4cf7b99fe6bb7b6b2f97841da3d16))
+* **httpx:** updated httpx hook and tests ([7a3621d](https://github.com/opencadc/canfar/commit/7a3621df72303985c1f4a2788dcc313895535762))
+* **model:** updates to default config to add auth tracking offered by the upstream server ([52e291e](https://github.com/opencadc/canfar/commit/52e291ed8d3e57471e6180d7033d4524b71785ca))
+* **registry:** added keel-dev to discoverable registeries ([78ccbe6](https://github.com/opencadc/canfar/commit/78ccbe656fd1d6decd34ff625b46402a3c5fb6b3))
+* **registry:** fix for testing to include keel-dev ([dcf3cda](https://github.com/opencadc/canfar/commit/dcf3cdaa4177f5c48d9f908811d9841d4ad64367))
+* **tests:** removed now redundant test ([c6b519c](https://github.com/opencadc/canfar/commit/c6b519c3beb31fa2b525fdf064ad4843a83aafa9))
+* **utils:** vosi ([c925e5a](https://github.com/opencadc/canfar/commit/c925e5ae3b0019f5249a6b09b97d455215030475))
+
+
+### Documentation
+
+* **client:** updated client documentation ([74e64ec](https://github.com/opencadc/canfar/commit/74e64ec5d8bf92a9f1a9eeacf75e2ed11526b890))
+* **doi:** updated formatting of the doi details section ([6133c1a](https://github.com/opencadc/canfar/commit/6133c1a3338bf4ad2e0aaf4c991a9a378992ec10))
+* **landing-page:** added publications and moved some things to footnotes ([afc2336](https://github.com/opencadc/canfar/commit/afc2336d576b05116540958e73a0199d2755b612))
+* **landing-page:** cleanup and dyamic links ([f37887b](https://github.com/opencadc/canfar/commit/f37887be9ece7da256b6bd7a0843ff068ef335ac))
+* **pacakge:** major updates for docs, merged in science container docs ([3b9c12a](https://github.com/opencadc/canfar/commit/3b9c12ac3861aba5441ef7402cb0500a51acd983))
+* **user-guides----documentations:** add legacy index and pages; update guides link; ([0867c96](https://github.com/opencadc/canfar/commit/0867c9620692967224428e01d8afe2eb5389b881))
+
 ## [0.8.0](https://github.com/opencadc/canfar/compare/v0.7.0...v0.8.0) (2025-08-08)
 
 
