@@ -33,7 +33,9 @@ theme:
     text: Roboto
     code: Roboto Mono
   language: en
+  favicon: static/meteor.ico
   icon:
+    logo: simple/meteor
     repo: fontawesome/brands/github-alt
     edit: material/pencil-box
     view: material/eye-outline
