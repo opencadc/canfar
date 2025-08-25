@@ -1,12 +1,12 @@
 
 # Launching Desktop Sessions
 
-Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. While a few applications are native to the desktop, most astronomy software is launched in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This guide explains how to launch and use desktop sessions, including CANFAR-supported and user-contributed astronomy software.
+Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. Most astronomy software is launched in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This guide explains how to launch and use desktop sessions, including CANFAR-supported and user-contributed astronomy software.
 
 !!! abstract "🎯 What You'll Learn"
-    - How to launch, connect, and size desktop sessions
-    - What software is available and how to launch it
-    - How to manage files and storage within desktop sessions
+    - Launching, connecting, and sizing desktop sessions
+    - Available software and how to launch it
+    - Managing files and storage within desktop sessions
     - Tips for collaboration, performance, and troubleshooting
 
 ## Overview
@@ -36,15 +36,14 @@ then select **desktop** as your session type.
 
 > ![image](../images/desktop/1_launch_desktop.png)
 
-Give your session a descriptive name that will help you identify it later 
-(e.g., "data-reduction", "teaching-session", "multi-instrument-analysis").
+Choose a descriptive session name to help you identify it later (e.g., `data-reduction`, `teaching-session`, `multi-instrument-analysis`).
 
 > ![image](../images/desktop/3_choose_name.png)
 
 
 ### Step 2: Launch Session
 
-Click the **Launch** button and wait for your session to initialize. Desktop sessions 
+Click the **Launch** button and wait for your session to initialize. Desktop sessions
 may take slightly longer to start than other session types.
 
 > ![image](../images/desktop/4_launch.png)
@@ -81,8 +80,9 @@ Most applications are launched in containers and connect to your desktop session
 
 ### Session Persistence
 
-When your session becomes inactive, you'll be returned to the connection page. 
-Click **Connect** again to resume exactly where you left off - all your applications 
+and work remain open.
+When your session becomes inactive, you'll be returned to the connection page.
+Click **Connect** again to resume exactly where you left off - all your applications
 and work remain open.
 
 
@@ -97,36 +97,24 @@ The desktop session provides access to astronomy software in two ways:
 
 You can also access other tools and environments, including Python (with AstroPy, Jupyter), CASA, IRAF/PyRAF, and more, depending on the available containers and desktop configuration.
 
-### Development Tools
-
-- **Text editors**: gedit, vim, emacs
-- **IDEs**: Available through package installation
-- **Version control**: Git and other VCS tools
-- **Compilers**: GCC, Python, and other development tools
-
-### System Tools
-
-- **File manager**: Graphical file operations
-- **Terminal**: Full shell access
-- **System monitor**: Resource usage monitoring
-- **Network tools**: File transfer and connectivity utilities
-
-
 ## Working with Applications
 
 ### Launching Applications
 
-**Method 1: Astro Software Menu**
+### Method 1: Astro Software Menu
+
 1. Click the Applications menu in the taskbar
 2. Select "Astro Software" to browse CANFAR-supported and user-contributed astronomy containers
 3. Choose your desired application to launch it in a dedicated container
 
-**Method 2: Desktop Shortcuts**
+### Method 2: Desktop Shortcuts
+
 - Click the shortcut icon for DS9, Aladin, TOPCAT, or Firefox on the main desktop to launch these applications quickly
 
 **Note:** Most astronomy applications are launched in containers and connect to your desktop session. You cannot start a terminal and simply run `ds9 &` or similar commands, as these applications are not installed natively in the desktop environment.
 
-**Method 3: File Association**
+### Method 3: File Association
+
 - Double-click FITS files to open in DS9 (if available)
 - Right-click files for "Open with" options
 
@@ -200,12 +188,12 @@ This feature works in:
 
 Your desktop session provides access to:
 
-- **`/arc/projects/[groupname]/`**: Shared project storage
+- **`/arc/projects/[projectname]/`**: Shared project storage
 - **`/arc/home/[username]/`**: Personal persistent storage
 - **`/scratch/`**: Temporary scratch space, unique to each application.
 
 !!! warning "Persistence Reminder"
-    Use `/arc/projects/` or `/arc/home/` for important files. The session-local home and `/tmp/` are not guaranteed to persist after the session ends.
+    Use `/arc/projects/` or `/arc/home/` for important files. `/scratch` and `/tmp/` will not persist after the session ends.
 
 ### File Operations
 
@@ -230,24 +218,28 @@ To properly end your desktop session:
 
 ### Common Issues
 
-**Session won't connect**
+### Session won't connect
+
 - Wait 30 seconds and try again
 - Check browser compatibility (Chrome/Firefox recommended)
 - Disable browser extensions that might interfere
 
-**Poor performance**
+### Poor performance
+
 - Check resource usage with `htop`
 - Close unnecessary applications
 - Consider increasing session memory
 
 
-**Applications won't start**
+### Applications won't start
+
 - Ensure you are launching applications from the Astro Software menu or desktop shortcuts
 - Verify sufficient memory is available
 - If issues persist, check for error messages in the application window or contact support
 
-**File access problems**
-- Verify paths to `/arc/projects/[groupname]/`
+### File access problems
+
+- Verify paths to `/arc/projects/[projectname]/`
 - Check group permissions
 - Ensure files aren't locked by other processes
 

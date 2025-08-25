@@ -1,17 +1,16 @@
 # Launching CARTA Sessions
 
-CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialized image visualization and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.
+CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialised image visualisation and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.
 
 !!! abstract "🎯 What You'll Learn"
-    - How to launch a CARTA session and choose the right version
-    - How to load data from `/arc` and work with radio data cubes
+    - Launching a CARTA session and choosing the right version
+    - Loading data from `/arc` and working with radio data cubes
     - Tips for analysis features, performance, and troubleshooting
 
 ## Overview
 
-CARTA provides advanced features for:
-
-- **Image visualization**: Multi-dimensional data cube exploration
+Key features:
+- **Image visualisation**: Multi-dimensional data cube exploration
 - **Spectral analysis**: Line profiles and moment maps
 - **Region analysis**: Statistical analysis of image regions
 - **Animation**: Time-series and frequency animations
@@ -21,14 +20,14 @@ CARTA provides advanced features for:
 
 ### Step 1: Select Session Type
 
-From the Science Portal dashboard, click the **plus sign (+)** to create a new session, 
+From the Science Portal dashboard, click the **plus sign (+)** to create a new session,
 then select **carta** as your session type.
 
 > ![image](../images/carta/1_select_carta_session.png)
 
 ### Step 2: Choose Container Version
 
-Note that the menu options update automatically after your session type selection. 
+Note that the menu options update automatically after your session type selection.
 Choose the CARTA version that meets your needs:
 
 - **CARTA 4.0** (recommended): Latest features and bug fixes
@@ -40,12 +39,11 @@ Choose the CARTA version that meets your needs:
 
 #### Session Name
 
-Give your session a descriptive name that will help you identify it later 
-(e.g., "m87-analysis", "ngc-1300-cube").
+Choose a descriptive session name to help you identify it later (e.g., `m87-analysis`, `ngc-1300-cube`).
 
 > ![image](../images/carta/3_choose_carta_name.png)
 
-You may want to stay with a "flexible" session first, and switch to a fixed resourced one if necessary.
+Start with a "flexible" session, and switch to a fixed resource one if needed.
 
 ### Step 4: Launch Session
 
@@ -53,7 +51,7 @@ Click the **Launch** button and wait for your session to initialize.
 
 > ![image](../images/carta/6_launch_carta.png)
 
-Your session will appear on the Science Portal dashboard with your chosen name. 
+Your session will appear on the Science Portal dashboard with your chosen name.
 Click the CARTA icon to access your session.
 
 > ![image](../images/carta/7_click_carta.png)
@@ -74,7 +72,7 @@ Wait for CARTA to load completely. You'll see the main CARTA interface:
 
 1. Click the folder icon in the upper left to navigate directories
 2. Browse to your data location:
-   - **Project data**: `/arc/projects/[group]/`
+   - **Project data**: `/arc/projects/[projectname]/`
    - **Personal data**: `/arc/home/[username]/`
 
 > ![image](../images/carta/10_navigate_files.png)
@@ -198,22 +196,26 @@ For very large files:
 
 ### Common Issues
 
-**CARTA won't load**
+### CARTA won't load
+
 - Check browser compatibility (Chrome/Firefox recommended)
 - Disable browser extensions that might interfere
 - Clear browser cache and cookies
 
-**Performance problems**
+### Performance problems
+
 - Reduce image size or resolution
 - Close other applications
 - Check available memory
 
-**File loading errors**
+### File loading errors
+
 - Verify file format compatibility
 - Check file permissions in storage
 - Ensure file isn't corrupted
 
-**Display issues**
+### Display issues
+
 - Try different colormaps
 - Adjust image scaling
 - Check graphics driver compatibility

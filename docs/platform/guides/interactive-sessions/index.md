@@ -52,7 +52,7 @@ Select the interface that best matches your workflow:
 === "🔬 Catalogue Analysis"
     **Session Type:** `firefly`  
     **Container:** `firefly`  
-    **Use Case:** Optical data, catalogue overlays, image cutouts
+    **Use Case:** Vizualize images, overlay catalogues, image cutouts, query public large catalogues
 
 ### Step 3: Configure Resources
 
@@ -127,11 +127,11 @@ Save personal settings that persist across sessions:
 
 ```bash
 # Jupyter configuration
-mkdir -p /arc/home/$USER/.jupyter
+mkdir -p /arc/home/[username]/.jupyter
 cp jupyter_config.py /arc/home/$USER/.jupyter/
 
 # Shell configuration
-echo "alias ll='ls -la'" >> /arc/home/$USER/.bashrc
+echo "alias ll='ls -la'" >> /arc/home/[username]/.bashrc
 
 # Python packages (user installation)
 pip install --user astroplan # in some containers, the --user may not be needed
@@ -214,8 +214,8 @@ cp /scratch/results.fits /arc/projects/myproject/
 
 === "Container Issues"
     **Solutions:**
-    - Try a different container image (e.g., switch from custom to `astroml`)
-    - Check if container is available: `docker pull images.canfar.net/container:tag`
+    - Try a different container image (e.g., switch to `cadc/astroml:latest`)
+    - Check if container is available: `docker pull images.canfar.net/[orgname]/[containername]:[tagname]`
     - Use `latest` tag instead of specific versions
 
 === "Network Problems"
@@ -232,14 +232,14 @@ cp /scratch/results.fits /arc/projects/myproject/
 **Diagnostic Steps:**
 ```bash
 # Check file locations
-ls -la /arc/home/$(whoami)/     # Personal storage
+ls -la /arc/home/[username]/     # Personal storage
 ls -la /arc/projects/           # Available projects
 
 # Check group membership  
 groups
 
 # Check permissions on specific files
-ls -la /arc/projects/myproject/problematic_file
+ls -la /arc/projects/[projectname]/problematic_file
 ```
 
 **Solutions:**
@@ -329,12 +329,12 @@ df -h          # Disk usage
 **Diagnostic Commands:**
 ```bash
 # Check quotas and usage
-df -h /arc/home/$USER
-df -h /arc/projects/myproject
-du -sh /arc/home/$USER/*
+df -h /arc/home/[username]
+df -h /arc/projects/[projectname]
+du -sh /arc/home/[username]/*
 
 # Find large files
-find /arc/home/$USER -type f -size +100M
+find /arc/home/[username] -type f -size +100M
 ```
 
 **Solutions:**
