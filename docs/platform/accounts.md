@@ -38,7 +38,7 @@ graph TD
     Admin --> |"Controls access to"| Resources
     Members --> |"Access"| Resources
     
-    Resources --> Projects["📁 /arc/projects/[groupname]/"]
+    Resources --> Projects["📁 /arc/projects/[projectname]/"]
     Resources --> Storage["💾 Storage Quotas"]
     Resources --> Containers["🐳 Container Access"]
 ```
@@ -55,7 +55,7 @@ graph TD
 #### Step 1: Create a New Group
 
 1. Click **"New Group"**
-2. Provide a meaningful group name (e.g., `myproject-team`)
+2. Provide a meaningful group name (e.g., `cfhtls`)
 3. Add a brief description of the project or collaboration
 4. Click **"Create"**
 
@@ -113,10 +113,10 @@ Harbor permissions are typically managed by CANFAR administrators. Contact [supp
 docker login images.canfar.net
 
 # Pull a container
-docker pull images.canfar.net/skaha/astroml:latest
+docker pull images.canfar.net/cadc/astroml:latest
 
 # Push your container (if you have permissions)
-docker push images.canfar.net/myproject/custom-container:v1.0
+docker push images.canfar.net/[projectname]/[containername]:[tagname]
 ```
 
 ## 🛡️ Access Control Lists {#acl-access-control-lists}
@@ -157,7 +157,7 @@ docker push images.canfar.net/myproject/custom-container:v1.0
 
 ```bash
 # View ACL permissions
-getfacl /arc/projects/myproject/sensitive_data/
+getfacl /arc/projects/[projectname]/[directoryname]/
 
 # Output example:
 # file: sensitive_data/
