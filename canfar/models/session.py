@@ -210,7 +210,7 @@ class FetchResponse(BaseModel):
     requestedRAM: str
     requestedCPUCores: str
     requestedGPUCores: str = "<none>"
-    ramInUse: str
+    ramInUse: str = "<none>"
     gpuRAMInUse: str = "<none>"
-    cpuCoresInUse: str
+    cpuCoresInUse: str = "<none>"
     gpuUtilization: str = "<none>"
