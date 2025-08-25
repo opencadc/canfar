@@ -1,12 +1,29 @@
-# VOSpace API and Advanced Tools
 
-Advanced data management capabilities using VOSpace APIs and command-line tools for automation and bulk operations.
+
+
+# Vault (VOSpace API) and ARC Access
+
+Advanced data management capabilities using the VOSpace API for Vault (archive storage, vos: URIs) and ARC (project/home storage, arc: URIs). Both can be accessed programmatically and via command-line tools for automation and bulk operations.
+
+
+**ARC Access:**
+
+- **Inside a CANFAR session:** Use standard Unix commands (`cp`, `ls`, etc.) for `/arc/projects/[projectname]` and `/arc/home/[username]`.
+- **Outside a CANFAR session:** Use SSHFS to mount `/arc` or use VOSpace API with `arc:` URIs.
+
 
 ## Overview
 
-While the [Storage Guide](index.md) covers basic file operations, this guide focuses on programmatic access to your data using VOSpace APIs, command-line tools, and advanced workflows.
+While the [Storage Guide](index.md) covers basic file operations, this guide focuses on programmatic access to your data using the VOSpace API, command-line tools, and advanced workflows. You can access:
+
+- **Vault**: Long-term archive storage via `vos:` URIs (e.g., `vos:[username]/` or `vos:[projectname]`)
+- **ARC**: Project and home storage via `arc:` URIs (e.g., `arc:projects/[projectname]/mydatafile.fits`)
+
+
 
 ## Command-Line Tools
+
+
 
 ### Installation
 
@@ -20,6 +37,8 @@ pip install vos
 vls --help
 ```
 
+
+
 ### Authentication
 
 ```bash
@@ -27,46 +46,118 @@ vls --help
 cadc-get-cert --cert ~/.ssl/cadcproxy.pem
 
 # Or use your username/password
-export CADC_USERNAME=your_username
-export CADC_PASSWORD=your_password
+export CADC_USERNAME=[username]
+export CADC_PASSWORD=[password]
 ```
+
+
+
 
 ### Basic Operations
 
+#### Vault (VOSpace API)
+
+```bash
+# List files and directories in Vault
+vls vos:[username]/
+
+# Copy files to Vault
+vcp mydata.fits vos:[username]/data/
+
+# Copy files from Vault
+vcp vos:[username]/data/mydata.fits ./
+
+# Create directories in Vault
+vmkdir vos:[username]/projects/survey_analysis/
+
+# Move/rename files in Vault
+vmv vos:[username]/old.fits vos:[username]/new.fits
+
+# Remove files in Vault
+vrm vos:[username]/temp/old_data.fits
+```
+
+
+#### ARC (VOSpace API, outside CANFAR)
+
+```bash
+# List files and directories in ARC
+vls arc:projects/[projectname]/
+
+# Copy files to ARC
+vcp mydata.fits arc:projects/[projectname]/data/
+
+# Copy files from ARC
+vcp arc:projects/[projectname]/data/mydata.fits ./
+
+# Create directories in ARC
+vmkdir arc:projects/[projectname]/survey_analysis/
+
+# Move/rename files in ARC
+vmv arc:projects/[projectname]/old.fits arc:projects/[projectname]/new.fits
+
+# Remove files in ARC
+vrm arc:projects/[projectname]/temp/old_data.fits
+```
+
+
+#### ARC (Inside CANFAR session)
+
 ```bash
 # List files and directories
-vls vos:CANFAR/your_username/
+ls /arc/projects/[projectname]/
 
-# Copy files to VOSpace
-vcp mydata.fits vos:CANFAR/your_username/data/
-
-# Copy files from VOSpace  
-vcp vos:CANFAR/your_username/data/mydata.fits ./
+# Copy files
+cp mydata.fits /arc/projects/[projectname]/data/
 
 # Create directories
-vmkdir vos:CANFAR/your_username/projects/survey_analysis/
+mkdir /arc/projects/[projectname]/survey_analysis/
 
 # Move/rename files
-vmv vos:CANFAR/your_username/old.fits vos:CANFAR/your_username/new.fits
+mv /arc/projects/[projectname]/old.fits /arc/projects/[projectname]/new.fits
 
 # Remove files
-vrm vos:CANFAR/your_username/temp/old_data.fits
+rm /arc/projects/[projectname]/temp/old_data.fits
 ```
+
+
 
 ### Bulk Operations
 
+> Note: `vsync` and `vcp` are always recursive; no `--recursive` flag is needed.
+
+
+#### Vault (VOSpace API)
+
 ```bash
-# Sync entire directories
-vsync --recursive ./local_data/ vos:CANFAR/your_username/backup/
+# Sync entire directories to Vault
+vsync ./local_data/ vos:[username]/backup/
 
-# Download project data
-vsync --recursive vos:CANFAR/shared_project/survey_data/ ./project_data/
+# Download project data from Vault
+vsync vos:shared_project/survey_data/ ./project_data/
 
-# Upload analysis results
-vsync --recursive ./results/ vos:CANFAR/your_username/analysis_outputs/
+# Upload analysis results to Vault
+vsync ./results/ vos:[username]/analysis_outputs/
 ```
 
+
+#### ARC (VOSpace API, outside CANFAR)
+
+```bash
+# Sync entire directories to ARC
+vsync ./local_data/ arc:projects/[projectname]/backup/
+
+# Download project data from ARC
+vsync arc:projects/[projectname]/survey_data/ ./project_data/
+
+# Upload analysis results to ARC
+vsync ./results/ arc:projects/[projectname]/analysis_outputs/
+```
+
+
+
 ## Python API
+
 
 ### Basic Usage
 
@@ -76,34 +167,62 @@ import vos
 # Initialize client
 client = vos.Client()
 
-# List directory contents
-files = client.listdir("vos:CANFAR/your_username/")
-print(files)
 
-# Check if file exists
-exists = client.isfile("vos:CANFAR/your_username/data.fits")
+# List directory contents in Vault
+files_vault = client.listdir("vos:[username]/")
+print(files_vault)
 
-# Get file info
-info = client.get_info("vos:CANFAR/your_username/data.fits")
-print(f"Size: {info['size']} bytes")
-print(f"Modified: {info['date']}")
+# List directory contents in ARC
+files_arc = client.listdir("arc:projects/[projectname]/")
+print(files_arc)
+
+# Check if file exists in Vault
+exists_vault = client.isfile("vos:[username]/data.fits")
+
+# Check if file exists in ARC
+exists_arc = client.isfile("arc:projects/[projectname]/data.fits")
+
+# Get file info from Vault
+info_vault = client.get_info("vos:[username]/data.fits")
+print(f"Size: {info_vault['size']} bytes")
+print(f"Modified: {info_vault['date']}")
+
+# Get file info from ARC
+info_arc = client.get_info("arc:projects/[projectname]/data.fits")
+print(f"Size: {info_arc['size']} bytes")
+print(f"Modified: {info_arc['date']}")
 ```
+
 
 ### File Operations
 
 ```python
-# Copy file to VOSpace
-client.copy("mydata.fits", "vos:CANFAR/your_username/data/mydata.fits")
 
-# Copy file from VOSpace
-client.copy("vos:CANFAR/your_username/data/results.txt", "./results.txt")
+# Copy file to Vault
+client.copy("mydata.fits", "vos:[username]/data/mydata.fits")
 
-# Create directory
-client.mkdir("vos:CANFAR/your_username/new_project/")
+# Copy file to ARC
+client.copy("mydata.fits", "arc:projects/[projectname]/data/mydata.fits")
 
-# Delete file
-client.delete("vos:CANFAR/your_username/temp/old_file.txt")
+# Copy file from Vault
+client.copy("vos:[username]/data/results.txt", "./results.txt")
+
+# Copy file from ARC
+client.copy("arc:projects/[projectname]/data/results.txt", "./results.txt")
+
+# Create directory in Vault
+client.mkdir("vos:[username]/new_project/")
+
+# Create directory in ARC
+client.mkdir("arc:projects/[projectname]/new_project/")
+
+# Delete file in Vault
+client.delete("vos:[username]/temp/old_file.txt")
+
+# Delete file in ARC
+client.delete("arc:projects/[projectname]/temp/old_file.txt")
 ```
+
 
 ### Advanced Operations
 
@@ -111,9 +230,8 @@ client.delete("vos:CANFAR/your_username/temp/old_file.txt")
 import os
 from astropy.io import fits
 
-
 def process_fits_files(vospace_dir, output_dir):
-    """Process all FITS files in a VOSpace directory"""
+    """Process all FITS files in a Vault or ARC directory"""
 
     # List all FITS files
     files = client.listdir(vospace_dir)
@@ -135,25 +253,32 @@ def process_fits_files(vospace_dir, output_dir):
             output_path = f"{output_dir}/processed_{fits_file}"
             fits.writeto(output_path, processed_data, overwrite=True)
 
-            # Upload to VOSpace
-            client.copy(output_path, f"vos:CANFAR/your_username/processed/{fits_file}")
+
+            # Upload to Vault or ARC
+            if vospace_dir.startswith("vos:"):
+                client.copy(output_path, f"vos:your_username/processed/{fits_file}")
+            else:
+                client.copy(output_path, f"arc:projects/myproject/processed/{fits_file}")
 
         # Clean up temporary file
         os.remove(local_path)
 
-
 # Usage
-process_fits_files("vos:CANFAR/your_username/raw_data", "./processed/")
+
+process_fits_files("vos:your_username/raw_data", "./processed/")
+process_fits_files("arc:projects/myproject/raw_data", "./processed/")
 ```
 
+
 ## Automation Workflows
+
 
 ### Batch Processing Script
 
 ```python
 #!/usr/bin/env python3
 """
-Automated data processing pipeline using VOSpace
+Automated data processing pipeline using Vault (VOSpace API) and ARC
 """
 import vos
 import sys
@@ -163,7 +288,6 @@ from pathlib import Path
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
 
 def setup_vospace():
     """Initialize VOSpace client with authentication"""
@@ -176,9 +300,8 @@ def setup_vospace():
         logger.error(f"VOSpace authentication failed: {e}")
         sys.exit(1)
 
-
 def sync_input_data(client, remote_dir, local_dir):
-    """Download input data from VOSpace"""
+    """Download input data from Vault or ARC"""
     logger.info(f"Syncing {remote_dir} to {local_dir}")
 
     Path(local_dir).mkdir(parents=True, exist_ok=True)
@@ -195,9 +318,8 @@ def sync_input_data(client, remote_dir, local_dir):
                 logger.info(f"Downloading {file}")
                 client.copy(remote_path, local_path)
 
-
 def upload_results(client, local_dir, remote_dir):
-    """Upload processing results to VOSpace"""
+    """Upload processing results to Vault or ARC"""
     logger.info(f"Uploading results from {local_dir} to {remote_dir}")
 
     # Ensure remote directory exists
@@ -212,29 +334,33 @@ def upload_results(client, local_dir, remote_dir):
             logger.info(f"Uploading {file_path.name}")
             client.copy(str(file_path), remote_path)
 
-
 def main():
     """Main processing pipeline"""
     client = setup_vospace()
 
     # Configuration
-    input_remote = "vos:CANFAR/shared_project/raw_data"
-    output_remote = "vos:CANFAR/your_username/processed_results"
+    input_remote_vault = "vos:shared_project/raw_data"
+    input_remote_arc = "arc:projects/myproject/raw_data"
+    output_remote_vault = "vos:your_username/processed_results"
+    output_remote_arc = "arc:projects/myproject/processed_results"
     local_input = "./input_data"
     local_output = "./output_data"
 
-    # Download input data
-    sync_input_data(client, input_remote, local_input)
+    # Download input data from Vault
+    sync_input_data(client, input_remote_vault, local_input)
+    # Download input data from ARC
+    sync_input_data(client, input_remote_arc, local_input)
 
     # Your processing code here
     logger.info("Processing data...")
     # ... processing logic ...
 
-    # Upload results
-    upload_results(client, local_output, output_remote)
+    # Upload results to Vault
+    upload_results(client, local_output, output_remote_vault)
+    # Upload results to ARC
+    upload_results(client, local_output, output_remote_arc)
 
     logger.info("Pipeline completed successfully")
-
 
 if __name__ == "__main__":
     main()
@@ -385,27 +511,34 @@ def analyze_vospace_catalog(client, catalog_path):
     os.remove(result_path)
 ```
 
+
 ### With Batch Jobs
 
 ```bash
 #!/bin/bash
-# Batch job script using VOSpace
+# Batch job script using Vault and ARC via VOSpace API
 
 # Authenticate
 cadc-get-cert --cert ~/.ssl/cadcproxy.pem
 
-# Download input data
-vcp vos:CANFAR/project/input/data.fits ./input.fits
+
+# Download input data from Vault
+vcp vos:project/input/data.fits ./input.fits
+# Download input data from ARC
+vcp arc:projects/myproject/input/data.fits ./input_arc.fits
 
 # Process data
 python analysis_script.py input.fits output.fits
 
-# Upload results
-vcp output.fits vos:CANFAR/project/results/processed_$(date +%Y%m%d).fits
+# Upload results to Vault
+vcp output.fits vos:project/results/processed_$(date +%Y%m%d).fits
+# Upload results to ARC
+vcp output.fits arc:projects/myproject/results/processed_$(date +%Y%m%d).fits
 
 # Cleanup
-rm input.fits output.fits
+rm input.fits input_arc.fits output.fits
 ```
+
 
 ## Troubleshooting
 
@@ -429,13 +562,19 @@ client = vos.Client()
 client.timeout = 300  # 5 minutes
 ```
 
+
 **Permission Errors:**
 ```bash
-# Check file permissions
-vls -l vos:CANFAR/your_username/file.fits
 
-# Check directory access
-vls vos:CANFAR/project_name/
+# Check file permissions in Vault
+vls -l vos:your_username/file.fits
+# Check file permissions in ARC
+vls -l arc:projects/myproject/file.fits
+
+# Check directory access in Vault
+vls vos:project_name/
+# Check directory access in ARC
+vls arc:projects/myproject/
 ```
 
 ## Next Steps
