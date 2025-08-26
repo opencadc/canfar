@@ -6,7 +6,7 @@ hide:
 
 <h1>CANFAR Science Platform </h1>
     
-!!! info ""
+!!! note ""
     
     <center>
     <h3>
@@ -39,17 +39,14 @@ hide:
     
     </h3>
 
----
-
 !!! quote ""
 
     <font size="3">
-    ##### If you used our services, add an acknowledgement to your papers, theses, and other research outputs.
+    ##### If you use CANFAR, add an acknowledgement to your papers, theses, and other research outputs.
     </font>
 
     <span style="font-family: 'Roboto Mono', monospace; font-size: 12px; font-style: italic;">
     The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform operated by the Canadian Astronomy Data Center (CADC) and the Digital Research Alliance of Canada (DRAC), with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canadian Foundation for Innovation (CFI).
     </span>
 
-[^1]: CANFAR is built on **[IVOA standards](https://www.ivoa.net/documents/)**, based on **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
-[^2]: Please include [the following acknowledgment](about/acknowledgement.md) in your publications & other research outputs, as it directly helps us secure continued funding and support for the CANFAR Science Platform.
+###### Built on **[IVOA standards](https://www.ivoa.net/documents/)** & **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
