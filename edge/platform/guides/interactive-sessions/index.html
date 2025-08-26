@@ -1400,18 +1400,18 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-session-features" class="md-nav__link">
+  <a href="#security-and-best-practices" class="md-nav__link">
     <span class="md-ellipsis">
-      🔧 Advanced Session Features
+      🛡️ Security and Best Practices
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#security-and-best-practices" class="md-nav__link">
+  <a href="#troubleshooting-sessions" class="md-nav__link">
     <span class="md-ellipsis">
-      🛡️ Security and Best Practices
+      🔧 Troubleshooting Sessions
     </span>
   </a>
   
@@ -1480,7 +1480,7 @@
 </div>
 <p>Interactive sessions provide web-based access to powerful computing resources with different interfaces optimized for specific workflows. Whether you're analyzing data in Jupyter notebooks, visualizing radio astronomy images, or running GUI applications, CANFAR's interactive sessions make it easy to get started.</p>
 <h2 id="session-types-overview">🎯 Session Types Overview<a class="headerlink" href="#session-types-overview" title="Permanent link">&para;</a></h2>
-<p>CANFAR supports multiple session types, each optimized for different research workflows:</p>
+<p>CANFAR supports multiple interactive session types, each optimized for different research workflows:</p>
 <table>
 <thead>
 <tr>
@@ -1500,25 +1500,25 @@
 <tr>
 <td><strong><a href="launch-desktop/">🖥️ Desktop</a></strong></td>
 <td>Linux desktop</td>
-<td>GUI applications, legacy software</td>
+<td>Desktop GUI applications, legacy software</td>
 <td>Full desktop environment, X11 apps</td>
 </tr>
 <tr>
 <td><strong><a href="launch-carta/">📊 CARTA</a></strong></td>
 <td>CARTA viewer</td>
-<td>Radio astronomy visualization</td>
-<td>Cube analysis, region tools, catalogs</td>
+<td>FITS/HDF5 astronomy visualization</td>
+<td>Cube analysis, region tools, catalogues</td>
 </tr>
 <tr>
 <td><strong><a href="launch-firefly/">🔥 Firefly</a></strong></td>
 <td>Firefly viewer</td>
-<td>Optical data, table visualization</td>
-<td>Image viewer, catalog overlay, cutouts</td>
+<td>Optical data, catalogue visualization</td>
+<td>Image viewer, catalogue overlay, cutouts</td>
 </tr>
 <tr>
 <td><strong><a href="launch-contributed/">⚙️ Contributed</a></strong></td>
 <td>Various</td>
-<td>Community applications</td>
+<td>Contributed web applications</td>
 <td>Specialized tools, custom interfaces</td>
 </tr>
 </tbody>
@@ -1532,7 +1532,7 @@
 </ol>
 <h3 id="step-2-choose-session-type">Step 2: Choose Session Type<a class="headerlink" href="#step-2-choose-session-type" title="Permanent link">&para;</a></h3>
 <p>Select the interface that best matches your workflow:</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">📓 Data Analysis</label><label for="__tabbed_1_2">📡 Radio Astronomy</label><label for="__tabbed_1_3">🖥️ GUI Applications</label><label for="__tabbed_1_4">🔬 Table Analysis</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">📓 Data Analysis</label><label for="__tabbed_1_2">📡 Visualize Astronomy Data</label><label for="__tabbed_1_3">🖥️ GUI Desktop Applications</label><label for="__tabbed_1_4">🔬 Catalogue Analysis</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><strong>Session Type:</strong> <code>notebook</code><br />
@@ -1542,17 +1542,17 @@
 <div class="tabbed-block">
 <p><strong>Session Type:</strong> <code>carta</code><br />
 <strong>Container:</strong> <code>carta</code><br />
-<strong>Use Case:</strong> Radio cube visualization, source analysis, imaging</p>
+<strong>Use Case:</strong> FITS/HDF5 data visualization, source analysis popular for radio astronomy</p>
 </div>
 <div class="tabbed-block">
 <p><strong>Session Type:</strong> <code>desktop</code><br />
-<strong>Container:</strong> <code>desktop</code> or <code>astroml</code><br />
-<strong>Use Case:</strong> CASA, DS9, image viewers, legacy tools</p>
+<strong>Container:</strong> <code>desktop</code>
+<strong>Use Case:</strong> CASA, DS9, TOPCAT, image viewers, legacy astronomy software tools</p>
 </div>
 <div class="tabbed-block">
 <p><strong>Session Type:</strong> <code>firefly</code><br />
 <strong>Container:</strong> <code>firefly</code><br />
-<strong>Use Case:</strong> Optical data, catalog overlays, image cutouts</p>
+<strong>Use Case:</strong> Vizualize images, overlay catalogues, image cutouts, query public large catalogues</p>
 </div>
 </div>
 </div>
@@ -1561,21 +1561,21 @@
 <div class="admonition tip">
 <p class="admonition-title">Choosing Resources</p>
 <ul>
-<li>Start with defaults (2 cores, 8 GB RAM). Scale up only if needed</li>
-<li>Large data cubes or catalogs benefit from 32GB+ RAM</li>
-<li>GPU is only needed for ML or specialized GPU-enabled workflows</li>
+<li>Start with default: flexible</li>
+<li>If you know the number of cores and memory you need, choose fixed. </li>
+<li><strong>Memory (RAM):</strong><ul>
+<li>8GB: Light analysis, small datasets</li>
+<li>16GB: Default, suitable for most work</li>
+<li>32GB+: Larger datasets, memory-intensive tasks</li>
+</ul>
+</li>
+<li><strong>CPU Cores:</strong><ul>
+<li>2 cores: Default, recommended for most tasks</li>
+<li>4+ cores: Parallel processing, intensive computations</li>
+</ul>
+</li>
 </ul>
 </div>
-<p><strong>Memory (RAM):</strong>
-- 8GB: Light analysis, small datasets
-- 16GB: Default, suitable for most work
-- 32GB+: Large datasets, memory-intensive tasks</p>
-<p><strong>CPU Cores:</strong>
-- 2 cores: Default, recommended for most tasks
-- 4+ cores: Parallel processing, intensive computations</p>
-<p><strong>GPU (if available):</strong>
-- None: Standard CPU-only work
-- 1 GPU: Machine learning, image processing</p>
 <h3 id="step-4-launch-and-connect">Step 4: Launch and Connect<a class="headerlink" href="#step-4-launch-and-connect" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Click</strong> "Launch" and wait for initialization (~30-60 seconds)</li>
@@ -1623,7 +1623,7 @@
 <tr>
 <td><strong>Storage</strong></td>
 <td>Persistent</td>
-<td>Files saved to <code>/arc/</code> persist</td>
+<td>Files saved to <code>/arc/</code> will persist</td>
 </tr>
 </tbody>
 </table>
@@ -1637,80 +1637,22 @@
 </ul>
 <h4 id="from-command-line">From Command Line<a class="headerlink" href="#from-command-line" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># List your active sessions</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
+canfar<span class="w"> </span>list
 
-<span class="c1"># Delete specific session</span>
-curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session/SESSION_ID
-</code></pre></div>
-<h3 id="session-sharing">Session Sharing<a class="headerlink" href="#session-sharing" title="Permanent link">&para;</a></h3>
-<p>Share running sessions with collaborators in your group:</p>
-<ol>
-<li><strong>Copy session URL</strong> from browser address bar</li>
-<li><strong>Share with team member</strong> (must be in same CANFAR group)</li>
-<li><strong>Collaborate in real-time</strong> - both can see and modify the same session</li>
-</ol>
-<div class="admonition warning">
-<p class="admonition-title">Security Note</p>
-<p>Only share session URLs with trusted collaborators. Anyone with the URL and proper group membership can access your session.</p>
-</div>
-<h2 id="advanced-session-features">🔧 Advanced Session Features<a class="headerlink" href="#advanced-session-features" title="Permanent link">&para;</a></h2>
-<h3 id="resource-allocation">Resource Allocation<a class="headerlink" href="#resource-allocation" title="Permanent link">&para;</a></h3>
-<h4 id="memory-management">Memory Management<a class="headerlink" href="#memory-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check memory usage in session</span>
-free<span class="w"> </span>-h
-htop
-
-<span class="c1"># Monitor specific process</span>
-ps<span class="w"> </span>aux<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>python
-</code></pre></div>
-<p><strong>Memory Tips:</strong>
-- Start with default 16GB, increase if needed
-- Large datasets may require 32GB+ 
-- Memory is shared - be considerate of other users</p>
-<h4 id="cpu-usage">CPU Usage<a class="headerlink" href="#cpu-usage" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check CPU cores available</span>
-nproc
-
-<span class="c1"># Monitor CPU usage</span>
-top
-htop
-
-<span class="c1"># Run parallel processing</span>
-python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import multiprocessing; print(f&#39;CPUs: {multiprocessing.cpu_count()}&#39;)&quot;</span>
-</code></pre></div>
-<h3 id="gpu-access">GPU Access<a class="headerlink" href="#gpu-access" title="Permanent link">&para;</a></h3>
-<p>For containers with GPU support (e.g., <code>astroml-cuda</code>):</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check GPU availability</span>
-nvidia-smi
-
-<span class="c1"># Test GPU in Python</span>
-python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import torch; print(f&#39;CUDA available: {torch.cuda.is_available()}&#39;)&quot;</span>
-
-<span class="c1"># Monitor GPU usage</span>
-watch<span class="w"> </span>-n<span class="w"> </span><span class="m">1</span><span class="w"> </span>nvidia-smi
+<span class="c1"># Delete specific session ID</span>
+canfar<span class="w"> </span>delete<span class="w"> </span>&lt;ID&gt;
 </code></pre></div>
 <h3 id="persistent-configuration">Persistent Configuration<a class="headerlink" href="#persistent-configuration" title="Permanent link">&para;</a></h3>
 <p>Save personal settings that persist across sessions:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Jupyter configuration</span>
-mkdir<span class="w"> </span>-p<span class="w"> </span>/arc/home/<span class="nv">$USER</span>/.jupyter
+mkdir<span class="w"> </span>-p<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span>/.jupyter
 cp<span class="w"> </span>jupyter_config.py<span class="w"> </span>/arc/home/<span class="nv">$USER</span>/.jupyter/
 
 <span class="c1"># Shell configuration</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;alias ll=&#39;ls -la&#39;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/arc/home/<span class="nv">$USER</span>/.bashrc
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;alias ll=&#39;ls -la&#39;&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span>/.bashrc
 
 <span class="c1"># Python packages (user installation)</span>
 pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>astroplan<span class="w"> </span><span class="c1"># in some containers, the --user may not be needed</span>
-</code></pre></div>
-<h3 id="session-networking">Session Networking<a class="headerlink" href="#session-networking" title="Permanent link">&para;</a></h3>
-<h4 id="port-forwarding">Port Forwarding<a class="headerlink" href="#port-forwarding" title="Permanent link">&para;</a></h4>
-<p>For custom web applications running in sessions:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># In session: Run application on specific port</span>
-python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="w"> </span><span class="m">8080</span>
-
-<span class="c1"># Application accessible at: https://SESSION_URL/proxy/8080/</span>
 </code></pre></div>
 <h4 id="external-access">External Access<a class="headerlink" href="#external-access" title="Permanent link">&para;</a></h4>
 <p>Sessions are accessible from anywhere with proper authentication:</p>
@@ -1724,36 +1666,24 @@ python<span class="w"> </span>-m<span class="w"> </span>http.server<span class="
 <p><strong>✅ Do:</strong>
 - Save important work to <code>/arc/projects/</code> or <code>/arc/home/</code>
 - Use group permissions for collaborative data
-- Regularly save and backup critical results
-- Log out of shared computers</p>
+- Regularly save and backup critical results in vault storage (<code>/arc</code> is not backed up)</p>
 <p><strong>❌ Don't:</strong>
 - Store sensitive data in <code>/scratch/</code> (wiped at session end)
 - Share session URLs publicly
 - Leave sessions running unnecessarily
 - Store passwords in plain text files</p>
 <h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
-<h4 id="session-performance">Session Performance<a class="headerlink" href="#session-performance" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Close unused applications to free memory</span>
-<span class="c1"># Kill runaway processes</span>
-<span class="nb">kill</span><span class="w"> </span>-9<span class="w"> </span>PID
-
-<span class="c1"># Clean temporary files</span>
-rm<span class="w"> </span>-rf<span class="w"> </span>/scratch/temp_*
-</code></pre></div>
 <h4 id="storage-performance">Storage Performance<a class="headerlink" href="#storage-performance" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Use /scratch/ for intensive I/O</span>
-cp<span class="w"> </span>/arc/projects/data.fits<span class="w"> </span>/scratch/
+cp<span class="w"> </span>/arc/projects/myproject/data.fits<span class="w"> </span>/scratch/
 <span class="c1"># ... process in /scratch/ ...</span>
-cp<span class="w"> </span>/scratch/results.fits<span class="w"> </span>/arc/projects/
-
-<span class="c1"># Compress large files</span>
-gzip<span class="w"> </span>large_dataset.fits
+cp<span class="w"> </span>/scratch/results.fits<span class="w"> </span>/arc/projects/myproject/
 </code></pre></div>
 <h3 id="troubleshooting-common-issues">Troubleshooting Common Issues<a class="headerlink" href="#troubleshooting-common-issues" title="Permanent link">&para;</a></h3>
 <h4 id="session-wont-start">Session Won't Start<a class="headerlink" href="#session-wont-start" title="Permanent link">&para;</a></h4>
 <p><strong>Problem:</strong> Session stuck in "Launching" state</p>
 <p><strong>Solutions:</strong>
-1. Check resource availability - try lower memory/CPU
+1. Check resource availability - try a fixed session with lower memory/CPU
 2. Wait 2-3 minutes for container download
 3. Try different container image
 4. Contact support if persistent</p>
@@ -1771,13 +1701,149 @@ gzip<span class="w"> </span>large_dataset.fits
 2. Process data in smaller chunks
 3. Use <code>/scratch/</code> for temporary files
 4. Optimize code for memory efficiency</p>
+<h2 id="troubleshooting-sessions">🔧 Troubleshooting Sessions<a class="headerlink" href="#troubleshooting-sessions" title="Permanent link">&para;</a></h2>
+<h3 id="session-wont-start_1">Session Won't Start<a class="headerlink" href="#session-wont-start_1" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Session creation fails or hangs</p>
+<p><strong>Common Causes &amp; Solutions:</strong></p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Container Issues</label><label for="__tabbed_2_2">Network Problems</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p><strong>Solutions:</strong>
+- Try a different container image (e.g., switch to <code>cadc/astroml:latest</code>)
+- Check if container is available: <code>docker pull images.canfar.net/[orgname]/[containername]:[tagname]</code>
+- Use <code>latest</code> tag instead of specific versions</p>
+</div>
+<div class="tabbed-block">
+<p><strong>Solutions:</strong>
+- Check internet connection stability
+- Try different browser (Chrome/Firefox recommended)
+- Clear browser cache and cookies
+- Disable browser extensions temporarily</p>
+</div>
+</div>
+</div>
+<h3 id="cannot-access-files">Cannot Access Files<a class="headerlink" href="#cannot-access-files" title="Permanent link">&para;</a></h3>
+<p><strong>Problem:</strong> Files missing or permission denied</p>
+<p><strong>Diagnostic Steps:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check file locations</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span>/<span class="w">     </span><span class="c1"># Personal storage</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/<span class="w">           </span><span class="c1"># Available projects</span>
+
+<span class="c1"># Check group membership  </span>
+groups
+
+<span class="c1"># Check permissions on specific files</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/problematic_file
+</code></pre></div></p>
+<p><strong>Solutions:</strong>
+- Verify you're in the correct group via <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/">Group Management</a>
+- Check file paths are correct (case-sensitive)
+- Contact group administrator for access
+- Try copying files to your home directory first</p>
+<h3 id="session-performance-issues">Session Performance Issues<a class="headerlink" href="#session-performance-issues" title="Permanent link">&para;</a></h3>
+<h4 id="memory-problems">Memory Problems<a class="headerlink" href="#memory-problems" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> Session crashes or becomes unresponsive</p>
+<p><strong>Solutions:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Monitor memory usage</span>
+free<span class="w"> </span>-h
+top<span class="w"> </span>-o<span class="w"> </span>%MEM
+
+<span class="c1"># Find memory-hungry processes</span>
+ps<span class="w"> </span>aux<span class="w"> </span>--sort<span class="o">=</span>-%mem<span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-10
+</code></pre></div></p>
+<p><strong>Best Practices:</strong>
+1. Close unused applications and browser tabs
+2. Process data in smaller chunks
+3. Use <code>/scratch/</code> for temporary files
+4. Optimize code for memory efficiency
+5. Request more memory when launching session</p>
 <h4 id="slow-performance">Slow Performance<a class="headerlink" href="#slow-performance" title="Permanent link">&para;</a></h4>
 <p><strong>Problem:</strong> Session responding slowly</p>
+<p><strong>Diagnostic Commands:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check system resources</span>
+htop<span class="w">           </span><span class="c1"># Interactive process viewer</span>
+iostat<span class="w"> </span><span class="m">5</span><span class="w">       </span><span class="c1"># I/O statistics</span>
+df<span class="w"> </span>-h<span class="w">          </span><span class="c1"># Disk usage</span>
+</code></pre></div></p>
 <p><strong>Solutions:</strong>
-1. Check system resources (<code>htop</code>, <code>free -h</code>)
-2. Close unnecessary applications
-3. Use <code>/scratch/</code> for I/O intensive tasks
-4. Consider launching session with more resources</p>
+1. Close unnecessary applications
+2. Use <code>/scratch/</code> for I/O intensive tasks<br />
+3. Consider requesting more CPU cores
+4. Check for runaway processes
+5. Restart session if persistent</p>
+<h3 id="connection-issues">Connection Issues<a class="headerlink" href="#connection-issues" title="Permanent link">&para;</a></h3>
+<h4 id="browser-problems">Browser Problems<a class="headerlink" href="#browser-problems" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> Can't connect to session or interface not loading</p>
+<p><strong>Solutions:</strong>
+1. <strong>Try incognito/private mode</strong> - Eliminates extension conflicts
+2. <strong>Different browser</strong> - Test Chrome, Firefox, Safari
+3. <strong>Clear browser data:</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1"># Clear CANFAR-specific cookies and cache</span>
+<span class="c1"># In browser developer tools:</span>
+Application<span class="w"> </span>-&gt;<span class="w"> </span>Storage<span class="w"> </span>-&gt;<span class="w"> </span>Clear<span class="w"> </span>site<span class="w"> </span>data
+</code></pre></div>
+4. <strong>Check browser requirements:</strong>
+   - JavaScript enabled
+   - Cookies enabled
+   - WebSocket support</p>
+<h4 id="network-timeouts">Network Timeouts<a class="headerlink" href="#network-timeouts" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> Connection drops or times out</p>
+<p><strong>Solutions:</strong>
+- Check stable internet connection
+- Try wired connection instead of WiFi
+- Contact network administrator about firewall/proxy
+- Use VPN if on restricted network</p>
+<h3 id="storage-issues">Storage Issues<a class="headerlink" href="#storage-issues" title="Permanent link">&para;</a></h3>
+<h4 id="disk-space-problems">Disk Space Problems<a class="headerlink" href="#disk-space-problems" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> "No space left on device" errors</p>
+<p><strong>Diagnostic Commands:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check quotas and usage</span>
+df<span class="w"> </span>-h<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span>
+df<span class="w"> </span>-h<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>
+du<span class="w"> </span>-sh<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span>/*
+
+<span class="c1"># Find large files</span>
+find<span class="w"> </span>/arc/home/<span class="o">[</span>username<span class="o">]</span><span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-size<span class="w"> </span>+100M
+</code></pre></div></p>
+<p><strong>Solutions:</strong>
+1. Clean up large temporary files
+2. Compress old data: <code>gzip large_file.fits</code>
+3. Move old data to vault for archival
+4. Use <code>/scratch/</code> for temporary processing
+5. If necessary, request quota increase from support</p>
+<h4 id="file-transfer-problems">File Transfer Problems<a class="headerlink" href="#file-transfer-problems" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> Uploads/downloads fail or are slow</p>
+<p><strong>Solutions:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># For large files, use rsync for reliability</span>
+rsync<span class="w"> </span>-av<span class="w"> </span>--progress<span class="w"> </span>source/<span class="w"> </span>destination/
+
+<span class="c1"># Check network and resume transfers</span>
+wget<span class="w"> </span>-c<span class="w"> </span>https://example.com/large_file.fits
+
+<span class="c1"># Use vault VOSpace</span>
+vcp<span class="w"> </span>local_file.fits<span class="w"> </span>vos:myproject/
+</code></pre></div></p>
+<h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
+<p>When troubleshooting fails:</p>
+<ol>
+<li><strong>Check logs</strong> - Look for error messages in session logs</li>
+<li><strong>System status</strong> - Check <a href="https://www.canfar.net">CANFAR status page</a> for maintenance</li>
+<li><strong>Community help</strong> - Ask on <a href="https://discord.gg/vcCQ8QBvBa">Discord</a></li>
+<li><strong>Contact support</strong> - Email <a href="mailto:support@canfar.net">support@canfar.net</a> with:</li>
+<li>Session ID</li>
+<li>Container image used</li>
+<li>Error messages</li>
+<li>Steps to reproduce</li>
+</ol>
+<div class="admonition tip">
+<p class="admonition-title">Before Contacting Support</p>
+<ol>
+<li>Try basic troubleshooting steps above</li>
+<li>Check if problem persists with default settings</li>
+<li>Test with different browser/device</li>
+<li>Gather specific error messages</li>
+</ol>
+</div>
 <h2 id="session-specific-guides">🔗 Session-Specific Guides<a class="headerlink" href="#session-specific-guides" title="Permanent link">&para;</a></h2>
 <p>Detailed guides for each session type:</p>
 <ul>
@@ -1799,7 +1865,6 @@ gzip<span class="w"> </span>large_dataset.fits
 <div class="admonition tip">
 <p class="admonition-title">Session Success Tips</p>
 <ol>
-<li><strong>Start small</strong> - Use default resources and scale up if needed</li>
 <li><strong>Save frequently</strong> - Important work should go in <code>/arc/</code> directories  </li>
 <li><strong>Share wisely</strong> - Session URLs are powerful - only share with trusted collaborators</li>
 <li><strong>Monitor resources</strong> - Keep an eye on memory and CPU usage with <code>htop</code></li>
@@ -1828,7 +1893,7 @@ gzip<span class="w"> </span>large_dataset.fits
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:31:27 UTC">August 25, 2025</span>
   </span>
 
     
@@ -1855,6 +1920,11 @@ gzip<span class="w"> </span>large_dataset.fits
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

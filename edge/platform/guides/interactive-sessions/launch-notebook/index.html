@@ -1555,18 +1555,18 @@
 
 
 <h1 id="launching-jupyter-notebook-sessions">Launching Jupyter Notebook Sessions<a class="headerlink" href="#launching-jupyter-notebook-sessions" title="Permanent link">&para;</a></h1>
-<p><strong>Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualization, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.</strong></p>
+<p><strong>Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualisation, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.</strong></p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 What You'll Learn</p>
 <ul>
-<li>How to launch a Jupyter notebook session on CANFAR</li>
-<li>How to choose the right container and resources</li>
+<li>Launching a Jupyter notebook session on CANFAR</li>
+<li>Choosing the right container and resources</li>
 <li>How storage works inside notebooks and what persists</li>
 <li>Tips for performance, collaboration, and troubleshooting</li>
 </ul>
 </div>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Jupyter notebooks combine code execution, rich text documentation, and inline visualizations in a single interface. CANFAR's notebook sessions include:</p>
+<p>Jupyter notebooks combine code execution, rich text documentation, and inline visualisations in a single interface. CANFAR's notebook sessions include:</p>
 <ul>
 <li><strong>Jupyter Lab</strong>: Full-featured development environment</li>
 <li><strong>Pre-configured containers</strong>: Astronomy-specific software stacks</li>
@@ -1598,13 +1598,13 @@ with specific tools and libraries:</p>
 </div>
 <h3 id="step-3-configure-session-resources">Step 3: Configure Session Resources<a class="headerlink" href="#step-3-configure-session-resources" title="Permanent link">&para;</a></h3>
 <h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
-<p>Choose a descriptive name that helps you identify this session later (e.g., "galaxy-photometry", "pulsar-analysis").</p>
+<p>Choose a descriptive name that helps you identify this session later (e.g., <code>galaxy-photometry</code>, <code>pulsar-analysis</code>).</p>
 <blockquote>
 <p><img alt="image" src="../../images/notebook/4_choose_name.png" /></p>
 </blockquote>
 <h4 id="memory-ram-selection">Memory (RAM) Selection<a class="headerlink" href="#memory-ram-selection" title="Permanent link">&para;</a></h4>
-<p>Select the maximum memory your analysis will require. <strong>Start conservatively</strong>—you can always launch
-a new session with more memory if needed.</p>
+<p>a new session with more memory if needed.
+Select the maximum memory your analysis will require. <strong>Start conservatively</strong>—you can always launch a new session with more memory if needed.</p>
 <ul>
 <li><strong>8GB</strong>: Light data analysis, small datasets</li>
 <li><strong>16GB (default)</strong>: Suitable for most analyses, equivalent to a MacBook Pro</li>
@@ -1660,7 +1660,7 @@ may delay session startup if resources are unavailable.</p>
 <h3 id="storage-access">Storage Access<a class="headerlink" href="#storage-access" title="Permanent link">&para;</a></h3>
 <p>Your notebook session automatically mounts:</p>
 <ul>
-<li><strong><code>/arc/projects/[group]/</code></strong>: Shared project storage</li>
+<li><strong><code>/arc/projects/[groupname]/</code></strong>: Shared project storage</li>
 <li><strong><code>/arc/home/[username]/</code></strong>: Personal storage</li>
 <li><strong><code>/tmp/</code></strong>: Temporary space (cleared when session ends)</li>
 </ul>
@@ -1676,7 +1676,7 @@ may delay session startup if resources are unavailable.</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.wcs</span><span class="w"> </span><span class="kn">import</span> <span class="n">WCS</span>
 
 <span class="c1"># Load a FITS file</span>
-<span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/arc/projects/myproject/data/image.fits&quot;</span><span class="p">)</span>
+<span class="n">hdul</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/arc/projects/[groupname]/data/image.fits&quot;</span><span class="p">)</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 <span class="n">header</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">header</span>
 
@@ -1697,25 +1697,17 @@ may delay session startup if resources are unavailable.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">casa_tasks</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">tasks</span>
 
 <span class="c1"># Create measurement set summary</span>
-<span class="n">tasks</span><span class="o">.</span><span class="n">listobs</span><span class="p">(</span><span class="n">vis</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/data/observation.ms&quot;</span><span class="p">)</span>
+<span class="n">tasks</span><span class="o">.</span><span class="n">listobs</span><span class="p">(</span><span class="n">vis</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[groupname]/data/observation.ms&quot;</span><span class="p">)</span>
 
 <span class="c1"># Image the data</span>
 <span class="n">tasks</span><span class="o">.</span><span class="n">tclean</span><span class="p">(</span>
-    <span class="n">vis</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/data/observation.ms&quot;</span><span class="p">,</span>
+    <span class="n">vis</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[groupname]/data/observation.ms&quot;</span><span class="p">,</span>
     <span class="n">imagename</span><span class="o">=</span><span class="s2">&quot;my_image&quot;</span><span class="p">,</span>
     <span class="n">imsize</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
     <span class="n">cell</span><span class="o">=</span><span class="s2">&quot;0.1arcsec&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
-<h3 id="sharing-sessions">Sharing Sessions<a class="headerlink" href="#sharing-sessions" title="Permanent link">&para;</a></h3>
-<p>Share your session with collaborators:</p>
-<ol>
-<li>Click the session menu in Jupyter Lab</li>
-<li>Select "Share Session"</li>
-<li>Add collaborator usernames</li>
-<li>Set permissions (read-only or read-write)</li>
-</ol>
 <h3 id="saving-your-work">Saving Your Work<a class="headerlink" href="#saving-your-work" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Auto-save</strong>: Notebooks auto-save every 2 minutes</li>
@@ -1751,22 +1743,30 @@ may delay session startup if resources are unavailable.</p>
 </ul>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
-<p><strong>Session won't start</strong>
-- Check resource availability
-- Try reducing memory/CPU requirements
-- Contact support if persistent</p>
-<p><strong>Can't access files</strong>
-- Verify file paths in <code>/arc/projects/[group]/</code>
-- Check group permissions
-- Ensure files were uploaded correctly</p>
-<p><strong>Notebook kernel crashes</strong>
-- Often due to memory overuse
-- Restart kernel and reduce data size
-- Consider using more memory</p>
-<p><strong>Performance issues</strong>
-- Check if other users are sharing resources
-- Use <code>htop</code> to monitor system usage
-- Consider running during off-peak hours</p>
+<h3 id="session-wont-start">Session won't start<a class="headerlink" href="#session-wont-start" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Check resource availability</li>
+<li>Try reducing memory/CPU requirements</li>
+<li>Contact support if persistent</li>
+</ul>
+<h3 id="cant-access-files">Can't access files<a class="headerlink" href="#cant-access-files" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Verify file paths in <code>/arc/projects/[groupname]/</code></li>
+<li>Check group permissions</li>
+<li>Ensure files were uploaded correctly</li>
+</ul>
+<h3 id="notebook-kernel-crashes">Notebook kernel crashes<a class="headerlink" href="#notebook-kernel-crashes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Often due to memory overuse</li>
+<li>Restart kernel and reduce data size</li>
+<li>Consider using more memory</li>
+</ul>
+<h3 id="performance-issues">Performance issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Check if other users are sharing resources</li>
+<li>Use <code>htop</code> to monitor system usage</li>
+<li>Consider running during off-peak hours</li>
+</ul>
 
 
 
@@ -1789,7 +1789,7 @@ may delay session startup if resources are unavailable.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:31:27 UTC">August 25, 2025</span>
   </span>
 
     
@@ -1816,6 +1816,11 @@ may delay session startup if resources are unavailable.</p>
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

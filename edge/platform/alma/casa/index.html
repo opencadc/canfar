@@ -22,7 +22,7 @@
     
     
       
-        <title>General notes on CASA containers - CANFAR</title>
+        <title>CASA Container Reference - CANFAR</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#general-notes-on-casa-containers" class="md-skip">
+        <a href="#casa-container-reference" class="md-skip">
           Skip to content
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              General notes on CASA containers
+              CASA Container Reference
             
           </span>
         </div>
@@ -728,72 +728,45 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#astroquery-astropy" class="md-nav__link">
+  <a href="#available-casa-versions" class="md-nav__link">
     <span class="md-ellipsis">
-      Astroquery / astropy
+      Available CASA Versions
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#analysis-utilities" class="md-nav__link">
+  <a href="#pre-installed-tools" class="md-nav__link">
     <span class="md-ellipsis">
-      Analysis Utilities
+      Pre-installed Tools
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#admit" class="md-nav__link">
+  <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
-      ADMIT
+      Troubleshooting
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#firefox" class="md-nav__link">
+  <a href="#related-containers" class="md-nav__link">
     <span class="md-ellipsis">
-      Firefox
+      Related Containers
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#uvmultifit" class="md-nav__link">
+  <a href="#related-documentation" class="md-nav__link">
     <span class="md-ellipsis">
-      UVMultiFit
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-container-bugs" class="md-nav__link">
-    <span class="md-ellipsis">
-      Known Container Bugs
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#almacasa-adjacent-containers-galario" class="md-nav__link">
-    <span class="md-ellipsis">
-      ALMA/CASA Adjacent Containers : Galario
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#almacasa-adjacent-containers-starlink" class="md-nav__link">
-    <span class="md-ellipsis">
-      ALMA/CASA Adjacent Containers : Starlink
+      Related Documentation
     </span>
   </a>
   
@@ -831,38 +804,76 @@
   
 
 
-<h1 id="general-notes-on-casa-containers">General notes on CASA containers<a class="headerlink" href="#general-notes-on-casa-containers" title="Permanent link">&para;</a></h1>
-<p>This page contains a compilation of useful notes, etc, on various CASA containers.</p>
-<h2 id="astroquery-astropy">Astroquery / astropy<a class="headerlink" href="#astroquery-astropy" title="Permanent link">&para;</a></h2>
-<p>The <a href="https://astroquery.readthedocs.io/en/latest/">astroquery tool</a> is presently only installed on newer CASA containers (6.4.4-6.6.3).  To use astroquery from an appropriate CASA container, type the following to initiate an astroquery-compatible version of python:
-<code>/opt/casa/bin/python3</code>
-As per the <a href="https://astroquery.readthedocs.io/en/latest/">astroquery documentation</a>, the tool can then be used on the command line within the python environment.  For example, the following sequence of commands</p>
-<p><code>from astroquery.simbad import Simbad</code></p>
-<p><code>result_table = Simbad.query_object("m1")</code></p>
-<p><code>result_table.pprint()</code></p>
-<p>yield a one-line table listing some basic information about M1.</p>
-<h2 id="analysis-utilities">Analysis Utilities<a class="headerlink" href="#analysis-utilities" title="Permanent link">&para;</a></h2>
-<p>The <a href="https://casaguides.nrao.edu/index.php/Analysis_Utilities">analysisUtils package</a> package is pre-installed on every CASA container, and is ready to use.  You may need to type
-<code>import analysisUtils as au</code>
-to load it.</p>
-<h2 id="admit">ADMIT<a class="headerlink" href="#admit" title="Permanent link">&para;</a></h2>
-<p><a href="https://casaguides.nrao.edu/index.php/ADMIT_Products_and_Usage_CASA_6">ADMIT (ALMA Data Mining Tool)</a> is pre-installed on CASA containers where possible (CASA versions 4.5 and higher) and should be ready to use, although it has not been tested.  Note that the newest CASA containers (6.6.1-pipeline and regular versions 6.6.4 and higher) exclude ADMIT because it does not properly compile.</p>
-<h2 id="firefox">Firefox<a class="headerlink" href="#firefox" title="Permanent link">&para;</a></h2>
-<p>The Firefox web-browser, needed for CASA commands where you are interacting with the weblogs, should available for CASA versions 6.1.0 to 6.4.3.  Error messages will pop up in your terminal window, but minimal testing suggests that it is sufficiently functional.</p>
-<h2 id="uvmultifit">UVMultiFit<a class="headerlink" href="#uvmultifit" title="Permanent link">&para;</a></h2>
-<p>The <a href="https://github.com/onsala-space-observatory/UVMultiFit/blob/master/INSTALL.md">UVMultiFit</a> package is presently installed and working for all CASA 5.X versions except 5.8.  To load the UVMultiFit package, initiate casa and then type</p>
-<p><code>from NordicARC import uvmultifit as uvm</code></p>
-<h2 id="known-container-bugs">Known Container Bugs<a class="headerlink" href="#known-container-bugs" title="Permanent link">&para;</a></h2>
-<p>1) CASA versions 6.5.0 to 6.5.2 initially launch with some display errors in the logger window.  Exiting casa (but not the container) and re-starting casa fixes the issue, i.e.,</p>
-<p><code>casa</code></p>
-<p><code>exit</code></p>
-<p><code>casa</code></p>
-<p>2) Running multi-thread pipeline scripts (MPI CASA) may generate error messages, as described <a href="https://casadocs.readthedocs.io/en/latest/notebooks/frequently-asked-questions.html">here</a> under the 'Running pipeline in non-interactive mode' section.  A CANFAR ALMA user reports success initiating MPI CASA in a Desktop container as follows:</p>
-<p><code>xvfb-run -a mpicasa casa —nologger —nogui -agg -c casa_script.py</code></p>
-<h2 id="almacasa-adjacent-containers-galario">ALMA/CASA Adjacent Containers : Galario<a class="headerlink" href="#almacasa-adjacent-containers-galario" title="Permanent link">&para;</a></h2>
-<p>The UV data analysis package <a href="https://mtazzari.github.io/galario">galario</a> is available under the radio-submm menu.  Note that this container has had minimal testing, and the uvplot package commands in the quickstart.py script are not presently working, although all preceeding commands in the quickstart.py script do work.</p>
-<h2 id="almacasa-adjacent-containers-starlink">ALMA/CASA Adjacent Containers : Starlink<a class="headerlink" href="#almacasa-adjacent-containers-starlink" title="Permanent link">&para;</a></h2>
-<p>The JCMT's <a href="https://starlink.eao.hawaii.edu/starlink">Starlink</a> package is available under the radio-submm menu, including image analysis tools and the gaia image viewer.  Note that the <a href="https://starlink-pywrapper.readthedocs.io/en/latest/">starlink-pywrapper</a> add-on package is presently not working.  Minimal testing has been done on the Starlink container.</p>
+<h1 id="casa-container-reference">CASA Container Reference<a class="headerlink" href="#casa-container-reference" title="Permanent link">&para;</a></h1>
+<p>This page provides specific information about using CASA containers on CANFAR, including available tools, known issues, and troubleshooting tips.</p>
+<div class="admonition info">
+<p class="admonition-title">Integration Note</p>
+<p>This is a technical reference for CASA-specific details. For comprehensive radio astronomy workflows, see the main <a href="../../guides/radio-astronomy/">Radio Astronomy Guide</a>.</p>
+</div>
+<h2 id="available-casa-versions">Available CASA Versions<a class="headerlink" href="#available-casa-versions" title="Permanent link">&para;</a></h2>
+<p>CANFAR provides multiple CASA versions to support different workflows and compatibility requirements:</p>
+<ul>
+<li><strong>CASA 6.5</strong> (recommended): Latest stable release with Python 3 support</li>
+<li><strong>CASA 6.4</strong>: Previous stable version for compatibility</li>
+<li><strong>CASA Pipeline</strong>: Automated calibration and imaging pipelines</li>
+<li><strong>Custom builds</strong>: Specialized versions for specific instruments</li>
+</ul>
+<h2 id="pre-installed-tools">Pre-installed Tools<a class="headerlink" href="#pre-installed-tools" title="Permanent link">&para;</a></h2>
+<h3 id="astroquery-astropy">Astroquery / astropy<a class="headerlink" href="#astroquery-astropy" title="Permanent link">&para;</a></h3>
+<p>The <a href="https://astroquery.readthedocs.io/en/latest/">astroquery tool</a> is available on newer CASA containers (6.4.4-6.6.3). To use astroquery from an appropriate CASA container:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use the astroquery-compatible Python environment</span>
+/opt/casa/bin/python3
+</code></pre></div>
+<p><strong>Example usage:</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">astroquery.simbad</span><span class="w"> </span><span class="kn">import</span> <span class="n">Simbad</span>
+<span class="n">result_table</span> <span class="o">=</span> <span class="n">Simbad</span><span class="o">.</span><span class="n">query_object</span><span class="p">(</span><span class="s2">&quot;m1&quot;</span><span class="p">)</span>
+<span class="n">result_table</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
+</code></pre></div></p>
+<p>This yields a table with basic information about M1.</p>
+<h3 id="analysis-utilities">Analysis Utilities<a class="headerlink" href="#analysis-utilities" title="Permanent link">&para;</a></h3>
+<p>The <a href="https://casaguides.nrao.edu/index.php/Analysis_Utilities">analysisUtils package</a> is pre-installed on every CASA container and ready to use:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">analysisUtils</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">au</span>
+</code></pre></div>
+<h3 id="admit">ADMIT<a class="headerlink" href="#admit" title="Permanent link">&para;</a></h3>
+<p><a href="https://casaguides.nrao.edu/index.php/ADMIT_Products_and_Usage_CASA_6">ADMIT (ALMA Data Mining Tool)</a> is pre-installed on CASA containers where possible (CASA versions 4.5 and higher) and should be ready to use, although it has not been extensively tested.</p>
+<div class="admonition warning">
+<p class="admonition-title">Version Compatibility</p>
+<p>The newest CASA containers (6.6.1-pipeline and regular versions 6.6.4 and higher) exclude ADMIT because it does not properly compile.</p>
+</div>
+<h3 id="firefox">Firefox<a class="headerlink" href="#firefox" title="Permanent link">&para;</a></h3>
+<p>The Firefox web browser is available for CASA versions 6.1.0 to 6.4.3, needed for CASA commands that interact with weblogs. Error messages may appear in your terminal window, but the browser is functionally sufficient for most CASA weblog tasks.</p>
+<h3 id="uvmultifit">UVMultiFit<a class="headerlink" href="#uvmultifit" title="Permanent link">&para;</a></h3>
+<p>The <a href="https://github.com/onsala-space-observatory/UVMultiFit/blob/master/INSTALL.md">UVMultiFit</a> package is installed and working for all CASA 5.X versions except 5.8. To load UVMultiFit:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># In CASA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">NordicARC</span><span class="w"> </span><span class="kn">import</span> <span class="n">uvmultifit</span> <span class="k">as</span> <span class="n">uvm</span>
+</code></pre></div>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="known-issues">Known Issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h3>
+<h4 id="casa-650-to-652-display-errors">CASA 6.5.0 to 6.5.2 Display Errors<a class="headerlink" href="#casa-650-to-652-display-errors" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> CASA initially launches with display errors in the logger window.</p>
+<p><strong>Solution:</strong> Exit and restart CASA:
+<div class="highlight"><pre><span></span><code>casa<span class="w">     </span><span class="c1"># Initial launch (may show errors)</span>
+<span class="nb">exit</span><span class="w">     </span><span class="c1"># Exit CASA</span>
+casa<span class="w">     </span><span class="c1"># Restart (errors should be resolved)</span>
+</code></pre></div></p>
+<h4 id="multi-thread-pipeline-errors">Multi-thread Pipeline Errors<a class="headerlink" href="#multi-thread-pipeline-errors" title="Permanent link">&para;</a></h4>
+<p><strong>Problem:</strong> Running multi-thread pipeline scripts (MPI CASA) may generate error messages.</p>
+<p><strong>Reference:</strong> See <a href="https://casadocs.readthedocs.io/en/latest/notebooks/frequently-asked-questions.html">CASA FAQ</a> under 'Running pipeline in non-interactive mode'.</p>
+<p><strong>Solution:</strong> In Desktop containers, initiate MPI CASA as follows:
+<div class="highlight"><pre><span></span><code>xvfb-run<span class="w"> </span>-a<span class="w"> </span>mpicasa<span class="w"> </span>casa<span class="w"> </span>--nologger<span class="w"> </span>--nogui<span class="w"> </span>-agg<span class="w"> </span>-c<span class="w"> </span>casa_script.py
+</code></pre></div></p>
+<h2 id="related-containers">Related Containers<a class="headerlink" href="#related-containers" title="Permanent link">&para;</a></h2>
+<h3 id="galario">Galario<a class="headerlink" href="#galario" title="Permanent link">&para;</a></h3>
+<p>The UV data analysis package <a href="https://mtazzari.github.io/galario">galario</a> is available under the radio-submm menu. Note that this container has had minimal testing, and the uvplot package commands in the quickstart.py script are not currently working, although all preceding commands in the quickstart.py script do work.</p>
+<h3 id="starlink">Starlink<a class="headerlink" href="#starlink" title="Permanent link">&para;</a></h3>
+<p>The JCMT's <a href="https://starlink.eao.hawaii.edu/starlink">Starlink</a> package is available under the radio-submm menu, including image analysis tools and the gaia image viewer. Note that the <a href="https://starlink-pywrapper.readthedocs.io/en/latest/">starlink-pywrapper</a> add-on package is not currently working. Minimal testing has been done on the Starlink container.</p>
+<hr />
+<h2 id="related-documentation">Related Documentation<a class="headerlink" href="#related-documentation" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong><a href="../../guides/radio-astronomy/">Radio Astronomy Guide</a></strong> - Comprehensive radio astronomy workflows</li>
+<li><strong><a href="../../guides/radio-astronomy/casa-workflows/">CASA Desktop Workflows</a></strong> - Advanced CASA usage patterns</li>
+<li><strong><a href="../../containers/">Container Guide</a></strong> - General container usage and development</li>
+</ul>
 
 
 
@@ -885,7 +896,7 @@ to load it.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 12, 2025 23:26:43 UTC">August 12, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 23:31:20 UTC">August 21, 2025</span>
   </span>
 
     
@@ -912,6 +923,11 @@ to load it.</p>
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

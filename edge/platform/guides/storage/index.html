@@ -744,6 +744,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#storage-types-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Storage Types Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#storage-lifecycle-overview" class="md-nav__link">
     <span class="md-ellipsis">
       🗺️ Storage Lifecycle Overview
@@ -753,27 +762,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#arc-storage" class="md-nav__link">
+  <a href="#arc-projects-storage-shared" class="md-nav__link">
     <span class="md-ellipsis">
-      📁 ARC Storage
+      📁 ARC Projects Storage (Shared)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#scratch-storage" class="md-nav__link">
+  <a href="#arc-home-storage-personal" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚡ Scratch Storage
+      🏠 ARC Home Storage (Personal)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#vospace" class="md-nav__link">
+  <a href="#scratch-storage-session-temporary" class="md-nav__link">
     <span class="md-ellipsis">
-      ☁️ VOSpace
+      ⚡ Scratch Storage (Session Temporary)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vault-vospace-api-archive-sharing" class="md-nav__link">
+    <span class="md-ellipsis">
+      ☁️ Vault (VOSpace API Archive &amp; Sharing)
     </span>
   </a>
   
@@ -801,6 +819,15 @@
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       🔗 What's Next?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❓ FAQ &amp; Troubleshooting
     </span>
   </a>
   
@@ -1366,6 +1393,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#storage-types-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      📊 Storage Types Comparison
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#storage-lifecycle-overview" class="md-nav__link">
     <span class="md-ellipsis">
       🗺️ Storage Lifecycle Overview
@@ -1375,27 +1411,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#arc-storage" class="md-nav__link">
+  <a href="#arc-projects-storage-shared" class="md-nav__link">
     <span class="md-ellipsis">
-      📁 ARC Storage
+      📁 ARC Projects Storage (Shared)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#scratch-storage" class="md-nav__link">
+  <a href="#arc-home-storage-personal" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚡ Scratch Storage
+      🏠 ARC Home Storage (Personal)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#vospace" class="md-nav__link">
+  <a href="#scratch-storage-session-temporary" class="md-nav__link">
     <span class="md-ellipsis">
-      ☁️ VOSpace
+      ⚡ Scratch Storage (Session Temporary)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vault-vospace-api-archive-sharing" class="md-nav__link">
+    <span class="md-ellipsis">
+      ☁️ Vault (VOSpace API Archive &amp; Sharing)
     </span>
   </a>
   
@@ -1423,6 +1468,15 @@
   <a href="#whats-next" class="md-nav__link">
     <span class="md-ellipsis">
       🔗 What's Next?
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#faq-troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      ❓ FAQ &amp; Troubleshooting
     </span>
   </a>
   
@@ -1461,68 +1515,88 @@
 
 
 <h1 id="canfar-storage-systems">CANFAR Storage Systems<a class="headerlink" href="#canfar-storage-systems" title="Permanent link">&para;</a></h1>
-<p><strong>Master CANFAR's storage systems for efficient data management</strong></p>
+<p><strong>A guide to CANFAR's storage options for astronomy research: what they are, how to use them, and best practices for data management.</strong></p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 What You'll Learn</p>
-<p>By the end of this guide, you'll understand:
-- The different storage systems available on CANFAR
-- When and how to use each storage type for your research
-- Best practices for data management, transfer, and backup
-- How to optimize your workflow for performance and data safety</p>
+<ul>
+<li>The different storage systems available on CANFAR</li>
+<li>How to choose the right storage for your workflow and data size</li>
+<li>How to access storage (CLI, API, Web, SSHFS)</li>
+<li>Best practices for data management, transfer, and backup</li>
+<li>How to monitor usage and request more quota</li>
+<li>Troubleshooting common issues</li>
+</ul>
 </div>
-<p>CANFAR provides multiple storage systems optimized for different stages of your research workflow. Understanding when and how to use each storage type is crucial for efficient data analysis and collaboration.</p>
+<p>CANFAR provides several storage systems, each optimized for different research needs. Choosing the right storage type is crucial for efficient analysis, collaboration, and data safety.</p>
 <h2 id="types-comparison">📊 Types Comparison<a class="headerlink" href="#types-comparison" title="Permanent link">&para;</a></h2>
+<h2 id="storage-types-comparison">📊 Storage Types Comparison<a class="headerlink" href="#storage-types-comparison" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Storage</th>
-<th>Mount Path</th>
-<th>Speed</th>
+<th>Mount Path / URI</th>
+<th>Access Speed</th>
+<th>Visibility</th>
+<th>Access Type</th>
 <th>Persistence</th>
 <th>Backup</th>
 <th>Quota</th>
+<th>Data Size Suitability</th>
 <th>Best For</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>ARC Projects</strong></td>
-<td><code>/arc/projects/group/</code></td>
+<td><code>/arc/projects/[projectname]/</code> or <code>arc:projects/[projectname]/...</code></td>
 <td>Fast SSD</td>
+<td>Shared (group)</td>
+<td>File system, SSHFS, VOSpace API</td>
 <td>✅ Permanent</td>
 <td>✅ Daily snapshots</td>
-<td>Project-based</td>
+<td>upon request</td>
+<td>Medium/Large</td>
 <td>Active research, shared data</td>
 </tr>
 <tr>
 <td><strong>ARC Home</strong></td>
-<td><code>/arc/home/username/</code></td>
+<td><code>/arc/home/[username]/</code> or <code>arc:home/[username]/...</code></td>
 <td>Fast SSD</td>
+<td>Personal</td>
+<td>File system, VOSpace API</td>
 <td>✅ Permanent</td>
 <td>✅ Daily snapshots</td>
 <td>10GB default</td>
-<td>Personal configs, keys</td>
+<td>Small</td>
+<td>Personal configs, keys, code</td>
 </tr>
 <tr>
 <td><strong>Scratch</strong></td>
 <td><code>/scratch/</code></td>
 <td>Fastest NVMe</td>
-<td>❌ <strong>Wiped at session end</strong></td>
+<td>Session only</td>
+<td>File system</td>
+<td>❌ Wiped at session end</td>
 <td>❌ No backup</td>
 <td>Unlimited</td>
+<td>Medium/Large</td>
 <td>Temporary processing</td>
 </tr>
 <tr>
-<td><strong>VOSpace</strong></td>
-<td><code>vos:username/</code></td>
+<td><strong>Vault (VOSpace API)</strong></td>
+<td><code>vos:[username]/...</code></td>
 <td>Medium</td>
+<td>Shared/personal</td>
+<td>API, Web, FUSE</td>
 <td>✅ Permanent</td>
 <td>✅ Geo-redundant</td>
-<td>User/project based</td>
+<td>User/project</td>
+<td>Small/Medium/Large</td>
 <td>Archives, public data</td>
 </tr>
 </tbody>
 </table>
+<p><strong>How to request more quota:</strong> Contact CANFAR support or your project PI. Quota increases are subject to review.</p>
 <h2 id="storage-lifecycle-overview">🗺️ Storage Lifecycle Overview<a class="headerlink" href="#storage-lifecycle-overview" title="Permanent link">&para;</a></h2>
 <p>CANFAR's storage architecture is designed around the astronomy research lifecycle:</p>
 <pre class="mermaid"><code>graph LR
@@ -1540,27 +1614,29 @@
     ARC --&gt; VOSpace
     ARC -.-&gt; |Backup| Process</code></pre>
 <hr />
-<h2 id="arc-storage">📁 ARC Storage<a class="headerlink" href="#arc-storage" title="Permanent link">&para;</a></h2>
+<h2 id="arc-projects-storage-shared">📁 ARC Projects Storage (Shared)<a class="headerlink" href="#arc-projects-storage-shared" title="Permanent link">&para;</a></h2>
 <p>ARC (Advanced Research Computing) storage provides high-performance, persistent storage for active research.</p>
-<h3 id="arcprojectsgroupname-shared-research-storage"><code>/arc/projects/groupname/</code> - Shared Research Storage<a class="headerlink" href="#arcprojectsgroupname-shared-research-storage" title="Permanent link">&para;</a></h3>
+<h3 id="arcprojectsprojectname-shared-research-storage"><code>/arc/projects/[projectname]/</code> - Shared Research Storage<a class="headerlink" href="#arcprojectsprojectname-shared-research-storage" title="Permanent link">&para;</a></h3>
 <div class="admonition success">
 <p class="admonition-title">When to Use ARC Projects</p>
 <ul>
 <li>Raw and processed datasets</li>
-<li>Analysis scripts and notebooks  </li>
+<li>Analysis scripts and notebooks</li>
 <li>Results and publications</li>
 <li>Shared team resources</li>
 <li>Collaborative workflows</li>
+<li>Data you want to share with your group</li>
 </ul>
 </div>
 <p><strong>🔧 Features:</strong></p>
-<ul>
-<li><strong>Shared access</strong> - All group members can read/write</li>
-<li><strong>Fast SSD storage</strong> - Optimized for data analysis</li>
-<li><strong>Daily backups</strong> - 30-day retention policy</li>
-<li><strong>ACL support</strong> - Fine-grained permission control</li>
-</ul>
-<p><strong>📂 Recommended Structure:</strong></p>
+<div class="highlight"><pre><span></span><code>- **Shared access** - All group members can read/write
+- **Fast SSD storage** - Optimized for data analysis
+- **Daily backups** - 30-day retention policy
+- **ACL support** - Fine-grained permission control
+- **Access via SSHFS** - Mount on your local computer
+- **Quota per project** - Request increases as needed
+</code></pre></div>
+<p><strong>📂 Recommended Project Directory Structure:</strong></p>
 <div class="highlight"><pre><span></span><code>/arc/projects/myproject/
 ├── data/
 │   ├── raw/              # Original observational data
@@ -1582,7 +1658,8 @@
     ├── data_notes.md     # Dataset descriptions
     └── procedures.md     # Analysis procedures
 </code></pre></div>
-<h3 id="archomeusername-personal-space"><code>/arc/home/username/</code> - Personal Space<a class="headerlink" href="#archomeusername-personal-space" title="Permanent link">&para;</a></h3>
+<h2 id="arc-home-storage-personal">🏠 ARC Home Storage (Personal)<a class="headerlink" href="#arc-home-storage-personal" title="Permanent link">&para;</a></h2>
+<h3 id="archomeusername-personal-space"><code>/arc/home/[username]/</code> - Personal Space<a class="headerlink" href="#archomeusername-personal-space" title="Permanent link">&para;</a></h3>
 <div class="admonition info">
 <p class="admonition-title">When to Use ARC Home</p>
 <ul>
@@ -1590,14 +1667,15 @@
 <li>SSH keys and authentication credentials</li>
 <li>Personal scripts and utilities</li>
 <li>Small reference files</li>
+<li>Not for sharing or large datasets</li>
 </ul>
 </div>
 <p><strong>⚠️ Limitations:</strong></p>
-<ul>
-<li><strong>10GB default quota</strong> (contact support for increases)</li>
-<li>Personal access only (not shared)</li>
-<li>Not suitable for large datasets</li>
-</ul>
+<div class="highlight"><pre><span></span><code>- **10GB default quota** (contact support for increases)
+- Personal access only (not shared)
+- Not suitable for large datasets
+- Exceeding quota may result in errors; contact support
+</code></pre></div>
 <h3 id="storage-management">Managing ARC Storage<a class="headerlink" href="#storage-management" title="Permanent link">&para;</a></h3>
 <h4 id="check-usage-and-quotas">Check Usage and Quotas<a class="headerlink" href="#check-usage-and-quotas" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Check project storage usage</span>
@@ -1633,20 +1711,20 @@ cp<span class="w"> </span>/arc/projects/myproject/.snapshots/daily.2024-03-15/im
 <span class="w">   </span>/arc/projects/myproject/restored_file.fits
 </code></pre></div>
 <hr />
-<h2 id="scratch-storage">⚡ Scratch Storage<a class="headerlink" href="#scratch-storage" title="Permanent link">&para;</a></h2>
+<h2 id="scratch-storage-session-temporary">⚡ Scratch Storage (Session Temporary)<a class="headerlink" href="#scratch-storage-session-temporary" title="Permanent link">&para;</a></h2>
 <p>Scratch provides the fastest storage available on CANFAR, but files are <strong>temporary</strong>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Important: Scratch Storage Lifecycle</p>
-<p><strong>Scratch storage is wiped at the end of each session</strong>, not nightly as some older documentation stated. When your interactive session ends or your batch job completes, all files in <code>/scratch/</code> are permanently deleted.</p>
+<p><strong>Scratch storage is wiped at the end of each session.</strong> When your interactive session ends or your batch job completes, all files in <code>/scratch/</code> are permanently deleted. There is no backup or recovery.</p>
 </div>
 <h3 id="when-to-use-scratch">When to Use Scratch<a class="headerlink" href="#when-to-use-scratch" title="Permanent link">&para;</a></h3>
-<p><strong>✅ Excellent for:</strong>
+<p><strong>✅ Use Scratch for:</strong>
 - Large intermediate files during processing
 - Temporary downloads before organizing in ARC
 - High I/O operations requiring maximum speed
 - Uncompressing large archives
 - Sorting and filtering large datasets</p>
-<p><strong>❌ Never use for:</strong>
+<p><strong>❌ Never use Scratch for:</strong>
 - Important results (will be lost!)
 - Files you need to keep between sessions
 - Shared data (only accessible within your session)</p>
@@ -1702,37 +1780,38 @@ cp<span class="w"> </span>*.uvfits<span class="w"> </span>/arc/projects/myprojec
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processed </span><span class="k">$(</span>date<span class="k">)</span><span class="s2">: 2019.1.00123.S&quot;</span><span class="w"> </span>&gt;&gt;<span class="w"> </span>/arc/projects/myproject/processing_log.txt
 </code></pre></div>
 <hr />
-<h2 id="vospace">☁️ VOSpace<a class="headerlink" href="#vospace" title="Permanent link">&para;</a></h2>
-<p>VOSpace provides web-accessible, long-term archive storage based on IVOA standards.</p>
+<h2 id="vault-vospace-api-archive-sharing">☁️ Vault (VOSpace API Archive &amp; Sharing)<a class="headerlink" href="#vault-vospace-api-archive-sharing" title="Permanent link">&para;</a></h2>
+<p>The Vault is CANFAR's long-term archive storage, accessible only via the VOSpace API (vos: URIs, e.g., vos:username/...).
+You can also access ARC storage via the VOSpace API using arc: URIs (e.g., arc:projects/myproject/mydatafile.fits).</p>
 <div class="admonition info">
-<p class="admonition-title">When to Use VOSpace</p>
+<p class="admonition-title">When to Use Vault (VOSpace API)</p>
 <ul>
 <li>Archives and public data</li>
 <li>Long-term preservation</li>
 <li>Sharing data with external collaborators</li>
 <li>Metadata-rich datasets</li>
+<li>Data you want to publish or share outside CANFAR</li>
 </ul>
 </div>
-<p><strong>🔧 Features:</strong></p>
-<ul>
-<li><strong>Web-based access</strong> - Upload/download via browser or command line</li>
-<li><strong>Metadata support</strong> - Store astronomical metadata with files</li>
-<li><strong>Version control</strong> - Track changes to datasets</li>
-<li><strong>Sharing controls</strong> - Fine-grained access permissions</li>
-<li><strong>Geographic redundancy</strong> - Multiple backup locations</li>
-</ul>
-<p><strong>⚠️ Considerations:</strong></p>
-<ul>
-<li><strong>Slower access</strong> than ARC storage (network-based)</li>
-<li><strong>Better for archives</strong> than active analysis</li>
-<li><strong>Command-line tools required</strong> for advanced features</li>
-</ul>
-<h3 id="vospace-vs-arc-comparison">VOSpace vs ARC Comparison<a class="headerlink" href="#vospace-vs-arc-comparison" title="Permanent link">&para;</a></h3>
+<p><strong>🔧 Features:</strong>
+    - <strong>Web-based access</strong> - Upload/download via browser or command line
+    - <strong>Metadata support</strong> - Store astronomical metadata with files
+    - <strong>Version control</strong> - Track changes to datasets
+    - <strong>Sharing controls</strong> - Fine-grained access permissions
+    - <strong>Geographic redundancy</strong> - Multiple backup locations</p>
+<p><strong>⚠️ Considerations:</strong>
+    - <strong>Slower access</strong> than ARC storage
+    - <strong>Best for archives, not active analysis</strong>
+    - <strong>Requires account setup and permissions</strong>
+    - <strong>Command-line tools required</strong> for advanced features
+    - <strong>Vault is only accessible via VOSpace API (vos: URIs)</strong>
+    - <strong>ARC storage can also be accessed via VOSpace API (arc: URIs)</strong></p>
+<h3 id="vault-vospace-api-vs-arc-projects-comparison">Vault (VOSpace API) vs ARC Projects Comparison<a class="headerlink" href="#vault-vospace-api-vs-arc-projects-comparison" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>Use Case</th>
-<th>VOSpace</th>
+<th>Vault (VOSpace API)</th>
 <th>ARC Projects</th>
 </tr>
 </thead>
@@ -1744,7 +1823,7 @@ cp<span class="w"> </span>*.uvfits<span class="w"> </span>/arc/projects/myprojec
 </tr>
 <tr>
 <td><strong>Data sharing</strong></td>
-<td>✅ Web interface</td>
+<td>✅ Web interface, API</td>
 <td>⚠️ Requires group membership</td>
 </tr>
 <tr>
@@ -1764,28 +1843,43 @@ cp<span class="w"> </span>*.uvfits<span class="w"> </span>/arc/projects/myprojec
 </tr>
 </tbody>
 </table>
-<h3 id="using-vospace">Using VOSpace<a class="headerlink" href="#using-vospace" title="Permanent link">&para;</a></h3>
+<h3 id="using-vault-and-arc-via-vospace-api">Using Vault and ARC via VOSpace API<a class="headerlink" href="#using-vault-and-arc-via-vospace-api" title="Permanent link">&para;</a></h3>
 <h4 id="web-interface">Web Interface<a class="headerlink" href="#web-interface" title="Permanent link">&para;</a></h4>
-<p>Access VOSpace through the CANFAR portal:
+<p>Access Vault (VOSpace) through the CANFAR portal:
 <a class="md-button" href="https://www.canfar.net/storage/vault"><strong>🔗 VOSpace File Manager</strong></a></p>
 <h4 id="command-line-tools">Command Line Tools<a class="headerlink" href="#command-line-tools" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Install VOSpace tools</span>
 pip<span class="w"> </span>install<span class="w"> </span>vostools
 
-<span class="c1"># List VOSpace contents</span>
+<span class="c1"># List Vault contents</span>
 vls<span class="w"> </span>vos:myproject
 
-<span class="c1"># Upload file</span>
+<span class="c1"># List ARC contents via VOSpace API</span>
+vls<span class="w"> </span>arc:projects/myproject
+
+<span class="c1"># Upload file to Vault</span>
 vcp<span class="w"> </span>local_file.fits<span class="w"> </span>vos:myproject/
 
-<span class="c1"># Download file  </span>
+<span class="c1"># Upload file to ARC via VOSpace API</span>
+vcp<span class="w"> </span>local_file.fits<span class="w"> </span>arc:projects/myproject/
+
+<span class="c1"># Download file from Vault</span>
 vcp<span class="w"> </span>vos:myproject/data.fits<span class="w"> </span>./
 
-<span class="c1"># Create directory</span>
+<span class="c1"># Download file from ARC via VOSpace API</span>
+vcp<span class="w"> </span>arc:projects/myproject/mydatafile.fits<span class="w"> </span>./
+
+<span class="c1"># Create directory in Vault</span>
 vmkdir<span class="w"> </span>vos:myproject/results
 
-<span class="c1"># Set permissions</span>
+<span class="c1"># Create directory in ARC via VOSpace API</span>
+vmkdir<span class="w"> </span>arc:projects/myproject/results
+
+<span class="c1"># Set permissions in Vault</span>
 vchmod<span class="w"> </span>o+r<span class="w"> </span>vos:myproject/public_data.fits<span class="w">  </span><span class="c1"># Make publicly readable</span>
+
+<span class="c1"># Set permissions in ARC via VOSpace API</span>
+vchmod<span class="w"> </span>o+r<span class="w"> </span>arc:projects/myproject/public_data.fits
 </code></pre></div>
 <h4 id="vospace-python-api">VOSpace Python API<a class="headerlink" href="#vospace-python-api" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">vos</span>
@@ -1793,23 +1887,34 @@ vchmod<span class="w"> </span>o+r<span class="w"> </span>vos:myproject/public_da
 <span class="c1"># Create client</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">vos</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
-<span class="c1"># Upload file with metadata</span>
+<span class="c1"># Upload file to Vault</span>
 <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;local_file.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;vos:myproject/survey_data.fits&quot;</span><span class="p">)</span>
 
-<span class="c1"># Set metadata</span>
+<span class="c1"># Upload file to ARC via VOSpace API</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;local_file.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;arc:projects/myproject/mydatafile.fits&quot;</span><span class="p">)</span>
+
+<span class="c1"># Set metadata in Vault</span>
 <span class="n">node</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s2">&quot;vos:myproject/survey_data.fits&quot;</span><span class="p">)</span>
 <span class="n">node</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s2">&quot;TELESCOPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ALMA&quot;</span>
 <span class="n">node</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;NGC1365&quot;</span>
 <span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
 
-<span class="c1"># Download with progress</span>
+<span class="c1"># Set metadata in ARC via VOSpace API</span>
+<span class="n">node_arc</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="s2">&quot;arc:projects/myproject/mydatafile.fits&quot;</span><span class="p">)</span>
+<span class="n">node_arc</span><span class="o">.</span><span class="n">props</span><span class="p">[</span><span class="s2">&quot;TELESCOPE&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ALMA&quot;</span>
+<span class="n">client</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">node_arc</span><span class="p">)</span>
+
+<span class="c1"># Download with progress from Vault</span>
 <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;vos:myproject/large_file.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;local_copy.fits&quot;</span><span class="p">,</span> <span class="n">send_md5</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="c1"># Download with progress from ARC via VOSpace API</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;arc:projects/myproject/mydatafile.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;local_copy.fits&quot;</span><span class="p">,</span> <span class="n">send_md5</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </code></pre></div>
 <hr />
 <h2 id="data-transfer-strategies">🔄 Data Transfers<a class="headerlink" href="#data-transfer-strategies" title="Permanent link">&para;</a></h2>
 <div class="admonition tip">
 <p class="admonition-title">Data Transfer Best Practice</p>
-<p>Always move important results from <code>/scratch/</code> to <code>/arc/projects/</code> or VOSpace before ending your session. Use the right tool for your file size and workflow.</p>
+<p>Always move important results from <code>/scratch/</code> to <code>/arc/projects/[projectname]/</code> or VOSpace before ending your session. Use the right tool for your file size and workflow.</p>
 </div>
 <h3 id="transfer-strategies-by-data-size">Transfer Strategies by Data Size<a class="headerlink" href="#transfer-strategies-by-data-size" title="Permanent link">&para;</a></h3>
 <h4 id="small-files-1gb">Small Files (&lt;1GB)<a class="headerlink" href="#small-files-1gb" title="Permanent link">&para;</a></h4>
@@ -1837,7 +1942,7 @@ vcp<span class="w"> </span>--enable-compression<span class="w"> </span>/arc/proj
 <span class="w">    </span>rm<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$file</span><span class="s2">&quot;</span>
 <span class="k">done</span>
 </code></pre></div>
-<h3 id="sshfs-setup-for-external-access">SSHFS Setup for External Access<a class="headerlink" href="#sshfs-setup-for-external-access" title="Permanent link">&para;</a></h3>
+<h3 id="sshfs-setup-for-external-access-arc-projects-only">SSHFS Setup for External Access (ARC Projects Only)<a class="headerlink" href="#sshfs-setup-for-external-access-arc-projects-only" title="Permanent link">&para;</a></h3>
 <p>Mount CANFAR storage on your local computer:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Install SSHFS (macOS with Homebrew)</span>
 brew<span class="w"> </span>install<span class="w"> </span>--cask<span class="w"> </span>macfuse
@@ -1983,8 +2088,26 @@ vchmod<span class="w"> </span>o+r<span class="w"> </span>vos:myproject/public
 <hr />
 <div class="admonition tip">
 <p class="admonition-title">Storage Strategy Summary</p>
-<p><strong>Golden Rule:</strong> Use <code>/scratch/</code> for fast temporary work, save everything important to <code>/arc/projects/</code>, and archive final results in VOSpace. Plan your data workflow around these three storage tiers for optimal performance and data safety.</p>
+<p><strong>Golden Rule:</strong> Use <code>/scratch/</code> for fast temporary work, save everything important to <code>/arc/projects/[projectname]/</code>, and archive final results in VOSpace. Plan your data workflow around these three storage tiers for optimal performance and data safety.</p>
 </div>
+<hr />
+<h2 id="faq-troubleshooting">❓ FAQ &amp; Troubleshooting<a class="headerlink" href="#faq-troubleshooting" title="Permanent link">&para;</a></h2>
+<p><strong>Q: How do I request more storage quota?</strong><br />
+A: Contact CANFAR support or your project PI. Quota increases are subject to review.</p>
+<p><strong>Q: Why can't I access my project directory?</strong><br />
+A: You must be a member of the project group. Contact your PI or support to be added.</p>
+<p><strong>Q: What happens if I exceed my quota?</strong><br />
+A: You may get errors when writing files. Contact support for help.</p>
+<p><strong>Q: Is my data backed up?</strong><br />
+A: ARC Projects and ARC Home are backed up daily (30 days). Scratch is not backed up. VOSpace is geo-redundant.</p>
+<p><strong>Q: How do I share data with external collaborators?</strong><br />
+A: Use VOSpace and set permissions or public URLs.</p>
+<p><strong>Q: Why is VOSpace slow?</strong><br />
+A: VOSpace is network-based and best for archiving, not active analysis. Use ARC Projects for fast access.</p>
+<p><strong>Q: How do I mount storage on my computer?</strong><br />
+A: Use SSHFS for ARC Projects. See instructions above.</p>
+<p><strong>Q: Who do I contact for help?</strong><br />
+A: See the support section in the CANFAR portal or documentation.</p>
 
 
 
@@ -2007,7 +2130,7 @@ vchmod<span class="w"> </span>o+r<span class="w"> </span>vos:myproject/public
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:50:03 UTC">August 25, 2025</span>
   </span>
 
     
@@ -2034,6 +2157,11 @@ vchmod<span class="w"> </span>o+r<span class="w"> </span>vos:myproject/public
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

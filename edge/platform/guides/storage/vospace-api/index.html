@@ -84,7 +84,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#vospace-api-and-advanced-tools" class="md-skip">
+        <a href="#vault-vospace-api-and-arc-access" class="md-skip">
           Skip to content
         </a>
       
@@ -1478,10 +1478,19 @@
   
 
 
-<h1 id="vospace-api-and-advanced-tools">VOSpace API and Advanced Tools<a class="headerlink" href="#vospace-api-and-advanced-tools" title="Permanent link">&para;</a></h1>
-<p>Advanced data management capabilities using VOSpace APIs and command-line tools for automation and bulk operations.</p>
+<h1 id="vault-vospace-api-and-arc-access">Vault (VOSpace API) and ARC Access<a class="headerlink" href="#vault-vospace-api-and-arc-access" title="Permanent link">&para;</a></h1>
+<p>Advanced data management capabilities using the VOSpace API for Vault (archive storage, vos: URIs) and ARC (project/home storage, arc: URIs). Both can be accessed programmatically and via command-line tools for automation and bulk operations.</p>
+<p><strong>ARC Access:</strong></p>
+<ul>
+<li><strong>Inside a CANFAR session:</strong> Use standard Unix commands (<code>cp</code>, <code>ls</code>, etc.) for <code>/arc/projects/[projectname]</code> and <code>/arc/home/[username]</code>.</li>
+<li><strong>Outside a CANFAR session:</strong> Use SSHFS to mount <code>/arc</code> or use VOSpace API with <code>arc:</code> URIs.</li>
+</ul>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>While the <a href="../">Storage Guide</a> covers basic file operations, this guide focuses on programmatic access to your data using VOSpace APIs, command-line tools, and advanced workflows.</p>
+<p>While the <a href="../">Storage Guide</a> covers basic file operations, this guide focuses on programmatic access to your data using the VOSpace API, command-line tools, and advanced workflows. You can access:</p>
+<ul>
+<li><strong>Vault</strong>: Long-term archive storage via <code>vos:</code> URIs (e.g., <code>vos:[username]/</code> or <code>vos:[projectname]</code>)</li>
+<li><strong>ARC</strong>: Project and home storage via <code>arc:</code> URIs (e.g., <code>arc:projects/[projectname]/mydatafile.fits</code>)</li>
+</ul>
 <h2 id="command-line-tools">Command-Line Tools<a class="headerlink" href="#command-line-tools" title="Permanent link">&para;</a></h2>
 <h3 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h3>
 <p>VOSpace tools are pre-installed in all CANFAR containers. For local use:</p>
@@ -1496,37 +1505,87 @@ vls<span class="w"> </span>--help
 cadc-get-cert<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem
 
 <span class="c1"># Or use your username/password</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">CADC_USERNAME</span><span class="o">=</span>your_username
-<span class="nb">export</span><span class="w"> </span><span class="nv">CADC_PASSWORD</span><span class="o">=</span>your_password
+<span class="nb">export</span><span class="w"> </span><span class="nv">CADC_USERNAME</span><span class="o">=[</span>username<span class="o">]</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">CADC_PASSWORD</span><span class="o">=[</span>password<span class="o">]</span>
 </code></pre></div>
 <h3 id="basic-operations">Basic Operations<a class="headerlink" href="#basic-operations" title="Permanent link">&para;</a></h3>
+<h4 id="vault-vospace-api">Vault (VOSpace API)<a class="headerlink" href="#vault-vospace-api" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># List files and directories in Vault</span>
+vls<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/
+
+<span class="c1"># Copy files to Vault</span>
+vcp<span class="w"> </span>mydata.fits<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/data/
+
+<span class="c1"># Copy files from Vault</span>
+vcp<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/data/mydata.fits<span class="w"> </span>./
+
+<span class="c1"># Create directories in Vault</span>
+vmkdir<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/projects/survey_analysis/
+
+<span class="c1"># Move/rename files in Vault</span>
+vmv<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/old.fits<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/new.fits
+
+<span class="c1"># Remove files in Vault</span>
+vrm<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/temp/old_data.fits
+</code></pre></div>
+<h4 id="arc-vospace-api-outside-canfar">ARC (VOSpace API, outside CANFAR)<a class="headerlink" href="#arc-vospace-api-outside-canfar" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># List files and directories in ARC</span>
+vls<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/
+
+<span class="c1"># Copy files to ARC</span>
+vcp<span class="w"> </span>mydata.fits<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/data/
+
+<span class="c1"># Copy files from ARC</span>
+vcp<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/data/mydata.fits<span class="w"> </span>./
+
+<span class="c1"># Create directories in ARC</span>
+vmkdir<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/survey_analysis/
+
+<span class="c1"># Move/rename files in ARC</span>
+vmv<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/old.fits<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/new.fits
+
+<span class="c1"># Remove files in ARC</span>
+vrm<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/temp/old_data.fits
+</code></pre></div>
+<h4 id="arc-inside-canfar-session">ARC (Inside CANFAR session)<a class="headerlink" href="#arc-inside-canfar-session" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># List files and directories</span>
-vls<span class="w"> </span>vos:CANFAR/your_username/
+ls<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/
 
-<span class="c1"># Copy files to VOSpace</span>
-vcp<span class="w"> </span>mydata.fits<span class="w"> </span>vos:CANFAR/your_username/data/
-
-<span class="c1"># Copy files from VOSpace  </span>
-vcp<span class="w"> </span>vos:CANFAR/your_username/data/mydata.fits<span class="w"> </span>./
+<span class="c1"># Copy files</span>
+cp<span class="w"> </span>mydata.fits<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/data/
 
 <span class="c1"># Create directories</span>
-vmkdir<span class="w"> </span>vos:CANFAR/your_username/projects/survey_analysis/
+mkdir<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/survey_analysis/
 
 <span class="c1"># Move/rename files</span>
-vmv<span class="w"> </span>vos:CANFAR/your_username/old.fits<span class="w"> </span>vos:CANFAR/your_username/new.fits
+mv<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/old.fits<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/new.fits
 
 <span class="c1"># Remove files</span>
-vrm<span class="w"> </span>vos:CANFAR/your_username/temp/old_data.fits
+rm<span class="w"> </span>/arc/projects/<span class="o">[</span>projectname<span class="o">]</span>/temp/old_data.fits
 </code></pre></div>
 <h3 id="bulk-operations">Bulk Operations<a class="headerlink" href="#bulk-operations" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Sync entire directories</span>
-vsync<span class="w"> </span>--recursive<span class="w"> </span>./local_data/<span class="w"> </span>vos:CANFAR/your_username/backup/
+<blockquote>
+<p>Note: <code>vsync</code> and <code>vcp</code> are always recursive; no <code>--recursive</code> flag is needed.</p>
+</blockquote>
+<h4 id="vault-vospace-api_1">Vault (VOSpace API)<a class="headerlink" href="#vault-vospace-api_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Sync entire directories to Vault</span>
+vsync<span class="w"> </span>./local_data/<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/backup/
 
-<span class="c1"># Download project data</span>
-vsync<span class="w"> </span>--recursive<span class="w"> </span>vos:CANFAR/shared_project/survey_data/<span class="w"> </span>./project_data/
+<span class="c1"># Download project data from Vault</span>
+vsync<span class="w"> </span>vos:shared_project/survey_data/<span class="w"> </span>./project_data/
 
-<span class="c1"># Upload analysis results</span>
-vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span class="w"> </span>vos:CANFAR/your_username/analysis_outputs/
+<span class="c1"># Upload analysis results to Vault</span>
+vsync<span class="w"> </span>./results/<span class="w"> </span>vos:<span class="o">[</span>username<span class="o">]</span>/analysis_outputs/
+</code></pre></div>
+<h4 id="arc-vospace-api-outside-canfar_1">ARC (VOSpace API, outside CANFAR)<a class="headerlink" href="#arc-vospace-api-outside-canfar_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Sync entire directories to ARC</span>
+vsync<span class="w"> </span>./local_data/<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/backup/
+
+<span class="c1"># Download project data from ARC</span>
+vsync<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/survey_data/<span class="w"> </span>./project_data/
+
+<span class="c1"># Upload analysis results to ARC</span>
+vsync<span class="w"> </span>./results/<span class="w"> </span>arc:projects/<span class="o">[</span>projectname<span class="o">]</span>/analysis_outputs/
 </code></pre></div>
 <h2 id="python-api">Python API<a class="headerlink" href="#python-api" title="Permanent link">&para;</a></h2>
 <h3 id="basic-usage">Basic Usage<a class="headerlink" href="#basic-usage" title="Permanent link">&para;</a></h3>
@@ -1535,38 +1594,62 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
 <span class="c1"># Initialize client</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">vos</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
 
-<span class="c1"># List directory contents</span>
-<span class="n">files</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
-<span class="c1"># Check if file exists</span>
-<span class="n">exists</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/data.fits&quot;</span><span class="p">)</span>
+<span class="c1"># List directory contents in Vault</span>
+<span class="n">files_vault</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;vos:[username]/&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">files_vault</span><span class="p">)</span>
 
-<span class="c1"># Get file info</span>
-<span class="n">info</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/data.fits&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Size: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modified: </span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># List directory contents in ARC</span>
+<span class="n">files_arc</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">files_arc</span><span class="p">)</span>
+
+<span class="c1"># Check if file exists in Vault</span>
+<span class="n">exists_vault</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;vos:[username]/data.fits&quot;</span><span class="p">)</span>
+
+<span class="c1"># Check if file exists in ARC</span>
+<span class="n">exists_arc</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/data.fits&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get file info from Vault</span>
+<span class="n">info_vault</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="s2">&quot;vos:[username]/data.fits&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Size: </span><span class="si">{</span><span class="n">info_vault</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modified: </span><span class="si">{</span><span class="n">info_vault</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get file info from ARC</span>
+<span class="n">info_arc</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/data.fits&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Size: </span><span class="si">{</span><span class="n">info_arc</span><span class="p">[</span><span class="s1">&#39;size&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> bytes&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Modified: </span><span class="si">{</span><span class="n">info_arc</span><span class="p">[</span><span class="s1">&#39;date&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="file-operations">File Operations<a class="headerlink" href="#file-operations" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Copy file to VOSpace</span>
-<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;mydata.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;vos:CANFAR/your_username/data/mydata.fits&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Copy file to Vault</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;mydata.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;vos:[username]/data/mydata.fits&quot;</span><span class="p">)</span>
 
-<span class="c1"># Copy file from VOSpace</span>
-<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/data/results.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;./results.txt&quot;</span><span class="p">)</span>
+<span class="c1"># Copy file to ARC</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;mydata.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;arc:projects/[projectname]/data/mydata.fits&quot;</span><span class="p">)</span>
 
-<span class="c1"># Create directory</span>
-<span class="n">client</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/new_project/&quot;</span><span class="p">)</span>
+<span class="c1"># Copy file from Vault</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;vos:[username]/data/results.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;./results.txt&quot;</span><span class="p">)</span>
 
-<span class="c1"># Delete file</span>
-<span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/temp/old_file.txt&quot;</span><span class="p">)</span>
+<span class="c1"># Copy file from ARC</span>
+<span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/data/results.txt&quot;</span><span class="p">,</span> <span class="s2">&quot;./results.txt&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create directory in Vault</span>
+<span class="n">client</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;vos:[username]/new_project/&quot;</span><span class="p">)</span>
+
+<span class="c1"># Create directory in ARC</span>
+<span class="n">client</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/new_project/&quot;</span><span class="p">)</span>
+
+<span class="c1"># Delete file in Vault</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;vos:[username]/temp/old_file.txt&quot;</span><span class="p">)</span>
+
+<span class="c1"># Delete file in ARC</span>
+<span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="s2">&quot;arc:projects/[projectname]/temp/old_file.txt&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="advanced-operations">Advanced Operations<a class="headerlink" href="#advanced-operations" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
 
-
 <span class="k">def</span><span class="w"> </span><span class="nf">process_fits_files</span><span class="p">(</span><span class="n">vospace_dir</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process all FITS files in a VOSpace directory&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process all FITS files in a Vault or ARC directory&quot;&quot;&quot;</span>
 
     <span class="c1"># List all FITS files</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">vospace_dir</span><span class="p">)</span>
@@ -1588,21 +1671,26 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
             <span class="n">output_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/processed_</span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="n">fits</span><span class="o">.</span><span class="n">writeto</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="n">processed_data</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            <span class="c1"># Upload to VOSpace</span>
-            <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;vos:CANFAR/your_username/processed/</span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Upload to Vault or ARC</span>
+            <span class="k">if</span> <span class="n">vospace_dir</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;vos:&quot;</span><span class="p">):</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;vos:your_username/processed/</span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">output_path</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;arc:projects/myproject/processed/</span><span class="si">{</span><span class="n">fits_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Clean up temporary file</span>
         <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
 
-
 <span class="c1"># Usage</span>
-<span class="n">process_fits_files</span><span class="p">(</span><span class="s2">&quot;vos:CANFAR/your_username/raw_data&quot;</span><span class="p">,</span> <span class="s2">&quot;./processed/&quot;</span><span class="p">)</span>
+
+<span class="n">process_fits_files</span><span class="p">(</span><span class="s2">&quot;vos:your_username/raw_data&quot;</span><span class="p">,</span> <span class="s2">&quot;./processed/&quot;</span><span class="p">)</span>
+<span class="n">process_fits_files</span><span class="p">(</span><span class="s2">&quot;arc:projects/myproject/raw_data&quot;</span><span class="p">,</span> <span class="s2">&quot;./processed/&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="automation-workflows">Automation Workflows<a class="headerlink" href="#automation-workflows" title="Permanent link">&para;</a></h2>
 <h3 id="batch-processing-script">Batch Processing Script<a class="headerlink" href="#batch-processing-script" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Automated data processing pipeline using VOSpace</span>
+<span class="sd">Automated data processing pipeline using Vault (VOSpace API) and ARC</span>
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">vos</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
@@ -1612,7 +1700,6 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
 <span class="c1"># Setup logging</span>
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
 
 <span class="k">def</span><span class="w"> </span><span class="nf">setup_vospace</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize VOSpace client with authentication&quot;&quot;&quot;</span>
@@ -1625,9 +1712,8 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;VOSpace authentication failed: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
-
 <span class="k">def</span><span class="w"> </span><span class="nf">sync_input_data</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">remote_dir</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download input data from VOSpace&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Download input data from Vault or ARC&quot;&quot;&quot;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Syncing </span><span class="si">{</span><span class="n">remote_dir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">local_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">Path</span><span class="p">(</span><span class="n">local_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1644,9 +1730,8 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="p">)</span>
 
-
 <span class="k">def</span><span class="w"> </span><span class="nf">upload_results</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">local_dir</span><span class="p">,</span> <span class="n">remote_dir</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload processing results to VOSpace&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Upload processing results to Vault or ARC&quot;&quot;&quot;</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploading results from </span><span class="si">{</span><span class="n">local_dir</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">remote_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Ensure remote directory exists</span>
@@ -1661,29 +1746,33 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploading </span><span class="si">{</span><span class="n">file_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">client</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">),</span> <span class="n">remote_path</span><span class="p">)</span>
 
-
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Main processing pipeline&quot;&quot;&quot;</span>
     <span class="n">client</span> <span class="o">=</span> <span class="n">setup_vospace</span><span class="p">()</span>
 
     <span class="c1"># Configuration</span>
-    <span class="n">input_remote</span> <span class="o">=</span> <span class="s2">&quot;vos:CANFAR/shared_project/raw_data&quot;</span>
-    <span class="n">output_remote</span> <span class="o">=</span> <span class="s2">&quot;vos:CANFAR/your_username/processed_results&quot;</span>
+    <span class="n">input_remote_vault</span> <span class="o">=</span> <span class="s2">&quot;vos:shared_project/raw_data&quot;</span>
+    <span class="n">input_remote_arc</span> <span class="o">=</span> <span class="s2">&quot;arc:projects/myproject/raw_data&quot;</span>
+    <span class="n">output_remote_vault</span> <span class="o">=</span> <span class="s2">&quot;vos:your_username/processed_results&quot;</span>
+    <span class="n">output_remote_arc</span> <span class="o">=</span> <span class="s2">&quot;arc:projects/myproject/processed_results&quot;</span>
     <span class="n">local_input</span> <span class="o">=</span> <span class="s2">&quot;./input_data&quot;</span>
     <span class="n">local_output</span> <span class="o">=</span> <span class="s2">&quot;./output_data&quot;</span>
 
-    <span class="c1"># Download input data</span>
-    <span class="n">sync_input_data</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">input_remote</span><span class="p">,</span> <span class="n">local_input</span><span class="p">)</span>
+    <span class="c1"># Download input data from Vault</span>
+    <span class="n">sync_input_data</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">input_remote_vault</span><span class="p">,</span> <span class="n">local_input</span><span class="p">)</span>
+    <span class="c1"># Download input data from ARC</span>
+    <span class="n">sync_input_data</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">input_remote_arc</span><span class="p">,</span> <span class="n">local_input</span><span class="p">)</span>
 
     <span class="c1"># Your processing code here</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Processing data...&quot;</span><span class="p">)</span>
     <span class="c1"># ... processing logic ...</span>
 
-    <span class="c1"># Upload results</span>
-    <span class="n">upload_results</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">local_output</span><span class="p">,</span> <span class="n">output_remote</span><span class="p">)</span>
+    <span class="c1"># Upload results to Vault</span>
+    <span class="n">upload_results</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">local_output</span><span class="p">,</span> <span class="n">output_remote_vault</span><span class="p">)</span>
+    <span class="c1"># Upload results to ARC</span>
+    <span class="n">upload_results</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">local_output</span><span class="p">,</span> <span class="n">output_remote_arc</span><span class="p">)</span>
 
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Pipeline completed successfully&quot;</span><span class="p">)</span>
-
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
@@ -1817,22 +1906,27 @@ vsync<span class="w"> </span>--recursive<span class="w"> </span>./results/<span 
 </code></pre></div>
 <h3 id="with-batch-jobs">With Batch Jobs<a class="headerlink" href="#with-batch-jobs" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="c1"># Batch job script using VOSpace</span>
+<span class="c1"># Batch job script using Vault and ARC via VOSpace API</span>
 
 <span class="c1"># Authenticate</span>
 cadc-get-cert<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem
 
-<span class="c1"># Download input data</span>
-vcp<span class="w"> </span>vos:CANFAR/project/input/data.fits<span class="w"> </span>./input.fits
+
+<span class="c1"># Download input data from Vault</span>
+vcp<span class="w"> </span>vos:project/input/data.fits<span class="w"> </span>./input.fits
+<span class="c1"># Download input data from ARC</span>
+vcp<span class="w"> </span>arc:projects/myproject/input/data.fits<span class="w"> </span>./input_arc.fits
 
 <span class="c1"># Process data</span>
 python<span class="w"> </span>analysis_script.py<span class="w"> </span>input.fits<span class="w"> </span>output.fits
 
-<span class="c1"># Upload results</span>
-vcp<span class="w"> </span>output.fits<span class="w"> </span>vos:CANFAR/project/results/processed_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.fits
+<span class="c1"># Upload results to Vault</span>
+vcp<span class="w"> </span>output.fits<span class="w"> </span>vos:project/results/processed_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.fits
+<span class="c1"># Upload results to ARC</span>
+vcp<span class="w"> </span>output.fits<span class="w"> </span>arc:projects/myproject/results/processed_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.fits
 
 <span class="c1"># Cleanup</span>
-rm<span class="w"> </span>input.fits<span class="w"> </span>output.fits
+rm<span class="w"> </span>input.fits<span class="w"> </span>input_arc.fits<span class="w"> </span>output.fits
 </code></pre></div>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
@@ -1851,11 +1945,15 @@ cadc-get-cert<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcpr
 <span class="n">client</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="mi">300</span>  <span class="c1"># 5 minutes</span>
 </code></pre></div></p>
 <p><strong>Permission Errors:</strong>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check file permissions</span>
-vls<span class="w"> </span>-l<span class="w"> </span>vos:CANFAR/your_username/file.fits
+<div class="highlight"><pre><span></span><code><span class="c1"># Check file permissions in Vault</span>
+vls<span class="w"> </span>-l<span class="w"> </span>vos:your_username/file.fits
+<span class="c1"># Check file permissions in ARC</span>
+vls<span class="w"> </span>-l<span class="w"> </span>arc:projects/myproject/file.fits
 
-<span class="c1"># Check directory access</span>
-vls<span class="w"> </span>vos:CANFAR/project_name/
+<span class="c1"># Check directory access in Vault</span>
+vls<span class="w"> </span>vos:project_name/
+<span class="c1"># Check directory access in ARC</span>
+vls<span class="w"> </span>arc:projects/myproject/
 </code></pre></div></p>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1885,7 +1983,7 @@ vls<span class="w"> </span>vos:CANFAR/project_name/
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:50:03 UTC">August 25, 2025</span>
   </span>
 
     
@@ -1912,6 +2010,11 @@ vls<span class="w"> </span>vos:CANFAR/project_name/
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

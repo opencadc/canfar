@@ -962,36 +962,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      Session Management
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#collaboration-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Collaboration Features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      Best Practices
     </span>
   </a>
   
@@ -1586,36 +1559,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
-    <span class="md-ellipsis">
-      Session Management
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#collaboration-features" class="md-nav__link">
-    <span class="md-ellipsis">
-      Collaboration Features
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
-    <span class="md-ellipsis">
-      Best Practices
     </span>
   </a>
   
@@ -1663,64 +1609,45 @@
 
 
 <h1 id="launching-desktop-sessions">Launching Desktop Sessions<a class="headerlink" href="#launching-desktop-sessions" title="Permanent link">&para;</a></h1>
-<p>Desktop sessions provide a full Linux graphical environment in your browser, giving you access to traditional astronomy software with familiar desktop interfaces. This guide walks you through launching and using desktop sessions on the CANFAR Science Platform.</p>
+<p>Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. Most astronomy software is launched in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This guide explains how to launch and use desktop sessions, including CANFAR-supported and user-contributed astronomy software.</p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 What You'll Learn</p>
 <ul>
-<li>How to launch, connect, and size desktop sessions</li>
-<li>What software is available and how to launch it</li>
-<li>How to manage files and storage within desktop sessions</li>
+<li>Launching, connecting, and sizing desktop sessions</li>
+<li>Available software and how to launch it</li>
+<li>Managing files and storage within desktop sessions</li>
 <li>Tips for collaboration, performance, and troubleshooting</li>
 </ul>
 </div>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
 <p>Desktop sessions offer:</p>
 <ul>
-<li><strong>Full Linux desktop</strong>: Complete graphical environment in your browser</li>
-<li><strong>Multi-application workflow</strong>: Run multiple programs simultaneously</li>
-<li><strong>Traditional interfaces</strong>: Use software with graphical user interfaces</li>
+<li><strong>Full Linux desktop</strong>: Accessed in your browser, with CANFAR storage integration</li>
+<li><strong>Multi-application workflow</strong>: Run multiple programs and containers simultaneously</li>
+<li><strong>Traditional interfaces</strong>: Use graphical astronomy software and desktop tools</li>
 <li><strong>File management</strong>: Visual file browser and management tools</li>
 <li><strong>Session persistence</strong>: Resume work exactly where you left off</li>
 </ul>
 <p>Common use cases include:</p>
 <ul>
-<li>Running GUI-based astronomy software (DS9, SAOImage, IRAF)</li>
-<li>Complex multi-step workflows requiring multiple applications</li>
-<li>Teaching and demonstration scenarios</li>
-<li>Legacy software that requires a desktop environment</li>
+<li>Running astronomy software in containers (DS9, Aladin, TOPCAT, CASA, etc.)</li>
+<li>Multi-step workflows with several applications</li>
+<li>Teaching, demonstrations, and collaborative analysis</li>
+<li>Legacy or specialised software requiring a desktop environment</li>
 </ul>
 <h2 id="creating-a-desktop-session">Creating a Desktop Session<a class="headerlink" href="#creating-a-desktop-session" title="Permanent link">&para;</a></h2>
-<h3 id="step-1-select-session-type">Step 1: Select Session Type<a class="headerlink" href="#step-1-select-session-type" title="Permanent link">&para;</a></h3>
+<h3 id="step-1-select-session-type-and-a-name">Step 1: Select Session Type and a Name<a class="headerlink" href="#step-1-select-session-type-and-a-name" title="Permanent link">&para;</a></h3>
 <p>From the Science Portal dashboard, click the <strong>plus sign (+)</strong> to create a new session, 
 then select <strong>desktop</strong> as your session type.</p>
 <blockquote>
 <p><img alt="image" src="../../images/desktop/1_launch_desktop.png" /></p>
 </blockquote>
-<h3 id="step-2-choose-container">Step 2: Choose Container<a class="headerlink" href="#step-2-choose-container" title="Permanent link">&para;</a></h3>
-<p>The desktop container includes a comprehensive set of astronomy software. Currently, 
-there's one main desktop environment available with pre-installed tools.</p>
-<blockquote>
-<p><img alt="image" src="../../images/desktop/2_select_container.png" /></p>
-</blockquote>
-<h3 id="step-3-configure-session">Step 3: Configure Session<a class="headerlink" href="#step-3-configure-session" title="Permanent link">&para;</a></h3>
-<h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
-<p>Give your session a descriptive name that will help you identify it later 
-(e.g., "data-reduction", "teaching-session", "multi-instrument-analysis").</p>
+<p>Choose a descriptive session name to help you identify it later (e.g., <code>data-reduction</code>, <code>teaching-session</code>, <code>multi-instrument-analysis</code>).</p>
 <blockquote>
 <p><img alt="image" src="../../images/desktop/3_choose_name.png" /></p>
 </blockquote>
-<h4 id="resource-configuration">Resource Configuration<a class="headerlink" href="#resource-configuration" title="Permanent link">&para;</a></h4>
-<p>Desktop sessions typically require more resources than other session types:</p>
-<p><strong>Memory (RAM)</strong>:
-- <strong>16GB (recommended)</strong>: Standard desktop usage
-- <strong>32GB</strong>: Multiple applications or large datasets
-- <strong>64GB</strong>: Intensive workflows with large data</p>
-<p><strong>CPU Cores</strong>:
-- <strong>2 cores</strong>: Basic desktop operations
-- <strong>4 cores (recommended)</strong>: Multiple applications
-- <strong>8+ cores</strong>: Compute-intensive desktop workflows</p>
-<h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
-<p>Click the <strong>Launch</strong> button and wait for your session to initialize. Desktop sessions 
+<h3 id="step-2-launch-session">Step 2: Launch Session<a class="headerlink" href="#step-2-launch-session" title="Permanent link">&para;</a></h3>
+<p>Click the <strong>Launch</strong> button and wait for your session to initialize. Desktop sessions
 may take slightly longer to start than other session types.</p>
 <blockquote>
 <p><img alt="image" src="../../images/desktop/4_launch.png" /></p>
@@ -1740,63 +1667,49 @@ may take slightly longer to start than other session types.</p>
 <p><img alt="image" src="../../images/desktop/6_connect_desktop.png" /></p>
 </blockquote>
 <h3 id="desktop-environment">Desktop Environment<a class="headerlink" href="#desktop-environment" title="Permanent link">&para;</a></h3>
-<p>You'll see a full Linux desktop environment with:</p>
+<p>When you connect, you'll see a full Linux desktop in your browser. Key features include:</p>
 <ul>
 <li><strong>Taskbar</strong>: Application launcher and system controls</li>
-<li><strong>File manager</strong>: Browse your storage and files</li>
+<li><strong>File manager</strong>: Browse CANFAR storage and files</li>
 <li><strong>Terminal</strong>: Command-line access</li>
-<li><strong>Pre-installed software</strong>: Astronomy applications ready to use</li>
+<li><strong>Shortcut icons</strong>: Quick launch for DS9, Aladin, TOPCAT, and Firefox</li>
+<li><strong>Astro Software menu</strong>: Access CANFAR-supported and user-contributed astronomy containers</li>
 </ul>
+<p>Most applications are launched in containers and connect to your desktop session using X11 protocols. Only a few tools are native to the desktop itself.</p>
 <blockquote>
 <p><img alt="image" src="../../images/desktop/7_desktop_connected.png" /></p>
 </blockquote>
 <h3 id="session-persistence">Session Persistence<a class="headerlink" href="#session-persistence" title="Permanent link">&para;</a></h3>
-<p>When your session becomes inactive, you'll be returned to the connection page. 
-Click <strong>Connect</strong> again to resume exactly where you left off - all your applications 
+<p>and work remain open.
+When your session becomes inactive, you'll be returned to the connection page.
+Click <strong>Connect</strong> again to resume exactly where you left off - all your applications
 and work remain open.</p>
 <h2 id="available-software">Available Software<a class="headerlink" href="#available-software" title="Permanent link">&para;</a></h2>
 <h3 id="astronomy-applications">Astronomy Applications<a class="headerlink" href="#astronomy-applications" title="Permanent link">&para;</a></h3>
-<p>Your desktop session includes:</p>
+<p>The desktop session provides access to astronomy software in two ways:</p>
 <ul>
-<li><strong>DS9</strong>: Advanced FITS image viewer and analyzer</li>
-<li><strong>SAOImage</strong>: Astronomical image display</li>
-<li><strong>CASA</strong>: Complete radio astronomy suite with GUI</li>
-<li><strong>Python environments</strong>: With Jupyter, AstroPy, and other libraries</li>
-<li><strong>IRAF/PyRAF</strong>: Legacy optical astronomy reduction (if needed)</li>
+<li><strong>Shortcut icons</strong>: DS9, Aladin, TOPCAT, and Firefox are available directly on the desktop for quick access.</li>
+<li><strong>Astro Software menu</strong>: Find CANFAR-supported and user-contributed astronomy containers under Applications → Astro Software. These containers run on separate worker nodes and connect to your desktop session.</li>
 </ul>
-<h3 id="development-tools">Development Tools<a class="headerlink" href="#development-tools" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Text editors</strong>: gedit, vim, emacs</li>
-<li><strong>IDEs</strong>: Available through package installation</li>
-<li><strong>Version control</strong>: Git and other VCS tools</li>
-<li><strong>Compilers</strong>: GCC, Python, and other development tools</li>
-</ul>
-<h3 id="system-tools">System Tools<a class="headerlink" href="#system-tools" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>File manager</strong>: Graphical file operations</li>
-<li><strong>Terminal</strong>: Full shell access</li>
-<li><strong>System monitor</strong>: Resource usage monitoring</li>
-<li><strong>Network tools</strong>: File transfer and connectivity utilities</li>
-</ul>
+<p>You can also access other tools and environments, including Python (with AstroPy, Jupyter), CASA, IRAF/PyRAF, and more, depending on the available containers and desktop configuration.</p>
 <h2 id="working-with-applications">Working with Applications<a class="headerlink" href="#working-with-applications" title="Permanent link">&para;</a></h2>
 <h3 id="launching-applications">Launching Applications<a class="headerlink" href="#launching-applications" title="Permanent link">&para;</a></h3>
-<p><strong>Method 1: Application Menu</strong>
-1. Click the applications menu in the taskbar
-2. Browse categories (Graphics, Science, Development)
-3. Click to launch your chosen application</p>
-<p><strong>Method 2: Terminal</strong>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch DS9</span>
-ds9<span class="w"> </span><span class="p">&amp;</span>
-
-<span class="c1"># Launch CASA with GUI</span>
-casa<span class="w"> </span>--gui<span class="w"> </span><span class="p">&amp;</span>
-
-<span class="c1"># Launch Python with astronomy libraries</span>
-ipython<span class="w"> </span>--pylab
-</code></pre></div></p>
-<p><strong>Method 3: File Association</strong>
-- Double-click FITS files to open in DS9
-- Right-click files for "Open with" options</p>
+<h3 id="method-1-astro-software-menu">Method 1: Astro Software Menu<a class="headerlink" href="#method-1-astro-software-menu" title="Permanent link">&para;</a></h3>
+<ol>
+<li>Click the Applications menu in the taskbar</li>
+<li>Select "Astro Software" to browse CANFAR-supported and user-contributed astronomy containers</li>
+<li>Choose your desired application to launch it in a dedicated container</li>
+</ol>
+<h3 id="method-2-desktop-shortcuts">Method 2: Desktop Shortcuts<a class="headerlink" href="#method-2-desktop-shortcuts" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Click the shortcut icon for DS9, Aladin, TOPCAT, or Firefox on the main desktop to launch these applications quickly</li>
+</ul>
+<p><strong>Note:</strong> Most astronomy applications are launched in containers and connect to your desktop session. You cannot start a terminal and simply run <code>ds9 &amp;</code> or similar commands, as these applications are not installed natively in the desktop environment.</p>
+<h3 id="method-3-file-association">Method 3: File Association<a class="headerlink" href="#method-3-file-association" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Double-click FITS files to open in DS9 (if available)</li>
+<li>Right-click files for "Open with" options</li>
+</ul>
 <h3 id="example-multi-application-workflow">Example: Multi-Application Workflow<a class="headerlink" href="#example-multi-application-workflow" title="Permanent link">&para;</a></h3>
 <p>Here's a typical desktop workflow for optical astronomy:</p>
 <ol>
@@ -1807,15 +1720,7 @@ ipython<span class="w"> </span>--pylab
 <li><strong>Results</strong>: Save plots and analysis outputs</li>
 </ol>
 <h3 id="casa-desktop-usage">CASA Desktop Usage<a class="headerlink" href="#casa-desktop-usage" title="Permanent link">&para;</a></h3>
-<p>To use CASA with its graphical interface:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch CASA with GUI</span>
-casa<span class="w"> </span>--gui
-
-<span class="c1"># Or use the interactive shell</span>
-casa
-</code></pre></div>
-<p>The desktop environment allows you to use CASA's plotting and visualization 
-tools that aren't available in command-line mode.</p>
+<p>To use CASA with its graphical interface, launch it from the Astro Software menu. CASA runs in a dedicated container and connects to your desktop session, allowing access to its full plotting and visualisation tools.</p>
 <h2 id="desktop-session-tips">Desktop Session Tips<a class="headerlink" href="#desktop-session-tips" title="Permanent link">&para;</a></h2>
 <h3 id="copy-paste-between-containers">Copy &amp; Paste Between Containers<a class="headerlink" href="#copy-paste-between-containers" title="Permanent link">&para;</a></h3>
 <p>Since different containers (e.g., CASA and terminal windows) in a desktop session may run on different remote computers, copying and pasting text between containers requires using the <strong>Clipboard</strong> application.</p>
@@ -1869,14 +1774,13 @@ tools that aren't available in command-line mode.</p>
 <h3 id="storage-access">Storage Access<a class="headerlink" href="#storage-access" title="Permanent link">&para;</a></h3>
 <p>Your desktop session provides access to:</p>
 <ul>
-<li><strong><code>/arc/projects/[group]/</code></strong>: Shared project storage</li>
+<li><strong><code>/arc/projects/[projectname]/</code></strong>: Shared project storage</li>
 <li><strong><code>/arc/home/[username]/</code></strong>: Personal persistent storage</li>
-<li><strong><code>/home/[username]/</code></strong>: Session-local home directory</li>
-<li><strong><code>/tmp/</code></strong>: Temporary scratch space</li>
+<li><strong><code>/scratch/</code></strong>: Temporary scratch space, unique to each application.</li>
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Persistence Reminder</p>
-<p>Use <code>/arc/projects/</code> or <code>/arc/home/</code> for important files. The session-local home and <code>/tmp/</code> are not guaranteed to persist after the session ends.</p>
+<p>Use <code>/arc/projects/</code> or <code>/arc/home/</code> for important files. <code>/scratch</code> and <code>/tmp/</code> will not persist after the session ends.</p>
 </div>
 <h3 id="file-operations">File Operations<a class="headerlink" href="#file-operations" title="Permanent link">&para;</a></h3>
 <p>Use the graphical file manager for:</p>
@@ -1886,32 +1790,6 @@ tools that aren't available in command-line mode.</p>
 <li><strong>Batch operations</strong>: Select multiple files for operations</li>
 <li><strong>Permissions</strong>: Set file and directory permissions</li>
 </ul>
-<h3 id="data-transfer">Data Transfer<a class="headerlink" href="#data-transfer" title="Permanent link">&para;</a></h3>
-<p>Transfer files to/from your desktop session:</p>
-<ul>
-<li><strong>Browser upload</strong>: Use Science Portal file manager</li>
-<li><strong>Command line</strong>: <code>scp</code>, <code>rsync</code>, <code>wget</code></li>
-<li><strong>Cloud storage</strong>: Mount external storage systems</li>
-<li><strong>USB/local</strong>: Upload through browser interface</li>
-</ul>
-<h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
-<h3 id="resource-monitoring">Resource Monitoring<a class="headerlink" href="#resource-monitoring" title="Permanent link">&para;</a></h3>
-<p>Monitor your session resources:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check memory usage</span>
-free<span class="w"> </span>-h
-
-<span class="c1"># Monitor CPU usage</span>
-htop
-
-<span class="c1"># Check disk space</span>
-df<span class="w"> </span>-h<span class="w"> </span>/arc<span class="w"> </span>/tmp
-</code></pre></div>
-<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Close unused applications</strong>: Free up memory and CPU</li>
-<li><strong>Use virtual desktops</strong>: Organize workflows across multiple desktops</li>
-<li><strong>Monitor network</strong>: Large file transfers can affect responsiveness</li>
-</ul>
 <h3 id="ending-sessions">Ending Sessions<a class="headerlink" href="#ending-sessions" title="Permanent link">&para;</a></h3>
 <p>To properly end your desktop session:</p>
 <ol>
@@ -1920,41 +1798,32 @@ df<span class="w"> </span>-h<span class="w"> </span>/arc<span class="w"> </span>
 <li><strong>Disconnect</strong>: Close the browser tab</li>
 <li><strong>Delete session</strong>: Use Science Portal to free resources</li>
 </ol>
-<h2 id="collaboration-features">Collaboration Features<a class="headerlink" href="#collaboration-features" title="Permanent link">&para;</a></h2>
-<h3 id="screen-sharing">Screen Sharing<a class="headerlink" href="#screen-sharing" title="Permanent link">&para;</a></h3>
-<p>Share your desktop session with collaborators:</p>
-<ol>
-<li>Access session sharing from Science Portal</li>
-<li>Add collaborator usernames</li>
-<li>Set permissions (view-only or full control)</li>
-<li>Collaborators see your full desktop in real-time</li>
-</ol>
-<h3 id="teaching-and-demonstration">Teaching and Demonstration<a class="headerlink" href="#teaching-and-demonstration" title="Permanent link">&para;</a></h3>
-<p>Desktop sessions are ideal for:</p>
-<ul>
-<li><strong>Live demonstrations</strong>: Show software usage to groups</li>
-<li><strong>Hands-on training</strong>: Students can follow along</li>
-<li><strong>Collaborative debugging</strong>: Work together on problems</li>
-<li><strong>Code review</strong>: Visual examination of code and results</li>
-</ul>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
-<p><strong>Session won't connect</strong>
-- Wait 30 seconds and try again
-- Check browser compatibility (Chrome/Firefox recommended)
-- Disable browser extensions that might interfere</p>
-<p><strong>Poor performance</strong>
-- Check resource usage with <code>htop</code>
-- Close unnecessary applications
-- Consider increasing session memory</p>
-<p><strong>Applications won't start</strong>
-- Check for error messages in terminal
-- Verify sufficient memory available
-- Try launching from command line for error details</p>
-<p><strong>File access problems</strong>
-- Verify paths to <code>/arc/projects/[group]/</code>
-- Check group permissions
-- Ensure files aren't locked by other processes</p>
+<h3 id="session-wont-connect">Session won't connect<a class="headerlink" href="#session-wont-connect" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Wait 30 seconds and try again</li>
+<li>Check browser compatibility (Chrome/Firefox recommended)</li>
+<li>Disable browser extensions that might interfere</li>
+</ul>
+<h3 id="poor-performance">Poor performance<a class="headerlink" href="#poor-performance" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Check resource usage with <code>htop</code></li>
+<li>Close unnecessary applications</li>
+<li>Consider increasing session memory</li>
+</ul>
+<h3 id="applications-wont-start">Applications won't start<a class="headerlink" href="#applications-wont-start" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Ensure you are launching applications from the Astro Software menu or desktop shortcuts</li>
+<li>Verify sufficient memory is available</li>
+<li>If issues persist, check for error messages in the application window or contact support</li>
+</ul>
+<h3 id="file-access-problems">File access problems<a class="headerlink" href="#file-access-problems" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Verify paths to <code>/arc/projects/[projectname]/</code></li>
+<li>Check group permissions</li>
+<li>Ensure files aren't locked by other processes</li>
+</ul>
 <h3 id="browser-optimization">Browser Optimization<a class="headerlink" href="#browser-optimization" title="Permanent link">&para;</a></h3>
 <p>For best performance:</p>
 <ul>
@@ -1968,25 +1837,6 @@ df<span class="w"> </span>-h<span class="w"> </span>/arc<span class="w"> </span>
 <li><strong>Support</strong>: Email <a href="mailto:support@canfar.net">support@canfar.net</a></li>
 <li><strong>Community</strong>: Join our Discord for desktop tips</li>
 <li><strong>Documentation</strong>: Check software-specific guides for DS9, CASA, etc.</li>
-</ul>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
-<h3 id="resource-management">Resource Management<a class="headerlink" href="#resource-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Plan resource needs</strong>: Estimate memory for your workflow</li>
-<li><strong>Monitor usage</strong>: Check system resources regularly</li>
-<li><strong>Clean up</strong>: Remove temporary files when finished</li>
-</ul>
-<h3 id="workflow-organization">Workflow Organization<a class="headerlink" href="#workflow-organization" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Organize windows</strong>: Use multiple desktops for complex workflows</li>
-<li><strong>Save frequently</strong>: Desktop sessions can be terminated for maintenance</li>
-<li><strong>Document work</strong>: Keep notes on your analysis steps</li>
-</ul>
-<h3 id="data-management">Data Management<a class="headerlink" href="#data-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Use persistent storage</strong>: Save important work to <code>/arc/</code></li>
-<li><strong>Organize files</strong>: Create clear directory structures</li>
-<li><strong>Backup results</strong>: Important outputs should be backed up</li>
 </ul>
 <h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
@@ -2017,7 +1867,7 @@ df<span class="w"> </span>-h<span class="w"> </span>/arc<span class="w"> </span>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:31:27 UTC">August 25, 2025</span>
   </span>
 
     
@@ -2044,6 +1894,11 @@ df<span class="w"> </span>-h<span class="w"> </span>/arc<span class="w"> </span>
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

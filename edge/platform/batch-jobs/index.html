@@ -1646,8 +1646,174 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 - Mock catalog generation
 - Instrument simulation
 - Survey planning</p>
+<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
+<h4 id="resource-allocation-strategy">Resource Allocation Strategy<a class="headerlink" href="#resource-allocation-strategy" title="Permanent link">&para;</a></h4>
+<p><strong>Right-sizing your jobs</strong> is crucial for performance and queue times:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Start small and scale up based on monitoring</span>
+<span class="c1"># Test job with minimal resources first</span>
+curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=test-small&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=2&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;ram=4&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;kind=headless&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cmd=python /arc/projects/myproject/test_script.py&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
+
+<span class="c1"># Monitor resource usage in the job logs</span>
+<span class="c1"># Scale up for production runs if needed</span>
+</code></pre></div>
+<p><strong>Memory Optimization:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Memory-efficient data processing patterns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_large_cube</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process large data cube efficiently&quot;&quot;&quot;</span>
+
+    <span class="c1"># Memory-map large files instead of loading fully</span>
+    <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+
+        <span class="c1"># Process in chunks to control memory usage</span>
+        <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Adjust based on available RAM</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">chunk_size</span><span class="p">):</span>
+            <span class="n">chunk</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">chunk_size</span><span class="p">]</span>
+            <span class="c1"># Process chunk and collect lightweight results</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># Example operation</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+            <span class="c1"># Explicit cleanup for large chunks</span>
+            <span class="k">del</span> <span class="n">chunk</span>
+
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Storage Performance:</strong>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use /scratch/ for I/O intensive operations</span>
+<span class="c1">#!/bin/bash</span>
+<span class="nb">set</span><span class="w"> </span>-e
+
+<span class="c1"># Copy data to fast scratch storage</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Copying data to scratch...&quot;</span>
+rsync<span class="w"> </span>-av<span class="w"> </span>/arc/projects/myproject/large_dataset/<span class="w"> </span>/scratch/working/
+
+<span class="c1"># Process on fast storage</span>
+<span class="nb">cd</span><span class="w"> </span>/scratch/working
+python<span class="w"> </span>intensive_processing.py
+
+<span class="c1"># Save results back to permanent storage</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Saving results...&quot;</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/arc/projects/myproject/results/<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>
+cp<span class="w"> </span>*.fits<span class="w"> </span>/arc/projects/myproject/results/<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>/
+cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/logs/
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing complete&quot;</span>
+</code></pre></div></p>
+<h4 id="parallel-processing">Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permanent link">&para;</a></h4>
+<p><strong>Multi-core CPU Usage:</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">process_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process a single file&quot;&quot;&quot;</span>
+    <span class="c1"># Your processing logic here</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">parallel_processing</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process multiple files in parallel&quot;&quot;&quot;</span>
+
+    <span class="c1"># Get available CPU cores (leave 1 for system)</span>
+    <span class="n">n_cores</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cpu_count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/scratch/input/*.fits&#39;</span><span class="p">)</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;param1&#39;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s1">&#39;param2&#39;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
+
+    <span class="c1"># Create partial function with fixed parameters</span>
+    <span class="n">process_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">process_file</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+
+    <span class="c1"># Process files in parallel</span>
+    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">n_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">process_func</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span>
+</code></pre></div></p>
+<p><strong>GPU Acceleration (when available):</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>  <span class="c1"># GPU arrays</span>
+    <span class="n">gpu_available</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>  <span class="c1"># Fallback to CPU</span>
+    <span class="n">gpu_available</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">gpu_accelerated_processing</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use GPU acceleration when available&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">gpu_available</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using GPU acceleration&quot;</span><span class="p">)</span>
+        <span class="c1"># Convert to GPU array</span>
+        <span class="n">gpu_data</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="c1"># GPU-accelerated operations</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+        <span class="c1"># Convert back to CPU for saving</span>
+        <span class="k">return</span> <span class="n">cp</span><span class="o">.</span><span class="n">asnumpy</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using CPU fallback&quot;</span><span class="p">)</span>
+        <span class="c1"># CPU-only operations</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+</code></pre></div></p>
+<h4 id="job-monitoring-and-logging">Job Monitoring and Logging<a class="headerlink" href="#job-monitoring-and-logging" title="Permanent link">&para;</a></h4>
+<p><strong>Comprehensive Logging:</strong>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="c1"># Setup logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
+    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s1">&#39;/arc/projects/myproject/logs/processing.log&#39;</span><span class="p">),</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">log_system_status</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log current system resource usage&quot;&quot;&quot;</span>
+    <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
+    <span class="n">disk</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s1">&#39;/scratch&#39;</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">used</span><span class="o">//</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">GB used), &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Scratch: </span><span class="si">{</span><span class="n">disk</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% used&quot;</span><span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">timed_processing</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper to time and log function execution&quot;&quot;&quot;</span>
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log_system_status</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+</code></pre></div></p>
 <h2 id="resource-planning">Resource Planning<a class="headerlink" href="#resource-planning" title="Permanent link">&para;</a></h2>
-<h3 id="job-sizing">Job Sizing<a class="headerlink" href="#job-sizing" title="Permanent link">&para;</a></h3>
+<h3 id="job-sizing-guidelines">Job Sizing Guidelines<a class="headerlink" href="#job-sizing-guidelines" title="Permanent link">&para;</a></h3>
 <p>Choose appropriate resources based on your workload:</p>
 <table>
 <thead>
@@ -1697,9 +1863,14 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 </tr>
 </tbody>
 </table>
-<div class="admonition info">
-<p class="admonition-title">Queue Behavior</p>
-<p>Small jobs (≤4 cores, ≤16GB) start faster. Large jobs (≥16 cores, ≥64GB) may queue longer. Off-peak hours often improve start times.</p>
+<div class="admonition tip">
+<p class="admonition-title">Queue Optimization</p>
+<ul>
+<li><strong>Small jobs</strong> (≤4 cores, ≤16GB) start faster</li>
+<li><strong>Large jobs</strong> (≥16 cores, ≥64GB) may queue longer  </li>
+<li><strong>Off-peak hours</strong> (evenings, weekends) often have shorter wait times</li>
+<li><strong>Resource requests</strong> should match actual usage to avoid waste</li>
+</ul>
 </div>
 <h3 id="queue-management">Queue Management<a class="headerlink" href="#queue-management" title="Permanent link">&para;</a></h3>
 <p>Understand job priorities and scheduling:</p>
@@ -1976,7 +2147,7 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 23:09:26 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 23:31:20 UTC">August 21, 2025</span>
   </span>
 
     
@@ -2003,6 +2174,11 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/brianmajor" class="md-author" title="@brianmajor">
           

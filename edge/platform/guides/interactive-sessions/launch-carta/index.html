@@ -1627,34 +1627,31 @@
 
 
 <h1 id="launching-carta-sessions">Launching CARTA Sessions<a class="headerlink" href="#launching-carta-sessions" title="Permanent link">&para;</a></h1>
-<p>CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialized image visualization and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.</p>
+<p>CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialised image visualisation and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.</p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 What You'll Learn</p>
 <ul>
-<li>How to launch a CARTA session and choose the right version</li>
-<li>How to size RAM/CPU for your datasets</li>
-<li>How to load data from <code>/arc</code> and work with radio data cubes</li>
+<li>Launching a CARTA session and choosing the right version</li>
+<li>Loading data from <code>/arc</code> and working with radio data cubes</li>
 <li>Tips for analysis features, performance, and troubleshooting</li>
 </ul>
 </div>
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>CARTA provides advanced features for:</p>
-<ul>
-<li><strong>Image visualization</strong>: Multi-dimensional data cube exploration</li>
-<li><strong>Spectral analysis</strong>: Line profiles and moment maps</li>
-<li><strong>Region analysis</strong>: Statistical analysis of image regions</li>
-<li><strong>Animation</strong>: Time-series and frequency animations</li>
-<li><strong>Collaboration</strong>: Real-time session sharing</li>
-</ul>
+<p>Key features:
+- <strong>Image visualisation</strong>: Multi-dimensional data cube exploration
+- <strong>Spectral analysis</strong>: Line profiles and moment maps
+- <strong>Region analysis</strong>: Statistical analysis of image regions
+- <strong>Animation</strong>: Time-series and frequency animations
+- <strong>Collaboration</strong>: Real-time session sharing</p>
 <h2 id="creating-a-carta-session">Creating a CARTA Session<a class="headerlink" href="#creating-a-carta-session" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-select-session-type">Step 1: Select Session Type<a class="headerlink" href="#step-1-select-session-type" title="Permanent link">&para;</a></h3>
-<p>From the Science Portal dashboard, click the <strong>plus sign (+)</strong> to create a new session, 
+<p>From the Science Portal dashboard, click the <strong>plus sign (+)</strong> to create a new session,
 then select <strong>carta</strong> as your session type.</p>
 <blockquote>
 <p><img alt="image" src="../../images/carta/1_select_carta_session.png" /></p>
 </blockquote>
 <h3 id="step-2-choose-container-version">Step 2: Choose Container Version<a class="headerlink" href="#step-2-choose-container-version" title="Permanent link">&para;</a></h3>
-<p>Note that the menu options update automatically after your session type selection. 
+<p>Note that the menu options update automatically after your session type selection.
 Choose the CARTA version that meets your needs:</p>
 <ul>
 <li><strong>CARTA 4.0</strong> (recommended): Latest features and bug fixes
@@ -1665,43 +1662,17 @@ Choose the CARTA version that meets your needs:</p>
 </ul>
 <h3 id="step-3-configure-session">Step 3: Configure Session<a class="headerlink" href="#step-3-configure-session" title="Permanent link">&para;</a></h3>
 <h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
-<p>Give your session a descriptive name that will help you identify it later 
-(e.g., "m87-analysis", "ngc-1300-cube").</p>
+<p>Choose a descriptive session name to help you identify it later (e.g., <code>m87-analysis</code>, <code>ngc-1300-cube</code>).</p>
 <blockquote>
 <p><img alt="image" src="../../images/carta/3_choose_carta_name.png" /></p>
 </blockquote>
-<h4 id="memory-configuration">Memory Configuration<a class="headerlink" href="#memory-configuration" title="Permanent link">&para;</a></h4>
-<p>Select the maximum amount of RAM for your analysis. Choose the smallest value 
-reasonable for your needs, as resources are shared among all users:</p>
-<ul>
-<li><strong>8GB</strong>: Small images and simple analysis</li>
-<li><strong>16GB (default)</strong>: Most radio astronomy datasets</li>
-<li><strong>32GB+</strong>: Large data cubes or complex multi-image analysis</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Choosing Resources</p>
-<p>Start with 8GB RAM and 2 CPU cores. Increase memory for very large FITS or CASA images and increase cores for CPU-intensive operations like moment map generation.</p>
-</div>
-<blockquote>
-<p><img alt="image" src="../../images/carta/4_choose_carta_ram.png" /></p>
-</blockquote>
-<h4 id="cpu-cores">CPU Cores<a class="headerlink" href="#cpu-cores" title="Permanent link">&para;</a></h4>
-<p>Select the number of computing cores. CARTA can benefit from multiple cores 
-for certain operations:</p>
-<ul>
-<li><strong>1 core</strong>: Basic image viewing</li>
-<li><strong>2 cores (default)</strong>: Recommended for most tasks</li>
-<li><strong>4+ cores</strong>: Large data processing and animations</li>
-</ul>
-<blockquote>
-<p><img alt="image" src="../../images/carta/5_choose_carta_cores.png" /></p>
-</blockquote>
+<p>Start with a "flexible" session, and switch to a fixed resource one if needed.</p>
 <h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
 <p>Click the <strong>Launch</strong> button and wait for your session to initialize.</p>
 <blockquote>
 <p><img alt="image" src="../../images/carta/6_launch_carta.png" /></p>
 </blockquote>
-<p>Your session will appear on the Science Portal dashboard with your chosen name. 
+<p>Your session will appear on the Science Portal dashboard with your chosen name.
 Click the CARTA icon to access your session.</p>
 <blockquote>
 <p><img alt="image" src="../../images/carta/7_click_carta.png" /></p>
@@ -1718,7 +1689,7 @@ Click the CARTA icon to access your session.</p>
 <ol>
 <li>Click the folder icon in the upper left to navigate directories</li>
 <li>Browse to your data location:</li>
-<li><strong>Project data</strong>: <code>/arc/projects/[group]/</code></li>
+<li><strong>Project data</strong>: <code>/arc/projects/[projectname]/</code></li>
 <li><strong>Personal data</strong>: <code>/arc/home/[username]/</code></li>
 </ol>
 <blockquote>
@@ -1830,22 +1801,30 @@ Click the CARTA icon to access your session.</p>
 </ul>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
-<p><strong>CARTA won't load</strong>
-- Check browser compatibility (Chrome/Firefox recommended)
-- Disable browser extensions that might interfere
-- Clear browser cache and cookies</p>
-<p><strong>Performance problems</strong>
-- Reduce image size or resolution
-- Close other applications
-- Check available memory</p>
-<p><strong>File loading errors</strong>
-- Verify file format compatibility
-- Check file permissions in storage
-- Ensure file isn't corrupted</p>
-<p><strong>Display issues</strong>
-- Try different colormaps
-- Adjust image scaling
-- Check graphics driver compatibility</p>
+<h3 id="carta-wont-load">CARTA won't load<a class="headerlink" href="#carta-wont-load" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Check browser compatibility (Chrome/Firefox recommended)</li>
+<li>Disable browser extensions that might interfere</li>
+<li>Clear browser cache and cookies</li>
+</ul>
+<h3 id="performance-problems">Performance problems<a class="headerlink" href="#performance-problems" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Reduce image size or resolution</li>
+<li>Close other applications</li>
+<li>Check available memory</li>
+</ul>
+<h3 id="file-loading-errors">File loading errors<a class="headerlink" href="#file-loading-errors" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Verify file format compatibility</li>
+<li>Check file permissions in storage</li>
+<li>Ensure file isn't corrupted</li>
+</ul>
+<h3 id="display-issues">Display issues<a class="headerlink" href="#display-issues" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Try different colormaps</li>
+<li>Adjust image scaling</li>
+<li>Check graphics driver compatibility</li>
+</ul>
 <h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>CARTA Documentation</strong>: <a href="https://carta.casa.nrao.edu">carta.casa.nrao.edu</a></li>
@@ -1894,7 +1873,7 @@ Click the CARTA icon to access your session.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 25, 2025 05:31:27 UTC">August 25, 2025</span>
   </span>
 
     
@@ -1921,6 +1900,11 @@ Click the CARTA icon to access your session.</p>
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
