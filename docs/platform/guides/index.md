@@ -83,10 +83,57 @@ Start with our [Getting Started Guide](../get-started.md) for a structured learn
 - **[VOSpace Tools](storage/vospace-api.md)** - Advanced data management
 - **[Container Registry](https://images.canfar.net/)** - Container registry for teams (Harbor)
 
+### Quick Commands Reference
+
+#### Storage Commands
+```bash
+# Check storage usage
+df -h /arc/projects/myproject
+du -sh /arc/home/$USER
+
+# VOSpace operations
+vls vos:myproject              # List files
+vcp file.fits vos:myproject/   # Upload
+vcp vos:myproject/file.fits .  # Download
+```
+
+#### Session Management (API)
+```bash
+# Get authentication token
+TOKEN=$(curl -s https://ws-cadc.canfar.net/ac/login \
+  -d "username=myuser" -d "password=mypass" | tr -d '"')
+
+# Launch notebook session
+curl -H "Authorization: Bearer $TOKEN" \
+  -d "name=analysis" -d "image=images.canfar.net/skaha/astroml:latest" \
+  -d "type=notebook" -d "cores=2" -d "ram=8" \
+  https://ws-uv.canfar.net/skaha/v0/session
+
+# List active sessions
+curl -H "Authorization: Bearer $TOKEN" \
+  https://ws-uv.canfar.net/skaha/v0/session
+```
+
+#### Container Operations
+```bash
+# Login to container registry
+docker login images.canfar.net
+
+# Build and push custom container
+docker build -t images.canfar.net/myproject/tool:latest .
+docker push images.canfar.net/myproject/tool:latest
+
+# Run container locally for testing
+docker run -it --rm \
+  -v /path/to/data:/arc/projects/test \
+  images.canfar.net/skaha/astroml:latest /bin/bash
+```
+
 ### Support
 
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** - Community support
 - **[FAQ](../../faq.md)** - Common solutions
+- **[Email Support](mailto:support@canfar.net)** - Direct assistance
 
 ---
 

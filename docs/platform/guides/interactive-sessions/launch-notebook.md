@@ -1,16 +1,17 @@
 # Launching Jupyter Notebook Sessions
 
-**Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualization, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.**
+**Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualisation, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.**
 
 !!! abstract "🎯 What You'll Learn"
-    - How to launch a Jupyter notebook session on CANFAR
-    - How to choose the right container and resources
+    - Launching a Jupyter notebook session on CANFAR
+    - Choosing the right container and resources
     - How storage works inside notebooks and what persists
     - Tips for performance, collaboration, and troubleshooting
 
 ## Overview
 
-Jupyter notebooks combine code execution, rich text documentation, and inline visualizations in a single interface. CANFAR's notebook sessions include:
+
+Jupyter notebooks combine code execution, rich text documentation, and inline visualisations in a single interface. CANFAR's notebook sessions include:
 
 - **Jupyter Lab**: Full-featured development environment
 - **Pre-configured containers**: Astronomy-specific software stacks
@@ -46,14 +47,14 @@ with specific tools and libraries:
 
 #### Session Name
 
-Choose a descriptive name that helps you identify this session later (e.g., "galaxy-photometry", "pulsar-analysis").
+Choose a descriptive name that helps you identify this session later (e.g., `galaxy-photometry`, `pulsar-analysis`).
 
 > ![image](../images/notebook/4_choose_name.png)
 
 #### Memory (RAM) Selection
 
-Select the maximum memory your analysis will require. **Start conservatively**—you can always launch
 a new session with more memory if needed.
+Select the maximum memory your analysis will require. **Start conservatively**—you can always launch a new session with more memory if needed.
 
 - **8GB**: Light data analysis, small datasets
 - **16GB (default)**: Suitable for most analyses, equivalent to a MacBook Pro
@@ -111,7 +112,7 @@ Wait for the Notebook icon to appear on your dashboard, then click it to access 
 
 Your notebook session automatically mounts:
 
-- **`/arc/projects/[group]/`**: Shared project storage
+- **`/arc/projects/[groupname]/`**: Shared project storage
 - **`/arc/home/[username]/`**: Personal storage
 - **`/tmp/`**: Temporary space (cleared when session ends)
 
@@ -129,7 +130,7 @@ from astropy.io import fits
 from astropy.wcs import WCS
 
 # Load a FITS file
-hdul = fits.open("/arc/projects/myproject/data/image.fits")
+hdul = fits.open("/arc/projects/[groupname]/data/image.fits")
 data = hdul[0].data
 header = hdul[0].header
 
@@ -153,11 +154,11 @@ import casa_tools as tools
 import casa_tasks as tasks
 
 # Create measurement set summary
-tasks.listobs(vis="/arc/projects/myproject/data/observation.ms")
+tasks.listobs(vis="/arc/projects/[groupname]/data/observation.ms")
 
 # Image the data
 tasks.tclean(
-    vis="/arc/projects/myproject/data/observation.ms",
+    vis="/arc/projects/[groupname]/data/observation.ms",
     imagename="my_image",
     imsize=1024,
     cell="0.1arcsec",
@@ -165,15 +166,6 @@ tasks.tclean(
 ```
 
 ## Session Management
-
-### Sharing Sessions
-
-Share your session with collaborators:
-
-1. Click the session menu in Jupyter Lab
-2. Select "Share Session"
-3. Add collaborator usernames
-4. Set permissions (read-only or read-write)
 
 ### Saving Your Work
 
@@ -214,22 +206,26 @@ Always properly shut down your session to free resources:
 
 ### Common Issues
 
-**Session won't start**
+### Session won't start
+
 - Check resource availability
 - Try reducing memory/CPU requirements
 - Contact support if persistent
 
-**Can't access files**
-- Verify file paths in `/arc/projects/[group]/`
+### Can't access files
+
+- Verify file paths in `/arc/projects/[groupname]/`
 - Check group permissions
 - Ensure files were uploaded correctly
 
-**Notebook kernel crashes**
+### Notebook kernel crashes
+
 - Often due to memory overuse
 - Restart kernel and reduce data size
 - Consider using more memory
 
-**Performance issues**
+### Performance issues
+
 - Check if other users are sharing resources
 - Use `htop` to monitor system usage
 - Consider running during off-peak hours

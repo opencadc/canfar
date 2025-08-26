@@ -1,25 +1,34 @@
+
 # CANFAR Storage Systems
 
-**Master CANFAR's storage systems for efficient data management**
+**A guide to CANFAR's storage options for astronomy research: what they are, how to use them, and best practices for data management.**
+
 
 !!! abstract "🎯 What You'll Learn"
-
-    By the end of this guide, you'll understand:
     - The different storage systems available on CANFAR
-    - When and how to use each storage type for your research
+    - How to choose the right storage for your workflow and data size
+    - How to access storage (CLI, API, Web, SSHFS)
     - Best practices for data management, transfer, and backup
-    - How to optimize your workflow for performance and data safety
+    - How to monitor usage and request more quota
+    - Troubleshooting common issues
 
-CANFAR provides multiple storage systems optimized for different stages of your research workflow. Understanding when and how to use each storage type is crucial for efficient data analysis and collaboration.
+
+CANFAR provides several storage systems, each optimized for different research needs. Choosing the right storage type is crucial for efficient analysis, collaboration, and data safety.
 
 ## 📊 Types Comparison
 
-| Storage | Mount Path | Speed | Persistence | Backup | Quota | Best For |
-|---------|------------|-------|-------------|--------|-------|----------|
-| **ARC Projects** | `/arc/projects/group/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | Project-based | Active research, shared data |
-| **ARC Home** | `/arc/home/username/` | Fast SSD | ✅ Permanent | ✅ Daily snapshots | 10GB default | Personal configs, keys |
-| **Scratch** | `/scratch/` | Fastest NVMe | ❌ **Wiped at session end** | ❌ No backup | Unlimited | Temporary processing |
-| **VOSpace** | `vos:username/` | Medium | ✅ Permanent | ✅ Geo-redundant | User/project based | Archives, public data |
+
+## 📊 Storage Types Comparison
+
+| Storage        | Mount Path / URI               | Access Speed   | Visibility         | Access Type      | Persistence         | Backup              | Quota         | Data Size Suitability | Best For                       |
+|----------------|-------------------------------|----------------|--------------------|------------------|---------------------|---------------------|---------------|----------------------|-------------------------------|
+| **ARC Projects** | `/arc/projects/[projectname]/` or `arc:projects/[projectname]/...` | Fast SSD       | Shared (group)      | File system, SSHFS, VOSpace API | ✅ Permanent         | ✅ Daily snapshots  | upon request   | Medium/Large         | Active research, shared data   |
+| **ARC Home**    | `/arc/home/[username]/` or `arc:home/[username]/...`        | Fast SSD       | Personal            | File system, VOSpace API      | ✅ Permanent         | ✅ Daily snapshots  | 10GB default  | Small                | Personal configs, keys, code   |
+| **Scratch**     | `/scratch/`                    | Fastest NVMe   | Session only        | File system      | ❌ Wiped at session end | ❌ No backup      | Unlimited     | Medium/Large         | Temporary processing           |
+| **Vault (VOSpace API)** | `vos:[username]/...`              | Medium         | Shared/personal     | API, Web, FUSE   | ✅ Permanent         | ✅ Geo-redundant    | User/project  | Small/Medium/Large    | Archives, public data          |
+
+**How to request more quota:** Contact CANFAR support or your project PI. Quota increases are subject to review.
+
 
 ## 🗺️ Storage Lifecycle Overview
 
@@ -44,28 +53,35 @@ graph LR
 
 ---
 
-## 📁 ARC Storage
+
+## 📁 ARC Projects Storage (Shared)
 
 ARC (Advanced Research Computing) storage provides high-performance, persistent storage for active research.
 
-### `/arc/projects/groupname/` - Shared Research Storage
+
+### `/arc/projects/[projectname]/` - Shared Research Storage
+
 
 !!! success "When to Use ARC Projects"
-
     - Raw and processed datasets
-    - Analysis scripts and notebooks  
+    - Analysis scripts and notebooks
     - Results and publications
     - Shared team resources
     - Collaborative workflows
+    - Data you want to share with your group
 
 **🔧 Features:**
 
-  - **Shared access** - All group members can read/write
-  - **Fast SSD storage** - Optimized for data analysis
-  - **Daily backups** - 30-day retention policy
-  - **ACL support** - Fine-grained permission control
 
-**📂 Recommended Structure:**
+    - **Shared access** - All group members can read/write
+    - **Fast SSD storage** - Optimized for data analysis
+    - **Daily backups** - 30-day retention policy
+    - **ACL support** - Fine-grained permission control
+    - **Access via SSHFS** - Mount on your local computer
+    - **Quota per project** - Request increases as needed
+
+
+**📂 Recommended Project Directory Structure:**
 
 ```text
 /arc/projects/myproject/
@@ -90,21 +106,30 @@ ARC (Advanced Research Computing) storage provides high-performance, persistent 
     └── procedures.md     # Analysis procedures
 ```
 
-### `/arc/home/username/` - Personal Space  
+
+## 🏠 ARC Home Storage (Personal)
+
+### `/arc/home/[username]/` - Personal Space
+
 
 !!! info "When to Use ARC Home"
     - Personal configuration files (`.bashrc`, `.jupyter/`)
     - SSH keys and authentication credentials
     - Personal scripts and utilities
     - Small reference files
+    - Not for sharing or large datasets
 
 **⚠️ Limitations:**
 
-  - **10GB default quota** (contact support for increases)
-  - Personal access only (not shared)
-  - Not suitable for large datasets
+
+    - **10GB default quota** (contact support for increases)
+    - Personal access only (not shared)
+    - Not suitable for large datasets
+    - Exceeding quota may result in errors; contact support
+
 
 ### Managing ARC Storage {#storage-management}
+
 
 #### Check Usage and Quotas
 
@@ -122,6 +147,7 @@ du -sh /arc/home/$USER/*
 df -h /arc
 ```
 
+
 #### Organizing Data
 
 ```bash
@@ -132,6 +158,7 @@ mkdir -p /arc/projects/myproject/{data/{raw,processed,catalogs},code,results,doc
 chmod -R g+rw /arc/projects/myproject/
 chmod g+s /arc/projects/myproject/  # Inherit group ownership
 ```
+
 
 #### Backup and Recovery
 
@@ -149,23 +176,25 @@ cp /arc/projects/myproject/.snapshots/daily.2024-03-15/important_file.fits \
 
 ---
 
-## ⚡ Scratch Storage
+
+## ⚡ Scratch Storage (Session Temporary)
 
 Scratch provides the fastest storage available on CANFAR, but files are **temporary**.
 
+
 !!! warning "Important: Scratch Storage Lifecycle"
-    **Scratch storage is wiped at the end of each session**, not nightly as some older documentation stated. When your interactive session ends or your batch job completes, all files in `/scratch/` are permanently deleted.
+    **Scratch storage is wiped at the end of each session.** When your interactive session ends or your batch job completes, all files in `/scratch/` are permanently deleted. There is no backup or recovery.
 
 ### When to Use Scratch
 
-**✅ Excellent for:**
+**✅ Use Scratch for:**
 - Large intermediate files during processing
 - Temporary downloads before organizing in ARC
 - High I/O operations requiring maximum speed
 - Uncompressing large archives
 - Sorting and filtering large datasets
 
-**❌ Never use for:**
+**❌ Never use Scratch for:**
 - Important results (will be lost!)
 - Files you need to keep between sessions
 - Shared data (only accessible within your session)
@@ -233,45 +262,59 @@ echo "Processed $(date): 2019.1.00123.S" >> /arc/projects/myproject/processing_l
 
 ---
 
-## ☁️ VOSpace
 
-VOSpace provides web-accessible, long-term archive storage based on IVOA standards.
 
-!!! info "When to Use VOSpace"
+## ☁️ Vault (VOSpace API Archive & Sharing)
+
+The Vault is CANFAR's long-term archive storage, accessible only via the VOSpace API (vos: URIs, e.g., vos:username/...).
+You can also access ARC storage via the VOSpace API using arc: URIs (e.g., arc:projects/myproject/mydatafile.fits).
+
+
+
+!!! info "When to Use Vault (VOSpace API)"
     - Archives and public data
     - Long-term preservation
     - Sharing data with external collaborators
     - Metadata-rich datasets
+    - Data you want to publish or share outside CANFAR
+
 
 **🔧 Features:**
+    - **Web-based access** - Upload/download via browser or command line
+    - **Metadata support** - Store astronomical metadata with files
+    - **Version control** - Track changes to datasets
+    - **Sharing controls** - Fine-grained access permissions
+    - **Geographic redundancy** - Multiple backup locations
 
-- **Web-based access** - Upload/download via browser or command line
-- **Metadata support** - Store astronomical metadata with files
-- **Version control** - Track changes to datasets
-- **Sharing controls** - Fine-grained access permissions
-- **Geographic redundancy** - Multiple backup locations
+
 
 **⚠️ Considerations:**
+    - **Slower access** than ARC storage
+    - **Best for archives, not active analysis**
+    - **Requires account setup and permissions**
+    - **Command-line tools required** for advanced features
+    - **Vault is only accessible via VOSpace API (vos: URIs)**
+    - **ARC storage can also be accessed via VOSpace API (arc: URIs)**
 
-- **Slower access** than ARC storage (network-based)
-- **Better for archives** than active analysis
-- **Command-line tools required** for advanced features
 
-### VOSpace vs ARC Comparison
 
-| Use Case | VOSpace | ARC Projects |
-|----------|---------|--------------|
+### Vault (VOSpace API) vs ARC Projects Comparison
+
+| Use Case | Vault (VOSpace API) | ARC Projects |
+|----------|---------------------|--------------|
 | **Active analysis** | ❌ Too slow | ✅ Optimized |
-| **Data sharing** | ✅ Web interface | ⚠️ Requires group membership |
+| **Data sharing** | ✅ Web interface, API | ⚠️ Requires group membership |
 | **Public releases** | ✅ Public URLs | ❌ Access controlled |
 | **Long-term preservation** | ✅ Geo-redundant | ✅ Daily backups |
 | **Large file processing** | ❌ Network overhead | ✅ Direct access |
 
-### Using VOSpace
+
+
+### Using Vault and ARC via VOSpace API
 
 #### Web Interface
 
-Access VOSpace through the CANFAR portal:
+Access Vault (VOSpace) through the CANFAR portal:
 [**🔗 VOSpace File Manager**](https://www.canfar.net/storage/vault){ .md-button }
 
 #### Command Line Tools
@@ -280,21 +323,38 @@ Access VOSpace through the CANFAR portal:
 # Install VOSpace tools
 pip install vostools
 
-# List VOSpace contents
+# List Vault contents
 vls vos:myproject
 
-# Upload file
+# List ARC contents via VOSpace API
+vls arc:projects/myproject
+
+# Upload file to Vault
 vcp local_file.fits vos:myproject/
 
-# Download file  
+# Upload file to ARC via VOSpace API
+vcp local_file.fits arc:projects/myproject/
+
+# Download file from Vault
 vcp vos:myproject/data.fits ./
 
-# Create directory
+# Download file from ARC via VOSpace API
+vcp arc:projects/myproject/mydatafile.fits ./
+
+# Create directory in Vault
 vmkdir vos:myproject/results
 
-# Set permissions
+# Create directory in ARC via VOSpace API
+vmkdir arc:projects/myproject/results
+
+# Set permissions in Vault
 vchmod o+r vos:myproject/public_data.fits  # Make publicly readable
+
+# Set permissions in ARC via VOSpace API
+vchmod o+r arc:projects/myproject/public_data.fits
 ```
+
+
 
 #### VOSpace Python API
 
@@ -304,25 +364,39 @@ import vos
 # Create client
 client = vos.Client()
 
-# Upload file with metadata
+# Upload file to Vault
 client.copy("local_file.fits", "vos:myproject/survey_data.fits")
 
-# Set metadata
+# Upload file to ARC via VOSpace API
+client.copy("local_file.fits", "arc:projects/myproject/mydatafile.fits")
+
+# Set metadata in Vault
 node = client.get_node("vos:myproject/survey_data.fits")
 node.props["TELESCOPE"] = "ALMA"
 node.props["OBJECT"] = "NGC1365"
 client.update(node)
 
-# Download with progress
+# Set metadata in ARC via VOSpace API
+node_arc = client.get_node("arc:projects/myproject/mydatafile.fits")
+node_arc.props["TELESCOPE"] = "ALMA"
+client.update(node_arc)
+
+# Download with progress from Vault
 client.copy("vos:myproject/large_file.fits", "local_copy.fits", send_md5=True)
+
+# Download with progress from ARC via VOSpace API
+client.copy("arc:projects/myproject/mydatafile.fits", "local_copy.fits", send_md5=True)
 ```
 
 ---
 
+
 ## 🔄 Data Transfers {#data-transfer-strategies}
 
+
 !!! tip "Data Transfer Best Practice"
-    Always move important results from `/scratch/` to `/arc/projects/` or VOSpace before ending your session. Use the right tool for your file size and workflow.
+    Always move important results from `/scratch/` to `/arc/projects/[projectname]/` or VOSpace before ending your session. Use the right tool for your file size and workflow.
+
 
 ### Transfer Strategies by Data Size
 
@@ -357,7 +431,8 @@ for file in /scratch/survey_*.fits; do
 done
 ```
 
-### SSHFS Setup for External Access
+
+### SSHFS Setup for External Access (ARC Projects Only)
 
 Mount CANFAR storage on your local computer:
 
@@ -379,6 +454,7 @@ cp ~/local_analysis.py ~/canfar/code/
 # Unmount when done
 umount ~/canfar
 ```
+
 
 #### SSHFS on Different Platforms
 
@@ -413,7 +489,9 @@ umount ~/canfar
 
 ---
 
+
 ## 🛠️ Advanced Storage Operations
+
 
 ### Full VOSpace API Usage
 
@@ -443,6 +521,7 @@ vmkdir vos:myproject/public
 vchmod o+r vos:myproject/public
 ```
 
+
 ### Cutout Services
 
 Access subsections of large files without downloading the entire dataset:
@@ -458,6 +537,7 @@ response = requests.get(cutout_url, params=params)
 with open("cutout.fits", "wb") as f:
     f.write(response.content)
 ```
+
 
 ### Automated Data Workflows
 
@@ -513,6 +593,7 @@ for dataset in ["obs001", "obs002", "obs003"]:
 
 ---
 
+
 ## 🔗 What's Next?
 
 Now that you understand CANFAR's storage systems:
@@ -524,5 +605,34 @@ Now that you understand CANFAR's storage systems:
 
 ---
 
+
 !!! tip "Storage Strategy Summary"
-    **Golden Rule:** Use `/scratch/` for fast temporary work, save everything important to `/arc/projects/`, and archive final results in VOSpace. Plan your data workflow around these three storage tiers for optimal performance and data safety.
+    **Golden Rule:** Use `/scratch/` for fast temporary work, save everything important to `/arc/projects/[projectname]/`, and archive final results in VOSpace. Plan your data workflow around these three storage tiers for optimal performance and data safety.
+
+---
+
+## ❓ FAQ & Troubleshooting
+
+**Q: How do I request more storage quota?**  
+A: Contact CANFAR support or your project PI. Quota increases are subject to review.
+
+**Q: Why can't I access my project directory?**  
+A: You must be a member of the project group. Contact your PI or support to be added.
+
+**Q: What happens if I exceed my quota?**  
+A: You may get errors when writing files. Contact support for help.
+
+**Q: Is my data backed up?**  
+A: ARC Projects and ARC Home are backed up daily (30 days). Scratch is not backed up. VOSpace is geo-redundant.
+
+**Q: How do I share data with external collaborators?**  
+A: Use VOSpace and set permissions or public URLs.
+
+**Q: Why is VOSpace slow?**  
+A: VOSpace is network-based and best for archiving, not active analysis. Use ARC Projects for fast access.
+
+**Q: How do I mount storage on my computer?**  
+A: Use SSHFS for ARC Projects. See instructions above.
+
+**Q: Who do I contact for help?**  
+A: See the support section in the CANFAR portal or documentation.

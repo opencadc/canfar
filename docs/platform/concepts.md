@@ -1,10 +1,10 @@
 # CANFAR Platform Concepts
 
-**Understanding the architecture and core concepts behind the CANFAR Science Platform**
+Understanding the architecture and core concepts behind the CANFAR Science Platform.
 
-This section covers the fundamental concepts you need to understand to effectively use CANFAR. Whether you are a student starting your first analysis or a project manager setting up a team workspace, these concepts will help you understand how the platform works.
+This section explains the core concepts you need to use CANFAR. Whether you are a student starting your first analysis or a project manager setting up a team workspace, these notes will help you use the platform effectively.
 
-!!! abstract "🎯 What You'll Learn"
+!!! abstract "🎯 What you'll learn"
     By the end of this guide, you'll understand:
     
     - How CANFAR's cloud architecture works
@@ -65,7 +65,7 @@ graph LR
     Storage["💾 Storage Systems"]:::storage
     
     %% Storage Systems
-    arc["📁 arc Posix Storage<br/>Shared Filesystem"]:::arc
+    arc["📁 arc POSIX Storage<br/>Shared Filesystem"]:::arc
     VOSpace["☁️ VOSpace Object Store<br/>Long-term Storage"]:::vospace
     Scratch["⚡ Scratch<br/>Temporary SSDs"]:::scratch
     
@@ -137,14 +137,14 @@ Containers are at the heart of CANFAR's flexibility and power. Think of them as 
 
 ### Why Containers Matter for Astronomy
 
-**Traditional Software Installation:**
+#### Traditional software installation
 
 - Struggle with dependencies and conflicting versions
 - Missing libraries and system requirements
-- Different behavior across different machines
+- Different behaviour across different machines
 - Time-consuming setup and configuration
 
-**CANFAR Containers:**
+#### CANFAR containers
 
 - Consistent environment that works the same everywhere
 - Pre-configured with astronomy packages
@@ -239,8 +239,8 @@ CANFAR provides multiple storage systems optimized for different use cases:
 
 | Location | Persistence | Best For |
 |----------|-------------|----------|
-| `/arc/projects/yourgroup/` | ✅ **Permanent, backed up** | Datasets, results, shared code |
-| `/arc/home/yourusername/` | ✅ **Permanent, backed up** | Personal configs, small files |
+| `/arc/projects/[project]/` | ✅ **Permanent, backed up** | Datasets, results, shared code |
+| `/arc/home/[user]/` | ✅ **Permanent, backed up** | Personal configs, small files |
 | `/scratch/` | ❌ **Wiped at session end** | Large computations, temporary files |
 | `/tmp/` | ❌ **Lost when session ends** | Temporary processing only |
 
