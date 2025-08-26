@@ -1,35 +1,34 @@
-# New to CANFAR?
 
-Get up and running with our, 
+# Welcome to CANFAR
 
-[📖 Getting Started Guide](get-started.md){.md-button}
+Start here to access all CANFAR resources and documentation.
 
----
 
-# Existing User?
+- ## 🆕 New to CANFAR?
 
-Manage your workspace with,
+- See the [📖 Getting Started Guide](get-started.md) for account setup and your first session.
 
-- **[🌐 CANFAR Portal](https://www.canfar.net/science-portal/)** - Launch sessions
-- **[📁 File Manager](https://www.canfar.net/storage/arc/list)** - Access and manage storage  
-- **[👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)** - Manage teams and permissions
 
----
+- ## 👤 Existing User?
 
-# 📖 [Checkout our User Guides](guides/index.md)
+- Use the [🌐 CANFAR Portal](https://www.canfar.net/science-portal/) to launch sessions.
+- Access and manage storage with the [📁 File Manager](https://www.canfar.net/storage/arc/list).
+- Manage teams and permissions via [👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/).
 
-**Comprehensive documentation** organized by topic:
 
-- [Platform Concepts](concepts.md) - Architecture and key concepts
-- [Accounts & Permissions](accounts.md) - Access control and collaboration
-- [Storage Systems](guides/storage/index.md) - Data management and file operations
-- [Container Usage](containers.md) - Working with software containers
-- [Interactive Sessions](guides/interactive-sessions/index.md) - Jupyter, CARTA, Firefly, Desktop, and more
-- [Batch Jobs](batch-jobs.md) - Automated processing and workflows
-- [Radio Astronomy](guides/radio-astronomy/index.md) - CASA, CARTA, and interferometry workflows
+- ## 📖 User Guides
 
----
+Explore comprehensive documentation:
 
-## ❓Need Help?
+- [🧩 Platform Concepts](concepts.md)
+- [🔑 Accounts & Permissions](accounts.md)
+- [🗄️ Storage Systems](guides/storage/index.md)
+- [🐳 Container Usage](containers.md)
+- [🖥️ Interactive Sessions](guides/interactive-sessions/index.md)
+- [🏭 Batch Jobs](batch-jobs.md)
+- [📡 Radio Astronomy](guides/radio-astronomy/index.md)
 
-Check out our [FAQ](../faq.md) and [Help & Support](help.md) pages.
+
+- ## ❓ Need Help?
+
+- Visit the [❓ FAQ](../faq.md) and [🆘 Help & Support](help.md) pages for answers and troubleshooting.

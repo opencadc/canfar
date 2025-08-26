@@ -234,26 +234,23 @@ If rules aren't taking effect, check the ACL mask and default entries (see "View
 
 ### Overview
 
-CANFAR provides REST APIs for programmatic access to platform features. All API calls require proper authentication.
+CANFAR provides REST APIs for programmatic access to platform features. All API calls require proper authentication. For detailed examples of using the `canfar` command-line client and Python library, see the [Batch Jobs guide](batch-jobs.md#api-access).
 
 !!! info "API Access"
     APIs enable automation and integration with external tools and workflows.
 
 ### Authentication Methods
 
-#### Method 1: Bearer Tokens (Recommended)
+#### Method 1: `canfar` CLI (Recommended)
 
 **Best for:** Short-term automation, development, interactive use
 
 ```bash
-# Get a 48-hour token
-curl https://ws-cadc.canfar.net/ac/login \
-  -d "username=[username]" \
-  -d "password=[password]"
+# Log in to get a token stored in your configuration
+canfar auth login
 
-# Use token in API calls
-curl -H "Authorization: Bearer YOUR_TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session
+# Subsequent canfar commands will use the stored token
+canfar ps
 ```
 
 #### Method 2: Proxy Certificates
@@ -273,47 +270,7 @@ cadc-get-cert -u [user]
 
 ### API Examples
 
-#### Session Management
-
-```bash
-# List active sessions
-curl -H "Authorization: Bearer TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session
-
-# Launch new session  
-curl -H "Authorization: Bearer TOKEN" \
-  -d "name=my-analysis" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  https://ws-uv.canfar.net/skaha/v0/session
-
-# Delete session
-curl -X DELETE \
-  -H "Authorization: Bearer TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session/SESSION_ID
-```
-
-#### File Operations (VOSpace)
-
-```bash
-# List files
-curl -H "Authorization: Bearer TOKEN" \
-  https://ws-cadc.canfar.net/vospace/nodes/myproject
-
-# Upload file
-curl -X PUT \
-  -H "Authorization: Bearer TOKEN" \
-  -H "Content-Type: application/octet-stream" \
-  --data-binary @local_file.fits \
-  https://ws-cadc.canfar.net/vospace/data/myproject/remote_file.fits
-```
-
-### API Resources
-
-| Service | Documentation | Purpose |
-|---------|---------------|---------|
-| **skaha** | [ws-uv.canfar.net](https://ws-uv.canfar.net) | Session management |
-| **VOSpace** | [CADC VOSpace](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/vospace/) | File operations |
-| **CADC Auth** | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/netrc) | Authentication |
+For detailed API usage examples, please refer to the [API Reference in the Batch Jobs guide](batch-jobs.md#api-access).
 
 ## 🚨 Common Issues
 
@@ -344,7 +301,7 @@ Solution:
 
 Solution:
 
-1. Generate a new token: `curl https://ws-cadc.canfar.net/ac/login -d "username=..." -d "password=..."`
+1. Generate a new token: `canfar auth login`
 2. Check the token format in the Authorization header: `Bearer YOUR_TOKEN`
 
 ### Problem: ACL changes not taking effect

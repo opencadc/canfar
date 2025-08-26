@@ -5,7 +5,7 @@ This unified FAQ covers the CANFAR Science Platform across three areas: Platform
 ## Platform
 
 ### What is the CANFAR Science Platform?
-The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, contributed applications (e.g., CARTA, Firefly), batch jobs, and direct access to CADC data holdings.
+The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, browser-native visualization (e.g., CARTA, Firefly), user-contributed web applications, batch jobs, and direct access to CADC data holdings.
 
 ### Who can use it and what does it cost?
 CANFAR is free for astronomical research. Canadian astronomers and their collaborators can use it subject to fair‑use and allocation limits. For larger needs, request additional resources via the Digital Research Alliance of Canada (DRAC) Resource Allocation Competition.
@@ -27,34 +27,62 @@ CANFAR is free for astronomical research. Canadian astronomers and their collabo
 - Batch jobs: no strict time limit; queue priority depends on resource usage.
 
 ### Can I run GPU‑accelerated workloads?
-Yes. Request GPUs in the session configuration (e.g., NVIDIA Tesla/RTX). Ensure your chosen container supports GPU computing.
+Yes. Request NVIDIA GPUs in the session configuration from the command line or the API. Ensure your chosen container supports CUDA libraries (i.e. `astroml-cuda`)
+
 
 ### How much storage do I get and where should I put data?
-- Personal: `/arc/home/[username]/` (e.g., 10 GB typical).
-- Project/group: `/arc/projects/[group]/` (hundreds of GB to TBs, varies by project). If you don't already have a project space, you can request one by e-mailing suport@canfar.net.
-- Temporary: `/tmp/` inside sessions (cleared when the session ends).
-Suggested layout: raw → `/arc/projects/[group]/raw/`, working → `/arc/projects/[group]/data/`, results → `/arc/projects/[group]/results/`, scripts → `/arc/projects/[group]/scripts/`.
+
+- Personal: `/arc/home/[user]/` (typically 10 GB).
+- Project/group: `/arc/projects/[project]/` (hundreds of GB to TBs, varies by project). If you do not have a project space, request one by emailing support@canfar.net.
+- Temporary: `/scratch/` inside sessions (cleared when the session ends).
+
+Suggested layout:
+
+- Raw data: `/arc/projects/[project]/raw/`
+- Working data: `/arc/projects/[project]/working/`
+- Data: `/arc/projects/[project]/data/`
+- Results: `/arc/projects/[project]/results/`
+- Scripts: `/arc/projects/[project]/scripts/`
+
 
 ### How do I transfer large datasets?
-- For files <1 GB, the Science Portal file manager is convenient.
-- For larger transfers, use `rsync`/`scp` or VOSpace for very large files (>10 GB).
 
-Example:
-```bash
-rsync -avz --progress source/ username@canfar.net:/arc/projects/mygroup/
-cadc-data put largefile.fits vos:myproject/data/
-```
+- For files <1 GB, the Science Portal file manager is convenient.
+
+or the VOSpace client `vcp` from the `vos` python package:
+
+- For larger transfers, use `sshfs`:
+
+    ```bash
+    sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10,defer_permissions -p 64022 [user]@ws-uv.canfar.net:/ $HOME/arc
+    cp largedata.fits $HOME/arc/projects/[project]/data/
+    ```
+
+- Or use the VOSpace client `vcp` from the `vos` python package:
+
+    ```bash
+    # to vault VOSpace for long-term access
+    vcp largefile.fits vos:[project]/data/
+    # to arc file system (and VOSpace) for short-term access
+    vcp largefile.fits arc:[project]/data/
+    ```
+
 
 ### What software/containers are available?
-Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, full Linux desktops, and specialized tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at `platform/containers.md`.
+
+Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data science tools, machine learning libraries, full Linux desktops, and specialized astronomy tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at `platform/containers.md`.
+
 
 ### Can I install additional software?
-- Temporary (inside a running session): `pip install --user ...` or system packages if permitted.
-- Permanent: build a custom container with your required stack (see `platform/containers.md`).
+
+- Temporary (inside a running session): `pip install --user ...` or within environments. Software will be persisted on `/arc`
+- Permanent: build a custom container with your required stack (see `platform/containers.md`). Software will be persisted on the container.
+
 
 ### Collaboration and sharing
-- Share sessions for real‑time collaboration (view or full access).
-- Share data via project groups and `/arc/projects/[group]/` with appropriate permissions.
+
+- Share data via project groups and `/arc/projects/[project]/` or in vault VOSPace with appropriate permissions.
+- Share container images via the Harbor registry on images.canfar.net
 - Share code via Git and group storage; document workflows.
 
 ### Troubleshooting slow or failing sessions
@@ -62,11 +90,6 @@ Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, full L
 - Container issues: verify name/version; try a maintained baseline image.
 - Account/group issues: confirm group membership and active account status.
 - Performance: process data in fast scratch (e.g., `/tmp/`), parallelize where appropriate, monitor with `htop`, `df -h`, `iotop`.
-
-### Where are my files?
-- Personal: `/arc/home/$(whoami)/`
-- Group: `/arc/projects/`
-- Temporary: session‑local `/tmp/` (deleted at end of session)
 
 ### Getting help and community
 - Documentation: start at `platform/home.md` and `platform/guides/index.md`.
@@ -85,7 +108,7 @@ import time
 from canfar import Session
 
 session = Session()
-sid = session.create(name="automated", kind="headless", cmd="python", args=["script.py"])
+sid = session.launch(name="automated", kind="headless", cmd="python", args=["script.py"])
 
 while session.info(sid)[0]["status"] != "Completed":
     time.sleep(60)
@@ -106,25 +129,14 @@ response = requests.post(
     headers={"Authorization": f"Bearer {token}"},
     data={
         "name": "automated-analysis",
-        "image": "images.canfar.net/skaha/astroml:latest",
+        "image": "images.canfar.net/cadc/astroml:latest",
         "cores": 4,
         "ram": 16,
         "kind": "headless",
-        "cmd": "python /arc/projects/myproject/analyze.py",
+        "cmd": "python /arc/projects/[project]/scripts/analyze.py",
     },
 )
 response.raise_for_status()
-```
-
-### How do I access VOSpace programmatically?
-Use CADC client libraries to interact with VOSpace objects.
-
-Example:
-```python
-from cadcdata import CadcDataClient
-
-client = CadcDataClient()
-client.put_file("local_file.fits", "vos:myproject/data/file.fits")
 ```
 
 ### Authentication options for programs
@@ -134,38 +146,55 @@ client.put_file("local_file.fits", "vos:myproject/data/file.fits")
 
 ## CLI
 
+
 ### How do I authenticate?
+
 - Certificates:
-```bash
-cadc-get-cert -u <username>
-```
+
+    ```bash
+    cadc-get-cert -u [user]
+    # enter CADC password when prompted
+    ```
+
 - OIDC (SRCNet‑aware):
-```bash
-canfar auth login
-```
+
+    ```bash
+    canfar auth login
+    ```
 
 Certificates typically last ~10 days; renew as needed.
 
+
 ### How do I check platform status and quotas from the CLI?
+
 ```bash
 canfar stats
 ```
 
+
 ### Why is my session stuck in "Pending"?
+
 Possible reasons: insufficient resources, image issues, quota limits, or maintenance windows. Inspect events:
+
 ```bash
 canfar events <session-id>
 ```
 
+
 ### I can’t connect to my session URL
+
 1. Ensure the session is Running (`canfar ps`).
 2. Check for VPN/firewall interference.
 3. Try another browser or clear cache/private mode.
 
+
 ### Can I run multiple sessions at once?
+
 Yes. You can run multiple sessions concurrently subject to fair‑use and any configured limits per session type. Prefer batch/headless for automation.
 
+
 ### Where can I find more CLI help?
+
 - Quick start: `cli/quick-start.md`
 - Auth contexts: `cli/authentication-contexts.md`
 - Command reference: `cli/cli-help.md`

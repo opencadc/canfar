@@ -2,11 +2,17 @@
 
 Batch jobs enable automated, non-interactive processing of astronomical data at scale. This section covers headless execution, API access, job scheduling, and workflow automation on the CANFAR Science Platform.
 
+
 !!! abstract "🎯 What You'll Learn"
     - The difference between headless and interactive containers
     - How to submit jobs via API and Python client
-    - Resource planning, queue behavior, and monitoring
+    - Resource planning, queue behaviour, and monitoring
     - Best practices for automation, logging, and data management
+    - [Container Development](containers.md)
+    - [Storage Optimization](guides/storage/index.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [Support & Troubleshooting](help.md)
 
 ## What is Batch Processing?
 
@@ -32,60 +38,69 @@ Batch processing is essential for:
 - **Resource optimization**: Run during off-peak hours for better performance
 - **Reproducible science**: Documented, automated workflows
 
+
 !!! tip "When to Use Batch Jobs"
-    - Use interactive sessions to develop and test
+    - Use [Interactive Sessions](guides/interactive-sessions/index.md) to develop and test
     - Switch to headless jobs for production-scale runs
     - Schedule jobs during off-peak hours for faster starts
+    - For automation, see [CANFAR Python Client](../client/home.md)
 
-## Batch Processing Methods
+
+---
+
+!!! info "Quick Links"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### 1. API-Based Execution
 
-Execute containers programmatically using the CANFAR API:
+Execute containers programmatically using the `canfar` command-line client:
 
 ```bash
-# Submit a job via API
-curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "name=data-reduction-job" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "cores=4" \
-  -d "ram=16" \
-  -d "cmd=python /arc/projects/myproject/scripts/reduce_data.py"
+# Ensure you are logged in first
+canfar auth login
+
+# Submit a job
+canfar create \
+  --name "data-reduction-job" \
+  --image "images.canfar.net/skaha/astroml:latest" \
+  --cores 4 \
+  --ram 16 \
+  --cmd "python /arc/projects/myproject/scripts/reduce_data.py"
 ```
 
 ### 2. Job Submission Scripts
 
-Create shell scripts for common workflows using the API or Python client:
+Create shell scripts for common workflows using the `canfar` client:
 
 ```bash
 #!/bin/bash
-# submit_reduction.sh - API-based job submission
+# submit_reduction.sh
 
 # Set job parameters
 JOB_NAME="nightly-reduction-$(date +%Y%m%d)"
 IMAGE="images.canfar.net/skaha/casa:6.5"
 CMD="python /arc/projects/survey/pipelines/reduce_night.py /arc/projects/survey/data/$(date +%Y%m%d)"
 
-# Submit job via API
-curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "name=$JOB_NAME" \
-  -d "image=$IMAGE" \
-  -d "cores=8" \
-  -d "ram=32" \
-  -d "cmd=$CMD"
+# Submit job
+canfar create \
+  --name "$JOB_NAME" \
+  --image "$IMAGE" \
+  --cores 8 \
+  --ram 32 \
+  --cmd "$CMD"
 ```
 
-Or using the Python skaha client:
+Or using the Python `canfar` client:
 
 ```python
 #!/usr/bin/env python3
 # submit_reduction.py - Python client-based submission
 
-from skaha.session import Session
+from canfar.sessions import Session
 from datetime import datetime
 
 # Initialize session manager
@@ -97,7 +112,7 @@ image = "images.canfar.net/skaha/casa:6.5"
 data_path = f"/arc/projects/survey/data/{datetime.now().strftime('%Y%m%d')}"
 
 # Submit job
-job_id = session.create(
+job_ids = session.create(
     name=job_name,
     image=image,
     cores=8,
@@ -106,8 +121,9 @@ job_id = session.create(
     args=["/arc/projects/survey/pipelines/reduce_night.py", data_path]
 )
 
-print(f"Submitted job: {job_id}")
+print(f"Submitted job(s): {job_ids}")
 ```
+
 
 ### 3. Workflow Automation
 
@@ -178,7 +194,12 @@ rule source_extract:
 - Instrument simulation
 - Survey planning
 
+
 ### Performance Optimization
+
+!!! tip "Advanced: Resource Monitoring"
+    - Use `canfar stats <session-id>` and `canfar info <session-id>` to monitor job resource usage.
+    - For parallel workloads, see [Distributed Computing](../helpers/distributed.md).
 
 #### Resource Allocation Strategy
 
@@ -187,17 +208,18 @@ rule source_extract:
 ```bash
 # Start small and scale up based on monitoring
 # Test job with minimal resources first
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=test-small" \
-  -d "cores=2" -d "ram=4" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "kind=headless" \
-  -d "cmd=python /arc/projects/myproject/test_script.py" \
-  https://ws-uv.canfar.net/skaha/v0/session
+canfar create \
+  --name "test-small" \
+  --cores 2 \
+  --ram 4 \
+  --image "images.canfar.net/skaha/astroml:latest" \
+  --kind "headless" \
+  --cmd "python /arc/projects/myproject/test_script.py"
 
 # Monitor resource usage in the job logs
 # Scale up for production runs if needed
 ```
+
 
 **Memory Optimization:**
 ```python
@@ -251,7 +273,12 @@ cp *.log /arc/projects/myproject/logs/
 echo "Processing complete"
 ```
 
+
 #### Parallel Processing
+
+!!! tip "Advanced: Distributed Workflows"
+    - Use [Snakemake](https://snakemake.readthedocs.io/en/stable/) or [Prefect](https://www.prefect.io/) for complex workflow automation.
+    - For team projects, see [Accounts & Permissions](accounts.md) for collaboration strategies.
 
 **Multi-core CPU Usage:**
 ```python
@@ -339,7 +366,7 @@ def log_system_status():
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/scratch')
     
-    logger.info(f"CPU: {cpu_percent:.1f}%, "
+    logger.info(f"CPU: {cpu_percent:.1f}%", 
                 f"Memory: {memory.percent:.1f}% "
                 f"({memory.used//1024**3:.1f}GB used), "
                 f"Scratch: {disk.percent:.1f}% used")
@@ -361,7 +388,15 @@ def timed_processing(func, *args, **kwargs):
         raise
 ```
 
-## Resource Planning
+
+---
+
+!!! info "See Also"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### Job Sizing Guidelines
 
@@ -375,11 +410,13 @@ Choose appropriate resources based on your workload:
 | ML model training | 8-16 | 32-64GB | 200GB | 4-24 hours |
 | Large simulations | 16-32 | 64-128GB | 1TB | Days-weeks |
 
+
 !!! tip "Queue Optimization"
     - **Small jobs** (≤4 cores, ≤16GB) start faster
     - **Large jobs** (≥16 cores, ≥64GB) may queue longer  
     - **Off-peak hours** (evenings, weekends) often have shorter wait times
     - **Resource requests** should match actual usage to avoid waste
+    - For advanced queue management, see [CANFAR Python Client](../client/home.md)
 
 ### Queue Management
 
@@ -392,79 +429,74 @@ Understand job priorities and scheduling:
 
 ## API Reference {#api-access}
 
-### Method 1: Direct curl Commands
+
+!!! note "Legacy Client"
+    The `skaha` Python client is deprecated and has been replaced by the `canfar` client. The following examples use the modern `canfar` client.
+    For more examples, see [Client Examples](../client/examples.md).
+
+### Method 1: `canfar` Command-Line Client
 
 #### Submit Job
 
 ```bash
-curl -X POST "https://ws-uv.canfar.net/skaha/v0/session" \
-  -H "Authorization: Bearer $TOKEN" \
-  -H "Content-Type: application/x-www-form-urlencoded" \
-  -d "name=my-analysis-job" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "cores=4" \
-  -d "ram=16" \
-  -d "cmd=python /arc/projects/myproject/analysis.py"
+canfar create \
+  --name "my-analysis-job" \
+  --image "images.canfar.net/skaha/astroml:latest" \
+  --cores 4 \
+  --ram 16 \
+  --cmd "python /arc/projects/myproject/analysis.py"
 ```
 
 #### List Jobs
 
 ```bash
-curl -X GET "https://ws-uv.canfar.net/skaha/v0/session" \
-  -H "Authorization: Bearer $TOKEN"
+canfar ps
 ```
 
 #### Get Job Status
 
 ```bash
-curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}" \
-  -H "Authorization: Bearer $TOKEN"
+canfar info <session-id>
 ```
 
 #### Cancel Job
 
 ```bash
-curl -X DELETE "https://ws-uv.canfar.net/skaha/v0/session/{session-id}" \
-  -H "Authorization: Bearer $TOKEN"
+canfar delete <session-id>
 ```
 
 #### Get Job Logs
 
 ```bash
-curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}/logs" \
-  -H "Authorization: Bearer $TOKEN"
+canfar logs <session-id>
 ```
 
 #### Get Resource Usage
 
 ```bash
-curl -X GET "https://ws-uv.canfar.net/skaha/v0/session/{session-id}/stats" \
-  -H "Authorization: Bearer $TOKEN" | jq .
+canfar stats <session-id>
 ```
 
-### Method 2: Python skaha Client
+### Method 2: `canfar` Python Client
 
-The [skaha](https://shinybrar.github.io/skaha/latest/) Python client provides a more convenient interface for batch job management and automation.
+The `canfar` Python client provides a convenient interface for batch job management and automation.
 
 #### Installation
 
 ```bash
-mamba activate base
-pip install skaha
+pip install canfar
 ```
 
 #### Basic Python Client Usage
 
 ```python
-from skaha.session import Session
-from skaha.image import Image
-import time
+from canfar.sessions import Session
 
 # Initialize session manager
 session = Session()
 
 # Simple job submission
-job_id = session.create(
+job_ids = session.create(
     name="python-analysis",
     image="images.canfar.net/skaha/astroml:latest",
     kind="headless",
@@ -472,14 +504,18 @@ job_id = session.create(
     args=["/arc/projects/myproject/analysis.py"]
 )
 
-print(f"Submitted job: {job_id}")
+print(f"Submitted job(s): {job_ids}")
 ```
 
 #### Advanced Job Submission
 
 ```python
+from canfar.sessions import Session
+
+session = Session()
+
 # Job with custom resources and environment
-job_id = session.create(
+job_ids = session.create(
     name="heavy-computation",
     image="images.canfar.net/myproject/processor:latest", 
     kind="headless",
@@ -497,117 +533,79 @@ job_id = session.create(
 
 #### Private Image Authentication
 
-```python
-# For private images, set registry authentication
-import base64
-
-username = "username"
-cli_secret = "************"
-auth_string = base64.b64encode(f"{username}:{cli_secret}".encode()).decode()
-
-job_id = session.create(
-    name="private-image-job",
-    image="images.canfar.net/myproject/private:latest",
-    kind="headless",
-    cmd="python /opt/analysis.py",
-    registry_auth=auth_string
-)
-```
-
-!!! warning "Private Images"
-    For private Harbor projects, ensure your CLI credentials are valid and your account has access to the project repository.
+To use private images, you first need to configure the client with your registry credentials. See the [authentication guide](accounts.md) for details.
 
 #### Job Monitoring and Management
 
 ```python
+import time
+from canfar.sessions import Session
+
+session = Session()
+
 # List all your sessions
 sessions = session.fetch()
 print(f"Active sessions: {len(sessions)}")
 
+# Create a job to monitor
+job_ids = session.create(
+    name="monitored-job",
+    image="images.canfar.net/skaha/astroml:latest",
+    kind="headless",
+    cmd="sleep 60"
+)
+job_id = job_ids[0]
+
 # Get session details
-session_info = session.fetch(job_id)
-print(f"Status: {session_info['status']}")
-print(f"Start time: {session_info['startTime']}")
+session_info = session.info(ids=job_id)
+print(f"Status: {session_info[0]['status']}")
+print(f"Start time: {session_info[0]['startTime']}")
 
 # Wait for completion
 while True:
-    status = session.fetch(job_id)['status']
+    status = session.info(ids=job_id)[0]['status']
     if status in ['Succeeded', 'Failed', 'Terminated']:
         print(f"Job completed with status: {status}")
         break
-    time.sleep(30)
+    time.sleep(10)
 
 # Get logs
-logs = session.logs(job_id)
+logs = session.logs(ids=job_id)
 print("Job output:")
-print(logs)
+print(logs[job_id])
 
 # Clean up
-session.delete(job_id)
+session.destroy(ids=job_id)
 ```
 
 #### Bulk Job Management
 
 ```python
-# Submit multiple related jobs
-job_ids = []
-for i in range(10):
-    job_id = session.create(
-        name=f"parameter-study-{i}",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="headless",
-        cmd="python",
-        args=["/arc/projects/study/analyze.py", f"--param={i}"]
-    )
-    job_ids.append(job_id)
-    print(f"Submitted job {i}: {job_id}")
+from canfar.sessions import Session
 
-# Monitor all jobs
-completed = 0
-while completed < len(job_ids):
-    completed = 0
-    for job_id in job_ids:
-        status = session.fetch(job_id)['status']
-        if status in ['Succeeded', 'Failed', 'Terminated']:
-            completed += 1
-    
-    print(f"Completed: {completed}/{len(job_ids)}")
-    if completed < len(job_ids):
-        time.sleep(60)
-
-print("All jobs completed!")
-```
-
-### Method 3: Higher-Level Python API
-
-```python
-# Example: Higher-level API for common tasks
-from skaha import Session
-
-# Create a session object
 session = Session()
 
-# Submit a data reduction job
-job_id = session.submit(
-    name="data-reduction",
+# Submit multiple related jobs
+job_ids = session.create(
+    name="parameter-study",
     image="images.canfar.net/skaha/astroml:latest",
-    cmd="python /arc/projects/myproject/scripts/reduce_data.py",
-    cores=4,
-    ram=16
+    kind="headless",
+    cmd="python /arc/projects/study/analyze.py",
+    replicas=10 # Creates 10 jobs named parameter-study-1, parameter-study-2, etc.
 )
+print(f"Submitted jobs: {job_ids}")
 
-# Monitor the job
-session.monitor(job_id)
-
-# Fetch and print logs
-logs = session.logs(job_id)
-print(logs)
-
-# Delete the job after completion
-session.delete(job_id)
+# Monitor all jobs
+# ... (see single job monitoring example)
 ```
 
+
+
 ## Monitoring and Debugging
+
+!!! tip "Advanced: Debugging Batch Jobs"
+    - Use `canfar logs <session-id>` and `canfar stats <session-id>` for troubleshooting.
+    - For persistent issues, see [FAQ](../faq.md) and [Support](help.md).
 
 ### Log Analysis
 
@@ -615,12 +613,10 @@ Monitor job progress through logs:
 
 ```bash
 # Real-time log monitoring
-curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/logs" \
-  -H "Authorization: Bearer $TOKEN" | tail -f
+canfar logs -f <session-id>
 
 # Search for errors
-curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/logs" \
-  -H "Authorization: Bearer $TOKEN" | grep -i error
+canfar logs <session-id> | grep -i error
 ```
 
 ### Resource Monitoring
@@ -629,8 +625,7 @@ Track resource usage:
 
 ```bash
 # Get session statistics
-curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
-  -H "Authorization: Bearer $TOKEN" | jq .
+canfar stats <session-id>
 ```
 
 ### Common Issues
@@ -650,7 +645,15 @@ curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
 - Check for infinite loops
 - Verify network connectivity
 
+
 ## Best Practices
+
+!!! info "See Also"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### Script Design
 
@@ -666,8 +669,10 @@ curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
 - **Cleanup**: Remove temporary files to save storage
 - **Metadata**: Include processing parameters in output headers
 
+
 !!! warning "Persistence Reminder"
     Headless containers do not persist changes to the container filesystem. Always write outputs to `/arc/projects/` or `/arc/home/`.
+    For data management strategies, see [Storage Guide](guides/storage/index.md).
 
 ### Security and Efficiency
 
@@ -676,7 +681,14 @@ curl -s "https://ws-uv.canfar.net/skaha/v0/session/$SESSION_ID/stats" \
 - **Parallel processing**: Use appropriate parallelization strategies
 - **Cost optimization**: Run large jobs during off-peak hours
 
+
 ## Getting Help
+
+!!! info "Quick Links"
+    - [Support](help.md)
+    - [FAQ](../faq.md)
+    - [Client Examples](../client/examples.md)
+    - [Discord Community](https://discord.gg/vcCQ8QBvBa)
 
 - **API Documentation**: [CANFAR API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
 - **Support**: Email [support@canfar.net](mailto:support@canfar.net)
