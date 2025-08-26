@@ -2,11 +2,17 @@
 
 Batch jobs enable automated, non-interactive processing of astronomical data at scale. This section covers headless execution, API access, job scheduling, and workflow automation on the CANFAR Science Platform.
 
+
 !!! abstract "🎯 What You'll Learn"
     - The difference between headless and interactive containers
     - How to submit jobs via API and Python client
-    - Resource planning, queue behavior, and monitoring
+    - Resource planning, queue behaviour, and monitoring
     - Best practices for automation, logging, and data management
+    - [Container Development](containers.md)
+    - [Storage Optimization](guides/storage/index.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [Support & Troubleshooting](help.md)
 
 ## What is Batch Processing?
 
@@ -32,12 +38,22 @@ Batch processing is essential for:
 - **Resource optimization**: Run during off-peak hours for better performance
 - **Reproducible science**: Documented, automated workflows
 
+
 !!! tip "When to Use Batch Jobs"
-    - Use interactive sessions to develop and test
+    - Use [Interactive Sessions](guides/interactive-sessions/index.md) to develop and test
     - Switch to headless jobs for production-scale runs
     - Schedule jobs during off-peak hours for faster starts
+    - For automation, see [CANFAR Python Client](../client/home.md)
 
-## Batch Processing Methods
+
+---
+
+!!! info "Quick Links"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### 1. API-Based Execution
 
@@ -178,7 +194,12 @@ rule source_extract:
 - Instrument simulation
 - Survey planning
 
+
 ### Performance Optimization
+
+!!! tip "Advanced: Resource Monitoring"
+    - Use `canfar stats <session-id>` and `canfar info <session-id>` to monitor job resource usage.
+    - For parallel workloads, see [Distributed Computing](../helpers/distributed.md).
 
 #### Resource Allocation Strategy
 
@@ -252,7 +273,12 @@ cp *.log /arc/projects/myproject/logs/
 echo "Processing complete"
 ```
 
+
 #### Parallel Processing
+
+!!! tip "Advanced: Distributed Workflows"
+    - Use [Snakemake](https://snakemake.readthedocs.io/en/stable/) or [Prefect](https://www.prefect.io/) for complex workflow automation.
+    - For team projects, see [Accounts & Permissions](accounts.md) for collaboration strategies.
 
 **Multi-core CPU Usage:**
 ```python
@@ -362,7 +388,15 @@ def timed_processing(func, *args, **kwargs):
         raise
 ```
 
-## Resource Planning
+
+---
+
+!!! info "See Also"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### Job Sizing Guidelines
 
@@ -376,11 +410,13 @@ Choose appropriate resources based on your workload:
 | ML model training | 8-16 | 32-64GB | 200GB | 4-24 hours |
 | Large simulations | 16-32 | 64-128GB | 1TB | Days-weeks |
 
+
 !!! tip "Queue Optimization"
     - **Small jobs** (≤4 cores, ≤16GB) start faster
     - **Large jobs** (≥16 cores, ≥64GB) may queue longer  
     - **Off-peak hours** (evenings, weekends) often have shorter wait times
     - **Resource requests** should match actual usage to avoid waste
+    - For advanced queue management, see [CANFAR Python Client](../client/home.md)
 
 ### Queue Management
 
@@ -393,8 +429,10 @@ Understand job priorities and scheduling:
 
 ## API Reference {#api-access}
 
+
 !!! note "Legacy Client"
     The `skaha` Python client is deprecated and has been replaced by the `canfar` client. The following examples use the modern `canfar` client.
+    For more examples, see [Client Examples](../client/examples.md).
 
 ### Method 1: `canfar` Command-Line Client
 
@@ -562,7 +600,12 @@ print(f"Submitted jobs: {job_ids}")
 ```
 
 
+
 ## Monitoring and Debugging
+
+!!! tip "Advanced: Debugging Batch Jobs"
+    - Use `canfar logs <session-id>` and `canfar stats <session-id>` for troubleshooting.
+    - For persistent issues, see [FAQ](../faq.md) and [Support](help.md).
 
 ### Log Analysis
 
@@ -602,7 +645,15 @@ canfar stats <session-id>
 - Check for infinite loops
 - Verify network connectivity
 
+
 ## Best Practices
+
+!!! info "See Also"
+    - [Container Development](containers.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [Support](help.md)
 
 ### Script Design
 
@@ -618,8 +669,10 @@ canfar stats <session-id>
 - **Cleanup**: Remove temporary files to save storage
 - **Metadata**: Include processing parameters in output headers
 
+
 !!! warning "Persistence Reminder"
     Headless containers do not persist changes to the container filesystem. Always write outputs to `/arc/projects/` or `/arc/home/`.
+    For data management strategies, see [Storage Guide](guides/storage/index.md).
 
 ### Security and Efficiency
 
@@ -628,7 +681,14 @@ canfar stats <session-id>
 - **Parallel processing**: Use appropriate parallelization strategies
 - **Cost optimization**: Run large jobs during off-peak hours
 
+
 ## Getting Help
+
+!!! info "Quick Links"
+    - [Support](help.md)
+    - [FAQ](../faq.md)
+    - [Client Examples](../client/examples.md)
+    - [Discord Community](https://discord.gg/vcCQ8QBvBa)
 
 - **API Documentation**: [CANFAR API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
 - **Support**: Email [support@canfar.net](mailto:support@canfar.net)

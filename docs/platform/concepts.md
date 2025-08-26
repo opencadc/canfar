@@ -2,7 +2,16 @@
 
 Understanding the architecture and core concepts behind the CANFAR Science Platform.
 
-This section explains the core concepts you need to use CANFAR. Whether you are a student starting your first analysis or a project manager setting up a team workspace, these notes will help you use the platform effectively.
+
+!!! info "Quick Links"
+    - [Get Started Guide](get-started.md)
+    - [FAQ](../faq.md)
+    - [Containers](containers.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [Batch Jobs](batch-jobs.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [Contact Support](help.md#contact-support)
 
 !!! abstract "🎯 What you'll learn"
     By the end of this guide, you'll understand:
@@ -24,13 +33,19 @@ It provides:
 - **Shared storage systems** for collaborative research
 - **Scalable infrastructure** that grows with your project needs
 
+
 !!! success "Key Benefit"
     CANFAR eliminates the traditional barriers of software installation, hardware management, and infrastructure setup, letting you focus entirely on your research.
+
+!!! tip "Advanced: Platform Automation"
+    - Use [CANFAR CLI](../../cli/cli-help.md) and [Python Client](../client/home.md) for scripting and automation.
+    - Integrate CANFAR with [GitHub Actions](https://github.com/features/actions) for automated workflows.
 
 
 ### Who Benefits from CANFAR?
 
-See [Accounts & Permissions](accounts.md) for details on user roles and collaboration.
+
+See [Accounts & Permissions](accounts.md) for details on user roles and collaboration. For team onboarding, see [Get Started Guide](get-started.md).
 
 === "Individual Researchers"
     - **No software installation headaches** – pre-configured containers ready to use
@@ -137,7 +152,8 @@ graph LR
 
 ## 🐳 Containers
 
-See [Container Usage](containers.md) for practical details and workflows.
+
+See [Container Usage](containers.md) for practical details and workflows. For building your own containers, see [Container Building](containers.md#building-custom-containers).
 
 Containers are at the heart of CANFAR's flexibility and power. Think of them as complete, portable software environments that include everything needed to run specific applications.
 
@@ -176,8 +192,13 @@ See [Container Usage](containers.md) for a full list and details.
 | **carta** | Radio astronomy visualisation | CARTA viewer, analysis tools |
 | **notebook** | Interactive computing | JupyterLab, Python scientific stack |
 
+
 !!! tip "Getting Started"
     Start with the **astroml** container for general astronomy work. It includes most common packages and is regularly updated.
+
+!!! tip "Advanced: Custom Containers"
+    - Build your own containers for specialized workflows. See [Container Building](containers.md#building-custom-containers).
+    - Use [Harbor Registry](https://images.canfar.net/) to browse and manage images.
 
 ### Container Lifecycle
 
@@ -195,14 +216,20 @@ When you launch a session, here's what happens behind the scenes:
 
 ## ☸️ Sessions and Computing Resources
 
-See [Interactive Sessions](guides/interactive-sessions/index.md) for session workflows and examples.
+
+See [Interactive Sessions](guides/interactive-sessions/index.md) for session workflows and examples. For batch processing, see [Batch Jobs](batch-jobs.md).
 
 CANFAR uses Kubernetes to manage your computing sessions. You don't need to understand Kubernetes deeply, but here are the key concepts:
+
 
 !!! abstract "Session Fundamentals"
     - **Temporary**: Each session creates a new container instance
     - **Persistent Data**: Files persist through storage systems, not containers
     - **Resource Limits**: CPU, memory, and storage based on your request
+
+!!! tip "Advanced: Session Management"
+    - Use `canfar info [session-id]` and `canfar stats` to monitor and debug sessions.
+    - For automation, see [Python Client](../client/home.md).
 
 ### Session Types
 
@@ -246,7 +273,8 @@ Different session types provide different interfaces to the same underlying comp
 
 ## 💾 Storage Systems
 
-See the [Storage Guide](guides/storage/index.md) for practical usage and quotas.
+
+See the [Storage Guide](guides/storage/index.md) for practical usage and quotas. For VOSpace scripting, see [VOSpace API](guides/storage/vospace-api.md).
 
 ### Data Persistence Rules
 
@@ -283,8 +311,13 @@ CANFAR provides multiple storage systems optimised for different use cases:
 - **Best For**: Archives, sharing, backups, metadata-rich data
 
 
+
 !!! tip "Storage Strategy"
     Use **ARC storage** for active analysis and **VOSpace** for long-term archival and sharing.
+
+!!! tip "Advanced: Data Automation"
+    - Automate data transfers with [CANFAR Python Client](../client/home.md) and [VOSpace API](guides/storage/vospace-api.md).
+    - Use [Git LFS](https://git-lfs.github.com/) for versioning large datasets.
 
 ### Storage Comparison
 
@@ -316,8 +349,10 @@ CANFAR provides REST APIs for programmatic access, allowing you to:
 | **VOSpace** | File operations | [VOSpace API](guides/storage/vospace-api.md) |
 | **Access Control** | Authentication and Authorization | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
+
 !!! info "Advanced Users"
     The REST APIs enable automation and integration with external tools and workflows.
+    For example workflows, see [Client Examples](../client/examples.md).
 
 ## 🔗 What's Next?
 
