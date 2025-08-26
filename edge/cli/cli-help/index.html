@@ -1213,36 +1213,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-commands" class="md-nav__link">
+  <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
-      🔐 Authentication Commands
+      Authentication
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management-commands" class="md-nav__link">
+  <a href="#session-management" class="md-nav__link">
     <span class="md-ellipsis">
-      🚀 Session Management Commands
+      Session Management
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-information-commands" class="md-nav__link">
+  <a href="#cluster-info" class="md-nav__link">
     <span class="md-ellipsis">
-      📊 Cluster Information Commands
+      Cluster Info
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#client-configuration-commands" class="md-nav__link">
+  <a href="#client-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚙️ Client Configuration Commands
+      Client Configuration
     </span>
   </a>
   
@@ -1452,36 +1452,36 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-commands" class="md-nav__link">
+  <a href="#authentication" class="md-nav__link">
     <span class="md-ellipsis">
-      🔐 Authentication Commands
+      Authentication
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management-commands" class="md-nav__link">
+  <a href="#session-management" class="md-nav__link">
     <span class="md-ellipsis">
-      🚀 Session Management Commands
+      Session Management
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#cluster-information-commands" class="md-nav__link">
+  <a href="#cluster-info" class="md-nav__link">
     <span class="md-ellipsis">
-      📊 Cluster Information Commands
+      Cluster Info
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#client-configuration-commands" class="md-nav__link">
+  <a href="#client-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      ⚙️ Client Configuration Commands
+      Client Configuration
     </span>
   </a>
   
@@ -1561,7 +1561,7 @@
 </code></pre></div></p>
 </div>
 <hr />
-<h2 id="authentication-commands">🔐 Authentication Commands<a class="headerlink" href="#authentication-commands" title="Permanent link">&para;</a></h2>
+<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-auth"><code>canfar auth</code><a class="headerlink" href="#canfar-auth" title="Permanent link">&para;</a></h3>
 <p>Authenticate with Science Platform.</p>
 <h4 id="canfar-auth-login"><code>canfar auth login</code><a class="headerlink" href="#canfar-auth-login" title="Permanent link">&para;</a></h4>
@@ -1688,11 +1688,19 @@
 <p>This command removes ALL authentication contexts. Use with caution!</p>
 </div>
 <hr />
-<h2 id="session-management-commands">🚀 Session Management Commands<a class="headerlink" href="#session-management-commands" title="Permanent link">&para;</a></h2>
+<h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-create"><code>canfar create</code><a class="headerlink" href="#canfar-create" title="Permanent link">&para;</a></h3>
 <p>Create a new session on the Science Platform.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>desktop<span class="p">|</span>notebook<span class="p">|</span>carta<span class="p">|</span>headless<span class="p">|</span>firefly<span class="p">|</span>desktop-app<span class="p">|</span>contributed<span class="w"> </span>IMAGE<span class="w"> </span><span class="o">[</span>--<span class="w"> </span>CMD<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...<span class="o">]</span>
 </code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">Passing Commands &amp; Arguments</p>
+<p>If you need to pass arguments to the command, you must use the <code>--</code> separator. For example:
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>example<span class="w"> </span>--cpu<span class="w"> </span><span class="m">1</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">1</span><span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>ls<span class="w"> </span>-la<span class="w"> </span>/
+</code></pre></div>
+In this example, <code>ls</code> is the command and <code>-la /</code> are the arguments.</p>
+<p>Options for launching the session come before the <code>--</code>, while options for the command come after.</p>
+</div>
 <p><strong>Arguments:</strong>
 - <code>KIND</code> (required): Session type - one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code>
 - <code>IMAGE</code> (required): Container image to use
@@ -1768,13 +1776,24 @@
 </tbody>
 </table>
 <div class="admonition example">
-<p class="admonition-title">Create a Jupyter Notebook</p>
+<p class="admonition-title">Create a Notebook Session</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/base-notebook:latest
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Create a Jupyter Notebook with Custom Resources</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml-notebook:latest
 </code></pre></div>
 </div>
 <div class="admonition example">
-<p class="admonition-title">Create a Headless Session with Custom Command</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>env
+<p class="admonition-title">Create a Headless Session with Command &amp; Arguments</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/path/to/script.py<span class="w"> </span>--arg1<span class="w"> </span>--arg2
+</code></pre></div>
+</div>
+<div class="admonition example">
+<p class="admonition-title">Create a Replicated Headless Sessions</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create 10 headless replicas running the `env` command</span>
+canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>env
 </code></pre></div>
 </div>
 <h3 id="canfar-ps"><code>canfar ps</code><a class="headerlink" href="#canfar-ps" title="Permanent link">&para;</a></h3>
@@ -2024,7 +2043,7 @@
 <p>Use prune to clean up multiple sessions that match specific criteria, especially useful for automated workflows.</p>
 </div>
 <hr />
-<h2 id="cluster-information-commands">📊 Cluster Information Commands<a class="headerlink" href="#cluster-information-commands" title="Permanent link">&para;</a></h2>
+<h2 id="cluster-info">Cluster Info<a class="headerlink" href="#cluster-info" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-stats"><code>canfar stats</code><a class="headerlink" href="#canfar-stats" title="Permanent link">&para;</a></h3>
 <p>Show cluster statistics and resource usage.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -2054,7 +2073,7 @@
 <p>This command provides insights into cluster resource usage, helping you understand available capacity.</p>
 </div>
 <hr />
-<h2 id="client-configuration-commands">⚙️ Client Configuration Commands<a class="headerlink" href="#client-configuration-commands" title="Permanent link">&para;</a></h2>
+<h2 id="client-configuration">Client Configuration<a class="headerlink" href="#client-configuration" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-config"><code>canfar config</code><a class="headerlink" href="#canfar-config" title="Permanent link">&para;</a></h3>
 <p>Manage client configuration settings.</p>
 <h4 id="canfar-config-show-canfar-config-list-canfar-config-ls"><code>canfar config show</code> / <code>canfar config list</code> / <code>canfar config ls</code><a class="headerlink" href="#canfar-config-show-canfar-config-list-canfar-config-ls" title="Permanent link">&para;</a></h4>
@@ -2132,7 +2151,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 00:30:56 UTC">August 21, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 23:19:27 UTC">August 26, 2025</span>
   </span>
 
     
