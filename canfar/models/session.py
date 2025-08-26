@@ -199,7 +199,7 @@ class FetchResponse(BaseModel):
     runAsUID: str
     runAsGID: str
     supplementalGroups: list[int]
-    appid: str
+    appid: str | None = None
     image: str
     type: Kind
     status: Status
@@ -209,8 +209,8 @@ class FetchResponse(BaseModel):
     connectURL: str
     requestedRAM: str
     requestedCPUCores: str
-    requestedGPUCores: str
-    ramInUse: str
-    gpuRAMInUse: str
-    cpuCoresInUse: str
-    gpuUtilization: str
+    requestedGPUCores: str = "<none>"
+    ramInUse: str = "<none>"
+    gpuRAMInUse: str = "<none>"
+    cpuCoresInUse: str = "<none>"
+    gpuUtilization: str = "<none>"

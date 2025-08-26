@@ -450,6 +450,7 @@ class AsyncSession(HTTPClient):
         parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
         response: Response = await self.asynclient.get(url="session", params=parameters)
         data: list[dict[str, str]] = response.json()
+        log.debug(data)
         return data
 
     async def stats(self) -> dict[str, Any]:

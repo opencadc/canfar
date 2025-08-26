@@ -5,15 +5,20 @@ hide:
 ---
 
 <h1>CANFAR Science Platform </h1>
-
-!!! info "Canadian Advanced Network for Astronomical Research[^1]"
     
-    *A scalable, cloud-native workspace with interactive computing and shared storage for astronomy research.
-    Built on [IVOA standards](https://www.ivoa.net/documents/), based on [F.A.I.R. principles](https://www.go-fair.org/fair-principles/).*
+!!! info ""
+    
+    <center>
+    <h3>
+    **Canadian Advanced Network for Astronomical Research is a scalable, cloud-native workspace for astronomy research.**
+ 
+    *Spin up JupyterLab, submit batch jobs, and collaborate in shared project spacesno hardware to maintain, no software to install. <br> The CANFAR Science Platform gives professors, postdocs, and students the tools they need with zero setup.*
+    </h3>
+    </center>
+    
+!!! success ""
 
-Whether you're an observational astronomer, a data scientist, or an enthusiastic student, the Canadian Advanced Network for Astronomical Research (CANFAR) Science Platform provides everything you need to explore, analyze, and share your discoveries — without worrying about hardware or software installations.
-
-    <h4>Discover what the CANFAR Science Platform can do for you, your team, and your research group.[^2]</h4>
+    <h4>Discover what the CANFAR Science Platform can do for you, your team, and your research group.</h4>
 
     <h3>
 
@@ -34,5 +39,17 @@ Whether you're an observational astronomer, a data scientist, or an enthusiastic
     
     </h3>
 
-[^1]: Built on **[IVOA standards](https://www.ivoa.net/documents/)**, based on **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
+---
+
+!!! quote ""
+
+    <font size="3">
+    ##### If you used our services, add an acknowledgement to your papers, theses, and other research outputs.
+    </font>
+
+    <span style="font-family: 'Roboto Mono', monospace; font-size: 12px; font-style: italic;">
+    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform operated by the Canadian Astronomy Data Center (CADC) and the Digital Research Alliance of Canada (DRAC), with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canadian Foundation for Innovation (CFI).
+    </span>
+
+[^1]: CANFAR is built on **[IVOA standards](https://www.ivoa.net/documents/)**, based on **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
 [^2]: Please include [the following acknowledgment](about/acknowledgement.md) in your publications & other research outputs, as it directly helps us secure continued funding and support for the CANFAR Science Platform.
