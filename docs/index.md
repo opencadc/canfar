@@ -12,7 +12,7 @@ hide:
     <h3>
     **Canadian Advanced Network for Astronomical Research is a scalable, cloud-native workspace for astronomy research.**
  
-    *Spin up JupyterLab, submit batch jobs, and collaborate in shared project spacesno hardware to maintain, no software to install. <br> The CANFAR Science Platform gives professors, postdocs, and students the tools they need with zero setup.*
+    *Spin up JupyterLab, submit batch jobs, and collaborate in shared project spaces. <br> The CANFAR Science Platform gives researchers the tools they need with minimal setup.*
     </h3>
     </center>
     
