@@ -207,8 +207,8 @@ class FetchResponse(BaseModel):
     startTime: datetime
     expiryTime: datetime | None = None
     connectURL: str
-    requestedRAM: str
-    requestedCPUCores: str
+    requestedRAM: str = "<none>"
+    requestedCPUCores: str = "<none>"
     requestedGPUCores: str = "<none>"
     ramInUse: str = "<none>"
     gpuRAMInUse: str = "<none>"

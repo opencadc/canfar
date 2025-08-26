@@ -32,7 +32,7 @@ canfar [OPTIONS] COMMAND [ARGS]...
 
 ---
 
-## 🔐 Authentication Commands
+## Authentication
 
 ### `canfar auth`
 
@@ -132,7 +132,7 @@ canfar auth purge [OPTIONS]
 
 ---
 
-## 🚀 Session Management Commands
+## Session Management
 
 ### `canfar create`
 
@@ -141,6 +141,17 @@ Create a new session on the Science Platform.
 ```bash
 canfar create [OPTIONS] desktop|notebook|carta|headless|firefly|desktop-app|contributed IMAGE [-- CMD [ARGS]...]
 ```
+
+!!! note "Passing Commands & Arguments"
+
+    If you need to pass arguments to the command, you must use the `--` separator. For example:
+    ```bash
+    canfar create --name example --cpu 1 --memory 1 headless skaha/terminal:1.1.2 -- ls -la /
+    ```
+    In this example, `ls` is the command and `-la /` are the arguments.
+    
+    Options for launching the session come before the `--`, while options for the command come after.
+
 
 **Arguments:**
 - `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`
@@ -160,14 +171,25 @@ canfar create [OPTIONS] desktop|notebook|carta|headless|firefly|desktop-app|cont
 | `--debug` | - | Flag | - | Enable debug logging |
 | `--dry-run` | - | Flag | - | Perform a dry run without creating the session |
 
-!!! example "Create a Jupyter Notebook"
+!!! example "Create a Notebook Session"
+    ```bash
+    canfar create notebook skaha/base-notebook:latest
+    ```
+
+!!! example "Create a Jupyter Notebook with Custom Resources"
     ```bash
     canfar create --cpu 4 --memory 8 notebook skaha/astroml-notebook:latest
     ```
 
-!!! example "Create a Headless Session with Custom Command"
+!!! example "Create a Headless Session with Command & Arguments"
     ```bash
-    canfar create headless skaha/terminal:1.1.2 -- env
+    canfar create headless skaha/terminal:1.1.2 -- python3 /path/to/script.py --arg1 --arg2
+    ```
+
+!!! example "Create a Replicated Headless Sessions"
+    ```bash
+    # Create 10 headless replicas running the `env` command
+    canfar create --replicas 10 headless skaha/terminal:1.1.2 -- env
     ```
 
 ### `canfar ps`
@@ -350,7 +372,7 @@ canfar prune [OPTIONS] NAME KIND STATUS
 
 ---
 
-## 📊 Cluster Information Commands
+## Cluster Info
 
 ### `canfar stats`
 
@@ -376,7 +398,7 @@ canfar stats [OPTIONS]
 
 ---
 
-## ⚙️ Client Configuration Commands
+## Client Configuration
 
 ### `canfar config`
 
