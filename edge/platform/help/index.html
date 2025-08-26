@@ -1035,15 +1035,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-help" class="md-nav__link">
-    <span class="md-ellipsis">
-      Quick Help
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#self-help-resources" class="md-nav__link">
     <span class="md-ellipsis">
       Self-Help Resources
@@ -1056,15 +1047,6 @@
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contact-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contact Support
     </span>
   </a>
   
@@ -1375,15 +1357,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-help" class="md-nav__link">
-    <span class="md-ellipsis">
-      Quick Help
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#self-help-resources" class="md-nav__link">
     <span class="md-ellipsis">
       Self-Help Resources
@@ -1396,15 +1369,6 @@
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#contact-support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Contact Support
     </span>
   </a>
   
@@ -1498,7 +1462,19 @@
 
 <h1 id="getting-help-and-support">Getting Help and Support<a class="headerlink" href="#getting-help-and-support" title="Permanent link">&para;</a></h1>
 <p>The CANFAR Science Platform provides multiple channels for getting help, from self-service documentation to direct support. This section guides you to the right resources for your needs.</p>
-<h2 id="quick-help">Quick Help<a class="headerlink" href="#quick-help" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Quick Links</p>
+<ul>
+<li><a href="../get-started/">Get Started Guide</a></li>
+<li><a href="../../faq/">FAQ</a></li>
+<li><a href="../concepts/">Platform Concepts</a></li>
+<li><a href="../containers/">Containers</a></li>
+<li><a href="../guides/interactive-sessions/">Interactive Sessions</a></li>
+<li><a href="../batch-jobs/">Batch Jobs</a></li>
+<li><a href="../guides/radio-astronomy/">Radio Astronomy Guide</a></li>
+<li><a href="#contact-support">Contact Support</a></li>
+</ul>
+</div>
 <h3 id="new-to-canfar">New to CANFAR?<a class="headerlink" href="#new-to-canfar" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong><a href="../get-started/">Get Started Guide</a></strong>: 10-minute quick start</li>
@@ -1570,11 +1546,12 @@
 <p><strong>Symptoms</strong>: Files missing or permission denied</p>
 <p><strong>Solutions</strong>:
 <div class="highlight"><pre><span></span><code><span class="c1"># Check file locations</span>
-ls<span class="w"> </span>/arc/home/<span class="k">$(</span>whoami<span class="k">)</span>/<span class="w">     </span><span class="c1"># Personal storage</span>
+ls<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/<span class="w">     </span><span class="c1"># Personal storage</span>
 ls<span class="w"> </span>/arc/projects/<span class="w">           </span><span class="c1"># Group storage</span>
 
 <span class="c1"># Check permissions</span>
-ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/mygroup/
+ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+getfacl<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
 </code></pre></div></p>
 <ul>
 <li>Verify you're in the correct group</li>
@@ -1582,13 +1559,29 @@ ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/mygroup/
 <li>Contact group administrator</li>
 </ul>
 <h4 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h4>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Optimizing Performance</p>
+<ul>
+<li>Use <a href="../batch-jobs/">Batch Jobs</a> for large-scale or automated processing.</li>
+<li>Monitor session resource usage with <code>canfar stats</code> and <a href="../concepts/#sessions">session info</a>.</li>
+<li>Store temporary files in <code>/scratch/</code> for faster I/O.</li>
+<li>For parallel workloads, see <a href="../helpers/distributed.md">Distributed Computing</a>.</li>
+</ul>
+</div>
 <p><strong>Symptoms</strong>: Slow processing or unresponsive interface</p>
 <p><strong>Solutions</strong>:
 - Monitor resource usage with <code>htop</code>
 - Close unnecessary applications
-- Use scratch storage (<code>/tmp/</code>) for temporary files
+- Use scratch storage (<code>/scratch/</code>) for temporary files
 - Consider requesting more resources</p>
 <h4 id="browser-compatibility">Browser Compatibility<a class="headerlink" href="#browser-compatibility" title="Permanent link">&para;</a></h4>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Browser Automation</p>
+<ul>
+<li>Use browser profiles/extensions for session isolation.</li>
+<li>Automate repetitive browser tasks with <a href="https://www.selenium.dev/">Selenium</a> or <a href="https://playwright.dev/">Playwright</a>.</li>
+</ul>
+</div>
 <p><strong>Symptoms</strong>: Interface doesn't load or behaves incorrectly</p>
 <p><strong>Solutions</strong>:
 - Use Chrome or Firefox (recommended)
@@ -1596,23 +1589,29 @@ ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/mygroup/
 - Disable ad blockers for canfar.net
 - Update browser to latest version</p>
 <h3 id="diagnostic-commands">Diagnostic Commands<a class="headerlink" href="#diagnostic-commands" title="Permanent link">&para;</a></h3>
+<div class="admonition example">
+<p class="admonition-title">Gathering Diagnostic Info for Support</p>
+<p>Use these commands before contacting support to speed up troubleshooting:</p>
+</div>
 <p>Use these commands to gather information for support requests:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># System information</span>
-uname<span class="w"> </span>-a
-cat<span class="w"> </span>/proc/cpuinfo<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span><span class="s2">&quot;model name&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>head<span class="w"> </span>-1
-free<span class="w"> </span>-h
-df<span class="w"> </span>-h
+canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
+canfar<span class="w"> </span>stats
 
-<span class="c1"># Session information</span>
+<span class="c1"># Within session information</span>
 <span class="nb">echo</span><span class="w"> </span><span class="nv">$USER</span>
 groups
-env<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;(CANFAR|SESSION)&quot;</span>
-
-<span class="c1"># Network connectivity</span>
-ping<span class="w"> </span>-c<span class="w"> </span><span class="m">3</span><span class="w"> </span>canfar.net
-curl<span class="w"> </span>-I<span class="w"> </span>https://canfar.net
+env<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-E<span class="w"> </span><span class="s2">&quot;(CANFAR|SKAHA)&quot;</span>
 </code></pre></div>
-<h2 id="contact-support">Contact Support<a class="headerlink" href="#contact-support" title="Permanent link">&para;</a></h2>
+<hr />
+<div class="admonition info">
+<p class="admonition-title">See Also</p>
+<ul>
+<li><a href="../../bug-reports/">Bug Reports</a></li>
+<li><a href="../../security.md">Security</a></li>
+<li><a href="#contributing-to-documentation">Contributing</a></li>
+</ul>
+</div>
 <h3 id="when-to-contact-support">When to Contact Support<a class="headerlink" href="#when-to-contact-support" title="Permanent link">&para;</a></h3>
 <p>Contact <a href="mailto:support@canfar.net">support@canfar.net</a> for:</p>
 <ul>
@@ -1624,13 +1623,14 @@ curl<span class="w"> </span>-I<span class="w"> </span>https://canfar.net
 </ul>
 <h3 id="how-to-write-effective-support-requests">How to Write Effective Support Requests<a class="headerlink" href="#how-to-write-effective-support-requests" title="Permanent link">&para;</a></h3>
 <p>Include these details in your support email:</p>
-<p><strong>Essential information</strong>:
+<p><strong>Essential information</strong>:</p>
+<p>Example:
 <div class="highlight"><pre><span></span><code>Subject: [Brief description of problem]
 
 CANFAR Username: your.email@domain.com
 Date/Time of issue: 2024-01-15 14:30 PST
-Session type: Desktop/Notebook/CARTA/Batch
-Container used: astroml:latest
+Session type: desktop | notebook | carta | firefly | headless
+Container used: skaha/astroml:latest
 Browser: Chrome 120.0.6099
 
 Problem description:
@@ -1645,16 +1645,19 @@ Steps to reproduce:
 3. [etc.]
 
 What you&#39;ve already tried:
+
 - Cleared browser cache
 - Tried different browser
 - [etc.]
 </code></pre></div></p>
-<p><strong>Additional helpful information</strong>:
-- Screenshots of error messages
-- Session IDs for failed jobs
-- File paths for missing data
-- Group names for permission issues</p>
-<h3 id="response-times">Response Times<a class="headerlink" href="#response-times" title="Permanent link">&para;</a></h3>
+<p><strong>Additional helpful information</strong>:</p>
+<ul>
+<li>Screenshots of error messages</li>
+<li>Session IDs for failed jobs</li>
+<li>File paths for missing data</li>
+<li>Group names for permission issues</li>
+</ul>
+<h3 id="expetected-response-times">Expetected Response Times<a class="headerlink" href="#expetected-response-times" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Standard support</strong>: 1-2 business days</li>
 <li><strong>Urgent issues</strong>: Same day during business hours</li>
@@ -1671,6 +1674,14 @@ What you&#39;ve already tried:
 </ol>
 <h2 id="community-support">Community Support<a class="headerlink" href="#community-support" title="Permanent link">&para;</a></h2>
 <h3 id="discord-community">Discord Community<a class="headerlink" href="#discord-community" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Community Collaboration</p>
+<ul>
+<li>Share workflow examples in Discord for peer review.</li>
+<li>Use Discord threads for project-specific discussions.</li>
+<li>Join <a href="#office-hours">Office Hours</a> for live troubleshooting.</li>
+</ul>
+</div>
 <p>Join our Discord server for peer support and community interaction:</p>
 <ul>
 <li><strong>Quick questions</strong>: Get fast answers from other users</li>
@@ -1679,12 +1690,22 @@ What you&#39;ve already tried:
 <li><strong>Announcements</strong>: Stay updated on new features and maintenance</li>
 </ul>
 <p><strong>Discord invite</strong>: <a href="https://discord.gg/vcCQ8QBvBa">Join CANFAR Discord</a></p>
-<p><strong>Community guidelines</strong>:
-- Search previous messages before asking
-- Use appropriate channels and threads
-- Be respectful and helpful to other users
-- Don't share sensitive data or credentials</p>
+<p><strong>Community guidelines</strong>:</p>
+<ul>
+<li>Search previous messages before asking</li>
+<li>Use appropriate channels and threads</li>
+<li>Be respectful and helpful to other users</li>
+<li>Don't share sensitive data or credentials</li>
+</ul>
 <h3 id="github-issues">GitHub Issues<a class="headerlink" href="#github-issues" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Effective GitHub Contributions</p>
+<ul>
+<li>Reference related documentation pages in your issue or pull request.</li>
+<li>Link to example workflows or scripts.</li>
+<li>Tag your issue with relevant labels (e.g., <code>documentation</code>, <code>feature-request</code>).</li>
+</ul>
+</div>
 <p>For bug reports and feature requests, use our GitHub repositories:</p>
 <ul>
 <li><strong>Platform issues</strong>: Report technical problems</li>
@@ -1693,6 +1714,14 @@ What you&#39;ve already tried:
 <li><strong>Community contributions</strong>: Submit code and examples</li>
 </ul>
 <h3 id="office-hours">Office Hours<a class="headerlink" href="#office-hours" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Office Hours: Get Real-Time Help</p>
+<ul>
+<li>Thursdays 2-3 PM Pacific Time</li>
+<li><a href="https://discord.gg/vcCQ8QBvBa">Join via Discord</a></li>
+<li>Bring your code, workflows, or error messages for live support.</li>
+</ul>
+</div>
 <p><strong>Virtual office hours</strong>: Thursdays 2-3 PM Pacific Time</p>
 <ul>
 <li><strong>Format</strong>: Video conference with screen sharing</li>
@@ -1705,6 +1734,13 @@ What you&#39;ve already tried:
 - Example code or workflows
 - Error messages or screenshots</p>
 <h3 id="peer-mentoring">Peer Mentoring<a class="headerlink" href="#peer-mentoring" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Become a Mentor</p>
+<ul>
+<li>Experienced users can volunteer as mentors via <a href="mailto:support@canfar.net">support@canfar.net</a>.</li>
+<li>Mentors help with onboarding, troubleshooting, and advanced workflows.</li>
+</ul>
+</div>
 <p><strong>Experienced user program</strong>: Connect new users with experienced mentors</p>
 <ul>
 <li><strong>Mentors</strong>: Volunteer researchers who use CANFAR regularly</li>
@@ -1713,6 +1749,14 @@ What you&#39;ve already tried:
 <li><strong>Contact</strong>: Email support to request mentor connection</li>
 </ul>
 <h3 id="community-contributions">Community Contributions<a class="headerlink" href="#community-contributions" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Share Your Expertise</p>
+<ul>
+<li>Submit tutorials or workflow examples to the documentation via GitHub.</li>
+<li>Answer questions in Discord and GitHub Issues.</li>
+<li>Report bugs and suggest features to improve the platform for all users.</li>
+</ul>
+</div>
 <p><strong>Ways to help other users</strong>:</p>
 <ul>
 <li><strong>Answer questions</strong>: Respond to Discord and community discussions</li>
@@ -1740,13 +1784,14 @@ What you&#39;ve already tried:
 <ol>
 <li>
 <p><strong>Clone the repository</strong>:
-   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/opencadc/science-containers.git
+   <div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/opencadc/canfar.git
 <span class="nb">cd</span><span class="w"> </span>science-containers
 </code></pre></div></p>
 </li>
 <li>
-<p><strong>Install dependencies</strong> (using Poetry):
-   <div class="highlight"><pre><span></span><code><span class="c1"># Install Poetry if you don&#39;t have it</span>
+<p><strong>Install dependencies</strong>:
+NB: at the time of writing <code>poetry</code> was a good tool to deal with python dependencies. Now <code>uv</code> or <code>pixi</code> may be better choices.
+   <div class="highlight"><pre><span></span><code><span class="c1"># You may want to install `poetry` if you don&#39;t have it</span>
 <span class="c1"># See: https://python-poetry.org/docs/#installation</span>
 
 poetry<span class="w"> </span>install
@@ -1764,6 +1809,18 @@ mkdocs<span class="w"> </span>serve
 </ol>
 <p>Changes to documentation files will automatically reload in your browser for real-time preview.</p>
 <h3 id="documentation-structure">📁 Documentation Structure<a class="headerlink" href="#documentation-structure" title="Permanent link">&para;</a></h3>
+<div class="admonition info">
+<p class="admonition-title">Explore More Documentation</p>
+<ul>
+<li><a href="../get-started/">Get Started</a></li>
+<li><a href="../../faq/">FAQ</a></li>
+<li><a href="../concepts/">Platform Concepts</a></li>
+<li><a href="../containers/">Containers</a></li>
+<li><a href="../guides/interactive-sessions/">Interactive Sessions</a></li>
+<li><a href="../batch-jobs/">Batch Jobs</a></li>
+<li><a href="../guides/radio-astronomy/">Radio Astronomy</a></li>
+</ul>
+</div>
 <p>Our documentation follows a clear structure designed for different user needs:</p>
 <ul>
 <li><strong><code>get-started/</code></strong>: Quick setup for new users</li>
@@ -1807,9 +1864,10 @@ mkdocs<span class="w"> </span>serve
 - Include plenty of examples</p>
 <p><strong>Advanced Users</strong>:
 - Provide technical details and configuration options
-- Include information on automation, APIs, and advanced workflows
-- Assume familiarity with relevant technologies
-- Link to detailed reference materials</p>
+- Use <a href="../../cli/cli-help.md">CANFAR CLI</a> for automation and scripting
+- Explore <a href="../helpers/distributed.md">Distributed Computing</a> for parallel workloads
+- Integrate CANFAR with external tools (e.g., Jupyter, Docker, GitHub Actions)
+- Link to detailed reference materials and example scripts</p>
 <h3 id="contribution-process">🔄 Contribution Process<a class="headerlink" href="#contribution-process" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Make your changes</strong> in the appropriate documentation files</li>
@@ -1826,7 +1884,7 @@ mkdocs<span class="w"> </span>serve
 - <strong>User-Friendly</strong>: Well-structured and accessible</p>
 <h3 id="questions-about-contributing">❓ Questions About Contributing?<a class="headerlink" href="#questions-about-contributing" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Open an issue on <a href="https://github.com/opencadc/science-containers/issues">GitHub</a></li>
+<li>Open an issue on <a href="https://github.com/opencadc/canfar/issues">GitHub</a></li>
 <li>Ask on Discord in the community channels</li>
 <li>Email the CANFAR team at <a href="mailto:support@canfar.net">support@canfar.net</a></li>
 </ul>
@@ -1836,8 +1894,8 @@ mkdocs<span class="w"> </span>serve
 <h3 id="external-documentation">External Documentation<a class="headerlink" href="#external-documentation" title="Permanent link">&para;</a></h3>
 <p><strong>Related platforms</strong>:
 - <strong>CADC Archive</strong>: <a href="https://cadc-ccda.hia-iha.nrc-cnrc.gc.ca">cadc-ccda.hia-iha.nrc-cnrc.gc.ca</a>
-- <strong>VOSpace</strong>: <a href="https://vospace.canfar.net">vospace.canfar.net</a>
-- <strong>Science Portal</strong>: <a href="https://science.canfar.net">science.canfar.net</a></p>
+- <strong>VOSpace</strong>: <a href="https://www.canfar.net">vospace.canfar.net</a>
+- <strong>Science Portal</strong>: <a href="https://www.canfar.net">science.canfar.net</a></p>
 <p><strong>Software documentation</strong>:
 - <strong>CASA</strong>: <a href="https://casa.nrao.edu">casa.nrao.edu</a>
 - <strong>AstroPy</strong>: <a href="https://astropy.org">astropy.org</a>
@@ -1858,19 +1916,12 @@ mkdocs<span class="w"> </span>serve
 <p><strong>Announcements</strong>:
 - Email notifications for maintenance
 - Discord #announcements channel
-- Science Portal news section
-- Twitter <a href="https://twitter.com/CANFAR_ACFC">@CANFAR_ACFC</a></p>
-<p><strong>Feature updates</strong>:
-- Monthly platform updates
-- New container releases
-- Beta feature testing
-- User feedback integration</p>
+- Science Portal news section</p>
 <h2 id="emergency-contacts">Emergency Contacts<a class="headerlink" href="#emergency-contacts" title="Permanent link">&para;</a></h2>
 <h3 id="system-outages">System Outages<a class="headerlink" href="#system-outages" title="Permanent link">&para;</a></h3>
 <p><strong>Planned maintenance</strong>: Announced 48+ hours in advance via email and Discord</p>
 <p><strong>Unplanned outages</strong>: 
 - Check status.canfar.net for current status (when available)
-- Follow <a href="https://twitter.com/CANFAR_ACFC">@CANFAR_ACFC</a> for real-time updates
 - Email <a href="mailto:support@canfar.net">support@canfar.net</a> if status unclear</p>
 <h3 id="critical-data-issues">Critical Data Issues<a class="headerlink" href="#critical-data-issues" title="Permanent link">&para;</a></h3>
 <p><strong>Data loss or corruption</strong>:
@@ -1886,12 +1937,11 @@ mkdocs<span class="w"> </span>serve
 <h3 id="security-incidents">Security Incidents<a class="headerlink" href="#security-incidents" title="Permanent link">&para;</a></h3>
 <p><strong>Suspected security breach</strong>:
 1. <strong>Change credentials</strong>: Update certificates immediately
-2. <strong>Report incident</strong>: Email <a href="mailto:security@canfar.net">security@canfar.net</a>
+2. <strong>Report incident</strong>: Email <a href="mailto:support@canfar.net">support@canfar.net</a>
 3. <strong>Document details</strong>: What you observed and when
 4. <strong>Follow instructions</strong>: Wait for security team guidance</p>
 <p><strong>Prevention</strong>:
 - Never share your certificates
-- Use secure networks
 - Keep software updated
 - Report suspicious activity</p>
 <hr />
@@ -1920,7 +1970,7 @@ mkdocs<span class="w"> </span>serve
 <ol>
 <li><strong>Clone the repository</strong>:</li>
 </ol>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/opencadc/science-containers.git
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/opencadc/canfar.git
 <span class="nb">cd</span><span class="w"> </span>science-containers
 </code></pre></div>
 <ol>
@@ -1945,14 +1995,14 @@ mkdocs<span class="w"> </span>serve
 <p>Our documentation follows a clear structure designed for different user needs:</p>
 <ul>
 <li><strong><code>get-started/</code></strong>: Quick setup for new users</li>
-<li><strong><code>user-guide/</code></strong>: Comprehensive platform documentation</li>
-<li><code>concepts/</code>: Platform architecture and core concepts</li>
-<li><code>accounts-permissions/</code>: User management and access control</li>
-<li><code>storage/</code>: Data management and storage systems</li>
+<li><strong><code>guides/</code></strong>: Comprehensive platform documentation</li>
 <li><code>containers/</code>: Container usage and building</li>
 <li><code>interactive-sessions/</code>: Jupyter, desktop, and application sessions</li>
-<li><code>batch-jobs/</code>: Automated and large-scale processing</li>
 <li><code>radio-astronomy/</code>: CASA and radio-specific workflows</li>
+<li><code>storage/</code>: Data management and storage systems</li>
+<li><strong><code>accounts/</code></strong>: User management and access control</li>
+<li><strong><code>batch-jobs/</code></strong>: Automated and large-scale processing</li>
+<li><strong><code>concepts/</code></strong>: Platform architecture and core concepts</li>
 <li><strong><code>faq/</code></strong>: Frequently asked questions and troubleshooting</li>
 <li><strong><code>help/</code></strong>: Support resources and community information</li>
 </ul>
@@ -2078,7 +2128,7 @@ mkdocs<span class="w"> </span>serve
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 23:31:20 UTC">August 21, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 22:48:00 UTC">August 26, 2025</span>
   </span>
 
     

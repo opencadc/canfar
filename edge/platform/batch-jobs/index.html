@@ -887,27 +887,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#batch-processing-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Batch Processing Methods
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#job-types-and-use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       Job Types and Use Cases
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resource-planning" class="md-nav__link">
-    <span class="md-ellipsis">
-      Resource Planning
     </span>
   </a>
   
@@ -1393,27 +1375,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#batch-processing-methods" class="md-nav__link">
-    <span class="md-ellipsis">
-      Batch Processing Methods
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#job-types-and-use-cases" class="md-nav__link">
     <span class="md-ellipsis">
       Job Types and Use Cases
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#resource-planning" class="md-nav__link">
-    <span class="md-ellipsis">
-      Resource Planning
     </span>
   </a>
   
@@ -1503,8 +1467,13 @@
 <ul>
 <li>The difference between headless and interactive containers</li>
 <li>How to submit jobs via API and Python client</li>
-<li>Resource planning, queue behavior, and monitoring</li>
+<li>Resource planning, queue behaviour, and monitoring</li>
 <li>Best practices for automation, logging, and data management</li>
+<li><a href="../containers/">Container Development</a></li>
+<li><a href="../guides/storage/">Storage Optimization</a></li>
+<li><a href="../guides/interactive-sessions/">Interactive Sessions</a></li>
+<li><a href="../../client/home/">CANFAR Python Client</a></li>
+<li><a href="../help/">Support &amp; Troubleshooting</a></li>
 </ul>
 </div>
 <h2 id="what-is-batch-processing">What is Batch Processing?<a class="headerlink" href="#what-is-batch-processing" title="Permanent link">&para;</a></h2>
@@ -1526,49 +1495,59 @@
 <div class="admonition tip">
 <p class="admonition-title">When to Use Batch Jobs</p>
 <ul>
-<li>Use interactive sessions to develop and test</li>
+<li>Use <a href="../guides/interactive-sessions/">Interactive Sessions</a> to develop and test</li>
 <li>Switch to headless jobs for production-scale runs</li>
 <li>Schedule jobs during off-peak hours for faster starts</li>
+<li>For automation, see <a href="../../client/home/">CANFAR Python Client</a></li>
 </ul>
 </div>
-<h2 id="batch-processing-methods">Batch Processing Methods<a class="headerlink" href="#batch-processing-methods" title="Permanent link">&para;</a></h2>
+<hr />
+<div class="admonition info">
+<p class="admonition-title">Quick Links</p>
+<ul>
+<li><a href="../containers/">Container Development</a></li>
+<li><a href="../guides/storage/">Storage Guide</a></li>
+<li><a href="../../client/home/">CANFAR Python Client</a></li>
+<li><a href="https://ws-uv.canfar.net/skaha/v0/capabilities">API Reference</a></li>
+<li><a href="../help/">Support</a></li>
+</ul>
+</div>
 <h3 id="1-api-based-execution">1. API-Based Execution<a class="headerlink" href="#1-api-based-execution" title="Permanent link">&para;</a></h3>
-<p>Execute containers programmatically using the CANFAR API:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Submit a job via API</span>
-curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/x-www-form-urlencoded&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=data-reduction-job&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=4&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;ram=16&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cmd=python /arc/projects/myproject/scripts/reduce_data.py&quot;</span>
+<p>Execute containers programmatically using the <code>canfar</code> command-line client:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Ensure you are logged in first</span>
+canfar<span class="w"> </span>auth<span class="w"> </span>login
+
+<span class="c1"># Submit a job</span>
+canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;data-reduction-job&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cores<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ram<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/myproject/scripts/reduce_data.py&quot;</span>
 </code></pre></div>
 <h3 id="2-job-submission-scripts">2. Job Submission Scripts<a class="headerlink" href="#2-job-submission-scripts" title="Permanent link">&para;</a></h3>
-<p>Create shell scripts for common workflows using the API or Python client:</p>
+<p>Create shell scripts for common workflows using the <code>canfar</code> client:</p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="c1"># submit_reduction.sh - API-based job submission</span>
+<span class="c1"># submit_reduction.sh</span>
 
 <span class="c1"># Set job parameters</span>
 <span class="nv">JOB_NAME</span><span class="o">=</span><span class="s2">&quot;nightly-reduction-</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span><span class="s2">&quot;</span>
 <span class="nv">IMAGE</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/casa:6.5&quot;</span>
 <span class="nv">CMD</span><span class="o">=</span><span class="s2">&quot;python /arc/projects/survey/pipelines/reduce_night.py /arc/projects/survey/data/</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span><span class="s2">&quot;</span>
 
-<span class="c1"># Submit job via API</span>
-curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/x-www-form-urlencoded&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=</span><span class="nv">$JOB_NAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=</span><span class="nv">$IMAGE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=8&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;ram=32&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cmd=</span><span class="nv">$CMD</span><span class="s2">&quot;</span>
+<span class="c1"># Submit job</span>
+canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$JOB_NAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$IMAGE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cores<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ram<span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2">&quot;</span>
 </code></pre></div>
-<p>Or using the Python skaha client:</p>
+<p>Or using the Python <code>canfar</code> client:</p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
 <span class="c1"># submit_reduction.py - Python client-based submission</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">skaha.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="c1"># Initialize session manager</span>
@@ -1580,7 +1559,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 <span class="n">data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;/arc/projects/survey/data/</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <span class="c1"># Submit job</span>
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
     <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
@@ -1589,7 +1568,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
     <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/arc/projects/survey/pipelines/reduce_night.py&quot;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">]</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job: </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job(s): </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="3-workflow-automation">3. Workflow Automation<a class="headerlink" href="#3-workflow-automation" title="Permanent link">&para;</a></h3>
 <p>Use workflow managers like <a href="https://www.prefect.io/">Prefect</a> or <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a>:</p>
@@ -1647,17 +1626,24 @@ curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </spa
 - Instrument simulation
 - Survey planning</p>
 <h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Resource Monitoring</p>
+<ul>
+<li>Use <code>canfar stats &lt;session-id&gt;</code> and <code>canfar info &lt;session-id&gt;</code> to monitor job resource usage.</li>
+<li>For parallel workloads, see <a href="../helpers/distributed.md">Distributed Computing</a>.</li>
+</ul>
+</div>
 <h4 id="resource-allocation-strategy">Resource Allocation Strategy<a class="headerlink" href="#resource-allocation-strategy" title="Permanent link">&para;</a></h4>
 <p><strong>Right-sizing your jobs</strong> is crucial for performance and queue times:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Start small and scale up based on monitoring</span>
 <span class="c1"># Test job with minimal resources first</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=test-small&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=2&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;ram=4&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;kind=headless&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cmd=python /arc/projects/myproject/test_script.py&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
+canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;test-small&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cores<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ram<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--kind<span class="w"> </span><span class="s2">&quot;headless&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/myproject/test_script.py&quot;</span>
 
 <span class="c1"># Monitor resource usage in the job logs</span>
 <span class="c1"># Scale up for production runs if needed</span>
@@ -1711,6 +1697,13 @@ cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/l
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing complete&quot;</span>
 </code></pre></div></p>
 <h4 id="parallel-processing">Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permanent link">&para;</a></h4>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Distributed Workflows</p>
+<ul>
+<li>Use <a href="https://snakemake.readthedocs.io/en/stable/">Snakemake</a> or <a href="https://www.prefect.io/">Prefect</a> for complex workflow automation.</li>
+<li>For team projects, see <a href="../accounts/">Accounts &amp; Permissions</a> for collaboration strategies.</li>
+</ul>
+</div>
 <p><strong>Multi-core CPU Usage:</strong>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -1791,7 +1784,7 @@ cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/l
     <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
     <span class="n">disk</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s1">&#39;/scratch&#39;</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, &quot;</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span> 
                 <span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">used</span><span class="o">//</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">GB used), &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Scratch: </span><span class="si">{</span><span class="n">disk</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% used&quot;</span><span class="p">)</span>
@@ -1812,7 +1805,17 @@ cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/l
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">raise</span>
 </code></pre></div></p>
-<h2 id="resource-planning">Resource Planning<a class="headerlink" href="#resource-planning" title="Permanent link">&para;</a></h2>
+<hr />
+<div class="admonition info">
+<p class="admonition-title">See Also</p>
+<ul>
+<li><a href="../containers/">Container Development</a></li>
+<li><a href="../guides/storage/">Storage Guide</a></li>
+<li><a href="../../client/home/">CANFAR Python Client</a></li>
+<li><a href="https://ws-uv.canfar.net/skaha/v0/capabilities">API Reference</a></li>
+<li><a href="../help/">Support</a></li>
+</ul>
+</div>
 <h3 id="job-sizing-guidelines">Job Sizing Guidelines<a class="headerlink" href="#job-sizing-guidelines" title="Permanent link">&para;</a></h3>
 <p>Choose appropriate resources based on your workload:</p>
 <table>
@@ -1870,6 +1873,7 @@ cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/l
 <li><strong>Large jobs</strong> (≥16 cores, ≥64GB) may queue longer  </li>
 <li><strong>Off-peak hours</strong> (evenings, weekends) often have shorter wait times</li>
 <li><strong>Resource requests</strong> should match actual usage to avoid waste</li>
+<li>For advanced queue management, see <a href="../../client/home/">CANFAR Python Client</a></li>
 </ul>
 </div>
 <h3 id="queue-management">Queue Management<a class="headerlink" href="#queue-management" title="Permanent link">&para;</a></h3>
@@ -1881,53 +1885,48 @@ cp<span class="w"> </span>*.log<span class="w"> </span>/arc/projects/myproject/l
 <li><strong>Resource limits</strong>: Per-user and per-group limits apply</li>
 </ul>
 <h2 id="api-access">API Reference<a class="headerlink" href="#api-access" title="Permanent link">&para;</a></h2>
-<h3 id="method-1-direct-curl-commands">Method 1: Direct curl Commands<a class="headerlink" href="#method-1-direct-curl-commands" title="Permanent link">&para;</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Legacy Client</p>
+<p>The <code>skaha</code> Python client is deprecated and has been replaced by the <code>canfar</code> client. The following examples use the modern <code>canfar</code> client.
+For more examples, see <a href="../../client/examples/">Client Examples</a>.</p>
+</div>
+<h3 id="method-1-canfar-command-line-client">Method 1: <code>canfar</code> Command-Line Client<a class="headerlink" href="#method-1-canfar-command-line-client" title="Permanent link">&para;</a></h3>
 <h4 id="submit-job">Submit Job<a class="headerlink" href="#submit-job" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/x-www-form-urlencoded&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=my-analysis-job&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=4&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;ram=16&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cmd=python /arc/projects/myproject/analysis.py&quot;</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;my-analysis-job&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cores<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ram<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/myproject/analysis.py&quot;</span>
 </code></pre></div>
 <h4 id="list-jobs">List Jobs<a class="headerlink" href="#list-jobs" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
 </code></pre></div>
 <h4 id="get-job-status">Get Job Status<a class="headerlink" href="#get-job-status" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/{session-id}&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>info<span class="w"> </span>&lt;session-id&gt;
 </code></pre></div>
 <h4 id="cancel-job">Cancel Job<a class="headerlink" href="#cancel-job" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/{session-id}&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>&lt;session-id&gt;
 </code></pre></div>
 <h4 id="get-job-logs">Get Job Logs<a class="headerlink" href="#get-job-logs" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/{session-id}/logs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span>&lt;session-id&gt;
 </code></pre></div>
 <h4 id="get-resource-usage">Get Resource Usage<a class="headerlink" href="#get-resource-usage" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/{session-id}/stats&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats<span class="w"> </span>&lt;session-id&gt;
 </code></pre></div>
-<h3 id="method-2-python-skaha-client">Method 2: Python skaha Client<a class="headerlink" href="#method-2-python-skaha-client" title="Permanent link">&para;</a></h3>
-<p>The <a href="https://shinybrar.github.io/skaha/latest/">skaha</a> Python client provides a more convenient interface for batch job management and automation.</p>
+<h3 id="method-2-canfar-python-client">Method 2: <code>canfar</code> Python Client<a class="headerlink" href="#method-2-canfar-python-client" title="Permanent link">&para;</a></h3>
+<p>The <code>canfar</code> Python client provides a convenient interface for batch job management and automation.</p>
 <h4 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>mamba<span class="w"> </span>activate<span class="w"> </span>base
-pip<span class="w"> </span>install<span class="w"> </span>skaha
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar
 </code></pre></div>
 <h4 id="basic-python-client-usage">Basic Python Client Usage<a class="headerlink" href="#basic-python-client-usage" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">skaha.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">skaha.image</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
 <span class="c1"># Initialize session manager</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 
 <span class="c1"># Simple job submission</span>
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;python-analysis&quot;</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
@@ -1935,11 +1934,15 @@ pip<span class="w"> </span>install<span class="w"> </span>skaha
     <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/arc/projects/myproject/analysis.py&quot;</span><span class="p">]</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job: </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job(s): </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="advanced-job-submission">Advanced Job Submission<a class="headerlink" href="#advanced-job-submission" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Job with custom resources and environment</span>
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<span class="c1"># Job with custom resources and environment</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;heavy-computation&quot;</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/myproject/processor:latest&quot;</span><span class="p">,</span> 
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
@@ -1955,122 +1958,85 @@ pip<span class="w"> </span>install<span class="w"> </span>skaha
 <span class="p">)</span>
 </code></pre></div>
 <h4 id="private-image-authentication">Private Image Authentication<a class="headerlink" href="#private-image-authentication" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># For private images, set registry authentication</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">base64</span>
-
-<span class="n">username</span> <span class="o">=</span> <span class="s2">&quot;username&quot;</span>
-<span class="n">cli_secret</span> <span class="o">=</span> <span class="s2">&quot;************&quot;</span>
-<span class="n">auth_string</span> <span class="o">=</span> <span class="n">base64</span><span class="o">.</span><span class="n">b64encode</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">cli_secret</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
-
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-image-job&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/myproject/private:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python /opt/analysis.py&quot;</span><span class="p">,</span>
-    <span class="n">registry_auth</span><span class="o">=</span><span class="n">auth_string</span>
-<span class="p">)</span>
-</code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Private Images</p>
-<p>For private Harbor projects, ensure your CLI credentials are valid and your account has access to the project repository.</p>
-</div>
+<p>To use private images, you first need to configure the client with your registry credentials. See the <a href="../accounts/">authentication guide</a> for details.</p>
 <h4 id="job-monitoring-and-management">Job Monitoring and Management<a class="headerlink" href="#job-monitoring-and-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># List all your sessions</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<span class="c1"># List all your sessions</span>
 <span class="n">sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active sessions: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+<span class="c1"># Create a job to monitor</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;monitored-job&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;sleep 60&quot;</span>
+<span class="p">)</span>
+<span class="n">job_id</span> <span class="o">=</span> <span class="n">job_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
 <span class="c1"># Get session details</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start time: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="s1">&#39;startTime&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start time: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;startTime&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
 <span class="c1"># Wait for completion</span>
 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">job_id</span><span class="p">)[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
+    <span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Succeeded&#39;</span><span class="p">,</span> <span class="s1">&#39;Failed&#39;</span><span class="p">,</span> <span class="s1">&#39;Terminated&#39;</span><span class="p">]:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job completed with status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">break</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span>
+    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
 
 <span class="c1"># Get logs</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Job output:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">logs</span><span class="p">[</span><span class="n">job_id</span><span class="p">])</span>
 
 <span class="c1"># Clean up</span>
-<span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
 </code></pre></div>
 <h4 id="bulk-job-management">Bulk Job Management<a class="headerlink" href="#bulk-job-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Submit multiple related jobs</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="p">[]</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-    <span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;parameter-study-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/arc/projects/study/analyze.py&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;--param=</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-    <span class="p">)</span>
-    <span class="n">job_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">job_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Monitor all jobs</span>
-<span class="n">completed</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="k">while</span> <span class="n">completed</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">job_ids</span><span class="p">):</span>
-    <span class="n">completed</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">job_id</span> <span class="ow">in</span> <span class="n">job_ids</span><span class="p">:</span>
-        <span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">job_id</span><span class="p">)[</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Succeeded&#39;</span><span class="p">,</span> <span class="s1">&#39;Failed&#39;</span><span class="p">,</span> <span class="s1">&#39;Terminated&#39;</span><span class="p">]:</span>
-            <span class="n">completed</span> <span class="o">+=</span> <span class="mi">1</span>
-
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed: </span><span class="si">{</span><span class="n">completed</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">completed</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">job_ids</span><span class="p">):</span>
-        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;All jobs completed!&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="method-3-higher-level-python-api">Method 3: Higher-Level Python API<a class="headerlink" href="#method-3-higher-level-python-api" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Example: Higher-level API for common tasks</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">skaha</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="c1"># Create a session object</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 
-<span class="c1"># Submit a data reduction job</span>
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;data-reduction&quot;</span><span class="p">,</span>
+<span class="c1"># Submit multiple related jobs</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;parameter-study&quot;</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python /arc/projects/myproject/scripts/reduce_data.py&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">16</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python /arc/projects/study/analyze.py&quot;</span><span class="p">,</span>
+    <span class="n">replicas</span><span class="o">=</span><span class="mi">10</span> <span class="c1"># Creates 10 jobs named parameter-study-1, parameter-study-2, etc.</span>
 <span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted jobs: </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-<span class="c1"># Monitor the job</span>
-<span class="n">session</span><span class="o">.</span><span class="n">monitor</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
-
-<span class="c1"># Fetch and print logs</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
-
-<span class="c1"># Delete the job after completion</span>
-<span class="n">session</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">job_id</span><span class="p">)</span>
+<span class="c1"># Monitor all jobs</span>
+<span class="c1"># ... (see single job monitoring example)</span>
 </code></pre></div>
 <h2 id="monitoring-and-debugging">Monitoring and Debugging<a class="headerlink" href="#monitoring-and-debugging" title="Permanent link">&para;</a></h2>
+<div class="admonition tip">
+<p class="admonition-title">Advanced: Debugging Batch Jobs</p>
+<ul>
+<li>Use <code>canfar logs &lt;session-id&gt;</code> and <code>canfar stats &lt;session-id&gt;</code> for troubleshooting.</li>
+<li>For persistent issues, see <a href="../../faq/">FAQ</a> and <a href="../help/">Support</a>.</li>
+</ul>
+</div>
 <h3 id="log-analysis">Log Analysis<a class="headerlink" href="#log-analysis" title="Permanent link">&para;</a></h3>
 <p>Monitor job progress through logs:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Real-time log monitoring</span>
-curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/</span><span class="nv">$SESSION_ID</span><span class="s2">/logs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-f
+canfar<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span>&lt;session-id&gt;
 
 <span class="c1"># Search for errors</span>
-curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/</span><span class="nv">$SESSION_ID</span><span class="s2">/logs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>error
+canfar<span class="w"> </span>logs<span class="w"> </span>&lt;session-id&gt;<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>error
 </code></pre></div>
 <h3 id="resource-monitoring">Resource Monitoring<a class="headerlink" href="#resource-monitoring" title="Permanent link">&para;</a></h3>
 <p>Track resource usage:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Get session statistics</span>
-curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;https://ws-uv.canfar.net/skaha/v0/session/</span><span class="nv">$SESSION_ID</span><span class="s2">/stats&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>jq<span class="w"> </span>.
+canfar<span class="w"> </span>stats<span class="w"> </span>&lt;session-id&gt;
 </code></pre></div>
 <h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
 <p><strong>Job fails to start</strong>:
@@ -2086,6 +2052,16 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
 - Check for infinite loops
 - Verify network connectivity</p>
 <h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">See Also</p>
+<ul>
+<li><a href="../containers/">Container Development</a></li>
+<li><a href="../guides/storage/">Storage Guide</a></li>
+<li><a href="../../client/home/">CANFAR Python Client</a></li>
+<li><a href="https://ws-uv.canfar.net/skaha/v0/capabilities">API Reference</a></li>
+<li><a href="../help/">Support</a></li>
+</ul>
+</div>
 <h3 id="script-design">Script Design<a class="headerlink" href="#script-design" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Error handling</strong>: Use try-catch blocks and meaningful error messages</li>
@@ -2102,7 +2078,8 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
 </ul>
 <div class="admonition warning">
 <p class="admonition-title">Persistence Reminder</p>
-<p>Headless containers do not persist changes to the container filesystem. Always write outputs to <code>/arc/projects/</code> or <code>/arc/home/</code>.</p>
+<p>Headless containers do not persist changes to the container filesystem. Always write outputs to <code>/arc/projects/</code> or <code>/arc/home/</code>.
+For data management strategies, see <a href="../guides/storage/">Storage Guide</a>.</p>
 </div>
 <h3 id="security-and-efficiency">Security and Efficiency<a class="headerlink" href="#security-and-efficiency" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2112,6 +2089,15 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
 <li><strong>Cost optimization</strong>: Run large jobs during off-peak hours</li>
 </ul>
 <h2 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h2>
+<div class="admonition info">
+<p class="admonition-title">Quick Links</p>
+<ul>
+<li><a href="../help/">Support</a></li>
+<li><a href="../../faq/">FAQ</a></li>
+<li><a href="../../client/examples/">Client Examples</a></li>
+<li><a href="https://discord.gg/vcCQ8QBvBa">Discord Community</a></li>
+</ul>
+</div>
 <ul>
 <li><strong>API Documentation</strong>: <a href="https://ws-uv.canfar.net/skaha/v0/capabilities">CANFAR API Reference</a></li>
 <li><strong>Support</strong>: Email <a href="mailto:support@canfar.net">support@canfar.net</a></li>
@@ -2147,7 +2133,7 @@ curl<span class="w"> </span>-s<span class="w"> </span><span class="s2">&quot;htt
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 23:31:20 UTC">August 21, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 22:59:34 UTC">August 26, 2025</span>
   </span>
 
     

@@ -1616,26 +1616,11 @@ ls<span class="w"> </span>/scratch/<span class="w">                    </span><s
 <h2 id="working-with-existing-containers">Working with Existing Containers<a class="headerlink" href="#working-with-existing-containers" title="Permanent link">&para;</a></h2>
 <p>Most astronomy work on CANFAR can be accomplished using existing containers without requiring custom builds. The <strong>astroml</strong> container covers the majority of Python-based astronomy analysis needs, while <strong>casa</strong> handles radio astronomy workflows. For GUI applications, the <strong>desktop</strong> container provides a complete environment with Firefox, file managers, and terminal access.</p>
 <p>Choosing the right container depends on your specific workflow requirements. General Python astronomy work benefits from <strong>astroml</strong> in either notebook or desktop terminal sessions. Radio astronomy tasks requiring CASA tools work best with the <strong>casa</strong> container in notebook or desktop modes. Legacy GUI applications or IDL-based workflows should use <strong>desktop</strong> sessions with the desktop container.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch different session types via API</span>
-<span class="nv">TOKEN</span><span class="o">=</span><span class="k">$(</span>curl<span class="w"> </span>-s<span class="w"> </span>https://ws-cadc.canfar.net/ac/login<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;username=myuser&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;password=mypass&quot;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>tr<span class="w"> </span>-d<span class="w"> </span><span class="s1">&#39;&quot;&#39;</span><span class="k">)</span>
-
-<span class="c1"># Notebook session with astroml</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=analysis-session&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;type=notebook&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=2&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;ram=4&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
-
-<span class="c1"># Desktop session with CASA</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=casa-desktop&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/casa:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;type=desktop&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;cores=4&quot;</span><span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;ram=8&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
+<div class="highlight"><pre><span></span><code><span class="c1"># Launch different session types using the CANFAR client</span>
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>images.canfar.net/skaha/astroml:latest<span class="w"> </span>--name<span class="w"> </span>analysis-session<span class="w"> </span>--cpu<span class="w"> </span><span class="m">2</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">4</span>
+canfar<span class="w"> </span>create<span class="w"> </span>desktop<span class="w"> </span>images.canfar.net/skaha/casa:latest<span class="w"> </span>--name<span class="w"> </span>casa-desktop<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span>
 </code></pre></div>
+<p>See <a href="../../cli/cli-help/">CLI Help</a> for more details and options.</p>
 <div class="admonition tip">
 <p class="admonition-title">Best Practice: Code Placement</p>
 <p>Keep stable, tested code inside the container image. Keep frequently edited analysis code and notebooks in <code>/arc/home</code> or project directories.</p>
@@ -1649,11 +1634,9 @@ curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Aut
 <p>CANFAR containers fall into three main categories, each serving different purposes and maintained by different groups.</p>
 <h3 id="canfar-supported-containers">CANFAR-Supported Containers<a class="headerlink" href="#canfar-supported-containers" title="Permanent link">&para;</a></h3>
 <p>These are officially maintained by the CANFAR team and provide the foundation for most astronomy work. The core offerings include <strong>astroml</strong> for general astronomy analysis with Python, Astropy, and machine learning libraries; <strong>casa</strong> for radio interferometry work; <strong>notebook</strong> for lightweight Jupyter environments; and <strong>desktop</strong> for full Ubuntu desktop sessions with GUI applications.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Browse available CANFAR containers</span>
-curl<span class="w"> </span>-s<span class="w"> </span>https://images.canfar.net/api/v2.0/projects/skaha/repositories<span class="w"> </span><span class="p">|</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>jq<span class="w"> </span>-r<span class="w"> </span><span class="s1">&#39;.[] | .name&#39;</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>sort
+<!-- NOTE: As of this release, browsing available CANFAR containers is not implemented in the CLI. Please visit the Harbor registry at https://images.canfar.net/ to view available images. -->
 
-<span class="c1"># Check container details</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check container details (locally, with Docker)</span>
 docker<span class="w"> </span>inspect<span class="w"> </span>images.canfar.net/skaha/astroml:latest
 </code></pre></div>
 <p>For specialized visualization needs, CANFAR provides <strong>carta</strong> for radio astronomy data visualization and <strong>firefly</strong> for optical and infrared data exploration. These containers receive regular updates and official support from the CANFAR team.</p>
@@ -1848,12 +1831,11 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>.github/workflows/build.y
 <span class="l l-Scalar l-Scalar-Plain">This container provides a specialized environment for X-ray astronomy analysis.</span>
 
 <span class="l l-Scalar l-Scalar-Plain">## Usage</span>
+
+
 <span class="l l-Scalar l-Scalar-Plain">```bash</span>
-<span class="l l-Scalar l-Scalar-Plain"># Launch notebook session</span>
-<span class="l l-Scalar l-Scalar-Plain">curl -H &quot;Authorization</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Bearer $TOKEN&quot; \</span>
-<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">-d &quot;image=images.canfar.net/myteam/xray-analysis:latest&quot; \</span>
-<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">-d &quot;type=notebook&quot; \</span>
-<span class="w">  </span><span class="l l-Scalar l-Scalar-Plain">https://ws-uv.canfar.net/skaha/v0/session</span>
+<span class="l l-Scalar l-Scalar-Plain"># Launch notebook session using the CANFAR client</span>
+<span class="l l-Scalar l-Scalar-Plain">canfar run --image images.canfar.net/myteam/xray-analysis:latest --type notebook</span>
 </code></pre></div>
 <h2 id="included-software">Included Software<a class="headerlink" href="#included-software" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1865,9 +1847,9 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>.github/workflows/build.y
 <ul>
 <li>Maintainer: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#116;&#101;&#97;&#109;&#64;&#105;&#110;&#115;&#116;&#105;&#116;&#117;&#116;&#105;&#111;&#110;&#46;&#101;&#100;&#117;">&#116;&#101;&#97;&#109;&#64;&#105;&#110;&#115;&#116;&#105;&#116;&#117;&#116;&#105;&#111;&#110;&#46;&#101;&#100;&#117;</a></li>
 <li>Update schedule: Monthly</li>
-<li>Source: <a href="https://github.com/myteam/xray-container">https://github.com/myteam/xray-container</a>
-```</li>
+<li>Source: <a href="https://github.com/myteam/xray-container">GitHub repository</a></li>
 </ul>
+<p>```bash</p>
 <p>Regular maintenance includes updating base images, refreshing software dependencies, and testing compatibility with new CANFAR features. Community-maintained containers benefit from collaborative development practices including shared repositories and issue tracking.</p>
 <hr />
 <h2 id="integration-with-canfar-workflows">Integration with CANFAR Workflows<a class="headerlink" href="#integration-with-canfar-workflows" title="Permanent link">&para;</a></h2>
@@ -1876,7 +1858,11 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>.github/workflows/build.y
 <p>Session persistence allows users to return to running containers across browser sessions while maintaining computational state. However, containers themselves are ephemeral - when sessions end, any changes made within the container filesystem are lost. This design encourages proper separation between stable container environments and dynamic analysis code.</p>
 <p>Understanding this integration helps optimize workflows by leveraging container strengths while working within system constraints. Plan computational workflows to use containers for consistent software environments while storing results, code, and data on the persistent <code>/arc</code> filesystem.</p>
 <hr />
-<p><em>Continue exploring CANFAR capabilities through <a href="../guides/interactive-sessions/">Interactive Sessions</a> for hands-on container usage, <a href="../batch-jobs/">Batch Jobs</a> for automated processing, or <a href="../guides/storage/">Storage Management</a> for data organization strategies.</em></p>
+<p>Continue exploring CANFAR capabilities through:
+- <a href="../guides/interactive-sessions/">Interactive Sessions</a> for hands-on container usage
+- <a href="../batch-jobs/">Batch Jobs</a> for automated processing
+- <a href="../guides/storage/">Storage Management</a> for data organisation strategies
+- <a href="../concepts/">Platform Concepts</a> for architecture and integration details</p>
 
 
 
@@ -1899,7 +1885,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>.github/workflows/build.y
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 13, 2025 21:47:47 UTC">August 13, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 22:48:00 UTC">August 26, 2025</span>
   </span>
 
     
@@ -1926,6 +1912,11 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>.github/workflows/build.y
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           

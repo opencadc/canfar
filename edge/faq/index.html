@@ -865,7 +865,7 @@
 <p>This unified FAQ covers the CANFAR Science Platform across three areas: Platform, Client, and CLI.</p>
 <h2 id="platform">Platform<a class="headerlink" href="#platform" title="Permanent link">&para;</a></h2>
 <h3 id="what-is-the-canfar-science-platform">What is the CANFAR Science Platform?<a class="headerlink" href="#what-is-the-canfar-science-platform" title="Permanent link">&para;</a></h3>
-<p>The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, contributed applications (e.g., CARTA, Firefly), batch jobs, and direct access to CADC data holdings.</p>
+<p>The CANFAR Science Platform is a national cloud computing environment tailored for astronomy. It provides interactive notebooks and desktops, browser-native visualization (e.g., CARTA, Firefly), user-contributed web applications, batch jobs, and direct access to CADC data holdings.</p>
 <h3 id="who-can-use-it-and-what-does-it-cost">Who can use it and what does it cost?<a class="headerlink" href="#who-can-use-it-and-what-does-it-cost" title="Permanent link">&para;</a></h3>
 <p>CANFAR is free for astronomical research. Canadian astronomers and their collaborators can use it subject to fair‑use and allocation limits. For larger needs, request additional resources via the Digital Research Alliance of Canada (DRAC) Resource Allocation Competition.</p>
 <h3 id="how-do-i-get-access">How do I get access?<a class="headerlink" href="#how-do-i-get-access" title="Permanent link">&para;</a></h3>
@@ -888,34 +888,53 @@
 <li>Batch jobs: no strict time limit; queue priority depends on resource usage.</li>
 </ul>
 <h3 id="can-i-run-gpuaccelerated-workloads">Can I run GPU‑accelerated workloads?<a class="headerlink" href="#can-i-run-gpuaccelerated-workloads" title="Permanent link">&para;</a></h3>
-<p>Yes. Request GPUs in the session configuration (e.g., NVIDIA Tesla/RTX). Ensure your chosen container supports GPU computing.</p>
+<p>Yes. Request NVIDIA GPUs in the session configuration from the command line or the API. Ensure your chosen container supports CUDA libraries (i.e. <code>astroml-cuda</code>)</p>
 <h3 id="how-much-storage-do-i-get-and-where-should-i-put-data">How much storage do I get and where should I put data?<a class="headerlink" href="#how-much-storage-do-i-get-and-where-should-i-put-data" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Personal: <code>/arc/home/[username]/</code> (e.g., 10 GB typical).</li>
-<li>Project/group: <code>/arc/projects/[group]/</code> (hundreds of GB to TBs, varies by project). If you don't already have a project space, you can request one by e-mailing <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#117;&#112;&#111;&#114;&#116;&#64;&#99;&#97;&#110;&#102;&#97;&#114;&#46;&#110;&#101;&#116;">&#115;&#117;&#112;&#111;&#114;&#116;&#64;&#99;&#97;&#110;&#102;&#97;&#114;&#46;&#110;&#101;&#116;</a>.</li>
-<li>Temporary: <code>/tmp/</code> inside sessions (cleared when the session ends).
-Suggested layout: raw → <code>/arc/projects/[group]/raw/</code>, working → <code>/arc/projects/[group]/data/</code>, results → <code>/arc/projects/[group]/results/</code>, scripts → <code>/arc/projects/[group]/scripts/</code>.</li>
+<li>Personal: <code>/arc/home/[user]/</code> (typically 10 GB).</li>
+<li>Project/group: <code>/arc/projects/[project]/</code> (hundreds of GB to TBs, varies by project). If you do not have a project space, request one by emailing <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#115;&#117;&#112;&#112;&#111;&#114;&#116;&#64;&#99;&#97;&#110;&#102;&#97;&#114;&#46;&#110;&#101;&#116;">&#115;&#117;&#112;&#112;&#111;&#114;&#116;&#64;&#99;&#97;&#110;&#102;&#97;&#114;&#46;&#110;&#101;&#116;</a>.</li>
+<li>Temporary: <code>/scratch/</code> inside sessions (cleared when the session ends).</li>
+</ul>
+<p>Suggested layout:</p>
+<ul>
+<li>Raw data: <code>/arc/projects/[project]/raw/</code></li>
+<li>Working data: <code>/arc/projects/[project]/working/</code></li>
+<li>Data: <code>/arc/projects/[project]/data/</code></li>
+<li>Results: <code>/arc/projects/[project]/results/</code></li>
+<li>Scripts: <code>/arc/projects/[project]/scripts/</code></li>
 </ul>
 <h3 id="how-do-i-transfer-large-datasets">How do I transfer large datasets?<a class="headerlink" href="#how-do-i-transfer-large-datasets" title="Permanent link">&para;</a></h3>
 <ul>
 <li>For files &lt;1 GB, the Science Portal file manager is convenient.</li>
-<li>For larger transfers, use <code>rsync</code>/<code>scp</code> or VOSpace for very large files (&gt;10 GB).</li>
 </ul>
-<p>Example:
-<div class="highlight"><pre><span></span><code>rsync<span class="w"> </span>-avz<span class="w"> </span>--progress<span class="w"> </span>source/<span class="w"> </span>username@canfar.net:/arc/projects/mygroup/
-cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span class="w"> </span>vos:myproject/data/
-</code></pre></div></p>
+<p>or the VOSpace client <code>vcp</code> from the <code>vos</code> python package:</p>
+<ul>
+<li>
+<p>For larger transfers, use <code>sshfs</code>:</p>
+<div class="highlight"><pre><span></span><code>sshfs<span class="w"> </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span>,defer_permissions<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span><span class="nv">$HOME</span>/arc
+cp<span class="w"> </span>largedata.fits<span class="w"> </span><span class="nv">$HOME</span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data/
+</code></pre></div>
+</li>
+<li>
+<p>Or use the VOSpace client <code>vcp</code> from the <code>vos</code> python package:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># to vault VOSpace for long-term access</span>
+vcp<span class="w"> </span>largefile.fits<span class="w"> </span>vos:<span class="o">[</span>project<span class="o">]</span>/data/
+<span class="c1"># to arc file system (and VOSpace) for short-term access</span>
+vcp<span class="w"> </span>largefile.fits<span class="w"> </span>arc:<span class="o">[</span>project<span class="o">]</span>/data/
+</code></pre></div>
+</li>
+</ul>
 <h3 id="what-softwarecontainers-are-available">What software/containers are available?<a class="headerlink" href="#what-softwarecontainers-are-available" title="Permanent link">&para;</a></h3>
-<p>Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, full Linux desktops, and specialized tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at <code>platform/containers.md</code>.</p>
+<p>Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data science tools, machine learning libraries, full Linux desktops, and specialized astronomy tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at <code>platform/containers.md</code>.</p>
 <h3 id="can-i-install-additional-software">Can I install additional software?<a class="headerlink" href="#can-i-install-additional-software" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Temporary (inside a running session): <code>pip install --user ...</code> or system packages if permitted.</li>
-<li>Permanent: build a custom container with your required stack (see <code>platform/containers.md</code>).</li>
+<li>Temporary (inside a running session): <code>pip install --user ...</code> or within environments. Software will be persisted on <code>/arc</code></li>
+<li>Permanent: build a custom container with your required stack (see <code>platform/containers.md</code>). Software will be persisted on the container.</li>
 </ul>
 <h3 id="collaboration-and-sharing">Collaboration and sharing<a class="headerlink" href="#collaboration-and-sharing" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Share sessions for real‑time collaboration (view or full access).</li>
-<li>Share data via project groups and <code>/arc/projects/[group]/</code> with appropriate permissions.</li>
+<li>Share data via project groups and <code>/arc/projects/[project]/</code> or in vault VOSPace with appropriate permissions.</li>
+<li>Share container images via the Harbor registry on images.canfar.net</li>
 <li>Share code via Git and group storage; document workflows.</li>
 </ul>
 <h3 id="troubleshooting-slow-or-failing-sessions">Troubleshooting slow or failing sessions<a class="headerlink" href="#troubleshooting-slow-or-failing-sessions" title="Permanent link">&para;</a></h3>
@@ -924,12 +943,6 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
 <li>Container issues: verify name/version; try a maintained baseline image.</li>
 <li>Account/group issues: confirm group membership and active account status.</li>
 <li>Performance: process data in fast scratch (e.g., <code>/tmp/</code>), parallelize where appropriate, monitor with <code>htop</code>, <code>df -h</code>, <code>iotop</code>.</li>
-</ul>
-<h3 id="where-are-my-files">Where are my files?<a class="headerlink" href="#where-are-my-files" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Personal: <code>/arc/home/$(whoami)/</code></li>
-<li>Group: <code>/arc/projects/</code></li>
-<li>Temporary: session‑local <code>/tmp/</code> (deleted at end of session)</li>
 </ul>
 <h3 id="getting-help-and-community">Getting help and community<a class="headerlink" href="#getting-help-and-community" title="Permanent link">&para;</a></h3>
 <ul>
@@ -945,7 +958,7 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">sid</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;automated&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;script.py&quot;</span><span class="p">])</span>
+<span class="n">sid</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;automated&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;script.py&quot;</span><span class="p">])</span>
 
 <span class="k">while</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">sid</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;Completed&quot;</span><span class="p">:</span>
     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>
@@ -963,22 +976,14 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
     <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Bearer </span><span class="si">{</span><span class="n">token</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
     <span class="n">data</span><span class="o">=</span><span class="p">{</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;automated-analysis&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="s2">&quot;images.canfar.net/cadc/astroml:latest&quot;</span><span class="p">,</span>
         <span class="s2">&quot;cores&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span>
         <span class="s2">&quot;ram&quot;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span>
         <span class="s2">&quot;kind&quot;</span><span class="p">:</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;cmd&quot;</span><span class="p">:</span> <span class="s2">&quot;python /arc/projects/myproject/analyze.py&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;cmd&quot;</span><span class="p">:</span> <span class="s2">&quot;python /arc/projects/[project]/scripts/analyze.py&quot;</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">)</span>
 <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-</code></pre></div></p>
-<h3 id="how-do-i-access-vospace-programmatically">How do I access VOSpace programmatically?<a class="headerlink" href="#how-do-i-access-vospace-programmatically" title="Permanent link">&para;</a></h3>
-<p>Use CADC client libraries to interact with VOSpace objects.</p>
-<p>Example:
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">cadcdata</span><span class="w"> </span><span class="kn">import</span> <span class="n">CadcDataClient</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">CadcDataClient</span><span class="p">()</span>
-<span class="n">client</span><span class="o">.</span><span class="n">put_file</span><span class="p">(</span><span class="s2">&quot;local_file.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;vos:myproject/data/file.fits&quot;</span><span class="p">)</span>
 </code></pre></div></p>
 <h3 id="authentication-options-for-programs">Authentication options for programs<a class="headerlink" href="#authentication-options-for-programs" title="Permanent link">&para;</a></h3>
 <ul>
@@ -988,21 +993,26 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
 <h2 id="cli">CLI<a class="headerlink" href="#cli" title="Permanent link">&para;</a></h2>
 <h3 id="how-do-i-authenticate">How do I authenticate?<a class="headerlink" href="#how-do-i-authenticate" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Certificates:
-<div class="highlight"><pre><span></span><code>cadc-get-cert<span class="w"> </span>-u<span class="w"> </span>&lt;username&gt;
-</code></pre></div></li>
-<li>OIDC (SRCNet‑aware):
+<li>
+<p>Certificates:</p>
+<div class="highlight"><pre><span></span><code>cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
+<span class="c1"># enter CADC password when prompted</span>
+</code></pre></div>
+</li>
+<li>
+<p>OIDC (SRCNet‑aware):</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
-</code></pre></div></li>
+</code></pre></div>
+</li>
 </ul>
 <p>Certificates typically last ~10 days; renew as needed.</p>
 <h3 id="how-do-i-check-platform-status-and-quotas-from-the-cli">How do I check platform status and quotas from the CLI?<a class="headerlink" href="#how-do-i-check-platform-status-and-quotas-from-the-cli" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats
 </code></pre></div>
 <h3 id="why-is-my-session-stuck-in-pending">Why is my session stuck in "Pending"?<a class="headerlink" href="#why-is-my-session-stuck-in-pending" title="Permanent link">&para;</a></h3>
-<p>Possible reasons: insufficient resources, image issues, quota limits, or maintenance windows. Inspect events:
+<p>Possible reasons: insufficient resources, image issues, quota limits, or maintenance windows. Inspect events:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span>&lt;session-id&gt;
-</code></pre></div></p>
+</code></pre></div>
 <h3 id="i-cant-connect-to-my-session-url">I can’t connect to my session URL<a class="headerlink" href="#i-cant-connect-to-my-session-url" title="Permanent link">&para;</a></h3>
 <ol>
 <li>Ensure the session is Running (<code>canfar ps</code>).</li>
@@ -1039,7 +1049,7 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 22, 2025 21:41:01 UTC">August 22, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 16:45:25 UTC">August 26, 2025</span>
   </span>
 
     
@@ -1066,6 +1076,11 @@ cadc-data<span class="w"> </span>put<span class="w"> </span>largefile.fits<span 
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/stephengwyn" class="md-author" title="@stephengwyn">
           

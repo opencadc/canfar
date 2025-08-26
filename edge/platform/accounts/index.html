@@ -1702,22 +1702,19 @@ setfacl<span class="w"> </span>-b<span class="w"> </span>/arc/projects/<span cla
 <p>If rules aren't taking effect, check the ACL mask and default entries (see "Viewing ACLs" and troubleshooting below).</p>
 <h2 id="api-authentication">🔌 API Authentication<a class="headerlink" href="#api-authentication" title="Permanent link">&para;</a></h2>
 <h3 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h3>
-<p>CANFAR provides REST APIs for programmatic access to platform features. All API calls require proper authentication.</p>
+<p>CANFAR provides REST APIs for programmatic access to platform features. All API calls require proper authentication. For detailed examples of using the <code>canfar</code> command-line client and Python library, see the <a href="../batch-jobs/#api-access">Batch Jobs guide</a>.</p>
 <div class="admonition info">
 <p class="admonition-title">API Access</p>
 <p>APIs enable automation and integration with external tools and workflows.</p>
 </div>
 <h3 id="authentication-methods">Authentication Methods<a class="headerlink" href="#authentication-methods" title="Permanent link">&para;</a></h3>
-<h4 id="method-1-bearer-tokens-recommended">Method 1: Bearer Tokens (Recommended)<a class="headerlink" href="#method-1-bearer-tokens-recommended" title="Permanent link">&para;</a></h4>
+<h4 id="method-1-canfar-cli-recommended">Method 1: <code>canfar</code> CLI (Recommended)<a class="headerlink" href="#method-1-canfar-cli-recommended" title="Permanent link">&para;</a></h4>
 <p><strong>Best for:</strong> Short-term automation, development, interactive use</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Get a 48-hour token</span>
-curl<span class="w"> </span>https://ws-cadc.canfar.net/ac/login<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;username=[username]&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;password=[password]&quot;</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># Log in to get a token stored in your configuration</span>
+canfar<span class="w"> </span>auth<span class="w"> </span>login
 
-<span class="c1"># Use token in API calls</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer YOUR_TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
+<span class="c1"># Subsequent canfar commands will use the stored token</span>
+canfar<span class="w"> </span>ps
 </code></pre></div>
 <h4 id="method-2-proxy-certificates">Method 2: Proxy Certificates<a class="headerlink" href="#method-2-proxy-certificates" title="Permanent link">&para;</a></h4>
 <p><strong>Best for:</strong> Long-term automation, file transfers, production scripts</p>
@@ -1731,61 +1728,7 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
 <span class="c1"># Valid for 10 days, automatically used by CADC tools</span>
 </code></pre></div>
 <h3 id="api-examples">API Examples<a class="headerlink" href="#api-examples" title="Permanent link">&para;</a></h3>
-<h4 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># List active sessions</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
-
-<span class="c1"># Launch new session  </span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;name=my-analysis&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-d<span class="w"> </span><span class="s2">&quot;image=images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session
-
-<span class="c1"># Delete session</span>
-curl<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-uv.canfar.net/skaha/v0/session/SESSION_ID
-</code></pre></div>
-<h4 id="file-operations-vospace">File Operations (VOSpace)<a class="headerlink" href="#file-operations-vospace" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># List files</span>
-curl<span class="w"> </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-cadc.canfar.net/vospace/nodes/myproject
-
-<span class="c1"># Upload file</span>
-curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/octet-stream&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--data-binary<span class="w"> </span>@local_file.fits<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>https://ws-cadc.canfar.net/vospace/data/myproject/remote_file.fits
-</code></pre></div>
-<h3 id="api-resources">API Resources<a class="headerlink" href="#api-resources" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Service</th>
-<th>Documentation</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>skaha</strong></td>
-<td><a href="https://ws-uv.canfar.net">ws-uv.canfar.net</a></td>
-<td>Session management</td>
-</tr>
-<tr>
-<td><strong>VOSpace</strong></td>
-<td><a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/vospace/">CADC VOSpace</a></td>
-<td>File operations</td>
-</tr>
-<tr>
-<td><strong>CADC Auth</strong></td>
-<td><a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/doc/netrc">CADC Services</a></td>
-<td>Authentication</td>
-</tr>
-</tbody>
-</table>
+<p>For detailed API usage examples, please refer to the <a href="../batch-jobs/#api-access">API Reference in the Batch Jobs guide</a>.</p>
 <h2 id="common-issues">🚨 Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h2>
 <div class="admonition warning">
 <p class="admonition-title">Troubleshooting Guide</p>
@@ -1809,7 +1752,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span
 <p><strong>Cause:</strong> Invalid or expired authentication token</p>
 <p>Solution:</p>
 <ol>
-<li>Generate a new token: <code>curl https://ws-cadc.canfar.net/ac/login -d "username=..." -d "password=..."</code></li>
+<li>Generate a new token: <code>canfar auth login</code></li>
 <li>Check the token format in the Authorization header: <code>Bearer YOUR_TOKEN</code></li>
 </ol>
 <h3 id="problem-acl-changes-not-taking-effect">Problem: ACL changes not taking effect<a class="headerlink" href="#problem-acl-changes-not-taking-effect" title="Permanent link">&para;</a></h3>
@@ -1855,7 +1798,7 @@ curl<span class="w"> </span>-X<span class="w"> </span>PUT<span class="w"> </span
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 05:11:59 UTC">August 26, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 22:48:00 UTC">August 26, 2025</span>
   </span>
 
     
