@@ -205,7 +205,7 @@ class FetchResponse(BaseModel):
     status: Status
     name: str
     startTime: datetime
-    expiryTime: datetime
+    expiryTime: datetime | None = None
     connectURL: str
     requestedRAM: str
     requestedCPUCores: str
