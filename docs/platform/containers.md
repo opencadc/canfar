@@ -143,27 +143,15 @@ Most astronomy work on CANFAR can be accomplished using existing containers with
 
 Choosing the right container depends on your specific workflow requirements. General Python astronomy work benefits from **astroml** in either notebook or desktop terminal sessions. Radio astronomy tasks requiring CASA tools work best with the **casa** container in notebook or desktop modes. Legacy GUI applications or IDL-based workflows should use **desktop** sessions with the desktop container.
 
+
+
 ```bash
-# Launch different session types via API
-TOKEN=$(curl -s https://ws-cadc.canfar.net/ac/login \
-  -d "username=myuser" -d "password=mypass" | tr -d '"')
-
-# Notebook session with astroml
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=analysis-session" \
-  -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "type=notebook" \
-  -d "cores=2" -d "ram=4" \
-  https://ws-uv.canfar.net/skaha/v0/session
-
-# Desktop session with CASA
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=casa-desktop" \
-  -d "image=images.canfar.net/skaha/casa:latest" \
-  -d "type=desktop" \
-  -d "cores=4" -d "ram=8" \
-  https://ws-uv.canfar.net/skaha/v0/session
+# Launch different session types using the CANFAR client
+canfar create notebook images.canfar.net/skaha/astroml:latest --name analysis-session --cpu 2 --memory 4
+canfar create desktop images.canfar.net/skaha/casa:latest --name casa-desktop --cpu 4 --memory 8
 ```
+
+See [CLI Help](../cli/cli-help.md) for more details and options.
 
 !!! tip "Best Practice: Code Placement"
     Keep stable, tested code inside the container image. Keep frequently edited analysis code and notebooks in `/arc/home` or project directories.
@@ -181,12 +169,12 @@ CANFAR containers fall into three main categories, each serving different purpos
 
 These are officially maintained by the CANFAR team and provide the foundation for most astronomy work. The core offerings include **astroml** for general astronomy analysis with Python, Astropy, and machine learning libraries; **casa** for radio interferometry work; **notebook** for lightweight Jupyter environments; and **desktop** for full Ubuntu desktop sessions with GUI applications.
 
-```bash
-# Browse available CANFAR containers
-curl -s https://images.canfar.net/api/v2.0/projects/skaha/repositories | \
-  jq -r '.[] | .name' | sort
 
-# Check container details
+
+<!-- NOTE: As of this release, browsing available CANFAR containers is not implemented in the CLI. Please visit the Harbor registry at https://images.canfar.net/ to view available images. -->
+
+```bash
+# Check container details (locally, with Docker)
 docker inspect images.canfar.net/skaha/astroml:latest
 ```
 
@@ -424,24 +412,30 @@ For team containers, establish clear documentation including purpose, usage exam
 This container provides a specialized environment for X-ray astronomy analysis.
 
 ## Usage
+
+
 ```bash
-# Launch notebook session
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "image=images.canfar.net/myteam/xray-analysis:latest" \
-  -d "type=notebook" \
-  https://ws-uv.canfar.net/skaha/v0/session
+# Launch notebook session using the CANFAR client
+canfar run --image images.canfar.net/myteam/xray-analysis:latest --type notebook
 ```
 
+
+
+
+
 ## Included Software
+
 - XSPEC 12.12.1
 - PyXspec
 - Custom analysis tools v2.1
 
 ## Maintenance
+
 - Maintainer: team@institution.edu
 - Update schedule: Monthly
-- Source: https://github.com/myteam/xray-container
-```
+- Source: [GitHub repository](https://github.com/myteam/xray-container)
+
+```bash
 
 Regular maintenance includes updating base images, refreshing software dependencies, and testing compatibility with new CANFAR features. Community-maintained containers benefit from collaborative development practices including shared repositories and issue tracking.
 
@@ -459,4 +453,9 @@ Understanding this integration helps optimize workflows by leveraging container 
 
 ---
 
-*Continue exploring CANFAR capabilities through [Interactive Sessions](guides/interactive-sessions/index.md) for hands-on container usage, [Batch Jobs](batch-jobs.md) for automated processing, or [Storage Management](guides/storage/index.md) for data organization strategies.*
+
+Continue exploring CANFAR capabilities through:
+- [Interactive Sessions](guides/interactive-sessions/index.md) for hands-on container usage
+- [Batch Jobs](batch-jobs.md) for automated processing
+- [Storage Management](guides/storage/index.md) for data organisation strategies
+- [Platform Concepts](concepts.md) for architecture and integration details

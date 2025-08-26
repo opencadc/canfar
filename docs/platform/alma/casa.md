@@ -12,7 +12,7 @@ CANFAR provides multiple CASA versions to support different workflows and compat
 - **CASA 6.5** (recommended): Latest stable release with Python 3 support
 - **CASA 6.4**: Previous stable version for compatibility
 - **CASA Pipeline**: Automated calibration and imaging pipelines
-- **Custom builds**: Specialized versions for specific instruments
+- **Custom builds**: Specialised versions for specific instruments
 
 ## Pre-installed Tools
 

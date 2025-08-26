@@ -12,9 +12,12 @@ This section explains the core concepts you need to use CANFAR. Whether you are 
     - How sessions and storage systems interact
     - When to use different platform features
 
+
 ## 🚀 What is CANFAR?
 
-The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platform is a cloud-based computing environment designed specifically for astronomical research. It provides:
+The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platform is a cloud-based computing environment designed specifically for astronomical research. For onboarding, see the [Getting Started Guide](get-started.md).
+
+It provides:
 
 - **On-demand computing resources** without needing your own servers
 - **Pre-built software environments** with astronomy packages ready to use
@@ -24,10 +27,13 @@ The **Canadian Advanced Network for Astronomy Research (CANFAR)** Science Platfo
 !!! success "Key Benefit"
     CANFAR eliminates the traditional barriers of software installation, hardware management, and infrastructure setup, letting you focus entirely on your research.
 
+
 ### Who Benefits from CANFAR?
 
+See [Accounts & Permissions](accounts.md) for details on user roles and collaboration.
+
 === "Individual Researchers"
-    - **No software installation headaches** - pre-configured containers ready to use
+    - **No software installation headaches** – pre-configured containers ready to use
     - Access powerful computing resources without owning hardware
     - Work from anywhere with just a web browser
     - Automatic backups and data protection
@@ -128,7 +134,10 @@ graph LR
     - **Storage Systems**: Multiple types optimized for different use cases
     - **Authentication**: Secure access via CADC integration
 
+
 ## 🐳 Containers
+
+See [Container Usage](containers.md) for practical details and workflows.
 
 Containers are at the heart of CANFAR's flexibility and power. Think of them as complete, portable software environments that include everything needed to run specific applications.
 
@@ -154,14 +163,17 @@ Containers are at the heart of CANFAR's flexibility and power. Think of them as 
 !!! success "Research Reproducibility"
     Containers ensure your analysis runs the same way for you, your collaborators, and future researchers. This is crucial for reproducible science.
 
+
 ### Popular CANFAR Containers
+
+See [Container Usage](containers.md) for a full list and details.
 
 | Container | Purpose | Best For |
 |-----------|---------|----------|
 | **astroml** | General astronomy analysis | Python, NumPy, SciPy, Astropy, Matplotlib |
 | **casa** | Radio interferometry | CASA software, Python, astronomy tools |
 | **desktop** | GUI applications | Full Ubuntu desktop, Firefox, terminal |
-| **carta** | Radio astronomy visualization | CARTA viewer, analysis tools |
+| **carta** | Radio astronomy visualisation | CARTA viewer, analysis tools |
 | **notebook** | Interactive computing | JupyterLab, Python scientific stack |
 
 !!! tip "Getting Started"
@@ -180,7 +192,10 @@ When you launch a session, here's what happens behind the scenes:
 !!! info "Performance Note"
     Subsequent launches of the same container are much faster (30-60 seconds) since the image is cached locally.
 
+
 ## ☸️ Sessions and Computing Resources
+
+See [Interactive Sessions](guides/interactive-sessions/index.md) for session workflows and examples.
 
 CANFAR uses Kubernetes to manage your computing sessions. You don't need to understand Kubernetes deeply, but here are the key concepts:
 
@@ -228,11 +243,14 @@ Different session types provide different interfaces to the same underlying comp
     - Community-maintained software
     - Experimental features
 
+
 ## 💾 Storage Systems
+
+See the [Storage Guide](guides/storage/index.md) for practical usage and quotas.
 
 ### Data Persistence Rules
 
-CANFAR provides multiple storage systems optimized for different use cases:
+CANFAR provides multiple storage systems optimised for different use cases:
 
 !!! warning "Critical: Where Your Files Are Saved"
     Understanding where your files persist is crucial for not losing work:
@@ -255,6 +273,7 @@ CANFAR provides multiple storage systems optimized for different use cases:
 
 ### VOSpace (`vos:`)
 
+
 **Web-accessible object store** for long-term storage:
 
 - **IVOA**: Based on the International Virtual Observatory Alliance (IVOA) standard
@@ -262,6 +281,7 @@ CANFAR provides multiple storage systems optimized for different use cases:
 - **Metadata**: Astronomical metadata support
 - **Versioning**: Track changes to datasets
 - **Best For**: Archives, sharing, backups, metadata-rich data
+
 
 !!! tip "Storage Strategy"
     Use **ARC storage** for active analysis and **VOSpace** for long-term archival and sharing.
@@ -276,7 +296,10 @@ CANFAR provides multiple storage systems optimized for different use cases:
 | **Quota** | Group-based | User/project based |
 | **Backup** | Daily snapshots | Geo-redundant |
 
+
 ## 🌐 Programmatic Access
+
+See [CANFAR Python Client](../client/home.md) and [VOSpace API](guides/storage/vospace-api.md) for automation and scripting.
 
 CANFAR provides REST APIs for programmatic access, allowing you to:
 

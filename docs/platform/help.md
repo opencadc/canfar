@@ -2,7 +2,17 @@
 
 The CANFAR Science Platform provides multiple channels for getting help, from self-service documentation to direct support. This section guides you to the right resources for your needs.
 
-## Quick Help
+
+!!! info "Quick Links"
+    - [Get Started Guide](get-started.md)
+    - [FAQ](../faq.md)
+    - [Platform Concepts](concepts.md)
+    - [Containers](containers.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [Batch Jobs](batch-jobs.md)
+    - [Radio Astronomy Guide](guides/radio-astronomy/index.md)
+    - [Contact Support](#contact-support)
+
 
 ### New to CANFAR?
 
@@ -87,28 +97,41 @@ When you encounter issues, try these steps first:
 **Solutions**:
 ```bash
 # Check file locations
-ls /arc/home/$(whoami)/     # Personal storage
+ls /arc/home/[user]/     # Personal storage
 ls /arc/projects/           # Group storage
 
 # Check permissions
-ls -la /arc/projects/mygroup/
+ls -la /arc/projects/[project]/
+getfacl /arc/projects/[project]/
 ```
 
 - Verify you're in the correct group
 - Check file paths are correct
 - Contact group administrator
 
+
 #### Performance Issues
+
+!!! tip "Advanced: Optimizing Performance"
+    - Use [Batch Jobs](batch-jobs.md) for large-scale or automated processing.
+    - Monitor session resource usage with `canfar stats` and [session info](concepts.md#sessions).
+    - Store temporary files in `/scratch/` for faster I/O.
+    - For parallel workloads, see [Distributed Computing](../helpers/distributed.md).
 
 **Symptoms**: Slow processing or unresponsive interface
 
 **Solutions**:
 - Monitor resource usage with `htop`
 - Close unnecessary applications
-- Use scratch storage (`/tmp/`) for temporary files
+- Use scratch storage (`/scratch/`) for temporary files
 - Consider requesting more resources
 
+
 #### Browser Compatibility
+
+!!! tip "Advanced: Browser Automation"
+    - Use browser profiles/extensions for session isolation.
+    - Automate repetitive browser tasks with [Selenium](https://www.selenium.dev/) or [Playwright](https://playwright.dev/).
 
 **Symptoms**: Interface doesn't load or behaves incorrectly
 
@@ -118,28 +141,32 @@ ls -la /arc/projects/mygroup/
 - Disable ad blockers for canfar.net
 - Update browser to latest version
 
+
 ### Diagnostic Commands
+
+!!! example "Gathering Diagnostic Info for Support"
+    Use these commands before contacting support to speed up troubleshooting:
 
 Use these commands to gather information for support requests:
 
 ```bash
 # System information
-uname -a
-cat /proc/cpuinfo | grep "model name" | head -1
-free -h
-df -h
+canfar info [session-id]
+canfar stats
 
-# Session information
+# Within session information
 echo $USER
 groups
-env | grep -E "(CANFAR|SESSION)"
-
-# Network connectivity
-ping -c 3 canfar.net
-curl -I https://canfar.net
+env | grep -E "(CANFAR|SKAHA)"
 ```
 
-## Contact Support
+
+---
+
+!!! info "See Also"
+    - [Bug Reports](../bug-reports.md)
+    - [Security](../../security.md)
+    - [Contributing](#contributing-to-documentation)
 
 ### When to Contact Support
 
@@ -156,13 +183,15 @@ Contact [support@canfar.net](mailto:support@canfar.net) for:
 Include these details in your support email:
 
 **Essential information**:
+
+Example:
 ```
 Subject: [Brief description of problem]
 
 CANFAR Username: your.email@domain.com
 Date/Time of issue: 2024-01-15 14:30 PST
-Session type: Desktop/Notebook/CARTA/Batch
-Container used: astroml:latest
+Session type: desktop | notebook | carta | firefly | headless
+Container used: skaha/astroml:latest
 Browser: Chrome 120.0.6099
 
 Problem description:
@@ -177,24 +206,28 @@ Steps to reproduce:
 3. [etc.]
 
 What you've already tried:
+
 - Cleared browser cache
 - Tried different browser
 - [etc.]
+
 ```
 
 **Additional helpful information**:
+
 - Screenshots of error messages
 - Session IDs for failed jobs
 - File paths for missing data
 - Group names for permission issues
 
-### Response Times
+### Expetected Response Times
 
 - **Standard support**: 1-2 business days
 - **Urgent issues**: Same day during business hours
 - **Emergency outages**: Immediate response during business hours
 
 **Business hours**: Monday-Friday, 9 AM - 5 PM Pacific Time
+
 
 ### Support Escalation
 
@@ -205,9 +238,16 @@ For urgent research deadlines or critical system issues:
 3. **Provide context**: Explain impact of the issue
 4. **Follow up**: Call if no response within expected timeframe
 
+
 ## Community Support
 
+
 ### Discord Community
+
+!!! tip "Advanced: Community Collaboration"
+    - Share workflow examples in Discord for peer review.
+    - Use Discord threads for project-specific discussions.
+    - Join [Office Hours](#office-hours) for live troubleshooting.
 
 Join our Discord server for peer support and community interaction:
 
@@ -219,12 +259,20 @@ Join our Discord server for peer support and community interaction:
 **Discord invite**: [Join CANFAR Discord](https://discord.gg/vcCQ8QBvBa)
 
 **Community guidelines**:
+
 - Search previous messages before asking
 - Use appropriate channels and threads
 - Be respectful and helpful to other users
 - Don't share sensitive data or credentials
 
+
+
 ### GitHub Issues
+
+!!! tip "Advanced: Effective GitHub Contributions"
+    - Reference related documentation pages in your issue or pull request.
+    - Link to example workflows or scripts.
+    - Tag your issue with relevant labels (e.g., `documentation`, `feature-request`).
 
 For bug reports and feature requests, use our GitHub repositories:
 
@@ -233,7 +281,14 @@ For bug reports and feature requests, use our GitHub repositories:
 - **Feature requests**: Propose new capabilities
 - **Community contributions**: Submit code and examples
 
+
+
 ### Office Hours
+
+!!! info "Office Hours: Get Real-Time Help"
+    - Thursdays 2-3 PM Pacific Time
+    - [Join via Discord](https://discord.gg/vcCQ8QBvBa)
+    - Bring your code, workflows, or error messages for live support.
 
 **Virtual office hours**: Thursdays 2-3 PM Pacific Time
 
@@ -247,7 +302,12 @@ For bug reports and feature requests, use our GitHub repositories:
 - Example code or workflows
 - Error messages or screenshots
 
+
 ### Peer Mentoring
+
+!!! tip "Advanced: Become a Mentor"
+    - Experienced users can volunteer as mentors via [support@canfar.net](mailto:support@canfar.net).
+    - Mentors help with onboarding, troubleshooting, and advanced workflows.
 
 **Experienced user program**: Connect new users with experienced mentors
 
@@ -256,7 +316,13 @@ For bug reports and feature requests, use our GitHub repositories:
 - **Matching**: Based on research area and experience level
 - **Contact**: Email support to request mentor connection
 
+
 ### Community Contributions
+
+!!! tip "Advanced: Share Your Expertise"
+    - Submit tutorials or workflow examples to the documentation via GitHub.
+    - Answer questions in Discord and GitHub Issues.
+    - Report bugs and suggest features to improve the platform for all users.
 
 **Ways to help other users**:
 
@@ -293,13 +359,14 @@ The CANFAR Science Platform documentation is community-driven, and we welcome co
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/opencadc/science-containers.git
+   git clone https://github.com/opencadc/canfar.git
    cd science-containers
    ```
 
-2. **Install dependencies** (using Poetry):
+2. **Install dependencies**:
+NB: at the time of writing `poetry` was a good tool to deal with python dependencies. Now `uv` or `pixi` may be better choices.
    ```bash
-   # Install Poetry if you don't have it
+   # You may want to install `poetry` if you don't have it
    # See: https://python-poetry.org/docs/#installation
    
    poetry install
@@ -315,7 +382,17 @@ The CANFAR Science Platform documentation is community-driven, and we welcome co
 
 Changes to documentation files will automatically reload in your browser for real-time preview.
 
+
 ### 📁 Documentation Structure
+
+!!! info "Explore More Documentation"
+    - [Get Started](get-started.md)
+    - [FAQ](../faq.md)
+    - [Platform Concepts](concepts.md)
+    - [Containers](containers.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [Batch Jobs](batch-jobs.md)
+    - [Radio Astronomy](guides/radio-astronomy/index.md)
 
 Our documentation follows a clear structure designed for different user needs:
 
@@ -364,11 +441,13 @@ Our documentation follows a clear structure designed for different user needs:
 - Focus on common tasks and getting started
 - Include plenty of examples
 
+
 **Advanced Users**:
 - Provide technical details and configuration options
-- Include information on automation, APIs, and advanced workflows
-- Assume familiarity with relevant technologies
-- Link to detailed reference materials
+- Use [CANFAR CLI](../../cli/cli-help.md) for automation and scripting
+- Explore [Distributed Computing](../helpers/distributed.md) for parallel workloads
+- Integrate CANFAR with external tools (e.g., Jupyter, Docker, GitHub Actions)
+- Link to detailed reference materials and example scripts
 
 ### 🔄 Contribution Process
 
@@ -388,7 +467,7 @@ We aim for documentation that is:
 
 ### ❓ Questions About Contributing?
 
-- Open an issue on [GitHub](https://github.com/opencadc/science-containers/issues)
+- Open an issue on [GitHub](https://github.com/opencadc/canfar/issues)
 - Ask on Discord in the community channels
 - Email the CANFAR team at [support@canfar.net](mailto:support@canfar.net)
 
@@ -402,8 +481,8 @@ Your contributions help make CANFAR better for the entire astronomy community!
 
 **Related platforms**:
 - **CADC Archive**: [cadc-ccda.hia-iha.nrc-cnrc.gc.ca](https://cadc-ccda.hia-iha.nrc-cnrc.gc.ca)
-- **VOSpace**: [vospace.canfar.net](https://vospace.canfar.net)
-- **Science Portal**: [science.canfar.net](https://science.canfar.net)
+- **VOSpace**: [vospace.canfar.net](https://www.canfar.net)
+- **Science Portal**: [science.canfar.net](https://www.canfar.net)
 
 **Software documentation**:
 - **CASA**: [casa.nrao.edu](https://casa.nrao.edu)
@@ -431,13 +510,6 @@ Your contributions help make CANFAR better for the entire astronomy community!
 - Email notifications for maintenance
 - Discord #announcements channel
 - Science Portal news section
-- Twitter [@CANFAR_ACFC](https://twitter.com/CANFAR_ACFC)
-
-**Feature updates**:
-- Monthly platform updates
-- New container releases
-- Beta feature testing
-- User feedback integration
 
 ## Emergency Contacts
 
@@ -447,7 +519,6 @@ Your contributions help make CANFAR better for the entire astronomy community!
 
 **Unplanned outages**: 
 - Check status.canfar.net for current status (when available)
-- Follow [@CANFAR_ACFC](https://twitter.com/CANFAR_ACFC) for real-time updates
 - Email [support@canfar.net](mailto:support@canfar.net) if status unclear
 
 ### Critical Data Issues
@@ -468,13 +539,12 @@ Your contributions help make CANFAR better for the entire astronomy community!
 
 **Suspected security breach**:
 1. **Change credentials**: Update certificates immediately
-2. **Report incident**: Email [security@canfar.net](mailto:security@canfar.net)
+2. **Report incident**: Email [support@canfar.net](mailto:support@canfar.net)
 3. **Document details**: What you observed and when
 4. **Follow instructions**: Wait for security team guidance
 
 **Prevention**:
 - Never share your certificates
-- Use secure networks
 - Keep software updated
 - Report suspicious activity
 
@@ -510,7 +580,7 @@ The CANFAR Science Platform documentation is community-driven, and we welcome co
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/opencadc/science-containers.git
+   git clone https://github.com/opencadc/canfar.git
    cd science-containers
    ```
 
@@ -539,14 +609,14 @@ Changes to documentation files will automatically reload in your browser for rea
 Our documentation follows a clear structure designed for different user needs:
 
 - **`get-started/`**: Quick setup for new users
-- **`user-guide/`**: Comprehensive platform documentation
-  - `concepts/`: Platform architecture and core concepts
-  - `accounts-permissions/`: User management and access control
-  - `storage/`: Data management and storage systems
+- **`guides/`**: Comprehensive platform documentation
   - `containers/`: Container usage and building
   - `interactive-sessions/`: Jupyter, desktop, and application sessions
-  - `batch-jobs/`: Automated and large-scale processing
   - `radio-astronomy/`: CASA and radio-specific workflows
+  - `storage/`: Data management and storage systems
+- **`accounts/`**: User management and access control
+- **`batch-jobs/`**: Automated and large-scale processing
+- **`concepts/`**: Platform architecture and core concepts
 - **`faq/`**: Frequently asked questions and troubleshooting
 - **`help/`**: Support resources and community information
 
