@@ -11,10 +11,24 @@ These examples use the asynchronous API for best performance and scalability.
 
 ### Notebook
 
-=== "Basic Notebook"
+=== "Flexible Mode (Default)"
 
     ```python
+    from canfar.sessions import Session
 
+    session = Session()
+    ids = session.create(
+        name="my-notebook",
+        image="images.canfar.net/skaha/base-notebook:latest",
+        kind="notebook",
+    )
+    print(ids)  # ["d1tsqexh"]
+    session.connect(ids)
+    ```
+
+=== "Fixed Mode"
+
+    ```python
     from canfar.sessions import Session
 
     session = Session()
@@ -29,23 +43,6 @@ These examples use the asynchronous API for best performance and scalability.
     session.connect(ids)
     ```
 
-=== "`sync context`"
-
-    ```python
-    from canfar.sessions import Session
-
-    with Session() as session:
-        ids = session.create(
-            name="my-notebook",
-            image="images.canfar.net/skaha/base-notebook:latest",
-            kind="notebook",
-            cores=2,
-            ram=4,
-        )
-        print(ids)  # ["d1tsqexh"]
-        session.connect(ids)
-    ```
-
 === "`async`"
 
     ```python
@@ -56,28 +53,9 @@ These examples use the asynchronous API for best performance and scalability.
         name="my-notebook",
         image="images.canfar.net/skaha/base-notebook:latest",
         kind="notebook",
-        cores=2,
-        ram=4,
     )
     print(ids)  # ["d1tsqexh"]
     await session.connect(ids)
-    ```
-
-=== "`async context`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        ids = await session.create(
-            name="my-notebook",
-            image="images.canfar.net/skaha/base-notebook:latest",
-            kind="notebook",
-            cores=2,
-            ram=4,
-        )
-        print(ids)  # ["d1tsqexh"]
-        await session.connect(ids)
     ```
 
 ### Headless
@@ -102,22 +80,6 @@ These examples use the asynchronous API for best performance and scalability.
     print(ids)  # ["d1tsqexh"]
     ```
 
-=== "`sync context`"
-
-    ```python
-    from canfar.sessions import Session
-
-    with Session() as session:
-        ids = session.create(
-            name="my-headless",
-            image="images.canfar.net/skaha/base-notebook:latest",
-            kind="headless",
-            cmd="echo",
-            args=["Hello, World!"],
-        )
-        print(ids)  # ["d1tsqexh"]
-    ```
-
 === "`async`"
 
     ```python
@@ -134,21 +96,6 @@ These examples use the asynchronous API for best performance and scalability.
     print(ids)  # ["d1tsqexh"]
     ```
 
-=== "`async context`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        ids = await session.create(
-            name="my-headless",
-            image="images.canfar.net/skaha/base-notebook:latest",
-            kind="headless",
-            cmd="echo",
-            args=["Hello, World!"],
-        )
-        print(ids)  # ["d1tsqexh"]
-    ```
 
 !!! example "Replica Environment Variables"
     All containers receive the following environment variables:
@@ -178,6 +125,68 @@ These examples use the asynchronous API for best performance and scalability.
         print(ids)
 
     asyncio.run(main())
+    ```
+
+## Resource Allocation Modes
+
+CANFAR supports two resource allocation modes for your sessions.
+
+### Flexible Sessions (Default)
+When you don't specify `cores` or `ram` parameters, your session runs in **flexible mode**:
+
+- **:material-trending-up: Adaptive Resource Usage**: Your session can use more CPU and memory when necessary, if available
+- **:material-rocket-launch: Efficient Scheduling**: Sessions start faster as they're easier to place on available nodes
+- **:material-chart-line-variant: Variable Performance**: Performance may fluctuate based on cluster load and other users' activity
+
+### Fixed Sessions
+When you specify exact `cores` and `ram` values, your session runs in **fixed mode**:
+
+- **:material-speedometer: Predictable Performance**: Consistent CPU and memory allocation regardless of cluster load
+- **:material-lock: Resource Reservation**: Resources are reserved exclusively for your session
+- **:material-clock-alert: Potential Scheduling Delays**: May take longer to start if exact resources aren't immediately available
+
+### When to Use Each Mode
+
+!!! success "Use Flexible Mode (Default) When:"
+    - Developing and testing code
+    - Interactive data exploration
+    - Learning and experimentation
+    - Resource requirements are unknown or variable
+
+!!! warning "Use Fixed Mode When:"
+    - Running production workloads
+    - Performance consistency is critical
+    - Processing large datasets with known resource requirements
+    - Running time-sensitive computations
+
+### Examples
+
+=== "Flexible Mode (Default)"
+    ```python
+    from canfar.sessions import Session
+
+    session = Session()
+    # No cores/ram specification - uses flexible allocation
+    ids = session.create(
+        name="flexible-notebook",
+        image="images.canfar.net/skaha/base-notebook:latest",
+        kind="notebook"
+    )
+    ```
+
+=== "Fixed Mode"
+    ```python
+    from canfar.sessions import Session
+
+    session = Session()
+    # Specify exact resources for guaranteed allocation
+    ids = session.create(
+        name="fixed-notebook",
+        image="images.canfar.net/skaha/base-notebook:latest",
+        kind="notebook",
+        cores=4,
+        ram=8
+    )
     ```
 
 ## Discover and Filter Sessions

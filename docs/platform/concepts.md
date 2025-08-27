@@ -270,6 +270,90 @@ Different session types provide different interfaces to the same underlying comp
     - Community-maintained software
     - Experimental features
 
+### Session Resource Allocation
+
+CANFAR supports two resource allocation modes that determine how CPU and memory are allocated to your sessions:
+
+!!! info "Flexible Sessions (Default)"
+    **Adaptive resource allocation** that adjusts to your needs:
+
+    - **:material-trending-up: Dynamic Usage**: Sessions can use more CPU and memory when cluster resources are available
+    - **:material-rocket-launch: Fast Scheduling**: Sessions start quickly as they're easier to place on available nodes
+    - **:material-chart-line-variant: Variable Performance**: Performance adapts to cluster load and other users' activity
+    - **:material-kubernetes: Kubernetes QoS**: Runs as "Burstable" quality of service class
+
+!!! warning "Fixed Sessions"
+    **Guaranteed resource allocation** with dedicated resources:
+
+    - **:material-speedometer: Predictable Performance**: Consistent CPU and memory allocation regardless of cluster load
+    - **:material-lock: Resource Reservation**: Resources are reserved exclusively for your session
+    - **:material-clock-alert: Scheduling Delays**: May take longer to start if exact resources aren't immediately available
+    - **:material-kubernetes: Kubernetes QoS**: Runs as "Guaranteed" quality of service class
+
+#### When to Choose Each Mode
+
+=== "🔄 Flexible Mode (Default)"
+
+    !!! info ""
+        **Best for most research workflows:**
+
+        - Interactive data exploration and analysis
+        - Development and testing of code
+        - Learning and experimentation
+        - Workflows with variable resource needs
+        - General-purpose computing tasks
+
+        **Example Use Cases:**
+
+        - Jupyter notebook sessions for data analysis
+        - Testing new analysis pipelines
+        - Interactive visualization with CARTA or Firefly
+        - Educational workshops and tutorials
+
+        **Example Commands:**
+
+        ```bash
+        canfar create notebook skaha/base-notebook:latest
+        canfar create headless skaha/base-notebook:latest -- python script.py
+        ```
+
+=== "🎯 Fixed Mode"
+
+    !!! warning ""
+        **Best for production and critical workloads:**
+
+        - Production data processing pipelines
+        - Time-sensitive computations
+        - Large-scale batch processing with known requirements
+        - Performance benchmarking
+        - Critical deadlines requiring consistent performance
+
+        **Example Use Cases:**
+
+        - Processing large survey datasets
+        - Running computationally intensive simulations
+        - Batch processing with strict time constraints
+        - Performance-critical analysis workflows
+
+        **Example Commands:**
+
+        ```bash
+        canfar create notebook skaha/base-notebook:latest --cpu 4 --memory 8
+        canfar create headless skaha/base-notebook:latest --cpu 2 --memory 4 -- python script.py
+        ```
+
+#### Resource Allocation in Practice
+
+| Aspect | Flexible Mode | Fixed Mode |
+|--------|---------------|------------|
+| **Resources** | Optional (defaults to flexible) | Required (explicit values) |
+| **Startup Time** | Faster | Variable (may wait for resources) |
+| **Performance** | Variable, can burst higher | Consistent, predictable |
+| **Efficiency** | High (shared resources) | Lower (dedicated resources) |
+| **Best Use Case** | Interactive, exploratory work | Production, critical workloads |
+
+!!! tip "Getting Started"
+    Start with **flexible mode** (the default) for most work. Only switch to **fixed mode** when you need guaranteed performance or have specific resource requirements.
 
 ## 💾 Storage Systems
 

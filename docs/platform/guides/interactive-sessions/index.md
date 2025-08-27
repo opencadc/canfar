@@ -58,16 +58,7 @@ Select the interface that best matches your workflow:
 
 **Session Name:** Choose a descriptive name (e.g., "galaxy-photometry", "alma-reduction")
 
-!!! tip "Choosing Resources"
-    - Start with default: flexible
-    - If you know the number of cores and memory you need, choose fixed. 
-    - **Memory (RAM):**
-        - 8GB: Light analysis, small datasets
-        - 16GB: Default, suitable for most work
-        - 32GB+: Larger datasets, memory-intensive tasks
-    - **CPU Cores:**
-        - 2 cores: Default, recommended for most tasks
-        - 4+ cores: Parallel processing, intensive computations
+**Resource Allocation:** Select `flexible` for most workloads. Use `fixed` only if you need guaranteed performance. See [resource allocation guide](../platform/concepts.md#session-resource-allocation) for more information.
 
 ### Step 4: Launch and Connect
 

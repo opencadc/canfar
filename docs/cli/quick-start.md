@@ -103,9 +103,9 @@ Successfully created session 'finish-inmate' (ID: d1tsqexh)
 !!! success "What just happened?"
     - We connected to CANFAR using your certificate
     - The CLI defaulted the container image to `images.canfar.net/skaha/astroml-notebook:latest`
-    - A Jupyter notebook was launched with the container image
-    - A random name was generated for your session, `scare-monster` in this case
-    - The Science Platform allocated resources for your notebook and started it.
+    - A Jupyter notebook was launched with the container image in **flexible mode**
+    - A random name was generated for your session, `finish-inmate` in this case
+    - The Science Platform allocated flexible resources for your notebook and started it
 
 ## Peek Under the Hood
 
@@ -165,8 +165,9 @@ $ canfar info $(canfar ps -q)
 !!! success "What just happened?"
     - We connected to CANFAR using your certificate
     - The information for your session was fetched
-    - When we created a your session, we never specified a name, cpu or memory, so the default values were used
-    - The default values are 1 core, 2GB of RAM, and 4 days of lifetime
+    - When we created your session, we never specified a name, CPU or memory, so **flexible mode** was used
+    - Flexible mode allows your session to adapt its resource usage based on cluster availability
+    - The session lifetime defaults to 4 days
 
 
 ## Access Your Notebook
@@ -186,6 +187,11 @@ Opening session tcgle3m3 in a new tab.
 
 !!! tip "Pro Tip"
     The notebook usually takes 60-120 seconds to start. You can also check status from the command line:
+
+#### Resource Allocation Modes
+
+CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#session-resource-allocation) for more information.
+
 
 ## Start Analyzing!
 
@@ -236,12 +242,16 @@ You now have a fully-equipped astronomy computing environment running in the clo
 
     - **Notebook won't start?**
         - Check available resources: `canfar stats`
-        - Try a smaller configuration (fewer cores/RAM)
+        - Try flexible mode (default) for faster scheduling
+        - If using fixed mode, try smaller resource values (fewer cores/RAM)
         - Check session status: `canfar ps`
     - **Can't access notebook URL?**
       - Wait 1-2 minutes for full startup
       - Check if you're on a VPN that might block the connection
       - Verify the session is in "Running" status
+    - **Variable performance in flexible mode?**
+      - This is normal - performance adapts to cluster load
+      - For consistent performance, use fixed mode with specific `--cpu` and `--memory` values
 
 ## Need Help?
 
