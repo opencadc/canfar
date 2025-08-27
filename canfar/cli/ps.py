@@ -98,10 +98,7 @@ def show(
             if not everything and instance.status not in ["Pending", "Running"]:
                 continue
             running += 1
-            if isinstance(instance.startTime, datetime):
-                uptime = datetime.now(timezone.utc) - instance.startTime
-            else:
-                uptime = "N/A"
+            uptime = datetime.now(timezone.utc) - instance.startTime
             # Convert uptime to human readable format using strftime
             created = humanize.naturaldelta(uptime)
 

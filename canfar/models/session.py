@@ -7,7 +7,7 @@ including specifications for creating and fetching sessions.
 from __future__ import annotations
 
 import warnings
-from datetime import datetime  # noqa: TC003
+from datetime import datetime, timezone
 from typing import Any, get_args
 
 from pydantic import (
@@ -204,8 +204,8 @@ class FetchResponse(BaseModel):
     type: Kind
     status: Status
     name: str
-    startTime: datetime | str = "<none>"
-    expiryTime: datetime | str = "<none>"
+    startTime: datetime
+    expiryTime: datetime
     connectURL: str
     requestedRAM: str = "<none>"
     requestedCPUCores: str = "<none>"
@@ -214,3 +214,36 @@ class FetchResponse(BaseModel):
     gpuRAMInUse: str = "<none>"
     cpuCoresInUse: str = "<none>"
     gpuUtilization: str = "<none>"
+
+    @model_validator(mode="before")
+    @classmethod
+    def _validate_datetime_fields(cls, data: Any) -> Any:
+        """Validate and default startTime and expiryTime fields.
+
+        If startTime or expiryTime are not provided with proper type/kind,
+        they are defaulted to datetime.now().
+
+        Args:
+            data (Any): Raw input data.
+
+        Returns:
+            Any: Validated data with proper datetime fields.
+        """
+        if not isinstance(data, dict):
+            return data
+        for field in ["startTime", "expiryTime"]:
+            if field in data:
+                value: Any = data[field]
+                if not isinstance(value, datetime):
+                    try:
+                        # Try to parse as datetime if it's a string
+                        if isinstance(value, str):
+                            iso_time = value.replace("Z", "+00:00")
+                            data[field] = datetime.fromisoformat(iso_time)
+                        else:
+                            # If it's not a proper type, default to now
+                            data[field] = datetime.now(timezone.utc)
+                    except (ValueError, TypeError):
+                        # If parsing fails, default to now
+                        data[field] = datetime.now(timezone.utc)
+        return data
