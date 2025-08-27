@@ -31,7 +31,11 @@ def catch(response: httpx.Response) -> None:
         response: An httpx.Response object.
     """
     response.read()
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as err:
+        log.exception(err.response.text, exc_info=False, stack_info=False, stacklevel=1)  # noqa: LOG007
+        raise err from err
 
 
 async def acatch(response: httpx.Response) -> None:  # Renamed function
@@ -41,4 +45,8 @@ async def acatch(response: httpx.Response) -> None:  # Renamed function
         response: An httpx.Response object.
     """
     await response.aread()
-    response.raise_for_status()
+    try:
+        response.raise_for_status()
+    except httpx.HTTPStatusError as err:
+        log.exception(err.response.text, exc_info=False, stack_info=False, stacklevel=1)  # noqa: LOG007
+        raise err from err
