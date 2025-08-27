@@ -36,8 +36,8 @@ class CreateRequest(BaseModel):
         description="Container image to use for the session.",
         examples=["images.canfar.net/skaha/terminal:1.1.1"],
     )
-    cores: int = Field(1, description="Number of cores.", ge=1, le=256)
-    ram: int = Field(4, description="Amount of RAM (GB).", ge=1, le=512)
+    cores: int | None = Field(None, description="Number of cores.", ge=1, le=256)
+    ram: int | None = Field(None, description="Amount of RAM (GB).", ge=1, le=512)
     kind: Kind = Field(
         ...,
         description="Type of canfar session.",

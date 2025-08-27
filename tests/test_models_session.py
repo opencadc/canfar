@@ -22,8 +22,8 @@ class TestCreateSpec:
         assert spec.name == "test-session"
         assert spec.image == "images.canfar.net/skaha/terminal:1.1.1"
         assert spec.kind == "headless"
-        assert spec.cores == 1  # default
-        assert spec.ram == 4  # default
+        assert spec.cores is None  # default
+        assert spec.ram is None  # default
         assert spec.replicas == 1  # default
         assert spec.gpus is None
         assert spec.cmd is None

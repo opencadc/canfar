@@ -173,8 +173,8 @@ class Session(HTTPClient):
         self,
         name: str,
         image: str,
-        cores: int = 2,
-        ram: int = 4,
+        cores: int | None = None,
+        ram: int | None = None,
         kind: Kind = "headless",
         gpu: int | None = None,
         cmd: str | None = None,
@@ -187,8 +187,8 @@ class Session(HTTPClient):
         Args:
             name (str): A unique name for the session.
             image (str): Container image to use for the session.
-            cores (int, optional): Number of cores. Defaults to 2.
-            ram (int, optional): Amount of RAM (GB). Defaults to 4.
+            cores (int, optional): Number of cores. Defaults to None.
+            ram (int, optional): Amount of RAM (GB). Defaults to None.
             kind (str, optional): Type of canfar session. Defaults to "headless".
             gpu (Optional[int], optional): Number of GPUs. Defaults to None.
             cmd (Optional[str], optional): Command to run. Defaults to None.
@@ -198,8 +198,11 @@ class Session(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            The name of the session suffixed with the replica number. eg. test-1, test-2
-            Each container will have the following environment variables injected:
+            - If cores and ram are not specified, the session will be created with
+              flexible resource allocation.
+            - The name of the session suffixed with the replica number. eg. test-42
+              when replicas > 1.
+            - Each container will have the following environment variables injected:
                 * REPLICA_ID - The replica number
                 * REPLICA_COUNT - The total number of replicas
 
@@ -572,8 +575,8 @@ class AsyncSession(HTTPClient):
         self,
         name: str,
         image: str,
-        cores: int = 2,
-        ram: int = 4,
+        cores: int | None = None,
+        ram: int | None = None,
         kind: Kind = "headless",
         gpu: int | None = None,
         cmd: str | None = None,
@@ -586,8 +589,8 @@ class AsyncSession(HTTPClient):
         Args:
             name (str): A unique name for the session.
             image (str): Container image to use for the session.
-            cores (int, optional): Number of cores. Defaults to 2.
-            ram (int, optional): Amount of RAM (GB). Defaults to 4.
+            cores (int, optional): Number of cores. Defaults to None.
+            ram (int, optional): Amount of RAM (GB). Defaults to None.
             kind (str, optional): Type of canfar session. Defaults to "headless".
             gpu (Optional[int], optional): Number of GPUs. Defaults to None.
             cmd (Optional[str], optional): Command to run. Defaults to None.
@@ -597,8 +600,11 @@ class AsyncSession(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            The name of the session suffixed with the replica number. eg. test-1, test-2
-            Each container will have the following environment variables injected:
+            - If cores and ram are not specified, the session will be created with
+              flexible resource allocation.
+            - The name of the session suffixed with the replica number. eg. test-42
+              when replicas > 1.
+            - Each container will have the following environment variables injected:
                 * REPLICA_ID - The replica number
                 * REPLICA_COUNT - The total number of replicas
 
