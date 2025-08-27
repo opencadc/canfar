@@ -31,8 +31,8 @@ def fetch_parameters(
 def create_parameters(
     name: str,
     image: str,
-    cores: int = 2,
-    ram: int = 4,
+    cores: int | None = None,
+    ram: int | None = None,
     kind: Kind = "headless",
     gpu: int | None = None,
     cmd: str | None = None,

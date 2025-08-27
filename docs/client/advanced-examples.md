@@ -30,12 +30,31 @@ for datafile in distributed.chunk(datafiles):
 
 ### Large Scale Parallel Processing
 
-=== ":material-language-python: API"
+=== ":material-language-python: Flexible Mode (Recommended)"
 
     ```python
     from canfar.session import AsyncSession
 
     async with AsyncSession() as session:
+        # Flexible resource allocation - adapts to cluster availability
+        sessions = await session.create(
+            name="fits-processing",
+            image="images.canfar.net/your/analysis-container:latest",
+            kind="headless",
+            cmd="python",
+            args=["/path/to/batch_processing.py"],
+            replicas=100,
+        )
+        return sessions
+    ```
+
+=== ":material-language-python: Fixed Mode"
+
+    ```python
+    from canfar.session import AsyncSession
+
+    async with AsyncSession() as session:
+        # Fixed resource allocation - guaranteed resources
         sessions = await session.create(
             name="fits-processing",
             image="images.canfar.net/your/analysis-container:latest",
@@ -49,11 +68,68 @@ for datafile in distributed.chunk(datafiles):
         return sessions
     ```
 
-=== ":simple-gnubash: CLI"
+=== ":simple-gnubash: CLI Flexible Mode"
 
     ```bash
+    # Flexible resource allocation (default)
+    canfar create -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
+    ```
+
+=== ":simple-gnubash: CLI Fixed Mode"
+
+    ```bash
+    # Fixed resource allocation
     canfar create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
     ```
+
+## Advanced Resource Allocation Strategies
+
+For complex workflows, choosing the right resource allocation mode can significantly impact performance:
+
+### Mixed Resource Allocation
+
+You can combine flexible and fixed modes within the same workflow:
+
+```python
+from canfar.sessions import AsyncSession
+
+async def mixed_workflow():
+    async with AsyncSession() as session:
+        # Use flexible mode for data preprocessing (variable workload)
+        preprocessing_sessions = await session.create(
+            name="preprocess",
+            image="images.canfar.net/your/preprocessing:latest",
+            kind="headless",
+            cmd="python",
+            args=["preprocess.py"],
+            replicas=50,
+        )
+
+        # Use fixed mode for intensive analysis (predictable workload)
+        analysis_sessions = await session.create(
+            name="analysis",
+            image="images.canfar.net/your/analysis:latest",
+            kind="headless",
+            cores=16,
+            ram=64,
+            cmd="python",
+            args=["analyze.py"],
+            replicas=10,
+        )
+
+        return preprocessing_sessions + analysis_sessions
+```
+
+### Resource Allocation Guidelines for Advanced Workflows
+
+| Workflow Type | Recommended Mode | Reasoning |
+|---------------|------------------|-----------|
+| **Data Preprocessing** | Flexible | Variable I/O patterns, benefits from burst capacity |
+| **Machine Learning Training** | Fixed | Consistent performance needed for convergence |
+| **Monte Carlo Simulations** | Flexible | Independent tasks, can handle variable performance |
+| **Image Processing Pipelines** | Fixed | Memory-intensive, predictable resource needs |
+| **Interactive Development** | Flexible | Exploratory work, cost-effective |
+| **Production Batch Jobs** | Fixed | Reliable performance for scheduled workflows |
 
 ## Distributed Processing Strategies
 

@@ -51,31 +51,18 @@ Choose a descriptive name that helps you identify this session later (e.g., `gal
 
 > ![image](../images/notebook/4_choose_name.png)
 
-#### Memory (RAM) Selection
-
-a new session with more memory if needed.
-Select the maximum memory your analysis will require. **Start conservatively**—you can always launch a new session with more memory if needed.
-
-- **8GB**: Light data analysis, small datasets
-- **16GB (default)**: Suitable for most analyses, equivalent to a MacBook Pro
-- **32GB+**: Large datasets, memory-intensive computations
-
-**Resource sharing**: Computing resources are shared among all users. Large memory requests
-may delay session startup if resources are unavailable.
+#### Resource Allocation
 
 > ![image](../images/notebook/5_select_RAM.png)
-
-#### CPU Cores
-
-Choose the number of processing cores based on your computational needs:
-
-- **1 core**: Simple analysis, single-threaded code
-- **2 cores (default)**: Recommended for most tasks
-- **4+ cores**: Parallel processing, intensive computations
 
 Most astronomy software uses only one core unless specifically configured for parallel processing.
 
 > ![image](../images/notebook/6_choose_cores.png)
+
+See [resource allocation guidelines](../../concepts.md#session-resource-allocation) for more information.
+
+!!! tip "Resource Strategy"
+    **Start with flexible mode** for most notebook work. Only use fixed mode when you need guaranteed performance or have specific resource requirements determined through testing.
 
 ### Step 4: Launch Your Session
 

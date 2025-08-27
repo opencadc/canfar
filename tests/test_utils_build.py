@@ -40,9 +40,10 @@ class TestCreateParameters:
         assert payload_dict["name"] == "test-session"
         assert payload_dict["image"] == "images.canfar.net/skaha/terminal:1.1.1"
         assert payload_dict["type"] == "headless"  # default kind becomes type
-        assert payload_dict["cores"] == 2  # default
-        assert payload_dict["ram"] == 4  # default
-
+        assert payload_dict.get("cores") is None  # default
+        assert payload_dict.get("ram") is None  # default
+        assert "cores" not in payload_dict
+        assert "ram" not in payload_dict
         # Check environment variables - they are stored as list of "KEY=VALUE" strings
         env_items = [item for key, item in payload if key == "env"]
         env_vars = dict([item.split("=", 1) for item in env_items])

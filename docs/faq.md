@@ -86,16 +86,23 @@ Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data s
 - Share code via Git and group storage; document workflows.
 
 ### Troubleshooting slow or failing sessions
-- Resource constraints: try fewer cores/less RAM, different time of day, or a different container.
-- Container issues: verify name/version; try a maintained baseline image.
-- Account/group issues: confirm group membership and active account status.
-- Performance: process data in fast scratch (e.g., `/tmp/`), parallelize where appropriate, monitor with `htop`, `df -h`, `iotop`.
+- **Resource constraints**: Try flexible mode (default) for faster scheduling, or use fixed mode with fewer cores/less RAM if needed. Consider different times of day when cluster load varies.
+- **Variable performance in flexible mode**: This is normal - performance adapts to cluster load. For consistent performance, use fixed mode with specific resource values.
+- **Container issues**: Verify name/version; try a maintained baseline image.
+- **Account/group issues**: Confirm group membership and active account status.
+- **Performance optimization**: Process data in fast scratch (e.g., `/scratch/`), parallelize where appropriate, monitor with `htop`, `df -h`, `iotop`.
 
 ### Getting help and community
 - Documentation: start at `platform/home.md` and `platform/guides/index.md`.
 - Help & Support: `platform/help.md` (how to contact support and what to include).
 - Community: Discord for Q&A and announcements; workshops and office hours are announced there.
 
+## Session Resources
+
+### Why is my session performance variable?
+If you're using flexible mode (the default), performance variation is normal and expected. Your session can use more resources when the cluster has capacity available, but may use fewer resources during peak usage times. This adaptive behavior allows for better overall cluster utilization.
+
+For consistent performance, use fixed mode by specifying exact `--cpu` and `--memory` values (CLI) or `cores` and `ram` parameters (Python API).
 
 ## Client
 

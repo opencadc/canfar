@@ -199,7 +199,7 @@ rule source_extract:
 
 !!! tip "Advanced: Resource Monitoring"
     - Use `canfar stats <session-id>` and `canfar info <session-id>` to monitor job resource usage.
-    - For parallel workloads, see [Distributed Computing](../helpers/distributed.md).
+    - For parallel workloads, see [Distributed Computing](../client/helpers.md).
 
 #### Resource Allocation Strategy
 

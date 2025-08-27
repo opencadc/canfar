@@ -139,45 +139,49 @@ canfar auth purge [OPTIONS]
 Create a new session on the Science Platform.
 
 ```bash
-canfar create [OPTIONS] desktop|notebook|carta|headless|firefly|desktop-app|contributed IMAGE [-- CMD [ARGS]...]
+canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 ```
 
 !!! note "Passing Commands & Arguments"
 
-    If you need to pass arguments to the command, you must use the `--` separator. For example:
     ```bash
-    canfar create --name example --cpu 1 --memory 1 headless skaha/terminal:1.1.2 -- ls -la /
+    canfar create headless skaha/terminal:1.1.2 -- python3 /path/to/script.py --arg1
     ```
-    In this example, `ls` is the command and `-la /` are the arguments.
-    
-    Options for launching the session come before the `--`, while options for the command come after.
+    In this example, `python3` is the command and `/path/to/script.py --arg1` are the arguments.
 
+    !!! warning ""
+
+        - If you need to pass arguments to the command, you must use the `--` separator.
+        - If you don’t supply a `CMD`, the `--` is not necessary.
 
 **Arguments:**
-- `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`
-- `IMAGE` (required): Container image to use
-- `CMD [ARGS]...` (optional): Runtime command and arguments
+
+  - `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `contributed`
+  - `IMAGE` (required): Container image to use
+  - `CMD [ARGS]...` (optional): Runtime command and arguments
 
 #### Options
 
 | Option | Short | Type | Default | Description |
 |--------|-------|------|---------|-------------|
 | `--name` | `-n` | TEXT | Auto-generated | Name of the session |
-| `--cpu` | `-c` | INTEGER | 1 | Number of CPU cores |
-| `--memory` | `-m` | INTEGER | 2 | Amount of RAM in GB |
+| `--cpu` | `-c` | INTEGER | flexible | Number of CPU cores (optional - uses flexible allocation if not specified) |
+| `--memory` | `-m` | INTEGER | flexible | Amount of RAM in GB (optional - uses flexible allocation if not specified) |
 | `--gpu` | `-g` | INTEGER | None | Number of GPUs |
 | `--env` | `-e` | TEXT | None | Environment variables (e.g., `--env KEY=VALUE`) |
 | `--replicas` | `-r` | INTEGER | 1 | Number of replicas to create |
 | `--debug` | - | Flag | - | Enable debug logging |
-| `--dry-run` | - | Flag | - | Perform a dry run without creating the session |
+| `--dry-run` | - | Flag | - | Dry run. Parse parameters and exit |
 
-!!! example "Create a Notebook Session"
+!!! example "Create a Flexible Notebook Session (Default)"
     ```bash
+    # Uses flexible resource allocation - adapts to user load
     canfar create notebook skaha/base-notebook:latest
     ```
 
-!!! example "Create a Jupyter Notebook with Custom Resources"
+!!! example "Create a Fixed Resource Notebook Session"
     ```bash
+    # Uses fixed resource allocation - guaranteed resources
     canfar create --cpu 4 --memory 8 notebook skaha/astroml-notebook:latest
     ```
 
@@ -186,11 +190,15 @@ canfar create [OPTIONS] desktop|notebook|carta|headless|firefly|desktop-app|cont
     canfar create headless skaha/terminal:1.1.2 -- python3 /path/to/script.py --arg1 --arg2
     ```
 
-!!! example "Create a Replicated Headless Sessions"
+!!! example "Create Replicated Headless Sessions"
     ```bash
     # Create 10 headless replicas running the `env` command
     canfar create --replicas 10 headless skaha/terminal:1.1.2 -- env
     ```
+
+#### Resource Allocation Modes
+
+CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#session-resource-allocation) for more information.
 
 ### `canfar ps`
 

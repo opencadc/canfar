@@ -116,7 +116,7 @@ getfacl /arc/projects/[project]/
     - Use [Batch Jobs](batch-jobs.md) for large-scale or automated processing.
     - Monitor session resource usage with `canfar stats` and [session info](concepts.md#sessions).
     - Store temporary files in `/scratch/` for faster I/O.
-    - For parallel workloads, see [Distributed Computing](../helpers/distributed.md).
+    - For parallel workloads, see [Distributed Computing](../client/helpers.md).
 
 **Symptoms**: Slow processing or unresponsive interface
 
@@ -165,7 +165,7 @@ env | grep -E "(CANFAR|SKAHA)"
 
 !!! info "See Also"
     - [Bug Reports](../bug-reports.md)
-    - [Security](../../security.md)
+    - [Security](../security.md)
     - [Contributing](#contributing-to-documentation)
 
 ### When to Contact Support
@@ -444,8 +444,8 @@ Our documentation follows a clear structure designed for different user needs:
 
 **Advanced Users**:
 - Provide technical details and configuration options
-- Use [CANFAR CLI](../../cli/cli-help.md) for automation and scripting
-- Explore [Distributed Computing](../helpers/distributed.md) for parallel workloads
+- Use [CANFAR CLI](../cli/cli-help.md) for automation and scripting
+- Explore [Distributed Computing](../client/helpers.md) for parallel workloads
 - Integrate CANFAR with external tools (e.g., Jupyter, Docker, GitHub Actions)
 - Link to detailed reference materials and example scripts
 

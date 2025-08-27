@@ -435,8 +435,6 @@ canfar run --image images.canfar.net/myteam/xray-analysis:latest --type notebook
 - Update schedule: Monthly
 - Source: [GitHub repository](https://github.com/myteam/xray-container)
 
-```bash
-
 Regular maintenance includes updating base images, refreshing software dependencies, and testing compatibility with new CANFAR features. Community-maintained containers benefit from collaborative development practices including shared repositories and issue tracking.
 
 ---
@@ -455,6 +453,7 @@ Understanding this integration helps optimize workflows by leveraging container 
 
 
 Continue exploring CANFAR capabilities through:
+
 - [Interactive Sessions](guides/interactive-sessions/index.md) for hands-on container usage
 - [Batch Jobs](batch-jobs.md) for automated processing
 - [Storage Management](guides/storage/index.md) for data organisation strategies

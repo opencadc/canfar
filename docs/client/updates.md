@@ -13,7 +13,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
 
     :simple-gnubash: **CLI Support**
     
-      - Comprehensive CLI support has been added to the client under the `canfar` entry point. See [CLI Reference](../cli/home.md) for more information.
+      - Comprehensive CLI support has been added to the client under the `canfar` entry point. See [CLI Reference](../cli/cli-help.md) for more information.
       - The `canfar` CLI is the recommended way to manage authentication. See [Authentication Contexts](../cli/authentication-contexts.md) for more information.
     
     **🌎 SRCnet Support**

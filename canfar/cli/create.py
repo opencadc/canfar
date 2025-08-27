@@ -16,6 +16,11 @@ from canfar.utils import funny
 
 console = Console()
 
+kinds: list[str] = list(get_args(Kind))
+# Remove desktop-app from the list of kinds for usage message since,
+# they can only be created from within a desktop session.
+kinds.remove("desktop-app")
+
 
 class CreateUsageMessage(AliasGroup):
     """Custom usage message for prune command.
@@ -33,13 +38,13 @@ class CreateUsageMessage(AliasGroup):
         Returns:
             str: The usage message.
         """
-        return "Usage: canfar create [OPTIONS] KIND IMAGE -- CMD [ARGS]... "
+        return "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]"
 
 
 create = typer.Typer(
     name="create",
     no_args_is_help=True,
-    cls=AliasGroup,
+    cls=CreateUsageMessage,
 )
 
 
@@ -55,8 +60,8 @@ def creation(
         Kind,
         typer.Argument(
             ...,
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),
-            metavar="|".join(list(get_args(Kind))),
+            click_type=click.Choice(kinds, case_sensitive=True),
+            metavar="|".join(kinds),
             help="Session Kind.",
         ),
     ],
@@ -71,17 +76,25 @@ def creation(
     name: Annotated[
         str, typer.Option("--name", "-n", help="Name of the session.")
     ] = funny.name(),
-    cpu: Annotated[int, typer.Option("--cpu", "-c", help="Number of CPU cores.")] = 1,
+    cpu: Annotated[
+        int | None,
+        typer.Option(
+            "--cpu", "-c", help="Number of CPU cores.", show_default="flexible"
+        ),
+    ] = None,
     memory: Annotated[
-        int, typer.Option("--memory", "-m", help="Amount of RAM in GB.")
-    ] = 2,
+        int | None,
+        typer.Option(
+            "--memory", "-m", help="Amount of RAM in GB.", show_default="flexible"
+        ),
+    ] = None,
     gpu: Annotated[
         int | None, typer.Option("--gpu", "-g", help="Number of GPUs.")
     ] = None,
     env: Annotated[
         list[str] | None,
         typer.Option(
-            "--env", "-e", help="Environment variables (e.g., --env KEY=VALUE)."
+            "--env", "-e", help="Set environment variables.", metavar="KEY=VALUE"
         ),
     ] = None,
     replicas: Annotated[
@@ -98,7 +111,7 @@ def creation(
         bool,
         typer.Option(
             "--dry-run",
-            help="Perform a dry run without actually creating the session.",
+            help="Dry run. Parse parameters and exit.",
         ),
     ] = False,
 ) -> None:
@@ -107,7 +120,7 @@ def creation(
     Examples:
     canfar create notebook skaha/base-notebook:latest
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
-    canfar create headless skaha/base-notebook:latest -- python3 -V
+    canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
     cmd = None
     args = ""
