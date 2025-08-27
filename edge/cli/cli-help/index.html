@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/" class="md-tabs__link">
+        <a href="../../conduct/" class="md-tabs__link">
           
   
   
@@ -1335,7 +1335,7 @@
   
   
   
-    <a href="../../contributing/" class="md-nav__link">
+    <a href="../../conduct/" class="md-nav__link">
       
   
   
@@ -1691,20 +1691,26 @@
 <h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-create"><code>canfar create</code><a class="headerlink" href="#canfar-create" title="Permanent link">&para;</a></h3>
 <p>Create a new session on the Science Platform.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>desktop<span class="p">|</span>notebook<span class="p">|</span>carta<span class="p">|</span>headless<span class="p">|</span>firefly<span class="p">|</span>desktop-app<span class="p">|</span>contributed<span class="w"> </span>IMAGE<span class="w"> </span><span class="o">[</span>--<span class="w"> </span>CMD<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...<span class="o">]</span>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>KIND<span class="w"> </span>IMAGE<span class="w"> </span><span class="o">[</span>--<span class="w"> </span>CMD<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...<span class="o">]</span>
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Passing Commands &amp; Arguments</p>
-<p>If you need to pass arguments to the command, you must use the <code>--</code> separator. For example:
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>example<span class="w"> </span>--cpu<span class="w"> </span><span class="m">1</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">1</span><span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>ls<span class="w"> </span>-la<span class="w"> </span>/
+<p><div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/path/to/script.py<span class="w"> </span>--arg1
 </code></pre></div>
-In this example, <code>ls</code> is the command and <code>-la /</code> are the arguments.</p>
-<p>Options for launching the session come before the <code>--</code>, while options for the command come after.</p>
+In this example, <code>python3</code> is the command and <code>/path/to/script.py --arg1</code> are the arguments.</p>
+<div class="admonition warning">
+<ul>
+<li>If you need to pass arguments to the command, you must use the <code>--</code> separator.</li>
+<li>If you don’t supply a <code>CMD</code>, the <code>--</code> is not necessary.</li>
+</ul>
 </div>
-<p><strong>Arguments:</strong>
-- <code>KIND</code> (required): Session type - one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code>
-- <code>IMAGE</code> (required): Container image to use
-- <code>CMD [ARGS]...</code> (optional): Runtime command and arguments</p>
+</div>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>KIND</code> (required): Session type - one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>contributed</code></li>
+<li><code>IMAGE</code> (required): Container image to use</li>
+<li><code>CMD [ARGS]...</code> (optional): Runtime command and arguments</li>
+</ul>
 <h4 id="options_2">Options<a class="headerlink" href="#options_2" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -1728,15 +1734,15 @@ In this example, <code>ls</code> is the command and <code>-la /</code> are the a
 <td><code>--cpu</code></td>
 <td><code>-c</code></td>
 <td>INTEGER</td>
-<td>1</td>
-<td>Number of CPU cores</td>
+<td>flexible</td>
+<td>Number of CPU cores (optional - uses flexible allocation if not specified)</td>
 </tr>
 <tr>
 <td><code>--memory</code></td>
 <td><code>-m</code></td>
 <td>INTEGER</td>
-<td>2</td>
-<td>Amount of RAM in GB</td>
+<td>flexible</td>
+<td>Amount of RAM in GB (optional - uses flexible allocation if not specified)</td>
 </tr>
 <tr>
 <td><code>--gpu</code></td>
@@ -1771,18 +1777,20 @@ In this example, <code>ls</code> is the command and <code>-la /</code> are the a
 <td>-</td>
 <td>Flag</td>
 <td>-</td>
-<td>Perform a dry run without creating the session</td>
+<td>Dry run. Parse parameters and exit</td>
 </tr>
 </tbody>
 </table>
 <div class="admonition example">
-<p class="admonition-title">Create a Notebook Session</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/base-notebook:latest
+<p class="admonition-title">Create a Flexible Notebook Session (Default)</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Uses flexible resource allocation - adapts to user load</span>
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/base-notebook:latest
 </code></pre></div>
 </div>
 <div class="admonition example">
-<p class="admonition-title">Create a Jupyter Notebook with Custom Resources</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml-notebook:latest
+<p class="admonition-title">Create a Fixed Resource Notebook Session</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Uses fixed resource allocation - guaranteed resources</span>
+canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml-notebook:latest
 </code></pre></div>
 </div>
 <div class="admonition example">
@@ -1791,11 +1799,13 @@ In this example, <code>ls</code> is the command and <code>-la /</code> are the a
 </code></pre></div>
 </div>
 <div class="admonition example">
-<p class="admonition-title">Create a Replicated Headless Sessions</p>
+<p class="admonition-title">Create Replicated Headless Sessions</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Create 10 headless replicas running the `env` command</span>
 canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>env
 </code></pre></div>
 </div>
+<h4 id="resource-allocation-modes">Resource Allocation Modes<a class="headerlink" href="#resource-allocation-modes" title="Permanent link">&para;</a></h4>
+<p>CANFAR Science Platform supports two resource allocation modes, see <a href="../../platform/concepts/#session-resource-allocation">platform concepts</a> for more information.</p>
 <h3 id="canfar-ps"><code>canfar ps</code><a class="headerlink" href="#canfar-ps" title="Permanent link">&para;</a></h3>
 <p>Show running sessions.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -2151,7 +2161,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 23:19:27 UTC">August 26, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 27, 2025 17:17:31 UTC">August 27, 2025</span>
   </span>
 
     

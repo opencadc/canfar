@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/" class="md-tabs__link">
+        <a href="../../conduct/" class="md-tabs__link">
           
   
   
@@ -1547,7 +1547,7 @@
   
   
   
-    <a href="../../contributing/" class="md-nav__link">
+    <a href="../../conduct/" class="md-nav__link">
       
   
   
@@ -1850,10 +1850,7 @@ retrieving logs, and destroying existing sessions.</p>
 
               <details class="quote">
                 <summary>Source code in <code>canfar/sessions.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">380</span>
 <span class="normal">381</span>
 <span class="normal">382</span>
 <span class="normal">383</span>
@@ -2278,7 +2275,13 @@ retrieving logs, and destroying existing sessions.</p>
 <span class="normal">802</span>
 <span class="normal">803</span>
 <span class="normal">804</span>
-<span class="normal">805</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AsyncSession</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AsyncSession</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronous CANFAR Session Management Client.</span>
 
 <span class="sd">    This class provides methods to manage sessions in the system,</span>
@@ -2476,8 +2479,8 @@ retrieving logs, and destroying existing sessions.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
         <span class="n">gpu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -2490,8 +2493,8 @@ retrieving logs, and destroying existing sessions.</p>
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): A unique name for the session.</span>
 <span class="sd">            image (str): Container image to use for the session.</span>
-<span class="sd">            cores (int, optional): Number of cores. Defaults to 2.</span>
-<span class="sd">            ram (int, optional): Amount of RAM (GB). Defaults to 4.</span>
+<span class="sd">            cores (int, optional): Number of cores. Defaults to None.</span>
+<span class="sd">            ram (int, optional): Amount of RAM (GB). Defaults to None.</span>
 <span class="sd">            kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
 <span class="sd">            gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">            cmd (Optional[str], optional): Command to run. Defaults to None.</span>
@@ -2501,8 +2504,11 @@ retrieving logs, and destroying existing sessions.</p>
 <span class="sd">            replicas (int, optional): Number of sessions to launch. Defaults to 1.</span>
 
 <span class="sd">        Notes:</span>
-<span class="sd">            The name of the session suffixed with the replica number. eg. test-1, test-2</span>
-<span class="sd">            Each container will have the following environment variables injected:</span>
+<span class="sd">            - If cores and ram are not specified, the session will be created with</span>
+<span class="sd">              flexible resource allocation.</span>
+<span class="sd">            - The name of the session suffixed with the replica number. eg. test-42</span>
+<span class="sd">              when replicas &gt; 1.</span>
+<span class="sd">            - Each container will have the following environment variables injected:</span>
 <span class="sd">                * REPLICA_ID - The replica number</span>
 <span class="sd">                * REPLICA_COUNT - The total number of replicas</span>
 
@@ -2781,13 +2787,7 @@ retrieving logs, and destroying existing sessions.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">787</span>
-<span class="normal">788</span>
-<span class="normal">789</span>
-<span class="normal">790</span>
-<span class="normal">791</span>
-<span class="normal">792</span>
-<span class="normal">793</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">793</span>
 <span class="normal">794</span>
 <span class="normal">795</span>
 <span class="normal">796</span>
@@ -2799,7 +2799,13 @@ retrieving logs, and destroying existing sessions.</p>
 <span class="normal">802</span>
 <span class="normal">803</span>
 <span class="normal">804</span>
-<span class="normal">805</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">805</span>
+<span class="normal">806</span>
+<span class="normal">807</span>
+<span class="normal">808</span>
+<span class="normal">809</span>
+<span class="normal">810</span>
+<span class="normal">811</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect to a session[s] in a web browser.</span>
 
 <span class="sd">    Args:</span>
@@ -2828,7 +2834,7 @@ retrieving logs, and destroying existing sessions.</p>
 
 
 <h2 id="canfar.sessions.AsyncSession.create" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;headless&#39;</span><span class="p">,</span> <span class="n">gpu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replicas</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
+            <code class="highlight language-python"><span class="n">create</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">ram</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;headless&#39;</span><span class="p">,</span> <span class="n">gpu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">replicas</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span></code>
 
   <span class="doc doc-labels">
       <small class="doc doc-label doc-label-async"><code>async</code></small>
@@ -2894,11 +2900,11 @@ retrieving logs, and destroying existing sessions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of cores. Defaults to 2.</p>
+                <p>Number of cores. Defaults to None.</p>
               </div>
             </td>
             <td>
-                  <code>2</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -2910,11 +2916,11 @@ retrieving logs, and destroying existing sessions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Amount of RAM (GB). Defaults to 4.</p>
+                <p>Amount of RAM (GB). Defaults to None.</p>
               </div>
             </td>
             <td>
-                  <code>4</code>
+                  <code>None</code>
             </td>
           </tr>
           <tr class="doc-section-item">
@@ -3020,10 +3026,17 @@ Defaults to None.</p>
 
 <details class="notes" open>
   <summary>Notes</summary>
-  <p>The name of the session suffixed with the replica number. eg. test-1, test-2
-Each container will have the following environment variables injected:
-    * REPLICA_ID - The replica number
-    * REPLICA_COUNT - The total number of replicas</p>
+  <ul>
+<li>If cores and ram are not specified, the session will be created with
+  flexible resource allocation.</li>
+<li>The name of the session suffixed with the replica number. eg. test-42
+  when replicas &gt; 1.</li>
+<li>Each container will have the following environment variables injected:<ul>
+<li>REPLICA_ID - The replica number</li>
+<li>REPLICA_COUNT - The total number of replicas</li>
+</ul>
+</li>
+</ul>
 </details>
 
     <p><span class="doc-section-title">Returns:</span></p>
@@ -3069,10 +3082,7 @@ Each container will have the following environment variables injected:
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">571</span>
-<span class="normal">572</span>
-<span class="normal">573</span>
-<span class="normal">574</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">574</span>
 <span class="normal">575</span>
 <span class="normal">576</span>
 <span class="normal">577</span>
@@ -3153,12 +3163,18 @@ Each container will have the following environment variables injected:
 <span class="normal">652</span>
 <span class="normal">653</span>
 <span class="normal">654</span>
-<span class="normal">655</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
+<span class="normal">655</span>
+<span class="normal">656</span>
+<span class="normal">657</span>
+<span class="normal">658</span>
+<span class="normal">659</span>
+<span class="normal">660</span>
+<span class="normal">661</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
     <span class="n">gpu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -3171,8 +3187,8 @@ Each container will have the following environment variables injected:
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): A unique name for the session.</span>
 <span class="sd">        image (str): Container image to use for the session.</span>
-<span class="sd">        cores (int, optional): Number of cores. Defaults to 2.</span>
-<span class="sd">        ram (int, optional): Amount of RAM (GB). Defaults to 4.</span>
+<span class="sd">        cores (int, optional): Number of cores. Defaults to None.</span>
+<span class="sd">        ram (int, optional): Amount of RAM (GB). Defaults to None.</span>
 <span class="sd">        kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
 <span class="sd">        gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">        cmd (Optional[str], optional): Command to run. Defaults to None.</span>
@@ -3182,8 +3198,11 @@ Each container will have the following environment variables injected:
 <span class="sd">        replicas (int, optional): Number of sessions to launch. Defaults to 1.</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">        The name of the session suffixed with the replica number. eg. test-1, test-2</span>
-<span class="sd">        Each container will have the following environment variables injected:</span>
+<span class="sd">        - If cores and ram are not specified, the session will be created with</span>
+<span class="sd">          flexible resource allocation.</span>
+<span class="sd">        - The name of the session suffixed with the replica number. eg. test-42</span>
+<span class="sd">          when replicas &gt; 1.</span>
+<span class="sd">        - Each container will have the following environment variables injected:</span>
 <span class="sd">            * REPLICA_ID - The replica number</span>
 <span class="sd">            * REPLICA_COUNT - The total number of replicas</span>
 
@@ -3336,13 +3355,7 @@ Each container will have the following environment variables injected:
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">710</span>
-<span class="normal">711</span>
-<span class="normal">712</span>
-<span class="normal">713</span>
-<span class="normal">714</span>
-<span class="normal">715</span>
-<span class="normal">716</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">716</span>
 <span class="normal">717</span>
 <span class="normal">718</span>
 <span class="normal">719</span>
@@ -3374,7 +3387,13 @@ Each container will have the following environment variables injected:
 <span class="normal">745</span>
 <span class="normal">746</span>
 <span class="normal">747</span>
-<span class="normal">748</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="normal">748</span>
+<span class="normal">749</span>
+<span class="normal">750</span>
+<span class="normal">751</span>
+<span class="normal">752</span>
+<span class="normal">753</span>
+<span class="normal">754</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy session[s].</span>
 
 <span class="sd">    Args:</span>
@@ -3550,13 +3569,7 @@ This method is useful for destroying multiple sessions at once.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">750</span>
-<span class="normal">751</span>
-<span class="normal">752</span>
-<span class="normal">753</span>
-<span class="normal">754</span>
-<span class="normal">755</span>
-<span class="normal">756</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">756</span>
 <span class="normal">757</span>
 <span class="normal">758</span>
 <span class="normal">759</span>
@@ -3585,7 +3598,13 @@ This method is useful for destroying multiple sessions at once.</p>
 <span class="normal">782</span>
 <span class="normal">783</span>
 <span class="normal">784</span>
-<span class="normal">785</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
+<span class="normal">785</span>
+<span class="normal">786</span>
+<span class="normal">787</span>
+<span class="normal">788</span>
+<span class="normal">789</span>
+<span class="normal">790</span>
+<span class="normal">791</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
@@ -3730,13 +3749,7 @@ This method is useful for destroying multiple sessions at once.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">657</span>
-<span class="normal">658</span>
-<span class="normal">659</span>
-<span class="normal">660</span>
-<span class="normal">661</span>
-<span class="normal">662</span>
-<span class="normal">663</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">663</span>
 <span class="normal">664</span>
 <span class="normal">665</span>
 <span class="normal">666</span>
@@ -3781,7 +3794,13 @@ This method is useful for destroying multiple sessions at once.</p>
 <span class="normal">705</span>
 <span class="normal">706</span>
 <span class="normal">707</span>
-<span class="normal">708</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+<span class="normal">708</span>
+<span class="normal">709</span>
+<span class="normal">710</span>
+<span class="normal">711</span>
+<span class="normal">712</span>
+<span class="normal">713</span>
+<span class="normal">714</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -3984,10 +4003,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">402</span>
 <span class="normal">403</span>
 <span class="normal">404</span>
 <span class="normal">405</span>
@@ -4039,7 +4055,10 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">451</span>
 <span class="normal">452</span>
 <span class="normal">453</span>
-<span class="normal">454</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4183,10 +4202,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">481</span>
 <span class="normal">482</span>
 <span class="normal">483</span>
 <span class="normal">484</span>
@@ -4222,7 +4238,10 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">514</span>
 <span class="normal">515</span>
 <span class="normal">516</span>
-<span class="normal">517</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="normal">517</span>
+<span class="normal">518</span>
+<span class="normal">519</span>
+<span class="normal">520</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get information about session[s].</span>
 
 <span class="sd">    Args:</span>
@@ -4366,10 +4385,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">519</span>
-<span class="normal">520</span>
-<span class="normal">521</span>
-<span class="normal">522</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">522</span>
 <span class="normal">523</span>
 <span class="normal">524</span>
 <span class="normal">525</span>
@@ -4416,7 +4432,10 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">566</span>
 <span class="normal">567</span>
 <span class="normal">568</span>
-<span class="normal">569</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
+<span class="normal">569</span>
+<span class="normal">570</span>
+<span class="normal">571</span>
+<span class="normal">572</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -4529,10 +4548,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">456</span>
-<span class="normal">457</span>
-<span class="normal">458</span>
-<span class="normal">459</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">459</span>
 <span class="normal">460</span>
 <span class="normal">461</span>
 <span class="normal">462</span>
@@ -4549,7 +4565,10 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">473</span>
 <span class="normal">474</span>
 <span class="normal">475</span>
-<span class="normal">476</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get statistics for the canfar cluster.</span>
 
 <span class="sd">    Returns:</span>

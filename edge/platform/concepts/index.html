@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/" class="md-tabs__link">
+        <a href="../../conduct/" class="md-tabs__link">
           
   
   
@@ -1240,7 +1240,7 @@
   
   
   
-    <a href="../../contributing/" class="md-nav__link">
+    <a href="../../conduct/" class="md-nav__link">
       
   
   
@@ -1454,7 +1454,7 @@
 <li><a href="../batch-jobs/">Batch Jobs</a></li>
 <li><a href="../guides/storage/">Storage Guide</a></li>
 <li><a href="../../client/home/">CANFAR Python Client</a></li>
-<li><a href="../help/#contact-support">Contact Support</a></li>
+<li><a href="../help/#contact-information-summary">Contact Support</a></li>
 </ul>
 </div>
 <div class="admonition abstract">
@@ -1483,7 +1483,7 @@
 <div class="admonition tip">
 <p class="admonition-title">Advanced: Platform Automation</p>
 <ul>
-<li>Use <a href="../../cli/cli-help.md">CANFAR CLI</a> and <a href="../../client/home/">Python Client</a> for scripting and automation.</li>
+<li>Use <a href="../../cli/cli-help/">CANFAR CLI</a> and <a href="../../client/home/">Python Client</a> for scripting and automation.</li>
 <li>Integrate CANFAR with <a href="https://github.com/features/actions">GitHub Actions</a> for automated workflows.</li>
 </ul>
 </div>
@@ -1751,6 +1751,120 @@ graph LR
 </div>
 </div>
 </div>
+<h3 id="session-resource-allocation">Session Resource Allocation<a class="headerlink" href="#session-resource-allocation" title="Permanent link">&para;</a></h3>
+<p>CANFAR supports two resource allocation modes that determine how CPU and memory are allocated to your sessions:</p>
+<div class="admonition info">
+<p class="admonition-title">Flexible Sessions (Default)</p>
+<p><strong>Adaptive resource allocation</strong> that adjusts to your needs:</p>
+<ul>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m16 6 2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/></svg></span> Dynamic Usage</strong>: Sessions can use more CPU and memory when cluster resources are available</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m13.13 22.19-1.63-3.83c1.57-.58 3.04-1.36 4.4-2.27zM5.64 12.5l-3.83-1.63 6.1-2.77C7 9.46 6.22 10.93 5.64 12.5M21.61 2.39S16.66.269 11 5.93c-2.19 2.19-3.5 4.6-4.35 6.71-.28.75-.09 1.57.46 2.13l2.13 2.12c.55.56 1.37.74 2.12.46A19.1 19.1 0 0 0 18.07 13c5.66-5.66 3.54-10.61 3.54-10.61m-7.07 7.07c-.78-.78-.78-2.05 0-2.83s2.05-.78 2.83 0c.77.78.78 2.05 0 2.83s-2.05.78-2.83 0m-5.66 7.07-1.41-1.41zM6.24 22l3.64-3.64c-.34-.09-.67-.24-.97-.45L4.83 22zM2 22h1.41l4.77-4.76-1.42-1.41L2 20.59zm0-2.83 4.09-4.08c-.21-.3-.36-.62-.45-.97L2 17.76z"/></svg></span> Fast Scheduling</strong>: Sessions start quickly as they're easier to place on available nodes</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m3.5 18.5 6-6 4 4L22 6.92 20.59 5.5l-7.09 8-4-4L2 17z"/></svg></span> Variable Performance</strong>: Performance adapts to cluster load and other users' activity</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.95 13.5h-.23c-.18.11-.26.32-.18.5l.86 2.11c.83-.53 1.46-1.32 1.79-2.25l-2.23-.36zm-3.45.29a.415.415 0 0 0-.38-.29h-.08l-2.22.37c.33.92.96 1.7 1.79 2.23l.85-2.07V14c.04-.05.04-.14.04-.21m1.83.81a.38.38 0 0 0-.51-.15c-.07.05-.12.08-.15.15h-.01l-1.09 1.97c.78.26 1.62.31 2.43.12.14-.03.29-.07.43-.12l-1.09-1.97zm3.45-4.57L14.1 11.5l.01.03a.37.37 0 0 0-.04.53q.075.09.18.12l.01.01 2.17.62c.07-.97-.14-1.95-.65-2.78m-3.11.16c.01.21.18.37.39.36.08 0 .15-.02.21-.05h.01l1.83-1.31a4.45 4.45 0 0 0-2.57-1.24zm-1.94.31c.17.11.4.08.52-.09.05-.06.07-.13.08-.21h.01l.12-2.25c-.15.02-.3.05-.46.08-.8.18-1.54.58-2.12 1.16l1.84 1.31zm-.99 1.69c.2-.05.32-.26.26-.46 0-.08-.05-.14-.11-.19v-.01L8.21 10c-.52.86-.74 1.84-.63 2.82l2.16-.62zm1.64.66.62.3.62-.3.15-.67-.43-.53h-.69l-.43.53zm10.89 1.32L20.5 6.5c-.09-.42-.37-.76-.74-.94l-7.17-3.43c-.37-.17-.81-.17-1.19 0L4.24 5.56c-.37.18-.65.52-.74.94l-1.77 7.67c-.05.2-.05.4 0 .59.01.06.03.12.05.18.03.09.08.19.13.27.03.04.05.08.09.11l4.95 6.18c.02 0 .05.04.05.06.1.09.19.16.28.22.12.08.26.14.4.17.11.05.23.05.32.05h8.12c.07 0 .14-.03.2-.05.05-.01.1-.03.14-.04.04-.02.07-.03.11-.05.05-.02.1-.05.15-.08.12-.08.23-.18.33-.28l.15-.2 4.8-5.98c.1-.12.17-.25.22-.38.02-.06.04-.12.05-.18.05-.19.05-.4 0-.59m-7.43 2.99c.02.06.04.12.07.17-.04.08-.06.17-.03.26.12.24.23.46.38.68.08.11.16.23.24.34 0 .03.03.08.04.12.12.2.06.46-.15.59s-.47.05-.59-.15c-.01-.03-.02-.05-.03-.08-.02-.03-.04-.09-.06-.09-.05-.15-.09-.28-.12-.41-.09-.25-.17-.49-.3-.72a.38.38 0 0 0-.21-.14l-.08-.16c-1.29.48-2.7.48-3.97-.01l-.1.18c-.07.01-.14.04-.19.09-.14.24-.24.49-.33.77-.03.13-.07.26-.12.4-.02 0-.04.07-.06.1a.43.43 0 0 1-.81-.29c.01-.03.03-.05.04-.08.04-.03.04-.08.04-.11.09-.12.16-.23.24-.35.16-.21.29-.45.39-.69a.54.54 0 0 0-.03-.25l.07-.18a5.6 5.6 0 0 1-2.47-3.09l-.2.03a.4.4 0 0 0-.23-.09c-.27.05-.51.13-.77.22-.11.06-.24.11-.37.15-.03.01-.07.02-.13.03a.44.44 0 0 1-.54-.27c-.07-.23.04-.47.28-.55.02 0 .05-.01.08-.01v-.01h.01l.11-.02c.14-.04.28-.04.41-.04.26 0 .52-.06.77-.12.08-.05.14-.11.19-.19l.19-.05c-.21-1.36.1-2.73.86-3.87l-.14-.12c0-.09-.03-.18-.08-.25-.2-.17-.41-.32-.64-.45q-.18-.09-.36-.21c-.02-.02-.06-.05-.08-.07l-.01-.01c-.2-.16-.25-.42-.11-.63.09-.1.21-.15.35-.15q.165.015.3.12l.09.07c.1.09.19.2.28.3.18.19.37.37.58.52.08.04.17.05.26.03l.15.11c.75-.8 1.73-1.36 2.8-1.6.25-.06.52-.1.78-.12l.01-.18a.45.45 0 0 0 .14-.23c.01-.26-.01-.52-.05-.77-.03-.13-.05-.27-.06-.41V5.1c-.02-.24.15-.45.39-.48s.44.15.47.38v.22c-.01.14-.03.28-.06.41-.04.25-.06.51-.05.77.02.1.07.17.14.22l.01.19c1.36.12 2.62.73 3.56 1.72l.16-.12c.09.02.18.01.26-.03.21-.15.41-.33.58-.52.09-.1.18-.2.28-.3.03-.02.07-.06.1-.06.17-.18.44-.18.59 0 .19.16.18.43 0 .6 0 .02-.03.04-.06.06a2.495 2.495 0 0 1-.44.28c-.23.13-.45.28-.64.45-.06.07-.09.15-.08.24l-.16.14a5.44 5.44 0 0 1 .88 3.86l.19.05c.04.08.11.14.19.18.25.07.51.11.77.14h.41c.03.03.08.04.12.05.24.03.4.25.37.49-.05.23-.24.4-.48.37-.03-.01-.07-.01-.07-.02v-.01c-.06 0-.1-.01-.14-.02q-.195-.06-.36-.15c-.26-.1-.5-.17-.77-.21-.09 0-.17 0-.23.08-.07-.01-.13-.02-.19-.03-.41 1.31-1.31 2.41-2.47 3.11"/></svg></span> Kubernetes QoS</strong>: Runs as "Burstable" quality of service class</li>
+</ul>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Fixed Sessions</p>
+<p><strong>Guaranteed resource allocation</strong> with dedicated resources:</p>
+<ul>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 16a3 3 0 0 1-3-3c0-1.12.61-2.1 1.5-2.61l9.71-5.62-5.53 9.58c-.5.98-1.51 1.65-2.68 1.65m0-13c1.81 0 3.5.5 4.97 1.32l-2.1 1.21C14 5.19 13 5 12 5a8 8 0 0 0-8 8c0 2.21.89 4.21 2.34 5.65h.01c.39.39.39 1.02 0 1.41s-1.03.39-1.42.01A9.97 9.97 0 0 1 2 13 10 10 0 0 1 12 3m10 10c0 2.76-1.12 5.26-2.93 7.07-.39.38-1.02.38-1.41-.01a.996.996 0 0 1 0-1.41A7.95 7.95 0 0 0 20 13c0-1-.19-2-.54-2.9L20.67 8C21.5 9.5 22 11.18 22 13"/></svg></span> Predictable Performance</strong>: Consistent CPU and memory allocation regardless of cluster load</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 17a2 2 0 0 0 2-2 2 2 0 0 0-2-2 2 2 0 0 0-2 2 2 2 0 0 0 2 2m6-9a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V10a2 2 0 0 1 2-2h1V6a5 5 0 0 1 5-5 5 5 0 0 1 5 5v2zm-6-5a3 3 0 0 0-3 3v2h6V6a3 3 0 0 0-3-3"/></svg></span> Resource Reservation</strong>: Resources are reserved exclusively for your session</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12h2v6h-2zm0 8h2v2h-2zM12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c2.3 0 4.3-.8 6-2V10h3.8c-.9-4.6-5-8-9.8-8m4.2 14.2L11 13V7h1.5v5.2l4.5 2.7z"/></svg></span> Scheduling Delays</strong>: May take longer to start if exact resources aren't immediately available</li>
+<li><strong><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.95 13.5h-.23c-.18.11-.26.32-.18.5l.86 2.11c.83-.53 1.46-1.32 1.79-2.25l-2.23-.36zm-3.45.29a.415.415 0 0 0-.38-.29h-.08l-2.22.37c.33.92.96 1.7 1.79 2.23l.85-2.07V14c.04-.05.04-.14.04-.21m1.83.81a.38.38 0 0 0-.51-.15c-.07.05-.12.08-.15.15h-.01l-1.09 1.97c.78.26 1.62.31 2.43.12.14-.03.29-.07.43-.12l-1.09-1.97zm3.45-4.57L14.1 11.5l.01.03a.37.37 0 0 0-.04.53q.075.09.18.12l.01.01 2.17.62c.07-.97-.14-1.95-.65-2.78m-3.11.16c.01.21.18.37.39.36.08 0 .15-.02.21-.05h.01l1.83-1.31a4.45 4.45 0 0 0-2.57-1.24zm-1.94.31c.17.11.4.08.52-.09.05-.06.07-.13.08-.21h.01l.12-2.25c-.15.02-.3.05-.46.08-.8.18-1.54.58-2.12 1.16l1.84 1.31zm-.99 1.69c.2-.05.32-.26.26-.46 0-.08-.05-.14-.11-.19v-.01L8.21 10c-.52.86-.74 1.84-.63 2.82l2.16-.62zm1.64.66.62.3.62-.3.15-.67-.43-.53h-.69l-.43.53zm10.89 1.32L20.5 6.5c-.09-.42-.37-.76-.74-.94l-7.17-3.43c-.37-.17-.81-.17-1.19 0L4.24 5.56c-.37.18-.65.52-.74.94l-1.77 7.67c-.05.2-.05.4 0 .59.01.06.03.12.05.18.03.09.08.19.13.27.03.04.05.08.09.11l4.95 6.18c.02 0 .05.04.05.06.1.09.19.16.28.22.12.08.26.14.4.17.11.05.23.05.32.05h8.12c.07 0 .14-.03.2-.05.05-.01.1-.03.14-.04.04-.02.07-.03.11-.05.05-.02.1-.05.15-.08.12-.08.23-.18.33-.28l.15-.2 4.8-5.98c.1-.12.17-.25.22-.38.02-.06.04-.12.05-.18.05-.19.05-.4 0-.59m-7.43 2.99c.02.06.04.12.07.17-.04.08-.06.17-.03.26.12.24.23.46.38.68.08.11.16.23.24.34 0 .03.03.08.04.12.12.2.06.46-.15.59s-.47.05-.59-.15c-.01-.03-.02-.05-.03-.08-.02-.03-.04-.09-.06-.09-.05-.15-.09-.28-.12-.41-.09-.25-.17-.49-.3-.72a.38.38 0 0 0-.21-.14l-.08-.16c-1.29.48-2.7.48-3.97-.01l-.1.18c-.07.01-.14.04-.19.09-.14.24-.24.49-.33.77-.03.13-.07.26-.12.4-.02 0-.04.07-.06.1a.43.43 0 0 1-.81-.29c.01-.03.03-.05.04-.08.04-.03.04-.08.04-.11.09-.12.16-.23.24-.35.16-.21.29-.45.39-.69a.54.54 0 0 0-.03-.25l.07-.18a5.6 5.6 0 0 1-2.47-3.09l-.2.03a.4.4 0 0 0-.23-.09c-.27.05-.51.13-.77.22-.11.06-.24.11-.37.15-.03.01-.07.02-.13.03a.44.44 0 0 1-.54-.27c-.07-.23.04-.47.28-.55.02 0 .05-.01.08-.01v-.01h.01l.11-.02c.14-.04.28-.04.41-.04.26 0 .52-.06.77-.12.08-.05.14-.11.19-.19l.19-.05c-.21-1.36.1-2.73.86-3.87l-.14-.12c0-.09-.03-.18-.08-.25-.2-.17-.41-.32-.64-.45q-.18-.09-.36-.21c-.02-.02-.06-.05-.08-.07l-.01-.01c-.2-.16-.25-.42-.11-.63.09-.1.21-.15.35-.15q.165.015.3.12l.09.07c.1.09.19.2.28.3.18.19.37.37.58.52.08.04.17.05.26.03l.15.11c.75-.8 1.73-1.36 2.8-1.6.25-.06.52-.1.78-.12l.01-.18a.45.45 0 0 0 .14-.23c.01-.26-.01-.52-.05-.77-.03-.13-.05-.27-.06-.41V5.1c-.02-.24.15-.45.39-.48s.44.15.47.38v.22c-.01.14-.03.28-.06.41-.04.25-.06.51-.05.77.02.1.07.17.14.22l.01.19c1.36.12 2.62.73 3.56 1.72l.16-.12c.09.02.18.01.26-.03.21-.15.41-.33.58-.52.09-.1.18-.2.28-.3.03-.02.07-.06.1-.06.17-.18.44-.18.59 0 .19.16.18.43 0 .6 0 .02-.03.04-.06.06a2.495 2.495 0 0 1-.44.28c-.23.13-.45.28-.64.45-.06.07-.09.15-.08.24l-.16.14a5.44 5.44 0 0 1 .88 3.86l.19.05c.04.08.11.14.19.18.25.07.51.11.77.14h.41c.03.03.08.04.12.05.24.03.4.25.37.49-.05.23-.24.4-.48.37-.03-.01-.07-.01-.07-.02v-.01c-.06 0-.1-.01-.14-.02q-.195-.06-.36-.15c-.26-.1-.5-.17-.77-.21-.09 0-.17 0-.23.08-.07-.01-.13-.02-.19-.03-.41 1.31-1.31 2.41-2.47 3.11"/></svg></span> Kubernetes QoS</strong>: Runs as "Guaranteed" quality of service class</li>
+</ul>
+</div>
+<h4 id="when-to-choose-each-mode">When to Choose Each Mode<a class="headerlink" href="#when-to-choose-each-mode" title="Permanent link">&para;</a></h4>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">🔄 Flexible Mode (Default)</label><label for="__tabbed_3_2">🎯 Fixed Mode</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="admonition info">
+<p><strong>Best for most research workflows:</strong></p>
+<ul>
+<li>Interactive data exploration and analysis</li>
+<li>Development and testing of code</li>
+<li>Learning and experimentation</li>
+<li>Workflows with variable resource needs</li>
+<li>General-purpose computing tasks</li>
+</ul>
+<p><strong>Example Use Cases:</strong></p>
+<ul>
+<li>Jupyter notebook sessions for data analysis</li>
+<li>Testing new analysis pipelines</li>
+<li>Interactive visualization with CARTA or Firefly</li>
+<li>Educational workshops and tutorials</li>
+</ul>
+<p><strong>Example Commands:</strong></p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/base-notebook:latest
+canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/base-notebook:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>script.py
+</code></pre></div>
+</div>
+</div>
+<div class="tabbed-block">
+<div class="admonition warning">
+<p><strong>Best for production and critical workloads:</strong></p>
+<ul>
+<li>Production data processing pipelines</li>
+<li>Time-sensitive computations</li>
+<li>Large-scale batch processing with known requirements</li>
+<li>Performance benchmarking</li>
+<li>Critical deadlines requiring consistent performance</li>
+</ul>
+<p><strong>Example Use Cases:</strong></p>
+<ul>
+<li>Processing large survey datasets</li>
+<li>Running computationally intensive simulations</li>
+<li>Batch processing with strict time constraints</li>
+<li>Performance-critical analysis workflows</li>
+</ul>
+<p><strong>Example Commands:</strong></p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/base-notebook:latest<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span>
+canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/base-notebook:latest<span class="w"> </span>--cpu<span class="w"> </span><span class="m">2</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">4</span><span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>script.py
+</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<h4 id="resource-allocation-in-practice">Resource Allocation in Practice<a class="headerlink" href="#resource-allocation-in-practice" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Aspect</th>
+<th>Flexible Mode</th>
+<th>Fixed Mode</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Resources</strong></td>
+<td>Optional (defaults to flexible)</td>
+<td>Required (explicit values)</td>
+</tr>
+<tr>
+<td><strong>Startup Time</strong></td>
+<td>Faster</td>
+<td>Variable (may wait for resources)</td>
+</tr>
+<tr>
+<td><strong>Performance</strong></td>
+<td>Variable, can burst higher</td>
+<td>Consistent, predictable</td>
+</tr>
+<tr>
+<td><strong>Efficiency</strong></td>
+<td>High (shared resources)</td>
+<td>Lower (dedicated resources)</td>
+</tr>
+<tr>
+<td><strong>Best Use Case</strong></td>
+<td>Interactive, exploratory work</td>
+<td>Production, critical workloads</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition tip">
+<p class="admonition-title">Getting Started</p>
+<p>Start with <strong>flexible mode</strong> (the default) for most work. Only switch to <strong>fixed mode</strong> when you need guaranteed performance or have specific resource requirements.</p>
+</div>
 <h2 id="storage-systems">💾 Storage Systems<a class="headerlink" href="#storage-systems" title="Permanent link">&para;</a></h2>
 <p>See the <a href="../guides/storage/">Storage Guide</a> for practical usage and quotas. For VOSpace scripting, see <a href="../guides/storage/vospace-api/">VOSpace API</a>.</p>
 <h3 id="data-persistence-rules">Data Persistence Rules<a class="headerlink" href="#data-persistence-rules" title="Permanent link">&para;</a></h3>
@@ -1931,7 +2045,7 @@ For example workflows, see <a href="../../client/examples/">Client Examples</a>.
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 26, 2025 22:59:34 UTC">August 26, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 27, 2025 17:38:27 UTC">August 27, 2025</span>
   </span>
 
     
@@ -1959,14 +2073,14 @@ For example workflows, see <a href="../../client/examples/">Client Examples</a>.
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

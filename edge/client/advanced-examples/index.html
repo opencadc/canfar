@@ -332,7 +332,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../contributing/" class="md-tabs__link">
+        <a href="../../conduct/" class="md-tabs__link">
           
   
   
@@ -1258,7 +1258,7 @@
   
   
   
-    <a href="../../contributing/" class="md-nav__link">
+    <a href="../../conduct/" class="md-nav__link">
       
   
   
@@ -1415,12 +1415,29 @@
     <span class="n">analysis</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="large-scale-parallel-processing">Large Scale Parallel Processing<a class="headerlink" href="#large-scale-parallel-processing" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 7.5A2.86 2.86 0 0 1 22 10.36v3.78A2.86 2.86 0 0 1 19.14 17H12c0 .39.32.96.71.96H17v1.68a2.86 2.86 0 0 1-2.86 2.86H9.86A2.86 2.86 0 0 1 7 19.64v-3.75a2.85 2.85 0 0 1 2.86-2.85h5.25a2.85 2.85 0 0 0 2.85-2.86V7.5zm-4.28 11.79c-.4 0-.72.3-.72.89s.32.71.72.71a.71.71 0 0 0 .71-.71c0-.59-.32-.89-.71-.89m-10-1.79A2.86 2.86 0 0 1 2 14.64v-3.78A2.86 2.86 0 0 1 4.86 8H12c0-.39-.32-.96-.71-.96H7V5.36A2.86 2.86 0 0 1 9.86 2.5h4.28A2.86 2.86 0 0 1 17 5.36v3.75a2.85 2.85 0 0 1-2.86 2.85H8.89a2.85 2.85 0 0 0-2.85 2.86v2.68zM9.14 5.71c.4 0 .72-.3.72-.89s-.32-.71-.72-.71c-.39 0-.71.12-.71.71s.32.89.71.89"/></svg></span> API</label><label for="__tabbed_1_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.038 4.9 13.461.402a2.86 2.86 0 0 0-2.923.001L2.961 4.9A3.02 3.02 0 0 0 1.5 7.503v8.995c0 1.073.557 2.066 1.462 2.603l7.577 4.497a2.86 2.86 0 0 0 2.922 0l7.577-4.497a3.02 3.02 0 0 0 1.462-2.603V7.503A3.02 3.02 0 0 0 21.038 4.9M15.17 18.946l.013.646c.001.078-.05.167-.111.198l-.383.22c-.061.031-.111-.007-.112-.085l-.007-.635c-.328.136-.66.169-.872.084-.04-.016-.057-.075-.041-.142l.139-.584a.24.24 0 0 1 .069-.121.2.2 0 0 1 .036-.026q.033-.017.062-.006c.229.077.521.041.802-.101.357-.181.596-.545.592-.907-.003-.328-.181-.465-.613-.468-.55.001-1.064-.107-1.072-.917-.007-.667.34-1.361.889-1.8l-.007-.652c-.001-.08.048-.168.111-.2l.37-.236c.061-.031.111.007.112.087l.006.653c.273-.109.511-.138.726-.088.047.012.067.076.048.151l-.144.578a.26.26 0 0 1-.065.116.2.2 0 0 1-.038.028.1.1 0 0 1-.057.009c-.098-.022-.332-.073-.699.113-.385.195-.52.53-.517.778.003.297.155.387.681.396.7.012 1.003.318 1.01 1.023.007.689-.362 1.433-.928 1.888m3.973-1.087c0 .06-.008.116-.058.145l-1.916 1.164c-.05.029-.09.004-.09-.056v-.494c0-.06.037-.093.087-.122l1.887-1.129c.05-.029.09-.004.09.056zm1.316-11.062-7.168 4.427c-.894.523-1.553 1.109-1.553 2.187v8.833c0 .645.26 1.063.66 1.184a2.3 2.3 0 0 1-.398.039c-.42 0-.833-.114-1.197-.33L3.226 18.64a2.5 2.5 0 0 1-1.201-2.142V7.503c0-.881.46-1.702 1.201-2.142L10.803.863a2.34 2.34 0 0 1 2.394 0l7.577 4.498a2.48 2.48 0 0 1 1.164 1.732c-.252-.536-.818-.682-1.479-.296"/></svg></span> CLI</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:4"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><input id="__tabbed_1_4" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 7.5A2.86 2.86 0 0 1 22 10.36v3.78A2.86 2.86 0 0 1 19.14 17H12c0 .39.32.96.71.96H17v1.68a2.86 2.86 0 0 1-2.86 2.86H9.86A2.86 2.86 0 0 1 7 19.64v-3.75a2.85 2.85 0 0 1 2.86-2.85h5.25a2.85 2.85 0 0 0 2.85-2.86V7.5zm-4.28 11.79c-.4 0-.72.3-.72.89s.32.71.72.71a.71.71 0 0 0 .71-.71c0-.59-.32-.89-.71-.89m-10-1.79A2.86 2.86 0 0 1 2 14.64v-3.78A2.86 2.86 0 0 1 4.86 8H12c0-.39-.32-.96-.71-.96H7V5.36A2.86 2.86 0 0 1 9.86 2.5h4.28A2.86 2.86 0 0 1 17 5.36v3.75a2.85 2.85 0 0 1-2.86 2.85H8.89a2.85 2.85 0 0 0-2.85 2.86v2.68zM9.14 5.71c.4 0 .72-.3.72-.89s-.32-.71-.72-.71c-.39 0-.71.12-.71.71s.32.89.71.89"/></svg></span> Flexible Mode (Recommended)</label><label for="__tabbed_1_2"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19.14 7.5A2.86 2.86 0 0 1 22 10.36v3.78A2.86 2.86 0 0 1 19.14 17H12c0 .39.32.96.71.96H17v1.68a2.86 2.86 0 0 1-2.86 2.86H9.86A2.86 2.86 0 0 1 7 19.64v-3.75a2.85 2.85 0 0 1 2.86-2.85h5.25a2.85 2.85 0 0 0 2.85-2.86V7.5zm-4.28 11.79c-.4 0-.72.3-.72.89s.32.71.72.71a.71.71 0 0 0 .71-.71c0-.59-.32-.89-.71-.89m-10-1.79A2.86 2.86 0 0 1 2 14.64v-3.78A2.86 2.86 0 0 1 4.86 8H12c0-.39-.32-.96-.71-.96H7V5.36A2.86 2.86 0 0 1 9.86 2.5h4.28A2.86 2.86 0 0 1 17 5.36v3.75a2.85 2.85 0 0 1-2.86 2.85H8.89a2.85 2.85 0 0 0-2.85 2.86v2.68zM9.14 5.71c.4 0 .72-.3.72-.89s-.32-.71-.72-.71c-.39 0-.71.12-.71.71s.32.89.71.89"/></svg></span> Fixed Mode</label><label for="__tabbed_1_3"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.038 4.9 13.461.402a2.86 2.86 0 0 0-2.923.001L2.961 4.9A3.02 3.02 0 0 0 1.5 7.503v8.995c0 1.073.557 2.066 1.462 2.603l7.577 4.497a2.86 2.86 0 0 0 2.922 0l7.577-4.497a3.02 3.02 0 0 0 1.462-2.603V7.503A3.02 3.02 0 0 0 21.038 4.9M15.17 18.946l.013.646c.001.078-.05.167-.111.198l-.383.22c-.061.031-.111-.007-.112-.085l-.007-.635c-.328.136-.66.169-.872.084-.04-.016-.057-.075-.041-.142l.139-.584a.24.24 0 0 1 .069-.121.2.2 0 0 1 .036-.026q.033-.017.062-.006c.229.077.521.041.802-.101.357-.181.596-.545.592-.907-.003-.328-.181-.465-.613-.468-.55.001-1.064-.107-1.072-.917-.007-.667.34-1.361.889-1.8l-.007-.652c-.001-.08.048-.168.111-.2l.37-.236c.061-.031.111.007.112.087l.006.653c.273-.109.511-.138.726-.088.047.012.067.076.048.151l-.144.578a.26.26 0 0 1-.065.116.2.2 0 0 1-.038.028.1.1 0 0 1-.057.009c-.098-.022-.332-.073-.699.113-.385.195-.52.53-.517.778.003.297.155.387.681.396.7.012 1.003.318 1.01 1.023.007.689-.362 1.433-.928 1.888m3.973-1.087c0 .06-.008.116-.058.145l-1.916 1.164c-.05.029-.09.004-.09-.056v-.494c0-.06.037-.093.087-.122l1.887-1.129c.05-.029.09-.004.09.056zm1.316-11.062-7.168 4.427c-.894.523-1.553 1.109-1.553 2.187v8.833c0 .645.26 1.063.66 1.184a2.3 2.3 0 0 1-.398.039c-.42 0-.833-.114-1.197-.33L3.226 18.64a2.5 2.5 0 0 1-1.201-2.142V7.503c0-.881.46-1.702 1.201-2.142L10.803.863a2.34 2.34 0 0 1 2.394 0l7.577 4.498a2.48 2.48 0 0 1 1.164 1.732c-.252-.536-.818-.682-1.479-.296"/></svg></span> CLI Flexible Mode</label><label for="__tabbed_1_4"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.038 4.9 13.461.402a2.86 2.86 0 0 0-2.923.001L2.961 4.9A3.02 3.02 0 0 0 1.5 7.503v8.995c0 1.073.557 2.066 1.462 2.603l7.577 4.497a2.86 2.86 0 0 0 2.922 0l7.577-4.497a3.02 3.02 0 0 0 1.462-2.603V7.503A3.02 3.02 0 0 0 21.038 4.9M15.17 18.946l.013.646c.001.078-.05.167-.111.198l-.383.22c-.061.031-.111-.007-.112-.085l-.007-.635c-.328.136-.66.169-.872.084-.04-.016-.057-.075-.041-.142l.139-.584a.24.24 0 0 1 .069-.121.2.2 0 0 1 .036-.026q.033-.017.062-.006c.229.077.521.041.802-.101.357-.181.596-.545.592-.907-.003-.328-.181-.465-.613-.468-.55.001-1.064-.107-1.072-.917-.007-.667.34-1.361.889-1.8l-.007-.652c-.001-.08.048-.168.111-.2l.37-.236c.061-.031.111.007.112.087l.006.653c.273-.109.511-.138.726-.088.047.012.067.076.048.151l-.144.578a.26.26 0 0 1-.065.116.2.2 0 0 1-.038.028.1.1 0 0 1-.057.009c-.098-.022-.332-.073-.699.113-.385.195-.52.53-.517.778.003.297.155.387.681.396.7.012 1.003.318 1.01 1.023.007.689-.362 1.433-.928 1.888m3.973-1.087c0 .06-.008.116-.058.145l-1.916 1.164c-.05.029-.09.004-.09-.056v-.494c0-.06.037-.093.087-.122l1.887-1.129c.05-.029.09-.004.09.056zm1.316-11.062-7.168 4.427c-.894.523-1.553 1.109-1.553 2.187v8.833c0 .645.26 1.063.66 1.184a2.3 2.3 0 0 1-.398.039c-.42 0-.833-.114-1.197-.33L3.226 18.64a2.5 2.5 0 0 1-1.201-2.142V7.503c0-.881.46-1.702 1.201-2.142L10.803.863a2.34 2.34 0 0 1 2.394 0l7.577 4.498a2.48 2.48 0 0 1 1.164 1.732c-.252-.536-.818-.682-1.479-.296"/></svg></span> CLI Fixed Mode</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
 
 <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="c1"># Flexible resource allocation - adapts to cluster availability</span>
+    <span class="n">sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fits-processing&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/your/analysis-container:latest&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/path/to/batch_processing.py&quot;</span><span class="p">],</span>
+        <span class="n">replicas</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">sessions</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+
+<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="c1"># Fixed resource allocation - guaranteed resources</span>
     <span class="n">sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fits-processing&quot;</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/your/analysis-container:latest&quot;</span><span class="p">,</span>
@@ -1435,11 +1452,91 @@
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>-c<span class="w"> </span><span class="m">8</span><span class="w"> </span>-m<span class="w"> </span><span class="m">32</span><span class="w"> </span>-r<span class="w"> </span><span class="m">100</span><span class="w"> </span>-n<span class="w"> </span>fits-processing<span class="w"> </span>headless<span class="w"> </span>images.canfar.net/your/analysis-container:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/path/to/batch_processing.py
+<div class="highlight"><pre><span></span><code><span class="c1"># Flexible resource allocation (default)</span>
+canfar<span class="w"> </span>create<span class="w"> </span>-r<span class="w"> </span><span class="m">100</span><span class="w"> </span>-n<span class="w"> </span>fits-processing<span class="w"> </span>headless<span class="w"> </span>images.canfar.net/your/analysis-container:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/path/to/batch_processing.py
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Fixed resource allocation</span>
+canfar<span class="w"> </span>create<span class="w"> </span>-c<span class="w"> </span><span class="m">8</span><span class="w"> </span>-m<span class="w"> </span><span class="m">32</span><span class="w"> </span>-r<span class="w"> </span><span class="m">100</span><span class="w"> </span>-n<span class="w"> </span>fits-processing<span class="w"> </span>headless<span class="w"> </span>images.canfar.net/your/analysis-container:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/path/to/batch_processing.py
 </code></pre></div>
 </div>
 </div>
 </div>
+<h2 id="advanced-resource-allocation-strategies">Advanced Resource Allocation Strategies<a class="headerlink" href="#advanced-resource-allocation-strategies" title="Permanent link">&para;</a></h2>
+<p>For complex workflows, choosing the right resource allocation mode can significantly impact performance:</p>
+<h3 id="mixed-resource-allocation">Mixed Resource Allocation<a class="headerlink" href="#mixed-resource-allocation" title="Permanent link">&para;</a></h3>
+<p>You can combine flexible and fixed modes within the same workflow:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">mixed_workflow</span><span class="p">():</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+        <span class="c1"># Use flexible mode for data preprocessing (variable workload)</span>
+        <span class="n">preprocessing_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;preprocess&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/your/preprocessing:latest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;preprocess.py&quot;</span><span class="p">],</span>
+            <span class="n">replicas</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Use fixed mode for intensive analysis (predictable workload)</span>
+        <span class="n">analysis_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;analysis&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/your/analysis:latest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+            <span class="n">ram</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;analyze.py&quot;</span><span class="p">],</span>
+            <span class="n">replicas</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">preprocessing_sessions</span> <span class="o">+</span> <span class="n">analysis_sessions</span>
+</code></pre></div>
+<h3 id="resource-allocation-guidelines-for-advanced-workflows">Resource Allocation Guidelines for Advanced Workflows<a class="headerlink" href="#resource-allocation-guidelines-for-advanced-workflows" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Workflow Type</th>
+<th>Recommended Mode</th>
+<th>Reasoning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Data Preprocessing</strong></td>
+<td>Flexible</td>
+<td>Variable I/O patterns, benefits from burst capacity</td>
+</tr>
+<tr>
+<td><strong>Machine Learning Training</strong></td>
+<td>Fixed</td>
+<td>Consistent performance needed for convergence</td>
+</tr>
+<tr>
+<td><strong>Monte Carlo Simulations</strong></td>
+<td>Flexible</td>
+<td>Independent tasks, can handle variable performance</td>
+</tr>
+<tr>
+<td><strong>Image Processing Pipelines</strong></td>
+<td>Fixed</td>
+<td>Memory-intensive, predictable resource needs</td>
+</tr>
+<tr>
+<td><strong>Interactive Development</strong></td>
+<td>Flexible</td>
+<td>Exploratory work, cost-effective</td>
+</tr>
+<tr>
+<td><strong>Production Batch Jobs</strong></td>
+<td>Fixed</td>
+<td>Reliable performance for scheduled workflows</td>
+</tr>
+</tbody>
+</table>
 <h2 id="distributed-processing-strategies">Distributed Processing Strategies<a class="headerlink" href="#distributed-processing-strategies" title="Permanent link">&para;</a></h2>
 <p>The <code>canfar.helpers.distributed</code> module provides two main strategies for distributing data across replicas:</p>
 <h3 id="chunking-distributedchunk">Chunking (<code>distributed.chunk</code>)<a class="headerlink" href="#chunking-distributedchunk" title="Permanent link">&para;</a></h3>
@@ -1578,7 +1675,7 @@ This happens when you have more containers than data items. Handle it gracefully
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 23:59:02 UTC">August 21, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 27, 2025 17:17:31 UTC">August 27, 2025</span>
   </span>
 
     
