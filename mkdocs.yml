@@ -220,10 +220,12 @@ nav:
       - Reference: cli/cli-help.md
   - FAQ: faq.md
   - Contributor Guide:
-    - Contributing: contributing.md
     - Code of Conduct: conduct.md
     - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
     - License: license.md
+    - Dev Guide:
+      - Contributing: contributing.md
+      - Testing: client/testing.md
     - Bug Reports:
       - Bugs: bug-reports.md
       - Security Issues: security.md

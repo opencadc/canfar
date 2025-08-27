@@ -129,35 +129,7 @@ These examples use the asynchronous API for best performance and scalability.
 
 ## Resource Allocation Modes
 
-CANFAR supports two resource allocation modes for your sessions.
-
-### Flexible Sessions (Default)
-When you don't specify `cores` or `ram` parameters, your session runs in **flexible mode**:
-
-- **:material-trending-up: Adaptive Resource Usage**: Your session can use more CPU and memory when necessary, if available
-- **:material-rocket-launch: Efficient Scheduling**: Sessions start faster as they're easier to place on available nodes
-- **:material-chart-line-variant: Variable Performance**: Performance may fluctuate based on cluster load and other users' activity
-
-### Fixed Sessions
-When you specify exact `cores` and `ram` values, your session runs in **fixed mode**:
-
-- **:material-speedometer: Predictable Performance**: Consistent CPU and memory allocation regardless of cluster load
-- **:material-lock: Resource Reservation**: Resources are reserved exclusively for your session
-- **:material-clock-alert: Potential Scheduling Delays**: May take longer to start if exact resources aren't immediately available
-
-### When to Use Each Mode
-
-!!! success "Use Flexible Mode (Default) When:"
-    - Developing and testing code
-    - Interactive data exploration
-    - Learning and experimentation
-    - Resource requirements are unknown or variable
-
-!!! warning "Use Fixed Mode When:"
-    - Running production workloads
-    - Performance consistency is critical
-    - Processing large datasets with known resource requirements
-    - Running time-sensitive computations
+CANFAR supports two resource allocation modes for your sessions. See the [resource allocation guide](../platform/concepts.md#session-resource-allocation) for more information.
 
 ### Examples
 

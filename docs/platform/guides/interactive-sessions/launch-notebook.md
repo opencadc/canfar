@@ -59,7 +59,7 @@ Most astronomy software uses only one core unless specifically configured for pa
 
 > ![image](../images/notebook/6_choose_cores.png)
 
-See [resource allocation guidelines](../platform/concepts.md#session-resource-allocation) for more information.
+See [resource allocation guidelines](../../concepts.md#session-resource-allocation) for more information.
 
 !!! tip "Resource Strategy"
     **Start with flexible mode** for most notebook work. Only use fixed mode when you need guaranteed performance or have specific resource requirements determined through testing.

@@ -11,7 +11,7 @@ Understanding the architecture and core concepts behind the CANFAR Science Platf
     - [Batch Jobs](batch-jobs.md)
     - [Storage Guide](guides/storage/index.md)
     - [CANFAR Python Client](../client/home.md)
-    - [Contact Support](help.md#contact-support)
+    - [Contact Support](help.md#contact-information-summary)
 
 !!! abstract "🎯 What you'll learn"
     By the end of this guide, you'll understand:
@@ -38,7 +38,7 @@ It provides:
     CANFAR eliminates the traditional barriers of software installation, hardware management, and infrastructure setup, letting you focus entirely on your research.
 
 !!! tip "Advanced: Platform Automation"
-    - Use [CANFAR CLI](../../cli/cli-help.md) and [Python Client](../client/home.md) for scripting and automation.
+    - Use [CANFAR CLI](../cli/cli-help.md) and [Python Client](../client/home.md) for scripting and automation.
     - Integrate CANFAR with [GitHub Actions](https://github.com/features/actions) for automated workflows.
 
 
