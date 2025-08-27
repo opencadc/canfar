@@ -204,8 +204,8 @@ class FetchResponse(BaseModel):
     type: Kind
     status: Status
     name: str
-    startTime: datetime
-    expiryTime: datetime | None = None
+    startTime: datetime | str = "<none>"
+    expiryTime: datetime | str = "<none>"
     connectURL: str
     requestedRAM: str = "<none>"
     requestedCPUCores: str = "<none>"
