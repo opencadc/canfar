@@ -377,11 +377,15 @@ async def _authflow_impl(
     interval: int = int(verification.get("interval", 5))
     code: str = str(verification["device_code"])
 
-    webbrowser.get().open(uri, new=2)
     console.print("[green]✓[/green] Follow the link below to authorize:")
     console.print(f"\n  {uri}\n")
     qr = segno.make(uri, error="H")
     qr.terminal(compact=True)
+
+    try:
+        webbrowser.get().open(uri, new=2)
+    except webbrowser.Error:
+        console.print("[yellow]Failed to open browser. Please visit the URL manually.")
 
     progress = Progress(
         TextColumn("[bold blue]{task.description}"),
