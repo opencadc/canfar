@@ -129,21 +129,17 @@ You can use REST endpoints for jobs and sessions if you prefer low‑level contr
 
 Example:
 ```python
-import requests
+from canfar.sessions import Session
 
-response = requests.post(
-    "https://ws-uv.canfar.net/skaha/v0/session",
-    headers={"Authorization": f"Bearer {token}"},
-    data={
-        "name": "automated-analysis",
-        "image": "images.canfar.net/cadc/astroml:latest",
-        "cores": 4,
-        "ram": 16,
-        "kind": "headless",
-        "cmd": "python /arc/projects/[project]/scripts/analyze.py",
-    },
+session = Session()
+job_ids = session.create(
+    name="automated-analysis",
+    image="images.canfar.net/cadc/astroml:latest",
+    cores=4,
+    ram=16,
+    kind="headless",
+    cmd="python /arc/projects/[project]/scripts/analyze.py",
 )
-response.raise_for_status()
 ```
 
 ### Authentication options for programs

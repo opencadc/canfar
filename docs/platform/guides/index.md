@@ -97,21 +97,16 @@ vcp file.fits vos:myproject/   # Upload
 vcp vos:myproject/file.fits .  # Download
 ```
 
-#### Session Management (API)
+#### Session Management (CLI)
 ```bash
 # Get authentication token
-TOKEN=$(curl -s https://ws-cadc.canfar.net/ac/login \
-  -d "username=myuser" -d "password=mypass" | tr -d '"')
+canfar auth login
 
 # Launch notebook session
-curl -H "Authorization: Bearer $TOKEN" \
-  -d "name=analysis" -d "image=images.canfar.net/skaha/astroml:latest" \
-  -d "type=notebook" -d "cores=2" -d "ram=8" \
-  https://ws-uv.canfar.net/skaha/v0/session
+canfar create notebook --name analysis --cores 2 --ram 8 images.canfar.net/skaha/astroml:latest
 
 # List active sessions
-curl -H "Authorization: Bearer $TOKEN" \
-  https://ws-uv.canfar.net/skaha/v0/session
+canfar ps
 ```
 
 #### Container Operations

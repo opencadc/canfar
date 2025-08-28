@@ -24,17 +24,18 @@ The container ecosystem on CANFAR follows a layered approach. Base containers pr
 ### Runtime Environment
 
 !!! info "How Containers Run on CANFAR"
-    - Containers run as your CADC user (not root)
-    - `/arc/home/[username]` is the container's home directory
-    - Project directories under `/arc/projects/` are mounted and accessible
-    - `/scratch/` provides high-speed temporary storage
+    - Containers run as your CADC user (not root and not `jovyan` or any created user on the container)
+    - `/arc` shared file system is mounted at runtime which comprises of:
+        - `/arc/home`: CANFAR users home directories 
+        - `/arc/projects`: CANFAR projects directories
+    - `/scratch/` is mounted for fast temporary storage, local to the worker node only.
 
 ```bash
 # Inside a running container, check your environment
-echo $USER                      # Your CADC username
-echo $HOME                      # /arc/home/[username]
+echo $USER                      # should be your CADC username
+echo $HOME                      # /arc/home/[user] : your home directory
 ls /arc/projects/               # Available project directories
-ls /scratch/                    # Temporary high-speed storage
+ls /scratch/                    # Temporary, non-shared, faster storage 
 ```
 
 This runtime setup means there's an important compatibility consideration between code packaged in the container image and code stored on the `/arc` filesystem. Best practice involves keeping stable, tested code within the container image while placing development scripts and analysis notebooks in your `/arc/home` or project directories where they can be easily modified and version controlled.
@@ -44,96 +45,60 @@ This runtime setup means there's an important compatibility consideration betwee
 
 ---
 
-## Container Types and Session Integration
+## Session Types and Integration
 
 CANFAR containers are designed to work with different session types, each optimized for specific workflows and interaction patterns.
 
-### Notebook Containers
+### Notebooks
 
-Notebook containers provide interactive Jupyter environments accessed through your web browser. These containers must include Jupyter Lab and are optimized for data analysis, visualization, and interactive computing. The **astroml** container exemplifies this type, offering a comprehensive Python astronomy stack with popular packages like Astropy, SciPy, and scikit-learn.
+Notebook sessions ners provide interactive Jupyter environments accessed through your web browser. The containers running these sessions will launch Jupyter Lab. They are optimized for data analysis, visualization, and interactive computing.
+There are 2 requirements for a container to be able to run as a notebook session:
+1. Have the `jupyterlab` package installed
+2. Be labelled as `notebook`
 
-```python
-# Example notebook session - check available packages
-import astropy
-import numpy as np
-import matplotlib.pyplot as plt
-from astroquery import vizier
+**The `astroml` container**
 
-print(f"Astropy version: {astropy.__version__}")
-print(f"NumPy version: {np.__version__}")
+The `astroml` container exemplifies this type, offering a comprehensive Python astronomy stack with popular packages like astropy, scipy, pandas, scikit-learn, pytorch and many more. Think of it as an equivalent of Google Colab for astro on CANFAR with persistent storage.
+you can check which packages are pre-installed on the container in `/opt/conda`:
+```bash
+mamba list
+```
+Check which packages are pre-install on the container OS (latest Ubuntu-LTS):
+```bash
+apt list --installed
+```
+You can also checked how this container was also built in the `/build_info` directory of your running `astroml` container that includes the Dockerfile and a few other files.
 
-# Access your data
-import os
-
-data_path = f"/arc/projects/{os.environ.get('PROJECT_NAME', 'myproject')}"
-print(f"Project data at: {data_path}")
+While you can not install new OS package (with `sudo apt install`) at runtime, you can install python packages at runtime, simply using `pip`. It will install them in your `$HOME/.local` directory on `/arc`.
+```bash
+# install the fireducks package
+pip install fireducks
+# show what it just installed
+pip show -f fireducks
 ```
 
-For GPU-accelerated computing, **astroml-cuda** includes the CUDA toolkit alongside the standard astronomy libraries, enabling machine learning and image processing workflows that leverage GPU acceleration.
+For users needing GPU acceleration, the `astroml-cuda` container extends the standard `astroml` environment with CUDA libraries and GPU-enabled versions of machine learning frameworks like PyTorch, PyArrow and others. This enables workflows that leverage GPU computing for tasks such as deep learning and large-scale data processing.
 
-```python
-# Check GPU availability in astroml-cuda container
-import torch
-import tensorflow as tf
+If you feel more advanced, you can build your own custom container, either basing it from the `astroml:latest` container, or simply back to a vanilla very lightweight OS container, such as `ubuntu:latest`.
 
-print(f"PyTorch CUDA available: {torch.cuda.is_available()}")
-if torch.cuda.is_available():
-    print(f"GPU device: {torch.cuda.get_device_name(0)}")
+### Desktop-App
 
-print(f"TensorFlow GPU devices: {len(tf.config.list_physical_devices('GPU'))}")
-```
+While CANFAR maintains the base **desktop** container that provides the Ubuntu desktop environment, users can create **desktop-app** containers that package specific GUI applications to run within desktop sessions. These containers focus on single applications or related tool suites rather than providing complete desktop environments. At runtime, each `desktop-app` container will then run on its own attributed worker node and will interact with the `desktop` session through the graphical environment. A `desktop-app` container has to follow the following requirements:
+1. Have a X11/Xorg application installed (minimally it is `xterm`)
+2. The application will be ran by a script located in `/skaha/startup.sh`
+3. The container has to be labelled as `deskto-app``
 
-### Desktop-App Containers
+If everything works out, a lauching button on a `desktop` type session will appear for the desktop application, under the **AstroSoftware** menu.
+Desktop-app containers are particularly useful for legacy astronomy software, specialized visualization tools (TOPCAT, DS9, Aladin). When launched in a desktop session, these applications integrate seamlessly with the desktop-on-browser environment while maintaining their isolated software dependencies, by sharing both the underlying storage and their rendering communication sockets.
 
-While CANFAR maintains the base **desktop** container that provides the Ubuntu desktop environment, users can create **desktop-app** containers that package specific GUI applications to run within desktop sessions. These containers focus on single applications or related tool suites rather than providing complete desktop environments.
+The same **astroml** container can be launched as a notebook (as it has jupyterlab installed), and as a desktop-app container (as it has xterm installed).
 
-```dockerfile
-# Example desktop-app container for DS9 image viewer
-FROM ubuntu:22.04
+### Contributed
 
-# Install DS9 and dependencies
-RUN apt-get update && apt-get install -y \
-    saods9 \
-    x11-apps \
-    libx11-6 \
-    libxft2 \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
-# Create startup script
-RUN echo '#!/bin/bash\nds9 "$@"' > /usr/local/bin/start-ds9 && \
-    chmod +x /usr/local/bin/start-ds9
+### Headless
 
-# Default command for desktop session
-CMD ["/usr/local/bin/start-ds9"]
-```
-
-Desktop-app containers are particularly useful for legacy astronomy software, specialized visualization tools, or applications that require specific library versions or configurations. When launched in a desktop session, these applications integrate seamlessly with the desktop environment while maintaining their isolated software dependencies.
-
-### Headless Containers
-
-Headless containers run without graphical interfaces and are designed for batch processing and automated workflows. These containers execute through the batch job system and are optimized for non-interactive processing tasks like data reduction pipelines, large-scale analysis, or scheduled computations.
-
-```dockerfile
-# Example headless processing container
-FROM images.canfar.net/skaha/astroml:latest
-
-# Install additional processing tools
-USER root
-RUN apt-get update && apt-get install -y \
-    parallel \
-    rsync \
-    && apt-get clean
-
-USER ${NB_USER}
-
-# Copy processing scripts
-COPY scripts/ /opt/processing/
-RUN chmod +x /opt/processing/*.sh
-
-# Default processing command
-CMD ["/opt/processing/batch_process.sh"]
-```
+Headless containers run without any graphical interfaces and are designed for batch processing and automated workflows. These containers execute through the batch job system and are optimized for non-interactive processing tasks like data reduction pipelines, large-scale analysis, or scheduled computations.
 
 ---
 
@@ -155,10 +120,6 @@ See [CLI Help](../cli/cli-help.md) for more details and options.
 
 !!! tip "Best Practice: Code Placement"
     Keep stable, tested code inside the container image. Keep frequently edited analysis code and notebooks in `/arc/home` or project directories.
-
-!!! warning "Temporary Installs"
-    Software installations using `pip install --user` or `apt` inside a running container are temporary and will be lost when the session ends.
-
 ---
 
 ## Container Categories
@@ -182,7 +143,7 @@ For specialized visualization needs, CANFAR provides **carta** for radio astrono
 
 ### Community-Maintained Containers
 
-The astronomy community contributes specialized containers for emerging tools and workflows. Examples include **marimo** for modern reproducible notebook environments, **vscode** for browser-based code development, and **pluto** for interactive Julia computing. These containers are maintained by community members with oversight from CANFAR.
+The astronomy community contributes specialized containers for emerging tools and workflows. Examples include **marimo** for modern reproducible notebook environments, **vscode** for browser-based code development. These containers are maintained by community members with oversight from CANFAR.
 
 ### Team and Individual Containers
 
@@ -256,9 +217,6 @@ RUN apt-get update && apt-get install -y \
     libcfitsio-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Switch to user context for application installs
-USER ${NB_USER}
 
 # Install specialized astronomy packages
 RUN pip install --no-cache-dir \
