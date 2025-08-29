@@ -33,6 +33,7 @@ repos:
       - id: mixed-line-ending
       - id: check-toml
       - id: pretty-format-json
+        args: ['--autofix']
       - id: check-symlinks
       - id: detect-private-key
 
