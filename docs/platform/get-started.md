@@ -2,7 +2,15 @@
 
 # 🚀 Quick Setup
 
-This guide walks you through getting started with CANFAR, from account setup to your first session. For details on accounts, storage, and containers, see the linked guides below.
+
+!!! info "Quick Links"
+    - [Accounts & Permissions](accounts.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [Container Guide](containers.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [Batch Jobs](batch-jobs.md)
+    - [CANFAR Python Client](../client/home.md)
+    - [Support & FAQ](../faq.md)
 
 
 ## 1️⃣ Get Your CADC Account
@@ -13,8 +21,10 @@ If you are a first-time user, request a Canadian Astronomy Data Centre (CADC) ac
 
 See [Accounts & Permissions](accounts.md) for more details.
 
+
 !!! info "Account Processing Time"
     CADC accounts are typically approved within 1–2 business days.
+    For troubleshooting account issues, see [FAQ](../faq.md) or [Contact Support](help.md#contact-support).
 
 
 
@@ -32,7 +42,8 @@ Once you have a CADC account:
     - Storage requirements
     - Timeline
 
-See [Accounts & Permissions](accounts.md) for group management details.
+
+See [Accounts & Permissions](accounts.md) for group management details. For advanced collaboration, see [Storage Guide](guides/storage/index.md).
 
 
 ## 3️⃣ First Login and Setup
@@ -41,7 +52,8 @@ See [Accounts & Permissions](accounts.md) for group management details.
 2. Accept Terms of Service to complete setup.
 3. Access the [Image Registry](https://images.canfar.net) (required for private containers).
 
-See [Container Usage](containers.md) for more about images and custom software.
+
+See [Container Usage](containers.md) for more about images and custom software. For building your own containers, see [Container Guide](containers.md#building-custom-containers).
 
 
 ## 4️⃣ Launch Your First Session
@@ -55,16 +67,23 @@ To start analyzing data, launch a Jupyter notebook:
 
 🎉 You're ready to go! Your session includes Python, common astronomy packages, and access to shared storage.
 
-See [Interactive Sessions](guides/interactive-sessions/index.md) for more session types and workflows.
+
+See [Interactive Sessions](guides/interactive-sessions/index.md) for more session types and workflows. For automation, see [CANFAR Python Client](../client/home.md).
+
 
 !!! tip "Recommended Starting Point"
     Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated.
+
+!!! tip "Advanced: Custom Containers"
+    - Build your own containers for specialized workflows. See [Container Guide](containers.md#building-custom-containers).
+    - Use [Harbor Registry](https://images.canfar.net/) to browse and manage images.
 
 
 
 ## 📁 Understanding Your Workspace
 
-See the [Storage Guide](guides/storage/index.md) for full details.
+
+See the [Storage Guide](guides/storage/index.md) for full details. For VOSpace scripting, see [VOSpace API](guides/storage/vospace-api.md).
 
 | Location | Purpose | Persistence | Best For |
 |----------|---------|-------------|----------|
@@ -76,7 +95,8 @@ See the [Storage Guide](guides/storage/index.md) for full details.
 
 ## 🤝 Collaboration Features
 
-See [Accounts & Permissions](accounts.md) and [Storage Guide](guides/storage/index.md) for collaboration details.
+
+See [Accounts & Permissions](accounts.md) and [Storage Guide](guides/storage/index.md) for collaboration details. For team onboarding, see [Get Started Guide](get-started.md).
 
 ### Session Sharing
 
@@ -97,7 +117,16 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
 
 
 
-## 🔗 What's Next?
+
+---
+
+!!! info "Explore More Documentation"
+    - [User Guide](guides/index.md)
+    - [Storage Guide](guides/storage/index.md)
+    - [Container Guide](containers.md)
+    - [Interactive Sessions](guides/interactive-sessions/index.md)
+    - [Batch Jobs](batch-jobs.md)
+    - [Radio Astronomy](guides/radio-astronomy/index.md)
 
 Ready to dive deeper?
 
@@ -110,8 +139,10 @@ Ready to dive deeper?
 
 ## 💬 Need Help?
 
+
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** – Chat with other users
 - **[❓ FAQ](../faq.md)** – Common questions and solutions
+- **[Help & Support](help.md)** – Troubleshooting and contact info
 
 ---
 

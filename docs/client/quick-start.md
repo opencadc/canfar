@@ -50,7 +50,7 @@ Launch a Jupyter notebook session programmatically.
     session = Session()
     session_ids = session.create(
         name="my-first-notebook",
-        image="images.canfar.net/skaha/astroml-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
         cores=2,
         ram=4,
@@ -66,7 +66,7 @@ Launch a Jupyter notebook session programmatically.
     session = AsyncSession()
     ids = await session.create(
         name="my-first-notebook",
-        image="images.canfar.net/skaha/astroml-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
         cores=2,
         ram=4,
