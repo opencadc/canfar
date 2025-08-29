@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "python",
+      "package-name": "canfar",
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "path": "canfar/__init__.py",
+          "type": "generic"
+        },
+        {
+          "path": "uv.lock",
+          "type": "toml",
+          "jsonpath": "$.package[?(@.name.value=='canfar')].version"
+        }
+      ]
+    }
+  }
+}
