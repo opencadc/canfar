@@ -665,7 +665,7 @@ canfar stats <session-id>
 ### Data Management
 
 - **Input validation**: Check file existence and format before processing
-- **Output organization**: Use consistent naming and directory structures
+- **Output organisation**: Use consistent naming and directory structures
 - **Cleanup**: Remove temporary files to save storage
 - **Metadata**: Include processing parameters in output headers
 

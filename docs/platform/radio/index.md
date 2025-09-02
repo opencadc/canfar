@@ -408,7 +408,7 @@ Radio astronomy data requires careful storage planning:
 - Backup copies of critical observations
 - Metadata and observation logs
 
-**Processed data**: Organize in `/arc/projects/[group]/processed/`
+**Processed data**: Organise in `/arc/projects/[group]/processed/`
 - Calibrated measurement sets
 - Final images and cubes
 - Derived products (catalogs, moment maps)
@@ -418,7 +418,7 @@ Radio astronomy data requires careful storage planning:
 - Scientific catalogs
 - Analysis scripts and notebooks
 
-### File Organization
+### File Organisation
 
 ```
 /arc/projects/radio-survey/

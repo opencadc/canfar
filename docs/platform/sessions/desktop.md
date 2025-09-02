@@ -122,7 +122,7 @@ You can also access other tools and environments, including Python (with AstroPy
 
 Here's a typical desktop workflow for optical astronomy:
 
-1. **File Management**: Use file manager to organize data
+1. **File Management**: Use file manager to organise data
 2. **Image Display**: Open FITS files in DS9 for inspection
 3. **Analysis**: Launch Python/Jupyter for data analysis
 4. **Documentation**: Use text editor for notes and scripts

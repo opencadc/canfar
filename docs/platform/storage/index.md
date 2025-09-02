@@ -148,10 +148,10 @@ df -h /arc
 ```
 
 
-#### Organizing Data
+#### Organising Data
 
 ```bash
-# Create organized directory structure
+# Create organised directory structure
 mkdir -p /arc/projects/myproject/{data/{raw,processed,catalogs},code,results,docs}
 
 # Set group permissions for collaboration
@@ -189,7 +189,7 @@ Scratch provides the fastest storage available on CANFAR, but files are **tempor
 
 **✅ Use Scratch for:**
 - Large intermediate files during processing
-- Temporary downloads before organizing in ARC
+- Temporary downloads before organising in ARC
 - High I/O operations requiring maximum speed
 - Uncompressing large archives
 - Sorting and filtering large datasets

@@ -57,7 +57,7 @@ Start with our [Getting Started Guide](../get-started.md) for a structured learn
 - **[🔭 Radio Astronomy](radio-astronomy/index.md)** - CASA, CARTA workflows and interferometry
 - **[📊 Interactive Analysis](interactive-sessions/index.md)** - Jupyter notebooks, Python analysis
 - **[🖥️ Desktop Applications](interactive-sessions/launch-desktop.md)** - GUI tools, CASA, DS9
-- **[📁 Data Management](storage/index.md)** - Advanced transfer and organization
+- **[📁 Data Management](storage/index.md)** - Advanced transfer and organisation
 
 ### ⚡ Advanced Users
 
@@ -133,7 +133,7 @@ docker run -it --rm \
 ---
 
 !!! info "Documentation Structure"
-    This user guide is organized by workflow rather than by interface. Each section builds on previous concepts, so we recommend reading the Concepts section first if you're new to CANFAR.
+    This user guide is organised by workflow rather than by interface. Each section builds on previous concepts, so we recommend reading the Concepts section first if you're new to CANFAR.
 
 ---
 

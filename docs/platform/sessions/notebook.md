@@ -179,7 +179,7 @@ Always properly shut down your session to free resources:
 
 ### Data Management
 
-- **Organize files**: Create clear directory structures in your `/arc` space
+- **Organise files**: Create clear directory structures in your `/arc` space
 - **Document work**: Use markdown cells to explain your analysis
 - **Backup results**: Important results should be saved to persistent storage
 

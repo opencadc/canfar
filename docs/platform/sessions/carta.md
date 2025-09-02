@@ -93,7 +93,7 @@ Once loaded, your image appears in the main viewer with:
 
 - **Zoom controls**: Mouse wheel or toolbar buttons
 - **Pan**: Click and drag to move around the image
-- **Colormap**: Adjust scaling and color scheme
+- **Colormap**: Adjust scaling and colour scheme
 
 > ![image](../images/carta/12_success_CARTA.png)
 
@@ -228,9 +228,9 @@ For very large files:
 
 ## Best Practices
 
-### Workflow Organization
+### Workflow Organisation
 
-- **Organize data**: Keep raw and processed data separate
+- **Organise data**: Keep raw and processed data separate
 - **Document analysis**: Save session layouts for reproducibility
 - **Version control**: Track analysis parameters and results
 

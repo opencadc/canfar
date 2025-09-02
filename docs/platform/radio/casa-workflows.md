@@ -582,7 +582,7 @@ generate_qa_dashboard(
 - **Parallel processing**: Use n-1 cores to maintain system responsiveness
 - **Cleanup**: Remove temporary files regularly
 
-### Workflow Organization
+### Workflow Organisation
 
 ```python
 # Directory structure for complex projects

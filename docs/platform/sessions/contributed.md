@@ -78,7 +78,7 @@ The typical structure you'll encounter includes a navigation or menu area that p
 
 One of the  aspects of contributed applications is their seamless integration with CANFAR storage infrastructure. Your applications can directly access your project data through `/arc/projects/[projectname]]/`, your personal files via `/arc/home/[username]/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
 
-Understanding these storage patterns helps you organize your work effectively. You might use your personal home directory for notebooks and scripts under development, project directories for shared data and collaborative work, and scratch space for temporary files and intermediate processing results that don't need long-term storage.
+Understanding these storage patterns helps you organise your work effectively. You might use your personal home directory for notebooks and scripts under development, project directories for shared data and collaborative work, and scratch space for temporary files and intermediate processing results that don't need long-term storage.
 
 ### Authentication and Collaboration
 
