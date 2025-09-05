@@ -1,6 +1,21 @@
 # Frequently Asked Questions
 
-This unified FAQ covers the CANFAR Science Platform across three areas: Platform, Client, and CLI.
+**Comprehensive answers to common questions about the CANFAR Science Platform across all areas.**
+
+!!! info "Platform Navigation"
+    **FAQ Resources**: Common questions and solutions for platform, client, and CLI usage.  
+    **[Support Home](index.md)** | **[Platform Home](../home.md)**
+
+!!! abstract "🎯 Quick Navigation"
+    **Find answers by topic:**
+    
+    - **[Platform Questions](#platform)**: Getting started, sessions, storage, performance
+    - **[Session Resources](#session-resources)**: Resource management and optimisation
+    - **[Client Questions](#client)**: Python client automation and REST API usage
+    - **[CLI Questions](#cli)**: Command-line interface and authentication
+    - **[Troubleshooting](#troubleshooting)**: Common problems and solutions
+
+This unified FAQ covers the CANFAR Science Platform across all areas: Platform, Client, and CLI usage.
 
 ## Platform
 
@@ -202,3 +217,176 @@ Yes. You can run multiple sessions concurrently subject to fair‑use and any co
 - Auth contexts: `cli/authentication-contexts.md`
 - Command reference: `cli/cli-help.md`
 
+## 🔧 Troubleshooting
+
+### Common Platform Issues
+
+#### Sessions won't start or take too long to launch
+
+**Possible causes:**
+
+- High cluster usage during peak hours
+- Resource requirements too high
+- Container image issues
+- Insufficient group permissions
+
+**Solutions:**
+
+- Try flexible mode for faster scheduling
+- Reduce CPU/memory requirements
+- Use off-peak hours (evenings, weekends)
+- Verify container image name and availability
+- Check group membership for required projects
+
+#### Can't access files or storage
+
+**Possible causes:**
+
+- Incorrect file paths
+- Missing group permissions
+- Storage quota exceeded
+- Network connectivity issues
+
+**Solutions:**
+
+- Verify file paths: `/arc/home/[user]/` vs `/arc/projects/[project]/`
+- Check group membership with project administrators
+- Clean up old files to free space
+- Use `ls -la` and `getfacl` to check permissions
+
+#### Performance is slow or variable
+
+**In flexible mode (default):**
+
+- Performance varies with cluster load (this is normal)
+- More resources available during off-peak hours
+- Better overall cluster utilisation
+
+**For consistent performance:**
+
+- Use fixed mode with specific CPU/memory values
+- Consider batch jobs for large processing tasks
+- Use `/scratch/` storage for temporary files
+
+#### Browser or interface problems
+
+**Symptoms:**
+
+- Interface won't load
+- Features don't work properly
+- Connection timeouts
+
+**Solutions:**
+
+- Use Chrome or Firefox (recommended browsers)
+- Clear browser cache and cookies
+- Try incognito/private mode
+- Disable ad blockers for canfar.net
+- Check network connection stability
+
+### Authentication and Access Issues
+
+#### Certificate problems
+
+**Symptoms:**
+
+- Can't login or authenticate
+- "Certificate expired" errors
+- CLI commands fail with auth errors
+
+**Solutions:**
+
+```bash
+# Renew certificate
+cadc-get-cert -u [username]
+
+# Check certificate status
+cadc-get-cert --days-valid
+
+# For OIDC authentication
+canfar auth login
+```
+
+#### Permission denied errors
+
+**Symptoms:**
+
+- Can't access project directories
+- File operation failures
+- Session creation blocked
+
+**Solutions:**
+
+- Verify group membership with project PI
+- Check project access through Science Portal
+- Ensure account is active and in good standing
+- Contact support if permissions seem incorrect
+
+## 🆘 Getting Help
+
+### When to Use Each Support Channel
+
+#### Use Discord for
+
+- Quick questions with fast community response
+- Sharing tips and tricks with other users
+- General platform discussions
+- Finding collaborators
+
+#### Use GitHub Issues for
+
+- Bug reports with reproducible problems
+- Feature requests and suggestions
+- Documentation improvements
+- Technical discussions
+
+#### Email Support for
+
+- Account access problems
+- Resource allocation requests
+- Data recovery needs
+- Complex technical issues
+- Security concerns
+
+### Before Contacting Support
+
+1. **Check this FAQ** for common solutions
+2. **Search existing issues** on GitHub
+3. **Try basic troubleshooting steps** (restart browser, clear cache)
+4. **Gather diagnostic information** using commands in [index.md](index.md#diagnostic-commands)
+
+### What to Include in Support Requests
+
+**Essential information:**
+
+- CANFAR username
+- Date/time of issue
+- Session type and container used
+- Browser and version
+- Complete error messages
+- Steps to reproduce the problem
+
+**Helpful additional details:**
+
+- Screenshots of error screens
+- Session IDs for failed jobs
+- File paths for access issues
+- What you've already tried
+
+### Response Time Expectations
+
+| Issue Type | Response Time | Examples |
+|------------|---------------|----------|
+| **Critical** | Same day | System outages, data loss, security |
+| **High** | 1-2 business days | Session failures, access problems |
+| **Normal** | 2-3 business days | General questions, how-to requests |
+| **Low** | 3-5 business days | Feature requests, documentation |
+
+### Community Resources
+
+- **[Discord Community](https://discord.gg/vcCQ8QBvBa)**: Active community chat
+- **[GitHub Discussions](https://github.com/opencadc/canfar/discussions)**: Longer-form Q&A
+- **[Office Hours](index.md#office-hours)**: Weekly video sessions with CANFAR team
+- **[Documentation](../guides/)**: Comprehensive user guides
+
+Remember: The CANFAR community is here to help! Don't hesitate to ask questions, share your experiences, or contribute solutions that might help other users.

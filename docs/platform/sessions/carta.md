@@ -1,248 +1,347 @@
-# Launching CARTA Sessions
+# CARTA Sessions
 
-CARTA (Cube Analysis and Rendering Tool for Astronomy) is a specialised image visualisation and analysis tool designed for radio astronomy data. This guide walks you through launching and using CARTA sessions on the CANFAR Science Platform.
+**CARTA (Cube Analysis and Rendering Tool for Astronomy) for radio astronomy data visualisation**
 
 !!! abstract "🎯 What You'll Learn"
-    - Launching a CARTA session and choosing the right version
-    - Loading data from `/arc` and working with radio data cubes
-    - Tips for analysis features, performance, and troubleshooting
+    - How to launch CARTA sessions and choose the right version
+    - Loading data from CANFAR storage and working with radio data cubes
+    - Key features for spectral analysis, region analysis, and animations
+    - Performance tips and troubleshooting guidance
 
-## Overview
+CARTA is a specialised image visualisation and analysis tool designed specifically for radio astronomy data. It excels at handling multi-dimensional data cubes, providing powerful tools for spectral analysis, and enabling real-time collaborative workflows.
 
-Key features:
-- **Image visualisation**: Multi-dimensional data cube exploration
-- **Spectral analysis**: Line profiles and moment maps
-- **Region analysis**: Statistical analysis of image regions
-- **Animation**: Time-series and frequency animations
-- **Collaboration**: Real-time session sharing
+## 📋 Overview
 
-## Creating a CARTA Session
+CARTA provides specialised capabilities for:
+
+### Key Features
+
+| Feature | Capability |
+|---------|------------|
+| **Image Visualisation** | Multi-dimensional data cube exploration with WCS support |
+| **Spectral Analysis** | Line profiles, moment maps, and velocity analysis |
+| **Region Analysis** | Statistical analysis of user-defined image regions |
+| **Animation** | Time-series and frequency animations through data cubes |
+| **Collaboration** | Real-time session sharing with multiple users |
+| **Performance** | Optimised rendering for large astronomical datasets |
+
+### Data Format Support
+
+- **FITS files:** Standard astronomical format with full WCS support
+- **HDF5 files:** High-performance format for large datasets
+- **CASA images:** Native support for CASA image formats
+- **Compressed formats:** Automatic handling of gzipped files
+
+## 🚀 Creating a CARTA Session
 
 ### Step 1: Select Session Type
 
-From the Science Portal dashboard, click the **plus sign (+)** to create a new session,
-then select **carta** as your session type.
+From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **carta** as your session type.
 
-> ![image](../images/carta/1_select_carta_session.png)
+![Select CARTA Session](images/carta/1_select_carta_session.png)
 
 ### Step 2: Choose Container Version
 
-Note that the menu options update automatically after your session type selection.
-Choose the CARTA version that meets your needs:
+Note that the menu options update automatically after your session type selection. Choose the CARTA version that meets your needs:
+
+![Select CARTA Container](images/carta/2_select_carta_container.png)
+
+#### Available Versions
 
 - **CARTA 4.0** (recommended): Latest features and bug fixes
-(The screenshot is old and showed older versions only.)
-> ![image](../images/carta/2_select_carta_container.png)
+- **CARTA 3.x:** Previous stable releases for compatibility
 
+!!! tip "Version Selection"
+    Use the latest version (4.0+) unless you specifically need compatibility with older workflows. New versions include performance improvements and additional features.
 
 ### Step 3: Configure Session
 
 #### Session Name
 
-Choose a descriptive session name to help you identify it later (e.g., `m87-analysis`, `ngc-1300-cube`).
+Choose a descriptive session name to help you identify it later:
 
-> ![image](../images/carta/3_choose_carta_name.png)
+![Choose CARTA Name](images/carta/3_choose_carta_name.png)
 
-Start with a "flexible" session, and switch to a fixed resource one if needed.
+**Good session names:**
+- `m87-analysis`
+- `ngc-1300-cube`
+- `alma-co-line-study`
+- `vla-continuum-imaging`
+
+#### Resource Allocation
+
+Start with a "flexible" session for most analyses. Switch to a fixed resource allocation if you need guaranteed performance for demanding visualisations.
+
+**Resource Guidelines:**
+- **Flexible:** Good for most CARTA workflows
+- **Fixed:** Use for large datasets (>1GB) or guaranteed performance
 
 ### Step 4: Launch Session
 
-Click the **Launch** button and wait for your session to initialize.
+Click the **Launch** button and wait for your session to initialise. CARTA sessions typically start within 30-60 seconds.
 
-> ![image](../images/carta/6_launch_carta.png)
+## 🧭 Using CARTA
 
-Your session will appear on the Science Portal dashboard with your chosen name.
-Click the CARTA icon to access your session.
+### First Steps
 
-> ![image](../images/carta/7_click_carta.png)
+Once connected to your CARTA session:
 
-## Using CARTA
+1. **File Menu:** Use "Open Image" to load your data
+2. **File Browser:** Navigate to `/arc/projects/[project]/` or `/arc/home/[user]/`
+3. **Load Data:** Select FITS or HDF5 files to visualise
 
-### Initial Setup
+### Data Loading
 
-Wait for CARTA to load completely. You'll see the main CARTA interface:
+#### From CANFAR Storage
 
-> ![image](../images/carta/8_carta_loading.png)
->
-> ![image](../images/carta/9_main_carta_landing.png)
+```bash
+# CARTA can access files from:
+/arc/home/[user]/                    # Your personal data
+/arc/projects/[project]/             # Shared project data
+/scratch/                            # Temporary high-speed storage
+```
 
-### Loading Data
+#### Supported File Paths
 
-#### Navigate to Your Files
+- **Local files:** Any file accessible in the session filesystem
+- **Remote files:** HTTP/HTTPS URLs (limited support)
+- **Archive data:** Files downloaded to CANFAR storage
 
-1. Click the folder icon in the upper left to navigate directories
-2. Browse to your data location:
-   - **Project data**: `/arc/projects/[projectname]/`
-   - **Personal data**: `/arc/home/[username]/`
+### Interface Overview
 
-> ![image](../images/carta/10_navigate_files.png)
+#### Main Components
 
-#### Load an Image
+- **Image Viewer:** Central panel showing the astronomical image
+- **File Browser:** Left panel for navigating and opening files
+- **Region List:** Panel for managing analysis regions
+- **Statistics:** Real-time statistics for selected regions
+- **Spectral Profiler:** Panel for line profile analysis
+- **Animation:** Controls for cycling through cube slices
 
-1. Navigate through the directory structure to find your FITS file
-2. Select the file you want to visualize
-3. Click the **Load** button
+#### Essential Controls
 
-> ![image](../images/carta/11_select_file.png)
+| Control | Function |
+|---------|----------|
+| **Mouse wheel** | Zoom in/out |
+| **Click + drag** | Pan around image |
+| **Right-click** | Context menu with additional options |
+| **Keyboard shortcuts** | See Help menu for complete list |
 
-### Basic Operations
+## 🔬 Analysis Features
 
-#### Image Display
+### Spectral Analysis
 
-Once loaded, your image appears in the main viewer with:
+#### Line Profiles
 
-- **Zoom controls**: Mouse wheel or toolbar buttons
-- **Pan**: Click and drag to move around the image
-- **Colormap**: Adjust scaling and colour scheme
+1. **Draw regions** on the image
+2. **Open Spectral Profiler** panel
+3. **Select region** to view spectrum
+4. **Analyse lines** with built-in fitting tools
 
-> ![image](../images/carta/12_success_CARTA.png)
+#### Moment Maps
+
+```bash
+# CARTA can generate:
+# - Moment 0: Integrated intensity
+# - Moment 1: Velocity field
+# - Moment 2: Velocity dispersion
+```
+
+### Region Analysis
+
+#### Creating Regions
+
+1. **Select region tool** from toolbar
+2. **Draw on image:** Rectangle, ellipse, polygon, or point
+3. **View statistics** in the Statistics panel
+4. **Export regions** in DS9 or CRTF format
+
+#### Statistical Analysis
+
+CARTA automatically computes:
+- **Sum, mean, RMS** within regions
+- **Min/max values** and positions
+- **Flux measurements** with proper units
+- **Histogram analysis** of pixel values
+
+### Animation and Navigation
 
 #### Data Cube Navigation
 
-For 3D data cubes:
+- **Slider controls:** Navigate through spectral channels or Stokes parameters
+- **Animation playback:** Automatic cycling through cube slices
+- **Frame rate control:** Adjust animation speed
+- **Custom ranges:** Focus on specific velocity ranges
 
-- **Channel slider**: Navigate through frequency/velocity channels
-- **Animation controls**: Play through channels automatically
-- **Spectral profile**: Click on pixels to see spectral information
+#### Multi-Panel Views
 
-#### Region Analysis
+- **Compare datasets:** Load multiple images simultaneously
+- **Linked panels:** Synchronise zoom, pan, and navigation
+- **Layout control:** Arrange panels as needed
 
-Create analysis regions:
-
-1. Select region tools from the toolbar
-2. Draw regions on your image
-3. View statistics in the statistics panel
-4. Export region data if needed
-
-## Advanced Features
-
-### Moment Maps
-
-Create moment maps from data cubes:
-
-1. Load your data cube
-2. Go to File → Generate Moment Map
-3. Select moment type (0, 1, or 2)
-4. Set channel range
-5. Generate and display
-
-### Spectral Line Analysis
-
-Analyze spectral profiles:
-
-1. Click on any pixel to see the spectrum
-2. Use the spectral profiler for detailed analysis
-3. Fit Gaussian profiles to lines
-4. Measure line properties
-
-### Contour Overlays
-
-Add contour overlays:
-
-1. Load a second image
-2. Go to View → Contours
-3. Adjust contour levels and styling
-4. Overlay on your main image
-
-## Session Sharing
-
-### Real-time Collaboration
-
-Share your CARTA session with collaborators:
-
-1. Click the session menu
-2. Select "Share Session"
-3. Add collaborator usernames
-4. Set permissions (view-only or full control)
-
-### Export and Save
-
-Save your work:
-
-- **Export images**: File → Export Image (PNG, JPEG, PDF)
-- **Save regions**: File → Export Regions (DS9, CRTF formats)
-- **Save session**: File → Save Layout (restore later)
-
-## Data Format Support
-
-CARTA supports multiple astronomical image formats:
-
-- **FITS**: Standard astronomical format
-- **CASA images**: Radio astronomy standard
-- **HDF5**: Large dataset format
-- **MIRIAD**: Legacy radio format
-
-## Performance Tips
-
-### Optimization
-
-- **Close unused images**: Reduces memory usage
-- **Use appropriate data types**: Float32 vs Float64
-- **Enable GPU acceleration**: For supported operations
-- **Adjust cache settings**: Balance memory vs speed
-
-!!! warning "Large Data Cubes"
-    Very large cubes can consume significant memory. Load subregions, work with decimated data, or increase RAM to avoid crashes.
+## ⚡ Performance Optimisation
 
 ### Large Dataset Handling
 
-For very large files:
+#### Memory Management
 
-- **Use decimation**: View subsampled versions first
-- **Load subregions**: Focus on areas of interest
-- **Consider preprocessing**: Use CASA to create smaller working files
+```bash
+# Monitor session resources
+htop                    # Check memory usage
+df -h                   # Check disk space
+```
 
-## Troubleshooting
+#### Optimisation Tips
+
+- **Use /scratch for large files:** Copy data to high-speed storage
+- **Close unused files:** Reduce memory consumption
+- **Reduce image resolution:** For initial exploration
+- **Use data subsets:** Work with spatial/spectral sub-cubes
+
+### Network Performance
+
+#### For Remote Access
+
+- **Stable connection:** CARTA requires consistent network connectivity
+- **Bandwidth:** Higher bandwidth improves responsiveness
+- **Close other applications:** Reduce network competition
+
+## 🤝 Collaboration Features
+
+### Real-Time Sharing
+
+CARTA supports collaborative analysis:
+
+1. **Share session URL** with team members
+2. **Simultaneous access:** Multiple users can connect
+3. **Synchronised views:** All users see the same state
+4. **Coordinate activities:** Communicate to avoid conflicts
+
+### Best Practices for Collaboration
+
+- **Designate a lead:** Have one person control navigation
+- **Use voice/chat:** Coordinate complex operations
+- **Save work frequently:** Export regions and analysis results
+- **Plan sessions:** Organise collaborative time in advance
+
+## 🔧 Advanced Features
+
+### Scripting and Automation
+
+#### Export Capabilities
+
+- **Image exports:** PNG, JPEG, PDF formats
+- **Region files:** DS9 or CRTF format for other tools
+- **Spectral data:** CSV format for further analysis
+- **Session state:** Save and restore CARTA configurations
+
+#### Integration with Other Tools
+
+```python
+# Load CARTA regions in Python
+from astropy.io import fits
+from regions import Regions
+
+# Read CARTA-exported region file
+regions = Regions.read('carta_regions.crtf', format='crtf')
+
+# Use with other astronomy software
+```
+
+### Custom Colour Maps
+
+- **Built-in maps:** Scientific colour schemes
+- **Custom maps:** Import your own colour tables
+- **Accessibility:** Colour-blind friendly options
+- **Publication quality:** High-contrast options for papers
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-### CARTA won't load
+#### Session Won't Load Data
 
-- Check browser compatibility (Chrome/Firefox recommended)
-- Disable browser extensions that might interfere
-- Clear browser cache and cookies
+**Problem:** CARTA cannot open FITS files
 
-### Performance problems
+**Solutions:**
 
-- Reduce image size or resolution
-- Close other applications
-- Check available memory
+1. Check file permissions and location
+2. Verify file format is supported
+3. Try copying file to `/scratch/` first
+4. Check file isn't corrupted
 
-### File loading errors
+#### Slow Performance
 
-- Verify file format compatibility
-- Check file permissions in storage
-- Ensure file isn't corrupted
+**Problem:** CARTA responds slowly to interactions
 
-### Display issues
+**Solutions:**
 
-- Try different colormaps
-- Adjust image scaling
-- Check graphics driver compatibility
+1. Check available memory with `htop`
+2. Close other browser tabs/applications
+3. Reduce image size or use sub-cubes
+4. Restart session if memory is exhausted
+
+#### Connection Issues
+
+**Problem:** Lost connection to CARTA session
+
+**Solutions:**
+
+1. Refresh browser page
+2. Check internet connection stability
+3. Clear browser cache if persistent
+4. Try different browser
+
+#### Display Problems
+
+**Problem:** Images don't render correctly
+
+**Solutions:**
+
+1. Try different browser (Chrome/Firefox recommended)
+2. Update browser to latest version
+3. Disable browser extensions temporarily
+4. Check graphics drivers on local machine
 
 ### Getting Help
 
-- **CARTA Documentation**: [carta.casa.nrao.edu](https://carta.casa.nrao.edu)
-- **Support**: Email [support@canfar.net](mailto:support@canfar.net)
-- **Community**: Join our Discord for CARTA tips and tricks
+#### CARTA Documentation
 
-## Best Practices
+- **[CARTA User Manual](https://carta.readthedocs.io/)**
+- **[CARTA Video Tutorials](https://cartavis.org/tutorials)**
+- **[Feature Documentation](https://cartavis.org/docs)**
 
-### Workflow Organisation
+#### Support Resources
 
-- **Organise data**: Keep raw and processed data separate
-- **Document analysis**: Save session layouts for reproducibility
-- **Version control**: Track analysis parameters and results
+- **CANFAR Support:** [support@canfar.net](mailto:support@canfar.net)
+- **CARTA Issues:** [GitHub Issues](https://github.com/CARTAvis/carta-frontend/issues)
+- **Community:** [CARTA Users Google Group](https://groups.google.com/g/carta-users)
 
-### Resource Management
+## 📚 Learning Resources
 
-- **Monitor usage**: Check memory consumption during analysis
-- **Clean up**: Close sessions when finished
-- **Share efficiently**: Use view-only sharing when appropriate
+### CARTA Tutorials
 
-## Next Steps
+- **[Getting Started Guide](https://carta.readthedocs.io/en/latest/user_manual.html)**
+- **[Video Tutorials](https://cartavis.org/tutorials)**
+- **[Advanced Features](https://carta.readthedocs.io/en/latest/advanced_features.html)**
 
-- **[Radio Astronomy Workflows](../radio-astronomy/index.md)**: CARTA in radio astronomy pipelines
-- **[Batch Processing](../../batch-jobs.md)**: Automate CARTA operations
-- **[CASA Integration](../radio-astronomy/casa-workflows.md)**: Combine CARTA with CASA analysis
-- **[Desktop Sessions](launch-desktop.md)**: Full desktop environment with CARTA
+### Radio Astronomy Resources
+
+- **[NRAO Data Tutorials](https://casaguides.nrao.edu/)**
+- **[Radio Astronomy Techniques](https://www.cv.nrao.edu/~sransom/web/xxx.html)**
+- **[Synthesis Imaging](https://www.atnf.csiro.au/people/Tobias.Westmeier/tools_hihelpers.php)**
+
+## 🔗 Next Steps
+
+- **[Try Notebook Sessions](notebook.md)** for quantitative analysis
+- **[Use Desktop Sessions](desktop.md)** for CASA and other GUI tools
+- **[Explore Firefly](firefly.md)** for optical astronomy data
+- **[Learn about Storage](../storage/index.md)** for managing large datasets
+- **[Batch Processing](batch.md)** for automated analysis pipelines
+
+## 🆘 Getting Help
+
+- **CARTA Help:** Built-in help system in CARTA interface
+- **Documentation:** [CARTA User Manual](https://carta.readthedocs.io/)
+- **CANFAR Support:** [support@canfar.net](mailto:support@canfar.net)
+- **Community:** [CANFAR Slack](https://canfar.slack.com)

@@ -1,16 +1,21 @@
 
 
-# 🚀 Quick Setup
+# 🚀 Getting Started with CANFAR
 
+**Your complete guide to setting up and using the CANFAR Science Platform for astronomical research.**
+
+!!! info "Platform Navigation"
+    **Getting Started**: Essential setup steps for new CANFAR users.  
+    **[Platform Home](home.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
 
 !!! info "Quick Links"
-    - [Accounts & Permissions](accounts.md)
-    - [Storage Guide](guides/storage/index.md)
-    - [Container Guide](containers.md)
-    - [Interactive Sessions](guides/interactive-sessions/index.md)
-    - [Batch Jobs](batch-jobs.md)
-    - [CANFAR Python Client](../client/home.md)
-    - [Support & FAQ](../faq.md)
+    **Essential Resources:**
+    
+    - **[Permissions Guide](permissions.md)**: Account setup and group management
+    - **[Sessions Overview](sessions/index.md)**: Interactive computing environments
+    - **[Storage Guide](storage/index.md)**: Data management and file systems
+    - **[Container Guide](containers/index.md)**: Software environments and registries
+    - **[Support Centre](support/index.md)**: Help resources and FAQ
 
 
 ## 1️⃣ Get Your CADC Account
@@ -24,7 +29,7 @@ See [Accounts & Permissions](accounts.md) for more details.
 
 !!! info "Account Processing Time"
     CADC accounts are typically approved within 1–2 business days.
-    For troubleshooting account issues, see [FAQ](../faq.md) or [Contact Support](help.md#contact-support).
+    For troubleshooting account issues, see [FAQ](support/faq.md) or [Contact Support](support/index.md).
 
 
 
@@ -43,7 +48,7 @@ Once you have a CADC account:
     - Timeline
 
 
-See [Accounts & Permissions](accounts.md) for group management details. For advanced collaboration, see [Storage Guide](guides/storage/index.md).
+See [Permissions Guide](permissions.md) for group management details. For advanced collaboration, see [Storage Guide](storage/index.md).
 
 
 ## 3️⃣ First Login and Setup
@@ -53,7 +58,7 @@ See [Accounts & Permissions](accounts.md) for group management details. For adva
 3. Access the [Image Registry](https://images.canfar.net) (required for private containers).
 
 
-See [Container Usage](containers.md) for more about images and custom software. For building your own containers, see [Container Guide](containers.md#building-custom-containers).
+See [Container Guide](containers/index.md) for more about images and custom software. For building your own containers, see [Building Containers](containers/build.md).
 
 
 ## 4️⃣ Launch Your First Session
@@ -68,14 +73,14 @@ To start analyzing data, launch a Jupyter notebook:
 🎉 You're ready to go! Your session includes Python, common astronomy packages, and access to shared storage.
 
 
-See [Interactive Sessions](guides/interactive-sessions/index.md) for more session types and workflows. For automation, see [CANFAR Python Client](../client/home.md).
+See [Sessions Overview](sessions/index.md) for more session types and workflows. For automation, see [CANFAR Python Client](../client/home.md).
 
 
 !!! tip "Recommended Starting Point"
     Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated.
 
 !!! tip "Advanced: Custom Containers"
-    - Build your own containers for specialized workflows. See [Container Guide](containers.md#building-custom-containers).
+    - Build your own containers for specialised workflows. See [Building Containers](containers/build.md).
     - Use [Harbor Registry](https://images.canfar.net/) to browse and manage images.
 
 
@@ -83,7 +88,7 @@ See [Interactive Sessions](guides/interactive-sessions/index.md) for more sessio
 ## 📁 Understanding Your Workspace
 
 
-See the [Storage Guide](guides/storage/index.md) for full details. For VOSpace scripting, see [VOSpace API](guides/storage/vospace-api.md).
+See the [Storage Guide](storage/index.md) for full details. For VOSpace scripting, see [VOSpace API](storage/vospace.md).
 
 | Location | Purpose | Persistence | Best For |
 |----------|---------|-------------|----------|
@@ -96,7 +101,7 @@ See the [Storage Guide](guides/storage/index.md) for full details. For VOSpace s
 ## 🤝 Collaboration Features
 
 
-See [Accounts & Permissions](accounts.md) and [Storage Guide](guides/storage/index.md) for collaboration details. For team onboarding, see [Get Started Guide](get-started.md).
+See [Permissions Guide](permissions.md) and [Storage Guide](storage/index.md) for collaboration details. For team onboarding, see [Getting Started](get-started.md).
 
 ### Session Sharing
 
@@ -121,28 +126,29 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
 ---
 
 !!! info "Explore More Documentation"
-    - [User Guide](guides/index.md)
-    - [Storage Guide](guides/storage/index.md)
-    - [Container Guide](containers.md)
-    - [Interactive Sessions](guides/interactive-sessions/index.md)
-    - [Batch Jobs](batch-jobs.md)
-    - [Radio Astronomy](guides/radio-astronomy/index.md)
+    **Platform Resources:**
+    
+    - **[Platform Concepts](concepts.md)**: Understanding CANFAR's architecture
+    - **[Sessions Guide](sessions/index.md)**: Interactive computing environments
+    - **[Storage Guide](storage/index.md)**: Data management and file systems
+    - **[Container Guide](containers/index.md)**: Software environments and registries
+    - **[Cloud Computing](cloud.md)**: Advanced batch processing workflows
 
 Ready to dive deeper?
 
-- **[📖 User Guide →](guides/index.md)** – Comprehensive documentation
-- **[🗄️ Storage Guide →](guides/storage/index.md)** – Detailed storage management
-- **[🐳 Container Guide →](containers.md)** – Using and building containers
-- **[📡 Radio Astronomy →](guides/radio-astronomy/index.md)** – CASA, ALMA workflows
+- **[📖 Platform Concepts →](concepts.md)** – Understanding CANFAR's architecture
+- **[🖥️ Sessions Guide →](sessions/index.md)** – Interactive computing environments
+- **[🗄️ Storage Guide →](storage/index.md)** – Data management and file systems
+- **[🐳 Container Guide →](containers/index.md)** – Software environments and registries
+- **[☁️ Cloud Computing →](cloud.md)** – Advanced batch processing workflows
 
 
 
 ## 💬 Need Help?
 
-
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** – Chat with other users
-- **[❓ FAQ](../faq.md)** – Common questions and solutions
-- **[Help & Support](help.md)** – Troubleshooting and contact info
+- **[❓ FAQ](support/faq.md)** – Common questions and solutions
+- **[🆘 Support Centre](support/index.md)** – Help resources and contact information
 
 ---
 

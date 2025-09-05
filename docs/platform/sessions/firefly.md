@@ -1,11 +1,11 @@
-# Launching a Firefly Session
+# Firefly Sessions
 
-**The LSST table and image visualiser for astronomical data exploration**
+## The LSST table and image visualiser for astronomical data exploration
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch a Firefly session and choose the right version
     - How to load images, tables, and access CANFAR storage
-    - How to perform catalog overlays, plotting, and cutouts
+    - How to perform catalogue overlays, plotting, and cutouts
     - Performance tips for large surveys and troubleshooting guidance
 
 Firefly is a powerful web-based visualisation tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogues, and analysing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.
@@ -45,20 +45,29 @@ Firefly offers specialised tools for:
 
 The container selection updates automatically after choosing the session type. Select the Firefly container version you need:
 
+![Choose Firefly Container](images/firefly/2_select_firefly_container.png)
+
+#### Available Versions
+
 - **firefly:latest** - Most recent stable version (recommended)
 - **firefly:X.X** - Specific version for reproducible analysis
 
-![Choose Firefly Container](images/firefly/2_select_firefly_container.png)
+!!! tip "Version Selection"
+    Use the latest version unless you need a specific version for reproducibility. The latest version includes performance improvements and new features.
 
 ### Step 3: Configure Session
 
 #### Session Name
+
 Choose a descriptive name that helps identify your work:
-- `lsst-photometry`
-- `hsc-catalog-analysis` 
-- `multiband-survey`
 
 ![Name Firefly Session](images/firefly/3_choose_firefly_name.png)
+
+**Good session names:**
+- `lsst-photometry`
+- `hsc-catalogue-analysis` 
+- `multiband-survey`
+- `gaia-cross-match`
 
 #### Memory Requirements
 
@@ -84,7 +93,7 @@ Most Firefly work is I/O bound rather than CPU intensive:
 ### Step 4: Launch Session
 
 1. **Click** "Launch" button
-2. **Wait** for container initialization (~30-60 seconds)
+2. **Wait** for container initialisation (~30-60 seconds)
 3. **Session appears** on your portal dashboard
 4. **Click** the session icon to access Firefly
 
@@ -106,16 +115,23 @@ graph TD
     
     Upload --> Local[Local Files]
     Upload --> URLs[Remote URLs]
-    Upload --> VOSpace[VOSpace Files]
+    Upload --> Storage[CANFAR Storage]
     
     Images --> Display[Image Canvas]
     Images --> Controls[Display Controls]
-    Images --> Overlays[Catalog Overlays]
+    Images --> Overlays[Catalogue Overlays]
     
     Tables --> Browse[Data Browser]
     Tables --> Filter[Filtering Tools]
     Tables --> Plot[Plotting Tools]
 ```
+
+#### Main Components
+
+- **File Upload Area**: Load local files, URLs, or access CANFAR storage
+- **Image Display**: Multi-panel image viewer with WCS support
+- **Table Viewer**: Advanced table browser with analysis tools
+- **Control Panels**: Image display controls, colour maps, overlays
 
 ### Loading Data
 
@@ -123,39 +139,33 @@ graph TD
 
 **FITS Images:**
 
-```text
 1. Click "Images" tab
 2. Select "Upload" 
 3. Choose FITS file from your computer
 4. Image loads automatically with WCS if available
-```
 
 **Catalogue Tables:**
 
-```text
 1. Click "Tables" tab
 2. Select "Upload"
 3. Choose CSV, FITS table, or VOTable
 4. Table opens in browser interface
-```
 
 #### Access CANFAR Storage
 
-**From `arc` Projects:**
+**From ARC Projects:**
 
 ```bash
 # Files in your project directory are accessible via:
-# /arc/projects/[projectname]/data/image.fits
-# /arc/projects/[projectname]/data/image_sources.csv
+/arc/projects/[project]/data/image.fits
+/arc/projects/[project]/data/image_sources.csv
 ```
 
 **From VOSpace:**
 
-```text
 1. In Firefly, use "File" → "Open"
 2. Navigate to VOSpace URLs
-3. Access: vos://cadc.nrc.ca~vault/[projectname]/
-```
+3. Access: `vos://cadc.nrc.ca~vault/[user]/`
 
 #### Remote Data Access
 
@@ -167,78 +177,96 @@ https://archive.stsci.edu/hlsp/data.fits
 https://irsa.ipac.caltech.edu/data/WISE/cutouts/
 ```
 
+**Supported Formats:**
+
+- **Images**: FITS, JPEG, PNG
+- **Tables**: CSV, FITS tables, VOTable, IPAC tables
+- **Archives**: Gzipped files automatically handled
+
 ### Image Analysis
 
 #### Basic Image Display
 
-```text
+**Display Controls:**
+
 1. Load FITS image
 2. Adjust stretch (log, linear, sqrt)
 3. Set scale limits (min/max values)
 4. Choose colour table (heat, cool, rainbow)
-```
+
+**Navigation:**
+
+- **Zoom**: Mouse wheel or zoom controls
+- **Pan**: Click and drag
+- **Centre**: Double-click to centre
+- **Reset**: Reset zoom and pan to default
 
 #### Multi-band RGB
 
-```text
+**Creating RGB Composites:**
+
 1. Load three images (e.g., g, r, i bands)
 2. Select "RGB" mode
 3. Assign each image to R, G, or B channel
 4. Adjust relative scaling
-```
+5. Fine-tune colour balance
 
 #### Coordinate Systems
 
-```text
-# Firefly supports standard coordinate systems:
-- Equatorial (RA/Dec) - J2000, B1950
-- Galactic coordinates
-- Ecliptic coordinates  
-- Pixel coordinates
-```
+Firefly supports standard coordinate systems:
 
-### Catalog Analysis
+- **Equatorial**: RA/Dec (J2000, B1950)
+- **Galactic**: Galactic longitude/latitude
+- **Ecliptic**: Ecliptic coordinates  
+- **Pixel**: Image pixel coordinates
+
+### Catalogue Analysis
 
 #### Table Operations
 
 **Basic Navigation:**
 
-```text
-- Sort columns by clicking headers
-- Filter rows using search box
-- Select multiple rows with Ctrl+click
-- Pan/zoom table with mouse wheel
-```
+- **Sort columns**: Click headers to sort
+- **Filter rows**: Use search box for text filtering
+- **Select rows**: Click rows, Ctrl+click for multiple
+- **Pagination**: Navigate large tables with page controls
 
 **Advanced Filtering:**
 
 ```javascript
 // Example filters (use in filter box):
-magnitude < 20.5                    // Bright sources
-colour_g_r > 0.5 && colour_g_r < 1.5  // Colour selection
-distance < 100                      // Distance constraint
+magnitude < 20.5                         // Bright sources
+colour_g_r > 0.5 && colour_g_r < 1.5     // Colour selection
+distance < 100                           // Distance constraint
+ra > 180 && ra < 200                     // RA range
 ```
+
+#### Statistical Analysis
+
+**Built-in Statistics:**
+
+- **Column statistics**: Mean, median, std deviation
+- **Histogram analysis**: Distribution plots
+- **Cross-correlation**: Compare columns
+- **Selection statistics**: Stats on filtered data
 
 #### Plotting Tools
 
 **Column Plots:**
 
-```text
 1. Select table columns for X and Y axes
 2. Choose plot type (scatter, histogram, line)
 3. Apply colour coding by third column
 4. Add error bars if available
-```
+5. Customise symbols and colours
 
 **Image-Catalogue Overlay:**
 
-```text
 1. Load image and catalogue table
 2. Match coordinate columns (RA, Dec)
 3. Select overlay symbol (circle, cross, diamond)
 4. Adjust symbol size and colour
 5. Sources appear overlaid on image
-```
 
 ### Advanced Features
 
@@ -246,69 +274,116 @@ distance < 100                      // Distance constraint
 
 Extract subimages from large surveys:
 
-```text
-# Using Firefly's cutout interface
+**Manual Cutouts:**
+
 1. Right-click on image location
 2. Select "Create Cutout"
 3. Specify size (arcmin)
 4. Choose format (FITS, JPEG, PNG)
-5. Download or save to VOSpace
+5. Download or save to CANFAR storage
+
+**Programmatic Cutouts:**
+
+```python
+# Example using Python and Firefly
+import requests
+
+url = "https://irsa.ipac.caltech.edu/cgi-bin/Cutouts/nph-cutouts"
+params = {
+    'mission': 'wise',
+    'locstr': '10.68 +41.27',
+    'sizeX': '300',
+    'sizeY': '300'
+}
+response = requests.get(url, params=params)
 ```
 
 #### Multi-wavelength Analysis
 
-```text
+**Cross-band Analysis:**
+
 1. Load images in different bands
 2. Use "Blink" mode to compare
 3. Create RGB composite
 4. Overlay catalogue with colour-magnitude selection
 5. Identify sources across wavelengths
-```
+
+**Spectral Energy Distributions:**
+
+1. Load multi-band photometry table
+2. Select source of interest
+3. Plot flux vs wavelength
+4. Fit SED models if available
 
 #### Data Export
 
 **Save Results:**
 
+- **Modified tables**: CSV, FITS, VOTable formats
+- **Image displays**: PNG, PDF for publications  
+- **Analysis plots**: Vector formats for papers
+- **Session state**: Save/restore workspace
+
+**Export Options:**
+
 ```text
-- Modified tables → CSV, FITS, VOTable formats
-- Image displays → PNG, PDF for publications  
-- Analysis plots → Vector formats for papers
-- Session state → Save/restore workspace
+File → Export → [Format]
+- Tables: CSV, FITS table, VOTable
+- Images: FITS, PNG, JPEG, PDF
+- Plots: PNG, PDF, SVG
+- Session: Save current state
 ```
 
 ## 🛠️ Common Workflows
 
 ### Survey Photometry
 
-```text
+**HSC/LSST Photometry Workflow:**
+
 1. Load survey image (HSC, LSST, etc.)
 2. Upload photometric catalogue
 3. Overlay sources on image
 4. Filter by magnitude and colour
 5. Create colour-magnitude diagram
 6. Export selected sources
+
+```python
+# Example: Filter for main sequence stars
+# In Firefly filter box:
+(g_mag - r_mag) > 0.2 && (g_mag - r_mag) < 1.0 && r_mag < 22
 ```
 
 ### Multi-object Analysis
 
-```text
+**Target List Processing:**
+
 1. Load target list (CSV with coordinates)
 2. Create cutouts around each target
 3. Measure properties in each cutout
 4. Compile results in table
 5. Plot trends and correlations
 6. Save analysis products
-```
+
+### Cross-matching Catalogues
+
+**Gaia Cross-match Example:**
+
+1. Load your source catalogue
+2. Load Gaia reference catalogue
+3. Perform spatial cross-match
+4. Analyse proper motions and parallaxes
+5. Create clean stellar sample
+6. Export matched catalogue
 
 ### Time Series Visualisation
 
-```text
+**Light Curve Analysis:**
+
 1. Load time-series table (time, magnitude, error)
 2. Create light curve plot
 3. Apply period folding if needed
 4. Identify outliers and trends
 5. Export cleaned data
-```
 
 ## 🔧 Integration with CANFAR
 
@@ -318,9 +393,9 @@ Extract subimages from large surveys:
 
 ```bash
 # Your project data appears in Firefly file browser
-/arc/projects/[projectname]/
+/arc/projects/[project]/
 ├── images/           # FITS images
-├── catalogue/        # Source tables  
+├── catalogues/       # Source tables  
 ├── results/          # Analysis products
 └── plots/            # Exported figures
 ```
@@ -329,7 +404,7 @@ Extract subimages from large surveys:
 
 ```bash
 # Access archived data
-vos://cadc.nrc.ca~vault/[projectname]/
+vos://cadc.nrc.ca~vault/[user]/
 ├── published_data/   # Public datasets
 ├── working_data/     # Analysis in progress
 └── final_products/   # Paper-ready results
@@ -339,21 +414,26 @@ vos://cadc.nrc.ca~vault/[projectname]/
 
 **Session Sharing:**
 
-```text
 1. Copy Firefly session URL
 2. Share with team members (same CANFAR group)
 3. Collaborate on analysis in real-time
 4. Each user sees same data and visualisations
-```
 
 **Data Sharing:**
 
-```text
 1. Save analysis results to shared project space
 2. Export publication-quality figures
 3. Share VOSpace links for external collaborators
 4. Version control important datasets
-```
+
+### Working with Other CANFAR Tools
+
+**Integration Patterns:**
+
+- **Notebooks → Firefly**: Prepare data in Python, visualise in Firefly
+- **Firefly → Desktop**: Export results for further analysis in CASA/DS9
+- **Batch → Firefly**: Process large datasets, visualise results
+- **CARTA → Firefly**: Radio analysis in CARTA, optical follow-up in Firefly
 
 ## 📊 Performance Tips
 
@@ -361,112 +441,152 @@ vos://cadc.nrc.ca~vault/[projectname]/
 
 **Memory Management:**
 
-```text
 - Load subsets of large catalogues first
 - Use server-side filtering when possible
 - Close unused tables and images
 - Monitor memory usage in browser
-```
 
 **Network Optimisation:**
 
-```text
 - Use compressed file formats (gzip FITS)
-- Access local files when possible (/arc/projects)
+- Access local files when possible (`/arc/projects`)
 - Cache frequently used data locally
 - Use cutout services for large images
-```
 
 ### Visualisation Performance
 
 **Image Display:**
 
-```text
 - Use appropriate image size for screen resolution
 - Apply reasonable stretch limits
 - Close unused image panels
 - Use PNG format for screenshots
-```
 
 **Table Operations:**
 
-```text
 - Filter large tables before plotting
 - Use sampling for very large datasets
 - Index frequently used columns
 - Batch operations when possible
-```
+
+**Browser Optimisation:**
+
+- Use Chrome or Firefox for best performance
+- Close other browser tabs to free memory
+- Disable unnecessary browser extensions
+- Use stable internet connection
 
 ## 🆘 Troubleshooting
 
 ### Common Issues
 
-**Firefly Won't Load:**
+#### Firefly Won't Load
 
-```text
-- Check browser compatibility (Chrome, Firefox recommended)
-- Clear browser cache and cookies
-- Disable browser extensions that might interfere
-- Try incognito/private browsing mode
+**Problem**: Firefly session doesn't start or shows blank screen
+
+**Solutions:**
+
+1. Check browser compatibility (Chrome, Firefox recommended)
+2. Clear browser cache and cookies
+3. Disable browser extensions that might interfere
+4. Try incognito/private browsing mode
+5. Wait for full session initialisation (up to 2 minutes)
+
+#### Images Not Displaying
+
+**Problem**: FITS images fail to load or display incorrectly
+
+**Solutions:**
+
+1. Verify FITS file format and WCS headers
+2. Check file permissions and accessibility
+3. Try loading smaller test image first
+4. Ensure sufficient memory allocation
+5. Check for corrupted files
+
+#### Tables Not Loading
+
+**Problem**: Catalogue tables won't open or display errors
+
+**Solutions:**
+
+1. Verify file format (CSV, FITS table, VOTable)
+2. Check column headers and data types
+3. Ensure proper delimiter in CSV files
+4. Try loading subset of data first
+5. Check for special characters in data
+
+#### Performance Issues
+
+**Problem**: Firefly responds slowly or becomes unresponsive
+
+**Solutions:**
+
+1. Reduce number of overlay sources
+2. Close unused browser tabs
+3. Increase session memory allocation
+4. Use more efficient file formats
+5. Filter large datasets before visualisation
+
+### Getting Help
+
+#### Firefly Documentation
+
+- **[Firefly User Guide](https://firefly-help.ipac.caltech.edu/)**: Comprehensive documentation
+- **[Video Tutorials](https://firefly-help.ipac.caltech.edu/firefly_help/videos.html)**: Step-by-step guides
+- **[API Documentation](https://firefly-help.ipac.caltech.edu/firefly_help/api.html)**: For developers
+
+#### CANFAR Support
+
+- **Support Email**: [support@canfar.net](mailto:support@canfar.net)
+- **Documentation**: [CANFAR Documentation](../)
+- **Community**: [CANFAR Slack](https://canfar.slack.com)
+
+## 📚 Learning Resources
+
+### Firefly Tutorials
+
+- **[Getting Started Guide](https://firefly-help.ipac.caltech.edu/)**: Basic operations
+- **[Video Tutorials](https://firefly-help.ipac.caltech.edu/firefly_help/videos.html)**: Visual guides
+- **[Advanced Features](https://firefly-help.ipac.caltech.edu/firefly_help/advanced.html)**: Power user tips
+
+### Survey Data Resources
+
+- **[LSST Data Portal](https://data.lsst.cloud/)**: LSST survey data
+- **[HSC Archive](https://hsc.mtk.nao.ac.jp/)**: Hyper Suprime-Cam data
+- **[IRSA](https://irsa.ipac.caltech.edu/)**: Infrared survey data
+- **[Gaia Archive](https://gea.esac.esa.int/archive/)**: Astrometric and photometric data
+
+### Python Integration
+
+```python
+# Example: Preparing data for Firefly
+import pandas as pd
+from astropy.io import fits
+from astropy.table import Table
+
+# Create catalogue for Firefly
+sources = Table.read('my_sources.fits')
+sources.write('/arc/projects/[project]/firefly_input.csv', 
+               format='csv', overwrite=True)
+
+# Save image for Firefly
+hdu = fits.open('my_image.fits')
+hdu.writeto('/arc/projects/[project]/firefly_image.fits', 
+            overwrite=True)
 ```
 
-**Images Not Displaying:**
+## 🔗 Next Steps
 
-```text
-- Verify FITS file format and WCS headers
-- Check file permissions and accessibility
-- Try loading smaller test image first
-- Ensure sufficient memory allocation
-```
+- **[Try CARTA Sessions](carta.md)** for radio astronomy visualisation
+- **[Use Notebook Sessions](notebook.md)** for quantitative analysis
+- **[Explore Desktop Sessions](desktop.md)** for GUI applications
+- **[Learn about Storage](../storage/index.md)** for managing large datasets
+- **[Batch Processing](batch.md)** for automated survey analysis
 
-**Tables Not Loading:**
+## 🆘 Getting Help
 
-```text
-- Verify file format (CSV, FITS table, VOTable)
-- Check column headers and data types
-- Ensure proper delimiter in CSV files
-- Try loading subset of data first
-```
-
-**Performance Issues:**
-
-```text
-- Reduce number of overlay sources
-- Close unused browser tabs
-- Increase session memory allocation
-- Use more efficient file formats
-```
-
-## 🔗 External Resources
-
-
-### Documentation
-
-- **[Firefly User Guide](https://firefly-help.ipac.caltech.edu/)** - Comprehensive documentation
-- **[LSST Science Pipelines](https://pipelines.lsst.io/)** - Integration with LSST tools
-- **[IRSA Tutorials](https://irsa.ipac.caltech.edu/docs/tutorials/)** - Survey data tutorials
-
-
-### Data Archives
-
-- **[LSST Data Portal](https://data.lsst.cloud/)** - LSST survey data
-- **[HSC Archive](https://hsc.mtk.nao.ac.jp/)** - Hyper Suprime-Cam data
-- **[IRSA](https://irsa.ipac.caltech.edu/)** - Infrared survey data
-
-## 🔗 What's Next?
-
-Firefly works great with other CANFAR tools:
-
-- **[Table Analysis →](../storage/vospace-api.md)** - Advanced catalog management
-- **[Desktop Sessions →](launch-desktop.md)** - Use Firefly with other GUI tools
-- **[Batch Processing →](../../batch-jobs.md)** - Automate large survey analysis
-- **[Container Guide →](../../containers.md)** - Customize Firefly environment
-
----
-
-!!! tip "Firefly Best Practices"
-    1. **Start with small datasets** to learn the interface before tackling large surveys
-    2. **Use appropriate memory** - large catalogues need more RAM than single images  
-    3. **Save your work frequently** - export important results to `/arc/projects/`
-    4. **Collaborate effectively** - share session URLs for real-time teamwork
-    5. **Optimize performance** - close unused data and use efficient file formats
+- **Firefly Help**: Built-in help system in Firefly interface
+- **Documentation**: [Firefly User Manual](https://firefly-help.ipac.caltech.edu/)
+- **CANFAR Support**: [support@canfar.net](mailto:support@canfar.net)
+- **Community**: [CANFAR Slack](https://canfar.slack.com)

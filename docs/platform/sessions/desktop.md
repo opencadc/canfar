@@ -1,16 +1,16 @@
+# Desktop Sessions
 
-# Launching Desktop Sessions
-
-Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. Most astronomy software is launched in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This guide explains how to launch and use desktop sessions, including CANFAR-supported and user-contributed astronomy software.
+## Full Linux graphical environment in your browser with astronomy software
 
 !!! abstract "🎯 What You'll Learn"
-    - Launching, connecting, and sizing desktop sessions
-    - Available software and how to launch it
+    - How to launch, connect, and configure desktop sessions
+    - Available software and how to launch astronomy applications
     - Managing files and storage within desktop sessions
     - Tips for collaboration, performance, and troubleshooting
 
-## Overview
+Desktop sessions on CANFAR provide a full Linux graphical environment directly in your browser, with access to CANFAR storage. Most astronomy software runs in dedicated containers on separate worker nodes and connects to your browser session using X11 protocols. This provides a familiar desktop experience for GUI applications and traditional workflows.
 
+## 📋 Overview
 
 Desktop sessions offer:
 
@@ -20,161 +20,261 @@ Desktop sessions offer:
 - **File management**: Visual file browser and management tools
 - **Session persistence**: Resume work exactly where you left off
 
-Common use cases include:
+### Common Use Cases
 
-- Running astronomy software in containers (DS9, Aladin, TOPCAT, CASA, etc.)
-- Multi-step workflows with several applications
-- Teaching, demonstrations, and collaborative analysis
-- Legacy or specialised software requiring a desktop environment
+- **Running astronomy software in containers**: DS9, Aladin, TOPCAT, CASA, etc.
+- **Multi-step workflows**: Combine several applications in sequence
+- **Teaching and demonstrations**: Share desktop for educational purposes
+- **Legacy software**: Applications requiring a desktop environment
+- **Visual file management**: Organise data with graphical tools
 
-## Creating a Desktop Session
+### How Desktop Sessions Work
 
-### Step 1: Select Session Type and a Name
+```mermaid
+graph TB
+    Browser[Your Browser] --> Desktop[Desktop Session]
+    Desktop --> FileManager[File Manager]
+    Desktop --> Terminal[Terminal]
+    Desktop --> Shortcuts[Application Shortcuts]
+    
+    Shortcuts --> DS9[DS9 Container]
+    Shortcuts --> TOPCAT[TOPCAT Container]
+    Shortcuts --> Aladin[Aladin Container]
+    
+    Desktop --> AstroMenu[Astro Software Menu]
+    AstroMenu --> CASA[CASA Container]
+    AstroMenu --> UserApps[User-Contributed Apps]
+    
+    Desktop --> Storage[CANFAR Storage]
+    Storage --> ArcHome[/arc/home/[user]/]
+    Storage --> ArcProjects[/arc/projects/[project]/]
+    Storage --> Scratch[/scratch/]
+```
 
-From the Science Portal dashboard, click the **plus sign (+)** to create a new session, 
-then select **desktop** as your session type.
+**Desktop Runtime**: Provides the graphical environment in your browser
+**Application Containers**: Most astronomy software runs in separate containers
+**X11 Forwarding**: Applications display through the desktop session
+**Storage Integration**: Direct access to CANFAR filesystems
 
-> ![image](../images/desktop/1_launch_desktop.png)
+## 🚀 Creating a Desktop Session
 
-Choose a descriptive session name to help you identify it later (e.g., `data-reduction`, `teaching-session`, `multi-instrument-analysis`).
+### Step 1: Select Session Type and Name
 
-> ![image](../images/desktop/3_choose_name.png)
+From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **desktop** as your session type.
 
+![Launch Desktop](images/desktop/1_launch_desktop.png)
 
-### Step 2: Launch Session
+Choose a descriptive session name to help you identify it later:
 
-Click the **Launch** button and wait for your session to initialize. Desktop sessions
-may take slightly longer to start than other session types.
+![Choose Name](images/desktop/3_choose_name.png)
 
-> ![image](../images/desktop/4_launch.png)
+**Good session names:**
+- `data-reduction`
+- `teaching-session`
+- `multi-instrument-analysis`
+- `collaborative-work`
 
-Your session will appear on the Science Portal dashboard. Click the desktop icon to access your session.
+### Step 2: Configure Resources
 
-> ![image](../images/desktop/5_active_desktop.png)
+Desktop sessions use the default container and resource allocation. For most desktop work, the default settings are appropriate.
+
+**Resource Guidelines:**
+- **Memory**: 16GB is typically sufficient for most desktop workflows
+- **CPU**: 2-4 cores handle most desktop applications well
+- **Storage**: Use persistent storage in `/arc/` for important work
+
+### Step 3: Launch Session
+
+Click the **Launch** button and wait for your session to initialise:
+
+![Launch](images/desktop/4_launch.png)
+
+Desktop sessions may take slightly longer to start than other session types as they need to set up the full graphical environment.
+
+Your session will appear on the Science Portal dashboard:
+
+![Active Desktop](images/desktop/5_active_desktop.png)
 
 !!! note "Connection Timing"
     Sometimes it takes a few seconds for the session link to work properly. If you see a "Bad gateway" error, wait a moment and try again.
 
-## Connecting to Your Desktop
+## 🖥️ Connecting to Your Desktop
 
 ### Initial Connection
 
-Click the **Connect** button to access your desktop environment.
+Click the desktop icon to access the connection page, then click **Connect** to access your desktop environment:
 
-> ![image](../images/desktop/6_connect_desktop.png)
-
+![Connect Desktop](images/desktop/6_connect_desktop.png)
 
 ### Desktop Environment
 
-When you connect, you'll see a full Linux desktop in your browser. Key features include:
+When you connect, you'll see a full Linux desktop in your browser:
 
-- **Taskbar**: Application launcher and system controls
-- **File manager**: Browse CANFAR storage and files
-- **Terminal**: Command-line access
-- **Shortcut icons**: Quick launch for DS9, Aladin, TOPCAT, and Firefox
-- **Astro Software menu**: Access CANFAR-supported and user-contributed astronomy containers
+![Desktop Connected](images/desktop/7_desktop_connected.png)
 
-Most applications are launched in containers and connect to your desktop session using X11 protocols. Only a few tools are native to the desktop itself.
+#### Key Desktop Features
 
-> ![image](../images/desktop/7_desktop_connected.png)
+- **Taskbar**: Application launcher and system controls at bottom
+- **File Manager**: Browse CANFAR storage and manage files
+- **Terminal**: Command-line access for advanced operations
+- **Application Shortcuts**: Quick launch icons for common tools
+- **System Menu**: Access to additional applications and settings
 
 ### Session Persistence
 
-and work remain open.
-When your session becomes inactive, you'll be returned to the connection page.
-Click **Connect** again to resume exactly where you left off - all your applications
-and work remain open.
+When your session becomes inactive, you'll be returned to the connection page. Click **Connect** again to resume exactly where you left off - all your applications and work remain open.
 
+**Session Persistence Features:**
+- Open applications remain running
+- File locations and window positions preserved
+- Terminal sessions maintain history
+- Application states saved automatically
 
-## Available Software
+## 🛠️ Available Software
 
-### Astronomy Applications
+### Desktop Architecture
 
-The desktop session provides access to astronomy software in two ways:
+The desktop session provides access to astronomy software in two main ways:
 
-- **Shortcut icons**: DS9, Aladin, TOPCAT, and Firefox are available directly on the desktop for quick access.
-- **Astro Software menu**: Find CANFAR-supported and user-contributed astronomy containers under Applications → Astro Software. These containers run on separate worker nodes and connect to your desktop session.
+#### 1. Desktop Shortcuts
 
-You can also access other tools and environments, including Python (with AstroPy, Jupyter), CASA, IRAF/PyRAF, and more, depending on the available containers and desktop configuration.
+Quick access icons available directly on the desktop:
+- **DS9**: FITS image viewer and analysis
+- **Aladin**: Interactive sky atlas and visualisation
+- **TOPCAT**: Tool for Operations on Catalogues And Tables
+- **Firefox**: Web browser for documentation and online tools
 
-## Working with Applications
+#### 2. Astro Software Menu
+
+Access CANFAR-supported and user-contributed astronomy containers:
+
+1. Click **Applications** menu in the taskbar
+2. Select **Astro Software** to browse available containers
+3. Choose your desired application to launch in a dedicated container
+
+#### Available Applications
+
+| Application | Type | Best For |
+|-------------|------|----------|
+| **DS9** | Image Viewer | FITS file display, region analysis |
+| **Aladin** | Sky Atlas | Multi-survey visualisation, catalog overlay |
+| **TOPCAT** | Table Tool | Catalogue analysis, cross-matching |
+| **CASA** | Radio Astronomy | Interferometry data reduction |
+| **Python/Jupyter** | Analysis | Scripting, notebook-based analysis |
+| **Firefox** | Web Browser | Documentation, online tools |
+
+### Native vs Container Applications
+
+**Native Applications** (few):
+- Basic file manager and terminal
+- Simple text editors
+- System utilities
+
+**Container Applications** (most astronomy software):
+- Run in dedicated containers on worker nodes
+- Connect via X11 forwarding to your desktop
+- Provide full functionality with isolated environments
+- Include DS9, CASA, TOPCAT, Aladin, and contributed applications
+
+!!! important "Application Launch Method"
+    You cannot start astronomy applications by simply running commands like `ds9 &` in a terminal. These applications must be launched through desktop shortcuts or the Astro Software menu, as they run in separate containers.
+
+## 🧭 Working with Applications
 
 ### Launching Applications
 
-### Method 1: Astro Software Menu
+#### Method 1: Desktop Shortcuts
 
-1. Click the Applications menu in the taskbar
-2. Select "Astro Software" to browse CANFAR-supported and user-contributed astronomy containers
-3. Choose your desired application to launch it in a dedicated container
+Click the shortcut icon on the desktop for immediate access to:
+- DS9 (FITS viewer)
+- Aladin (sky atlas)
+- TOPCAT (table analysis)
+- Firefox (web browser)
 
-### Method 2: Desktop Shortcuts
+#### Method 2: Astro Software Menu
 
-- Click the shortcut icon for DS9, Aladin, TOPCAT, or Firefox on the main desktop to launch these applications quickly
+1. Click **Applications** in the taskbar
+2. Navigate to **Astro Software**
+3. Select the application or container you need
+4. Application launches in a new window
 
-**Note:** Most astronomy applications are launched in containers and connect to your desktop session. You cannot start a terminal and simply run `ds9 &` or similar commands, as these applications are not installed natively in the desktop environment.
-
-### Method 3: File Association
+#### Method 3: File Association
 
 - Double-click FITS files to open in DS9 (if available)
 - Right-click files for "Open with" options
+- File manager remembers your preferred applications
 
-### Example: Multi-Application Workflow
+### Example Multi-Application Workflow
 
-Here's a typical desktop workflow for optical astronomy:
+**Optical Astronomy Analysis:**
 
-1. **File Management**: Use file manager to organise data
-2. **Image Display**: Open FITS files in DS9 for inspection
-3. **Analysis**: Launch Python/Jupyter for data analysis
-4. **Documentation**: Use text editor for notes and scripts
-5. **Results**: Save plots and analysis outputs
-
+1. **File Management**: Organise data using the graphical file manager
+2. **Image Display**: Open FITS files in DS9 for visual inspection
+3. **Catalogue Analysis**: Load source lists in TOPCAT for analysis
+4. **Cross-matching**: Use TOPCAT to cross-match with online catalogues
+5. **Documentation**: Use Firefox to access documentation and references
+6. **Scripting**: Open terminal for command-line operations as needed
 
 ### CASA Desktop Usage
 
-To use CASA with its graphical interface, launch it from the Astro Software menu. CASA runs in a dedicated container and connects to your desktop session, allowing access to its full plotting and visualisation tools.
+To use CASA with its graphical interface:
 
-## Desktop Session Tips
+1. Launch CASA from the **Astro Software** menu
+2. CASA runs in a dedicated container with full GUI support
+3. Access CASA's plotting and visualisation tools
+4. Use CASA's built-in task interfaces and parameter editors
+
+## 🔧 Desktop Session Features
 
 ### Copy & Paste Between Containers
 
-Since different containers (e.g., CASA and terminal windows) in a desktop session may run on different remote computers, copying and pasting text between containers requires using the **Clipboard** application.
+Since different containers may run on separate remote computers, text transfer between applications requires the **Clipboard** application.
 
 #### Accessing the Clipboard
 
-1. **Open the Clipboard**: Click the arrow at the far left of the desktop to open the application menu
-2. **Find Clipboard**: Look for "Clipboard" in the middle of the application list and click it
+1. **Click the arrow** at the far left of the desktop taskbar
+2. **Find "Clipboard"** in the application menu (middle of list)
+3. **Click to open** the Clipboard application
 
-> ![Desktop with Clipboard Menu](../images/clipboard/2_desktop_with_clipboard_menu.png)
+![Desktop with Clipboard Menu](images/clipboard/2_desktop_with_clipboard_menu.png)
 
-#### Using the Clipboard
+#### Using the Clipboard for Text Transfer
 
-The Clipboard serves as an intermediary for transferring text between containers:
+The Clipboard functions as an intermediary for text transfer:
 
-1. **Copy text**: Highlight text in the source container and use `Ctrl+Shift+C`
-2. **Transfer via Clipboard**: The text should appear in the Clipboard application
-3. **Select in Clipboard**: Highlight the text in the Clipboard and press `Ctrl+Shift+C`
-4. **Paste to target**: Click in the destination container and use `Ctrl+Shift+V`
+![Clipboard Open](images/clipboard/3_clipboard_open.png)
 
-> ![Copying Text Between Containers](../images/clipboard/4_text_into_clipboard.png)
+**Transfer Process:**
+1. **Copy text**: Highlight text in source application, use `Ctrl+Shift+C`
+2. **Transfer to Clipboard**: Text appears in the Clipboard application
+3. **Select in Clipboard**: Highlight the text and copy with `Ctrl+Shift+C`
+4. **Paste to target**: Click in destination application, use `Ctrl+Shift+V`
+
+![Text Transfer Example](images/clipboard/4_text_into_clipboard.png)
 
 !!! tip "Keyboard Shortcuts"
     - **Copy**: `Ctrl+Shift+C`
     - **Paste**: `Ctrl+Shift+V`
-    - These shortcuts work consistently across all desktop containers
+    - These shortcuts work consistently across desktop containers
 
-### Adjusting Font Size
+### Font Size Adjustment
 
 Desktop containers support adjustable font sizes for better readability:
 
 #### Changing Terminal Font Size
 
-1. **Access font menu**: Hold `Ctrl` and right-click anywhere in a terminal window
-2. **Select size**: Choose from the available font size options (Small, Medium, Large)
+1. **Access font menu**: Hold `Ctrl` and right-click in a terminal window
+2. **Select size**: Choose from Small, Medium, or Large options
 3. **Apply immediately**: Font changes take effect instantly
 
-> ![Font Size Adjustment](../images/font/2_fontsize_popup.png)
+![Font Size Popup](images/font/2_fontsize_popup.png)
 
-This feature works in:
+**Before and after font size change:**
+
+![Original Font](images/font/1_terminal_original_font.png)
+![Large Font](images/font/3_terminal_new_fontsize.png)
+
+**Compatible Applications:**
 - Terminal windows
 - CASA command-line interface
 - Text-based applications
@@ -182,86 +282,221 @@ This feature works in:
 !!! note "Font Persistence"
     Font size changes apply only to the current session. You'll need to readjust when starting new sessions.
 
-## File Management
+## 💾 File Management
 
 ### Storage Access
 
-Your desktop session provides access to:
+Your desktop session provides access to all CANFAR storage systems:
 
-- **`/arc/projects/[projectname]/`**: Shared project storage
-- **`/arc/home/[username]/`**: Personal persistent storage
-- **`/scratch/`**: Temporary scratch space, unique to each application.
-
-!!! warning "Persistence Reminder"
-    Use `/arc/projects/` or `/arc/home/` for important files. `/scratch` and `/tmp/` will not persist after the session ends.
+```bash
+/arc/home/[user]/           # Personal persistent storage (10GB)
+/arc/projects/[project]/    # Shared project storage
+/scratch/                   # Temporary high-speed storage
+```
 
 ### File Operations
 
 Use the graphical file manager for:
 
-- **Drag-and-drop**: Move files between directories
-- **Visual browsing**: Preview images and data files
+- **Visual browsing**: Navigate directories with point-and-click
+- **Drag-and-drop**: Move files between directories easily
+- **Preview**: View image thumbnails and file properties
 - **Batch operations**: Select multiple files for operations
-- **Permissions**: Set file and directory permissions
+- **Permissions**: Set file and directory permissions graphically
 
+### File Transfer
 
-### Ending Sessions
+**Small Files**: Drag and drop from your local computer to the file manager
+**Large Files**: Use [data transfer methods](../storage/transfers.md)
+**Between Sessions**: Files in `/arc/` are accessible from all session types
 
-To properly end your desktop session:
+!!! warning "Persistence Reminder"
+    Save important work to `/arc/projects/` or `/arc/home/`. Files in `/scratch/` and `/tmp/` will not persist after the session ends.
 
-1. **Save all work**: Ensure data is saved to persistent storage
-2. **Close applications**: Exit programs cleanly
-3. **Disconnect**: Close the browser tab
-4. **Delete session**: Use Science Portal to free resources
+## 🤝 Collaboration and Sharing
 
-## Troubleshooting
+### Session Sharing
+
+Desktop sessions can be shared for collaborative work:
+
+1. **Copy session URL** from browser address bar
+2. **Share with team members** who have CANFAR accounts
+3. **Coordinate activities** to avoid conflicts
+4. **Use shared storage** in `/arc/projects/[project]/` for collaboration
+
+### Collaborative Workflows
+
+**Teaching and Training:**
+- Share desktop session URL with students
+- Demonstrate software usage in real-time
+- Students can follow along with same tools
+
+**Team Analysis:**
+- Multiple researchers access same desktop
+- Share applications and data simultaneously
+- Coordinate complex multi-step analyses
+
+### Best Practices for Collaboration
+
+- **Communicate clearly** about who is controlling what
+- **Use shared storage** for data that everyone needs to access
+- **Plan ahead** for resource-intensive operations
+- **Save work frequently** to avoid conflicts
+
+## ⚡ Performance Optimisation
+
+### Resource Management
+
+#### Monitor System Resources
+
+```bash
+# Check resource usage in terminal
+htop                    # CPU and memory usage
+df -h                   # Disk space usage
+ps aux                  # Running processes
+```
+
+#### Optimise Memory Usage
+
+- **Close unused applications** to free memory
+- **Use efficient file formats** (compressed FITS when possible)
+- **Process data in chunks** for large datasets
+- **Clear temporary files** regularly
+
+### Network Performance
+
+#### For Remote Access
+
+- **Stable connection**: Desktop sessions require consistent connectivity
+- **Bandwidth considerations**: Higher bandwidth improves responsiveness
+- **Latency awareness**: High latency affects interactive performance
+- **Browser optimisation**: Close unnecessary tabs and extensions
+
+#### Storage Performance
+
+```bash
+# Use scratch storage for intensive I/O
+cp /arc/projects/[project]/large_data.fits /scratch/
+# ... process in /scratch/ ...
+cp /scratch/results.fits /arc/projects/[project]/outputs/
+```
+
+### Browser Optimisation
+
+**Recommended Browsers:**
+- **Chrome**: Excellent compatibility and performance
+- **Firefox**: Good alternative with solid support
+- **Safari**: Basic functionality, some limitations
+
+**Browser Settings:**
+- **Disable resource-heavy extensions**
+- **Allow pop-ups** for the session domain
+- **Enable hardware acceleration** if available
+- **Maintain stable internet connection**
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-### Session won't connect
+#### Session Won't Connect
 
-- Wait 30 seconds and try again
-- Check browser compatibility (Chrome/Firefox recommended)
-- Disable browser extensions that might interfere
+**Problem**: Desktop session shows "Bad gateway" or connection errors
 
-### Poor performance
+**Solutions:**
 
-- Check resource usage with `htop`
-- Close unnecessary applications
-- Consider increasing session memory
+1. Wait 30-60 seconds and try again
+2. Check browser compatibility (Chrome/Firefox recommended)
+3. Clear browser cache and cookies
+4. Disable browser extensions temporarily
+5. Try incognito/private browsing mode
 
+#### Poor Performance
 
-### Applications won't start
+**Problem**: Desktop responds slowly or applications lag
 
-- Ensure you are launching applications from the Astro Software menu or desktop shortcuts
-- Verify sufficient memory is available
-- If issues persist, check for error messages in the application window or contact support
+**Solutions:**
 
-### File access problems
+1. Check resource usage with `htop`
+2. Close unnecessary applications
+3. Reduce number of open windows
+4. Check internet connection stability
+5. Consider increasing session memory
 
-- Verify paths to `/arc/projects/[projectname]/`
-- Check group permissions
-- Ensure files aren't locked by other processes
+#### Applications Won't Start
 
-### Browser Optimization
+**Problem**: Astronomy applications fail to launch
 
-For best performance:
+**Solutions:**
 
-- **Use Chrome or Firefox**: Best compatibility and performance
-- **Close other tabs**: Free up browser memory
-- **Stable connection**: Ensure reliable internet connection
-- **Disable browser extensions**: Remove potential conflicts
+1. Launch from Astro Software menu, not command line
+2. Verify sufficient memory is available
+3. Check for error messages in application windows
+4. Wait for container initialisation (may take 30-60 seconds)
+5. Try restarting the desktop session
+
+#### File Access Problems
+
+**Problem**: Cannot access files or storage locations
+
+**Solutions:**
+
+1. Verify paths to `/arc/projects/[project]/`
+2. Check group membership and permissions
+3. Ensure files aren't locked by other processes
+4. Try accessing through file manager vs terminal
+5. Check storage quota and available space
 
 ### Getting Help
 
-- **Support**: Email [support@canfar.net](mailto:support@canfar.net)
-- **Community**: Join our Discord for desktop tips
-- **Documentation**: Check software-specific guides for DS9, CASA, etc.
+#### Built-in Help
 
+- **Application help**: Most applications include Help menus
+- **System documentation**: Check Applications → Documentation
+- **Terminal commands**: Use `man command` for command help
 
-## Next Steps
+#### CANFAR Support
 
-- **[CASA Desktop Workflows](../radio-astronomy/casa-workflows.md)**: Advanced CASA usage
-- **[Radio Astronomy Guide](../radio-astronomy/index.md)**: Desktop-based radio analysis workflows
-- **[Batch Processing](../../batch-jobs.md)**: Scale up desktop workflows
-- **[Notebook Sessions](launch-notebook.md)**: Alternative analysis environment
+- **Support Email**: [support@canfar.net](mailto:support@canfar.net)
+- **Documentation**: [CANFAR Documentation](../)
+- **Community**: [CANFAR Slack](https://canfar.slack.com)
+
+## 📚 Learning Resources
+
+### Desktop Environment
+
+- **Linux Desktop Basics**: Familiarise yourself with Linux desktop concepts
+- **File Management**: Learn efficient file organisation strategies
+- **Terminal Usage**: Basic command-line skills enhance desktop productivity
+
+### Astronomy Software
+
+#### DS9 Resources
+
+- **[DS9 User Manual](https://sites.google.com/cfa.harvard.edu/saoimageds9/)**
+- **[DS9 Video Tutorials](https://www.youtube.com/results?search_query=ds9+astronomy+tutorial)**
+
+#### TOPCAT Resources
+
+- **[TOPCAT User Manual](http://www.star.bris.ac.uk/~mbt/topcat/)**
+- **[TOPCAT Tutorials](http://www.star.bris.ac.uk/~mbt/topcat/sun253/tutorials.html)**
+
+#### CASA Resources
+
+- **[CASA Documentation](https://casa.nrao.edu/docs.shtml)**
+- **[CASA Guides](https://casaguides.nrao.edu/)**
+- **[CASA Video Tutorials](https://casatutorials.nrao.edu/)**
+
+## 🔗 Next Steps
+
+- **[Try Notebook Sessions](notebook.md)** for Python-based analysis
+- **[Use CARTA](carta.md)** for radio astronomy visualisation
+- **[Explore Firefly](firefly.md)** for optical survey data
+- **[Learn about Storage](../storage/index.md)** for data management
+- **[Batch Processing](batch.md)** for automated workflows
+
+## 🆘 Getting Help
+
+- **Desktop Help**: Use built-in help systems in applications
+- **Application Manuals**: Check software-specific documentation
+- **CANFAR Support**: [support@canfar.net](mailto:support@canfar.net)
+- **Community**: [CANFAR Slack](https://canfar.slack.com)

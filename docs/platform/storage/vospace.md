@@ -1,103 +1,733 @@
+# VOSpace (Vault)
 
+**Complete guide to CANFAR's VOSpace implementation for long-term storage, data sharing, and archival - including CLI tools, Python API, and web interface.**
 
+!!! info "Platform Navigation"
+    **VOSpace (Vault)**: Long-term storage, sharing, and archival for astronomical data.  
+    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[Data Transfers](transfers.md)** | **[Platform Home](../home.md)**
 
-# Vault (VOSpace API) and ARC Access
+!!! abstract "🎯 VOSpace Guide Overview"
+    **Master CANFAR's long-term storage system:**
+    
+    - **VOSpace Concepts**: Understanding IVOA standards and when to use Vault
+    - **Web Interface**: Browser-based file management and sharing
+    - **Command-Line Tools**: Efficient bulk operations and automation
+    - **Python API**: Programmatic access for workflows and integration
+    - **Metadata & Sharing**: Rich data descriptions and collaborative access
 
-Advanced data management capabilities using the VOSpace API for Vault (archive storage, vos: URIs) and ARC (project/home storage, arc: URIs). Both can be accessed programmatically and via command-line tools for automation and bulk operations.
+VOSpace is CANFAR's implementation of the International Virtual Observatory Alliance (IVOA) VOSpace standard, providing long-term, secure, and collaborative storage for astronomy data. It serves as both an archive and a data sharing platform.
 
+## 🌐 VOSpace Overview
 
-**ARC Access:**
+### What is VOSpace?
 
-- **Inside a CANFAR session:** Use standard Unix commands (`cp`, `ls`, etc.) for `/arc/projects/[projectname]` and `/arc/home/[username]`.
-- **Outside a CANFAR session:** Use SSHFS to mount `/arc` or use VOSpace API with `arc:` URIs.
+VOSpace is a distributed storage service that allows astronomers to:
 
+- **Store data persistently** with geographic redundancy
+- **Share data** with collaborators and the public
+- **Organize data** with hierarchical directories and metadata
+- **Access data** programmatically via standardized APIs
+- **Integrate** with Virtual Observatory tools and services
 
-## Overview
+### VOSpace vs Other Storage
 
-While the [Storage Guide](index.md) covers basic file operations, this guide focuses on programmatic access to your data using the VOSpace API, command-line tools, and advanced workflows. You can access:
+| Feature | VOSpace (Vault) | ARC Projects | ARC Home | Scratch |
+|---------|-----------------|--------------|----------|---------|
+| **Persistence** | ✅ Permanent | ✅ Permanent | ✅ Permanent | ❌ Session only |
+| **Backup** | ✅ Geo-redundant | ✅ Daily snapshots | ✅ Daily snapshots | ❌ None |
+| **Sharing** | ✅ Flexible permissions | ⚠️ Group-based | ❌ Personal only | ❌ Session only |
+| **Public access** | ✅ Public URLs | ❌ Private | ❌ Private | ❌ Session only |
+| **Metadata** | ✅ Rich metadata | ⚠️ Basic | ⚠️ Basic | ❌ None |
+| **API access** | ✅ Full API | ✅ VOSpace API | ✅ VOSpace API | ❌ None |
+| **Speed** | Medium (network) | Fast (SSD) | Fast (SSD) | Fastest (NVMe) |
 
-- **Vault**: Long-term archive storage via `vos:` URIs (e.g., `vos:[username]/` or `vos:[projectname]`)
-- **ARC**: Project and home storage via `arc:` URIs (e.g., `arc:projects/[projectname]/mydatafile.fits`)
+## 🌍 Web Interface
 
+### Accessing VOSpace
 
+1. **Navigate to**: [VOSpace File Manager](https://www.canfar.net/storage/vault/list/)
+2. **Login**: Use your CADC credentials
+3. **Browse**: Navigate through your space and shared spaces
 
-## Command-Line Tools
+### Web Interface Features
 
+#### File Operations
 
+- **Upload**: Drag and drop or click "Add" → "Upload Files"
+- **Download**: Select files → "Download" (ZIP, URL list, or HTML list)
+- **Create folders**: "Add" → "Create Folder"
+- **Delete**: Select items → "Delete"
+- **Move/Copy**: Drag and drop or cut/paste
+
+#### Sharing and Permissions
+
+```text
+Right-click file/folder → Properties → Permissions
+
+Permission Types:
+- Read (r): View and download
+- Write (w): Modify and delete  
+- Execute (x): Navigate directories
+
+Target Groups:
+- Owner: You (full control)
+- Group: Project members
+- Other: Public access
+```
+
+#### Metadata Management
+
+```text
+Right-click file → Properties → Metadata
+
+Common Astronomical Metadata:
+- TELESCOPE: Instrument name
+- OBJECT: Target name
+- DATE-OBS: Observation date
+- FILTER: Filter used
+- EXPTIME: Exposure time
+```
+
+## 💻 Command Line Interface
 
 ### Installation
 
-VOSpace tools are pre-installed in all CANFAR containers. For local use:
+VOSpace tools are pre-installed in CANFAR sessions. For local installation:
 
 ```bash
-# In CANFAR notebook/desktop session
-pip install vos
+# Install VOS tools
+pip install vostools
 
 # Verify installation
 vls --help
+vcp --help
 ```
-
-
 
 ### Authentication
 
 ```bash
-# Get a security certificate (valid for 24 hours)
-cadc-get-cert --cert ~/.ssl/cadcproxy.pem
+# Get security certificate (valid 24 hours)
+cadc-get-cert -u [user]
 
-# Or use your username/password
-export CADC_USERNAME=[username]
+# Alternative: Set environment variables
+export CADC_USERNAME=[user]
 export CADC_PASSWORD=[password]
+
+# Verify authentication
+vls vos:
 ```
-
-
-
 
 ### Basic Operations
 
-#### Vault (VOSpace API)
+#### Directory Operations
 
 ```bash
-# List files and directories in Vault
-vls vos:[username]/
+# List directories and files
+vls vos:[user]/                    # Your root directory
+vls vos:[user]/projects/           # Subdirectory
+vls -l vos:[user]/data/            # Detailed listing
 
-# Copy files to Vault
-vcp mydata.fits vos:[username]/data/
+# Create directories
+vmkdir vos:[user]/new_project/
+vmkdir vos:[user]/data/2024/
 
-# Copy files from Vault
-vcp vos:[username]/data/mydata.fits ./
-
-# Create directories in Vault
-vmkdir vos:[username]/projects/survey_analysis/
-
-# Move/rename files in Vault
-vmv vos:[username]/old.fits vos:[username]/new.fits
-
-# Remove files in Vault
-vrm vos:[username]/temp/old_data.fits
+# Navigate hierarchically
+vls vos:[user]/projects/survey/data/
 ```
 
-
-#### ARC (VOSpace API, outside CANFAR)
+#### File Operations
 
 ```bash
-# List files and directories in ARC
-vls arc:projects/[projectname]/
+# Upload files
+vcp mydata.fits vos:[user]/data/
+vcp *.fits vos:[user]/observations/
+vcp -r ./analysis_scripts/ vos:[user]/code/
 
-# Copy files to ARC
-vcp mydata.fits arc:projects/[projectname]/data/
+# Download files  
+vcp vos:[user]/data/results.fits ./
+vcp "vos:[user]/observations/*.fits" ./data/
+vcp -r vos:[user]/code/ ./local_scripts/
 
-# Copy files from ARC
-vcp arc:projects/[projectname]/data/mydata.fits ./
+# Copy between VOSpace locations
+vcp vos:[user]/data/obs1.fits vos:[user]/backup/
+```
 
-# Create directories in ARC
-vmkdir arc:projects/[projectname]/survey_analysis/
+#### File Management
 
-# Move/rename files in ARC
-vmv arc:projects/[projectname]/old.fits arc:projects/[projectname]/new.fits
+```bash
+# Move/rename files
+vmv vos:[user]/old_name.fits vos:[user]/new_name.fits
+vmv vos:[user]/temp/ vos:[user]/archive/
 
-# Remove files in ARC
-vrm arc:projects/[projectname]/temp/old_data.fits
+# Delete files and directories
+vrm vos:[user]/old_file.fits
+vrm -r vos:[user]/old_directory/
+
+# View file contents (for text files)
+vcat vos:[user]/catalog.csv
+```
+
+### Advanced Operations
+
+#### Bulk Operations
+
+```bash
+# Synchronize directories
+vsync ./local_data/ vos:[user]/backup/
+vsync vos:[user]/analysis/ ./local_analysis/
+
+# Resume interrupted transfers
+vcp --resume large_file.fits vos:[user]/
+
+# Parallel transfers for speed
+vcp --nstreams=4 huge_dataset.tar vos:[user]/archives/
+```
+
+#### Metadata Operations
+
+```bash
+# Set metadata attributes
+vattr vos:[user]/observation.fits TELESCOPE "ALMA"
+vattr vos:[user]/observation.fits OBJECT "NGC1365"
+vattr vos:[user]/observation.fits DATE-OBS "2024-03-15"
+
+# View metadata
+vattr vos:[user]/observation.fits
+vattr vos:[user]/observation.fits TELESCOPE
+
+# Set multiple attributes from file
+vattr -f metadata.txt vos:[user]/dataset.fits
+```
+
+#### Permission Management
+
+```bash
+# Make file publicly readable
+vchmod o+r vos:[user]/public_catalog.fits
+
+# Grant group access
+vchmod g+rw vos:[user]/shared_data.fits
+
+# Set permissions for specific groups
+vchmod g+r:external-collaborators vos:[user]/collaboration_data/
+
+# View current permissions
+vls -l vos:[user]/myfile.fits
+```
+
+### Data Cutouts and Processing
+
+```bash
+# FITS cutouts (pixel coordinates)
+vcp "vos:[user]/image.fits[100:200,100:200]" ./cutout.fits
+
+# Header-only download
+vcp --head vos:[user]/large_image.fits ./headers.txt
+
+# Inspect headers without downloading
+vcat --head vos:[user]/observation.fits
+
+# Compressed transfers
+vcp --compress large_dataset.fits vos:[user]/
+```
+
+## 🐍 Python API
+
+### Basic Setup
+
+```python
+import vos
+from vos import Client
+
+# Initialize client (uses existing authentication)
+client = Client()
+
+# Alternative: specify authentication
+client = Client(username='[user]', password='[password]')
+```
+
+### File Operations
+
+```python
+# List directory contents
+files = client.listdir('vos:[user]/')
+print(f"Found {len(files)} files")
+
+# Check if file exists
+exists = client.isfile('vos:[user]/data.fits')
+if not exists:
+    print("File not found")
+
+# Get file information
+info = client.get_info('vos:[user]/data.fits')
+print(f"Size: {info['size']} bytes")
+print(f"Modified: {info['date']}")
+
+# Copy files
+client.copy('mydata.fits', 'vos:[user]/uploads/mydata.fits')
+client.copy('vos:[user]/results.txt', './local_results.txt')
+
+# Create directories
+client.mkdir('vos:[user]/new_project/')
+
+# Delete files
+client.delete('vos:[user]/old_file.fits')
+```
+
+### Advanced Python Usage
+
+#### Batch Processing
+
+```python
+import os
+from pathlib import Path
+
+def process_vospace_directory(vospace_path, local_temp_dir):
+    """Download, process, and re-upload files from VOSpace"""
+    
+    # Create local working directory
+    Path(local_temp_dir).mkdir(exist_ok=True)
+    
+    # List files in VOSpace
+    files = client.listdir(vospace_path)
+    fits_files = [f for f in files if f.endswith('.fits')]
+    
+    for fits_file in fits_files:
+        vospace_file = f"{vospace_path}/{fits_file}"
+        local_file = f"{local_temp_dir}/{fits_file}"
+        processed_file = f"{local_temp_dir}/processed_{fits_file}"
+        
+        # Download
+        print(f"Downloading {fits_file}")
+        client.copy(vospace_file, local_file)
+        
+        # Process (example: your analysis here)
+        process_fits_file(local_file, processed_file)
+        
+        # Upload processed version
+        processed_vospace = f"{vospace_path}/processed_{fits_file}"
+        client.copy(processed_file, processed_vospace)
+        
+        # Cleanup local files
+        os.remove(local_file)
+        os.remove(processed_file)
+
+# Usage
+process_vospace_directory('vos:[user]/raw_data', './temp_processing')
+```
+
+#### Metadata Management
+
+```python
+# Get file node (for metadata operations)
+node = client.get_node('vos:[user]/observation.fits')
+
+# Set metadata
+node.props['TELESCOPE'] = 'ALMA'
+node.props['OBJECT'] = 'NGC1365'
+node.props['DATE-OBS'] = '2024-03-15T10:30:00'
+
+# Update node with new metadata
+client.update(node)
+
+# Read metadata
+props = node.props
+telescope = props.get('TELESCOPE', 'Unknown')
+object_name = props.get('OBJECT', 'Unknown')
+
+print(f"Observation of {object_name} with {telescope}")
+```
+
+#### Progress Monitoring
+
+```python
+def upload_with_progress(local_file, vospace_path):
+    """Upload file with progress monitoring"""
+    
+    file_size = os.path.getsize(local_file)
+    
+    def progress_callback(bytes_transferred):
+        percent = (bytes_transferred / file_size) * 100
+        print(f"\rProgress: {percent:.1f}% ({bytes_transferred}/{file_size} bytes)", end='')
+    
+    try:
+        client.copy(local_file, vospace_path, callback=progress_callback)
+        print("\nUpload completed successfully!")
+    except Exception as e:
+        print(f"\nUpload failed: {e}")
+
+# Usage
+upload_with_progress('large_dataset.fits', 'vos:[user]/archives/dataset.fits')
+```
+
+## 🔒 Sharing and Collaboration
+
+### Permission Levels
+
+#### Owner Permissions
+- **Full control**: Read, write, delete, change permissions
+- **Default**: Only owner has access to new files
+
+#### Group Permissions  
+- **Read**: Group members can view and download
+- **Write**: Group members can modify and upload
+- **Execute**: Group members can navigate directories
+
+#### Public Permissions
+- **Read**: Anyone with the URL can download
+- **Useful for**: Publishing datasets, sharing with external collaborators
+
+### Setting Up Sharing
+
+#### Command Line Sharing
+
+```bash
+# Make dataset publicly available
+vchmod o+r vos:[user]/public_datasets/gaia_subset.fits
+
+# Share with research group
+vchmod g+rw:my_research_group vos:[user]/shared_analysis/
+
+# Create public directory
+vmkdir vos:[user]/public/
+vchmod o+r vos:[user]/public/
+
+# Share specific project data
+vchmod g+r:external_collaborators vos:[user]/collaboration/survey_data/
+```
+
+#### Public URLs
+
+```bash
+# Files with public read permissions get accessible URLs:
+# https://ws-cadc.canfar.net/vault/nodes/[user]/public_file.fits
+
+# Direct download links for shared data:
+curl -O https://ws-cadc.canfar.net/vault/nodes/[user]/public/catalog.csv
+```
+
+### Collaboration Workflows
+
+#### Multi-Institutional Project
+
+```bash
+# Project coordinator sets up shared space
+vmkdir vos:shared_project/
+vchmod g+rw:all_collaborators vos:shared_project/
+
+# Collaborators contribute data
+vcp local_observations.fits vos:shared_project/data/institution_a/
+vcp analysis_results.csv vos:shared_project/results/
+
+# Public data release
+vcp vos:shared_project/final_catalog.fits vos:shared_project/public/
+vchmod o+r vos:shared_project/public/final_catalog.fits
+```
+
+#### Data Publication
+
+```python
+import vos
+
+def publish_dataset(local_files, publication_space):
+    """Publish dataset with proper metadata"""
+    
+    client = vos.Client()
+    
+    # Create publication directory
+    client.mkdir(publication_space)
+    
+    for local_file in local_files:
+        filename = os.path.basename(local_file)
+        vospace_path = f"{publication_space}/{filename}"
+        
+        # Upload file
+        client.copy(local_file, vospace_path)
+        
+        # Set metadata
+        node = client.get_node(vospace_path)
+        node.props['AUTHOR'] = 'Dr. Astronomer'
+        node.props['PUBLICATION'] = 'ApJ 2024, 123, 456'
+        node.props['DOI'] = '10.1088/example'
+        client.update(node)
+        
+        # Make publicly accessible
+        client.set_permissions(vospace_path, public_read=True)
+        
+        print(f"Published: {vospace_path}")
+
+# Usage
+files_to_publish = ['final_catalog.fits', 'processed_images.tar.gz']
+publish_dataset(files_to_publish, 'vos:[user]/publications/survey2024')
+```
+
+## 🔧 Integration with Astronomical Tools
+
+### FITS File Handling
+
+```python
+from astropy.io import fits
+import tempfile
+import os
+
+def analyze_vospace_fits(vospace_path):
+    """Analyze FITS file stored in VOSpace"""
+    
+    # Download to temporary file
+    with tempfile.NamedTemporaryFile(suffix='.fits', delete=False) as tmp:
+        client.copy(vospace_path, tmp.name)
+        
+        # Open with astropy
+        with fits.open(tmp.name) as hdul:
+            header = hdul[0].header
+            data = hdul[0].data
+            
+            # Perform analysis
+            mean_value = data.mean()
+            max_value = data.max()
+            
+            print(f"Image stats: mean={mean_value:.2f}, max={max_value:.2f}")
+            
+            # Extract key information
+            telescope = header.get('TELESCOP', 'Unknown')
+            object_name = header.get('OBJECT', 'Unknown')
+            
+        # Cleanup
+        os.unlink(tmp.name)
+        
+    return {'mean': mean_value, 'max': max_value, 'telescope': telescope}
+
+# Usage
+stats = analyze_vospace_fits('vos:[user]/observations/ngc1365.fits')
+```
+
+### Integration with Archives
+
+```python
+def mirror_archive_data(archive_url, vospace_destination):
+    """Download from astronomical archive and store in VOSpace"""
+    
+    import requests
+    import tempfile
+    
+    # Download from archive
+    response = requests.get(archive_url)
+    
+    # Save to temporary file
+    with tempfile.NamedTemporaryFile(delete=False) as tmp:
+        tmp.write(response.content)
+        tmp_path = tmp.name
+    
+    try:
+        # Upload to VOSpace
+        client.copy(tmp_path, vospace_destination)
+        
+        # Set metadata about source
+        node = client.get_node(vospace_destination)
+        node.props['ARCHIVE_URL'] = archive_url
+        node.props['DOWNLOAD_DATE'] = datetime.now().isoformat()
+        client.update(node)
+        
+        print(f"Mirrored {archive_url} to {vospace_destination}")
+        
+    finally:
+        os.unlink(tmp_path)
+
+# Example: Mirror HST data
+mirror_archive_data(
+    'https://archive.stsci.edu/missions/hubble/...',
+    'vos:[user]/hst_data/observation_123.fits'
+)
+```
+
+## 📊 Performance and Optimization
+
+### Transfer Performance
+
+#### Optimal Transfer Strategies
+
+```bash
+# For large files: use compression
+vcp --compress large_dataset.tar vos:[user]/archives/
+
+# For many small files: bundle first
+tar -czf many_files.tar.gz small_files/
+vcp many_files.tar.gz vos:[user]/collections/
+
+# Use multiple streams for large files
+vcp --nstreams=8 huge_file.fits vos:[user]/
+
+# Resume interrupted transfers
+vcp --resume partial_transfer.fits vos:[user]/
+```
+
+#### Caching and Local Mirrors
+
+```python
+import hashlib
+from pathlib import Path
+
+class VOSpaceCache:
+    def __init__(self, cache_dir='./vospace_cache'):
+        self.cache_dir = Path(cache_dir)
+        self.cache_dir.mkdir(exist_ok=True)
+        self.client = vos.Client()
+    
+    def get_cached_file(self, vospace_path, force_refresh=False):
+        """Get file from cache or download if needed"""
+        
+        # Generate cache filename
+        cache_name = hashlib.md5(vospace_path.encode()).hexdigest()
+        cache_file = self.cache_dir / cache_name
+        
+        # Check if cache is valid
+        if not force_refresh and cache_file.exists():
+            # Compare modification times
+            local_mtime = cache_file.stat().st_mtime
+            try:
+                remote_info = self.client.get_info(vospace_path)
+                remote_mtime = remote_info['date']
+                
+                if local_mtime >= remote_mtime:
+                    print(f"Using cached version: {cache_file}")
+                    return str(cache_file)
+            except:
+                pass
+        
+        # Download fresh copy
+        print(f"Downloading {vospace_path} to cache")
+        self.client.copy(vospace_path, str(cache_file))
+        return str(cache_file)
+
+# Usage
+cache = VOSpaceCache()
+local_file = cache.get_cached_file('vos:[user]/large_catalog.fits')
+```
+
+### Monitoring and Logging
+
+```python
+import logging
+import time
+
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def monitored_transfer(source, destination):
+    """Transfer with monitoring and timing"""
+    
+    start_time = time.time()
+    logger.info(f"Starting transfer: {source} → {destination}")
+    
+    try:
+        client.copy(source, destination)
+        
+        end_time = time.time()
+        duration = end_time - start_time
+        
+        # Get file size for speed calculation
+        if source.startswith('vos:'):
+            info = client.get_info(source)
+            size_mb = info['size'] / (1024 * 1024)
+        else:
+            size_mb = os.path.getsize(source) / (1024 * 1024)
+        
+        speed = size_mb / duration if duration > 0 else 0
+        
+        logger.info(f"Transfer completed: {size_mb:.1f} MB in {duration:.1f}s ({speed:.1f} MB/s)")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Transfer failed: {e}")
+        return False
+
+# Usage
+success = monitored_transfer('large_file.fits', 'vos:[user]/archives/')
+```
+
+## 🛠️ Troubleshooting
+
+### Common Issues
+
+#### Authentication Problems
+
+```bash
+# Certificate expired
+cadc-get-cert -u [user]
+
+# Check certificate validity
+cadc-get-cert --days-valid
+
+# Clear certificate cache
+rm ~/.ssl/cadcproxy.pem
+cadc-get-cert -u [user]
+```
+
+#### Permission Errors
+
+```bash
+# Check file permissions
+vls -l vos:[user]/file.fits
+
+# Verify directory permissions
+vls -l vos:[user]/
+
+# Check group membership
+# (Contact CANFAR support if needed)
+```
+
+#### Network and Transfer Issues
+
+```bash
+# Test connectivity
+ping ws-cadc.canfar.net
+
+# Check VOSpace service status
+vls vos:
+
+# Retry with different parameters
+vcp --timeout=3600 large_file.fits vos:[user]/  # Increase timeout
+vcp --nstreams=1 problematic_file.fits vos:[user]/  # Reduce streams
+```
+
+### Debugging and Diagnostics
+
+```python
+import vos
+import logging
+
+# Enable debug logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Get detailed client information
+client = vos.Client()
+print(f"VOSpace endpoint: {client.vospace_url}")
+print(f"Authentication: {client.get_auth()}")
+
+# Test basic operations
+try:
+    files = client.listdir('vos:')
+    print(f"Root access successful, found {len(files)} items")
+except Exception as e:
+    print(f"Root access failed: {e}")
+
+# Check specific paths
+test_paths = ['vos:[user]/', 'vos:[user]/data/']
+for path in test_paths:
+    try:
+        contents = client.listdir(path)
+        print(f"✓ {path}: {len(contents)} items")
+    except Exception as e:
+        print(f"✗ {path}: {e}")
+```
+
+## 🔗 Next Steps
+
+- **[Data Transfers →](transfers.md)** - Moving data between storage systems
+- **[Filesystem Access →](filesystem.md)** - ARC storage and SSHFS mounting
+- **[Storage Overview →](index.md)** - Understanding all CANFAR storage types
+- **[Interactive Sessions →](../sessions/)** - Using VOSpace within CANFAR sessions
 ```
 
 
@@ -256,17 +886,17 @@ def process_fits_files(vospace_dir, output_dir):
 
             # Upload to Vault or ARC
             if vospace_dir.startswith("vos:"):
-                client.copy(output_path, f"vos:your_username/processed/{fits_file}")
+                client.copy(output_path, f"vos:[user]/processed/{fits_file}")
             else:
-                client.copy(output_path, f"arc:projects/myproject/processed/{fits_file}")
+                client.copy(output_path, f"arc:projects/[project]/processed/{fits_file}")
 
         # Clean up temporary file
         os.remove(local_path)
 
 # Usage
 
-process_fits_files("vos:your_username/raw_data", "./processed/")
-process_fits_files("arc:projects/myproject/raw_data", "./processed/")
+process_fits_files("vos:[user]/raw_data", "./processed/")
+process_fits_files("arc:projects/[project]/raw_data", "./processed/")
 ```
 
 
@@ -340,9 +970,9 @@ def main():
 
     # Configuration
     input_remote_vault = "vos:shared_project/raw_data"
-    input_remote_arc = "arc:projects/myproject/raw_data"
-    output_remote_vault = "vos:your_username/processed_results"
-    output_remote_arc = "arc:projects/myproject/processed_results"
+    input_remote_arc = "arc:projects/[project]/raw_data"
+    output_remote_vault = "vos:[user]/processed_results"
+    output_remote_arc = "arc:projects/[project]/processed_results"
     local_input = "./input_data"
     local_output = "./output_data"
 
@@ -525,7 +1155,7 @@ cadc-get-cert --cert ~/.ssl/cadcproxy.pem
 # Download input data from Vault
 vcp vos:project/input/data.fits ./input.fits
 # Download input data from ARC
-vcp arc:projects/myproject/input/data.fits ./input_arc.fits
+vcp arc:projects/[project]/input/data.fits ./input_arc.fits
 
 # Process data
 python analysis_script.py input.fits output.fits
@@ -533,7 +1163,7 @@ python analysis_script.py input.fits output.fits
 # Upload results to Vault
 vcp output.fits vos:project/results/processed_$(date +%Y%m%d).fits
 # Upload results to ARC
-vcp output.fits arc:projects/myproject/results/processed_$(date +%Y%m%d).fits
+vcp output.fits arc:projects/[project]/results/processed_$(date +%Y%m%d).fits
 
 # Cleanup
 rm input.fits input_arc.fits output.fits
@@ -567,14 +1197,14 @@ client.timeout = 300  # 5 minutes
 ```bash
 
 # Check file permissions in Vault
-vls -l vos:your_username/file.fits
+vls -l vos:[user]/file.fits
 # Check file permissions in ARC
-vls -l arc:projects/myproject/file.fits
+vls -l arc:projects/[project]/file.fits
 
 # Check directory access in Vault
 vls vos:project_name/
 # Check directory access in ARC
-vls arc:projects/myproject/
+vls arc:projects/[project]/
 ```
 
 ## Next Steps

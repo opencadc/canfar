@@ -1,6 +1,6 @@
-# Launching Contributed Applications
+# Contributed Applications
 
-**Access community-developed tools and specialised research applications**
+## Community-developed tools and specialised research applications
 
 !!! abstract "🎯 What You'll Learn"
     - What contributed applications are and when to use them
@@ -8,22 +8,54 @@
     - How these apps integrate with CANFAR storage and authentication
     - Best practices for collaboration, performance, and security
 
+## 📋 Overview
+
 Contributed applications expand CANFAR's capabilities beyond standard notebook and desktop environments. These specialised tools are developed by the CANFAR community and external collaborators to address specific astronomical workflows and research needs not well-served by conventional interfaces.
 
-## 🎯 Contributed Apps
+### What Are Contributed Applications?
 
-Contributed applications are purpose-built web tools that seamlessly integrate with CANFAR's infrastructure while offering unique capabilities. Unlike general-purpose notebook or desktop sessions, these applications are crafted for specific tasks and often provide interfaces that would be difficult or impossible to replicate in standard environments.
+Contributed applications are purpose-built web tools that seamlessly integrate with CANFAR's infrastructure while offering unique capabilities:
 
-These applications extend CANFAR's reach by providing specialised interfaces for targeted research tasks, integrating naturally with CANFAR's storage and authentication systems, and offering workflows that leverage the unique aspects of web-based scientific computing. They support community innovation and enable researchers to share specialised tools with colleagues worldwide.
+- **Specialised interfaces**: Tools designed for specific research tasks
+- **Community-driven**: Developed by CANFAR users for CANFAR users  
+- **Seamless integration**: Full access to CANFAR storage and authentication
+- **Web-based access**: No local software installation required
+- **Collaborative ready**: Easy sharing and real-time collaboration
 
-### The Landscape of Contributed Applications
+### Benefits and Use Cases
 
-!!! info "Current Ecosystem"
-    The catalogue evolves regularly. Expect reactive notebooks (Marimo), browser IDEs (VSCode), and specialised computational interfaces contributed by the community.
+**Extending CANFAR's Capabilities:**
 
-The current ecosystem of contributed applications focuses on interactive computing environments that offer alternatives to traditional Jupyter notebooks. You'll find reactive notebook systems that provide real-time feedback as you modify code, browser-based development environments that give you the full power of modern IDEs without local installation, and specialised computational interfaces designed for specific programming languages or workflows.
+- **Modern development environments**: Browser-based IDEs and reactive notebooks
+- **Specialised analysis tools**: Applications tailored for specific astronomical workflows  
+- **Enhanced collaboration**: Real-time sharing and team development
+- **No installation hassles**: Access powerful tools without local setup
+- **Community innovation**: Cutting-edge tools shared across the research community
 
-Rather than trying to be everything to everyone, each contributed application excels in its particular domain. This focused approach means you can choose the tool that best matches your specific research workflow, whether you're doing exploratory data analysis, developing complex algorithms, or collaborating on code with distributed teams.
+**Common Applications:**
+
+- **Interactive development**: Modern Python environments and browser IDEs
+- **Reactive computing**: Notebooks that update automatically as you modify code
+- **Collaborative coding**: Shared development environments for team projects
+- **Specialised workflows**: Tools designed for specific research methodologies
+
+### Available Applications
+
+The catalogue evolves regularly as community members contribute new tools:
+
+**Currently Available:**
+
+| Application | Container | Best For |
+|-------------|-----------|----------|
+| **Marimo** | `images.canfar.net/cadc/marimo:latest` | Reactive Python notebooks, stored as pure Python files |
+| **VSCode Browser** | `images.canfar.net/cadc/vscode:latest` | Full IDE experience for software development |
+
+**Coming Soon:**
+
+The ecosystem continues to expand with reactive notebooks, browser IDEs, and specialised computational interfaces contributed by the community. Applications in development focus on time-series analysis, interactive visualisation, and collaborative annotation tools.
+
+!!! tip "Suggest New Applications"
+    Have an idea for a contributed application? Contact [support@canfar.net](mailto:support@canfar.net) to discuss community needs and development possibilities.
 
 ## 🚀 Getting Started
 

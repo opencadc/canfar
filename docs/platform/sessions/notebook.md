@@ -1,44 +1,49 @@
-# Launching Jupyter Notebook Sessions
+# Notebook Sessions
 
-**Interactive Jupyter Lab sessions provide a powerful environment for data analysis, visualisation, and computational astronomy. This guide walks you through launching and using notebook sessions on the CANFAR Science Platform.**
+**Interactive Jupyter Lab sessions for data analysis and computational astronomy**
 
 !!! abstract "🎯 What You'll Learn"
-    - Launching a Jupyter notebook session on CANFAR
-    - Choosing the right container and resources
-    - How storage works inside notebooks and what persists
-    - Tips for performance, collaboration, and troubleshooting
+    - How to launch and configure Jupyter notebook sessions
+    - Available containers and when to use each
+    - File management, uploads, and storage integration
+    - Performance tips, collaboration, and troubleshooting
 
-## Overview
+Jupyter notebooks combine code execution, rich text documentation, and inline visualisations in a single interface. CANFAR's notebook sessions include pre-configured astronomy software stacks, persistent storage access, and collaborative sharing capabilities.
 
+## 📋 Overview
 
-Jupyter notebooks combine code execution, rich text documentation, and inline visualisations in a single interface. CANFAR's notebook sessions include:
+Notebook sessions provide:
 
-- **Jupyter Lab**: Full-featured development environment
-- **Pre-configured containers**: Astronomy-specific software stacks
-- **Persistent storage**: Access to your ARC and VOSpace data
-- **Collaborative sharing**: Share sessions with team members
+- **Jupyter Lab:** Full-featured development environment with file browser, terminal, and extensions
+- **Pre-configured containers:** Astronomy-specific software stacks with popular libraries
+- **Persistent storage:** Direct access to your `/arc/home/` and `/arc/projects/` data
+- **Collaborative sharing:** Share session URLs with team members
+- **Terminal access:** Built-in terminal for command-line operations
+- **File transfers:** Upload/download capabilities for data management
 
-## Creating a New Session
+## 🚀 Creating a Notebook Session
 
 ### Step 1: Access Session Creation
 
-From the Science Portal dashboard, click the **plus sign (+)** to create a new session, 
-then select **notebook** as your session type.
+From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **notebook** as your session type.
 
-> ![image](../images/notebook/1_select_notebook_session.png)
->
-> ![image](../images/notebook/2_choose_notebook.png)
+![Select Notebook Session](images/notebook/1_select_notebook_session.png)
+
+![Choose Notebook](images/notebook/2_choose_notebook.png)
 
 ### Step 2: Choose Your Container
 
-Select a container image that includes the software you need. Each container comes pre-configured
-with specific tools and libraries:
+Select a container image that includes the software you need. Each container comes pre-configured with specific tools and libraries:
 
-- **astroml** (recommended): Modern Python astronomy libraries (AstroPy, NumPy, SciPy, Matplotlib)
-- **CASA 6.5-notebook**: Includes CASA (Common Astronomy Software Applications) for radio astronomy
-- **General purpose**: Standard Python data science stack
+![Choose Container](images/notebook/3_choose_casa_container.png)
 
-> ![image](../images/notebook/3_choose_casa_container.png)
+#### Available Containers
+
+| Container | Contents | Best For |
+|-----------|----------|----------|
+| **astroml** ⭐ | Modern Python astronomy stack (AstroPy, NumPy, SciPy, Matplotlib, Pandas) | General astronomy analysis, data science |
+| **CASA 6.5-notebook** | CASA (Common Astronomy Software Applications) + Python stack | Radio astronomy data reduction |
+| **General purpose** | Standard Python data science stack | Basic Python development |
 
 !!! tip "Container Selection"
     Start with **astroml** for most astronomy workflows. It includes the latest astronomy libraries and is actively maintained. Use CASA containers only when you specifically need CASA functionality.
@@ -47,172 +52,358 @@ with specific tools and libraries:
 
 #### Session Name
 
-Choose a descriptive name that helps you identify this session later (e.g., `galaxy-photometry`, `pulsar-analysis`).
+Choose a descriptive name that helps you identify this session later:
 
-> ![image](../images/notebook/4_choose_name.png)
+![Choose Name](images/notebook/4_choose_name.png)
 
-#### Resource Allocation
+**Good session names:**
+- `galaxy-photometry`
+- `pulsar-analysis`
+- `alma-data-reduction`
+- `exoplanet-search`
 
-> ![image](../images/notebook/5_select_RAM.png)
+#### Memory Allocation
 
-Most astronomy software uses only one core unless specifically configured for parallel processing.
+Select the maximum amount of RAM you anticipate requiring:
 
-> ![image](../images/notebook/6_choose_cores.png)
+![Select RAM](images/notebook/5_select_RAM.png)
 
-See [resource allocation guidelines](../../concepts.md#session-resource-allocation) for more information.
+**Memory Guidelines:**
+- **4GB:** Basic analysis, small datasets
+- **16GB:** Standard workflows, moderate datasets (recommended default)
+- **32GB:** Large datasets, memory-intensive operations
+- **64GB+:** Very large datasets, specialized workflows
 
-!!! tip "Resource Strategy"
-    **Start with flexible mode** for most notebook work. Only use fixed mode when you need guaranteed performance or have specific resource requirements determined through testing.
+!!! warning "Resource Sharing"
+    Choose the smallest value reasonable for your needs. Computing resources are shared amongst all users. Excessive requests may slow or prevent session launch.
 
-### Step 4: Launch Your Session
+#### CPU Cores
 
-Click the **Launch** button to create your Notebook session. The system will:
+Select the maximum number of computing cores you anticipate requiring:
 
-1. Allocate computing resources
-2. Pull the container image (if not cached)
-3. Initialize your environment
-4. Start Jupyter Lab
+![Choose Cores](images/notebook/6_choose_cores.png)
 
-!!! info "First Launch Timing"
-    The first launch of a specific container may take 2-3 minutes while the image is downloaded and cached. Subsequent launches are typically 30-60 seconds.
+**CPU Guidelines:**
+- **1-2 cores:** Most single-threaded analysis (recommended default)
+- **4-8 cores:** Parallel processing, multi-threaded libraries
+- **16+ cores:** Highly parallel workflows
 
-> ![image](../images/notebook/7_launch_notebook.png)
+### Step 4: Launch Session
 
-### Step 5: Connect to Your Session
+Click the **Launch** button to start your notebook session:
 
-Wait for the Notebook icon to appear on your dashboard, then click it to access your session.
-**Initial startup may take 2-3 minutes** if the container hasn't been used recently on this server.
+![Launch Notebook](images/notebook/7_launch_notebook.png)
 
-> ![image](../images/notebook/8_notebook_created.png)
+Wait until a notebook icon appears on your dashboard, then click it to access your session:
 
-## Working in Jupyter Lab
+![Notebook Created](images/notebook/8_notebook_created.png)
 
-### Available Interfaces
+## 🧭 Using Jupyter Lab
 
-- **Python 3 (ipykernel)**: Standard Python with astronomy libraries
-- **Terminal**: Command-line access for advanced operations
-- **File Browser**: Navigate your `/arc` storage directories
+### Interface Overview
 
-> ![image](../images/notebook/9_notebook_landing.png)
+Once connected, you'll see the Jupyter Lab interface with several key areas:
 
-### Storage Access
+- **File Browser (left):** Navigate your filesystem and open files
+- **Main Work Area (centre):** Notebooks, terminals, and file editors
+- **Launcher:** Create new notebooks, terminals, and files
+- **Menu Bar:** File operations, edit functions, and view options
 
-Your notebook session automatically mounts:
+### Starting Your First Notebook
 
-- **`/arc/projects/[groupname]/`**: Shared project storage
-- **`/arc/home/[username]/`**: Personal storage
-- **`/tmp/`**: Temporary space (cleared when session ends)
+1. **Click** the Python 3 (ipykernel) notebook icon in the launcher
+2. **Start coding** in the first cell
+3. **Run cells** with `Shift+Enter`
 
-!!! warning "Save to Persistent Storage"
-    Files in `/tmp/` do not persist when the session ends. Save important work to `/arc/projects/` or `/arc/home/`. For heavy I/O, use `/scratch/` if available and copy results to `/arc` when done.
+### File Management
 
-### Example: Astronomy Analysis
+#### Persistent Storage Locations
 
-Here's a simple example using AstroPy to work with FITS data:
+Your notebook session has access to:
+
+```bash
+/arc/home/[user]/           # Your personal 10GB space
+/arc/projects/[project]/    # Shared project spaces
+/scratch/                   # Temporary high-speed storage
+```
+
+#### Uploading Files
+
+**Method 1: Direct Upload (< 100MB)**
+
+1. **Navigate** to your target directory in the file browser
+2. **Click** the upload arrow in the top menu bar
+
+![Upload Files](images/transfer_file/1_landing_click_upload.png)
+
+3. **Select files** and click "Open"
+
+![Upload Window](images/transfer_file/2_upload_window.png)
+
+4. **Files appear** in the browser
+
+![File Uploaded](images/transfer_file/3_file_is_uploaded.png)
+
+**Method 2: Copy-Paste Text**
+
+For code snippets or small text files:
+
+1. **Open a terminal** by double-clicking the terminal icon
+
+![Open Terminal](images/transfer_file/4_open_terminal.png)
+
+2. **Create/edit files** using command-line editors
+
+![New Terminal](images/transfer_file/5_new_terminal.png)
+
+3. **Copy text** from your local computer
+
+![Copy Local Text](images/transfer_file/6_copy_local_text.png)
+
+4. **Paste into the editor**
+
+![Paste Text](images/transfer_file/7_paste_text.png)
+
+### Working with CASA
+
+If using a CASA container, you can run CASA commands directly in notebook cells:
+
+```python
+# Import CASA tasks
+import casatasks as casa
+
+# Example: Import UV data
+casa.importuvfits(fitsfile='data.uvfits', vis='data.ms')
+
+# List measurement set contents
+casa.listobs(vis='data.ms')
+```
+
+## 🔧 Advanced Features
+
+### Terminal Access
+
+Access the built-in terminal for command-line operations:
+
+1. **Click** the terminal icon in the launcher
+2. **Run commands** as you would in any Linux terminal
+3. **Install packages** with pip or conda (where permissions allow)
+
+```bash
+# Example terminal commands
+ls /arc/projects/[project]/
+python script.py
+git clone https://github.com/username/repo.git
+```
+
+### Jupyter Extensions
+
+Many useful extensions are pre-installed:
+
+- **Variable Inspector:** View variable contents
+- **Table of Contents:** Navigate large notebooks
+- **Git Integration:** Version control directly in Jupyter
+
+### Python Package Management
+
+#### Pre-installed Packages
+
+Most astronomy packages are already available:
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
+import astropy
 from astropy.io import fits
-from astropy.wcs import WCS
-
-# Load a FITS file
-hdul = fits.open("/arc/projects/[groupname]/data/image.fits")
-data = hdul[0].data
-header = hdul[0].header
-
-# Display the image
-plt.figure(figsize=(10, 8))
-plt.imshow(data, origin="lower", cmap="viridis")
-plt.colorbar(label="Flux")
-plt.title("Astronomical Image")
-plt.show()
+import pandas as pd
+import scipy
 ```
 
-### Using CASA in Jupyter
-
-If you're using a CASA container, you can run CASA commands directly in Python notebooks:
-
-> ![image](../images/notebook/10_example_casa_in_ipy_notebook.png)
+#### Installing Additional Packages
 
 ```python
-# CASA example
-import casa_tools as tools
-import casa_tasks as tasks
+# Install packages for current session (may require --user flag)
+!pip install package-name
 
-# Create measurement set summary
-tasks.listobs(vis="/arc/projects/[groupname]/data/observation.ms")
-
-# Image the data
-tasks.tclean(
-    vis="/arc/projects/[groupname]/data/observation.ms",
-    imagename="my_image",
-    imsize=1024,
-    cell="0.1arcsec",
-)
+# Check installed packages
+!pip list
 ```
 
-## Session Management
+#### Persistent Package Installation
 
-### Saving Your Work
+For packages that persist across sessions:
 
-- **Auto-save**: Notebooks auto-save every 2 minutes
-- **Manual save**: Use Ctrl+S or File → Save
-- **Version control**: Consider using Git for code versioning
+```bash
+# Install to user directory (in terminal)
+pip install --user package-name
 
-### Ending Sessions
+# Add to persistent startup script
+echo "pip install --user package-name" >> /arc/home/[user]/.bashrc
+```
 
-Always properly shut down your session to free resources:
+## 🤝 Collaboration and Sharing
 
-1. Save all work
-2. Close Jupyter Lab tab
-3. Return to Science Portal
-4. Click the session icon and select "Delete"
+### Sharing Sessions
 
-## Best Practices
+Share your notebook session with team members:
 
-### Resource Usage
+1. **Copy the session URL** from your browser address bar
+2. **Share with colleagues** who have CANFAR accounts
+3. **Coordinate editing** to avoid conflicts
 
-- **Start small**: Begin with minimal resources and scale up if needed
-- **Monitor usage**: Use the terminal to check memory with `htop` or `free -h`
-- **Clean up**: Remove large temporary files when finished
+### Best Practices for Collaboration
 
-### Data Management
+- **Use descriptive cell comments** for clarity
+- **Save frequently** to persistent storage
+- **Use version control** (git) for important work
+- **Communicate** who's editing what sections
 
-- **Organise files**: Create clear directory structures in your `/arc` space
-- **Document work**: Use markdown cells to explain your analysis
-- **Backup results**: Important results should be saved to persistent storage
+### Sharing Notebooks
 
-### Collaboration
+```bash
+# Save notebook to shared location
+cp my-analysis.ipynb /arc/projects/[project]/notebooks/
 
-- **Share sessions**: Real-time collaboration for debugging and teaching
-- **Version control**: Use Git for code sharing and version management
-- **Documentation**: Well-documented notebooks help collaborators understand your work
+# Share via git repository
+git add my-analysis.ipynb
+git commit -m "Add analysis notebook"
+git push origin main
+```
 
-## Troubleshooting
+## ⚡ Performance Optimisation
+
+### Memory Management
+
+```python
+# Monitor memory usage
+import psutil
+print(f"Memory usage: {psutil.virtual_memory().percent}%")
+
+# Free up memory by deleting large variables
+del large_array
+import gc
+gc.collect()
+```
+
+### Storage Performance
+
+```python
+# Use /scratch for intensive I/O operations
+import shutil
+
+# Copy to scratch for processing
+shutil.copy('/arc/projects/[project]/large_file.fits', '/scratch/')
+
+# Process in scratch
+# ... your analysis code ...
+
+# Copy results back
+shutil.copy('/scratch/results.fits', '/arc/projects/[project]/outputs/')
+```
+
+### Efficient Data Loading
+
+```python
+# For large FITS files, load only needed sections
+from astropy.io import fits
+
+# Load header only
+header = fits.getheader('large_file.fits')
+
+# Load specific HDU
+data = fits.getdata('large_file.fits', ext=1)
+
+# Use memmap for very large files
+data = fits.getdata('huge_file.fits', memmap=True)
+```
+
+## 🔧 Troubleshooting
 
 ### Common Issues
 
-### Session won't start
+#### Kernel Not Starting
 
-- Check resource availability
-- Try reducing memory/CPU requirements
-- Contact support if persistent
+**Problem:** Python kernel fails to start
 
-### Can't access files
+**Solutions:**
+1. Restart the kernel: `Kernel` → `Restart Kernel`
+2. Clear output: `Cell` → `All Output` → `Clear`
+3. Check memory usage and restart session if needed
 
-- Verify file paths in `/arc/projects/[groupname]/`
-- Check group permissions
-- Ensure files were uploaded correctly
+#### Out of Memory Errors
 
-### Notebook kernel crashes
+**Problem:** `MemoryError` or kernel crashes
 
-- Often due to memory overuse
-- Restart kernel and reduce data size
-- Consider using more memory
+**Solutions:**
+1. Restart kernel and clear variables
+2. Process data in smaller chunks
+3. Use more memory-efficient data types
+4. Launch session with more RAM
 
-### Performance issues
+#### Slow Performance
 
-- Check if other users are sharing resources
-- Use `htop` to monitor system usage
-- Consider running during off-peak hours
+**Problem:** Notebooks running slowly
+
+**Solutions:**
+1. Check system resources with `htop` in terminal
+2. Close unused notebooks and terminals
+3. Clear notebook output: `Cell` → `All Output` → `Clear`
+4. Use `/scratch` for temporary files
+
+#### File Upload Issues
+
+**Problem:** Cannot upload files or uploads fail
+
+**Solutions:**
+1. Check file size (< 100MB for web upload)
+2. Use command-line tools for larger files
+3. Check available disk space
+4. Try uploading to `/scratch` first, then moving
+
+### Getting Help
+
+```python
+# Built-in help systems
+help(function_name)
+?function_name          # In Jupyter
+??function_name         # Show source code
+
+# Package documentation
+import astropy
+astropy.__version__
+```
+
+## 📚 Learning Resources
+
+### Jupyter Lab Documentation
+
+- **[JupyterLab User Guide](https://jupyterlab.readthedocs.io/)**
+- **[Jupyter Notebook Basics](https://jupyter-notebook.readthedocs.io/)**
+- **[IPython Magic Commands](https://ipython.readthedocs.io/en/stable/interactive/magics.html)**
+
+### Astronomy Python Resources
+
+- **[AstroPy Tutorials](https://learn.astropy.org/)**
+- **[Python for Astronomers](https://python4astronomers.github.io/)**
+- **[Astro Hack Week](https://astrohackweek.org/)**
+
+### CASA Resources
+
+- **[CASA Documentation](https://casa.nrao.edu/docs.shtml)**
+- **[CASA Guides](https://casaguides.nrao.edu/)**
+- **[CASA Tutorials](https://casatutorials.nrao.edu/)**
+
+## 🔗 Next Steps
+
+- **[Try Desktop Sessions](desktop.md)** for GUI applications
+- **[Explore CARTA](carta.md)** for radio astronomy visualisation
+- **[Use Firefly](firefly.md)** for optical survey data
+- **[Learn about Storage](../storage/index.md)** for data management
+- **[Batch Processing](batch.md)** for large-scale automation
+
+## 🆘 Getting Help
+
+- **In-session help:** Use `help()` and `?` in notebooks
+- **Documentation:** Browse [CANFAR docs](../)
+- **Support:** Email [support@canfar.net](mailto:support@canfar.net)
+- **Community:** Join [CANFAR Slack](https://canfar.slack.com)

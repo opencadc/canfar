@@ -71,18 +71,18 @@ plugins:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - mkdocstrings:
       handlers:
-      python:
-        options:
-          show_symbol_type_toc: true
-          show_signature: true
-          separate_signature: true
-          line_length: 88
-          annotations_path: brief
-          docstring_style: google
-          docstring_section_style: spacy
-          docstring_options:
-            ignore_init_summary: true
-            trim_doctest_flags: true
+        python:
+          options:
+            show_symbol_type_toc: true
+            show_signature: true
+            separate_signature: true
+            line_length: 88
+            annotations_path: brief
+            docstring_style: google
+            docstring_section_style: spacy
+            docstring_options:
+              ignore_init_summary: true
+              trim_doctest_flags: true
   - git-revision-date-localized:
         type: date
         enable_creation_date: true
@@ -171,26 +171,28 @@ nav:
   - Platform:
     - Home: platform/home.md
     - Getting Started: platform/get-started.md
-    - User Guides:
-      - Intro: platform/guides/index.md
-      - Concepts: platform/concepts.md
-      - Accounts: platform/accounts.md
-      - Containers: platform/containers.md
-      - Storage: platform/guides/storage/index.md
-        - VOSpace Storage: platform/guides/storage/vospace-api.md
-      - Interactive Sessions:
-        - Home: platform/guides/interactive-sessions/index.md
-        - Jupyter Notebooks: platform/guides/interactive-sessions/launch-notebook.md
-        - Desktop Sessions: platform/guides/interactive-sessions/launch-desktop.md
-        - CARTA Visualization: platform/guides/interactive-sessions/launch-carta.md
-        - Firefly Table Viewer: platform/guides/interactive-sessions/launch-firefly.md
-        - Contributed Applications: platform/guides/interactive-sessions/launch-contributed.md
-      - Batch Sessions: platform/batch-jobs.md
-      - Radio Astronomy:
-        - Home: platform/guides/radio-astronomy/index.md
-        - CASA Workflows: platform/guides/radio-astronomy/casa-workflows.md
-      - DOI: platform/legacy/doi.md
-      - Legacy Cloud: platform/legacy/cloud-services.md
+    - Concepts: platform/concepts.md
+    - Permissions: platform/permissions.md
+    - DOI Publishing: platform/doi.md
+    - Cloud (legacy): platform/cloud.md
+    - Sessions:
+      - Overview: platform/sessions/index.md
+      - Jupyter Notebooks: platform/sessions/notebook.md
+      - CARTA Visualization: platform/sessions/carta.md
+      - Firefly Table Viewer: platform/sessions/firefly.md
+      - Contributed Applications: platform/sessions/contributed.md
+    - Storage:
+      - Overview: platform/storage/index.md
+      - Filesystem Storage: platform/storage/filesystem.md
+      - Data Transfers: platform/storage/transfers.md
+      - VOSpace API: platform/storage/vospace.md
+    - Containers:
+      - Overview: platform/containers/index.md
+      - Building Containers: platform/containers/build.md
+      - Harbor Registry: platform/containers/registry.md
+    - Support:
+      - Help Centre: platform/support/index.md
+      - FAQ: platform/support/faq.md
   - Client:
     - Home: client/home.md
     - Authentication: cli/authentication-contexts.md
@@ -215,9 +217,6 @@ nav:
     - CLI:
       - 5-Minute Tutorial: cli/quick-start.md
       - Reference: cli/cli-help.md
-  - Help & Support: 
-    - platform/help.md
-    - platform/faq.md
   - Contribute:
 #    - Code of Conduct: conduct.md
     - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar

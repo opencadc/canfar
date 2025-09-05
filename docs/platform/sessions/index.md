@@ -1,398 +1,208 @@
 # Interactive Sessions
 
-**Launch and manage interactive computing environments on CANFAR**
+**Comprehensive guide to CANFAR's interactive computing environments for astronomical research - from Jupyter notebooks to desktop applications.**
 
-!!! abstract "🎯 What You'll Learn"
-    - The differences between session types and when to use each
-    - How to launch and connect to sessions quickly
-    - How to size resources (RAM/CPU/GPU) appropriately
-    - How to manage, share, and troubleshoot sessions
+!!! info "Platform Navigation"
+    **Interactive Sessions**: Your gateway to computing environments and analysis workflows.  
+    **[Platform Home](../home.md)** | **[Platform Concepts](../concepts.md)** | **[Storage Systems](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
 
-Interactive sessions provide web-based access to powerful computing resources with different interfaces optimized for specific workflows. Whether you're analyzing data in Jupyter notebooks, visualizing radio astronomy images, or running GUI applications, CANFAR's interactive sessions make it easy to get started.
+!!! abstract "🎯 Session Types Overview"
+    **Choose the right interface for your research:**
+    
+    - **[Jupyter Notebooks](notebook.md)**: Interactive data analysis and visualisation
+    - **[Desktop Environment](desktop.md)**: Full Linux desktop with GUI applications  
+    - **[CARTA Viewer](carta.md)**: Radio astronomy visualisation and analysis
+    - **[Firefly Viewer](firefly.md)**: Table and image viewing for surveys
+    - **[Contributed Apps](contributed.md)**: Specialised community applications
+    - **[Batch Processing](batch.md)**: Automated and large-scale workflows
 
-## 🎯 Session Types Overview
+## 🚀 Session Fundamentals
 
-CANFAR supports multiple interactive session types, each optimized for different research workflows:
+### What are Interactive Sessions?
 
-| Session Type | Interface | Best For | Key Features |
-|--------------|-----------|----------|--------------|
-| **[📓 Notebook](launch-notebook.md)** | JupyterLab | Data analysis, coding, documentation | Interactive Python, visualization, markdown |
-| **[🖥️ Desktop](launch-desktop.md)** | Linux desktop | Desktop GUI applications, legacy software | Full desktop environment, X11 apps |
-| **[📊 CARTA](launch-carta.md)** | CARTA viewer | FITS/HDF5 astronomy visualization | Cube analysis, region tools, catalogues |
-| **[🔥 Firefly](launch-firefly.md)** | Firefly viewer | Optical data, catalogue visualization | Image viewer, catalogue overlay, cutouts |
-| **[⚙️ Contributed](launch-contributed.md)** | Various | Contributed web applications | Specialized tools, custom interfaces |
+Interactive sessions provide on-demand access to pre-configured computing environments running in containers. Each session type offers different interfaces optimised for specific astronomical workflows.
 
-## 🚀 Quick Start Guide
+### Key Benefits
 
-### Step 1: Access the Science Portal
+**No Installation Required**
+:   Access complex astronomy software through your web browser without local installation or configuration.
 
-1. **Login** to [CANFAR Portal](https://www.canfar.net)
-2. **Navigate** to "Science Portal" 
-3. **Click** the plus sign (**+**) to create a new session
+**Pre-Configured Environments**
+:   Containers include popular astronomy packages like AstroPy, CASA, and scientific Python libraries ready to use.
 
-### Step 2: Choose Session Type
+**Persistent Data Access**
+:   All sessions automatically connect to your ARC storage and can access VOSpace for long-term data management.
 
-Select the interface that best matches your workflow:
+**Collaborative Computing**
+:   Share session URLs with team members for real-time collaboration and troubleshooting.
 
-=== "📓 Data Analysis"
-    **Session Type:** `notebook`  
-    **Container:** `astroml`  
-    **Use Case:** Python analysis, Jupyter notebooks, data exploration
+**Scalable Resources**
+:   Choose flexible or fixed resource allocation based on your computational requirements.
 
-=== "📡 Visualize Astronomy Data" 
-    **Session Type:** `carta`  
-    **Container:** `carta`  
-    **Use Case:** FITS/HDF5 data visualization, source analysis popular for radio astronomy
+## 📊 Session Type Comparison
 
-=== "🖥️ GUI Desktop Applications"
-    **Session Type:** `desktop`  
-    **Container:** `desktop`
-    **Use Case:** CASA, DS9, TOPCAT, image viewers, legacy astronomy software tools
+| Session Type | Interface | Best For | Collaboration | GUI Support |
+|--------------|-----------|----------|---------------|-------------|
+| **[Notebook](notebook.md)** | JupyterLab | Data analysis, prototyping, documentation | ✅ Shareable URLs | ⚠️ Web-based |
+| **[Desktop](desktop.md)** | Full Linux desktop | CASA, image viewers, traditional software | ✅ Screen sharing | ✅ Full GUI |
+| **[CARTA](carta.md)** | CARTA interface | Radio astronomy visualisation | ✅ Shareable sessions | ✅ Specialised |
+| **[Firefly](firefly.md)** | Firefly viewer | Catalogue analysis, image display | ✅ Shareable views | ✅ Web-based |
+| **[Contributed](contributed.md)** | Various | Specialised applications | ⚠️ Varies | ⚠️ Varies |
+| **[Batch](batch.md)** | None (headless) | Large-scale processing | ❌ Non-interactive | ❌ Headless |
 
-=== "🔬 Catalogue Analysis"
-    **Session Type:** `firefly`  
-    **Container:** `firefly`  
-    **Use Case:** Vizualize images, overlay catalogues, image cutouts, query public large catalogues
+## 🔧 Session Management
 
-### Step 3: Configure Resources
+### Creating Sessions
 
-**Session Name:** Choose a descriptive name (e.g., "galaxy-photometry", "alma-reduction")
+**Via Science Portal:**
+:   Launch sessions through the [CANFAR Science Portal](https://www.canfar.net/science-portal/) web interface with point-and-click simplicity.
 
-**Resource Allocation:** Select `flexible` for most workloads. Use `fixed` only if you need guaranteed performance. See [resource allocation guide](../../concepts.md#session-resource-allocation) for more information.
+**Via Command Line:**
+:   Use the [CANFAR CLI](../../cli/cli-help.md) for scripted session creation and automation.
 
-### Step 4: Launch and Connect
-
-1. **Click** "Launch" and wait for initialization (~30-60 seconds)
-2. **Session appears** on your portal dashboard
-3. **Click** the session icon to connect
-4. **Start working** in your interactive environment
-
-## 📱 Session Management
+**Via Python API:**
+:   Integrate session management into custom workflows using the [CANFAR Python Client](../../client/home.md).
 
 ### Session Lifecycle
 
-```mermaid
-stateDiagram-v2
-    [*] --> Launching: Click Launch
-    Launching --> Running: Session ready
-    Running --> Suspended: Close browser
-    Suspended --> Running: Reconnect
-    Running --> Terminated: Delete session
-    Terminated --> [*]
-    
-    note right of Running: Access from any device
-    note right of Suspended: Session continues running
-```
+**Creation** (30 seconds - 3 minutes)
+:   Container download (first time) and startup with storage mounting
 
-### Session Limits
+**Active Use**
+:   Full access to computing resources and storage systems
 
-| Limit | Value | Notes |
-|-------|-------|-------|
-| **Concurrent sessions** | 3 active sessions | Across all interactive session types |
-| **Session duration** | 4 days maximum | Can be renewed indefinitely |
-| **Idle timeout** | None | Sessions run until manually deleted |
-| **Storage** | Persistent | Files saved to `/arc/` will persist |
+**Idle Management**
+:   Sessions automatically suspend after periods of inactivity to conserve resources
 
-### Managing Active Sessions
+**Termination**
+:   Container deletion with data preserved in persistent storage
 
-#### From the Science Portal
+!!! warning "Data Persistence"
+    **Important**: Session containers are temporary. Always save important work to `/arc/` storage or VOSpace before ending sessions.
 
-- **View all sessions:** Portal dashboard shows active sessions
-- **Connect to session:** Click session icon
-- **Extend session:** Use "Renew" button before expiration
-- **Delete session:** Click "X" to terminate and free resources
+## 📈 Resource Allocation
 
-#### From Command Line
+### Flexible Allocation (Default)
 
-```bash
-# List your active sessions
-canfar list
+**Advantages:**
+- Faster session startup
+- Can burst to higher resource usage when available
+- Optimal for interactive work and development
 
-# Delete specific session ID
-canfar delete <ID>
-```
+**Best For:**
+- Data exploration and analysis
+- Development and testing
+- Educational workshops
 
-### Persistent Configuration
+### Fixed Allocation
 
-Save personal settings that persist across sessions:
+**Advantages:**
+- Guaranteed consistent performance
+- Predictable resource availability
+- Better for production workloads
 
-```bash
-# Jupyter configuration
-mkdir -p /arc/home/[username]/.jupyter
-cp jupyter_config.py /arc/home/$USER/.jupyter/
+**Best For:**
+- Large-scale processing
+- Performance-critical analysis
+- Time-sensitive computations
 
-# Shell configuration
-echo "alias ll='ls -la'" >> /arc/home/[username]/.bashrc
+### Resource Selection Guide
 
-# Python packages (user installation)
-pip install --user astroplan # in some containers, the --user may not be needed
-```
+| Workflow Type | Recommended Mode | CPU/Memory | Duration |
+|---------------|------------------|------------|----------|
+| **Interactive Analysis** | Flexible | 2-4 CPU, 4-8GB | Hours |
+| **Large Dataset Processing** | Fixed | 4-8 CPU, 16-32GB | Hours-Days |
+| **Development & Testing** | Flexible | 1-2 CPU, 2-4GB | Hours |
+| **Production Pipelines** | Fixed | Varies by workload | Days |
 
-#### External Access
+## 🔗 Integration with Platform Services
 
-Sessions are accessible from anywhere with proper authentication:
+### Storage Integration
 
-- **Same computer:** Original browser window
-- **Different computer:** Copy session URL, login with CADC credentials  
-- **Mobile device:** Session URL works in mobile browsers
+All interactive sessions automatically mount:
 
-## 🛡️ Security and Best Practices
+- **ARC Home** (`/arc/home/[user]/`): Personal configurations and scripts
+- **ARC Projects** (`/arc/projects/[project]/`): Shared research data and results
+- **Scratch** (`/scratch/`): High-speed temporary storage for processing
 
-### Data Security
+Additional storage accessible via API:
+- **VOSpace** (`vos:`): Long-term archives and data sharing
 
-**✅ Do:**
-- Save important work to `/arc/projects/` or `/arc/home/`
-- Use group permissions for collaborative data
-- Regularly save and backup critical results in vault storage (`/arc` is not backed up)
+### Container Environments
 
-**❌ Don't:**
-- Store sensitive data in `/scratch/` (wiped at session end)
-- Share session URLs publicly
-- Leave sessions running unnecessarily
-- Store passwords in plain text files
+Sessions run in [container environments](../containers/index.md) that include:
 
-### Performance Optimization
+- Operating system (typically Ubuntu Linux)
+- Astronomy software packages (AstroPy, CASA, etc.)
+- Scientific computing libraries (NumPy, SciPy, Matplotlib)
+- Development tools and utilities
 
-#### Storage Performance
+### Authentication & Permissions
 
-```bash
-# Use /scratch/ for intensive I/O
-cp /arc/projects/myproject/data.fits /scratch/
-# ... process in /scratch/ ...
-cp /scratch/results.fits /arc/projects/myproject/
+Sessions inherit your [CANFAR permissions](../permissions.md):
 
-```
+- Automatic access to your group projects
+- Secure integration with CADC services
+- API access for automated workflows
 
-### Troubleshooting Common Issues
+## 🎯 Choosing Your Session Type
 
-#### Session Won't Start
+### For Data Analysis
 
-**Problem:** Session stuck in "Launching" state
+**New to CANFAR?** → Start with **[Jupyter Notebooks](notebook.md)**
+:   Familiar interface combining code, documentation, and visualisation
 
-**Solutions:**
-1. Check resource availability - try a fixed session with lower memory/CPU
-2. Wait 2-3 minutes for container download
-3. Try different container image
-4. Contact support if persistent
+**Need GUI Applications?** → Use **[Desktop Sessions](desktop.md)**
+:   Full Linux desktop for CASA, image viewers, and traditional software
 
-#### Session Disconnected
+### For Astronomy Specialisations
 
-**Problem:** Lost connection to running session
+**Radio Astronomy** → **[CARTA Viewer](carta.md)**
+:   Optimised for radio interferometry data visualisation and analysis
 
-**Solutions:**
-1. Refresh browser page
-2. Click session icon again from portal
-3. Check internet connection
-4. Clear browser cache if needed
+**Survey Data** → **[Firefly Viewer](firefly.md)**
+:   Efficient table and image viewing for large astronomical catalogues
 
-#### Out of Memory Errors
+**Specialised Tools** → **[Contributed Applications](contributed.md)**
+:   Community-maintained applications for specific research domains
 
-**Problem:** Application crashes with memory errors
+### For Production Work
 
-**Solutions:**
-1. Launch new session with more memory
-2. Process data in smaller chunks
-3. Use `/scratch/` for temporary files
-4. Optimize code for memory efficiency
+**Large-Scale Processing** → **[Batch Sessions](batch.md)**
+:   Automated workflows for processing large datasets without interactive interfaces
 
-## 🔧 Troubleshooting Sessions
+## 🆘 Getting Help
 
-### Session Won't Start
+### Session Issues
 
-**Problem:** Session creation fails or hangs
-
-**Common Causes & Solutions:**
+**Session Won't Start:**
+- Check [container status](../containers/index.md) and try alternative images
+- Verify [group permissions](../permissions.md) for project access
+- Contact [support](../support/index.md) if problems persist
 
-=== "Container Issues"
-    **Solutions:**
-    - Try a different container image (e.g., switch to `cadc/astroml:latest`)
-    - Check if container is available: `docker pull images.canfar.net/[orgname]/[containername]:[tagname]`
-    - Use `latest` tag instead of specific versions
+**Performance Problems:**
+- Consider upgrading to [fixed resources](#fixed-allocation)
+- Move large files to [scratch storage](../storage/index.md) for processing
+- Review [best practices](#resource-selection-guide) for your workflow type
 
-=== "Network Problems"
-    **Solutions:**
-    - Check internet connection stability
-    - Try different browser (Chrome/Firefox recommended)
-    - Clear browser cache and cookies
-    - Disable browser extensions temporarily
+**Collaboration Questions:**
+- Learn about [session sharing](notebook.md#collaboration) capabilities
+- Understand [group management](../permissions.md) for team access
+- Explore [storage sharing](../storage/index.md) for data collaboration
 
-### Cannot Access Files
+### Additional Resources
 
-**Problem:** Files missing or permission denied
-
-**Diagnostic Steps:**
-```bash
-# Check file locations
-ls -la /arc/home/[username]/     # Personal storage
-ls -la /arc/projects/           # Available projects
-
-# Check group membership  
-groups
-
-# Check permissions on specific files
-ls -la /arc/projects/[projectname]/problematic_file
-```
-
-**Solutions:**
-- Verify you're in the correct group via [Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
-- Check file paths are correct (case-sensitive)
-- Contact group administrator for access
-- Try copying files to your home directory first
-
-### Session Performance Issues
-
-#### Memory Problems
-
-**Problem:** Session crashes or becomes unresponsive
-
-**Solutions:**
-```bash
-# Monitor memory usage
-free -h
-top -o %MEM
-
-# Find memory-hungry processes
-ps aux --sort=-%mem | head -10
-```
-
-**Best Practices:**
-1. Close unused applications and browser tabs
-2. Process data in smaller chunks
-3. Use `/scratch/` for temporary files
-4. Optimize code for memory efficiency
-5. Request more memory when launching session
-
-#### Slow Performance
-
-**Problem:** Session responding slowly
-
-**Diagnostic Commands:**
-```bash
-# Check system resources
-htop           # Interactive process viewer
-iostat 5       # I/O statistics
-df -h          # Disk usage
-```
-
-**Solutions:**
-1. Close unnecessary applications
-2. Use `/scratch/` for I/O intensive tasks  
-3. Consider requesting more CPU cores
-4. Check for runaway processes
-5. Restart session if persistent
-
-### Connection Issues
-
-#### Browser Problems
-
-**Problem:** Can't connect to session or interface not loading
-
-**Solutions:**
-1. **Try incognito/private mode** - Eliminates extension conflicts
-2. **Different browser** - Test Chrome, Firefox, Safari
-3. **Clear browser data:**
-   ```bash
-   # Clear CANFAR-specific cookies and cache
-   # In browser developer tools:
-   Application -> Storage -> Clear site data
-   ```
-4. **Check browser requirements:**
-   - JavaScript enabled
-   - Cookies enabled
-   - WebSocket support
-
-#### Network Timeouts
-
-**Problem:** Connection drops or times out
-
-**Solutions:**
-- Check stable internet connection
-- Try wired connection instead of WiFi
-- Contact network administrator about firewall/proxy
-- Use VPN if on restricted network
-
-### Storage Issues
-
-#### Disk Space Problems
-
-**Problem:** "No space left on device" errors
-
-**Diagnostic Commands:**
-```bash
-# Check quotas and usage
-df -h /arc/home/[username]
-df -h /arc/projects/[projectname]
-du -sh /arc/home/[username]/*
-
-# Find large files
-find /arc/home/[username] -type f -size +100M
-```
-
-**Solutions:**
-1. Clean up large temporary files
-2. Compress old data: `gzip large_file.fits`
-3. Move old data to vault for archival
-4. Use `/scratch/` for temporary processing
-5. If necessary, request quota increase from support
-
-#### File Transfer Problems
-
-**Problem:** Uploads/downloads fail or are slow
-
-**Solutions:**
-```bash
-# For large files, use rsync for reliability
-rsync -av --progress source/ destination/
-
-# Check network and resume transfers
-wget -c https://example.com/large_file.fits
-
-# Use vault VOSpace
-vcp local_file.fits vos:myproject/
-```
-
-### Getting Help
-
-When troubleshooting fails:
-
-1. **Check logs** - Look for error messages in session logs
-2. **System status** - Check [CANFAR status page](https://www.canfar.net) for maintenance
-3. **Community help** - Ask on [Discord](https://discord.gg/vcCQ8QBvBa)
-4. **Contact support** - Email [support@canfar.net](mailto:support@canfar.net) with:
-   - Session ID
-   - Container image used
-   - Error messages
-   - Steps to reproduce
-
-!!! tip "Before Contacting Support"
-    1. Try basic troubleshooting steps above
-    2. Check if problem persists with default settings
-    3. Test with different browser/device
-    4. Gather specific error messages
-
-## 🔗 Session-Specific Guides
-
-Detailed guides for each session type:
-
-- **[📓 Jupyter Notebooks →](launch-notebook.md)** - Interactive data analysis and visualization
-- **[🖥️ Desktop Environment →](launch-desktop.md)** - GUI applications and legacy software
-- **[📊 CARTA Viewer →](launch-carta.md)** - Radio astronomy cube visualization
-- **[🔥 Firefly Viewer →](launch-firefly.md)** - LSST image and table visualization  
-- **[⚙️ Contributed Apps →](launch-contributed.md)** - Community-developed tools
-
-## 🔗 What's Next?
-
-Once you're comfortable with interactive sessions:
-
-- **[Storage Guide →](../storage/index.md)** - Manage data across sessions
-- **[Batch Jobs →](../../batch-jobs.md)** - Automate workflows  
-- **[Container Guide →](../../containers.md)** - Customize software environments
-- **[Radio Astronomy →](../radio-astronomy/index.md)** - Specialized workflows
+- **[FAQ](../support/faq.md)**: Common questions and solutions
+- **[Support Channels](../support/index.md)**: Direct assistance and community help
+- **[Tutorials](../get-started.md)**: Step-by-step learning materials
 
 ---
 
-!!! tip "Session Success Tips"
-    1. **Save frequently** - Important work should go in `/arc/` directories  
-    2. **Share wisely** - Session URLs are powerful - only share with trusted collaborators
-    3. **Monitor resources** - Keep an eye on memory and CPU usage with `htop`
-    4. **Clean up** - Delete finished sessions to free resources for others
+!!! success "Ready to Start Computing?"
+    **Choose your interface and start analysing:**
+    
+    **Interactive Analysis** → **[Launch Jupyter Notebook](notebook.md)**  
+    **GUI Applications** → **[Start Desktop Session](desktop.md)**  
+    **Radio Astronomy** → **[Open CARTA Viewer](carta.md)**
+    
+    **Focus on your research** - let CANFAR handle the infrastructure and software environments.

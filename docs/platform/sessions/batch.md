@@ -1,49 +1,25 @@
-# Batch Jobs and Headless Processing
+# Batch Processing
 
-Batch jobs enable automated, non-interactive processing of astronomical data at scale. This section covers headless execution, API access, job scheduling, and workflow automation on the CANFAR Science Platform.
-
+## Headless container execution for automated workflows and large-scale processing
 
 !!! abstract "🎯 What You'll Learn"
-    - The difference between headless and interactive containers
-    - How to submit jobs via API and Python client
-    - Resource planning, queue behaviour, and monitoring
-    - Best practices for automation, logging, and data management
-    - [Container Development](containers.md)
-    - [Storage Optimization](guides/storage/index.md)
-    - [Interactive Sessions](guides/interactive-sessions/index.md)
-    - [CANFAR Python Client](../client/home.md)
-    - [Support & Troubleshooting](help.md)
+    - How to run containers without interactive interfaces (headless mode)
+    - Submitting and managing batch jobs through the Science Portal
+    - Using the REST API for programmatic job control and automation
+    - Best practices for resource allocation, job scheduling, and monitoring
+    - Advanced workflows including parameter sweeps and pipeline automation
 
-## What is Batch Processing?
+Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyses automatically while you focus on other work.
 
-Batch processing refers to the execution of computational tasks without user interaction, typically running in the background to process large datasets or perform repetitive analysis tasks. In the context of the CANFAR Science Platform, batch jobs run as **headless containers** - containerized environments that execute your code without graphical interfaces or interactive terminals.
+## 📋 Overview
 
-### Headless vs Interactive Containers
+Batch processing provides several key advantages for astronomical research:
 
-The key difference between headless and interactive containers lies not in the container images themselves, but in how they are executed. The same container image can be launched in either mode depending on your needs.
-
-**Headless containers** execute a user-specified command or script directly. When you submit a headless job, you specify exactly what command should run - whether it's a Python script, a shell command, or any executable available in the container. The container starts, runs your specified command, and terminates when the command completes. For example, submitting a headless job with the `astroml` container might execute `python /arc/projects/myproject/analysis.py` directly.
-
-**Interactive containers** launch predefined interactive services that you can access through your web browser. The same `astroml` container, when launched interactively, would start Jupyter Lab, providing you with a notebook interface for development and exploration. These containers run indefinitely until you manually stop them, allowing for real-time interaction and iterative development.
-
-This distinction makes headless containers ideal for production workflows and automated processing, while interactive containers excel for development, prototyping, and exploratory data analysis.
-
-## Overview
-
-Batch processing is essential for:
-
-- **Large dataset processing**: Handle terabytes of astronomical data
-- **Automated pipelines**: Run standardized reduction workflows
-- **Parameter studies**: Execute multiple analysis runs with different parameters
-- **Resource optimization**: Run during off-peak hours for better performance
-- **Reproducible science**: Documented, automated workflows
-
-
-!!! tip "When to Use Batch Jobs"
-    - Use [Interactive Sessions](guides/interactive-sessions/index.md) to develop and test
-    - Switch to headless jobs for production-scale runs
-    - Schedule jobs during off-peak hours for faster starts
-    - For automation, see [CANFAR Python Client](../client/home.md)
+- **Unattended execution**: Jobs run without requiring user interaction
+- **Resource efficiency**: Optimal resource allocation for long-running tasks
+- **Scalability**: Process large datasets or parameter sweeps systematically
+- **Automation**: Integrate with existing workflows and pipelines
+- **Cost effectiveness**: Run jobs during off-peak hours when resources are available
 
 
 ---

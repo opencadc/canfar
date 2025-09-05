@@ -24,16 +24,16 @@ hide:
 
     <div class="grid cards" markdown>
 
-    - [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md)
-    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/batch-jobs.md)
-    - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/guides/storage/index.md)
-    - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers.md)
-    - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/accounts.md)
-    - [:material-wrench: __Expert Support__ <small>for research workflows</small>](platform/help.md)
+    - [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/sessions/index.md)
+    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/cloud.md)
+    - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/storage/index.md)
+    - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers/index.md)
+    - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/permissions.md)
+    - [:material-wrench: __Expert Support__ <small>for research workflows</small>](platform/support/index.md)
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
-    - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/legacy/publication.md)
-    - [:simple-wpexplorer: and much more...](platform/guides/index.md)
+    - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
+    - [:simple-wpexplorer: and much more...](platform/home.md)
 
     </div>
     
