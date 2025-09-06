@@ -25,7 +25,7 @@ hide:
     <div class="grid cards" markdown>
 
     - [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/sessions/index.md)
-    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/cloud.md)
+    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/sessions/batch.md)
     - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/storage/index.md)
     - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers/index.md)
     - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/permissions.md)

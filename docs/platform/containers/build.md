@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Container Building**: Creating custom software environments for specialised research workflows.  
-    **[Containers Home](index.md)** | **[Registry Management](registry.md)** | **[Platform Home](../home.md)**
+    **[Containers Home](index.md)** | **[Registry Management](registry.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Container Building Overview"
     **Master custom container development:**
@@ -920,11 +920,9 @@ docker run -it --rm \
 - **[Harbor Registry Guide →](registry.md)** - Manage and organise your containers
 - **[Session Integration →](../sessions/)** - Use custom containers in different session types
 - **[Storage Integration →](../storage/)** - Optimise data workflows with custom containers
-- **[Performance Tuning →](../guides/performance/)** - Optimise container and session performance
 
 ## 🆘 Getting Help
 
 - **Build Issues**: Check [Docker documentation](https://docs.docker.com/) and [CANFAR container examples](https://github.com/opencadc/skaha-containers)
 - **CANFAR Integration**: Contact [support@canfar.net](mailto:support@canfar.net)
 - **Harbor Registry**: Access [Harbor documentation](https://goharbor.io/docs/)
-- **Community**: [CANFAR Slack](https://canfar.slack.com) #containers channel

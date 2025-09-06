@@ -26,9 +26,9 @@ Batch processing provides several key advantages for astronomical research:
 
 !!! info "Quick Links"
     - [Container Development](containers.md)
-    - [Storage Guide](guides/storage/index.md)
+    - [Storage Guide](../storage/index.md)
     - [CANFAR Python Client](../client/home.md)
-    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
     - [Support](help.md)
 
 ### 1. API-Based Execution
@@ -369,9 +369,9 @@ def timed_processing(func, *args, **kwargs):
 
 !!! info "See Also"
     - [Container Development](containers.md)
-    - [Storage Guide](guides/storage/index.md)
+    - [Storage Guide](../storage/index.md)
     - [CANFAR Python Client](../client/home.md)
-    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
     - [Support](help.md)
 
 ### Job Sizing Guidelines
@@ -626,9 +626,9 @@ canfar stats <session-id>
 
 !!! info "See Also"
     - [Container Development](containers.md)
-    - [Storage Guide](guides/storage/index.md)
+    - [Storage Guide](../storage/index.md)
     - [CANFAR Python Client](../client/home.md)
-    - [API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+    - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
     - [Support](help.md)
 
 ### Script Design
@@ -648,7 +648,7 @@ canfar stats <session-id>
 
 !!! warning "Persistence Reminder"
     Headless containers do not persist changes to the container filesystem. Always write outputs to `/arc/projects/` or `/arc/home/`.
-    For data management strategies, see [Storage Guide](guides/storage/index.md).
+    For data management strategies, see [Storage Guide](../storage/index.md).
 
 ### Security and Efficiency
 
@@ -661,19 +661,19 @@ canfar stats <session-id>
 ## Getting Help
 
 !!! info "Quick Links"
-    - [Support](help.md)
+    - [Support](../support/index.md)
     - [FAQ](../faq.md)
     - [Client Examples](../client/examples.md)
     - [Discord Community](https://discord.gg/vcCQ8QBvBa)
 
-- **API Documentation**: [CANFAR API Reference](https://ws-uv.canfar.net/skaha/v0/capabilities)
+- **API Documentation**: [CANFAR API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
 - **Support**: Email [support@canfar.net](mailto:support@canfar.net)
 - **Community**: Join our Discord for batch processing discussions
 - **Examples**: Check the [CANFAR GitHub](https://github.com/opencadc) for more examples
 
 ## Next Steps
 
-- **[Container Development](containers.md)**: Build custom containers for your workflows
-- **[Storage Optimization](guides/storage/index.md)**: Efficient data management strategies
-- **[Interactive Sessions](guides/interactive-sessions/index.md)**: Develop and test scripts interactively
-- **[Radio Astronomy Workflows](guides/radio-astronomy/index.md)**: Specialized batch processing for radio data
+- **[Container Development]../containers/inde.md)**: Build custom containers for your workflows
+- **[Storage Optimization](../storage/index.md)**: Efficient data management strategies
+- **[Interactive Sessions](index.md)**: Develop and test scripts interactively
+- **[Radio Astronomy Workflows](../radio/index.md)**: Specialized batch processing for radio data

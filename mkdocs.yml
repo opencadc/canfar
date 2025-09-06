@@ -169,29 +169,30 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Platform:
-    - Home: platform/home.md
+    - Overview: platform/index.md
     - Getting Started: platform/get-started.md
     - Concepts: platform/concepts.md
     - Permissions: platform/permissions.md
-    - DOI Publishing: platform/doi.md
+    - DOI: platform/doi.md
     - Cloud (legacy): platform/cloud.md
     - Sessions:
       - Overview: platform/sessions/index.md
-      - Jupyter Notebooks: platform/sessions/notebook.md
-      - CARTA Visualization: platform/sessions/carta.md
-      - Firefly Table Viewer: platform/sessions/firefly.md
+      - Notebooks: platform/sessions/notebook.md
+      - CARTA: platform/sessions/carta.md
+      - Firefly: platform/sessions/firefly.md
+      - Desktop: platform/sessions/desktop.md
       - Contributed Applications: platform/sessions/contributed.md
     - Storage:
       - Overview: platform/storage/index.md
-      - Filesystem Storage: platform/storage/filesystem.md
+      - Filesystem: platform/storage/filesystem.md
       - Data Transfers: platform/storage/transfers.md
-      - VOSpace API: platform/storage/vospace.md
+      - VOSpace: platform/storage/vospace.md
     - Containers:
       - Overview: platform/containers/index.md
       - Building Containers: platform/containers/build.md
-      - Harbor Registry: platform/containers/registry.md
+      - Registry: platform/containers/registry.md
     - Support:
-      - Help Centre: platform/support/index.md
+      - Help: platform/support/index.md
       - FAQ: platform/support/faq.md
   - Client:
     - Home: client/home.md

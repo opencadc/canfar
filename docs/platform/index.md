@@ -1,31 +1,28 @@
 
 # CANFAR Science Platform
 
-Welcome to CANFAR - the Canadian Advanced Network for Astronomy Research. Access cloud computing, storage, and software environments designed specifically for astronomical research.
+The Canadian Advanced Network for Astronomy Research let you access  software environments and large datasets on the cloud designed specifically for astronomical research.
 
 !!! info "Platform Navigation"
     **CANFAR Science Platform**: Your gateway to cloud-based astronomical computing and collaboration.  
     **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
 
 !!! abstract "🚀 Platform Overview"
-    **Everything you need for astronomical research:**
-    
-    - **Browser-Based Computing**: No software installation required
-    - **Pre-Built Environments**: Astronomy software ready to use
-    - **Collaborative Storage**: Shared data and project management  
-    - **Scalable Resources**: Computing power that grows with your needs
-    - **Reproducible Science**: Container-based workflows ensure consistent results
+    - **Scalable** cloud compute and storage to analyze very large datasets from anywhere.
+    - **Browser-based** interactive environments for instant, device-independent data exploration.
+    - **Collaborative** tools hat make teamwork and data sharing simple.
+    - **Well‑tested** default scientific containers plus customizable images and registries for large-team workflows.
 
 ## � Quick Access
 
-=== "�🆕 New to CANFAR?"
+=== "🆕 New to CANFAR?"
     **Start Your Research Journey**
     
     **[📖 Getting Started Guide](get-started.md)**
     :   Complete onboarding with tutorials, examples, and first session setup
     
     **[🧩 Platform Concepts](concepts.md)**
-    :   Understanding CANFAR's architecture, containers, sessions, and storage systems
+    :   Understanding CANFAR architecture, containers, sessions, and storage systems
     
     **[🔑 Account Setup](permissions.md)**
     :   User management, groups, and collaboration access
@@ -65,31 +62,31 @@ Welcome to CANFAR - the Canadian Advanced Network for Astronomy Research. Access
 :   **Collaboration and access control** - Accounts, groups, ACLs, container registry, and API authentication
 
 **[📄 Data Publication Service](doi.md)**
-:   **DOI management and data preservation** - Request DOIs, upload packages, referee access, and DataCite publication
+:   **DOI management and data preservation** - Request DOIs, referee access, and freeze your data for publication
 
-**[☁️ Legacy Platform](cloud.md)**
-:   **Traditional VM infrastructure** - OpenStack cloud, batch processing, and migration to modern platform
+**[☁️ Legacy Cloud Platform](cloud.md)**
+:   **Traditional VM infrastructure** - OpenStack cloud, VM batch processing
 
 ### Getting Started Resources
 
 **[📖 Getting Started Guide](get-started.md)**
 :   **Hands-on tutorials** - Account setup, first sessions, data management, and workflow examples
 
-**[🗄️ Storage Systems](../guides/storage/index.md)**
+**[🗄️ Storage Systems](storage/index.md)**
 :   **Data management mastery** - ARC storage, VOSpace, quotas, and collaboration workflows
 
-**[🐳 Container Environments](../guides/containers/index.md)**
+**[🐳 Container Environments](containers/index.md)**
 :   **Software environment usage** - Available containers, custom builds, and workflow integration
 
-**[🖥️ Interactive Sessions](../guides/interactive-sessions/index.md)**
-:   **Computing workflows** - Notebooks, desktops, CARTA, and specialized applications
+**[🖥️ Sessions](sessions/index.md)**
+:   **Computing workflows** - Notebooks, desktops, CARTA, Firefly, specialized browser-based apps
 
 ### Advanced Topics
 
-**[🏭 Batch Processing](../guides/batch-jobs/index.md)**
+**[🏭 Batch Processing](sessions/batch.md)**
 :   **Automated workflows** - Large-scale processing, job management, and production pipelines
 
-**[📡 Radio Astronomy Tools](../guides/radio-astronomy/index.md)**
+**[📡 Radio Astronomy Tools](adio-astronomy/index.md)**
 :   **Specialized workflows** - CASA, CARTA, interferometry, and radio data processing
 
 **[⚙️ Command Line Interface](../cli/cli-help.md)**
@@ -102,51 +99,19 @@ Welcome to CANFAR - the Canadian Advanced Network for Astronomy Research. Access
 
 ### Getting Help
 
-**[❓ Frequently Asked Questions](../faq.md)**
-:   **Common questions and solutions** - Platform usage, troubleshooting, and best practices
-
-**[🆘 Help & Support](../support/help.md)**
+**[🆘 Help & Support](support/index.md)**
 :   **Technical assistance** - Support channels, issue reporting, and community resources
 
-**[🐛 Bug Reports & Feature Requests](../support/help.md#bug-reports)**
-:   **Platform improvement** - Issue tracking, enhancement requests, and contribution guidelines
+**[❓ Frequently Asked Questions](support/faq.md)**
+:   **Common questions and solutions** - Platform usage, troubleshooting, and best practices
 
-### Community Resources
-
-**[📖 Tutorials & Examples](../tutorials/index.md)**
-:   **Learning resources** - Step-by-step guides, workflow examples, and best practices
-
-**[🎓 Training Materials](../training/index.md)**
-:   **Educational content** - Workshops, webinars, and collaborative learning
-
-**[🤝 User Community](../community/index.md)**
-:   **Collaboration and networking** - User groups, discussions, and shared experiences
 
 ## 🔗 External Resources
 
 ### CANFAR Ecosystem
 
 **[Canadian Astronomy Data Centre (CADC)](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/)**
-:   **Data archives and services** - Observatory data, VO services, and astronomical catalogs
+:   **Data archives and services** - Search observatory data, VO services
 
 **[CANFAR Main Website](https://www.canfar.net/)**
 :   **Project information** - About CANFAR, news, partnerships, and organizational details
-
-### Integration & Standards
-
-**[International Virtual Observatory Alliance (IVOA)](https://www.ivoa.net/)**
-:   **Astronomical standards** - Protocols, data models, and interoperability frameworks
-
-**[Container Technologies](https://www.docker.com/)**
-:   **Containerization resources** - Docker documentation, best practices, and community tools
-
----
-
-!!! success "Welcome to CANFAR"
-    **Ready to start your astronomical research?**
-    
-    **New users**: Begin with the **[Getting Started Guide](get-started.md)**  
-    **Returning users**: Access the **[Science Portal](https://www.canfar.net/science-portal/)**  
-    **Developers**: Explore the **[API Documentation](../client/home.md)**
-    
-    **Focus on your science** - let CANFAR handle the computing infrastructure, software environments, and data management.

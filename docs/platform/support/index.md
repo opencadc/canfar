@@ -21,7 +21,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 ### New to CANFAR?
 
 - **[Get Started Guide](../get-started.md)**: 10-minute quick start
-- **[First Login](../accounts.md)**: Account setup and access
+- **[First Login](../permissions.md)**: Account setup and access
 - **[Choose Your Interface](../sessions/)**: Pick the right session type
 
 ### Having Problems?
@@ -29,12 +29,6 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 - **[FAQ](faq.md)**: Common questions and solutions
 - **[Troubleshooting](#troubleshooting)**: Diagnostic steps for common issues
 - **[Contact Support](#contact-support)**: Direct help from CANFAR staff
-
-### Want to Learn More?
-
-- **[User Guide](../guides/)**: Comprehensive platform documentation
-- **[Radio Astronomy Guide](../guides/radio-astronomy/)**: Specialised astronomy workflows
-- **[Community](#community-support)**: Connect with other users
 
 ## 📚 Self-Help Resources
 
@@ -47,28 +41,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 - **[Containers](../containers/)**: Using and building software environments
 - **[Interactive Sessions](../sessions/)**: Jupyter, Desktop, CARTA
 - **[Batch Jobs](../sessions/batch.md)**: Automated and large-scale processing
-- **[Radio Astronomy](../guides/radio-astronomy/)**: CASA and radio-specific workflows
-
-**Tutorials:**
-
-- **[Data Analysis Examples](../sessions/)**: Common astronomy workflows
-- **[Radio Astronomy Guide](../guides/radio-astronomy/)**: CASA and interferometry
-- **[Container Building](../containers/build.md)**: Create custom environments
-
-### Video Resources
-
-**Getting Started Videos** (coming soon):
-
-- Platform overview and navigation
-- Creating your first session
-- Data management basics
-- Collaboration features
-
-**Workflow Demonstrations:**
-
-- Optical photometry pipeline
-- Radio interferometry reduction
-- Multi-wavelength analysis
+- **[Radio Astronomy](../radio/)**: CASA and radio-specific workflows
 
 ## 🔧 Troubleshooting
 
@@ -474,13 +447,12 @@ Changes to documentation files will automatically reload in your browser for rea
 Our documentation follows a clear structure designed for different user needs:
 
 - **`get-started/`**: Quick setup for new users
-- **`guides/`**: Comprehensive platform documentation
-  - `containers/`: Container usage and building
-  - `sessions/`: Jupyter, desktop, and application sessions
-  - `radio-astronomy/`: CASA and radio-specific workflows
-  - `storage/`: Data management and storage systems
-- **`accounts/`**: User management and access control
-- **`concepts/`**: Platform architecture and core concepts
+- `containers/`: Container usage and building
+- `sessions/`: Jupyter, desktop, and application sessions
+- `radio/`: CASA and radio-specific workflows
+- `storage/`: Data management and storage systems
+- **`permissions`**: User management and access control
+- **`concepts`**: Platform architecture and core concepts
 - **`support/`**: Support resources, FAQ, and community information
 
 ### Writing Guidelines

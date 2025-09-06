@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **FAQ Resources**: Common questions and solutions for platform, client, and CLI usage.  
-    **[Support Home](index.md)** | **[Platform Home](../home.md)**
+    **[Support Home](index.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Quick Navigation"
     **Find answers by topic:**
@@ -108,8 +108,8 @@ Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data s
 - **Performance optimization**: Process data in fast scratch (e.g., `/scratch/`), parallelize where appropriate, monitor with `htop`, `df -h`, `iotop`.
 
 ### Getting help and community
-- Documentation: start at `platform/home.md` and `platform/guides/index.md`.
-- Help & Support: `platform/help.md` (how to contact support and what to include).
+- Documentation: start at `platform/index.md`.
+- Help & Support: `platform/support/index.md` (how to contact support and what to include).
 - Community: Discord for Q&A and announcements; workshops and office hours are announced there.
 
 ## Session Resources
@@ -386,7 +386,5 @@ canfar auth login
 
 - **[Discord Community](https://discord.gg/vcCQ8QBvBa)**: Active community chat
 - **[GitHub Discussions](https://github.com/opencadc/canfar/discussions)**: Longer-form Q&A
-- **[Office Hours](index.md#office-hours)**: Weekly video sessions with CANFAR team
-- **[Documentation](../guides/)**: Comprehensive user guides
 
 Remember: The CANFAR community is here to help! Don't hesitate to ask questions, share your experiences, or contribute solutions that might help other users.

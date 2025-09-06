@@ -6,7 +6,7 @@
 
 !!! info "Platform Navigation"
     **Getting Started**: Essential setup steps for new CANFAR users.  
-    **[Platform Home](home.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
+    **[Platform Home](index.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
 
 !!! info "Quick Links"
     **Essential Resources:**
@@ -24,7 +24,7 @@ If you are a first-time user, request a Canadian Astronomy Data Centre (CADC) ac
 
 [🔗 Request CADC Account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html){ .md-button .md-button--primary }
 
-See [Accounts & Permissions](accounts.md) for more details.
+See [Accounts & Permissions](permissions.md) for more details.
 
 
 !!! info "Account Processing Time"
@@ -119,8 +119,6 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
 - Collaborative analysis scripts
 - Common software environments
 - Project documentation
-
-
 
 
 ---

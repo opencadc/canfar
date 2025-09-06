@@ -4,7 +4,7 @@ CANFAR's Data Publication Service (DPS) provides permanent Digital Object Identi
 
 !!! info "Platform Navigation"
     **Data Publication & DOIs**: Permanent identifiers and data preservation for research publications.  
-    **[Platform Home](home.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[Legacy Platform](cloud.md)**
+    **[Platform Home](index.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[Legacy Platform](cloud.md)**
 
 !!! abstract "🎯 DOI Service Overview"
     **Essential data publication workflows:**
@@ -54,7 +54,7 @@ The **CANFAR Data Publication Service (DPS)** creates permanent links between re
 :   Use the Web Storage UI for direct browser upload
 
 **Large/Many Files:**
-:   Use [`vos` CLI tools](../guides/storage/vospace-cli.md) for efficient bulk transfer
+:   Use [`vos` CLI tools](storage/vospace.md) for efficient bulk transfer
 
 See [Data Package Guidelines](#data-package-requirements) for content organization recommendations.
 

@@ -4,7 +4,7 @@ Comprehensive guide to accounts, groups, access control, and API authentication 
 
 !!! info "Platform Navigation"
     **User Management & Permissions**: Complete access control and collaboration management.  
-    **[Platform Home](home.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
+    **[Platform Home](index.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
 
 !!! abstract "🎯 Permission System Overview"
     **Essential access control concepts for all users:**
@@ -61,7 +61,7 @@ CANFAR's security model consists of multiple integrated layers providing flexibl
 Groups form the foundation of collaborative research on CANFAR, providing shared access to computing resources, storage systems, and container environments while maintaining security boundaries between projects.
 
 ### Group-Based Resource Sharing
-
+```mermaid
     graph TD
         Admin["👑 Group Administrator"]
         Members["👤 Group Members"]
@@ -74,7 +74,7 @@ Groups form the foundation of collaborative research on CANFAR, providing shared
         Resources --> Projects["📁 /arc/projects/[project]/"]
         Resources --> Storage["💾 Storage Quotas"]
         Resources --> Containers["🐳 Container Access"]
-
+```
 ### Group Administration Interface
 
 **Access Group Management:**
@@ -117,7 +117,7 @@ Groups form the foundation of collaborative research on CANFAR, providing shared
 ### Group Resource Access
 
 **Shared Storage Access:**
-:   Groups automatically receive shared directories in `/arc/projects/[groupname]/` with managed quotas and backup policies.
+:   Groups automatically receive shared directories in `/arc/projects/[project]/` with managed quotas and backup policies.
 
 **Container Image Sharing:**
 :   Group-specific namespaces in Harbor container registry for sharing custom software environments.
@@ -182,7 +182,7 @@ Harbor serves as CANFAR's container registry for storing, managing, and distribu
 **Pulling Images:**
 
     # Pull public container images
-    docker pull images.canfar.net/cadc/astroml:latest
+    docker pull images.canfar.net/skaha/astroml:latest
     
     # Pull private group images (requires permissions)
     docker pull images.canfar.net/[project]/[container]:[tag]
@@ -198,7 +198,7 @@ Harbor serves as CANFAR's container registry for storing, managing, and distribu
 ### Project Organization
 
 **Public Projects:**
-:   CANFAR-maintained base images available to all users (e.g., `cadc/astroml`, `skaha/notebook-base`)
+:   CANFAR-maintained base images available to all users (e.g., `skaha/astroml`)
 
 **Group Projects:**
 :   Private repositories for research teams with controlled access and custom software environments
@@ -363,7 +363,7 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
         
         # Subsequent commands use stored credentials
         canfar ps
-        canfar create notebook skaha/astroml:latest
+        canfar launch notebook skaha/astroml:latest
         canfar info [session-id]
     
     **Benefits:**
@@ -376,7 +376,7 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
     **Best for:** Long-term automation, production scripts, file operations
     
     **Setup:**
-    
+    ```bash
         # Install CADC utilities
         pip install cadcutils
         
@@ -385,7 +385,7 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
         
         # Certificate stored in ~/.ssl/cadcproxy.pem
         # Automatically used by CADC tools and APIs
-    
+```
     **Benefits:**
     - Extended validity (10 days)
     - Compatible with all CADC services
@@ -395,14 +395,14 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
 ### API Integration Examples
 
 **Session Management:**
-
-    from canfar.client import Session
+```python
+    from canfar.sessions import Session
     
-    # Create authenticated session client
+    # Start authenticated session client
     session = Session()
     
     # Launch computing sessions programmatically
-    job = session.create('notebook', 'skaha/astroml:latest')
+    job = session.launch('notebook', 'skaha/astroml:latest')
     
     # Monitor session status
     status = session.info(job.id)
@@ -410,48 +410,21 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
     # List all active sessions
     active_sessions = session.list()
 
-**Data Operations:**
-
-    from canfar.storage import VOSpace
-    
-    # Initialize VOSpace client
-    vos = VOSpace()
-    
-    # Upload data programmatically
-    vos.upload('/local/data.fits', 'vos:project/data/')
-    
-    # Download results
-    vos.download('vos:project/results/', '/local/results/')
-
 **Batch Processing Integration:**
 
     # Automated pipeline example
-    import canfar
+    from canfar.sessions import Session
     
     # Submit batch job with custom parameters
-    job = canfar.batch.submit(
+    session = Session()
+    job = canfar.launch(
         image='skaha/astroml:latest',
         command=['python', 'analysis.py'],
         cpu=4,
         memory=8
     )
     
-    # Monitor completion and retrieve results
-    canfar.batch.wait_for_completion(job.id)
-
-### Advanced API Usage
-
-**Workflow Automation:**
-:   Integrate CANFAR APIs with GitHub Actions, CI/CD pipelines, and custom workflow management systems.
-
-**Custom Applications:**
-:   Build specialized research tools using CANFAR's computing and storage APIs as backend services.
-
-**Multi-Service Integration:**
-:   Combine CANFAR platform APIs with CADC data archive services for end-to-end astronomical workflows.
-
-!!! tip "API Resources"
-    **Comprehensive API Documentation:** See the [CANFAR Python Client](../client/home.md) documentation for detailed examples and advanced usage patterns.
+```
 
 ## 🚨 Common Issues & Troubleshooting
 
@@ -571,14 +544,10 @@ Understanding and resolving common permission issues helps maintain smooth colla
 ### Next Steps
 
 **For Users:**
-- **[Storage Systems](../guides/storage/index.md)** - Apply permissions to manage research data
-- **[Container Management](../guides/containers/index.md)** - Access and build software environments
+- **[Storage Systems](storage/index.md)** - Apply permissions to manage research data
+- **[Container Management](containers/index.md)** - Access and build software environments
 - **[API Documentation](../client/home.md)** - Programmatic platform access
-
-**For Administrators:**
-- **[Project Setup](../guides/projects/index.md)** - Establish research collaborations
-- **[Resource Management](../guides/administration/index.md)** - Quota and allocation oversight
-- **[Support Channels](../support/help.md)** - Administrative assistance and escalation
+- **[Support Channels](support/index.md)** - Administrative assistance and escalation
 
 !!! success "Permission Management Success"
     **Effective permission management enables secure, flexible collaboration** across astronomical research teams while maintaining institutional security requirements and supporting complex multi-party projects.
