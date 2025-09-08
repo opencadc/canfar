@@ -66,7 +66,7 @@ Suggested layout:
 
 or the VOSpace client `vcp` from the `vos` python package:
 
-- For larger transfers, use `sshfs`:
+- For larger transfers, you can use `sshfs`:
 
     ```bash
     sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10,defer_permissions -p 64022 [user]@ws-uv.canfar.net:/ $HOME/arc
@@ -90,7 +90,7 @@ Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data s
 
 ### Can I install additional software?
 
-- Temporary (inside a running session): `pip install --user ...` or within environments. Software will be persisted on `/arc`
+- `pip install --user ...` (the `--user` option may not be necessary depending on container) or within environments. Software will be persisted on `/arc`
 - Permanent: build a custom container with your required stack (see `platform/containers.md`). Software will be persisted on the container.
 
 
@@ -149,7 +149,7 @@ from canfar.sessions import Session
 session = Session()
 job_ids = session.create(
     name="automated-analysis",
-    image="images.canfar.net/cadc/astroml:latest",
+    image="images.canfar.net/skaha/astroml:latest",
     cores=4,
     ram=16,
     kind="headless",

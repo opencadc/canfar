@@ -41,7 +41,6 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 - **[Containers](../containers/)**: Using and building software environments
 - **[Interactive Sessions](../sessions/)**: Jupyter, Desktop, CARTA
 - **[Batch Jobs](../sessions/batch.md)**: Automated and large-scale processing
-- **[Radio Astronomy](../radio/)**: CASA and radio-specific workflows
 
 ## 🔧 Troubleshooting
 
@@ -77,7 +76,7 @@ When you encounter issues, try these steps first:
 ```bash
 # Check file locations
 ls /arc/home/[user]/     # Personal storage
-ls /arc/projects/           # Group storage
+ls /arc/projects/[project]           # Group storage
 
 # Check permissions
 ls -la /arc/projects/[project]/
@@ -215,9 +214,8 @@ If your issue isn't resolved within expected timeframes:
 ### Discord Community
 
 !!! tip "Advanced: Community Collaboration"
-    - Share workflow examples in Discord for peer review.
+    - Share workflow examples in Discord.
     - Use Discord threads for project-specific discussions.
-    - Join [Office Hours](#office-hours) for live troubleshooting.
 
 Join our Discord server for peer support and community interaction:
 
@@ -234,25 +232,6 @@ Join our Discord server for peer support and community interaction:
 - Use appropriate channels and threads
 - Be respectful and helpful to other users
 - Don't share sensitive data or credentials
-
-### Office Hours
-
-**Schedule**: Thursdays 2-3 PM PT
-
-**Format**: Video conference with CANFAR team members
-
-**What to bring:**
-
-- Specific questions or problems
-- Example code or workflows
-- Screenshots of issues
-
-**Topics covered:**
-
-- Platform troubleshooting
-- Workflow optimisation
-- New feature demonstrations
-- Community Q&A
 
 ### GitHub Issues
 
@@ -529,8 +508,5 @@ Your contributions help make CANFAR better for the entire astronomy community!
 |------|---------|---------------|
 | General support | [support@canfar.net](mailto:support@canfar.net) | 1-2 business days |
 | Quick questions | [Discord Community](https://discord.gg/vcCQ8QBvBa) | Minutes to hours |
-| Security issues | [security@canfar.net](mailto:security@canfar.net) | Same day |
-| Documentation | [support@canfar.net](mailto:support@canfar.net) | 1-2 business days |
-| Office hours | Video conference | Thursdays 2-3 PM PT |
 
 Remember: The CANFAR team is here to help you succeed in your research. Don't hesitate to reach out with questions, no matter how basic they might seem!
