@@ -322,10 +322,10 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 **Purpose**: Comprehensive Python environment for most astronomy workflows
 
 **Pre-installed software:**
-- **Python stack**: NumPy, SciPy, Matplotlib, pandas, Jupyter
-- **Astronomy libraries**: Astropy, Astroquery, Photutils, Reproject
-- **Machine learning**: scikit-learn, PyTorch, TensorFlow
-- **Data formats**: FITS, HDF5, NetCDF support
+- **Python stack**: numpy, scipy, matplotlib, pandas, jupyter, pyarrow
+- **Astronomy libraries**: astropy, astroquery, photutils, reproject
+- **Machine learning**: scikit-learn, pytorch
+- **Data formats**: FITS, HDF5
 - **Development tools**: Git, vim, nano, SSH client
 
 **Best for:**
@@ -336,7 +336,7 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 
 ```bash
 # Launch astroml notebook session
-canfar create notebook images.canfar.net/skaha/astroml:latest \
+canfar launch notebook images.canfar.net/skaha/astroml:latest \
   --name "data-analysis" --cores 4 --memory 16
 ```
 
@@ -346,9 +346,7 @@ canfar create notebook images.canfar.net/skaha/astroml:latest \
 
 **Additional features:**
 - **CUDA libraries**: NVIDIA CUDA toolkit and drivers
-- **GPU frameworks**: PyTorch with CUDA, cuPy, Rapids
-- **Accelerated computing**: GPU-optimised NumPy operations
-- **Deep learning**: TensorFlow-GPU, PyTorch Lightning
+- **GPU frameworks**: all cuda-enabled frameworks of the astroml container
 
 **Best for:**
 - Machine learning with large datasets
@@ -396,23 +394,23 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 
 **Features:**
 - **Multi-mission support**: LSST, Spitzer, WISE, 2MASS data
-- **Interactive catalogs**: Source overlays and cross-matching
+- **Interactive catalogues**: Source overlays and cross-matching
 - **Multi-wavelength workflows**: RGB composites and band comparisons
 - **Large dataset handling**: Efficient rendering of survey-scale data
 
 ### Development and Desktop Containers
 
-#### `desktop` - Full Ubuntu Environment
+#### `desktop` - Ubuntu Environment
 
 **Purpose**: Complete Linux desktop for GUI applications and legacy software
 
 **Features:**
-- **Ubuntu 22.04 LTS**: Latest stable Linux environment
+- **Ubuntu 22.04 LTS**: Linux environment
 - **Desktop environment**: Full GNOME-based interface
 - **Applications**: Firefox, file managers, terminals, editors
 - **X11 forwarding**: Support for launching astronomy GUI applications
 
-#### `notebook` - Lightweight Jupyter
+#### `notebook` - Jupyter Environment
 
 **Purpose**: Minimal Jupyter environment for basic Python work
 
@@ -443,7 +441,7 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 CANFAR containers follow semantic versioning:
 
 - **`:latest`** - Current stable release (recommended for most work)
-- **`:2024.03`** - Monthly snapshots for reproducibility
+- **`:YY.MM`** - Monthly snapshots for reproducibility
 - **`:commit-hash`** - Specific builds for exact reproducibility
 
 ```bash
@@ -451,7 +449,7 @@ CANFAR containers follow semantic versioning:
 images.canfar.net/skaha/astroml:latest
 
 # Use specific monthly snapshot for reproducible research
-images.canfar.net/skaha/astroml:2024.03
+images.canfar.net/skaha/astroml:25.09
 
 # Use exact commit for critical reproducibility
 images.canfar.net/skaha/astroml:a1b2c3d4
@@ -466,8 +464,6 @@ CANFAR containers receive regular updates:
 **Community feedback**: Feature requests and bug reports incorporated
 
 **Update notifications:**
-- [CANFAR Announcements](https://lists.canfar.net/mailman/listinfo/canfar-announce)
-- [GitHub Releases](https://github.com/opencadc/skaha-containers)
 - Science Portal notifications for major changes
 
 !!! warning "Version Pinning for Reproducibility"
@@ -482,7 +478,6 @@ CANFAR containers receive regular updates:
 
 ## 🆘 Getting Help
 
-- **Container Issues**: Check container documentation in running sessions (`/build_info/`)
+- **[CANFAR Support](../support)**
+- **Container Issues**: Check container build information in running sessions (`/build_info/`)
 - **Software Problems**: Consult individual application documentation
-- **CANFAR Support**: [support@canfar.net](mailto:support@canfar.net)
-- **Community**: [CANFAR Slack](https://canfar.slack.com)

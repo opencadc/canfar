@@ -74,13 +74,10 @@ images.canfar.net/
 │   ├── astroml:latest
 │   ├── casa:latest
 │   └── desktop:latest
-├── cadc/                     # CADC-maintained containers
-│   ├── astroml:2024.03
-│   └── specialised-tools:v1.0
-├── myteam/                   # Research team project
+├── [project]/                # Research team project
 │   ├── custom-pipeline:latest
 │   └── analysis-env:v2.1
-└── username/                 # Personal project
+└── [user]/                   # Personal project
     ├── development:latest
     └── testing:experimental
 ```
@@ -99,8 +96,7 @@ images.canfar.net/
 **Examples:**
 
 - `skaha/` - Core CANFAR containers
-- `cadc/` - CADC-maintained specialized tools
-- `community/` - Community-contributed containers
+- `lsst/` - LSST Community-contributed containers
 
 #### Private Projects
 
@@ -163,7 +159,7 @@ Project owners can manage membership through the Harbor web interface:
 Within each project, **repositories** contain the actual container images:
 
 ```text
-myteam/                       # Project
+[project]/                       # Project
 ├── analysis-pipeline/        # Repository
 │   ├── latest               # Tag
 │   ├── v1.0.0               # Tag
@@ -272,9 +268,7 @@ Harbor stores rich metadata for each image:
 # Login to Harbor registry
 docker login images.canfar.net
 # Enter CADC username and password when prompted
-
-# Or use credential helpers
-echo "your-harbor-password" | docker login images.canfar.net -u your-username --password-stdin
+# Paste the Habor CLI Secret copied from the images.canfar.net User Profile->
 
 # Verify authentication
 docker info | grep -A 5 "Registry Mirrors"
@@ -311,36 +305,7 @@ curl -X GET "https://images.canfar.net/api/v2.0/projects" \
 *Only if member of project  
 **Public images only
 
-### Security Best Practices
 
-#### Credential Management
-
-```bash
-# Use credential helpers instead of storing passwords
-docker-credential-osxkeychain  # macOS
-docker-credential-wincred      # Windows
-docker-credential-secretservice # Linux
-
-# Rotate credentials regularly
-# Set up API tokens with limited scope when possible
-```
-
-#### Image Security
-
-```bash
-# Scan images for vulnerabilities
-# Harbor automatically scans public images
-# Enable scanning for private repositories
-
-# Sign images for integrity verification
-docker trust sign images.canfar.net/myteam/analysis-env:v1.0.0
-
-# Use multi-stage builds to reduce attack surface
-FROM ubuntu:22.04 AS builder
-# ... build stage ...
-FROM images.canfar.net/skaha/astroml:latest
-COPY --from=builder /app/binary /usr/local/bin/
-```
 
 ## 🔍 Harbor Web Interface
 
@@ -442,9 +407,7 @@ RUN apt-get update && apt-get upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Update Python packages
-USER ${NB_USER}
-RUN pip install --upgrade pip \
-    && pip install --upgrade package-with-vulnerability
+RUN pip install --upgrade package-with-vulnerability
 ```
 
 ## 🛠️ CLI and API Usage

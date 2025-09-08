@@ -445,20 +445,6 @@ cp /scratch/results.fits /arc/projects/[project]/outputs/
 4. Try accessing through file manager vs terminal
 5. Check storage quota and available space
 
-### Getting Help
-
-#### Built-in Help
-
-- **Application help**: Most applications include Help menus
-- **System documentation**: Check Applications → Documentation
-- **Terminal commands**: Use `man command` for command help
-
-#### CANFAR Support
-
-- **Support Email**: [support@canfar.net](mailto:support@canfar.net)
-- **Documentation**: [CANFAR Documentation](../)
-- **Community**: [CANFAR Slack](https://canfar.slack.com)
-
 ## 📚 Learning Resources
 
 ### Desktop Environment
@@ -495,7 +481,11 @@ cp /scratch/results.fits /arc/projects/[project]/outputs/
 
 ## 🆘 Getting Help
 
+#### Built-in Help
+
+- **Application help**: Most applications include Help menus
+- **System documentation**: Check Applications → Documentation
+- **Terminal commands**: Use `man command` for command help
 - **Desktop Help**: Use built-in help systems in applications
 - **Application Manuals**: Check software-specific documentation
-- **CANFAR Support**: [support@canfar.net](mailto:support@canfar.net)
-- **Community**: [CANFAR Slack](https://canfar.slack.com)
+- **[CANFAR Support](../support/**
