@@ -188,21 +188,12 @@ Sessions inherit your [CANFAR permissions](../permissions.md):
 **Collaboration Questions:**
 - Learn about [session sharing](notebook.md#collaboration) capabilities
 - Understand [group management](../permissions.md) for team access
-- Explore [storage sharing](../storage/index.md) for data collaboration
+- Explore [storage sharing](../storage/) for data collaboration
 
 ### Additional Resources
 
 - **[FAQ](../support/faq.md)**: Common questions and solutions
-- **[Support Channels](../support/index.md)**: Direct assistance and community help
-- **[Tutorials](../get-started.md)**: Step-by-step learning materials
+- **[Support Channels](../support/)**: Direct assistance and community help
+- **[Getting Started](../get-started.md)**: Step-by-step learning materials
 
 ---
-
-!!! success "Ready to Start Computing?"
-    **Choose your interface and start analysing:**
-    
-    **Interactive Analysis** → **[Launch Jupyter Notebook](notebook.md)**  
-    **GUI Applications** → **[Start Desktop Session](desktop.md)**  
-    **Radio Astronomy** → **[Open CARTA Viewer](carta.md)**
-    
-    **Focus on your research** - let CANFAR handle the infrastructure and software environments.

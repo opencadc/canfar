@@ -160,8 +160,7 @@ Access CANFAR-supported and user-contributed astronomy containers:
 | **Aladin** | Sky Atlas | Multi-survey visualisation, catalog overlay |
 | **TOPCAT** | Table Tool | Catalogue analysis, cross-matching |
 | **CASA** | Radio Astronomy | Interferometry data reduction |
-| **Python/Jupyter** | Analysis | Scripting, notebook-based analysis |
-| **Firefox** | Web Browser | Documentation, online tools |
+| **astroml** | Analysis | python software stack for astronomy and ML |
 
 ### Native vs Container Applications
 
@@ -311,7 +310,7 @@ Use the graphical file manager for:
 **Between Sessions**: Files in `/arc/` are accessible from all session types
 
 !!! warning "Persistence Reminder"
-    Save important work to `/arc/projects/` or `/arc/home/`. Files in `/scratch/` and `/tmp/` will not persist after the session ends.
+    Save important work to `/arc/projects/` or `/arc/home/`. Files in `/scratch/` will not persist after the session ends.
 
 ## 🤝 Collaboration and Sharing
 

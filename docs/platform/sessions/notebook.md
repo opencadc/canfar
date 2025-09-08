@@ -221,24 +221,13 @@ import scipy
 
 #### Installing Additional Packages
 
-```python
-# Install packages for current session (may require --user flag)
-!pip install package-name
+```bash
+# Install packages for current session (may require --user option)
+# Will install in home directory
+pip install package-name
 
 # Check installed packages
-!pip list
-```
-
-#### Persistent Package Installation
-
-For packages that persist across sessions:
-
-```bash
-# Install to user directory (in terminal)
-pip install --user package-name
-
-# Add to persistent startup script
-echo "pip install --user package-name" >> /arc/home/[user]/.bashrc
+pip list
 ```
 
 ## 🤝 Collaboration and Sharing
@@ -365,7 +354,7 @@ data = fits.getdata('huge_file.fits', memmap=True)
 ```python
 # Built-in help systems
 help(function_name)
-?function_name          # In Jupyter
+?function_name          # In JupyterLab
 ??function_name         # Show source code
 
 # Package documentation
@@ -381,29 +370,16 @@ astropy.__version__
 - **[Jupyter Notebook Basics](https://jupyter-notebook.readthedocs.io/)**
 - **[IPython Magic Commands](https://ipython.readthedocs.io/en/stable/interactive/magics.html)**
 
-### Astronomy Python Resources
-
-- **[AstroPy Tutorials](https://learn.astropy.org/)**
-- **[Python for Astronomers](https://python4astronomers.github.io/)**
-- **[Astro Hack Week](https://astrohackweek.org/)**
-
-### CASA Resources
-
-- **[CASA Documentation](https://casa.nrao.edu/docs.shtml)**
-- **[CASA Guides](https://casaguides.nrao.edu/)**
-- **[CASA Tutorials](https://casatutorials.nrao.edu/)**
-
 ## 🔗 Next Steps
 
 - **[Try Desktop Sessions](desktop.md)** for GUI applications
 - **[Explore CARTA](carta.md)** for radio astronomy visualisation
 - **[Use Firefly](firefly.md)** for optical survey data
-- **[Learn about Storage](../storage/index.md)** for data management
+- **[Learn about Storage](../storage/)** for data management
 - **[Batch Processing](batch.md)** for large-scale automation
 
 ## 🆘 Getting Help
 
 - **In-session help:** Use `help()` and `?` in notebooks
 - **Documentation:** Browse [CANFAR docs](../)
-- **Support:** Email [support@canfar.net](mailto:support@canfar.net)
-- **Community:** Join [CANFAR Slack](https://canfar.slack.com)
+- **[Support](../support)`**

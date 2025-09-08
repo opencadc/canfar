@@ -510,22 +510,6 @@ mirror_archive_data(
 
 ### Transfer Performance
 
-#### Optimal Transfer Strategies
-
-```bash
-# For large files: use compression
-vcp --compress large_dataset.tar vos:[user]/archives/
-
-# For many small files: bundle first
-tar -czf many_files.tar.gz small_files/
-vcp many_files.tar.gz vos:[user]/collections/
-
-# Use multiple streams for large files
-vcp --nstreams=8 huge_file.fits vos:[user]/
-
-# Resume interrupted transfers
-vcp --resume partial_transfer.fits vos:[user]/
-```
 
 #### Caching and Local Mirrors
 
