@@ -24,7 +24,7 @@ hide:
 
     <div class="grid cards" markdown>
 
-    - [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md)
+    - [:material-monitor-shimmer: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md)
     - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/batch-jobs.md)
     - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/guides/storage/index.md)
     - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers.md)
@@ -33,7 +33,8 @@ hide:
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/legacy/publication.md)
-    - [:simple-wpexplorer: and much more...](platform/guides/index.md)
+    - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](release-notes.md)
+    - [:octicons-telescope-fill-16: and much more...](platform/guides/index.md)
 
     </div>
     
