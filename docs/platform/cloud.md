@@ -151,8 +151,8 @@ This tutorial demonstrates building a basic **source detection** pipeline for CF
 ### 1. Create a VM {#create-vm}
 Use the DRAC web dashboard.
 
-1. Sign in to [:material-open-in-new: Dashboard](https://arbutus-canfar.cloud.computecanada.ca/) with CADC `<USERNAME>`/password.
-2. Each CANFAR allocation maps to an OpenStack **`<PROJECT>`**. Use the top-left project picker to switch if you belong to multiple.
+1. Sign in to [:material-open-in-new: Dashboard](https://arbutus-canfar.cloud.computecanada.ca/) with CADC `[user]`/password.
+2. Each CANFAR allocation maps to an OpenStack **`[project]`**. Use the top-left project picker to switch if you belong to multiple.
 
 Follow DRAC’s [Creating a Linux VM](https://docs.alliancecan.ca/wiki/Creating_a_Linux_VM). Summary below.
 
@@ -254,7 +254,7 @@ cadc-get-cert -n   # generate an X509 proxy (default 10 days)
 ```
 
 ```bash
-vcp 1056213p.cat vos:<VOSPACE>/
+vcp 1056213p.cat vos:[project]/
 ```
 
 !!! danger "Credential hygiene"
@@ -287,7 +287,7 @@ X_IMAGE
 Y_IMAGE
 EOF
 source-extractor "${id}.fits" -CATALOG_NAME "${id}.cat"
-vcp "${id}.cat" "vos:<VOSPACE>/"
+vcp "${id}.cat" "vos:[project]/"
 ```
 
 ### Write a submission file {#submission}
