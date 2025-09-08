@@ -8,23 +8,22 @@
 
     ### ✨ Highlights
     - [**New & Improved** User Documentation Hub](https://www.opencadc.org/canfar/latest/)
-    - **Offcial Release of the CANFAR Python Client & CLI** — see [clients docs for more details.](client/home.md)
+    - **Official Release of the CANFAR Python Client & CLI** — see [clients docs for more details.](client/home.md)
     - **Smart Session Launching** — **Flexible** (auto-scales) and **Fixed** modes
     - **Portal Enhancements** — home directory usage & quota information display
-    - **New Science Use Cases** — [CARTA 5.0](platform/guides/interactive-sessions/launch-carta.md) and [Firefly](platform/guides/interactive-sessions/launch-firefly.md) support
-    - **Batch Job Scheduling** is now generally availaible for all users via the [CANFAR Python Client](client/home.md) and [CLI](cli/quick-start.md).
+    - **New Science Containers** — [CARTA 5.0](platform/guides/interactive-sessions/launch-carta.md) and [Firefly](platform/guides/interactive-sessions/launch-firefly.md) support
 
     ### 📝 Changes & Deprecations
-    - **Skaha API has been upgraded to `v1`**. The [`v0`](https://ws-uv.canfar.net/skaha/v0) API is scheduled to be sunset with the release of **CSP 2026.1**. Portal users are unaffected; API users should plan to move to v1.
+    - **Skaha API has been upgraded to `v1`**. The [`v0`](https://ws-uv.canfar.net/skaha/v0) API will be sunset at a date TBA (to be announced). Portal users are unaffected; API users should plan to move to v1.
     - **Container Image Labels** are no longer required in the [Harbor Image Registry](https://images.canfar.net/). They are only used to populate dropdown menu options in the Science Portal UI for public images.
-    - **`headless`** mode is the default session behavior, use the `kind` flag in the client and CLI to override this.
+    - **Session Types**: When launching via API, omit the `type` parameter for headless mode; interactive sessions require the `type` parameter.
     
 
     ### 🐛 Fixes
     - **Resource Monitoring** — RAM and CPU usage for sessions/headless jobs are shown again in the portal.
 
     ### ⚙️ For Deployers
-    - **Kueue Scheduling**: Optional advanced job scheduling system available for deployment to reduce cluster pressure and provide queue management. See [deployment configuration](https://github.com/opencadc/deployments/tree/main/configs/kueue) for setup instructions.
+    - **Kueue Scheduling**: Optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management. See [deployment configuration](https://github.com/opencadc/deployments/tree/main/configs/kueue) for setup instructions.
 
     ---
 
@@ -32,17 +31,17 @@
 
     ### System Architecture Changes
     - **Kubernetes Upgrade**: Cluster upgraded to **Kubernetes 1.28** for improved performance and security
-    - **Queue Management**: Internal scheduler now fronted by Kueue system to alleviate cluster pressure
+    - **Queue Management**: Optional Kueue system available to front internal scheduler and alleviate cluster pressure
     - **Resource Allocation**: Smart session launching with **Flexible** (auto-scaling) and **Fixed** modes for better cluster efficiency
 
     ### API Evolution
     - **Skaha API v1**: New endpoint at `https://ws-uv.canfar.net/skaha/`
-    - **Backward Compatibility**: v0 API remains available during transition period (sunset with CSP 2026.1)
+    - **Backward Compatibility**: v0 API remains available during transition period (sunset date TBA)
     - **Session Parameters**: Interactive sessions now require `type` parameter; headless jobs should omit it
 
     ### Container & Image Management  
     - **Harbor Labels**: No longer required for session launching (only for Science Portal UI dropdown population)
-    - **Headless Mode**: Now default session behavior - any image can run headless without special labels
+    - **Headless Mode**: Any image can run headless without special labels when `type` parameter is omitted
     - **Science Containers**: Curated containers available in [skaha project](https://images.canfar.net/) on Science Portal
 
     ### Enhanced User Experience
