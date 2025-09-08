@@ -1,6 +1,6 @@
-# VOSpace (Vault)
+# Storage 
 
-**Complete guide to CANFAR's VOSpace implementation for long-term storage, data sharing, and archival - including CLI tools, Python API, and web interface.**
+**Long-term storage, data sharing, and archival - tools, Python API, and web interface.**
 
 !!! info "Platform Navigation"
     **VOSpace (Vault)**: Long-term storage, sharing, and archival for astronomical data.  
@@ -31,14 +31,14 @@ VOSpace is a distributed storage service that allows astronomers to:
 
 ### VOSpace vs Other Storage
 
-| Feature | VOSpace (Vault) | ARC Projects | ARC Home | Scratch |
+| Feature | Vault | ARC Projects | ARC Home | Scratch |
 |---------|-----------------|--------------|----------|---------|
 | **Persistence** | ✅ Permanent | ✅ Permanent | ✅ Permanent | ❌ Session only |
 | **Backup** | ✅ Geo-redundant | ⚠️ Basic | ⚠️ Basic | ❌ None |
 | **Sharing** | ✅ Flexible permissions | ⚠️ Group-based |  ⚠️ User-based | ❌ Session only |
 | **Public access** | ✅ Public URLs | ❌ Private | ❌ Private | ❌ Session only |
 | **Metadata** | ✅ Rich metadata | ⚠️ Basic | ⚠️ Basic | ❌ None |
-| **API access** | ✅ Full API | ✅ VOSpace API | ✅ VOSpace API | ❌ None |
+| **API access** | ✅ VOSpace API | ✅ VOSpace API | ✅ VOSpace API | ❌ None |
 | **Speed** | Slow (network) | Medium (network) | Medium (network) | Fast (SSD) |
 
 ## 🌍 Web Interface
@@ -1156,8 +1156,3 @@ vls vos:project_name/
 # Check directory access in ARC
 vls arc:projects/[project]/
 ```
-
-## Next Steps
-
-- **[Batch Jobs →](../sessions/batch.md)** - Automate VOSpace workflows
-- **[Containers →](../containers/index.md)** - Include VOSpace tools in custom containers

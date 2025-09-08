@@ -545,7 +545,7 @@ vclient.copy(filename, 'vos:[project]/public/{filename})
 
 **Quota Information:**
 - **ARC Storage**: Project-based quotas managed by CANFAR administrators, request increase when necessary anytime
-- **VOSpace**: User and project allocations with expansion available, increase when necessary anytime
+- **Vault**: User and project allocations with expansion available, increase when necessary anytime
 - **Scratch**: Per-session allocation, automatically managed
 
 
@@ -655,7 +655,7 @@ Now that you understand CANFAR's core concepts, explore specific platform areas:
 
 - **[CANFAR CLI](../cli/cli-help.md)** - Command-line tools for platform automation
 - **[Python Client](../client/home.md)** - Programmatic access and workflow development
-- **[Container Building](containers/building.md)** - Create custom software environments
+- **[Container Building](containers/build.md)** - Create custom software environments
 - **[Batch Processing](sessions/batch.md)** - Large-scale automated workflows
 
 **For Administrators:**

@@ -230,10 +230,3 @@ rm -rf /arc/home/[user]/large_old_files/
 
 - Check if files were saved to `/scratch/` (wiped at session end)
 - Always save important results to `/arc/` or Vault before ending session
-
-## 🔗 Next Steps
-
-- **[Data Transfers →](transfers.md)** - Moving data between storages and external sources
-- **[VOSpace Guide →](vospace.md)** - Advanced Vault usage and API access  
-- **[Filesystem Access →](filesystem.md)** - ARC storage, SSHFS mounting, and permissions
-- **[Interactive Sessions →](../sessions/)** - Using storage within CANFAR sessions

@@ -247,19 +247,6 @@ For bug reports and feature requests, use our GitHub repositories:
 - **Feature requests**: Propose new capabilities
 - **Community contributions**: Submit code and examples
 
-### Peer Mentoring
-
-!!! tip "Advanced: Become a Mentor"
-    - Experienced users can volunteer as mentors via [support@canfar.net](mailto:support@canfar.net).
-    - Mentors help with onboarding, troubleshooting, and advanced workflows.
-
-**Experienced user programme**: Connect new users with experienced mentors
-
-- **Mentors**: Volunteer researchers who use CANFAR regularly
-- **Support areas**: Platform basics, specific software, research workflows
-- **Matching**: Based on research area and experience level
-- **Contact**: Email support to request mentor connection
-
 ### Community Contributions
 
 !!! tip "Advanced: Share Your Expertise"
@@ -426,10 +413,9 @@ Changes to documentation files will automatically reload in your browser for rea
 Our documentation follows a clear structure designed for different user needs:
 
 - **`get-started/`**: Quick setup for new users
-- `containers/`: Container usage and building
-- `sessions/`: Jupyter, desktop, and application sessions
-- `radio/`: CASA and radio-specific workflows
-- `storage/`: Data management and storage systems
+- **`containers/`**: Container usage and building
+- **`sessions/`**: Jupyter, desktop, and application sessions
+- **`storage/`**: Data management and storage systems
 - **`permissions`**: User management and access control
 - **`concepts`**: Platform architecture and core concepts
 - **`support/`**: Support resources, FAQ, and community information

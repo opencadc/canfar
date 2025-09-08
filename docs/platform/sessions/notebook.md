@@ -361,25 +361,3 @@ help(function_name)
 import astropy
 astropy.__version__
 ```
-
-## 📚 Learning Resources
-
-### Jupyter Lab Documentation
-
-- **[JupyterLab User Guide](https://jupyterlab.readthedocs.io/)**
-- **[Jupyter Notebook Basics](https://jupyter-notebook.readthedocs.io/)**
-- **[IPython Magic Commands](https://ipython.readthedocs.io/en/stable/interactive/magics.html)**
-
-## 🔗 Next Steps
-
-- **[Try Desktop Sessions](desktop.md)** for GUI applications
-- **[Explore CARTA](carta.md)** for radio astronomy visualisation
-- **[Use Firefly](firefly.md)** for optical survey data
-- **[Learn about Storage](../storage/)** for data management
-- **[Batch Processing](batch.md)** for large-scale automation
-
-## 🆘 Getting Help
-
-- **In-session help:** Use `help()` and `?` in notebooks
-- **Documentation:** Browse [CANFAR docs](../)
-- **[Support](../support)`**

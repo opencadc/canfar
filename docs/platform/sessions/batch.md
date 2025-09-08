@@ -649,30 +649,3 @@ canfar stats [session-id]
 !!! warning "Persistence Reminder"
     Headless containers do not persist changes to the container filesystem. Always write outputs to `/arc/projects/` or `/arc/home/`.
     For data management strategies, see [Storage Guide](../storage/index.md).
-
-### Security and Efficiency
-
-- **Token management**: Use secure token storage and rotation
-- **Resource limits**: Don't request more resources than needed
-- **Parallel processing**: Use appropriate parallelization strategies
-- **Cost optimization**: Run large jobs during off-peak hours
-
-
-## Getting Help
-
-!!! info "Quick Links"
-    - [Support](../support/index.md)
-    - [FAQ](../support/index.md)
-    - [Client Examples](../client/examples.md)
-    - [Discord Community](https://discord.gg/vcCQ8QBvBa)
-
-- **API Documentation**: [CANFAR API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
-- **Support**: Email [support@canfar.net](mailto:support@canfar.net)
-- **Community**: Join our Discord for batch processing discussions
-- **Examples**: Check the [CANFAR GitHub](https://github.com/opencadc) for more examples
-
-## Next Steps
-
-- **[Containers](../containers/index.md)**: Build custom containers for your workflows
-- **[Storage](../storage/index.md)**: Efficient data management strategies
-- **[Sessions](index.md)**: Develop and test scripts interactively

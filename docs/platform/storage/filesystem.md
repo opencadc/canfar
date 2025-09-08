@@ -683,10 +683,3 @@ rsync -avz --exclude='.git' . "$CANFAR_CODE/"
 
 echo "Code synchronized to CANFAR"
 ```
-
-## 🔗 Next Steps
-
-- **[Data Transfers →](transfers.md)** - Moving data between storage systems
-- **[VOSpace Guide →](vospace.md)** - Advanced Vault usage and API access
-- **[Storage Overview →](index.md)** - Understanding all CANFAR storage types
-- **[Interactive Sessions →](../sessions/)** - Using filesystem access within sessions

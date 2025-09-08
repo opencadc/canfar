@@ -468,16 +468,3 @@ CANFAR containers receive regular updates:
 
 !!! warning "Version Pinning for Reproducibility"
     For published research, specify exact container versions (monthly tags or commit hashes) to ensure long-term reproducibility of your analysis.
-
-## 🔗 Next Steps
-
-- **[Building Custom Containers →](build.md)** - Create your own specialised environments
-- **[Harbor Registry Guide →](registry.md)** - Navigate the container registry and manage images
-- **[Interactive Sessions →](../sessions/)** - Learn to use containers in different session types
-- **[Storage Management →](../storage/)** - Optimise data workflows with container storage integration
-
-## 🆘 Getting Help
-
-- **[CANFAR Support](../support)**
-- **Container Issues**: Check container build information in running sessions (`/build_info/`)
-- **Software Problems**: Consult individual application documentation

@@ -890,17 +890,3 @@ dive images.canfar.net/myteam/image:latest
 # Remove package caches
 # Use multi-stage builds
 ```
-
-## 🔗 Next Steps
-
-- **[Container Building →](build.md)** - Create optimized containers for Harbor
-- **[Container Usage →](index.md)** - Understand how Harbor containers integrate with CANFAR
-- **[Session Management →](../sessions/)** - Use Harbor containers in different session types
-- **[API Documentation →](../api/)** - Programmatic access to CANFAR services
-
-## 🆘 Getting Help
-
-- **Harbor Interface**: Use the web interface at [images.canfar.net](https://images.canfar.net) for most operations
-- **Access Issues**: Contact [support@canfar.net](mailto:support@canfar.net) for project creation and permissions
-- **Technical Problems**: Check [Harbor documentation](https://goharbor.io/docs/) for registry-specific issues
-- **Community**: [CANFAR Slack](https://canfar.slack.com) #containers channel for community support

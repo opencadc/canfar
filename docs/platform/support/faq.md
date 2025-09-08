@@ -385,6 +385,5 @@ canfar auth login
 ### Community Resources
 
 - **[Discord Community](https://discord.gg/vcCQ8QBvBa)**: Active community chat
-- **[GitHub Discussions](https://github.com/opencadc/canfar/discussions)**: Longer-form Q&A
 
 Remember: The CANFAR community is here to help! Don't hesitate to ask questions, share your experiences, or contribute solutions that might help other users.

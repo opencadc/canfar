@@ -171,29 +171,3 @@ Sessions inherit your [CANFAR permissions](../permissions.md):
 **Large-Scale Processing** → **[Batch Sessions](batch.md)**
 :   Automated workflows for processing large datasets without interactive interfaces
 
-## 🆘 Getting Help
-
-### Session Issues
-
-**Session Won't Start:**
-- Check [container status](../containers/index.md) and try alternative images
-- Verify [group permissions](../permissions.md) for project access
-- Contact [support](../support/index.md) if problems persist
-
-**Performance Problems:**
-- Consider upgrading to [fixed resources](#fixed-allocation)
-- Move large files to [scratch storage](../storage/index.md) for processing
-- Review [best practices](#resource-selection-guide) for your workflow type
-
-**Collaboration Questions:**
-- Learn about [session sharing](notebook.md#collaboration) capabilities
-- Understand [group management](../permissions.md) for team access
-- Explore [storage sharing](../storage/) for data collaboration
-
-### Additional Resources
-
-- **[FAQ](../support/faq.md)**: Common questions and solutions
-- **[Support Channels](../support/)**: Direct assistance and community help
-- **[Getting Started](../get-started.md)**: Step-by-step learning materials
-
----

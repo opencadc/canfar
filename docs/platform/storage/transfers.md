@@ -472,10 +472,3 @@ curl -E ~/.ssl/cadcproxy.pem \
      -T survey_data.fits \
      https://ws-uv.canfar.net/arc/files/projects/[project]/survey_data.fits
 ```
-
-## 🔗 Next Steps
-
-- **[VOSpace Guide →](vospace.md)** - Advanced Vault usage and API features
-- **[Filesystem Access →](filesystem.md)** - SSHFS mounting and ARC permissions
-- **[Storage Overview →](index.md)** - Understanding CANFAR storage types
-- **[Batch Jobs →](../jobs/)** - Automated workflows with data transfers

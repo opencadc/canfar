@@ -914,15 +914,3 @@ docker run -it --rm \
   myteam/container:latest \
   ls -la /arc/projects/test
 ```
-
-## 🔗 Next Steps
-
-- **[Harbor Registry Guide →](registry.md)** - Manage and organise your containers
-- **[Session Integration →](../sessions/)** - Use custom containers in different session types
-- **[Storage Integration →](../storage/)** - Optimise data workflows with custom containers
-
-## 🆘 Getting Help
-
-- **Build Issues**: Check [Docker documentation](https://docs.docker.com/) and [CANFAR container examples](https://github.com/opencadc/skaha-containers)
-- **CANFAR Integration**: Contact [support@canfar.net](mailto:support@canfar.net)
-- **Harbor Registry**: Access [Harbor documentation](https://goharbor.io/docs/)
