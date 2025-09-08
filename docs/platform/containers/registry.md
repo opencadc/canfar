@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Registry Management**: Storing, organising, and distributing container images on Harbor.  
-    **[Containers Home](index.md)** | **[Building Containers](build.md)** | **[Platform Home](../home.md)**
+    **[Containers Home](index.md)** | **[Building Containers](build.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Registry Management Overview"
     **Master Harbor registry operations:**

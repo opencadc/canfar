@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Containers**: Software environments and containerised applications for astronomy.  
-    **[Platform Home](../home.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Storage Systems](../storage/index.md)** | **[Support](../support/index.md)**
+    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Storage Systems](../storage/index.md)** | **[Support](../support/index.md)**
 
 !!! abstract "🎯 Container Guide Overview"
     **Master CANFAR's containerised environments:**

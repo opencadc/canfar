@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **VOSpace (Vault)**: Long-term storage, sharing, and archival for astronomical data.  
-    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[Data Transfers](transfers.md)** | **[Platform Home](../home.md)**
+    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[Data Transfers](transfers.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 VOSpace Guide Overview"
     **Master CANFAR's long-term storage system:**

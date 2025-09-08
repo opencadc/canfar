@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Filesystem Access**: Direct file system operations and external mounting for ARC storage.  
-    **[Storage Home](index.md)** | **[Data Transfers](transfers.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../home.md)**
+    **[Storage Home](index.md)** | **[Data Transfers](transfers.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Filesystem Guide Overview"
     **Master direct storage access:**

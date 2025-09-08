@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Support Centre**: Help resources, community connections, and technical assistance.  
-    **[FAQ](faq.md)** | **[Platform Home](../home.md)**
+    **[FAQ](faq.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Support Resources Overview"
     **Find the help you need:**

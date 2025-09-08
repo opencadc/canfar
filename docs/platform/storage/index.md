@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Storage Systems**: Data management and persistence for astronomical research.  
-    **[Platform Home](../home.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
+    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
 
 !!! abstract "🎯 Storage Guide Overview"
     **Master CANFAR's storage systems:**

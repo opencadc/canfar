@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Data Transfers**: Moving data efficiently between storage systems and external sources.  
-    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../home.md)**
+    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../index.md)**
 
 !!! abstract "🎯 Transfer Methods Overview"
     **Efficient data movement strategies:**
