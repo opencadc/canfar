@@ -34,12 +34,12 @@ VOSpace is a distributed storage service that allows astronomers to:
 | Feature | VOSpace (Vault) | ARC Projects | ARC Home | Scratch |
 |---------|-----------------|--------------|----------|---------|
 | **Persistence** | ✅ Permanent | ✅ Permanent | ✅ Permanent | ❌ Session only |
-| **Backup** | ✅ Geo-redundant | ✅ Daily snapshots | ✅ Daily snapshots | ❌ None |
-| **Sharing** | ✅ Flexible permissions | ⚠️ Group-based | ❌ Personal only | ❌ Session only |
+| **Backup** | ✅ Geo-redundant | ⚠️ Basic | ⚠️ Basic | ❌ None |
+| **Sharing** | ✅ Flexible permissions | ⚠️ Group-based |  ⚠️ User-based | ❌ Session only |
 | **Public access** | ✅ Public URLs | ❌ Private | ❌ Private | ❌ Session only |
 | **Metadata** | ✅ Rich metadata | ⚠️ Basic | ⚠️ Basic | ❌ None |
 | **API access** | ✅ Full API | ✅ VOSpace API | ✅ VOSpace API | ❌ None |
-| **Speed** | Medium (network) | Fast (SSD) | Fast (SSD) | Fastest (NVMe) |
+| **Speed** | Slow (network) | Medium (network) | Medium (network) | Fast (SSD) |
 
 ## 🌍 Web Interface
 
@@ -92,11 +92,12 @@ Common Astronomical Metadata:
 
 ### Installation
 
-VOSpace tools are pre-installed in CANFAR sessions. For local installation:
+VOSpace tools are pre-installed in CANFAR sessions in CANFAR-maintained containers such as `astroml`. 
+For local or custom installation, use `pip`:
 
 ```bash
 # Install VOS tools
-pip install vostools
+pip install vos
 
 # Verify installation
 vls --help
@@ -109,12 +110,8 @@ vcp --help
 # Get security certificate (valid 24 hours)
 cadc-get-cert -u [user]
 
-# Alternative: Set environment variables
-export CADC_USERNAME=[user]
-export CADC_PASSWORD=[password]
-
 # Verify authentication
-vls vos:
+vls vos:[user]
 ```
 
 ### Basic Operations
@@ -141,12 +138,13 @@ vls vos:[user]/projects/survey/data/
 # Upload files
 vcp mydata.fits vos:[user]/data/
 vcp *.fits vos:[user]/observations/
-vcp -r ./analysis_scripts/ vos:[user]/code/
+# vcp is recursive
+vcp ./analysis_scripts/ vos:[user]/code/ 
 
 # Download files  
 vcp vos:[user]/data/results.fits ./
 vcp "vos:[user]/observations/*.fits" ./data/
-vcp -r vos:[user]/code/ ./local_scripts/
+vcp vos:[user]/code/ ./local_scripts/
 
 # Copy between VOSpace locations
 vcp vos:[user]/data/obs1.fits vos:[user]/backup/
@@ -161,7 +159,7 @@ vmv vos:[user]/temp/ vos:[user]/archive/
 
 # Delete files and directories
 vrm vos:[user]/old_file.fits
-vrm -r vos:[user]/old_directory/
+vrm vos:[user]/old_directory/
 
 # View file contents (for text files)
 vcat vos:[user]/catalog.csv
@@ -176,27 +174,8 @@ vcat vos:[user]/catalog.csv
 vsync ./local_data/ vos:[user]/backup/
 vsync vos:[user]/analysis/ ./local_analysis/
 
-# Resume interrupted transfers
-vcp --resume large_file.fits vos:[user]/
-
 # Parallel transfers for speed
-vcp --nstreams=4 huge_dataset.tar vos:[user]/archives/
-```
-
-#### Metadata Operations
-
-```bash
-# Set metadata attributes
-vattr vos:[user]/observation.fits TELESCOPE "ALMA"
-vattr vos:[user]/observation.fits OBJECT "NGC1365"
-vattr vos:[user]/observation.fits DATE-OBS "2024-03-15"
-
-# View metadata
-vattr vos:[user]/observation.fits
-vattr vos:[user]/observation.fits TELESCOPE
-
-# Set multiple attributes from file
-vattr -f metadata.txt vos:[user]/dataset.fits
+vsync --nstreams=4 huge_dataset.tar vos:[user]/archives/
 ```
 
 #### Permission Management
@@ -227,8 +206,6 @@ vcp --head vos:[user]/large_image.fits ./headers.txt
 # Inspect headers without downloading
 vcat --head vos:[user]/observation.fits
 
-# Compressed transfers
-vcp --compress large_dataset.fits vos:[user]/
 ```
 
 ## 🐍 Python API
@@ -761,13 +738,13 @@ rm /arc/projects/[projectname]/temp/old_data.fits
 
 ```bash
 # Sync entire directories to Vault
-vsync ./local_data/ vos:[username]/backup/
+vsync ./local_data/ vos:[user]/backup/
 
 # Download project data from Vault
-vsync vos:shared_project/survey_data/ ./project_data/
+vsync vos:[project]/survey_data/ ./project_data/
 
 # Upload analysis results to Vault
-vsync ./results/ vos:[username]/analysis_outputs/
+vsync ./results/ vos:[user]/analysis_outputs/
 ```
 
 
@@ -775,13 +752,13 @@ vsync ./results/ vos:[username]/analysis_outputs/
 
 ```bash
 # Sync entire directories to ARC
-vsync ./local_data/ arc:projects/[projectname]/backup/
+vsync ./local_data/ arc:projects/[project]/backup/
 
 # Download project data from ARC
-vsync arc:projects/[projectname]/survey_data/ ./project_data/
+vsync arc:projects/[project]/survey_data/ ./project_data/
 
 # Upload analysis results to ARC
-vsync ./results/ arc:projects/[projectname]/analysis_outputs/
+vsync ./results/ arc:projects/[project]/analysis_outputs/
 ```
 
 
@@ -799,26 +776,26 @@ client = vos.Client()
 
 
 # List directory contents in Vault
-files_vault = client.listdir("vos:[username]/")
+files_vault = client.listdir("vos:[user]/")
 print(files_vault)
 
 # List directory contents in ARC
-files_arc = client.listdir("arc:projects/[projectname]/")
+files_arc = client.listdir("arc:projects/[project]/")
 print(files_arc)
 
 # Check if file exists in Vault
-exists_vault = client.isfile("vos:[username]/data.fits")
+exists_vault = client.isfile("vos:[user]/data.fits")
 
 # Check if file exists in ARC
-exists_arc = client.isfile("arc:projects/[projectname]/data.fits")
+exists_arc = client.isfile("arc:projects/[project]/data.fits")
 
 # Get file info from Vault
-info_vault = client.get_info("vos:[username]/data.fits")
+info_vault = client.get_info("vos:[user]/data.fits")
 print(f"Size: {info_vault['size']} bytes")
 print(f"Modified: {info_vault['date']}")
 
 # Get file info from ARC
-info_arc = client.get_info("arc:projects/[projectname]/data.fits")
+info_arc = client.get_info("arc:projects/[project]/data.fits")
 print(f"Size: {info_arc['size']} bytes")
 print(f"Modified: {info_arc['date']}")
 ```
@@ -829,28 +806,28 @@ print(f"Modified: {info_arc['date']}")
 ```python
 
 # Copy file to Vault
-client.copy("mydata.fits", "vos:[username]/data/mydata.fits")
+client.copy("mydata.fits", "vos:[user]/data/mydata.fits")
 
 # Copy file to ARC
-client.copy("mydata.fits", "arc:projects/[projectname]/data/mydata.fits")
+client.copy("mydata.fits", "arc:projects/[project]/data/mydata.fits")
 
 # Copy file from Vault
-client.copy("vos:[username]/data/results.txt", "./results.txt")
+client.copy("vos:[user]/data/results.txt", "./results.txt")
 
 # Copy file from ARC
-client.copy("arc:projects/[projectname]/data/results.txt", "./results.txt")
+client.copy("arc:projects/[project]/data/results.txt", "./results.txt")
 
 # Create directory in Vault
-client.mkdir("vos:[username]/new_project/")
+client.mkdir("vos:[user]/new_project/")
 
 # Create directory in ARC
-client.mkdir("arc:projects/[projectname]/new_project/")
+client.mkdir("arc:projects/[project]/new_project/")
 
 # Delete file in Vault
-client.delete("vos:[username]/temp/old_file.txt")
+client.delete("vos:[user]/temp/old_file.txt")
 
 # Delete file in ARC
-client.delete("arc:projects/[projectname]/temp/old_file.txt")
+client.delete("arc:projects/[project]/temp/old_file.txt")
 ```
 
 
@@ -924,7 +901,7 @@ def setup_vospace():
     try:
         client = vos.Client()
         # Test connection
-        client.listdir("vos:CANFAR/")
+        client.listdir("vos:[project]/")
         return client
     except Exception as e:
         logger.error(f"VOSpace authentication failed: {e}")
@@ -969,7 +946,7 @@ def main():
     client = setup_vospace()
 
     # Configuration
-    input_remote_vault = "vos:shared_project/raw_data"
+    input_remote_vault = "vos:[project]/raw_data"
     input_remote_arc = "arc:projects/[project]/raw_data"
     output_remote_vault = "vos:[user]/processed_results"
     output_remote_arc = "arc:projects/[project]/processed_results"
@@ -1153,7 +1130,7 @@ cadc-get-cert --cert ~/.ssl/cadcproxy.pem
 
 
 # Download input data from Vault
-vcp vos:project/input/data.fits ./input.fits
+vcp vos:[project]/input/data.fits ./input.fits
 # Download input data from ARC
 vcp arc:projects/[project]/input/data.fits ./input_arc.fits
 
@@ -1161,7 +1138,7 @@ vcp arc:projects/[project]/input/data.fits ./input_arc.fits
 python analysis_script.py input.fits output.fits
 
 # Upload results to Vault
-vcp output.fits vos:project/results/processed_$(date +%Y%m%d).fits
+vcp output.fits vos:[project]/results/processed_$(date +%Y%m%d).fits
 # Upload results to ARC
 vcp output.fits arc:projects/[project]/results/processed_$(date +%Y%m%d).fits
 
@@ -1209,6 +1186,5 @@ vls arc:projects/[project]/
 
 ## Next Steps
 
-- **[Batch Jobs →](../../batch-jobs.md)** - Automate VOSpace workflows
-- **[Containers →](../../containers.md)** - Include VOSpace tools in custom containers
-- **[Radio Astronomy →](../radio-astronomy/index.md)** - Specialized data workflows
+- **[Batch Jobs →](../sessions/batch.md)** - Automate VOSpace workflows
+- **[Containers →](../containers/index.md)** - Include VOSpace tools in custom containers

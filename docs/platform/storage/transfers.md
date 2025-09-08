@@ -32,7 +32,7 @@ Efficient data transfer is essential for astronomy workflows. CANFAR provides mu
 
 | Source → Destination | Method | Command Example |
 |---------------------|--------|-----------------|
-| **Local → ARC Projects** | SSHFS, Direct URL, VOSpace | `scp file.fits user@host:/arc/projects/[project]/` |
+| **Local → ARC Projects** | SSHFS, Direct URL, VOSpace | `vcp file.fits vos:/arc:projects/[project]/` |
 | **Local → Vault** | VOSpace CLI, Web | `vcp file.fits vos:[user]/` |
 | **Local → Scratch** | Only during sessions | `cp file.fits /scratch/` (within session) |
 | **ARC → Vault** | VOSpace CLI | `vcp /arc/projects/[project]/file.fits vos:[user]/` |
@@ -50,6 +50,8 @@ Efficient data transfer is essential for astronomy workflows. CANFAR provides mu
 3. **Upload files**: Click "Add" → "Upload Files" 
 4. **Select files**: Choose files from your computer
 5. **Confirm upload**: Click "Upload" then "OK"
+
+Note on a notebook session you can also use the JupyterLab **Upload** button.
 
 #### Vault (VOSpace)
 
@@ -81,7 +83,7 @@ curl -E ~/.ssl/cadcproxy.pem \
 
 ```bash
 # Install VOS tools (if not already available)
-pip install vostools
+pip install vos
 
 # Authenticate
 cadc-get-cert -u [user]
@@ -119,9 +121,6 @@ umount ~/canfar_mount
 ```bash
 # Sync entire directories
 vsync ./local_data/ vos:[user]/backup/
-
-# Resume interrupted transfers
-vsync --ignore-time ./local_data/ vos:[user]/backup/
 
 # Parallel transfers (faster for many files)
 vcp --nstreams=4 large_file.tar vos:[user]/archives/
@@ -165,9 +164,6 @@ vcp vos:[user]/data.fits ./
 
 # Directory with all contents
 vcp vos:[user]/survey_data/ ./local_survey/
-
-# With metadata preservation
-vcp --preserve-metadata vos:[user]/catalogue.fits ./
 ```
 
 #### Python API
@@ -197,7 +193,6 @@ client.copy("vos:[user]/large_file.fits",
 #### Scratch to ARC (Within Sessions)
 
 ```bash
-```bash
 # Process data in scratch for speed
 cp /arc/projects/[project]/raw_data.fits /scratch/
 python reduce_data.py /scratch/raw_data.fits
@@ -205,8 +200,6 @@ python reduce_data.py /scratch/raw_data.fits
 # Save results to permanent storage
 cp /scratch/processed_data.fits /arc/projects/[project]/results/
 cp /scratch/analysis_plots/ /arc/projects/[project]/figures/
-
-# Scratch is automatically cleaned when session ends
 ```
 
 #### ARC to Vault (Archival)
@@ -214,12 +207,6 @@ cp /scratch/analysis_plots/ /arc/projects/[project]/figures/
 ```bash
 # Archive completed project results
 vcp /arc/projects/[project]/final_results/ vos:[user]/archives/project2024/
-
-# Archive with metadata
-vattr vos:[user]/archives/project2024/final_spectrum.fits \
-       PROJECT "Galaxy Survey 2024"
-vattr vos:[user]/archives/project2024/final_spectrum.fits \
-       TELESCOPE "ALMA"
 ```
 
 #### Vault to ARC (Project Setup)
@@ -280,19 +267,6 @@ echo "Pipeline completed successfully!"
 
 ### Transfer Speed Optimization
 
-#### For Large Files
-
-```bash
-# Use compression for slow networks
-vcp --compress large_dataset.fits vos:[user]/
-
-# Multiple parallel streams
-vcp --nstreams=8 huge_file.tar vos:[user]/archives/
-
-# Resume interrupted transfers
-vcp --resume partial_file.fits vos:[user]/
-```
-
 #### For Many Small Files
 
 ```bash
@@ -301,7 +275,7 @@ tar -czf analysis_scripts.tar.gz scripts/
 vcp analysis_scripts.tar.gz vos:[user]/code/
 
 # Use directory sync instead of individual copies
-vsync ./many_small_files/ vos:[user]/collection/
+vsync --nstreams=4 ./many_small_files/ vos:[user]/collection/
 ```
 
 ### Network Performance Tips
@@ -319,8 +293,6 @@ ping ws-uv.canfar.net
 
 # Test transfer speed with small file
 time vcp test_file.fits vos:[user]/speed_test/
-
-# Use local network when possible (from CADC networks)
 ```
 
 ## 🚨 Error Handling and Recovery
@@ -343,30 +315,17 @@ cadc-get-cert --days-valid
 #### Network Timeouts
 
 ```bash
-# For large files, increase timeout
-vcp --timeout=3600 large_file.fits vos:[user]/  # 1 hour timeout
-
+# bash
 # Retry with exponential backoff
 for i in {1..3}; do
     vcp file.fits vos:[user]/ && break
     sleep $((2**i))
 done
 ```
-
-#### Partial Transfers
-
-```bash
-# Resume interrupted VOSpace transfer
-vcp --resume interrupted_file.fits vos:[user]/
-
-# Verify transfer integrity
-vcp --checksum file.fits vos:[user]/
-```
-
 ### Robust Transfer Script
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python
 """
 Robust file transfer with retry logic
 """
