@@ -721,6 +721,23 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#detailed-technical-information" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔍 Detailed Technical Information
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -762,7 +779,7 @@
 <li><strong>Offcial Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../client/home/">clients docs for more details.</a></li>
 <li><strong>Smart Session Launching</strong> — <strong>Flexible</strong> (auto-scales) and <strong>Fixed</strong> modes</li>
 <li><strong>Portal Enhancements</strong> — home directory usage &amp; quota information display</li>
-<li><strong>New Science Use Cases</strong> — CARTA 5.0 and Firefly support</li>
+<li><strong>New Science Use Cases</strong> — <a href="../platform/guides/interactive-sessions/launch-carta/">CARTA 5.0</a> and <a href="../platform/guides/interactive-sessions/launch-firefly/">Firefly</a> support</li>
 <li><strong>Batch Job Scheduling</strong> is now generally availaible for all users via the <a href="../client/home/">CANFAR Python Client</a> and <a href="../cli/quick-start/">CLI</a>.</li>
 </ul>
 <h3 id="changes-deprecations">📝 Changes &amp; Deprecations<a class="headerlink" href="#changes-deprecations" title="Permanent link">&para;</a></h3>
@@ -774,6 +791,49 @@
 <h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Resource Monitoring</strong> — RAM and CPU usage for sessions/headless jobs are shown again in the portal.</li>
+</ul>
+<h3 id="for-deployers">⚙️ For Deployers<a class="headerlink" href="#for-deployers" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Kueue Scheduling</strong>: Optional advanced job scheduling system available for deployment to reduce cluster pressure and provide queue management. See <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment configuration</a> for setup instructions.</li>
+</ul>
+<hr />
+<h2 id="detailed-technical-information">🔍 Detailed Technical Information<a class="headerlink" href="#detailed-technical-information" title="Permanent link">&para;</a></h2>
+<h3 id="system-architecture-changes">System Architecture Changes<a class="headerlink" href="#system-architecture-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Kubernetes Upgrade</strong>: Cluster upgraded to <strong>Kubernetes 1.28</strong> for improved performance and security</li>
+<li><strong>Queue Management</strong>: Internal scheduler now fronted by Kueue system to alleviate cluster pressure</li>
+<li><strong>Resource Allocation</strong>: Smart session launching with <strong>Flexible</strong> (auto-scaling) and <strong>Fixed</strong> modes for better cluster efficiency</li>
+</ul>
+<h3 id="api-evolution">API Evolution<a class="headerlink" href="#api-evolution" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Skaha API v1</strong>: New endpoint at <code>https://ws-uv.canfar.net/skaha/</code></li>
+<li><strong>Backward Compatibility</strong>: v0 API remains available during transition period (sunset with CSP 2026.1)</li>
+<li><strong>Session Parameters</strong>: Interactive sessions now require <code>type</code> parameter; headless jobs should omit it</li>
+</ul>
+<h3 id="container-image-management">Container &amp; Image Management<a class="headerlink" href="#container-image-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Harbor Labels</strong>: No longer required for session launching (only for Science Portal UI dropdown population)</li>
+<li><strong>Headless Mode</strong>: Now default session behavior - any image can run headless without special labels</li>
+<li><strong>Science Containers</strong>: Curated containers available in <a href="https://images.canfar.net/">skaha project</a> on Science Portal</li>
+</ul>
+<h3 id="enhanced-user-experience">Enhanced User Experience<a class="headerlink" href="#enhanced-user-experience" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Documentation Hub</strong>: Complete overhaul at <a href="https://www.canfar.net/docs">canfar.net/docs</a></li>
+<li><strong>Portal Improvements</strong>: Home directory usage and quota display in top-right corner</li>
+<li><strong>Batch Workflows</strong>: Programmatic access via Python Client and CLI for workflow automation</li>
+<li><strong>Resource Monitoring</strong>: Restored real-time RAM and CPU usage display for all sessions</li>
+</ul>
+<h3 id="scientific-computing-tools">Scientific Computing Tools<a class="headerlink" href="#scientific-computing-tools" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>CARTA 5.0</strong>: Latest radio astronomy visualization tool (August 2025 release)</li>
+<li><strong>Firefly</strong>: IVOA-compliant catalog browsing and visualization platform</li>
+<li><strong>Multi-wavelength Support</strong>: Enhanced containers for diverse astronomical workflows</li>
+</ul>
+<h3 id="future-roadmap">Future Roadmap<a class="headerlink" href="#future-roadmap" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Queue status information will be displayed in Science Portal (upcoming release)</li>
+<li>Enhanced resource quotas and budgeting system under development</li>
+<li>Continued optimization of cluster resource utilization</li>
 </ul>
 </div>
 
@@ -798,7 +858,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 18:39:23 UTC">September 8, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 22:17:41 UTC">September 8, 2025</span>
   </span>
 
     
@@ -825,6 +885,11 @@
 
     
     <nav>
+      
+        <a href="https://github.com/WenbinWL" class="md-author" title="@WenbinWL">
+          
+          <img src="https://avatars.githubusercontent.com/u/115598277?v=4&size=72" alt="WenbinWL">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
