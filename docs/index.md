@@ -24,7 +24,7 @@ hide:
 
     <div class="grid cards" markdown>
 
-    - [:material-monitor: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md)
+    - [:material-monitor-shimmer: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/guides/interactive-sessions/index.md)
     - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/batch-jobs.md)
     - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/guides/storage/index.md)
     - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers.md)
@@ -33,47 +33,12 @@ hide:
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/legacy/publication.md)
-    - [:simple-wpexplorer: and much more...](platform/guides/index.md)
+    - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](release-notes.md)
+    - [:octicons-telescope-fill-16: and much more...](platform/guides/index.md)
 
     </div>
     
     </h3>
-
-!!! info "📢 Release Notes"
-
-    ??? info "🚀 CanfarSP 2025.1 — September 9, 2025"
-        **The first formal release of the CANFAR Science Platform** 🎉  
-        Status: Scheduled • Version: **CANFAR-SP 2025.1**
-
-        ### ✨ Summary & Highlights
-        - **User Docs Overhaul** — new site at <https://www.opencadc.org/canfar/latest/>
-        - **Official Python Client & CLI** — first public release
-        - **Smart Session Launching** — **Flexible** (auto-scales) and **Fixed** modes
-        - **Portal Enhancements** — home directory usage & quota in the top-right
-        - **New Science Containers** — CARTA 5.0, Firefly (IVOA-compliant)
-
-        ### 🆕 New & Improved
-        - **API** — **Skaha API v1** introduced: `https://ws-uv.canfar.net/skaha/`  
-          `v0` will remain available during a transition period (sunset date TBA).  
-          Portal users are unaffected; API callers should plan to move to v1.
-        - **Images & Labels** — labels not required to run headless jobs;  
-          interactive sessions must provide a `type` parameter.
-        - **Scheduling** — internal scheduling fronted by **Kueue** to reduce cluster pressure.
-        - **Platform** — Kubernetes upgraded to **1.28**.
-
-        ### 🐛 Fixes
-        - **Resource Monitoring** — RAM and CPU usage for sessions/headless jobs are shown again in the portal.
-
-        ### 🔄 Upgrade Notes
-        - **API callers**: plan migration to **Skaha v1**; v0 deprecation date will be announced.
-        - **CLI**: if you used the beta "skaha" CLI, switch to the official **canfar** CLI.
-        - **Launch parameters**: interactive sessions require `type`; headless jobs should omit `type`.
-
-        ### 🔗 Links
-        - **Science Portal** — <https://www.opencadc.org/canfar/latest/>
-        - **User Documentation** — <https://www.opencadc.org/canfar/latest/platform/home/>
-        - **API v1** — `https://ws-uv.canfar.net/skaha/`
-        - **GitHub (canfar)** — <https://github.com/opencadc/canfar>
 
 !!! quote ""
 
