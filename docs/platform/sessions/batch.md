@@ -40,12 +40,10 @@ Execute containers programmatically using the `canfar` command-line client:
 canfar auth login
 
 # Submit a job
-canfar create \
+canfar launch \
   --name "data-reduction-job" \
   --image "images.canfar.net/skaha/astroml:latest" \
-  --cores 4 \
-  --ram 16 \
-  --cmd "python /arc/projects/myproject/scripts/reduce_data.py"
+  --cmd "python /arc/projects/[project]/scripts/reduce_data.py"
 ```
 
 ### 2. Job Submission Scripts
@@ -62,18 +60,18 @@ IMAGE="images.canfar.net/skaha/casa:6.5"
 CMD="python /arc/projects/survey/pipelines/reduce_night.py /arc/projects/survey/data/$(date +%Y%m%d)"
 
 # Submit job
-canfar create \
+canfar launch \
   --name "$JOB_NAME" \
   --image "$IMAGE" \
   --cores 8 \
-  --ram 32 \
+  --ram 364 \
   --cmd "$CMD"
 ```
 
 Or using the Python `canfar` client:
 
 ```python
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # submit_reduction.py - Python client-based submission
 
 from canfar.sessions import Session
@@ -85,7 +83,8 @@ session = Session()
 # Set job parameters
 job_name = f"nightly-reduction-{datetime.now().strftime('%Y%m%d')}"
 image = "images.canfar.net/skaha/casa:6.5"
-data_path = f"/arc/projects/survey/data/{datetime.now().strftime('%Y%m%d')}"
+project="/arc/projects/[project]"
+data_path = f"{project}/data/{datetime.now().strftime('%Y%m%d')}"
 
 # Submit job
 job_ids = session.create(
@@ -94,7 +93,7 @@ job_ids = session.create(
     cores=8,
     ram=32,
     cmd="python",
-    args=["/arc/projects/survey/pipelines/reduce_night.py", data_path]
+    args=[f"{project}/pipelines/reduce_night.py", data_path]
 )
 
 print(f"Submitted job(s): {job_ids}")
@@ -184,13 +183,13 @@ rule source_extract:
 ```bash
 # Start small and scale up based on monitoring
 # Test job with minimal resources first
-canfar create \
+canfar launch \
   --name "test-small" \
   --cores 2 \
   --ram 4 \
   --image "images.canfar.net/skaha/astroml:latest" \
   --kind "headless" \
-  --cmd "python /arc/projects/myproject/test_script.py"
+  --cmd "python /arc/projects/[project]/test_script.py"
 
 # Monitor resource usage in the job logs
 # Scale up for production runs if needed
@@ -231,10 +230,11 @@ def process_large_cube(filename):
 # Use /scratch/ for I/O intensive operations
 #!/bin/bash
 set -e
-
+PROJECT="/arc/projects/[project]"
+]
 # Copy data to fast scratch storage
 echo "Copying data to scratch..."
-rsync -av /arc/projects/myproject/large_dataset/ /scratch/working/
+rsync -av $PROJECT/large_dataset/ /scratch/working/
 
 # Process on fast storage
 cd /scratch/working
@@ -242,9 +242,9 @@ python intensive_processing.py
 
 # Save results back to permanent storage
 echo "Saving results..."
-mkdir -p /arc/projects/myproject/results/$(date +%Y%m%d)
-cp *.fits /arc/projects/myproject/results/$(date +%Y%m%d)/
-cp *.log /arc/projects/myproject/logs/
+mkdir -p $PROJECT/results/$(date +%Y%m%d)
+cp *.fits $PROJECT/results/$(date +%Y%m%d)/
+cp *.log $PROJECT/logs/
 
 echo "Processing complete"
 ```
@@ -368,11 +368,11 @@ def timed_processing(func, *args, **kwargs):
 ---
 
 !!! info "See Also"
-    - [Container Development](containers.md)
+    - [Container Development](../containers/index.md)
     - [Storage Guide](../storage/index.md)
     - [CANFAR Python Client](../client/home.md)
     - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
-    - [Support](help.md)
+    - [Support](../support/index.md)
 
 ### Job Sizing Guidelines
 
@@ -415,7 +415,7 @@ Understand job priorities and scheduling:
 #### Submit Job
 
 ```bash
-canfar create \
+canfar launch \
   --name "my-analysis-job" \
   --image "images.canfar.net/skaha/astroml:latest" \
   --cores 4 \
@@ -477,7 +477,7 @@ job_ids = session.create(
     image="images.canfar.net/skaha/astroml:latest",
     kind="headless",
     cmd="python",
-    args=["/arc/projects/myproject/analysis.py"]
+    args=["/arc/projects/[project]/analysis.py"]
 )
 
 print(f"Submitted job(s): {job_ids}")
@@ -493,12 +493,12 @@ session = Session()
 # Job with custom resources and environment
 job_ids = session.create(
     name="heavy-computation",
-    image="images.canfar.net/myproject/processor:latest", 
+    image="images.canfar.net/[project]/processor:latest", 
     kind="headless",
     cores=8,
     ram=32,
     cmd="/opt/scripts/heavy_process.sh",
-    args=["/arc/projects/data/large_dataset.h5", "/arc/projects/results/"],
+    args=["/arc/projects/[project]/data/large_dataset.h5", "/arc/projects/results/"],
     env={
         "PROCESSING_THREADS": "8",
         "OUTPUT_FORMAT": "hdf5",
@@ -509,7 +509,7 @@ job_ids = session.create(
 
 #### Private Image Authentication
 
-To use private images, you first need to configure the client with your registry credentials. See the [authentication guide](accounts.md) for details.
+To use private images, you first need to configure the client with your registry credentials. See the [authentication guide](../permissions.md) for details.
 
 #### Job Monitoring and Management
 
@@ -566,7 +566,7 @@ job_ids = session.create(
     name="parameter-study",
     image="images.canfar.net/skaha/astroml:latest",
     kind="headless",
-    cmd="python /arc/projects/study/analyze.py",
+    cmd="python /arc/projects/[project]/scripts/analyze.py",
     replicas=10 # Creates 10 jobs named parameter-study-1, parameter-study-2, etc.
 )
 print(f"Submitted jobs: {job_ids}")
@@ -581,7 +581,7 @@ print(f"Submitted jobs: {job_ids}")
 
 !!! tip "Advanced: Debugging Batch Jobs"
     - Use `canfar logs <session-id>` and `canfar stats <session-id>` for troubleshooting.
-    - For persistent issues, see [FAQ](../faq.md) and [Support](help.md).
+    - For persistent issues, see [FAQ](../support/faq.md) and [Support](../support/index.md).
 
 ### Log Analysis
 
@@ -589,10 +589,10 @@ Monitor job progress through logs:
 
 ```bash
 # Real-time log monitoring
-canfar logs -f <session-id>
+canfar logs -f [session-id]
 
 # Search for errors
-canfar logs <session-id> | grep -i error
+canfar logs <[session-id] | grep -i error
 ```
 
 ### Resource Monitoring
@@ -601,7 +601,7 @@ Track resource usage:
 
 ```bash
 # Get session statistics
-canfar stats <session-id>
+canfar stats [session-id]
 ```
 
 ### Common Issues
@@ -625,11 +625,11 @@ canfar stats <session-id>
 ## Best Practices
 
 !!! info "See Also"
-    - [Container Development](containers.md)
+    - [Container Development](../containers/index.md)
     - [Storage Guide](../storage/index.md)
     - [CANFAR Python Client](../client/home.md)
     - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
-    - [Support](help.md)
+    - [Support](../support/index.md)
 
 ### Script Design
 
@@ -662,7 +662,7 @@ canfar stats <session-id>
 
 !!! info "Quick Links"
     - [Support](../support/index.md)
-    - [FAQ](../faq.md)
+    - [FAQ](../support/index.md)
     - [Client Examples](../client/examples.md)
     - [Discord Community](https://discord.gg/vcCQ8QBvBa)
 
@@ -673,7 +673,6 @@ canfar stats <session-id>
 
 ## Next Steps
 
-- **[Container Development]../containers/inde.md)**: Build custom containers for your workflows
-- **[Storage Optimization](../storage/index.md)**: Efficient data management strategies
-- **[Interactive Sessions](index.md)**: Develop and test scripts interactively
-- **[Radio Astronomy Workflows](../radio/index.md)**: Specialized batch processing for radio data
+- **[Containers](../containers/index.md)**: Build custom containers for your workflows
+- **[Storage](../storage/index.md)**: Efficient data management strategies
+- **[Sessions](index.md)**: Develop and test scripts interactively

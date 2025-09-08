@@ -234,12 +234,12 @@ sshfs -p 64022 -i ~/.ssh/canfar_key \
       -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10 \
       -o cache=yes,kernel_cache,compression=yes \
       -o Ciphers=aes128-ctr \
-      username@ws-uv.canfar.net:/ ~/canfar_arc/
+      [user]@ws-uv.canfar.net:/ ~/canfar_arc/
 
 # Mount specific project only
 sshfs -p 64022 -i ~/.ssh/canfar_key \
       -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10 \
-      username@ws-uv.canfar.net:/arc/projects/myproject ~/project_mount/
+      [user]@ws-uv.canfar.net:/arc/projects/myproject ~/project_mount/
 ```
 
 #### Connection Configuration
@@ -250,7 +250,7 @@ Create `~/.ssh/config` for easier connections:
 Host canfar
     HostName ws-uv.canfar.net
     Port 64022
-    User your_canfar_username
+    User [user]
     IdentityFile ~/.ssh/canfar_key
     ServerAliveInterval 15
     ServerAliveCountMax 10
@@ -268,19 +268,19 @@ Once mounted, use CANFAR storage like any local directory:
 
 ```bash
 # Navigate to your project
-cd ~/canfar_arc/arc/projects/myproject/
+cd ~/canfar_arc/arc/projects/[project]/
 
 # Copy files from local to CANFAR
-cp ~/local_analysis.py ~/canfar_arc/arc/projects/myproject/code/
+cp ~/local_analysis.py ~/canfar_arc/arc/projects/[project]/code/
 
 # Edit files with local editor
-code ~/canfar_arc/arc/home/username/.bashrc
+code ~/canfar_arc/arc/home/[user]/.bashrc
 
 # Run local tools on CANFAR data
-python analyze_data.py ~/canfar_arc/arc/projects/myproject/data/observations.fits
+python analyze_data.py ~/canfar_arc/arc/projects/[project]/data/observations.fits
 
 # Sync directories
-rsync -avz ~/local_scripts/ ~/canfar_arc/arc/projects/myproject/code/
+rsync -avz ~/local_scripts/ ~/canfar_arc/arc/projects/[project]/code/
 ```
 
 ### Unmounting
@@ -330,10 +330,10 @@ whoami
 groups
 
 # Check file ownership
-stat /arc/projects/myproject/somefile.fits
+stat /arc/projects/[project]/somefile.fits
 
 # View group membership
-getent group projectname
+getent group [project]
 ```
 
 ### Managing Permissions
@@ -468,7 +468,7 @@ python shared_code/analysis.py data/observations.fits
 
 LOCAL_DIR="$HOME/important_work"
 CANFAR_MOUNT="$HOME/canfar_arc"
-BACKUP_DIR="$CANFAR_MOUNT/arc/home/username/backups"
+BACKUP_DIR="$CANFAR_MOUNT/arc/home/[user]/backups"
 
 # Check if CANFAR is mounted
 if ! mountpoint -q "$CANFAR_MOUNT"; then
@@ -546,11 +546,7 @@ create_project_structure "my_new_project"
 
 ```bash
 # Debug SSHFS connection
-sshfs -d -o sshfs_debug,loglevel=debug canfar:/ ~/canfar_arc/
-
-# Test SSH connection first
-ssh -p 64022 username@ws-uv.canfar.net
-
+sshfs -d -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10,defer_permissions -p 64022 [user]@ws-uv.canfar.net:/ $HOME/canfar_arc
 # Check mount status
 mount | grep sshfs
 df -h | grep sshfs
@@ -564,13 +560,11 @@ groups
 id
 
 # Verify file permissions
-ls -la /arc/projects/myproject/problematic_file
+ls -la /arc/projects/[project]/problematic_file
 
 # Check directory execute permissions
-ls -ld /arc/projects/myproject/
+ls -ld /arc/projects/[project]/
 
-# Fix common permission issues
-chmod g+x /arc/projects/myproject/  # Add execute for group
 ```
 
 #### Performance Issues
@@ -584,7 +578,7 @@ netstat -i
 iftop
 
 # Test SSHFS performance
-time ls -la ~/canfar_arc/arc/projects/myproject/
+time ls -la ~/canfar_arc/projects/[project]/
 
 # Remount with performance options
 umount ~/canfar_arc
@@ -595,14 +589,14 @@ sshfs -o cache=yes,compression=yes canfar:/ ~/canfar_arc/
 
 ```bash
 # Check quota usage
-df -h /arc/home/username/
-df -h /arc/projects/myproject/
+df -h /arc/home/[user]/
+df -h /arc/projects/[project]/
 
 # Find large files
-find /arc/projects/myproject/ -type f -size +100M -exec ls -lh {} \;
+find /arc/projects/[project]]/ -type f -size +100M -exec ls -lh {} \;
 
 # Clean up space
-du -sh /arc/projects/myproject/* | sort -hr
+du -sh /arc/projects/[project]/* | sort -hr
 # Remove or archive large unnecessary files
 ```
 
@@ -627,8 +621,8 @@ fusermount -V
 sshfs --version
 
 # Permission debugging
-getfacl /arc/projects/myproject/
-namei -l /arc/projects/myproject/path/to/file
+getfacl /arc/projects/[project]/
+namei -l /arc/projects/[project]/path/to/file
 ```
 
 ## 🔗 Integration Examples
@@ -640,7 +634,7 @@ namei -l /arc/projects/myproject/path/to/file
 ```json
 // .vscode/settings.json
 {
-    "python.defaultInterpreterPath": "/usr/bin/python3",
+    "python.defaultInterpreterPath": "/usr/bin/python",
     "files.watcherExclude": {
         "**/canfar_arc/**": true
     },
@@ -658,7 +652,7 @@ import pandas as pd
 from astropy.io import fits
 
 # Read data from mounted CANFAR storage
-data_path = "/home/user/canfar_arc/arc/projects/myproject/data/"
+data_path = "/home/user/canfar_arc/arc/projects/[project]/data/"
 catalog = pd.read_csv(f"{data_path}/catalog.csv")
 
 # Process and save results back to CANFAR
@@ -675,7 +669,7 @@ results.to_csv(f"{data_path}/processed_catalog.csv")
 # sync_code_to_canfar.sh
 
 LOCAL_REPO="$HOME/my_analysis_code"
-CANFAR_CODE="/home/user/canfar_arc/arc/projects/myproject/code"
+CANFAR_CODE="/home/user/canfar_arc/arc/projects/[project]/code"
 
 cd "$LOCAL_REPO"
 

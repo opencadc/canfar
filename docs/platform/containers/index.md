@@ -105,8 +105,8 @@ COPY analysis_tools/ /opt/tools/
 
 ```bash
 # Runtime environment (inside your running container)
-echo $USER                      # your-cadc-username
-echo $HOME                      # /arc/home/your-cadc-username
+echo $USER                      # [user]
+echo $HOME                      # /arc/home/[user]
 ls /arc/projects/               # Your accessible project directories
 df -h /scratch/                 # Temporary high-speed storage
 ```
@@ -158,7 +158,7 @@ When you launch a notebook session, CANFAR automatically:
 
 ```bash
 # Check installed packages in a running astroml container
-mamba list                      # Conda/mamba installed packages  
+mamba list                     # Conda/mamba installed packages  
 apt list --installed           # System packages (Ubuntu)
 ls /build_info/                # Container build information
 ```
@@ -218,7 +218,7 @@ Headless containers execute without graphical interfaces, perfect for automated 
 
 ```bash
 # Example headless execution
-python /arc/projects/survey/reduce_data.py --input=/arc/projects/data/ --output=/arc/projects/results/
+python /arc/projects/[project]/scripts/reduce_data.py --input=/arc/projects/[project]/data/ --output=/arc/projects/[project]/results/
 ```
 
 ### Contributed Application Sessions
@@ -242,8 +242,8 @@ CANFAR automatically mounts storage systems into your container at runtime, prov
 graph LR
     Container[Running Container] --> ArcMount[/arc/ Mount Point]
     
-    ArcMount --> Home[/arc/home/username/]
-    ArcMount --> Projects[/arc/projects/projectname/]
+    ArcMount --> Home[/arc/home/[user]/]
+    ArcMount --> Projects[/arc/projects/[project]/]
     
     Container --> Scratch[/scratch/]
     Container --> Tmp[/tmp/]
@@ -267,7 +267,7 @@ graph LR
 
 **Personal Development (`/arc/home/`):**
 ```bash
-/arc/home/username/
+/arc/home/[user]/
 ├── notebooks/              # Jupyter notebooks
 ├── scripts/               # Analysis scripts  
 ├── .local/               # pip install --user packages
@@ -277,7 +277,7 @@ graph LR
 
 **Project Collaboration (`/arc/projects/`):**
 ```bash
-/arc/projects/survey-project/
+/arc/projects/[project]/
 ├── raw_data/             # Input datasets
 ├── processed/            # Reduced data products
 ├── scripts/              # Shared analysis code
@@ -299,9 +299,9 @@ Containers run with your CADC user identity, not as root or container-defined us
 
 ```bash
 # Inside any CANFAR container
-whoami                     # your-cadc-username
-id                        # uid=1234(your-cadc-username) gid=1234(your-cadc-username)
-echo $HOME                # /arc/home/your-cadc-username
+whoami                    # [user]
+id                        # uid=1234([user]) gid=1234([user]) groups=[user](and-all-your-CADC-groups)
+echo $HOME                # /arc/home/[user]
 groups                    # Shows your CANFAR project group memberships
 ```
 

@@ -75,19 +75,6 @@ Target Groups:
 - Other: Public access
 ```
 
-#### Metadata Management
-
-```text
-Right-click file → Properties → Metadata
-
-Common Astronomical Metadata:
-- TELESCOPE: Instrument name
-- OBJECT: Target name
-- DATE-OBS: Observation date
-- FILTER: Filter used
-- EXPTIME: Exposure time
-```
-
 ## 💻 Command Line Interface
 
 ### Installation
@@ -96,7 +83,7 @@ VOSpace tools are pre-installed in CANFAR sessions in CANFAR-maintained containe
 For local or custom installation, use `pip`:
 
 ```bash
-# Install VOS tools
+# Install VOS python module with vcp/vsync/vls/vchmod/vmkdir commands
 pip install vos
 
 # Verify installation
@@ -389,16 +376,18 @@ curl -O https://ws-cadc.canfar.net/vault/nodes/[user]/public/catalog.csv
 
 ```bash
 # Project coordinator sets up shared space
-vmkdir vos:shared_project/
-vchmod g+rw:all_collaborators vos:shared_project/
+vmkdir vos:[project]/data
+vmkdir vos:[project]/public
+vmkdir vos:[project]/results
+vchmod g+rw:all_collaborators vos:[project]/data/
 
 # Collaborators contribute data
-vcp local_observations.fits vos:shared_project/data/institution_a/
-vcp analysis_results.csv vos:shared_project/results/
+vcp local_observations.fits vos:[project]/data/institution_a/
+vcp analysis_results.csv vos:[project]/results/
 
 # Public data release
-vcp vos:shared_project/final_catalog.fits vos:shared_project/public/
-vchmod o+r vos:shared_project/public/final_catalog.fits
+vcp vos:[project]/data/final_catalog.fits vos:[project]/public/
+vchmod o+r vos:[project]/public/final_catalog.fits
 ```
 
 #### Data Publication
@@ -712,19 +701,19 @@ for path in test_paths:
 
 ```bash
 # List files and directories
-ls /arc/projects/[projectname]/
+ls /arc/projects/[project]/
 
 # Copy files
-cp mydata.fits /arc/projects/[projectname]/data/
+cp mydata.fits /arc/projects/[project]/data/
 
 # Create directories
-mkdir /arc/projects/[projectname]/survey_analysis/
+mkdir /arc/projects/[project]/survey_analysis/
 
 # Move/rename files
-mv /arc/projects/[projectname]/old.fits /arc/projects/[projectname]/new.fits
+mv /arc/projects/[project]/old.fits /arc/projects/[project]/new.fits
 
 # Remove files
-rm /arc/projects/[projectname]/temp/old_data.fits
+rm /arc/projects/[project]/temp/old_data.fits
 ```
 
 

@@ -106,9 +106,9 @@ The typical structure you'll encounter includes a navigation or menu area that p
 ### Integrating with CANFAR Storage
 
 !!! warning "Persistence Reminder"
-    Save important results to `/arc/projects/[projectname]` or `/arc/home/[username]`. Temporary paths and in-app caches may not persist after the session ends.
+    Save important results to `/arc/projects/[project]` or `/arc/home/[user]`. Temporary paths and in-app caches may not persist after the session ends.
 
-One of the  aspects of contributed applications is their seamless integration with CANFAR storage infrastructure. Your applications can directly access your project data through `/arc/projects/[projectname]]/`, your personal files via `/arc/home/[username]/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
+One of the  aspects of contributed applications is their seamless integration with CANFAR storage infrastructure. Your applications can directly access your project data through `/arc/projects/[project]/`, your personal files via `/arc/home/[user]/`, and temporary processing space in `/scratch/`. This integration means you can move fluidly between different types of sessions and applications while maintaining access to the same data.
 
 Understanding these storage patterns helps you organise your work effectively. You might use your personal home directory for notebooks and scripts under development, project directories for shared data and collaborative work, and scratch space for temporary files and intermediate processing results that don't need long-term storage.
 
