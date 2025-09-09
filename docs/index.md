@@ -32,6 +32,7 @@ hide:
     - [:material-wrench: __Expert Support__ <small>for research workflows</small>](platform/support/index.md)
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
+    - [:material-alma: __ALMA guides__ <small>platform-specific tutorials</small>](platform/community/alma/index.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
     - [:simple-wpexplorer: and much more...](platform/home.md)
 

@@ -192,6 +192,9 @@ nav:
       - Overview: platform/containers/index.md
       - Building Containers: platform/containers/build.md
       - Registry: platform/containers/registry.md
+    - Community:
+      - Overview: platform/community/index.md
+      - ALMA: platform/community/alma/index.md
     - Support:
       - Help: platform/support/index.md
       - FAQ: platform/support/faq.md

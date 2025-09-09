@@ -26,7 +26,7 @@ When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage
 # Automatic mounts in every session
 /arc/home/[user]/          # Your personal 10GB space
 /arc/projects/[project]/   # Shared project spaces (if member)
-/scratch/                    # Temporary session storage
+/scratch/                  # Temporary session storage
 ```
 
 ### Directory Structure and Conventions
@@ -54,6 +54,7 @@ When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage
 
 #### ARC Projects Directory (`/arc/projects/[project]/`)
 
+Used for team project use. For example, for a propcessing pipeline analysis:
 ```text
 /arc/projects/[project]/
 ├── data/
@@ -168,12 +169,10 @@ SSHFS allows you to mount CANFAR's ARC storage on your local computer as if it w
     # Logout and login again
     ```
 
-=== "Linux (CentOS/RHEL/Fedora)"
+=== "Linux (Fedora)"
     ```bash
     # Install SSHFS
-    sudo yum install sshfs     # CentOS/RHEL
-    # or
-    sudo dnf install sshfs     # Fedora
+    sudo dnf install sshfs
     
     # Add user to fuse group
     sudo usermod -a -G fuse $USER
@@ -239,7 +238,7 @@ sshfs -p 64022 -i ~/.ssh/canfar_key \
 # Mount specific project only
 sshfs -p 64022 -i ~/.ssh/canfar_key \
       -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10 \
-      [user]@ws-uv.canfar.net:/arc/projects/myproject ~/project_mount/
+      [user]@ws-uv.canfar.net:/arc/projects/[project] ~/project_mount/
 ```
 
 #### Connection Configuration
@@ -307,7 +306,7 @@ ARC storage uses traditional Unix permissions combined with group-based access c
 
 ```bash
 # View detailed permissions
-ls -l /arc/projects/myproject/
+ls -l /arc/projects/[project]/
 
 # Example output:
 # drwxrwxr--  projectgroup  data/
@@ -366,13 +365,13 @@ Group membership is managed through CANFAR's Group Management system:
 
 ```bash
 # Change group ownership
-chgrp projectgroup /arc/projects/myproject/shared_data.fits
+chgrp projectgroup /arc/projects/[project]/shared_data.fits
 
 # Change recursively
-chgrp -R projectgroup /arc/projects/myproject/shared_results/
+chgrp -R projectgroup /arc/projects/[project]/shared_results/
 
 # Set default group for new files in directory
-chmod g+s /arc/projects/myproject/shared_directory/
+chmod g+s /arc/projects/[project]/shared_directory/
 ```
 
 ### Access Control Lists (ACLs)
@@ -381,19 +380,19 @@ For fine-grained permissions beyond standard Unix permissions:
 
 ```bash
 # View current ACLs
-getfacl /arc/projects/myproject/sensitive_data.fits
+getfacl /arc/projects/[project]/sensitive_data.fits
 
 # Set ACL for specific user
-setfacl -m u:collaborator:r /arc/projects/myproject/data.fits
+setfacl -m u:collaborator:r /arc/projects/[project]/data.fits
 
 # Set ACL for group
-setfacl -m g:external_collaborators:r /arc/projects/myproject/
+setfacl -m g:external_collaborators:r /arc/projects/[project]/
 
 # Remove ACL
-setfacl -x u:former_collaborator /arc/projects/myproject/data.fits
+setfacl -x u:former_collaborator /arc/projects/[project]/data.fits
 
 # Set default ACLs for directory
-setfacl -d -m g:projectgroup:rw /arc/projects/myproject/shared/
+setfacl -d -m g:projectgroup:rw /arc/projects/[project]/shared/
 ```
 
 ## 🔧 Optimization and Best Practices
@@ -404,7 +403,7 @@ setfacl -d -m g:projectgroup:rw /arc/projects/myproject/shared/
 
 ```bash
 # Use rsync for efficient synchronization
-rsync -avz --progress ~/local_data/ /arc/projects/myproject/backup/
+rsync -avz --progress ~/local_data/ /arc/projects/[project]/backup/
 
 # Monitor I/O performance
 iostat -x 1    # Live I/O statistics
@@ -412,9 +411,9 @@ iotop          # Process I/O usage
 
 # Optimize for large files
 # Use /scratch/ for intensive processing
-cp /arc/projects/myproject/large_dataset.fits /scratch/
+cp /arc/projects/[project]/large_dataset.fits /scratch/
 process_data /scratch/large_dataset.fits
-cp /scratch/results.fits /arc/projects/myproject/outputs/
+cp /scratch/results.fits /arc/projects/[project]/outputs/
 ```
 
 #### SSHFS Performance Tips
@@ -446,7 +445,7 @@ cd ~/canfar_project/
 
 # Mount CANFAR storage as subdirectory
 mkdir canfar_data
-sshfs canfar:/arc/projects/myproject canfar_data/
+sshfs canfar:/arc/projects/[project] canfar_data/
 
 # Create local working directory
 mkdir local_work
@@ -490,53 +489,7 @@ ls -t | tail -n +6 | xargs rm -rf
 echo "Backup completed successfully"
 ```
 
-### Directory Organization
 
-#### Project Structure Template
-
-```bash
-# Create standardized project structure
-create_project_structure() {
-    local project_path="/arc/projects/$1"
-    
-    mkdir -p "$project_path"/{data/{raw,processed,catalogs,external},code/{pipelines,analysis,notebooks,tools},results/{plots,tables,papers,presentations},docs,scratch_archive}
-    
-    # Set appropriate permissions
-    chmod -R g+rw "$project_path"
-    chmod g+s "$project_path"  # Inherit group ownership
-    
-    # Create README template
-    cat > "$project_path/README.md" << EOF
-# Project: $1
-
-## Description
-Brief description of the project.
-
-## Data
-- \`data/raw/\`: Original datasets
-- \`data/processed/\`: Calibrated/reduced data
-- \`data/catalogs/\`: Reference catalogs
-
-## Code
-- \`code/pipelines/\`: Data processing workflows
-- \`code/analysis/\`: Analysis scripts
-- \`code/notebooks/\`: Jupyter notebooks
-
-## Results
-- \`results/plots/\`: Figures and visualizations
-- \`results/tables/\`: Output measurements
-- \`results/papers/\`: Manuscripts
-
-## Usage
-Instructions for using this project.
-EOF
-
-    echo "Project structure created: $project_path"
-}
-
-# Usage
-create_project_structure "my_new_project"
-```
 
 ## 🛠️ Troubleshooting
 
@@ -647,12 +600,12 @@ namei -l /arc/projects/[project]/path/to/file
 #### Jupyter Lab with SSHFS
 
 ```python
-# In Jupyter Lab, access CANFAR data via mounted filesystem
+# In Jupyter Lab, access CANFAR data via mounted filesystem on your laptop
 import pandas as pd
 from astropy.io import fits
 
 # Read data from mounted CANFAR storage
-data_path = "/home/user/canfar_arc/arc/projects/[project]/data/"
+data_path = "$HOME/canfar_arc/arc/projects/[project]/data/"
 catalog = pd.read_csv(f"{data_path}/catalog.csv")
 
 # Process and save results back to CANFAR
@@ -669,7 +622,7 @@ results.to_csv(f"{data_path}/processed_catalog.csv")
 # sync_code_to_canfar.sh
 
 LOCAL_REPO="$HOME/my_analysis_code"
-CANFAR_CODE="/home/user/canfar_arc/arc/projects/[project]/code"
+CANFAR_CODE="$HOME/canfar_arc/arc/projects/[project]/code"
 
 cd "$LOCAL_REPO"
 

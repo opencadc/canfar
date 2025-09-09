@@ -130,7 +130,6 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
     - **[Sessions Guide](sessions/index.md)**: Interactive computing environments
     - **[Storage Guide](storage/index.md)**: Data management and file systems
     - **[Container Guide](containers/index.md)**: Software environments and registries
-    - **[Cloud Computing](cloud.md)**: Advanced batch processing workflows
 
 Ready to dive deeper?
 
@@ -138,7 +137,6 @@ Ready to dive deeper?
 - **[🖥️ Sessions Guide →](sessions/index.md)** – Interactive computing environments
 - **[🗄️ Storage Guide →](storage/index.md)** – Data management and file systems
 - **[🐳 Container Guide →](containers/index.md)** – Software environments and registries
-- **[☁️ Cloud Computing →](cloud.md)** – Advanced batch processing workflows
 
 
 

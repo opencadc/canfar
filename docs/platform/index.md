@@ -86,9 +86,6 @@ The Canadian Advanced Network for Astronomy Research let you access  software en
 **[🏭 Batch Processing](sessions/batch.md)**
 :   **Automated workflows** - Large-scale processing, job management, and production pipelines
 
-**[📡 Radio Astronomy Tools](adio-astronomy/index.md)**
-:   **Specialized workflows** - CASA, CARTA, interferometry, and radio data processing
-
 **[⚙️ Command Line Interface](../cli/cli-help.md)**
 :   **Platform automation** - CLI tools, scripting, and workflow management
 
