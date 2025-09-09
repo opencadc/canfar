@@ -1,0 +1,10 @@
+[data-md-color-scheme="canfar"] {
+  --md-primary-fg-color:               #005493;
+  --md-accent-fg-color:                #F5AA1C;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 210;
+  --md-primary-fg-color: #005493;
+  --md-accent-fg-color: #F5AA1C;
+}
