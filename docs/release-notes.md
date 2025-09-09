@@ -10,7 +10,7 @@
     - [**New & Improved** User Documentation Hub](index.md)
     - **Official Release of the CANFAR Python Client & CLI** — see [clients docs](client/home.md)
     - **Smart Session Launching** — choose between **flexible** (auto-scaling) and **fixed** modes
-    - **Portal Enhancements** — home directory & quota display
+    - **Science Portal UI Improvements** — added display for home directory & storage quota usage
     - **CARTA 5.0**: latest radio astronomy visualization tool ([August 2025 Release](https://docs.google.com/document/d/1kBtYjclOn5bxlvkV5a588DtUKy3UEqPXL78IiTVAMUk/edit?tab=t.0#heading=h.9m3bw7vn40ea))
     - **Firefly**: IVOA-compliant catalog browsing and visualization platform
 
