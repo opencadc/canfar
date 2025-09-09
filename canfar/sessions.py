@@ -187,8 +187,10 @@ class Session(HTTPClient):
         Args:
             name (str): A unique name for the session.
             image (str): Container image to use for the session.
-            cores (int, optional): Number of cores. Defaults to None.
-            ram (int, optional): Amount of RAM (GB). Defaults to None.
+            cores (int, optional): Number of cores.
+                Defaults to None, i.e. flexible mode.
+            ram (int, optional): Amount of RAM (GB).
+                Defaults to None, i.e. flexible mode.
             kind (str, optional): Type of canfar session. Defaults to "headless".
             gpu (Optional[int], optional): Number of GPUs. Defaults to None.
             cmd (Optional[str], optional): Command to run. Defaults to None.
@@ -199,7 +201,7 @@ class Session(HTTPClient):
 
         Notes:
             - If cores and ram are not specified, the session will be created with
-              flexible resource allocation.
+              flexible resource allocation of upto 8 cores and 32GB of RAM.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
@@ -589,8 +591,10 @@ class AsyncSession(HTTPClient):
         Args:
             name (str): A unique name for the session.
             image (str): Container image to use for the session.
-            cores (int, optional): Number of cores. Defaults to None.
-            ram (int, optional): Amount of RAM (GB). Defaults to None.
+            cores (int, optional): Number of cores.
+                Defaults to None, i.e. flexible mode.
+            ram (int, optional): Amount of RAM (GB).
+                Defaults to None, i.e. flexible mode.
             kind (str, optional): Type of canfar session. Defaults to "headless".
             gpu (Optional[int], optional): Number of GPUs. Defaults to None.
             cmd (Optional[str], optional): Command to run. Defaults to None.
@@ -601,7 +605,7 @@ class AsyncSession(HTTPClient):
 
         Notes:
             - If cores and ram are not specified, the session will be created with
-              flexible resource allocation.
+              flexible resource allocation of upto 8 cores and 32GB of RAM.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:

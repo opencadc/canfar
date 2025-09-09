@@ -9,6 +9,8 @@ copyright: Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
 remote_branch: gh-pages
 
 theme:
+  logo: static/logo.png
+  favicon: static/logo.png
   name: material
   palette:
     - media: "(prefers-color-scheme)"
@@ -16,16 +18,16 @@ theme:
         icon: material/link
         name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: indigo
+      scheme: canfar
+      primary: custom
+      accent: custom
       toggle:
         icon: material/toggle-switch
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: black
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/toggle-switch-off
         name: Switch to system preference
@@ -33,9 +35,7 @@ theme:
     text: Roboto
     code: Roboto Mono
   language: en
-  favicon: static/meteor.ico
   icon:
-    logo: simple/meteor
     repo: fontawesome/brands/github-alt
     edit: material/pencil-box
     view: material/eye-outline
@@ -93,6 +93,9 @@ plugins:
       branch: main
   - termynal
 
+extra_css:
+  - stylesheets/extra.css
+
 extra:
   version:
     provider: mike
@@ -103,7 +106,7 @@ extra:
     - icon: fontawesome/brands/python
       link: https://pypi.org/project/canfar
     - icon: fontawesome/brands/docker
-      link: images.canfar.net//harbor/projects
+      link: https://images.canfar.net
     - icon: fontawesome/brands/discord
       link: https://discord.gg/vcCQ8QBvBa
     - icon: fontawesome/solid/paper-plane
