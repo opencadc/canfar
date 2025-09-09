@@ -9,6 +9,7 @@ copyright: Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
 remote_branch: gh-pages
 
 theme:
+  logo: static/canfarLogo.png
   name: material
   palette:
     - media: "(prefers-color-scheme)"
@@ -16,16 +17,16 @@ theme:
         icon: material/link
         name: Switch to light mode
     - media: "(prefers-color-scheme: light)"
-      scheme: default
-      primary: indigo
-      accent: indigo
+      scheme: canfar
+      primary: custom
+      accent: custom
       toggle:
         icon: material/toggle-switch
         name: Switch to dark mode
     - media: "(prefers-color-scheme: dark)"
       scheme: slate
-      primary: black
-      accent: indigo
+      primary: custom
+      accent: custom
       toggle:
         icon: material/toggle-switch-off
         name: Switch to system preference
@@ -92,6 +93,9 @@ plugins:
       repository: opencadc/canfar
       branch: main
   - termynal
+
+extra_css:
+  - stylesheets/extra.css
 
 extra:
   version:
