@@ -23,14 +23,3 @@ To this end, CANFAR develops and operates user-facing and integrated services, s
 4. Reduce barriers and accelerate adoption of new emerging technologies in Big Data and Computing in the astronomy community.
 
 5. Share capabilities developed in the astronomy community with other domains.
-
-## Membership
-
-The consortium membership reflects the necessity of present and future science challenges to integrate those groups and institutions that specialize in the scientific aspects (typically at the universities and research centres and institutes) and the groups that have developed the technical and computer engineering expertise to respond to the needs of science programs.
-
-Consequently the following groups are eligible for membership in the CANFAR consortium:
-
-- Individual university researchers and their groups
-- University centres or institutions engaged in astronomy research
-- Multi-institutional or multi-investigator collaborations, including their international partners
-- Individuals and teams from the CADC, or teams from Digital Research Alliance Canada, WestGrid or other entities that provide computational and data resources and infrastructure
