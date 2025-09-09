@@ -52,7 +52,7 @@ jobs:
       -
         #! TODO: Enable the PYPI build, once confguration is confirmed.
         name: Dispatch PYPI Release
-        if: ${{ steps.release-please.outputs.release_created && false}}
+        if: ${{ steps.release-please.outputs.release_created }}
         uses: peter-evans/repository-dispatch@ff45666b9427631e3450c54a1bcbee4d9ff4d7c0 # v3.0.0
         with:
           repository: opencadc/canfar

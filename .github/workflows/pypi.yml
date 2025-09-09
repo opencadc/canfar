@@ -10,6 +10,9 @@ permissions:
 jobs:
   pypi-release:
     runs-on: ubuntu-latest
+    concurrency:
+      group: pypi-${{ github.event.client_payload.tag_name }}
+      cancel-in-progress: true
     permissions:
       id-token: write # Generate OIDC token for attestations
       attestations: write # Attest the build provenance
@@ -47,7 +50,7 @@ jobs:
         name: Publish release distributions to PyPI
         uses: pypa/gh-action-pypi-publish@67339c736fd9354cd4f8cb0b744f2b82a74b5c70 # v1.12.3
         with:
-          attestations: false
+          attestations: true
           packages-dir: dist/
           verbose: true
           print-hash: true
