@@ -1,10 +1,11 @@
 # Organisation
 
 
-The day-to-day operation of the consortium is coordinated by the CADC teams which consists of:
+The day-to-day operation of the CANFAR platform is coordinated by the CADC teams. The team management is composed of:
 
 | Name | Role |
 |------|---------------------|
 | Sharon Goliath | Operations Lead |
 | Brian Major | Software Development Lead |
-| CADC Lead| JJ Kavelaars |
+| JJ Kavelaars | CADC Lead |
+
