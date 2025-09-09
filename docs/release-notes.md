@@ -9,7 +9,7 @@
     ### ✨ Highlights
     - [**New & Improved** User Documentation Hub](index.md)
     - **Official Release of the CANFAR Python Client & CLI** — see [clients docs](client/home.md)
-    - **Smart Session Launching** — choose between *flexible** (auto-scaleing) and *fixed** modes
+    - **Smart Session Launching** — choose between **flexible** (auto-scaling) and **fixed** modes
     - **Portal Enhancements** — home directory & quota display
     - **CARTA 5.0**: latest radio astronomy visualization tool ([August 2025 Release](https://docs.google.com/document/d/1kBtYjclOn5bxlvkV5a588DtUKy3UEqPXL78IiTVAMUk/edit?tab=t.0#heading=h.9m3bw7vn40ea))
     - **Firefly**: IVOA-compliant catalog browsing and visualization platform
@@ -29,7 +29,7 @@
     - CANFAR deployment requires Kubernetes v1.29 or later
     - **Kueue Scheduling** — optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management.
     - **Monitoring Fixes** — Skaha API now uses the the Job API instead of the Pod API internally to provide more accurate resource usage information.
-    - *Flexible* sessions now use the `Burstable` Kubernetes Quality of Service (QoS) class instead of `Guaranteed`, which provides better resource efficiency on the cluster. Currently, `flexible` sessions can grow upto 8 cores and 32GB of RAM.
+    - *Flexible* sessions now use the `Burstable` Kubernetes Quality of Service (QoS) class instead of `Guaranteed`, which provides better resource efficiency on the cluster. Currently, *flexible* sessions can grow up to 8 cores and 32GB of RAM.
 
     #### API Evolution
     - Skaha API v1 — supported in the updated Python Client & CLI. 
