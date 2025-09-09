@@ -268,13 +268,13 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../platform/home/" class="md-tabs__link">
+        <a href="../../platform/" class="md-tabs__link">
           
   
   
     
   
-  Platform Concepts
+  Platform
 
         </a>
       </li>
@@ -311,35 +311,16 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  FAQ
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
     
     
       <li class="md-tabs__item">
-        <a href="../../conduct/" class="md-tabs__link">
+        <a href="https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar" class="md-tabs__link">
           
   
   
     
   
-  Contributor Guide
+  Contribute
 
         </a>
       </li>
@@ -451,6 +432,22 @@
     
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
       
         
       
@@ -478,12 +475,12 @@
   
   
   
-    <a href="../../platform/home/" class="md-nav__link">
+    <a href="../../platform/" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
-    Platform Concepts
+    Platform
     
   </span>
   
@@ -1418,36 +1415,8 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../faq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    FAQ
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
     
     
-      
-        
-      
-        
-      
-        
       
         
       
@@ -1475,12 +1444,12 @@
   
   
   
-    <a href="../../conduct/" class="md-nav__link">
+    <a href="https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
-    Contributor Guide
+    Contribute
     
   </span>
   
@@ -1680,7 +1649,7 @@
 
 
 <h3 id="canfar.helpers.distributed" class="doc doc-heading">
-            <code>canfar.helpers.distributed</code>
+            <span class="doc doc-object-name doc-module-name">canfar.helpers.distributed</span>
 
 
 <a href="#canfar.helpers.distributed" class="headerlink" title="Permanent link">&para;</a></h3>
@@ -1711,24 +1680,27 @@
 
 
 <h4 id="canfar.helpers.distributed.stripe" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">stripe</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REPLICA_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)),</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REPLICA_COUNT&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)))</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span></code>
+            <span class="doc doc-object-name doc-function-name">stripe</span>
+
 
 <a href="#canfar.helpers.distributed.stripe" class="headerlink" title="Permanent link">&para;</a></h4>
-
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">stripe</span><span class="p">(</span>
+    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+    <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_COUNT&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+</code></pre></div>
 
     <div class="doc doc-contents ">
 
         <p>Returns every <code>total</code>-th item from the iterable with a <code>replica</code>-th offset.</p>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
@@ -1736,50 +1708,58 @@
             <td>
                 <code>iterable</code>
             </td>
-            <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The iterable to partition.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.abc.Iterable">Iterable</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
                 <code>replica</code>
             </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The replica number.
 Defaults to int(os.environ.get("REPLICA_ID", 1)).</p>
               </div>
-            </td>
-            <td>
-                  <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
                 <code>total</code>
             </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The total number of replicas.
 Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
               </div>
-            </td>
-            <td>
-                  <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
@@ -1795,20 +1775,21 @@ Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
 </code></pre></div>
 
 
-    <p><span class="doc-section-title">Yields:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Type</th>
-          <th>Description</th>
+          <th><span class="doc-section-title">YIELDS</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="canfar.helpers.distributed.T">T</span></code>
+                <span class="doc-yields-annotation">
+                    <code><span title="canfar.helpers.distributed.T">T</span></code>
+                </span>
             </td>
-            <td>
+            <td class="doc-yields-details">
               <div class="doc-md-description">
                 <p>Iterator[T]: The <code>replica</code>-th partition of the iterable.</p>
               </div>
@@ -1826,10 +1807,16 @@ Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
 
 
 <h4 id="canfar.helpers.distributed.chunk" class="doc doc-heading">
-            <code class="highlight language-python"><span class="n">chunk</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REPLICA_ID&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)),</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;REPLICA_COUNT&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">)))</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span></code>
+            <span class="doc doc-object-name doc-function-name">chunk</span>
+
 
 <a href="#canfar.helpers.distributed.chunk" class="headerlink" title="Permanent link">&para;</a></h4>
-
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">chunk</span><span class="p">(</span>
+    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+    <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+    <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_COUNT&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
+</code></pre></div>
 
     <div class="doc doc-contents ">
 
@@ -1846,14 +1833,11 @@ provided container environment variables.</p>
 </ul>
 
 
-<p><span class="doc-section-title">Parameters:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Description</th>
-          <th>Default</th>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
@@ -1861,70 +1845,79 @@ provided container environment variables.</p>
             <td>
                 <code>iterable</code>
             </td>
-            <td>
-                  <code><span title="collections.abc.Iterable">Iterable</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The iterable to distribute across replicas.</p>
               </div>
-            </td>
-            <td>
-                <em>required</em>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.abc.Iterable">Iterable</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
                 <code>replica</code>
             </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The replica number using 1-based indexing.
 Must be &gt;= 1 and &lt;= total. Defaults to REPLICA_ID environment variable.</p>
               </div>
-            </td>
-            <td>
-                  <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+                  </span>
+              </p>
             </td>
           </tr>
           <tr class="doc-section-item">
             <td>
                 <code>total</code>
             </td>
-            <td>
-                  <code><span title="int">int</span></code>
-            </td>
-            <td>
+            <td class="doc-param-details">
               <div class="doc-md-description">
                 <p>The total number of replicas. Must be &gt; 0.
 Defaults to REPLICA_COUNT environment variable.</p>
               </div>
-            </td>
-            <td>
-                  <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="int">int</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+                  </span>
+              </p>
             </td>
           </tr>
       </tbody>
     </table>
 
 
-    <p><span class="doc-section-title">Returns:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Type</th>
-          <th>Description</th>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                  <code><span title="collections.abc.Iterator">Iterator</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
+                <span class="doc-returns-annotation">
+                    <code><span title="collections.abc.Iterator">Iterator</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
+                </span>
             </td>
-            <td>
+            <td class="doc-returns-details">
               <div class="doc-md-description">
                 <p>Iterator[T]: An iterator yielding items assigned to this replica.</p>
               </div>
@@ -1934,20 +1927,21 @@ Defaults to REPLICA_COUNT environment variable.</p>
     </table>
 
 
-<p><span class="doc-section-title">Raises:</span></p>
-    <table>
+<table>
       <thead>
         <tr>
-          <th>Type</th>
-          <th>Description</th>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
+              <span class="doc-raises-annotation">
                   <code><span title="ValueError">ValueError</span></code>
+              </span>
             </td>
-            <td>
+            <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If replica &lt; 1 (1-based indexing expected).</p>
               </div>
@@ -1955,9 +1949,11 @@ Defaults to REPLICA_COUNT environment variable.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+              <span class="doc-raises-annotation">
                   <code><span title="ValueError">ValueError</span></code>
+              </span>
             </td>
-            <td>
+            <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If replica &gt; total (replica cannot exceed total replicas).</p>
               </div>
@@ -1965,9 +1961,11 @@ Defaults to REPLICA_COUNT environment variable.</p>
           </tr>
           <tr class="doc-section-item">
             <td>
+              <span class="doc-raises-annotation">
                   <code><span title="ValueError">ValueError</span></code>
+              </span>
             </td>
-            <td>
+            <td class="doc-raises-details">
               <div class="doc-md-description">
                 <p>If total &lt;= 0 (must have at least one replica).</p>
               </div>

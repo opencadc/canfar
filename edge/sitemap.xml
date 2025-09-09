@@ -5,35 +5,7 @@
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/bug-reports/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/changelog/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/conduct/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/contributing/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/faq/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/license/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
          <loc>https://opencadc.github.io/canfar/edge/release-notes/</loc>
-         <lastmod>2025-09-09</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/security/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
@@ -74,6 +46,10 @@
     </url>
     <url>
          <loc>https://opencadc.github.io/canfar/edge/client/async_session/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/client/bug-reports/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
@@ -129,11 +105,11 @@
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/accounts/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/batch-jobs/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/cloud/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
@@ -141,7 +117,7 @@
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/containers/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/doi/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
@@ -149,79 +125,155 @@
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/help/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/permissions/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/home/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/alma/casa/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/ALMA_Desktop/archive_download/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/ALMA_Desktop/archive_script_download/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/ALMA_Desktop/casa_containers/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/launch-carta/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/ALMA_Desktop/start_casa/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/launch-contributed/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/ALMA_Desktop/typical_reduction/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/launch-desktop/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/General_tools/File_transfers/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/launch-firefly/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/General_tools/Group_management/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/interactive-sessions/launch-notebook/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/General_tools/Using_sshfs/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/radio-astronomy/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/General_tools/Using_vostools/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/radio-astronomy/casa-workflows/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/General_tools/Using_webstorage/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/storage/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/LaunchCARTA/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/guides/storage/vospace-api/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/LaunchDesktop/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/legacy/cloud-services/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/LaunchNotebook/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/legacy/publication/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/Login/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/platform/legacy/storage/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/Overview/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/portal/overview/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/NewUser/ProjectSpace/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/portal/storage/</loc>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/Notebook/transfer_file/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/TipsTricks/Direct_url/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/TipsTricks/Increase_font/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/community/alma/TipsTricks/Using_clipboard/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/containers/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/containers/build/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/containers/registry/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/batch/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/carta/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/contributed/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/desktop/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/firefly/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/sessions/notebook/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/storage/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/storage/filesystem/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/storage/transfers/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/storage/vospace/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/support/</loc>
+         <lastmod>2025-09-09</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/platform/support/faq/</loc>
          <lastmod>2025-09-09</lastmod>
     </url>
 </urlset>

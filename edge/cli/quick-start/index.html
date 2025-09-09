@@ -268,13 +268,13 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../platform/home/" class="md-tabs__link">
+        <a href="../../platform/" class="md-tabs__link">
           
   
   
     
   
-  Platform Concepts
+  Platform
 
         </a>
       </li>
@@ -311,35 +311,16 @@
   
   
   
-    <li class="md-tabs__item">
-      <a href="../../faq/" class="md-tabs__link">
-        
-  
-  
-    
-  
-  FAQ
-
-      </a>
-    </li>
-  
-
-      
-        
-  
-  
-  
-  
     
     
       <li class="md-tabs__item">
-        <a href="../../conduct/" class="md-tabs__link">
+        <a href="https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar" class="md-tabs__link">
           
   
   
     
   
-  Contributor Guide
+  Contribute
 
         </a>
       </li>
@@ -451,6 +432,22 @@
     
       
         
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
       
         
       
@@ -478,12 +475,12 @@
   
   
   
-    <a href="../../platform/home/" class="md-nav__link">
+    <a href="../../platform/" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
-    Platform Concepts
+    Platform
     
   </span>
   
@@ -1341,36 +1338,8 @@
   
   
   
-    <li class="md-nav__item">
-      <a href="../../faq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    FAQ
-    
-  </span>
-  
-
-      </a>
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
     
     
-      
-        
-      
-        
-      
-        
       
         
       
@@ -1398,12 +1367,12 @@
   
   
   
-    <a href="../../conduct/" class="md-nav__link">
+    <a href="https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
-    Contributor Guide
+    Contribute
     
   </span>
   
@@ -1711,13 +1680,13 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
 </div>
 <h2 id="launch-your-first-notebook">Launch Your First Notebook<a class="headerlink" href="#launch-your-first-notebook" title="Permanent link">&para;</a></h2>
 <p>Lets launch a Jupyter notebook with astronomy tools pre-installed, </p>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span class="termynal-comment" data-ty># Launch a notebook session</span><span data-ty="input" data-ty-prompt="$">canfar create notebook skaha/astroml-notebook:latest</span><span data-ty>Successfully created session 'finish-inmate' (ID: d1tsqexh)<br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span class="termynal-comment" data-ty># Launch a notebook session</span><span data-ty="input" data-ty-prompt="$">canfar create notebook skaha/astroml:latest</span><span data-ty>Successfully created session 'finish-inmate' (ID: d1tsqexh)<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
 <ul>
 <li>We connected to CANFAR using your certificate</li>
-<li>The CLI defaulted the container image to <code>images.canfar.net/skaha/astroml-notebook:latest</code></li>
+<li>The CLI defaulted the container image to <code>images.canfar.net/skaha/astroml:latest</code></li>
 <li>A Jupyter notebook was launched with the container image in <strong>flexible mode</strong></li>
 <li>A random name was generated for your session, <code>finish-inmate</code> in this case</li>
 <li>The Science Platform allocated flexible resources for your notebook and started it</li>
@@ -1736,7 +1705,7 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
 </ul>
 </div>
 <h2 id="check-status">Check Status<a class="headerlink" href="#check-status" title="Permanent link">&para;</a></h2>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar ps</span><span data-ty>                                                CANFAR Sessions<br><br>SESSION ID  NAME          KIND         STATUS    IMAGE                           CREATED<br>──────────────────────────────────────────────────────────────────────────────────────────<br>d1tsqexh    finish-inmate notebook     Running   skaha/astroml-notebook:latest   7 minutes<br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar ps</span><span data-ty>                                                CANFAR Sessions<br><br>SESSION ID  NAME          KIND         STATUS    IMAGE                           CREATED<br>──────────────────────────────────────────────────────────────────────────────────────────<br>d1tsqexh    finish-inmate notebook     Running   skaha/astroml:latest   7 minutes<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1747,7 +1716,7 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
 </ul>
 </div>
 <h2 id="get-session-information">Get Session Information<a class="headerlink" href="#get-session-information" title="Permanent link">&para;</a></h2>
-<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar info $(canfar ps -q)</span><span data-ty><br>  Session ID    d1tsqexh<br>  Name          finish-inmate<br>  Status        Running<br>  Type          notebook<br>  Image         images.canfar.net/skaha/astroml-notebook:latest<br>  User ID       brars<br>  Start Time    13 minutes ago<br>  Expiry Time   3 days and 23.77 hours<br>  Connect URL   https://connect.to/notebook/here<br>  UID           123456789<br>  GID           123456789<br>  Groups        [12345, 67890]<br>  App ID        &lt;none&gt;<br>  CPU Usage     0% of 1 core(s)<br>  RAM Usage     0% of 2G GB<br>  GPU Usage     Not Requested<br></span></div>
+<div class="termy" data-termynal data-ty-macos data-ty-title="bash"><span data-ty="input" data-ty-prompt="$">canfar info $(canfar ps -q)</span><span data-ty><br>  Session ID    d1tsqexh<br>  Name          finish-inmate<br>  Status        Running<br>  Type          notebook<br>  Image         images.canfar.net/skaha/astroml:latest<br>  User ID       brars<br>  Start Time    13 minutes ago<br>  Expiry Time   3 days and 23.77 hours<br>  Connect URL   https://connect.to/notebook/here<br>  UID           123456789<br>  GID           123456789<br>  Groups        [12345, 67890]<br>  App ID        &lt;none&gt;<br>  CPU Usage     0% of 1 core(s)<br>  RAM Usage     0% of 2G GB<br>  GPU Usage     Not Requested<br></span></div>
 
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
@@ -1833,7 +1802,7 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
 <h2 id="need-help">Need Help?<a class="headerlink" href="#need-help" title="Permanent link">&para;</a></h2>
 <ul>
 <li>💬 <a href="https://github.com/opencadc/canfar/discussions">Community Support</a></li>
-<li>🐛 <a href="../../bug-reports/">Report Issues</a></li>
+<li>🐛 <a href="../bug-reports.md">Report Issues</a></li>
 </ul>
 <hr />
 <div class="admonition quote">
@@ -1862,7 +1831,7 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 27, 2025 17:17:31 UTC">August 27, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 28, 2025 21:53:34 UTC">August 28, 2025</span>
   </span>
 
     
@@ -1889,6 +1858,11 @@ Starting<span class="w"> </span>OIDC<span class="w"> </span>Device<span class="w
 
     
     <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
       
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
