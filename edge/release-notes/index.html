@@ -17,7 +17,7 @@
       
       
       
-      <link rel="icon" href="../static/meteor.ico">
+      <link rel="icon" href="../static/logo.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
     
     
@@ -104,7 +104,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
       
-  <img src="../static/canfarLogo.png" alt="logo">
+  <img src="../static/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -393,7 +393,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
       
-  <img src="../static/canfarLogo.png" alt="logo">
+  <img src="../static/logo.png" alt="logo">
 
     </a>
     CANFAR
@@ -776,17 +776,16 @@
 <h3 id="highlights">✨ Highlights<a class="headerlink" href="#highlights" title="Permanent link">&para;</a></h3>
 <ul>
 <li><a href="https://www.opencadc.org/canfar/latest/"><strong>New &amp; Improved</strong> User Documentation Hub</a></li>
-<li><strong>Offcial Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../client/home/">clients docs for more details.</a></li>
+<li><strong>Official Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../client/home/">clients docs for more details.</a></li>
 <li><strong>Smart Session Launching</strong> — <strong>Flexible</strong> (auto-scales) and <strong>Fixed</strong> modes</li>
 <li><strong>Portal Enhancements</strong> — home directory usage &amp; quota information display</li>
-<li><strong>New Science Use Cases</strong> — <a href="../platform/guides/interactive-sessions/launch-carta/">CARTA 5.0</a> and <a href="../platform/guides/interactive-sessions/launch-firefly/">Firefly</a> support</li>
-<li><strong>Batch Job Scheduling</strong> is now generally availaible for all users via the <a href="../client/home/">CANFAR Python Client</a> and <a href="../cli/quick-start/">CLI</a>.</li>
+<li><strong>New Science Containers</strong> — <a href="../platform/guides/interactive-sessions/launch-carta/">CARTA 5.0</a> and <a href="../platform/guides/interactive-sessions/launch-firefly/">Firefly</a> support</li>
 </ul>
 <h3 id="changes-deprecations">📝 Changes &amp; Deprecations<a class="headerlink" href="#changes-deprecations" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Skaha API has been upgraded to <code>v1</code></strong>. The <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API is scheduled to be sunset with the release of <strong>CSP 2026.1</strong>. Portal users are unaffected; API users should plan to move to v1.</li>
+<li><strong>Skaha API has been upgraded to <code>v1</code></strong>. The <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API will be sunset at a date TBA (to be announced). Portal users are unaffected; API users should plan to move to v1.</li>
 <li><strong>Container Image Labels</strong> are no longer required in the <a href="https://images.canfar.net/">Harbor Image Registry</a>. They are only used to populate dropdown menu options in the Science Portal UI for public images.</li>
-<li><strong><code>headless</code></strong> mode is the default session behavior, use the <code>kind</code> flag in the client and CLI to override this.</li>
+<li><strong>Session Types</strong>: When launching via API, omit the <code>type</code> parameter for headless mode; interactive sessions require the <code>type</code> parameter.</li>
 </ul>
 <h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
@@ -794,26 +793,26 @@
 </ul>
 <h3 id="for-deployers">⚙️ For Deployers<a class="headerlink" href="#for-deployers" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Kueue Scheduling</strong>: Optional advanced job scheduling system available for deployment to reduce cluster pressure and provide queue management. See <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment configuration</a> for setup instructions.</li>
+<li><strong>Kueue Scheduling</strong>: Optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management. See <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment configuration</a> for setup instructions.</li>
 </ul>
 <hr />
 <h2 id="detailed-technical-information">🔍 Detailed Technical Information<a class="headerlink" href="#detailed-technical-information" title="Permanent link">&para;</a></h2>
 <h3 id="system-architecture-changes">System Architecture Changes<a class="headerlink" href="#system-architecture-changes" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Kubernetes Upgrade</strong>: Cluster upgraded to <strong>Kubernetes 1.28</strong> for improved performance and security</li>
-<li><strong>Queue Management</strong>: Internal scheduler now fronted by Kueue system to alleviate cluster pressure</li>
+<li><strong>Queue Management</strong>: Optional Kueue system available to front internal scheduler and alleviate cluster pressure</li>
 <li><strong>Resource Allocation</strong>: Smart session launching with <strong>Flexible</strong> (auto-scaling) and <strong>Fixed</strong> modes for better cluster efficiency</li>
 </ul>
 <h3 id="api-evolution">API Evolution<a class="headerlink" href="#api-evolution" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Skaha API v1</strong>: New endpoint at <code>https://ws-uv.canfar.net/skaha/</code></li>
-<li><strong>Backward Compatibility</strong>: v0 API remains available during transition period (sunset with CSP 2026.1)</li>
+<li><strong>Backward Compatibility</strong>: v0 API remains available during transition period (sunset date TBA)</li>
 <li><strong>Session Parameters</strong>: Interactive sessions now require <code>type</code> parameter; headless jobs should omit it</li>
 </ul>
 <h3 id="container-image-management">Container &amp; Image Management<a class="headerlink" href="#container-image-management" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Harbor Labels</strong>: No longer required for session launching (only for Science Portal UI dropdown population)</li>
-<li><strong>Headless Mode</strong>: Now default session behavior - any image can run headless without special labels</li>
+<li><strong>Headless Mode</strong>: Any image can run headless without special labels when <code>type</code> parameter is omitted</li>
 <li><strong>Science Containers</strong>: Curated containers available in <a href="https://images.canfar.net/">skaha project</a> on Science Portal</li>
 </ul>
 <h3 id="enhanced-user-experience">Enhanced User Experience<a class="headerlink" href="#enhanced-user-experience" title="Permanent link">&para;</a></h3>
@@ -858,7 +857,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 22:17:41 UTC">September 8, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 22:41:27 UTC">September 8, 2025</span>
   </span>
 
     
@@ -1027,7 +1026,7 @@
       
       
     
-    <a href="images.canfar.net//harbor/projects" target="_blank" rel="noopener" title="harbor" class="md-social__link">
+    <a href="https://images.canfar.net" target="_blank" rel="noopener" title="images.canfar.net" class="md-social__link">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
     </a>
   
