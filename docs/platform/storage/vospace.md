@@ -677,7 +677,7 @@ for path in test_paths:
 - **[Data Transfers →](transfers.md)** - Moving data between storage systems
 - **[Filesystem Access →](filesystem.md)** - ARC storage and SSHFS mounting
 - **[Storage Overview →](index.md)** - Understanding all CANFAR storage types
-- **[Interactive Sessions →](../sessions/)** - Using VOSpace within CANFAR sessions
+- **[Interactive Sessions →](../sessions/index.md)** - Using VOSpace within CANFAR sessions
 ```
 
 

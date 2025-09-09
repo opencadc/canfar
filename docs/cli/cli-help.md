@@ -198,7 +198,7 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 
 #### Resource Allocation Modes
 
-CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#session-resource-allocation) for more information.
+CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#resource-allocation-modes) for more information.
 
 ### `canfar ps`
 

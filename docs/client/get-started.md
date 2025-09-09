@@ -128,8 +128,4 @@ Now that you have canfar installed and configured:
 - [x] Learn about [Authentication Contexts](../cli/authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.
 - [x] Explore [Basic Examples](examples.md) and [Advanced Examples](advanced-examples.md) for common use cases.
 - [x] Check out the [Python API Reference](session.md) for detailed documentation of all available methods.
-- [x] Refer to the [FAQ](../faq.md) for answers to common questions.
-
-!!! tip "Getting Help"
-    - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions)
-    - 🐛 [Report Issues](../bug-reports.md)
+- [x] Refer to the [FAQ](../platform/support/faq.md) for answers to common questions.

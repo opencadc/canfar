@@ -190,7 +190,7 @@ Opening session tcgle3m3 in a new tab.
 
 #### Resource Allocation Modes
 
-CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#session-resource-allocation) for more information.
+CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#resource-allocation-modes) for more information.
 
 
 ## Start Analyzing!
@@ -252,13 +252,3 @@ You now have a fully-equipped astronomy computing environment running in the clo
     - **Variable performance in flexible mode?**
       - This is normal - performance adapts to cluster load
       - For consistent performance, use fixed mode with specific `--cpu` and `--memory` values
-
-## Need Help?
-
-- 💬 [Community Support](https://github.com/opencadc/canfar/discussions)
-- 🐛 [Report Issues](../bug-reports.md)
-
----
-
-!!! quote "Success Story"
-    "I went from never using clouds to analyzing my furry data in under 10 minutes. The setup was so smooth!" - *Tabby Cat, University of Purr*

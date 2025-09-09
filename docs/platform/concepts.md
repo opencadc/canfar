@@ -591,7 +591,7 @@ CANFAR provides REST APIs for programmatic access, enabling automation and integ
 | Service | Purpose | Documentation |
 |---------|---------|---------------|
 | **Session Management** | Launch, monitor, and control computing sessions | [Python Client](../client/home.md) |
-| **VOSpace Operations** | File transfer, storage, and metadata operations | [VOSpace API](../client/examples.md#vospace-examples) |
+| **VOSpace Operations** | File transfer, storage, and metadata operations | [VOSpace API](../storage/vospace.md#python-api) |
 | **Access Control** | Authentication and authorization management | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
 ### Automation Examples
@@ -660,9 +660,9 @@ Now that you understand CANFAR's core concepts, explore specific platform areas:
 
 **For Administrators:**
 
-- **[Project Management](permissions.md#project-administration)** - Managing research teams and resources
-- **[Resource Allocation](permissions.md#resource-management)** - Understanding quotas and limits
-- **[Access Control](permissions.md#access-control-lists)** - Fine-grained permission management
+- **[Project Management](permissions.md#group-management-collaboration)** - Managing research teams and resources
+- **[Resource Allocation](permissions.md#group-resource-access)** - Understanding quotas and limits
+- **[Access Control](permissions.md#access-control-lists-acls)** - Fine-grained permission management
 
 ---
 

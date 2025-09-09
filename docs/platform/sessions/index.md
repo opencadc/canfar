@@ -4,7 +4,7 @@
 
 !!! info "Platform Navigation"
     **Interactive Sessions**: Your gateway to computing environments and analysis workflows.  
-    **[Platform Home](../home.md)** | **[Platform Concepts](../concepts.md)** | **[Storage Systems](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
+    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Storage Systems](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
 
 !!! abstract "🎯 Session Types Overview"
     **Choose the right interface for your research:**

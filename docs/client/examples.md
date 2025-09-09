@@ -129,7 +129,7 @@ These examples use the asynchronous API for best performance and scalability.
 
 ## Resource Allocation Modes
 
-CANFAR supports two resource allocation modes for your sessions. See the [resource allocation guide](../platform/concepts.md#session-resource-allocation) for more information.
+CANFAR supports two resource allocation modes for your sessions. See the [resource allocation guide](../platform/concepts.md#resource-allocation-modes) for more information.
 
 ### Examples
 

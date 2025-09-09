@@ -248,8 +248,8 @@ Example: [Data Directory](https://www.canfar.net/storage/vault/list/AstroDataCit
 You decide what to include: data, figures, software, etc. We recommend a top‑level `README` describing layout and usage.
 
 ### Uploading {#uploading}
-- Few/small files: [Web Storage UI](storage.md).
-- Large/many files: [Use `vcp`, `vos` CLI Tools](./storage.md#vos-cli).
+- Few/small files: [Web Storage UI](storage/transfers.md#upload-methods).
+- Large/many files: [Use `vcp`, `vos` CLI Tools](storage/transfers.md#large-files-100gb-advanced-methods).
 
 ### Refereeing access {#ref-access}
 Contact support to obtain a read‑only account and share with the editor/referee. They may request changes prior to publication.

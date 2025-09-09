@@ -239,11 +239,3 @@ Enable detailed authentication logging:
 # CLI debug mode
 canfar auth login --debug
 ```
-
-### Getting Help
-
-!!! tip "Support Resources"
-    - 📖 [CLI Reference](cli-help.md) - Complete command documentation
-    - 💬 [Community Discussions](https://github.com/opencadc/canfar/discussions) - Ask questions
-    - 🐛 [Report Issues](../bug-reports.md) - Bug reports and feature requests
-```

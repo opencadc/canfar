@@ -75,16 +75,7 @@ When creating your bug report, please provide:
 
 ## Security Issues
 
-If you discover a security vulnerability, please **do not** create a public issue. Instead, refer to our [Security Policy](security.md) for instructions on how to report security issues responsibly.
-
-
-## Getting Help
-
-If you are not sure whether something is a bug or need help with usage:
-
-- Check our [documentation](https://opencadc.github.io/canfar/)
-- Ask questions in [GitHub Discussions](https://github.com/opencadc/canfar/discussions)
-- Review existing [GitHub Issues](https://github.com/opencadc/canfar/issues)
+If you discover a security vulnerability, please **do not** create a public issue. Instead, refer to our [Security Policy](../security.md) for instructions on how to report security issues responsibly.
 
 
 ## After Reporting

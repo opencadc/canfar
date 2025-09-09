@@ -6,7 +6,7 @@
     **Storage Systems**: Data management and persistence for astronomical research.  
     **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
 
-!!! abstract "🎯 Storage Guide Overview"
+!!! abstract "🎯 Storage Guide"
     **Master CANFAR's storage systems:**
     
     - **[Filesystem Access](filesystem.md)**: ARC storage, SSHFS mounting, and permissions
@@ -16,7 +16,7 @@
 
 CANFAR provides four distinct storage systems, each optimised for different stages of the research lifecycle. Understanding how these systems work together with CANFAR sessions is essential for efficient data management and analysis workflows.
 
-## 📊 Storage Types Overview
+## 📊 Storage Types
 
 | Storage Type    | Location/URI | Access Speed | Visibility | Persistence | Backup | Session Access | Best For |
 |----------------|--------------|--------------|------------|-------------|--------|----------------|----------|
@@ -189,7 +189,7 @@ Contact CANFAR support (`support@canfar.net`) with:
 - Justification (dataset size, collaboration needs)
 - Timeline for the project
 
-## 🔗 Integration with Other Systems
+## 🔗 Integrations
 
 ### Session Types and Storage Access
 
@@ -206,7 +206,7 @@ Contact CANFAR support (`support@canfar.net`) with:
 - **Vault**: Requires CADC certificate (`cadc-get-cert`)
 - **Group permissions**: Managed via CANFAR Group Management tools
 
-## ❓ Troubleshooting Common Issues
+## ❓ Troubleshooting
 
 **"No space left on device" in ARC Home**
 

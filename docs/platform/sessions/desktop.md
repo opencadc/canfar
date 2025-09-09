@@ -235,13 +235,13 @@ Since different containers may run on separate remote computers, text transfer b
 2. **Find "Clipboard"** in the application menu (middle of list)
 3. **Click to open** the Clipboard application
 
-![Desktop with Clipboard Menu](images/clipboard/2_desktop_with_clipboard_menu.png)
+![Desktop with Clipboard Menu](images/desktop/clipboard/2_desktop_with_clipboard_menu.png)
 
 #### Using the Clipboard for Text Transfer
 
 The Clipboard functions as an intermediary for text transfer:
 
-![Clipboard Open](images/clipboard/3_clipboard_open.png)
+![Clipboard Open](images/desktop/clipboard/3_clipboard_open.png)
 
 **Transfer Process:**
 1. **Copy text**: Highlight text in source application, use `Ctrl+Shift+C`
@@ -249,7 +249,7 @@ The Clipboard functions as an intermediary for text transfer:
 3. **Select in Clipboard**: Highlight the text and copy with `Ctrl+Shift+C`
 4. **Paste to target**: Click in destination application, use `Ctrl+Shift+V`
 
-![Text Transfer Example](images/clipboard/4_text_into_clipboard.png)
+![Text Transfer Example](images/desktop/clipboard/4_text_into_clipboard.png)
 
 !!! tip "Keyboard Shortcuts"
     - **Copy**: `Ctrl+Shift+C`
@@ -266,12 +266,12 @@ Desktop containers support adjustable font sizes for better readability:
 2. **Select size**: Choose from Small, Medium, or Large options
 3. **Apply immediately**: Font changes take effect instantly
 
-![Font Size Popup](images/font/2_fontsize_popup.png)
+![Font Size Popup](images/desktop/font/2_fontsize_popup.png)
 
 **Before and after font size change:**
 
-![Original Font](images/font/1_terminal_original_font.png)
-![Large Font](images/font/3_terminal_new_fontsize.png)
+![Original Font](images/desktop/font/1_terminal_original_font.png)
+![Large Font](images/desktop/font/3_terminal_new_fontsize.png)
 
 **Compatible Applications:**
 - Terminal windows

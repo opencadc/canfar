@@ -22,7 +22,7 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 
 - **[Get Started Guide](../get-started.md)**: 10-minute quick start
 - **[First Login](../permissions.md)**: Account setup and access
-- **[Choose Your Interface](../sessions/)**: Pick the right session type
+- **[Choose Your Interface](../sessions/index.md)**: Pick the right session type
 
 ### Having Problems?
 
@@ -37,9 +37,9 @@ The CANFAR Science Platform provides multiple channels for getting help, from se
 **User Guide Sections:**
 
 - **[Concepts](../concepts.md)**: Understanding the platform architecture
-- **[Storage](../storage/)**: Managing your data effectively
-- **[Containers](../containers/)**: Using and building software environments
-- **[Interactive Sessions](../sessions/)**: Jupyter, Desktop, CARTA
+- **[Storage](../storage/index.md)**: Managing your data effectively
+- **[Containers](../containers/index.md)**: Using and building software environments
+- **[Interactive Sessions](../sessions/index.md)**: Jupyter, Desktop, CARTA
 - **[Batch Jobs](../sessions/batch.md)**: Automated and large-scale processing
 
 ## 🔧 Troubleshooting
@@ -91,7 +91,7 @@ getfacl /arc/projects/[project]/
 
 !!! tip "Advanced: Optimising Performance"
     - Use [Batch Jobs](../sessions/batch.md) for large-scale or automated processing.
-    - Monitor session resource usage with `canfar stats` and [session info](../concepts.md#sessions).
+    - Monitor session resource usage with `canfar stats` and [session info](../cli/cli-help.md#canfar-info).
     - Store temporary files in `/scratch/` for faster I/O.
     - For parallel workloads, see [Distributed Computing](../../client/helpers.md).
 

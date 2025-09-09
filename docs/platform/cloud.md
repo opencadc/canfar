@@ -1,7 +1,7 @@
 # Legacy Cloud Platform (OpenStack VMs)
 
 !!! warning "Legacy Platform"
-    This documentation covers the legacy CANFAR cloud platform based on OpenStack virtual machines. For new users, we recommend the modern [CANFAR Science Platform](home.md) which provides container-based sessions, improved workflows, and better resource management.
+    This documentation covers the legacy CANFAR cloud platform based on OpenStack virtual machines. For new users, we recommend the modern [CANFAR Science Platform](get-started.md) which provides container-based sessions, improved workflows, and better resource management.
 
 !!! abstract "🎯 What You'll Learn"
     - How to access legacy CANFAR cloud services via Digital Research Alliance Canada (DRAC) OpenStack
@@ -396,8 +396,8 @@ Migrate components incrementally:
 ### Modern Platform Documentation
 
 - **[CANFAR Science Platform →](index.md)**: Overview of modern container-based platform
-- **[Interactive Sessions →](sessions/)**: Browser-based computing environments
-- **[Container Usage →](containers/)**: Working with pre-built and custom containers
+- **[Interactive Sessions →](sessions/index.md)**: Browser-based computing environments
+- **[Container Usage →](containers/index.md)**: Working with pre-built and custom containers
 - **[Batch Jobs →](sessions/batch.md)**: Modern batch processing workflows
 
 ### Support and Migration Assistance

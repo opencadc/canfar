@@ -25,11 +25,11 @@ Batch processing provides several key advantages for astronomical research:
 ---
 
 !!! info "Quick Links"
-    - [Container Development](containers.md)
+    - [Container Development](../containers/index.md)
     - [Storage Guide](../storage/index.md)
-    - [CANFAR Python Client](../client/home.md)
+    - [CANFAR Python Client](../../client/home.md)
     - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
-    - [Support](help.md)
+    - [Support](../support/index.md)
 
 ### 1. API-Based Execution
 
@@ -174,7 +174,7 @@ rule source_extract:
 
 !!! tip "Advanced: Resource Monitoring"
     - Use `canfar stats <session-id>` and `canfar info <session-id>` to monitor job resource usage.
-    - For parallel workloads, see [Distributed Computing](../client/helpers.md).
+    - For parallel workloads, see [Distributed Computing](../../client/helpers.md) for strategies.
 
 #### Resource Allocation Strategy
 
@@ -254,7 +254,7 @@ echo "Processing complete"
 
 !!! tip "Advanced: Distributed Workflows"
     - Use [Snakemake](https://snakemake.readthedocs.io/en/stable/) or [Prefect](https://www.prefect.io/) for complex workflow automation.
-    - For team projects, see [Accounts & Permissions](accounts.md) for collaboration strategies.
+    - For team projects, see [Accounts & Permissions](../permissions.md) for collaboration strategies.
 
 **Multi-core CPU Usage:**
 ```python
@@ -370,7 +370,7 @@ def timed_processing(func, *args, **kwargs):
 !!! info "See Also"
     - [Container Development](../containers/index.md)
     - [Storage Guide](../storage/index.md)
-    - [CANFAR Python Client](../client/home.md)
+    - [CANFAR Python Client](../../client/home.md)
     - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
     - [Support](../support/index.md)
 
@@ -392,7 +392,7 @@ Choose appropriate resources based on your workload:
     - **Large jobs** (≥16 cores, ≥64GB) may queue longer  
     - **Off-peak hours** (evenings, weekends) often have shorter wait times
     - **Resource requests** should match actual usage to avoid waste
-    - For advanced queue management, see [CANFAR Python Client](../client/home.md)
+    - For advanced queue management, see [CANFAR Python Client](../../client/home.md)
 
 ### Queue Management
 
@@ -408,7 +408,7 @@ Understand job priorities and scheduling:
 
 !!! note "Legacy Client"
     The `skaha` Python client is deprecated and has been replaced by the `canfar` client. The following examples use the modern `canfar` client.
-    For more examples, see [Client Examples](../client/examples.md).
+    For more examples, see [Client Examples](../../client/examples.md).
 
 ### Method 1: `canfar` Command-Line Client
 
@@ -627,7 +627,7 @@ canfar stats [session-id]
 !!! info "See Also"
     - [Container Development](../containers/index.md)
     - [Storage Guide](../storage/index.md)
-    - [CANFAR Python Client](../client/home.md)
+    - [CANFAR Python Client](../../client/home.md)
     - [API Reference](https://ws-uv.canfar.net/skaha/v1/capabilities)
     - [Support](../support/index.md)
 
