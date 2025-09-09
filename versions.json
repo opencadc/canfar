@@ -5,11 +5,16 @@
     "aliases": []
   },
   {
-    "version": "v1.0.0-rc",
-    "title": "v1.0.0-rc",
+    "version": "canfar-v1.0.0",
+    "title": "canfar-v1.0.0",
     "aliases": [
       "latest"
     ]
+  },
+  {
+    "version": "v1.0.0-rc",
+    "title": "v1.0.0-rc",
+    "aliases": []
   },
   {
     "version": "v0.8.0",
