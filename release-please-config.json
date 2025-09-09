@@ -3,6 +3,7 @@
   "packages": {
     ".": {
       "changelog-path": "CHANGELOG.md",
+      "include-component-in-tag": false,
       "extra-files": [
         {
           "path": "canfar/__init__.py",
