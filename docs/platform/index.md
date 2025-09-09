@@ -5,7 +5,7 @@ The Canadian Advanced Network for Astronomy Research let you access  software en
 
 !!! info "Platform Navigation"
     **CANFAR Science Platform**: Your gateway to cloud-based astronomical computing and collaboration.  
-    **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
+    **[Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[DOI Services](doi.md)** | **[Legacy Cloud](cloud.md)**
 
 !!! abstract "🚀 Platform Overview"
     - **Scalable** cloud compute and storage to analyze very large datasets from anywhere.

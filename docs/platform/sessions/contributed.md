@@ -26,7 +26,7 @@ Your application will start in 30-90 seconds.
 **Currently Available Applications:**
 
 - **[marimo](https://marimo.io)** (`skaha/marimo:latest`): Reactive Python notebooks for reproducible analysis.
-- **[VSCode on Browser](https://github.com/coder/code-server)** (`skaha/vscode:latest`): A browser-based development environment for collaborative projects.
+- **[VSCode on Browser](https://github.com/coder/code-server)** (`skaha/vscode:latest`): A browser-based development environment for collaborative projects (based on Visual Studio Code).
 
 ## 🧑‍💻 Contributing Your App
 

@@ -6,7 +6,7 @@
 
 !!! info "Platform Navigation"
     **Getting Started**: Essential setup steps for new CANFAR users.  
-    **[Platform Home](index.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
+    **[Home](index.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
 
 !!! info "Quick Links"
     **Essential Resources:**
