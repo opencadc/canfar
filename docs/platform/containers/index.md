@@ -3,15 +3,15 @@
 **Working with astronomy software containers on CANFAR - understanding container environments, using pre-built images, and creating custom software stacks.**
 
 !!! info "Platform Navigation"
-    **Containers**: Software environments and containerised applications for astronomy.  
+    **Containers**: Software environments and containerized applications for astronomy.  
     **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Storage Systems](../storage/index.md)** | **[Support](../support/index.md)**
 
 !!! abstract "🎯 Container Guide Overview"
-    **Master CANFAR's containerised environments:**
+    **Master CANFAR's containerized environments:**
     
     - **[Container Concepts](#what-are-containers)**: Understanding reproducible software environments
     - **[Available Containers](#canfar-supported-containers)**: Pre-built astronomy software stacks
-    - **[Container Building](build.md)**: Creating custom environments for specialised workflows
+    - **[Container Building](build.md)**: Creating custom environments for specialized workflows
     - **[Registry Management](registry.md)**: Harbor registry access and image distribution
 
 Containers provide pre-packaged software environments that include everything needed to run astronomy applications. On CANFAR, containers eliminate the "works on my machine" problem by ensuring consistent, reproducible computational environments across different sessions and workflows.
@@ -62,7 +62,7 @@ graph TB
     Runtime --> Resources[Resource Allocation]
 ```
 
-**Base containers** provide fundamental tools and the conda package manager, while **specialised containers** build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.
+**Base containers** provide fundamental tools and the conda package manager, while **specialized containers** build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.
 
 ## 🏗️ Build Time vs Runtime
 
@@ -75,7 +75,7 @@ Understanding the distinction between build time and runtime is crucial for effe
 - **Software installation**: Install system packages, Python libraries, astronomy tools
 - **Environment configuration**: Set up paths, environment variables, user permissions
 - **Code packaging**: Include stable scripts and analysis tools
-- **Image optimisation**: Layer caching, size reduction, security patches
+- **Image optimization**: Layer caching, size reduction, security patches
 
 ```dockerfile
 # Build time example
@@ -183,7 +183,7 @@ Desktop sessions integrate containers in two ways:
 The core **desktop** container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session.
 
 #### 2. Desktop-App Containers
-Specialised containers that run specific GUI applications within desktop sessions.
+Specialized containers that run specific GUI applications within desktop sessions.
 
 **Requirements for desktop-app containers:**
 
@@ -214,7 +214,7 @@ Headless containers execute without graphical interfaces, perfect for automated 
 - **No GUI requirements**: Command-line tools only
 - **Script execution**: Runs your specified command and exits
 - **Background processing**: Perfect for large datasets and automation
-- **Resource optimisation**: Can use different resource priorities
+- **Resource optimization**: Can use different resource priorities
 
 ```bash
 # Example headless execution
@@ -356,7 +356,7 @@ canfar launch notebook images.canfar.net/skaha/astroml:latest \
 
 #### `casa` - Radio Astronomy
 
-**Purpose**: Specialised environment for radio interferometry analysis
+**Purpose**: Specialized environment for radio interferometry analysis
 
 **Pre-installed software:**
 - **CASA suite**: Complete Common Astronomy Software Applications
@@ -393,7 +393,7 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 **Purpose**: Advanced visualisation for optical and infrared surveys
 
 **Features:**
-- **Multi-mission support**: LSST, Spitzer, WISE, 2MASS data
+- **Multi-mission support**: LSST, Spitzer, WISE, 2MASS, ...
 - **Interactive catalogues**: Source overlays and cross-matching
 - **Multi-wavelength workflows**: RGB composites and band comparisons
 - **Large dataset handling**: Efficient rendering of survey-scale data
@@ -402,10 +402,10 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 
 #### `desktop` - Ubuntu Environment
 
-**Purpose**: Complete Linux desktop for GUI applications and legacy software
+**Purpose**: Complete Linux desktop for GUI applications and legacy software. Astronomy software applications will each run on dedicated nodes.
 
 **Features:**
-- **Ubuntu 22.04 LTS**: Linux environment
+- **Ubuntu**: Linux environment
 - **Desktop environment**: Full GNOME-based interface
 - **Applications**: Firefox, file managers, terminals, editors
 - **X11 forwarding**: Support for launching astronomy GUI applications
@@ -415,7 +415,6 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 **Purpose**: Minimal Jupyter environment for basic Python work
 
 **Features:**
-- **Core Python**: NumPy, SciPy, Matplotlib basics
 - **Jupyter Lab**: Web-based notebook interface
 - **Extensible**: Foundation for custom development
 - **Fast startup**: Minimal software for quick sessions
@@ -434,7 +433,7 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 | **Batch processing** | `astroml`/`casa` | Headless | Variable |
 
 !!! tip "Container Selection Strategy"
-    Start with `astroml` for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialised containers (`casa`, `carta`, `firefly`) only when you need their specific tools.
+    Start with `astroml` for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialized containers (`casa`, `carta`, `firefly`) only when you need their specific tools.
 
 ### Version Management
 
