@@ -201,7 +201,8 @@ nav:
     - Support:
       - Help: platform/support/index.md
       - FAQ: platform/support/faq.md
-    - Release Notes: release-notes.md
+    - Releases:
+      - 2025.1: release-notes.md
   - Client:
     - Home: client/home.md
     - Authentication: cli/authentication-contexts.md
