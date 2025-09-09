@@ -2204,7 +2204,9 @@ destroying existing sessions.</p>
 <span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
-<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Session Management Client.</span>
 
 <span class="sd">    This class provides methods to manage sessions, including fetching</span>
@@ -2374,8 +2376,10 @@ destroying existing sessions.</p>
 <span class="sd">        Args:</span>
 <span class="sd">            name (str): A unique name for the session.</span>
 <span class="sd">            image (str): Container image to use for the session.</span>
-<span class="sd">            cores (int, optional): Number of cores. Defaults to None.</span>
-<span class="sd">            ram (int, optional): Amount of RAM (GB). Defaults to None.</span>
+<span class="sd">            cores (int, optional): Number of cores.</span>
+<span class="sd">                Defaults to None, i.e. flexible mode.</span>
+<span class="sd">            ram (int, optional): Amount of RAM (GB).</span>
+<span class="sd">                Defaults to None, i.e. flexible mode.</span>
 <span class="sd">            kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
 <span class="sd">            gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">            cmd (Optional[str], optional): Command to run. Defaults to None.</span>
@@ -2386,7 +2390,7 @@ destroying existing sessions.</p>
 
 <span class="sd">        Notes:</span>
 <span class="sd">            - If cores and ram are not specified, the session will be created with</span>
-<span class="sd">              flexible resource allocation.</span>
+<span class="sd">              flexible resource allocation of upto 8 cores and 32GB of RAM.</span>
 <span class="sd">            - The name of the session suffixed with the replica number. eg. test-42</span>
 <span class="sd">              when replicas &gt; 1.</span>
 <span class="sd">            - Each container will have the following environment variables injected:</span>
@@ -2632,9 +2636,7 @@ destroying existing sessions.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">362</span>
 <span class="normal">363</span>
 <span class="normal">364</span>
 <span class="normal">365</span>
@@ -2649,7 +2651,9 @@ destroying existing sessions.</p>
 <span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
-<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Open session[s] in a web browser.</span>
 
 <span class="sd">    Args:</span>
@@ -2739,7 +2743,8 @@ destroying existing sessions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Number of cores. Defaults to None.</p>
+                <p>Number of cores.
+Defaults to None, i.e. flexible mode.</p>
               </div>
             </td>
             <td>
@@ -2755,7 +2760,8 @@ destroying existing sessions.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Amount of RAM (GB). Defaults to None.</p>
+                <p>Amount of RAM (GB).
+Defaults to None, i.e. flexible mode.</p>
               </div>
             </td>
             <td>
@@ -2867,7 +2873,7 @@ Defaults to None.</p>
   <summary>Notes</summary>
   <ul>
 <li>If cores and ram are not specified, the session will be created with
-  flexible resource allocation.</li>
+  flexible resource allocation of upto 8 cores and 32GB of RAM.</li>
 <li>The name of the session suffixed with the replica number. eg. test-42
   when replicas &gt; 1.</li>
 <li>Each container will have the following environment variables injected:<ul>
@@ -2998,7 +3004,9 @@ Defaults to None.</p>
 <span class="normal">246</span>
 <span class="normal">247</span>
 <span class="normal">248</span>
-<span class="normal">249</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3016,8 +3024,10 @@ Defaults to None.</p>
 <span class="sd">    Args:</span>
 <span class="sd">        name (str): A unique name for the session.</span>
 <span class="sd">        image (str): Container image to use for the session.</span>
-<span class="sd">        cores (int, optional): Number of cores. Defaults to None.</span>
-<span class="sd">        ram (int, optional): Amount of RAM (GB). Defaults to None.</span>
+<span class="sd">        cores (int, optional): Number of cores.</span>
+<span class="sd">            Defaults to None, i.e. flexible mode.</span>
+<span class="sd">        ram (int, optional): Amount of RAM (GB).</span>
+<span class="sd">            Defaults to None, i.e. flexible mode.</span>
 <span class="sd">        kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
 <span class="sd">        gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">        cmd (Optional[str], optional): Command to run. Defaults to None.</span>
@@ -3028,7 +3038,7 @@ Defaults to None.</p>
 
 <span class="sd">    Notes:</span>
 <span class="sd">        - If cores and ram are not specified, the session will be created with</span>
-<span class="sd">          flexible resource allocation.</span>
+<span class="sd">          flexible resource allocation of upto 8 cores and 32GB of RAM.</span>
 <span class="sd">        - The name of the session suffixed with the replica number. eg. test-42</span>
 <span class="sd">          when replicas &gt; 1.</span>
 <span class="sd">        - Each container will have the following environment variables injected:</span>
@@ -3170,9 +3180,7 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">295</span>
-<span class="normal">296</span>
-<span class="normal">297</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">297</span>
 <span class="normal">298</span>
 <span class="normal">299</span>
 <span class="normal">300</span>
@@ -3197,7 +3205,9 @@ Defaults to None.</p>
 <span class="normal">319</span>
 <span class="normal">320</span>
 <span class="normal">321</span>
-<span class="normal">322</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="normal">322</span>
+<span class="normal">323</span>
+<span class="normal">324</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy canfar session[s].</span>
 
 <span class="sd">    Args:</span>
@@ -3358,9 +3368,7 @@ This method is useful for destroying multiple sessions at once.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">324</span>
-<span class="normal">325</span>
-<span class="normal">326</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">326</span>
 <span class="normal">327</span>
 <span class="normal">328</span>
 <span class="normal">329</span>
@@ -3392,7 +3400,9 @@ This method is useful for destroying multiple sessions at once.</p>
 <span class="normal">355</span>
 <span class="normal">356</span>
 <span class="normal">357</span>
-<span class="normal">358</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
@@ -3532,9 +3542,7 @@ This method is useful for destroying multiple sessions at once.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">253</span>
 <span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
@@ -3574,7 +3582,9 @@ This method is useful for destroying multiple sessions at once.</p>
 <span class="normal">290</span>
 <span class="normal">291</span>
 <span class="normal">292</span>
-<span class="normal">293</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
