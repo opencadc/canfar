@@ -1631,40 +1631,45 @@
 <p><strong>Status: Released</strong></p>
 <h3 id="highlights">✨ Highlights<a class="headerlink" href="#highlights" title="Permanent link">&para;</a></h3>
 <ul>
-<li><a href="https://www.opencadc.org/canfar/latest/"><strong>New &amp; Improved</strong> User Documentation Hub</a></li>
-<li><strong>Official Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../client/home/">clients docs for more details.</a></li>
-<li><strong>Smart Session Launching</strong> — <strong>Flexible</strong> (auto-scales) and <strong>Fixed</strong> modes</li>
-<li><strong>Portal Enhancements</strong> — home directory usage &amp; quota information display</li>
-<li><strong>CARTA 5.0</strong>: Latest radio astronomy visualization tool (<a href="https://docs.google.com/document/d/1kBtYjclOn5bxlvkV5a588DtUKy3UEqPXL78IiTVAMUk/edit?tab=t.0#heading=h.9m3bw7vn40ea">August 2025 Release</a>)</li>
+<li><a href="../"><strong>New &amp; Improved</strong> User Documentation Hub</a></li>
+<li><strong>Official Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../client/home/">clients docs</a></li>
+<li><strong>Smart Session Launching</strong> — choose between <em>flexible*</em> (auto-scaleing) and <em>fixed*</em> modes</li>
+<li><strong>Portal Enhancements</strong> — home directory &amp; quota display</li>
+<li><strong>CARTA 5.0</strong>: latest radio astronomy visualization tool (<a href="https://docs.google.com/document/d/1kBtYjclOn5bxlvkV5a588DtUKy3UEqPXL78IiTVAMUk/edit?tab=t.0#heading=h.9m3bw7vn40ea">August 2025 Release</a>)</li>
 <li><strong>Firefly</strong>: IVOA-compliant catalog browsing and visualization platform</li>
 </ul>
 <h3 id="changes-deprecations">📝 Changes &amp; Deprecations<a class="headerlink" href="#changes-deprecations" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Skaha API has been upgraded to <code>v1</code></strong>. The <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API will be sunset at a date TBA (to be announced). Portal users are unaffected; API users should plan to move to v1.</li>
-<li><strong>Container Image Labels</strong> are no longer required in the <a href="https://images.canfar.net/">Harbor Image Registry</a>. They are only used to populate dropdown menu options in the Science Portal UI for public images.</li>
-<li><strong>Session Types</strong>: When launching via API, omit the <code>type</code> parameter for headless mode; interactive sessions require the <code>type</code> parameter.</li>
+<li><strong>Skaha API <code>v1</code> Released</strong> — <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API will be sunset with <code>2026.1</code> release. Portal users are unaffected; API users should plan to migrate to v1.</li>
+<li><strong>Container Image Labels</strong> — no longer required in the <a href="https://images.canfar.net/">Harbor Image Registry</a>. They are only used to populate dropdown menu options in the Science Portal UI.</li>
+<li><strong>Session Types</strong> — launching via API, omit the <code>type</code> parameter for headless mode; interactive sessions require the <code>type</code> parameter.</li>
 </ul>
 <h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>Resource Monitoring</strong> — RAM and CPU usage for sessions/headless jobs are shown again in the portal.  </li>
+<li><strong>Resource Monitoring</strong> — RAM and CPU usage for sessions now display correctly in the Science Portal UI.</li>
 </ul>
 <h3 id="technical-notes">Technical Notes<a class="headerlink" href="#technical-notes" title="Permanent link">&para;</a></h3>
 <h4 id="system-architecture-changes">System Architecture Changes<a class="headerlink" href="#system-architecture-changes" title="Permanent link">&para;</a></h4>
 <ul>
-<li>CANFAR now requires Kubernetes v1.29 or later</li>
-<li><strong>Kueue Scheduling</strong>: Optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management.</li>
-<li>The resource monitoring fixes for the science portal now query the the Job API instead of the Pod API internally.</li>
-<li><em>Flexible</em> sessions now use the <code>Burstable</code> Kubernetes Quality of Service (QoS) class instead of <code>Garanteed</code>, which provides better resource efficiency on the cluster. Currently, <code>flexible</code> sessions can grow upto 8 cores and 32GB of RAM.</li>
+<li>CANFAR deployment requires Kubernetes v1.29 or later</li>
+<li><strong>Kueue Scheduling</strong> — optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management.</li>
+<li><strong>Monitoring Fixes</strong> — Skaha API now uses the the Job API instead of the Pod API internally to provide more accurate resource usage information.</li>
+<li><em>Flexible</em> sessions now use the <code>Burstable</code> Kubernetes Quality of Service (QoS) class instead of <code>Guaranteed</code>, which provides better resource efficiency on the cluster. Currently, <code>flexible</code> sessions can grow upto 8 cores and 32GB of RAM.</li>
 </ul>
 <h4 id="api-evolution">API Evolution<a class="headerlink" href="#api-evolution" title="Permanent link">&para;</a></h4>
 <ul>
-<li>With the release of <code>v1</code> of the Skaha API, the Python client has been updated to support the new API. The <code>v0</code> API will be sunset with release <code>2026.1</code>. This is a <strong>breaking change</strong> for API users, as the <code>kind</code> parameter can now be omitted for headless jobs.</li>
-<li><strong>Harbor Labels</strong> are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI.</li>
+<li>Skaha API v1 — supported in the updated Python Client &amp; CLI. </li>
+<li><strong>Breaking change</strong>:<ul>
+<li>For API users, <code>headless</code> sessions no longer require the <code>type</code> parameter</li>
+<li>For Python Client &amp; CLI users, <code>headless</code> sessions no longer require the <code>kind</code> parameter and the <code>headless</code> session <code>kind</code> will be deprecated in a future release.</li>
+</ul>
+</li>
+<li><strong>Harbor Labels</strong> are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI and only for publicly visible container images.</li>
 </ul>
 <h4 id="deployment">Deployment<a class="headerlink" href="#deployment" title="Permanent link">&para;</a></h4>
 <ul>
-<li>For admins who wish to deploy CANFAR 2025.1, please see use the offically supported helm charts in the <a href="https://github.com/opencadc/deployments/tree/main/helm/applications/skaha">opencadc/deployments</a> repository.</li>
-<li>To test, profile and install the Kueue scheduling system, see the <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment configuration</a> for detailed instructions.</li>
+<li>Use the offically supported helm charts in the <a href="https://github.com/opencadc/deployments/tree/main/helm/applications/skaha">opencadc/deployments</a> for CANFAR 2025.1 deployments.</li>
+<li>To test, profile and setup the Kueue scheduling system, see the <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment guide</a> for detailed instructions.</li>
 </ul>
 </div>
 
@@ -1689,7 +1694,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 17:45:32 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 18:17:04 UTC">September 9, 2025</span>
   </span>
 
     
