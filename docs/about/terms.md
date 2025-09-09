@@ -2,7 +2,7 @@
 
 ## Purpose
 
-The Canadian Advanced Network for Astronomy Research is a consortium that serves data-intensive storage, access, and processing needs of university groups and centers engaged in astronomy research.
+The Canadian Advanced Network for Astronomy Research is a consortium that serves data-intensive storage, access, and processing needs of university groups and centres engaged in astronomy research.
 
 To this end, CANFAR develops and operates user-facing and integrated services, such as:
 
@@ -26,11 +26,11 @@ To this end, CANFAR develops and operates user-facing and integrated services, s
 
 ## Membership
 
-The consortium membership reflects the necessity of present and future science challenges to integrate those groups and institutions that specialize in the scientific aspects (typically at the universities and research centers and institutes) and the groups that have developed the technical and computer engineering expertise to respond to the needs of science programs.
+The consortium membership reflects the necessity of present and future science challenges to integrate those groups and institutions that specialize in the scientific aspects (typically at the universities and research centres and institutes) and the groups that have developed the technical and computer engineering expertise to respond to the needs of science programs.
 
 Consequently the following groups are eligible for membership in the CANFAR consortium:
 
 - Individual university researchers and their groups
-- University centers or institutions engaged in astronomy research
+- University centres or institutions engaged in astronomy research
 - Multi-institutional or multi-investigator collaborations, including their international partners
 - Individuals and teams from the CADC, or teams from Digital Research Alliance Canada, WestGrid or other entities that provide computational and data resources and infrastructure

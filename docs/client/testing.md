@@ -37,7 +37,7 @@ uv run pytest --cov
 
 ### Test Categories
 
-Canfar tests are organized with markers to help you run specific subsets:
+Canfar tests are organised with markers to help you run specific subsets:
 
 #### Slow Tests
 
@@ -73,7 +73,7 @@ uv run pytest -m "unit"
 
 ### Test Methodology
 
-Tests are organized in the `tests/` directory and follow a specific naming convention that mirrors the source code structure. This approach ensures that tests are easy to locate and maintain.
+Tests are organised in the `tests/` directory and follow a specific naming convention that mirrors the source code structure. This approach ensures that tests are easy to locate and maintain.
 
 The naming convention is as follows:
 

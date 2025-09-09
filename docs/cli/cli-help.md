@@ -182,7 +182,7 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 !!! example "Create a Fixed Resource Notebook Session"
     ```bash
     # Uses fixed resource allocation - guaranteed resources
-    canfar create --cpu 4 --memory 8 notebook skaha/astroml-notebook:latest
+    canfar create --cpu 4 --memory 8 notebook skaha/astroml:latest
     ```
 
 !!! example "Create a Headless Session with Command & Arguments"

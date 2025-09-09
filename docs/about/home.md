@@ -1,4 +1,4 @@
-# Organization
+# Organisation
 
 The CANFAR consortium is represented by a network of university researchers that participate in determining directions and emphasis of the consortium and form the Science Management Committee.
 

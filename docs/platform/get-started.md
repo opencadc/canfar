@@ -1,8 +1,21 @@
 
 
-# 🚀 Quick Setup
+# 🚀 Getting Started with CANFAR
 
-This guide walks you through getting started with CANFAR, from account setup to your first session. For details on accounts, storage, and containers, see the linked guides below.
+**Your complete guide to setting up and using the CANFAR Science Platform for astronomical research.**
+
+!!! info "Platform Navigation"
+    **Getting Started**: Essential setup steps for new CANFAR users.  
+    **[Platform Home](index.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
+
+!!! info "Quick Links"
+    **Essential Resources:**
+    
+    - **[Permissions Guide](permissions.md)**: Account setup and group management
+    - **[Sessions Overview](sessions/index.md)**: Interactive computing environments
+    - **[Storage Guide](storage/index.md)**: Data management and file systems
+    - **[Container Guide](containers/index.md)**: Software environments and registries
+    - **[Support Centre](support/index.md)**: Help resources and FAQ
 
 
 ## 1️⃣ Get Your CADC Account
@@ -11,10 +24,12 @@ If you are a first-time user, request a Canadian Astronomy Data Centre (CADC) ac
 
 [🔗 Request CADC Account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html){ .md-button .md-button--primary }
 
-See [Accounts & Permissions](accounts.md) for more details.
+See [Accounts & Permissions](permissions.md) for more details.
+
 
 !!! info "Account Processing Time"
     CADC accounts are typically approved within 1–2 business days.
+    For troubleshooting account issues, see [FAQ](support/faq.md) or [Contact Support](support/index.md).
 
 
 
@@ -32,7 +47,8 @@ Once you have a CADC account:
     - Storage requirements
     - Timeline
 
-See [Accounts & Permissions](accounts.md) for group management details.
+
+See [Permissions Guide](permissions.md) for group management details. For advanced collaboration, see [Storage Guide](storage/index.md).
 
 
 ## 3️⃣ First Login and Setup
@@ -41,7 +57,8 @@ See [Accounts & Permissions](accounts.md) for group management details.
 2. Accept Terms of Service to complete setup.
 3. Access the [Image Registry](https://images.canfar.net) (required for private containers).
 
-See [Container Usage](containers.md) for more about images and custom software.
+
+See [Container Guide](containers/index.md) for more about images and custom software. For building your own containers, see [Building Containers](containers/build.md).
 
 
 ## 4️⃣ Launch Your First Session
@@ -55,16 +72,23 @@ To start analyzing data, launch a Jupyter notebook:
 
 🎉 You're ready to go! Your session includes Python, common astronomy packages, and access to shared storage.
 
-See [Interactive Sessions](guides/interactive-sessions/index.md) for more session types and workflows.
+
+See [Sessions Overview](sessions/index.md) for more session types and workflows. For automation, see [CANFAR Python Client](../client/home.md).
+
 
 !!! tip "Recommended Starting Point"
     Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated.
+
+!!! tip "Advanced: Custom Containers"
+    - Build your own containers for specialised workflows. See [Building Containers](containers/build.md).
+    - Use [Harbor Registry](https://images.canfar.net/) to browse and manage images.
 
 
 
 ## 📁 Understanding Your Workspace
 
-See the [Storage Guide](guides/storage/index.md) for full details.
+
+See the [Storage Guide](storage/index.md) for full details. For VOSpace scripting, see [VOSpace API](storage/vospace.md).
 
 | Location | Purpose | Persistence | Best For |
 |----------|---------|-------------|----------|
@@ -76,7 +100,8 @@ See the [Storage Guide](guides/storage/index.md) for full details.
 
 ## 🤝 Collaboration Features
 
-See [Accounts & Permissions](accounts.md) and [Storage Guide](guides/storage/index.md) for collaboration details.
+
+See [Permissions Guide](permissions.md) and [Storage Guide](storage/index.md) for collaboration details. For team onboarding, see [Getting Started](get-started.md).
 
 ### Session Sharing
 
@@ -96,22 +121,30 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
 - Project documentation
 
 
+---
 
-## 🔗 What's Next?
+!!! info "Explore More Documentation"
+    **Platform Resources:**
+    
+    - **[Platform Concepts](concepts.md)**: Understanding CANFAR's architecture
+    - **[Sessions Guide](sessions/index.md)**: Interactive computing environments
+    - **[Storage Guide](storage/index.md)**: Data management and file systems
+    - **[Container Guide](containers/index.md)**: Software environments and registries
 
 Ready to dive deeper?
 
-- **[📖 User Guide →](guides/index.md)** – Comprehensive documentation
-- **[🗄️ Storage Guide →](guides/storage/index.md)** – Detailed storage management
-- **[🐳 Container Guide →](containers.md)** – Using and building containers
-- **[📡 Radio Astronomy →](guides/radio-astronomy/index.md)** – CASA, ALMA workflows
+- **[📖 Platform Concepts →](concepts.md)** – Understanding CANFAR's architecture
+- **[🖥️ Sessions Guide →](sessions/index.md)** – Interactive computing environments
+- **[🗄️ Storage Guide →](storage/index.md)** – Data management and file systems
+- **[🐳 Container Guide →](containers/index.md)** – Software environments and registries
 
 
 
 ## 💬 Need Help?
 
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** – Chat with other users
-- **[❓ FAQ](../faq.md)** – Common questions and solutions
+- **[❓ FAQ](support/faq.md)** – Common questions and solutions
+- **[🆘 Support Centre](support/index.md)** – Help resources and contact information
 
 ---
 

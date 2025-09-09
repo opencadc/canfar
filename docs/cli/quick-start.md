@@ -96,13 +96,13 @@ Lets launch a Jupyter notebook with astronomy tools pre-installed,
 <!-- termynal -->
 ```
 # Launch a notebook session
-$ canfar create notebook skaha/astroml-notebook:latest
+$ canfar create notebook skaha/astroml:latest
 Successfully created session 'finish-inmate' (ID: d1tsqexh)
 ```
 
 !!! success "What just happened?"
     - We connected to CANFAR using your certificate
-    - The CLI defaulted the container image to `images.canfar.net/skaha/astroml-notebook:latest`
+    - The CLI defaulted the container image to `images.canfar.net/skaha/astroml:latest`
     - A Jupyter notebook was launched with the container image in **flexible mode**
     - A random name was generated for your session, `finish-inmate` in this case
     - The Science Platform allocated flexible resources for your notebook and started it
@@ -130,7 +130,7 @@ $ canfar ps
 
 SESSION ID  NAME          KIND         STATUS    IMAGE                           CREATED
 ──────────────────────────────────────────────────────────────────────────────────────────
-d1tsqexh    finish-inmate notebook     Running   skaha/astroml-notebook:latest   7 minutes
+d1tsqexh    finish-inmate notebook     Running   skaha/astroml:latest   7 minutes
 ```
 
 !!! success "What just happened?"
@@ -148,7 +148,7 @@ $ canfar info $(canfar ps -q)
   Name          finish-inmate
   Status        Running
   Type          notebook
-  Image         images.canfar.net/skaha/astroml-notebook:latest
+  Image         images.canfar.net/skaha/astroml:latest
   User ID       brars
   Start Time    13 minutes ago
   Expiry Time   3 days and 23.77 hours
