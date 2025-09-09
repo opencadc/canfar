@@ -79,13 +79,19 @@ def creation(
     cpu: Annotated[
         int | None,
         typer.Option(
-            "--cpu", "-c", help="Number of CPU cores.", show_default="flexible"
+            "--cpu",
+            "-c",
+            help="Number of CPU cores.",
+            show_default="flexible: ≤8 cores",
         ),
     ] = None,
     memory: Annotated[
         int | None,
         typer.Option(
-            "--memory", "-m", help="Amount of RAM in GB.", show_default="flexible"
+            "--memory",
+            "-m",
+            help="Amount of RAM in GB.",
+            show_default="flexible: ≤32 GB",
         ),
     ] = None,
     gpu: Annotated[
