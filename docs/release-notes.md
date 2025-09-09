@@ -11,7 +11,8 @@
     - **Official Release of the CANFAR Python Client & CLI** — see [clients docs for more details.](client/home.md)
     - **Smart Session Launching** — **Flexible** (auto-scales) and **Fixed** modes
     - **Portal Enhancements** — home directory usage & quota information display
-    - **New Science Containers** — [CARTA 5.0](platform/guides/interactive-sessions/launch-carta.md) and [Firefly](platform/guides/interactive-sessions/launch-firefly.md) support
+    - **CARTA 5.0**: Latest radio astronomy visualization tool (August 2025 release)
+    - **Firefly**: IVOA-compliant catalog browsing and visualization platform
 
     ### 📝 Changes & Deprecations
     - **Skaha API has been upgraded to `v1`**. The [`v0`](https://ws-uv.canfar.net/skaha/v0) API will be sunset at a date TBA (to be announced). Portal users are unaffected; API users should plan to move to v1.
@@ -20,42 +21,16 @@
     
 
     ### 🐛 Fixes
-    - **Resource Monitoring** — RAM and CPU usage for sessions/headless jobs are shown again in the portal.
+    - **Resource Monitoring** — RAM and CPU usage for sessions/headless jobs are shown again in the portal.  
 
-    ### ⚙️ For Deployers
+    ### Technical Notes
+
+    #### System Architecture Changes
+    - CANFAR now requires Kubernetes v1.29 or later
     - **Kueue Scheduling**: Optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management. See [deployment configuration](https://github.com/opencadc/deployments/tree/main/configs/kueue) for setup instructions.
+    - The resource monitoring fixes for the science portal now query the the Job API instead of the Pod API internally.
+    - *Flexible* sessions now use the `Burstable` Kubernetes Quality of Service (QoS) class instead of `Garanteed`, which provides better resource efficiency on the cluster. Currently, `flexible` sessions can grow upto 8 cores and 32GB of RAM.
 
-    ---
-
-    ## 🔍 Detailed Technical Information
-
-    ### System Architecture Changes
-    - **Kubernetes Upgrade**: Cluster upgraded to **Kubernetes 1.28** for improved performance and security
-    - **Queue Management**: Optional Kueue system available to front internal scheduler and alleviate cluster pressure
-    - **Resource Allocation**: Smart session launching with **Flexible** (auto-scaling) and **Fixed** modes for better cluster efficiency
-
-    ### API Evolution
-    - **Skaha API v1**: New endpoint at `https://ws-uv.canfar.net/skaha/`
-    - **Backward Compatibility**: v0 API remains available during transition period (sunset date TBA)
-    - **Session Parameters**: Interactive sessions now require `type` parameter; headless jobs should omit it
-
-    ### Container & Image Management  
-    - **Harbor Labels**: No longer required for session launching (only for Science Portal UI dropdown population)
-    - **Headless Mode**: Any image can run headless without special labels when `type` parameter is omitted
-    - **Science Containers**: Curated containers available in [skaha project](https://images.canfar.net/) on Science Portal
-
-    ### Enhanced User Experience
-    - **Documentation Hub**: Complete overhaul at [canfar.net/docs](https://www.canfar.net/docs)
-    - **Portal Improvements**: Home directory usage and quota display in top-right corner
-    - **Batch Workflows**: Programmatic access via Python Client and CLI for workflow automation
-    - **Resource Monitoring**: Restored real-time RAM and CPU usage display for all sessions
-
-    ### Scientific Computing Tools
-    - **CARTA 5.0**: Latest radio astronomy visualization tool (August 2025 release)
-    - **Firefly**: IVOA-compliant catalog browsing and visualization platform
-    - **Multi-wavelength Support**: Enhanced containers for diverse astronomical workflows
-
-    ### Future Roadmap
-    - Queue status information will be displayed in Science Portal (upcoming release)
-    - Enhanced resource quotas and budgeting system under development
-    - Continued optimization of cluster resource utilization
+    #### API Evolution
+    - With the release of `v1` of the Skaha API, the Python client has been updated to support the new API. The `v0` API will be sunset with release `2026.1`. This is a **breaking change** for API users, as the `kind` parameter can now be omitted for headless jobs.
+    - **Harbor Labels** are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI.
