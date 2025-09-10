@@ -14,7 +14,7 @@ A powerful Python API and CLI for the CANFAR Science Platform.
             session = Session()
             ids = session.create(
                 name="test",
-                image="images.canfar.net/skaha/base-notebook:latest",
+                image="images.canfar.net/skaha/astroml:latest",
                 kind="headless",
                 cmd="env",
                 env={"KEY": "VALUE"},
@@ -31,7 +31,7 @@ A powerful Python API and CLI for the CANFAR Science Platform.
             session = AsyncSession()
             ids = await session.create(
                 name="test",
-                image="images.canfar.net/skaha/base-notebook:latest",
+                image="images.canfar.net/skaha/astroml:latest",
                 kind="headless",
                 cmd="env",
                 env={"KEY": "VALUE"},
@@ -48,7 +48,7 @@ A powerful Python API and CLI for the CANFAR Science Platform.
             async with AsyncSession() as session:
                 ids = await session.create(
                     name="test",
-                    image="images.canfar.net/skaha/base-notebook:latest",
+                    image="images.canfar.net/skaha/astroml:latest",
                     kind="headless",
                     cmd="env",
                     env={"KEY": "VALUE"},
@@ -60,7 +60,7 @@ A powerful Python API and CLI for the CANFAR Science Platform.
     !!! example ":simple-gnubash: CLI"
 
         ```bash title="Create a Session"
-        canfar launch headless --env KEY=VALUE --replicas 3 images.canfar.net/skaha/base-notebook:latest 
+        canfar launch headless --env KEY=VALUE --replicas 3 images.canfar.net/skaha/astroml:latest 
         ```
 
 === ":material-download: Download"

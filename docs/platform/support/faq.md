@@ -3,8 +3,8 @@
 **Comprehensive answers to common questions about the CANFAR Science Platform across all areas.**
 
 !!! info "Platform Navigation"
-    **FAQ Resources**: Common questions and solutions for platform, client, and CLI usage.  
-    **[Support Home](index.md)** | **[Platform Home](../index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Quick Navigation"
     **Find answers by topic:**
@@ -34,7 +34,7 @@ CANFAR is free for astronomical research. Canadian astronomers and their collabo
 - Notebook: Jupyter Lab for interactive analysis and prototyping.
 - Desktop: Full Linux desktop for GUI workflows and multi‑app sessions.
 - Firefly: Interactive database access and visualization.
-- CARTA: Specialized image/cube visualization.
+- CARTA: Specialised image/cube visualisation.
 - Headless: Non‑GUI batch processing and automation.
 
 ### How long can sessions run?
@@ -85,13 +85,13 @@ or the VOSpace client `vcp` from the `vos` python package:
 
 ### What software/containers are available?
 
-Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data science tools, machine learning libraries, full Linux desktops, and specialized astronomy tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at `platform/containers.md`.
+Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data science tools, machine learning libraries, full Linux desktops, and specialised astronomy tools (CASA, CARTA, DS9, TOPCAT). You can also build and use custom containers. See the Container Guide at `platform/containers/index.md`.
 
 
 ### Can I install additional software?
 
 - `pip install --user ...` (the `--user` option may not be necessary depending on container) or within environments. Software will be persisted on `/arc`
-- Permanent: build a custom container with your required stack (see `platform/containers.md`). Software will be persisted on the container.
+- Permanent: build a custom container with your required stack (see `platform/containers/index.md`). Software will be persisted on the container.
 
 
 ### Collaboration and sharing

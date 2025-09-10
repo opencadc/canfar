@@ -5,13 +5,13 @@
 **Your complete guide to setting up and using the CANFAR Science Platform for astronomical research.**
 
 !!! info "Platform Navigation"
-    **Getting Started**: Essential setup steps for new CANFAR users.  
-    **[Home](index.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)**
+    **Platform Sections:**  
+    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/index.md)** | **[Storage](storage/index.md)** | **[Containers](containers/index.md)** | **[Support](support/index.md)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
 
 !!! info "Quick Links"
     **Essential Resources:**
     
-    - **[Permissions Guide](permissions.md)**: Account setup and group management
+    - **[Permissions Guide](permissions.md)**: Account set-up and group management
     - **[Sessions Overview](sessions/index.md)**: Interactive computing environments
     - **[Storage Guide](storage/index.md)**: Data management and file systems
     - **[Container Guide](containers/index.md)**: Software environments and registries
@@ -51,10 +51,10 @@ Once you have a CADC account:
 See [Permissions Guide](permissions.md) for group management details. For advanced collaboration, see [Storage Guide](storage/index.md).
 
 
-## 3️⃣ First Login and Setup
+## 3️⃣ First Login and Set-up
 
 1. Login to [canfar.net](https://www.canfar.net) with your CADC credentials.
-2. Accept Terms of Service to complete setup.
+2. Accept Terms of Service to complete set-up.
 3. Access the [Image Registry](https://images.canfar.net) (required for private containers).
 
 
@@ -131,19 +131,10 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
     - **[Storage Guide](storage/index.md)**: Data management and file systems
     - **[Container Guide](containers/index.md)**: Software environments and registries
 
-Ready to dive deeper?
-
-- **[📖 Platform Concepts →](concepts.md)** – Understanding CANFAR's architecture
-- **[🖥️ Sessions Guide →](sessions/index.md)** – Interactive computing environments
-- **[🗄️ Storage Guide →](storage/index.md)** – Data management and file systems
-- **[🐳 Container Guide →](containers/index.md)** – Software environments and registries
-
-
 
 ## 💬 Need Help?
 
 - **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** – Chat with other users
-- **[❓ FAQ](support/faq.md)** – Common questions and solutions
 - **[🆘 Support Centre](support/index.md)** – Help resources and contact information
 
 ---

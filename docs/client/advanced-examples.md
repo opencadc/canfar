@@ -5,14 +5,14 @@ Complex use cases and power-user examples for CANFAR Science Platform.
 # Quick Start
 
 !!! info
-    Canfar automatically sets these environment variables in each container:
+    `canfar` automatically sets these environment variables in each container:
 
     - `REPLICA_ID`: Current container ID (1, 2, 3, ...)
     - `REPLICA_COUNT`: Total number of containers
 
 ## Massively Parallel Processing
 
-Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different canfar sessions, with each container processing a subset of the files. This is a common pattern for distributed computing on canfar, and can be achieved with a few lines of code.
+Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different CANFAR sessions, with each container processing a subset of the files. This is a common pattern for distributed computing on CANFAR, and can be achieved with a few lines of code.
 
 ```python title="Batch Processing Script"
 from canfar.helpers import distributed
@@ -137,7 +137,7 @@ The `canfar.helpers.distributed` module provides two main strategies for distrib
 
 ### Chunking (`distributed.chunk`)
 
-The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching canfar's `REPLICA_ID` environment variable):
+The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching `canfar` `REPLICA_ID` environment variable):
 
 ```python title="Chunking Example"
 from canfar.helpers import distributed

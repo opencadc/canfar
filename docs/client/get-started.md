@@ -1,20 +1,20 @@
-# Installation & Setup
+# Installation & Set-up
 
 This guide covers everything you need to install and start using CANFAR Science Platform servers worldwide.
 
-!!! tip "New to Canfar?"
+!!! tip "New to CANFAR?"
     If you want to jump right in with a hands-on tutorial, check out our [5-Minute Quick Start](quick-start.md) guide first!
 
 ## Prerequisites
 
-Before you can use canfar, you need:
+Before you can use CANFAR, you need:
 
 - **Python 3.10+** installed on your system
 - **A Science Platform account** - For CANFAR, [request an account with CADC](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
 
 ## Installation
 
-Install canfar using `pip`:
+Install `canfar` using `pip`:
 
 ```bash
 pip install canfar --upgrade
@@ -28,9 +28,9 @@ pip install canfar --upgrade
     pip install canfar
     ```
 
-## Authentication Setup
+## Authentication Set-up
 
-Canfar uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI login command.
+CANFAR uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI log in command.
 
 ### Quick Authentication
 
@@ -53,7 +53,7 @@ This command will:
     Starting Science Platform Login
     Discovery completed in 2.1s (5/18 active)
 
-    Select a Canfar Server:
+    Select a server:
     » 🟢 CANFAR  CADC
       🟢 Canada  SRCnet
       🟢 UK-CAM  SRCnet
@@ -64,9 +64,9 @@ This command will:
     ✓ Login completed successfully!
     ```
 
-### Using Canfar Programmatically
+### Using CANFAR Programmatically
 
-Once authenticated via CLI, you can use Canfar in your Python code:
+Once authenticated via CLI, you can use `canfar` in your Python code:
 
 ```python
 from canfar.session import Session
@@ -83,7 +83,7 @@ print(f"Found {len(container_images)} container images")
 # Create a notebook session
 session_info = session.create(
     kind="notebook",
-    image="images.canfar.net/skaha/base-notebook:latest",
+    image="images.canfar.net/skaha/astroml:latest",
     name="my-analysis",
     cores=2,
     ram=4
@@ -122,7 +122,7 @@ session_info = session.create(
 
 ## Next Steps
 
-Now that you have canfar installed and configured:
+Now that you have `canfar` installed and configured:
 
 - [x] Try our [5-Minute Quick Start](quick-start.md) for a hands-on introduction to creating and managing sessions.
 - [x] Learn about [Authentication Contexts](../cli/authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.

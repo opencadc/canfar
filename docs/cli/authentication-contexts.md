@@ -1,6 +1,6 @@
 # Authentication Guide
 
-CANFAR Python Client and CLI are designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic setup to advanced scenarios.
+CANFAR Python Client and CLI are designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic set-up to advanced scenarios.
 
 ## Authentication Overview
 
@@ -14,11 +14,11 @@ Think of an authentication context (*context* for short) as a saved profile that
 - **Authentication credentials** (X.509 certificate, OIDC tokens, etc.)
 - **User preferences** for that specific server
 
-When you use Canfar, one context is always **active**, and all commands and API calls are directed to that server.
+When you use CANFAR, one context is always **active**, and all commands and API calls are directed to that server.
 
 ### Authentication Methods
 
-Canfar supports several authentication methods:
+CANFAR supports several authentication methods:
 
 !!! info "Authentication Methods"
     - **X.509 Certificates** - Most common, uses `.pem` certificate files
@@ -26,13 +26,14 @@ Canfar supports several authentication methods:
     - **Bearer Tokens** - Direct token authentication for API access
 
 !!! tip "Automatic Configuration"
-    Canfar automatically configures the appropriate authentication method based on the server's capabilities and your configuration.
+    CANFAR automatically configures the appropriate authentication method based on the server's capabilities and your configuration.
 
 ---
 
 ## CLI Authentication Management
 
-The Canfar CLI provides comprehensive commands for managing your authentication contexts.
+The CANFAR CLI provides comprehensive commands for managing your authentication contexts.
+
 
 ### Initial Login (`canfar auth login`)
 

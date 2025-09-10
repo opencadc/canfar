@@ -3,8 +3,8 @@
 **Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.**
 
 !!! info "Platform Navigation"
-    **Registry Management**: Storing, organising, and distributing container images on Harbor.  
-    **[Containers Home](index.md)** | **[Building Containers](build.md)** | **[Platform Home](../index.md)**
+  **Platform Sections:**  
+  **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Registry Management Overview"
 
@@ -752,7 +752,7 @@ LABEL security.updates="2024-03-15"
 # Order Dockerfile instructions by change frequency
 
 # Use multi-stage builds to reduce final image size
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 # ... build dependencies ...
 FROM images.canfar.net/skaha/astroml:latest
 COPY --from=builder /app/binary /usr/local/bin/

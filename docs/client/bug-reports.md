@@ -1,7 +1,7 @@
 # Bug Reports
 
 
-Thank you for taking the time to report a bug! Your feedback helps us improve Canfar for everyone. This guide will help you create effective bug reports so we can quickly identify and resolve issues.
+Thank you for taking the time to report a bug! Your feedback helps us improve CANFAR for everyone. This guide will help you create effective bug reports so we can quickly identify and resolve issues.
 
 
 ## Before Reporting a Bug
@@ -9,7 +9,7 @@ Thank you for taking the time to report a bug! Your feedback helps us improve Ca
 Before creating a new bug report, please:
 
 - **Search existing issues**: Check if the bug has already been reported in our [GitHub Issues](https://github.com/opencadc/canfar/issues).
-- **Update to the latest version**: Ensure you are using the latest version of the Canfar Client.
+- **Update to the latest version**: Ensure you are using the latest version of the CANFAR Client.
 - **Check the documentation**: Review our [documentation](https://opencadc.github.io/canfar/) to confirm the expected behaviour.
 
 
@@ -17,7 +17,7 @@ Before creating a new bug report, please:
 
 ### Gather System Information
 
-Before reporting a bug, collect detailed system information using the Canfar CLI:
+Before reporting a bug, collect detailed system information using the CANFAR CLI:
 
 ```bash
 canfar version --debug
@@ -25,7 +25,7 @@ canfar version --debug
 
 This command provides information about your environment:
 
-- **Client Information**: Canfar version, git commit info, installation method
+- **Client Information**: `canfar` version, git commit info, installation method
 - **Python Environment**: Python version, executable path, implementation
 - **System Details**: Operating system, version, architecture, platform
 - **Dependencies**: Versions of key packages that might affect functionality

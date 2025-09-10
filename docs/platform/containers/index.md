@@ -3,15 +3,15 @@
 **Working with astronomy software containers on CANFAR - understanding container environments, using pre-built images, and creating custom software stacks.**
 
 !!! info "Platform Navigation"
-    **Containers**: Software environments and containerized applications for astronomy.  
-    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Storage Systems](../storage/index.md)** | **[Support](../support/index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Container Guide Overview"
     **Master CANFAR's containerized environments:**
     
     - **[Container Concepts](#what-are-containers)**: Understanding reproducible software environments
     - **[Available Containers](#canfar-supported-containers)**: Pre-built astronomy software stacks
-    - **[Container Building](build.md)**: Creating custom environments for specialized workflows
+    - **[Container Building](build.md)**: Creating custom environments for specialised workflows
     - **[Registry Management](registry.md)**: Harbor registry access and image distribution
 
 Containers provide pre-packaged software environments that include everything needed to run astronomy applications. On CANFAR, containers eliminate the "works on my machine" problem by ensuring consistent, reproducible computational environments across different sessions and workflows.
@@ -51,27 +51,28 @@ graph TB
     BaseOS[Ubuntu Linux Base] --> SystemLibs[System Libraries]
     SystemLibs --> CondaPython[Conda + Python]
     CondaPython --> AstroLibs[Astronomy Libraries]
-    AstroLibs --> SpecializedTools[Specialized Tools]
+    AstroLibs --> SpecialisedTools[Specialised Tools]
     
-    SpecializedTools --> Astroml[astroml Container]
-    SpecializedTools --> Casa[casa Container]
-    SpecializedTools --> Custom[Custom Containers]
+    SpecialisedTools --> Astroml[astroml Container]
+    SpecialisedTools --> Casa[casa Container]
+    SpecialisedTools --> Custom[Custom Containers]
     
     Runtime[CANFAR Runtime] --> Storage[Storage Mounting]
     Runtime --> UserContext[User Context]
     Runtime --> Resources[Resource Allocation]
 ```
 
-**Base containers** provide fundamental tools and the conda package manager, while **specialized containers** build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.
+**Base containers** provide fundamental tools and the conda package manager, while **specialised containers** build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.
 
 ## 🏗️ Build Time vs Runtime
 
 Understanding the distinction between build time and runtime is crucial for effective container usage:
 
 ### Build Time
+
 **What happens when containers are created:**
 
-- **Base image selection**: Choose Ubuntu, Python, or specialized astronomy base
+- **Base image selection**: Choose Ubuntu, Python, or specialised astronomy base
 - **Software installation**: Install system packages, Python libraries, astronomy tools
 - **Environment configuration**: Set up paths, environment variables, user permissions
 - **Code packaging**: Include stable scripts and analysis tools
@@ -79,12 +80,12 @@ Understanding the distinction between build time and runtime is crucial for effe
 
 ```dockerfile
 # Build time example
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Install system dependencies (build time)
 RUN apt-get update && apt-get install -y \
     python3-dev \
-    libfitsio-dev \
+    libcfitsio-dev \
     && apt-get clean
 
 # Install Python packages (build time)
@@ -112,7 +113,7 @@ df -h /scratch/                 # Temporary high-speed storage
 ```
 
 !!! warning "Persistence Boundary"
-    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are temporary and lost when the session ends. Keep stable software in the image; keep development scripts in `/arc/`.
+    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are on `/arc` and not on the container. Keep stable software in the image; keep development scripts in `/arc/`.
 
 ## 🔗 How Containers Relate to Sessions
 
@@ -183,7 +184,7 @@ Desktop sessions integrate containers in two ways:
 The core **desktop** container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session.
 
 #### 2. Desktop-App Containers
-Specialized containers that run specific GUI applications within desktop sessions.
+Specialised containers that run specific GUI applications within desktop sessions.
 
 **Requirements for desktop-app containers:**
 
@@ -288,9 +289,9 @@ graph LR
 **Temporary Processing (`/scratch/`):**
 ```bash
 # Copy large datasets to fast storage for processing
-cp /arc/projects/survey/large_data.fits /scratch/
+cp /arc/projects/[project]/large_data.fits /scratch/
 process_data /scratch/large_data.fits /scratch/output.fits
-cp /scratch/output.fits /arc/projects/survey/results/
+cp /scratch/output.fits /arc/projects/[project]/results/
 ```
 
 ### User Context and Permissions
@@ -322,11 +323,12 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 **Purpose**: Comprehensive Python environment for most astronomy workflows
 
 **Pre-installed software:**
-- **Python stack**: numpy, scipy, matplotlib, pandas, jupyter, pyarrow
-- **Astronomy libraries**: astropy, astroquery, photutils, reproject
-- **Machine learning**: scikit-learn, pytorch
-- **Data formats**: FITS, HDF5
-- **Development tools**: Git, vim, nano, SSH client
+- **Python stack**: `numpy, scipy, matplotlib, pandas, jupyter, pyarrow`
+- **Astronomy libraries**: `astropy, astroquery, photutils, reproject`
+- **Machine learning**: `scikit-learn, pytorch`
+- **Data formats**: `FITS, HDF5`
+- **Development tools**: `git, vim, nano, ssh`
+
 
 **Best for:**
 - Python-based data analysis and visualisation
@@ -356,7 +358,8 @@ canfar launch notebook images.canfar.net/skaha/astroml:latest \
 
 #### `casa` - Radio Astronomy
 
-**Purpose**: Specialized environment for radio interferometry analysis
+**Purpose**: Specialised environment for radio interferometry analysis
+
 
 **Pre-installed software:**
 - **CASA suite**: Complete Common Astronomy Software Applications
@@ -433,7 +436,7 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 | **Batch processing** | `astroml`/`casa` | Headless | Variable |
 
 !!! tip "Container Selection Strategy"
-    Start with `astroml` for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialized containers (`casa`, `carta`, `firefly`) only when you need their specific tools.
+    Start with `astroml` for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialised containers (`casa`, `carta`, `firefly`) only when you need their specific tools.
 
 ### Version Management
 

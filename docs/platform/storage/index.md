@@ -3,8 +3,8 @@
 **Comprehensive guide to CANFAR's storage systems for astronomy research: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
 
 !!! info "Platform Navigation"
-    **Storage Systems**: Data management and persistence for astronomical research.  
-    **[Home](../index.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Storage Guide"
     **Master CANFAR's storage systems:**
