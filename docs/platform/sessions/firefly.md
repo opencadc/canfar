@@ -1,6 +1,6 @@
 # Firefly Sessions
 
-## The LSST table and image visualiser for astronomical data exploration
+**The LSST table and image visualiser for astronomical data exploration**
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch a Firefly session and choose the right version

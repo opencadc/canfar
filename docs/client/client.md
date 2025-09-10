@@ -14,7 +14,7 @@ The `canfar.client` module provides a comprehensive HTTP client for interacting 
     - **Debug Logging**: Comprehensive logging for troubleshooting
     - **Context Managers**: Proper resource management
 
-*This is a low-level client that is used by all other API clients in Canfar. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.*
+*This is a low-level client that is used by all other API clients in CANFAR. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.*
 
 ## Authentication Modes
 

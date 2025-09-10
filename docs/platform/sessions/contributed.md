@@ -1,12 +1,15 @@
 # Contributed Applications
 
+**Contributed Web-based Applications on CANFAR**
+
+
 !!! abstract "🎯 What You'll Learn"
     - How to launch contributed applications on CANFAR
     - Where your data is stored and how to save results
     - How to contribute your own web application
     - Troubleshooting common issues
 
-Contributed applications are specialized, community-developed web tools that expand CANFAR's capabilities. They integrate with CANFAR storage and authentication, are web-based for easy collaboration, and require no local installation. The catalogue of available applications evolves as the community contributes new tools.
+Contributed applications are specialised, community-developed web tools that expand CANFAR's capabilities. They integrate with CANFAR storage and authentication, are web-based for easy collaboration, and require no local installation. The catalogue of available applications evolves as the community contributes new tools.
 
 !!! tip "Suggest New Applications"
     Have an idea for a new application? Jump on [discord](https://discord.gg/vcCQ8QBvBa), or contact [support@canfar.net](mailto:support@canfar.net) to discuss it.

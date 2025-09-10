@@ -1,16 +1,16 @@
 
 # CANFAR Science Platform
 
-The Canadian Advanced Network for Astronomy Research let you access  software environments and large datasets on the cloud designed specifically for astronomical research.
+The Canadian Advanced Network for Astronomy Research lets you access software environments and large datasets on the cloud designed specifically for astronomical research.
 
 !!! info "Platform Navigation"
-    **CANFAR Science Platform**: Your gateway to cloud-based astronomical computing and collaboration.  
-    **[Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[DOI Services](doi.md)** | **[Legacy Cloud](cloud.md)**
+    **Platform Sections:**  
+    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
 
 !!! abstract "🚀 Platform Overview"
     - **Scalable** cloud compute and storage to analyze very large datasets from anywhere.
     - **Browser-based** interactive environments for instant, device-independent data exploration.
-    - **Collaborative** tools hat make teamwork and data sharing simple.
+    - **Collaborative** tools that make teamwork and data sharing simple.
     - **Well‑tested** default scientific containers plus customizable images and registries for large-team workflows.
 
 ## � Quick Access
@@ -111,4 +111,4 @@ The Canadian Advanced Network for Astronomy Research let you access  software en
 :   **Data archives and services** - Search observatory data, VO services
 
 **[CANFAR Main Website](https://www.canfar.net/)**
-:   **Project information** - About CANFAR, news, partnerships, and organizational details
+:   **Project information** - Access various CANFAR services, news, partnerships, and organizational details

@@ -19,7 +19,7 @@ These examples use the asynchronous API for best performance and scalability.
     session = Session()
     ids = session.create(
         name="my-notebook",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
     )
     print(ids)  # ["d1tsqexh"]
@@ -34,7 +34,7 @@ These examples use the asynchronous API for best performance and scalability.
     session = Session()
     ids = session.create(
         name="my-notebook",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
         cores=2,
         ram=4,
@@ -51,7 +51,7 @@ These examples use the asynchronous API for best performance and scalability.
     session = AsyncSession()
     ids = await session.create(
         name="my-notebook",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
     )
     print(ids)  # ["d1tsqexh"]
@@ -72,7 +72,7 @@ These examples use the asynchronous API for best performance and scalability.
     session = Session()
     ids = session.create(
         name="my-headless",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="headless",
         cmd="echo",
         args=["Hello, World!"],
@@ -88,7 +88,7 @@ These examples use the asynchronous API for best performance and scalability.
     session = AsyncSession()
     ids = await session.create(
         name="my-headless",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="headless",
         cmd="echo",
         args=["Hello, World!"],
@@ -141,7 +141,7 @@ CANFAR supports two resource allocation modes for your sessions. See the [resour
     # No cores/ram specification - uses flexible allocation
     ids = session.create(
         name="flexible-notebook",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook"
     )
     ```
@@ -154,7 +154,7 @@ CANFAR supports two resource allocation modes for your sessions. See the [resour
     # Specify exact resources for guaranteed allocation
     ids = session.create(
         name="fixed-notebook",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
         cores=4,
         ram=8

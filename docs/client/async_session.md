@@ -1,7 +1,7 @@
 # Asynchronous Sessions
 
 !!! info "Overview"
-    CANFAR supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
+    `canfar` supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
 
 ::: canfar.sessions.AsyncSession
     handler: python

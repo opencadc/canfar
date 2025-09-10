@@ -5,7 +5,7 @@
 
 !!! tip "Prerequisites"
     - A CADC Account (Canadian Astronomy Data Centre) - [Sign up here](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-    - You have atleast once logged into the [CANFAR Science Platform](https://canfar.net) and [Harbor Container Registry](https://images.canfar.net).
+    - You have at least once logged into the [CANFAR Science Platform](https://canfar.net) and [Harbor Container Registry](https://images.canfar.net).
     - Python 3.10+
     - Basic familiarity with Python and Jupyter notebooks
 
@@ -51,7 +51,7 @@ Login completed successfully!
 
     === "CADC Users with Existing `~/.ssl/cadcproxy.pem`"
     
-        If you’re using the [CADC CANFAR Science Platform](https://canfar.net) already have a valid certificate at `~/.ssl/cadcproxy.pem`, the CLI will log you in automatically
+        If you’re using the [CADC CANFAR Science Platform](https://canfar.net) and already have a valid certificate at `~/.ssl/cadcproxy.pem`, the CLI will log in automatically
 
         ```bash
         Starting Science Platform Login

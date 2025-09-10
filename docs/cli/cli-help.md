@@ -176,7 +176,7 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 !!! example "Create a Flexible Notebook Session (Default)"
     ```bash
     # Uses flexible resource allocation - adapts to user load
-    canfar create notebook skaha/base-notebook:latest
+    canfar create notebook skaha/astroml:latest
     ```
 
 !!! example "Create a Fixed Resource Notebook Session"

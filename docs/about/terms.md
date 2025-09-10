@@ -4,7 +4,7 @@
 
 The Canadian Advanced Network for Astronomy Research is a consortium that serves data-intensive storage, access, and processing needs of university groups and centres engaged in astronomy research.
 
-To this end, CANFAR develops and operates user-facing and integrated services, such as:
+To this end, CANFAR develops and operates user-facing and integrated services such as:
 
   - Research Data Management
   - User-managed storage and cloud processing
@@ -16,7 +16,7 @@ To this end, CANFAR develops and operates user-facing and integrated services, s
 
 1. To maintain and develop services in data and computationally intensive research that enable Canadian researchers and their international collaborators to generate the greatest possible scientific return on Canada’s investment in telescopes and computational resources.
 
-2. To coordinate efforts and resources in multi-use applications and services across Canadian groups, by generating integrated grant proposals and funding requests that enable the combination and integration of the science application domain (predominantly located at the universities) and the technical expertise (e.g. at CADC). Such grant proposals and funding request would be directed to any of the Canadian agencies involved in Science, Innovation, Computing and Big Data, such as NSERC, CFI, Canarie or NRC.
+2. To coordinate efforts and resources in multi-use applications and services across Canadian groups, by generating integrated grant proposals and funding requests that enable the combination and integration of the science application domain (predominantly located at the universities) and the technical expertise (e.g. at CADC). Such grant proposals and funding requests would be directed to any of the Canadian agencies involved in Science, Innovation, Computing and Big Data, such as NSERC, CFI, CANARIE or NRC.
 
 3. Interface on behalf of the astronomy community with Digital Research Alliance Canada to ensure that services meet the astronomy domain specific needs.
 

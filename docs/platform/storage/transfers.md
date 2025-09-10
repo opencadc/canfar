@@ -1,10 +1,10 @@
 # Data Transfers
 
-**Comprehensive guide to moving data between CANFAR storage systems, external sources, and your local computer - including interactive and automated transfer methods.**
+**Moving data between CANFAR storage systems, external sources, and your local computer.**
 
 !!! info "Platform Navigation"
-    **Data Transfers**: Moving data efficiently between storage systems and external sources.  
-    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Transfer Methods Overview"
     **Efficient data movement strategies:**
