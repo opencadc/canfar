@@ -17,7 +17,7 @@ The NRC is the home of the [Canadian Astronomy Data Centre](https://www.cadc-ccd
 
     ---
 
-    [CANARIE](https://www.canarie.ca) connects Canada to the world by providing an ultra-high-speed network that links Canada’s researchers and educators to each other and to global data, technology, and colleagues through collaboration with government, industry, and international partners.\
+    [CANARIE](https://www.canarie.ca) connects Canada to the world by providing an ultra-high-speed network that links Canada’s researchers and educators to each other and to global data, technology, and colleagues through collaboration with government, industry, and international partners.
 
 - ![DRAC](./drac.png)
 
@@ -32,7 +32,3 @@ The NRC is the home of the [Canadian Astronomy Data Centre](https://www.cadc-ccd
     The [Canadian Space Agency](https://www.asc-csa.gc.ca/eng/) supports Canada’s leadership in space astronomy and the growth of the national space technology sector. Through its funding of the [Canadian Astronomy Data Centre](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/), it directly supports the operation and advancement of CANFAR.
 
 </div>
-
-
-    
-

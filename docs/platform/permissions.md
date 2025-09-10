@@ -4,7 +4,7 @@ Comprehensive guide to accounts, groups, access control, and API authentication 
 
 !!! info "Platform Navigation"
     **User Management & Permissions**: Complete access control and collaboration management.  
-    **[Platform Home](index.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
+    **[Home](index.md)** | **[Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[DOI Services](doi.md)** | **[Legacy Cloud](cloud.md)**
 
 !!! abstract "🎯 Permission System Overview"
     **Essential access control concepts for all users:**

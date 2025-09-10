@@ -12,12 +12,6 @@ To request authorization to use the Science Portal, send an email to <support@ca
 
 Once your access has been confirmed, go to the CANFAR page: <https://www.canfar.net> and log in to access the Science Portal.
 
-> ![image](images/login/1_main_CANFAR_landing.png)
-
-Start a new session by clicking the plus sign
-
-> ![image](images/login/2_after_login.png)
+Start a new session by clicking the plus sign.
 
 There are four different types of sessions that you can choose to launch: Desktop, CARTA, Notebook, and Contributed. All are described below; in brief, Desktop provides a linux desktop-like working environment, CARTA corresponds to ALMA's CARTA visualization tool, Notebook provides a Jupyter Notebook environment, and Contributed contains community-contributed tools such as a time estimator for the CASTOR mission.
-
-> ![image](images/login/3_launch_session_general.png)

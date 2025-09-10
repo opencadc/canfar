@@ -169,7 +169,7 @@ SSHFS allows you to mount CANFAR's ARC storage on your local computer as if it w
     # Logout and login again
     ```
 
-=== "Linux (Fedora)"
+=== "Linux (Fedora/RedHat)"
     ```bash
     # Install SSHFS
     sudo dnf install sshfs
