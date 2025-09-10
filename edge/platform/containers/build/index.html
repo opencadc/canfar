@@ -1174,51 +1174,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#maintenance-and-updates" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔄 Maintenance and Updates
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#included-software" class="md-nav__link">
-    <span class="md-ellipsis">
-      Included Software
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#development" class="md-nav__link">
-    <span class="md-ellipsis">
-      Development
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Support
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#changelog" class="md-nav__link">
-    <span class="md-ellipsis">
-      Changelog
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1783,51 +1738,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#maintenance-and-updates" class="md-nav__link">
-    <span class="md-ellipsis">
-      🔄 Maintenance and Updates
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#included-software" class="md-nav__link">
-    <span class="md-ellipsis">
-      Included Software
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#development" class="md-nav__link">
-    <span class="md-ellipsis">
-      Development
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#support" class="md-nav__link">
-    <span class="md-ellipsis">
-      Support
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#changelog" class="md-nav__link">
-    <span class="md-ellipsis">
-      Changelog
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1864,7 +1774,7 @@
 <p><strong>Creating your own astronomy software environments for CANFAR - from development through deployment and maintenance.</strong></p>
 <div class="admonition info">
 <p class="admonition-title">Platform Navigation</p>
-<p><strong>Container Building</strong>: Creating custom software environments for specialised research workflows.<br />
+<p><strong>Container Building</strong>: Creating custom software environments for specialized research workflows.<br />
 <strong><a href="../">Containers Home</a></strong> | <strong><a href="../registry/">Registry Management</a></strong> | <strong><a href="../../">Platform Home</a></strong></p>
 </div>
 <div class="admonition abstract">
@@ -1885,16 +1795,16 @@
 - Cutting-edge research tools not yet in CANFAR containers
 - Specific versions of software required for reproducibility
 - Legacy software with complex dependency requirements</p>
-<p><strong>Team Standardisation:</strong>
+<p><strong>Team Standardization:</strong>
 - Consistent environments across research groups
 - Custom analysis pipelines and workflows
 - Institutional software licensing requirements
 - Project-specific data processing tools</p>
-<p><strong>Performance Optimisation:</strong>
+<p><strong>Performance Optimization:</strong>
 - GPU-optimised builds for specific hardware
 - Memory-efficient configurations for large datasets
 - Custom compilation flags for scientific software
-- Minimised container size for batch processing</p>
+- Minimized container size for batch processing</p>
 <h3 id="alternatives-to-consider-first">Alternatives to Consider First<a class="headerlink" href="#alternatives-to-consider-first" title="Permanent link">&para;</a></h3>
 <p>Before building custom containers, consider these alternatives:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Runtime package installation (temporary)</span>
@@ -1968,10 +1878,7 @@ mkdir<span class="w"> </span>test-home/
 <span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/casa:latest</span>
 
 <span class="c"># For minimal environments</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/notebook:latest</span>
-
-<span class="c"># For desktop applications</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span><span class="w">  </span><span class="c"># Only if creating completely new desktop-app</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/base:latest</span>
 </code></pre></div>
 <h3 id="basic-dockerfile-patterns">Basic Dockerfile Patterns<a class="headerlink" href="#basic-dockerfile-patterns" title="Permanent link">&para;</a></h3>
 <h4 id="notebook-container-extension">Notebook Container Extension<a class="headerlink" href="#notebook-container-extension" title="Permanent link">&para;</a></h4>
@@ -1985,26 +1892,6 @@ mkdir<span class="w"> </span>test-home/
 <span class="c"># Install system dependencies as root</span>
 <span class="k">USER</span><span class="w"> </span><span class="s">root</span>
 
-<span class="c"># Update package lists and install system packages</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>gfortran<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libcfitsio-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libwcs-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>cmake<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>build-essential<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*<span class="w"> </span>/var/cache/apt/*<span class="w"> </span>/var/tmp/*
-
-<span class="c"># Switch back to non-root user for application installs</span>
-<span class="k">USER</span><span class="w"> </span><span class="s">${NB_USER}</span>
-
-<span class="c"># Install Python packages</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">astroplan</span><span class="o">==</span><span class="m">0</span>.9.1<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">photutils</span><span class="o">==</span><span class="m">1</span>.10.0<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">reproject</span><span class="o">==</span><span class="m">0</span>.13.0<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">specutils</span><span class="o">==</span><span class="m">1</span>.12.0<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">regions</span><span class="o">==</span><span class="m">0</span>.8
 
 <span class="c"># Install specialized X-ray analysis tools</span>
 <span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
@@ -2018,22 +1905,12 @@ mkdir<span class="w"> </span>test-home/
 <span class="w">    </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>-e<span class="w"> </span>.<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>rm<span class="w"> </span>-rf<span class="w"> </span>/tmp/tools
 
-<span class="c"># Copy custom scripts and configurations</span>
-<span class="k">COPY</span><span class="w"> </span>--chown<span class="o">=</span><span class="si">${</span><span class="nv">NB_USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">NB_GID</span><span class="si">}</span><span class="w"> </span>scripts/<span class="w"> </span>/opt/custom-tools/
-<span class="k">COPY</span><span class="w"> </span>--chown<span class="o">=</span><span class="si">${</span><span class="nv">NB_USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">NB_GID</span><span class="si">}</span><span class="w"> </span>configs/<span class="w"> </span>/opt/configs/
-
 <span class="c"># Set up environment variables</span>
 <span class="k">ENV</span><span class="w"> </span><span class="nv">XRAY_TOOLS_PATH</span><span class="o">=</span>/opt/custom-tools
 <span class="k">ENV</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="si">${</span><span class="nv">PYTHONPATH</span><span class="si">}</span>:/opt/custom-tools
-
-<span class="c"># Set working directory</span>
-<span class="k">WORKDIR</span><span class="w"> </span><span class="s">${HOME}</span>
-
-<span class="c"># Ensure Jupyter can find custom tools</span>
-<span class="k">RUN</span><span class="w"> </span>jupyter<span class="w"> </span>lab<span class="w"> </span>build<span class="w"> </span>--dev-build<span class="o">=</span>False<span class="w"> </span>--minimize<span class="o">=</span>False
 </code></pre></div>
 <h4 id="desktop-app-container">Desktop-App Container<a class="headerlink" href="#desktop-app-container" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span>
+<p><div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:24.04</span>
 
 <span class="c"># Avoid prompts during installation</span>
 <span class="k">ENV</span><span class="w"> </span><span class="nv">DEBIAN_FRONTEND</span><span class="o">=</span>noninteractive
@@ -2048,11 +1925,8 @@ mkdir<span class="w"> </span>test-home/
 <span class="w">    </span>libxrandr2<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>libxss1<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>libgtk-3-0<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Application-specific<span class="w"> </span>dependencies
-<span class="w">    </span>ds9<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>saods9<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>xterm<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Basic<span class="w"> </span>tools
 <span class="w">    </span>wget<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>curl<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>vim<span class="w"> </span><span class="se">\</span>
@@ -2063,18 +1937,7 @@ mkdir<span class="w"> </span>test-home/
 <span class="k">RUN</span><span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>/skaha
 
 <span class="c"># Create the startup script</span>
-<span class="k">RUN</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span><span class="s1">&#39;#!/bin/bash\n\</span>
-<span class="s1"># Set up X11 environment\n\</span>
-<span class="s1">export DISPLAY=${DISPLAY:-:1}\n\</span>
-<span class="s1">\n\</span>
-<span class="s1"># Navigate to user home directory\n\</span>
-<span class="s1">cd /arc/home/$USER || cd /tmp\n\</span>
-<span class="s1">\n\</span>
-<span class="s1"># Launch the application\n\</span>
-<span class="s1">exec ds9 -title &quot;Custom DS9 - $USER&quot; &amp;\n\</span>
-<span class="s1">\n\</span>
-<span class="s1"># Keep container running\n\</span>
-<span class="s1">wait\n&#39;</span><span class="w"> </span>&gt;<span class="w"> </span>/skaha/startup.sh
+<span class="k">COPY</span><span class="w"> </span>startup.sh<span class="w"> </span>/skaha/<span class="w"> </span>
 
 <span class="c"># Make startup script executable</span>
 <span class="k">RUN</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>/skaha/startup.sh
@@ -2082,64 +1945,25 @@ mkdir<span class="w"> </span>test-home/
 <span class="c"># Set the startup script as entrypoint</span>
 <span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;/skaha/startup.sh&quot;</span><span class="p">]</span>
 </code></pre></div>
-<h4 id="headless-processing-container">Headless Processing Container<a class="headerlink" href="#headless-processing-container" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/astroml:latest</span>
+with the <code>startup.sh</code> being:
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
 
-<span class="k">USER</span><span class="w"> </span><span class="s">root</span>
+<span class="c1"># Set up X11 environment</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DISPLAY</span><span class="o">=</span><span class="si">${</span><span class="nv">DISPLAY</span><span class="k">:-</span><span class="p">:</span><span class="nv">1</span><span class="si">}</span>
 
-<span class="c"># Install processing tools</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Parallel<span class="w"> </span>processing<span class="w"> </span>tools
-<span class="w">    </span>parallel<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Image<span class="w"> </span>processing
-<span class="w">    </span>imagemagick<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Video<span class="w"> </span>processing
-<span class="w">    </span>ffmpeg<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Archive<span class="w"> </span>tools
-<span class="w">    </span>zip<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>unzip<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Performance<span class="w"> </span>monitoring
-<span class="w">    </span>htop<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>iotop<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+<span class="c1"># Navigate to user home directory</span>
+<span class="nb">cd</span><span class="w"> </span>/arc/home/<span class="nv">$USER</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/tmp
 
-<span class="k">USER</span><span class="w"> </span><span class="s">${NB_USER}</span>
+<span class="c1"># Launch the application\n\</span>
+<span class="nb">exec</span><span class="w"> </span>ds9<span class="w"> </span>-title<span class="w"> </span><span class="s2">&quot;Custom DS9 - </span><span class="nv">$USER</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">&amp;</span>
 
-<span class="c"># Install Python packages for large-scale processing</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Distributed<span class="w"> </span>computing
-<span class="w">    </span>dask<span class="o">[</span>complete<span class="o">]</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>High-performance<span class="w"> </span>I/O
-<span class="w">    </span>zarr<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>h5py<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Data<span class="w"> </span>formats
-<span class="w">    </span>xarray<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>astropy-healpix<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Workflow<span class="w"> </span>management
-<span class="w">    </span>snakemake<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>#<span class="w"> </span>Performance<span class="w"> </span>monitoring
-<span class="w">    </span>psutil
-
-<span class="c"># Copy processing scripts</span>
-<span class="k">COPY</span><span class="w"> </span>--chown<span class="o">=</span><span class="si">${</span><span class="nv">NB_USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">NB_GID</span><span class="si">}</span><span class="w"> </span>processing/<span class="w"> </span>/opt/processing/
-
-<span class="c"># Set up processing environment</span>
-<span class="k">ENV</span><span class="w"> </span><span class="nv">PROCESSING_THREADS</span><span class="o">=</span><span class="m">4</span>
-<span class="k">ENV</span><span class="w"> </span><span class="nv">PROCESSING_MEMORY_LIMIT</span><span class="o">=</span>8GB
-<span class="k">ENV</span><span class="w"> </span><span class="nv">OUTPUT_FORMAT</span><span class="o">=</span>fits
-<span class="k">ENV</span><span class="w"> </span><span class="nv">TEMP_DIR</span><span class="o">=</span>/scratch
-
-<span class="c"># Make scripts executable</span>
-<span class="k">RUN</span><span class="w"> </span>chmod<span class="w"> </span>+x<span class="w"> </span>/opt/processing/*.py<span class="w"> </span>/opt/processing/*.sh
-
-<span class="c"># Default command for batch execution</span>
-<span class="k">CMD</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/opt/processing/main.py&quot;</span><span class="p">]</span>
-</code></pre></div>
+<span class="c1"># Keep container running</span>
+<span class="nb">wait</span>
+</code></pre></div></p>
 <h3 id="advanced-container-features">Advanced Container Features<a class="headerlink" href="#advanced-container-features" title="Permanent link">&para;</a></h3>
 <h4 id="multi-stage-builds-for-complex-software">Multi-stage Builds for Complex Software<a class="headerlink" href="#multi-stage-builds-for-complex-software" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c"># Build stage for compiling software</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:24.04</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
 
 <span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>build-essential<span class="w"> </span><span class="se">\</span>
@@ -2163,7 +1987,6 @@ mkdir<span class="w"> </span>test-home/
 <span class="c"># Update library cache</span>
 <span class="k">USER</span><span class="w"> </span><span class="s">root</span>
 <span class="k">RUN</span><span class="w"> </span>ldconfig
-<span class="k">USER</span><span class="w"> </span><span class="s">${NB_USER}</span>
 </code></pre></div>
 <h4 id="gpu-enabled-containers">GPU-Enabled Containers<a class="headerlink" href="#gpu-enabled-containers" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/astroml-cuda:latest</span>
@@ -2179,8 +2002,6 @@ mkdir<span class="w"> </span>test-home/
 <span class="w">    </span>#<span class="w"> </span>GPU<span class="w"> </span>signal<span class="w"> </span>processing
 <span class="w">    </span>cusignal
 
-<span class="c"># Install custom CUDA code</span>
-<span class="k">COPY</span><span class="w"> </span>--chown<span class="o">=</span><span class="si">${</span><span class="nv">NB_USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">NB_GID</span><span class="si">}</span><span class="w"> </span>cuda_kernels/<span class="w"> </span>/opt/cuda_kernels/
 <span class="k">RUN</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>/opt/cuda_kernels<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>nvcc<span class="w"> </span>-o<span class="w"> </span>gpu_analysis<span class="w"> </span>analysis.cu<span class="w"> </span>-lcufft<span class="w"> </span>-lcublas
 </code></pre></div>
@@ -2281,7 +2102,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*<span class="w"> </span>/var/cache/apt/*<span class="w"> </span>/var/tmp/*
 
-<span class="c"># Pin package versions to avoid conflicts</span>
+<span class="c"># if necessary, you can pin exact package versions to avoid conflicts</span>
 <span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="nv">astropy</span><span class="o">==</span><span class="m">5</span>.3.4<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="nv">numpy</span><span class="o">==</span><span class="m">1</span>.24.3<span class="w"> </span><span class="se">\</span>
@@ -2289,7 +2110,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 </code></pre></div>
 <h4 id="container-size-issues">Container Size Issues<a class="headerlink" href="#container-size-issues" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c"># Use multi-stage builds</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:24.04</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="s">builder</span>
 <span class="c"># ... build software ...</span>
 
 <span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/astroml:latest</span>
@@ -2304,7 +2125,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 </code></pre></div>
 <h2 id="building-and-optimization">📦 Building and Optimization<a class="headerlink" href="#building-and-optimization" title="Permanent link">&para;</a></h2>
 <h3 id="efficient-docker-practices">Efficient Docker Practices<a class="headerlink" href="#efficient-docker-practices" title="Permanent link">&para;</a></h3>
-<h4 id="layer-optimisation">Layer Optimisation<a class="headerlink" href="#layer-optimisation" title="Permanent link">&para;</a></h4>
+<h4 id="layer-optimization">Layer Optimization<a class="headerlink" href="#layer-optimization" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c"># Good: Combine related operations</span>
 <span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>package1<span class="w"> </span><span class="se">\</span>
@@ -2322,7 +2143,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 <span class="c"># Custom code (changes frequently)</span>
 <span class="k">COPY</span><span class="w"> </span>.<span class="w"> </span>/app/
 </code></pre></div>
-<h4 id="size-minimisation">Size Minimisation<a class="headerlink" href="#size-minimisation" title="Permanent link">&para;</a></h4>
+<h4 id="size-minimization">Size Minimization<a class="headerlink" href="#size-minimization" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c"># Use .dockerignore to exclude unnecessary files</span>
 <span class="c"># .dockerignore contents:</span>
 <span class="c"># .git</span>
@@ -2341,7 +2162,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 <span class="c"># Use --no-cache-dir for pip</span>
 <span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>package-name
 </code></pre></div>
-<h3 id="performance-optimisation">Performance Optimisation<a class="headerlink" href="#performance-optimisation" title="Permanent link">&para;</a></h3>
+<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
 <h4 id="parallel-builds">Parallel Builds<a class="headerlink" href="#parallel-builds" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Build with multiple cores</span>
 docker<span class="w"> </span>build<span class="w"> </span>--build-arg<span class="w"> </span><span class="nv">MAKEFLAGS</span><span class="o">=</span>-j<span class="k">$(</span>nproc<span class="k">)</span><span class="w"> </span>.
@@ -2390,255 +2211,6 @@ docker<span class="w"> </span>push<span class="w"> </span>images.canfar.net/myte
 <span class="c1"># Push all tags</span>
 docker<span class="w"> </span>push<span class="w"> </span>--all-tags<span class="w"> </span>images.canfar.net/myteam/analysis-env
 </code></pre></div>
-<h3 id="container-labeling-for-canfar">Container Labeling for CANFAR<a class="headerlink" href="#container-labeling-for-canfar" title="Permanent link">&para;</a></h3>
-<p>Ensure proper labeling for session type integration:</p>
-<div class="highlight"><pre><span></span><code><span class="c"># For notebook containers</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;notebook&quot;</span>
-
-<span class="c"># For desktop-app containers  </span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;desktop-app&quot;</span>
-
-<span class="c"># For contributed applications</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;contributed&quot;</span>
-
-<span class="c"># Additional metadata</span>
-<span class="k">LABEL</span><span class="w"> </span><span class="nv">maintainer</span><span class="o">=</span><span class="s2">&quot;research-team@university.edu&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span><span class="nv">version</span><span class="o">=</span><span class="s2">&quot;1.2.3&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span><span class="nv">description</span><span class="o">=</span><span class="s2">&quot;Custom X-ray astronomy analysis environment&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span><span class="nv">documentation</span><span class="o">=</span><span class="s2">&quot;https://github.com/myteam/container-docs&quot;</span>
-</code></pre></div>
-<h2 id="maintenance-and-updates">🔄 Maintenance and Updates<a class="headerlink" href="#maintenance-and-updates" title="Permanent link">&para;</a></h2>
-<h3 id="update-strategy">Update Strategy<a class="headerlink" href="#update-strategy" title="Permanent link">&para;</a></h3>
-<h4 id="regular-maintenance-schedule">Regular Maintenance Schedule<a class="headerlink" href="#regular-maintenance-schedule" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="c1"># update-container.sh - Monthly maintenance script</span>
-
-<span class="c1"># Update base image</span>
-docker<span class="w"> </span>pull<span class="w"> </span>images.canfar.net/skaha/astroml:latest
-
-<span class="c1"># Rebuild container</span>
-docker<span class="w"> </span>build<span class="w"> </span>--no-cache<span class="w"> </span>-t<span class="w"> </span>myteam/analysis-env:<span class="k">$(</span>date<span class="w"> </span>+%Y.%m<span class="k">)</span><span class="w"> </span>.
-
-<span class="c1"># Test new build</span>
-./run-tests.sh<span class="w"> </span>myteam/analysis-env:<span class="k">$(</span>date<span class="w"> </span>+%Y.%m<span class="k">)</span>
-
-<span class="c1"># If tests pass, tag as latest</span>
-docker<span class="w"> </span>tag<span class="w"> </span>myteam/analysis-env:<span class="k">$(</span>date<span class="w"> </span>+%Y.%m<span class="k">)</span><span class="w"> </span>myteam/analysis-env:latest
-
-<span class="c1"># Push updates</span>
-docker<span class="w"> </span>push<span class="w"> </span>myteam/analysis-env:<span class="k">$(</span>date<span class="w"> </span>+%Y.%m<span class="k">)</span>
-docker<span class="w"> </span>push<span class="w"> </span>myteam/analysis-env:latest
-</code></pre></div>
-<h4 id="dependency-updates">Dependency Updates<a class="headerlink" href="#dependency-updates" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c"># Pin major versions, allow minor updates</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="s1">&#39;astropy&gt;=5.3,&lt;6.0&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="s1">&#39;numpy&gt;=1.24,&lt;2.0&#39;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="s1">&#39;scipy&gt;=1.10,&lt;2.0&#39;</span>
-
-<span class="c"># For critical reproducibility, pin exact versions</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">astropy</span><span class="o">==</span><span class="m">5</span>.3.4<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">numpy</span><span class="o">==</span><span class="m">1</span>.24.3<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="nv">scipy</span><span class="o">==</span><span class="m">1</span>.10.1
-</code></pre></div>
-<h3 id="cicd-integration">CI/CD Integration<a class="headerlink" href="#cicd-integration" title="Permanent link">&para;</a></h3>
-<h4 id="github-actions-for-automated-builds">GitHub Actions for Automated Builds<a class="headerlink" href="#github-actions-for-automated-builds" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># .github/workflows/build-container.yml</span>
-<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build and Push Container</span>
-
-<span class="nt">on</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p p-Indicator">]</span>
-<span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="s">&#39;v*&#39;</span><span class="w"> </span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">pull_request</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p p-Indicator">]</span>
-
-<span class="nt">jobs</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
-
-<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Checkout code</span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Set up Docker Buildx</span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/setup-buildx-action@v3</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Login to Harbor Registry</span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/login-action@v3</span>
-<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images.canfar.net</span>
-<span class="w">        </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.HARBOR_USERNAME }}</span>
-<span class="w">        </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.HARBOR_TOKEN }}</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Extract metadata</span>
-<span class="w">      </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meta</span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/metadata-action@v5</span>
-<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">images</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images.canfar.net/myteam/analysis-env</span>
-<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">          </span><span class="no">type=ref,event=branch</span>
-<span class="w">          </span><span class="no">type=ref,event=pr</span>
-<span class="w">          </span><span class="no">type=semver,pattern={{version}}</span>
-<span class="w">          </span><span class="no">type=semver,pattern={{major}}.{{minor}}</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build and push</span>
-<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/build-push-action@v5</span>
-<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">context</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">.</span>
-<span class="w">        </span><span class="nt">push</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ github.event_name != &#39;pull_request&#39; }}</span>
-<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ steps.meta.outputs.tags }}</span>
-<span class="w">        </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ steps.meta.outputs.labels }}</span>
-<span class="w">        </span><span class="nt">cache-from</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type=gha</span>
-<span class="w">        </span><span class="nt">cache-to</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type=gha,mode=max</span>
-
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Test container</span>
-<span class="w">      </span><span class="nt">run</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
-<span class="w">        </span><span class="no">docker run --rm ${{ steps.meta.outputs.tags }} python -c &quot;import astropy; print(&#39;Container test passed&#39;)&quot;</span>
-</code></pre></div>
-<h3 id="documentation-and-user-support">Documentation and User Support<a class="headerlink" href="#documentation-and-user-support" title="Permanent link">&para;</a></h3>
-<h4 id="container-documentation-template">Container Documentation Template<a class="headerlink" href="#container-documentation-template" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="gh"># Custom Analysis Environment</span>
-
-<span class="gu">## Overview</span>
-This container provides a specialized environment for X-ray astronomy analysis with the following additions to the base astroml container:
-
-<span class="k">-</span><span class="w"> </span>XSPEC and PyXspec for spectral analysis
-<span class="k">-</span><span class="w"> </span>Custom data reduction pipeline
-<span class="k">-</span><span class="w"> </span>Specialized plotting and analysis tools
-
-<span class="gu">## Usage</span>
-
-<span class="gu">### Notebook Session</span>
-```bash
-canfar create notebook images.canfar.net/myteam/xray-analysis:latest \
-  --name &quot;xray-analysis&quot; --cores 4 --memory 16
-</code></pre></div>
-<h3 id="desktop-session">Desktop Session<a class="headerlink" href="#desktop-session" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>desktop<span class="w"> </span>images.canfar.net/myteam/xray-analysis:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;xray-desktop&quot;</span><span class="w"> </span>--cores<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">16</span>
-</code></pre></div>
-<h2 id="included-software">Included Software<a class="headerlink" href="#included-software" title="Permanent link">&para;</a></h2>
-<h3 id="system-packages">System Packages<a class="headerlink" href="#system-packages" title="Permanent link">&para;</a></h3>
-<ul>
-<li>gfortran: Fortran compiler for XSPEC</li>
-<li>libcfitsio-dev: FITS file handling</li>
-</ul>
-<h3 id="python-packages">Python Packages<a class="headerlink" href="#python-packages" title="Permanent link">&para;</a></h3>
-<ul>
-<li>astroplan (0.9.1): Observation planning</li>
-<li>photutils (1.10.0): Photometry tools</li>
-<li>pyxspec: Python interface to XSPEC</li>
-</ul>
-<h3 id="custom-tools">Custom Tools<a class="headerlink" href="#custom-tools" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>/opt/custom-tools/</code>: Custom analysis scripts</li>
-<li><code>/opt/configs/</code>: Default configuration files</li>
-</ul>
-<h2 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h2>
-<h3 id="building-locally">Building Locally<a class="headerlink" href="#building-locally" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/myteam/xray-container.git
-<span class="nb">cd</span><span class="w"> </span>xray-container
-docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>myteam/xray-analysis:dev<span class="w"> </span>.
-</code></pre></div>
-<h3 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code>./run-tests.sh
-</code></pre></div>
-<h2 id="support">Support<a class="headerlink" href="#support" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>Issues</strong>: <a href="https://github.com/myteam/xray-container/issues">GitHub Issues</a></li>
-<li><strong>Documentation</strong>: <a href="https://github.com/myteam/xray-container/wiki">Project Wiki</a></li>
-<li><strong>Contact</strong>: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#114;&#101;&#115;&#101;&#97;&#114;&#99;&#104;&#45;&#116;&#101;&#97;&#109;&#64;&#117;&#110;&#105;&#118;&#101;&#114;&#115;&#105;&#116;&#121;&#46;&#101;&#100;&#117;">&#114;&#101;&#115;&#101;&#97;&#114;&#99;&#104;&#45;&#116;&#101;&#97;&#109;&#64;&#117;&#110;&#105;&#118;&#101;&#114;&#115;&#105;&#116;&#121;&#46;&#101;&#100;&#117;</a></li>
-</ul>
-<h2 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h2>
-<h3 id="v123-2024-03-15">v1.2.3 (2024-03-15)<a class="headerlink" href="#v123-2024-03-15" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Updated astroplan to 0.9.1</li>
-<li>Added custom spectral analysis tools</li>
-<li>Fixed XSPEC configuration issues</li>
-</ul>
-<h3 id="v122-2024-02-15">v1.2.2 (2024-02-15)<a class="headerlink" href="#v122-2024-02-15" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Updated base image to astroml:2024.02</li>
-<li>Security updates for system packages
-<div class="highlight"><pre><span></span><code>## 🆘 Troubleshooting
-
-### Common Build Issues
-
-#### Package Installation Failures
-
-```bash
-# Debug package installation
-docker run -it --rm images.canfar.net/skaha/astroml:latest /bin/bash
-# Try installing packages manually to identify issues
-
-# Check available package versions
-apt-cache search package-name
-apt-cache policy package-name
-</code></pre></div></li>
-</ul>
-<h4 id="permission-denied-errors">Permission Denied Errors<a class="headerlink" href="#permission-denied-errors" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c"># Ensure correct user context</span>
-<span class="k">USER</span><span class="w"> </span><span class="s">root</span>
-<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>packages
-<span class="k">USER</span><span class="w"> </span><span class="s">${NB_USER}</span>
-<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>packages
-
-<span class="c"># Fix file ownership</span>
-<span class="k">COPY</span><span class="w"> </span>--chown<span class="o">=</span><span class="si">${</span><span class="nv">NB_USER</span><span class="si">}</span>:<span class="si">${</span><span class="nv">NB_GID</span><span class="si">}</span><span class="w"> </span>files/<span class="w"> </span>/destination/
-</code></pre></div>
-<h4 id="container-wont-start-on-canfar">Container Won't Start on CANFAR<a class="headerlink" href="#container-wont-start-on-canfar" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check container labels</span>
-docker<span class="w"> </span>inspect<span class="w"> </span>images.canfar.net/myteam/container:latest<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">10</span><span class="w"> </span>Labels
-
-<span class="c1"># Test startup command</span>
-docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>images.canfar.net/myteam/container:latest<span class="w"> </span>/bin/bash
-
-<span class="c1"># For desktop-app containers, test startup script</span>
-docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span>images.canfar.net/myteam/container:latest<span class="w"> </span>/skaha/startup.sh
-</code></pre></div>
-<h3 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h3>
-<h4 id="large-container-size">Large Container Size<a class="headerlink" href="#large-container-size" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Analyze container size</span>
-docker<span class="w"> </span>images<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>myteam/container
-docker<span class="w"> </span><span class="nb">history</span><span class="w"> </span>myteam/container:latest
-
-<span class="c1"># Use dive tool for detailed analysis</span>
-dive<span class="w"> </span>myteam/container:latest
-</code></pre></div>
-<h4 id="slow-build-times">Slow Build Times<a class="headerlink" href="#slow-build-times" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Use build cache effectively</span>
-docker<span class="w"> </span>build<span class="w"> </span>--cache-from<span class="o">=</span>myteam/container:latest<span class="w"> </span>.
-
-<span class="c1"># Enable BuildKit</span>
-<span class="nb">export</span><span class="w"> </span><span class="nv">DOCKER_BUILDKIT</span><span class="o">=</span><span class="m">1</span>
-docker<span class="w"> </span>build<span class="w"> </span>.
-
-<span class="c1"># Use multi-stage builds to reduce final size</span>
-</code></pre></div>
-<h3 id="runtime-issues">Runtime Issues<a class="headerlink" href="#runtime-issues" title="Permanent link">&para;</a></h3>
-<h4 id="package-import-failures">Package Import Failures<a class="headerlink" href="#package-import-failures" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Test package installation in running container</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-
-<span class="c1"># Check package location</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">package_name</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">package_name</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span>
-
-<span class="c1"># Verify environment variables</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PYTHONPATH&#39;</span><span class="p">))</span>
-</code></pre></div>
-<h4 id="storage-access-problems">Storage Access Problems<a class="headerlink" href="#storage-access-problems" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="c1"># Test storage mounting (local testing)</span>
-docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </span>--rm<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-v<span class="w"> </span>/path/to/test:/arc/projects/test<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>-e<span class="w"> </span><span class="nv">USER</span><span class="o">=</span>testuser<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>myteam/container:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/test
-</code></pre></div>
 
 
 
@@ -2661,7 +2233,7 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 22:08:55 UTC">September 8, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 22:14:54 UTC">September 9, 2025</span>
   </span>
 
     
@@ -2676,6 +2248,29 @@ docker<span class="w"> </span>run<span class="w"> </span>-it<span class="w"> </s
 
     
     
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
     
   </aside>
 

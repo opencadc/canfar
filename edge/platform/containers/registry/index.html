@@ -1153,9 +1153,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#projects-and-organisation" class="md-nav__link">
+  <a href="#projects-and-organization" class="md-nav__link">
     <span class="md-ellipsis">
-      🏗️ Projects and Organisation
+      🏗️ Projects and Organization
     </span>
   </a>
   
@@ -1730,9 +1730,9 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#projects-and-organisation" class="md-nav__link">
+  <a href="#projects-and-organization" class="md-nav__link">
     <span class="md-ellipsis">
-      🏗️ Projects and Organisation
+      🏗️ Projects and Organization
     </span>
   </a>
   
@@ -1851,14 +1851,12 @@
 </div>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 Registry Management Overview</p>
-<p><strong>Master Harbor registry operations:</strong></p>
-<ul>
-<li><strong>Harbor Platform</strong>: Understanding CANFAR's enterprise container registry features</li>
-<li><strong>Access Control</strong>: Projects, repositories, and role-based permissions</li>
-<li><strong>Image Management</strong>: Tagging, versioning, and metadata organisation</li>
-<li><strong>Security Features</strong>: Vulnerability scanning and compliance monitoring</li>
-</ul>
 </div>
+<p><strong>Master Harbor registry operations:</strong></p>
+<p><strong>Harbor Platform</strong>: Understanding CANFAR's enterprise container registry features
+<strong>Access Control</strong>: Projects, repositories, and role-based permissions
+<strong>Image Management</strong>: Tagging, versioning, and metadata organization
+<strong>Security Features</strong>: Vulnerability scanning and compliance monitoring</p>
 <p>Harbor serves as CANFAR's container registry, providing a secure, feature-rich platform for storing, managing, and distributing container images. Built on Docker Registry v2, Harbor adds enterprise features like role-based access control, vulnerability scanning, and image replication.</p>
 <h2 id="harbor-registry-overview">📋 Harbor Registry Overview<a class="headerlink" href="#harbor-registry-overview" title="Permanent link">&para;</a></h2>
 <h3 id="what-is-harbor">What is Harbor?<a class="headerlink" href="#what-is-harbor" title="Permanent link">&para;</a></h3>
@@ -1876,7 +1874,7 @@
 <p><strong>Key features on CANFAR:</strong></p>
 <ul>
 <li>Integration with CADC authentication system</li>
-<li>Project-based organisation for research teams</li>
+<li>Project-based organization for research teams</li>
 <li>Automated vulnerability scanning for public containers</li>
 <li>Role-based permissions aligned with CANFAR groups</li>
 <li>API access for automated workflows</li>
@@ -1899,9 +1897,9 @@
     Features --&gt; Scanning[Vulnerability Scanning]
     Features --&gt; Replication[Image Replication]
     Features --&gt; API[REST API]</code></pre>
-<h2 id="projects-and-organisation">🏗️ Projects and Organisation<a class="headerlink" href="#projects-and-organisation" title="Permanent link">&para;</a></h2>
+<h2 id="projects-and-organization">🏗️ Projects and Organization<a class="headerlink" href="#projects-and-organization" title="Permanent link">&para;</a></h2>
 <h3 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h3>
-<p>Harbor organises containers into <strong>projects</strong>, which serve as top-level namespaces:</p>
+<p>Harbor organizes containers into <strong>projects</strong>, which serve as top-level namespaces:</p>
 <div class="highlight"><pre><span></span><code>images.canfar.net/
 ├── skaha/                    # Official CANFAR containers
 │   ├── astroml:latest
@@ -2467,7 +2465,7 @@ docker<span class="w"> </span>push<span class="w"> </span>images.canfar.net/myte
 </code></pre></div>
 <h2 id="best-practices">🚀 Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
 <h3 id="registry-best-practices">Registry Best Practices<a class="headerlink" href="#registry-best-practices" title="Permanent link">&para;</a></h3>
-<h4 id="registry-organisation">Registry Organisation<a class="headerlink" href="#registry-organisation" title="Permanent link">&para;</a></h4>
+<h4 id="registry-organization">Registry Organization<a class="headerlink" href="#registry-organization" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Recommended project organization</span>
 university-astronomy/<span class="w">        </span><span class="c1"># Institution-wide project</span>
 ├──<span class="w"> </span>public-tools/<span class="w">            </span><span class="c1"># Publicly available tools</span>
@@ -2557,25 +2555,11 @@ RUN<span class="w"> </span>apt-get<span class="w"> </span>update<span class="w">
 <span class="c1"># Smaller images start faster, especially for batch jobs</span>
 </code></pre></div>
 <h2 id="integration-with-canfar-services">🔗 Integration with CANFAR Services<a class="headerlink" href="#integration-with-canfar-services" title="Permanent link">&para;</a></h2>
-<h3 id="session-type-integration">Session Type Integration<a class="headerlink" href="#session-type-integration" title="Permanent link">&para;</a></h3>
-<p>Harbor labels determine how containers integrate with CANFAR sessions:</p>
-<div class="highlight"><pre><span></span><code><span class="c"># Notebook container labels</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;notebook&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.description<span class="o">=</span><span class="s2">&quot;Custom astronomy analysis environment&quot;</span>
-
-<span class="c"># Desktop-app container labels  </span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;desktop-app&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.name<span class="o">=</span><span class="s2">&quot;Custom Analysis Tool&quot;</span>
-
-<span class="c"># Contributed application labels</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.type<span class="o">=</span><span class="s2">&quot;contributed&quot;</span>
-<span class="k">LABEL</span><span class="w"> </span>ca.nrc.cadc.skaha.port<span class="o">=</span><span class="s2">&quot;5000&quot;</span>
-</code></pre></div>
 <h3 id="storage-integration">Storage Integration<a class="headerlink" href="#storage-integration" title="Permanent link">&para;</a></h3>
 <p>Containers automatically receive CANFAR storage mounts:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Inside any Harbor-deployed container on CANFAR</span>
-ls<span class="w"> </span>/arc/home/username/<span class="w">        </span><span class="c1"># Personal storage</span>
-ls<span class="w"> </span>/arc/projects/project/<span class="w">     </span><span class="c1"># Project storage  </span>
+ls<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/<span class="w">        </span><span class="c1"># Personal storage</span>
+ls<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="w">     </span><span class="c1"># Project storage  </span>
 ls<span class="w"> </span>/scratch/<span class="w">                  </span><span class="c1"># Temporary storage</span>
 </code></pre></div>
 <h3 id="authentication-integration">Authentication Integration<a class="headerlink" href="#authentication-integration" title="Permanent link">&para;</a></h3>
@@ -2667,7 +2651,7 @@ dive<span class="w"> </span>images.canfar.net/myteam/image:latest
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 8, 2025 22:08:55 UTC">September 8, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 22:14:09 UTC">September 9, 2025</span>
   </span>
 
     

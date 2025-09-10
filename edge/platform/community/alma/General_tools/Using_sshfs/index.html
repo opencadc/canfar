@@ -792,29 +792,19 @@
 <h2 id="prepare-your-arc-account">Prepare your Arc account<a class="headerlink" href="#prepare-your-arc-account" title="Permanent link">&para;</a></h2>
 <p>A public SSH key will need to be installed into your Arc home directory. Ensure you have a <code>.ssh</code> folder in your <code>/home/[your_cadc_username]</code> folder.  You can do this through the UI: <a href="https://www.canfar.net/storage/arc/list/home">https://www.canfar.net/storage/arc/list/home</a></p>
 <ol>
-<li>Ensure you are logged in using the pulldown in the top right menu.</li>
+<li>
+<p>Ensure you are logged in using the pulldown in the top right menu.</p>
+</li>
+<li>
+<p>Visit your <code>Home</code> folder.</p>
+</li>
+<li>
+<p>If there is no <code>.ssh</code> folder listed, create one.</p>
+</li>
+<li>
+<p>Ensure you have a file called <code>authorized_keys</code> with your SSH public key in it. This public key should match whichever private key you are using to authenticate with. For example, if your private key on your local machine is <code>${HOME}/.ssh/id_rsa</code>, then your public key is likely <code>${HOME}/.ssh/id_rsa.pub</code>.</p>
+</li>
 </ol>
-<blockquote>
-<p><img alt="image" src="images/sshfs/login.png" /></p>
-</blockquote>
-<ol>
-<li>Visit your <code>Home</code> folder.</li>
-</ol>
-<blockquote>
-<p><img alt="image" src="images/sshfs/home.png" /></p>
-</blockquote>
-<ol>
-<li>If there is no <code>.ssh</code> folder listed, create one.</li>
-</ol>
-<blockquote>
-<p><img alt="image" src="images/sshfs/add-folder.png" /></p>
-</blockquote>
-<ol>
-<li>Ensure you have a file called <code>authorized_keys</code> with your SSH public key in it. This public key should match which ever private key you are using to authenticate with.  For example, if your private key on your local machine is <code>${HOME}/.ssh/id_rsa</code>, then your public key is likely <code>${HOME}/.ssh/id_rsa.pub</code>.</li>
-</ol>
-<blockquote>
-<p><img alt="image" src="images/sshfs/auth-keys.png" /></p>
-</blockquote>
 <h2 id="mount-the-remote-file-system">Mount the Remote File System<a class="headerlink" href="#mount-the-remote-file-system" title="Permanent link">&para;</a></h2>
 <p>For Ubuntu/Debian Linux or Mac OSX, the instructions are below.</p>
 <p>To start, we will need to create a local directory in which to mount the file system, "arc":</p>
@@ -861,7 +851,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 00:03:34 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 19:49:16 UTC">September 9, 2025</span>
   </span>
 
     
