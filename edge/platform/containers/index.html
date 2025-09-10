@@ -1666,11 +1666,11 @@
 
 
 <h1 id="containers">Containers<a class="headerlink" href="#containers" title="Permanent link">&para;</a></h1>
-<p><strong>Working with astronomy software containers on CANFAR - understanding container environments, using pre-built images, and creating custom software stacks.</strong></p>
+<p><strong>Working and building software containers on CANFAR.</strong></p>
 <div class="admonition info">
 <p class="admonition-title">Platform Navigation</p>
-<p><strong>Containers</strong>: Software environments and containerized applications for astronomy.<br />
-<strong><a href="../">Platform Home</a></strong> | <strong><a href="../concepts/">Platform Concepts</a></strong> | <strong><a href="../sessions/">Interactive Sessions</a></strong> | <strong><a href="../storage/">Storage Systems</a></strong> | <strong><a href="../support/">Support</a></strong></p>
+<p><strong>Platform Sections:</strong><br />
+<strong><a href="../">Home</a></strong> | <strong><a href="../get-started/">Get Started</a></strong> | <strong><a href="../concepts/">Concepts</a></strong> | <strong><a href="../sessions/">Sessions</a></strong> | <strong><a href="../storage/">Storage</a></strong> | <strong><a href="../containers/">Containers</a></strong> | <strong><a href="../support/">Support</a></strong> | <strong><a href="../permissions/">Permissions</a></strong> | <strong><a href="../doi/">DOI</a></strong></p>
 </div>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 Container Guide Overview</p>
@@ -1678,7 +1678,7 @@
 <ul>
 <li><strong><a href="#what-are-containers">Container Concepts</a></strong>: Understanding reproducible software environments</li>
 <li><strong><a href="#canfar-supported-containers">Available Containers</a></strong>: Pre-built astronomy software stacks</li>
-<li><strong><a href="build/">Container Building</a></strong>: Creating custom environments for specialized workflows</li>
+<li><strong><a href="build/">Container Building</a></strong>: Creating custom environments for specialised workflows</li>
 <li><strong><a href="registry/">Registry Management</a></strong>: Harbor registry access and image distribution</li>
 </ul>
 </div>
@@ -1714,34 +1714,34 @@
     BaseOS[Ubuntu Linux Base] --&gt; SystemLibs[System Libraries]
     SystemLibs --&gt; CondaPython[Conda + Python]
     CondaPython --&gt; AstroLibs[Astronomy Libraries]
-    AstroLibs --&gt; SpecializedTools[Specialized Tools]
+    AstroLibs --&gt; SpecialisedTools[Specialised Tools]
 
-    SpecializedTools --&gt; Astroml[astroml Container]
-    SpecializedTools --&gt; Casa[casa Container]
-    SpecializedTools --&gt; Custom[Custom Containers]
+    SpecialisedTools --&gt; Astroml[astroml Container]
+    SpecialisedTools --&gt; Casa[casa Container]
+    SpecialisedTools --&gt; Custom[Custom Containers]
 
     Runtime[CANFAR Runtime] --&gt; Storage[Storage Mounting]
     Runtime --&gt; UserContext[User Context]
     Runtime --&gt; Resources[Resource Allocation]</code></pre>
-<p><strong>Base containers</strong> provide fundamental tools and the conda package manager, while <strong>specialized containers</strong> build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.</p>
+<p><strong>Base containers</strong> provide fundamental tools and the conda package manager, while <strong>specialised containers</strong> build upon these foundations to offer domain-specific software stacks. This architecture ensures consistency while allowing flexibility for different research needs.</p>
 <h2 id="build-time-vs-runtime">🏗️ Build Time vs Runtime<a class="headerlink" href="#build-time-vs-runtime" title="Permanent link">&para;</a></h2>
 <p>Understanding the distinction between build time and runtime is crucial for effective container usage:</p>
 <h3 id="build-time">Build Time<a class="headerlink" href="#build-time" title="Permanent link">&para;</a></h3>
 <p><strong>What happens when containers are created:</strong></p>
 <ul>
-<li><strong>Base image selection</strong>: Choose Ubuntu, Python, or specialized astronomy base</li>
+<li><strong>Base image selection</strong>: Choose Ubuntu, Python, or specialised astronomy base</li>
 <li><strong>Software installation</strong>: Install system packages, Python libraries, astronomy tools</li>
 <li><strong>Environment configuration</strong>: Set up paths, environment variables, user permissions</li>
 <li><strong>Code packaging</strong>: Include stable scripts and analysis tools</li>
 <li><strong>Image optimization</strong>: Layer caching, size reduction, security patches</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="c"># Build time example</span>
-<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:22.04</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">ubuntu:24.04</span>
 
 <span class="c"># Install system dependencies (build time)</span>
 <span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>python3-dev<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>libfitsio-dev<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>libcfitsio-dev<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean
 
 <span class="c"># Install Python packages (build time)</span>
@@ -1767,7 +1767,7 @@ df<span class="w"> </span>-h<span class="w"> </span>/scratch/<span class="w">   
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Persistence Boundary</p>
-<p><strong>Build time changes</strong> are permanent and part of the container image. <strong>Runtime changes</strong> (like <code>pip install --user package</code>) are temporary and lost when the session ends. Keep stable software in the image; keep development scripts in <code>/arc/</code>.</p>
+<p><strong>Build time changes</strong> are permanent and part of the container image. <strong>Runtime changes</strong> (like <code>pip install --user package</code>) are on <code>/arc</code> and not on the container. Keep stable software in the image; keep development scripts in <code>/arc/</code>.</p>
 </div>
 <h2 id="how-containers-relate-to-sessions">🔗 How Containers Relate to Sessions<a class="headerlink" href="#how-containers-relate-to-sessions" title="Permanent link">&para;</a></h2>
 <p>CANFAR containers are designed to work seamlessly with different session types, each optimised for specific workflows:</p>
@@ -1822,7 +1822,7 @@ pip<span class="w"> </span>show<span class="w"> </span>-f<span class="w"> </span
 <h4 id="1-base-desktop-container">1. Base Desktop Container<a class="headerlink" href="#1-base-desktop-container" title="Permanent link">&para;</a></h4>
 <p>The core <strong>desktop</strong> container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session.</p>
 <h4 id="2-desktop-app-containers">2. Desktop-App Containers<a class="headerlink" href="#2-desktop-app-containers" title="Permanent link">&para;</a></h4>
-<p>Specialized containers that run specific GUI applications within desktop sessions.</p>
+<p>Specialised containers that run specific GUI applications within desktop sessions.</p>
 <p><strong>Requirements for desktop-app containers:</strong></p>
 <ol>
 <li><strong>X11/Xorg application</strong>: Must have at least one GUI application (minimum: <code>xterm</code>)</li>
@@ -1936,9 +1936,9 @@ python<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span
 </code></pre></div></p>
 <p><strong>Temporary Processing (<code>/scratch/</code>):</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># Copy large datasets to fast storage for processing</span>
-cp<span class="w"> </span>/arc/projects/survey/large_data.fits<span class="w"> </span>/scratch/
+cp<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/large_data.fits<span class="w"> </span>/scratch/
 process_data<span class="w"> </span>/scratch/large_data.fits<span class="w"> </span>/scratch/output.fits
-cp<span class="w"> </span>/scratch/output.fits<span class="w"> </span>/arc/projects/survey/results/
+cp<span class="w"> </span>/scratch/output.fits<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/results/
 </code></pre></div></p>
 <h3 id="user-context-and-permissions">User Context and Permissions<a class="headerlink" href="#user-context-and-permissions" title="Permanent link">&para;</a></h3>
 <p>Containers run with your CADC user identity, not as root or container-defined users:</p>
@@ -1955,50 +1955,48 @@ groups<span class="w">                    </span><span class="c1"># Shows your C
 - <strong>Network isolation</strong>: Containers have internet access but cannot access other users' sessions</p>
 <h2 id="canfar-supported-containers">🔧 CANFAR-Supported Containers<a class="headerlink" href="#canfar-supported-containers" title="Permanent link">&para;</a></h2>
 <p>The CANFAR team maintains several core containers that cover most astronomy research needs:</p>
-<h3 id="core-astronomy-containers">Core Astronomy Containers<a class="headerlink" href="#core-astronomy-containers" title="Permanent link">&para;</a></h3>
-<h4 id="astroml-general-astronomy-analysis"><code>astroml</code> - General Astronomy Analysis<a class="headerlink" href="#astroml-general-astronomy-analysis" title="Permanent link">&para;</a></h4>
-<p><strong>Purpose</strong>: Comprehensive Python environment for most astronomy workflows</p>
-<p><strong>Pre-installed software:</strong>
-- <strong>Python stack</strong>: numpy, scipy, matplotlib, pandas, jupyter, pyarrow
-- <strong>Astronomy libraries</strong>: astropy, astroquery, photutils, reproject
-- <strong>Machine learning</strong>: scikit-learn, pytorch
-- <strong>Data formats</strong>: FITS, HDF5
-- <strong>Development tools</strong>: Git, vim, nano, SSH client</p>
-<p><strong>Best for:</strong>
-- Python-based data analysis and visualisation
-- Statistical analysis and machine learning
-- Multi-wavelength astronomy workflows
-- Educational and tutorial sessions</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch astroml notebook session</span>
-canfar<span class="w"> </span>launch<span class="w"> </span>notebook<span class="w"> </span>images.canfar.net/skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;data-analysis&quot;</span><span class="w"> </span>--cores<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">16</span>
-</code></pre></div>
-<h4 id="astroml-cuda-gpu-accelerated-analysis"><code>astroml-cuda</code> - GPU-Accelerated Analysis<a class="headerlink" href="#astroml-cuda-gpu-accelerated-analysis" title="Permanent link">&para;</a></h4>
-<p><strong>Purpose</strong>: Extends <code>astroml</code> with GPU computing capabilities</p>
-<p><strong>Additional features:</strong>
-- <strong>CUDA libraries</strong>: NVIDIA CUDA toolkit and drivers
-- <strong>GPU frameworks</strong>: all cuda-enabled frameworks of the astroml container</p>
-<p><strong>Best for:</strong>
-- Machine learning with large datasets
-- Image processing and computer vision
-- Simulation and N-body computations
-- Deep learning applications</p>
-<h4 id="casa-radio-astronomy"><code>casa</code> - Radio Astronomy<a class="headerlink" href="#casa-radio-astronomy" title="Permanent link">&para;</a></h4>
-<p><strong>Purpose</strong>: Specialized environment for radio interferometry analysis</p>
-<p><strong>Pre-installed software:</strong>
-- <strong>CASA suite</strong>: Complete Common Astronomy Software Applications
-- <strong>Python integration</strong>: CASA Python bindings and tasks
-- <strong>Data formats</strong>: Measurement Set, FITS-IDI, UVFITS support
-- <strong>Visualisation</strong>: CASA plotting and imaging tools</p>
-<p><strong>Best for:</strong>
-- Radio interferometry data reduction
-- Synthesis imaging and deconvolution
-- Calibration and flagging workflows
-- Single-dish radio astronomy</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch CASA desktop session for GUI tools</span>
-canfar<span class="w"> </span>create<span class="w"> </span>desktop<span class="w"> </span>images.canfar.net/skaha/casa:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;vla-reduction&quot;</span><span class="w"> </span>--cores<span class="w"> </span><span class="m">8</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">32</span>
-</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>skaha/base</strong></td>
+<td>Basic UNIX tools, conda, CADC packages</td>
+</tr>
+<tr>
+<td><strong>skaha/astroml</strong></td>
+<td>Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm.</td>
+</tr>
+<tr>
+<td><strong>skaha/improc</strong></td>
+<td>Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...)</td>
+</tr>
+<tr>
+<td><strong>skaha/casa</strong></td>
+<td>CASA installations</td>
+</tr>
+<tr>
+<td><strong>skaha/marimo</strong></td>
+<td>Same as astroml stack, with marimo notebook as web interface</td>
+</tr>
+<tr>
+<td><strong>skaha/vscode</strong></td>
+<td>Same as astroml, with VSCode on browser as interface</td>
+</tr>
+<tr>
+<td><strong>skaha/*-cuda</strong></td>
+<td>Same as above, with CUDA-enabled</td>
+</tr>
+<tr>
+<td><strong>lsst/sciplat-lab</strong></td>
+<td>LSST Software stack</td>
+</tr>
+</tbody>
+</table>
 <h3 id="visualisation-containers">Visualisation Containers<a class="headerlink" href="#visualisation-containers" title="Permanent link">&para;</a></h3>
 <h4 id="carta-radio-astronomy-visualisation"><code>carta</code> - Radio Astronomy Visualisation<a class="headerlink" href="#carta-radio-astronomy-visualisation" title="Permanent link">&para;</a></h4>
 <p><strong>Purpose</strong>: Interactive visualisation of radio astronomy data</p>
@@ -2091,7 +2089,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>desktop<span class="
 </table>
 <div class="admonition tip">
 <p class="admonition-title">Container Selection Strategy</p>
-<p>Start with <code>astroml</code> for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialized containers (<code>casa</code>, <code>carta</code>, <code>firefly</code>) only when you need their specific tools.</p>
+<p>Start with <code>astroml</code> for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialised containers (<code>casa</code>, <code>carta</code>, <code>firefly</code>) only when you need their specific tools.</p>
 </div>
 <h3 id="version-management">Version Management<a class="headerlink" href="#version-management" title="Permanent link">&para;</a></h3>
 <p>CANFAR containers follow semantic versioning:</p>
@@ -2142,7 +2140,7 @@ images.canfar.net/skaha/astroml:a1b2c3d4
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 22:14:09 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 21:44:49 UTC">September 10, 2025</span>
   </span>
 
     

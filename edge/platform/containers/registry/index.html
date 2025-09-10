@@ -1846,9 +1846,9 @@
 <p><strong>Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.</strong></p>
 <div class="admonition info">
 <p class="admonition-title">Platform Navigation</p>
-<p><strong>Registry Management</strong>: Storing, organising, and distributing container images on Harbor.<br />
-<strong><a href="../">Containers Home</a></strong> | <strong><a href="../build/">Building Containers</a></strong> | <strong><a href="../../">Platform Home</a></strong></p>
 </div>
+<p><strong>Platform Sections:</strong><br />
+<strong><a href="../">Home</a></strong> | <strong><a href="../../get-started/">Get Started</a></strong> | <strong><a href="../../concepts/">Concepts</a></strong> | <strong><a href="../sessions/">Sessions</a></strong> | <strong><a href="../storage/">Storage</a></strong> | <strong><a href="../containers/">Containers</a></strong> | <strong><a href="../support/">Support</a></strong> | <strong><a href="../../permissions/">Permissions</a></strong> | <strong><a href="../../doi/">DOI</a></strong></p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 Registry Management Overview</p>
 </div>
@@ -2534,7 +2534,7 @@ analysis-suite-minimal
 <span class="c1"># Order Dockerfile instructions by change frequency</span>
 
 <span class="c1"># Use multi-stage builds to reduce final image size</span>
-FROM<span class="w"> </span>ubuntu:22.04<span class="w"> </span>AS<span class="w"> </span>builder
+FROM<span class="w"> </span>ubuntu:24.04<span class="w"> </span>AS<span class="w"> </span>builder
 <span class="c1"># ... build dependencies ...</span>
 FROM<span class="w"> </span>images.canfar.net/skaha/astroml:latest
 COPY<span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/binary<span class="w"> </span>/usr/local/bin/
@@ -2651,7 +2651,7 @@ dive<span class="w"> </span>images.canfar.net/myteam/image:latest
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 22:14:09 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
   </span>
 
     
