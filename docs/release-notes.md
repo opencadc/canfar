@@ -1,8 +1,21 @@
 # CANFAR Science Platform 2025.1
 
-!!! tip "CANFAR Science Platform 2025.1"
+!!! success "CANFAR Science Platform 2025.1"
 
-    The CANFAR Team is proud to announce the first formal release of the CANFAR Science Platform.
+    **Dear CANFAR Community,**
+
+    We are pleased to announce a major milestone for the CANFAR Science Platform:
+
+    - **September 9, 2025**: Completed transition from beta system (released 2021) to production
+    - **CanfarSP 2025.1**: Our first official production release 
+    - **Release Cycle**: Beginning of regular CANFAR Science Platform production releases
+
+    **Key Highlights:**
+    
+    - **New & Improved Documentation**: Now available at [https://www.opencadc.org/canfar](https://www.opencadc.org/canfar)
+    - **Official Release Notes**: Detailed highlights are provided below
+
+    **For Canadian community:** If you have written scripts using the deprecated skaha python package or API v0, please migrate to the new CANFAR python client/CLI and API v1. Note that this release is distinct from the Arbutus cloud refresh (anticipated October 2025) and the maintenance downtime scheduled this weekend.
     
     **Status: Released**
 
@@ -41,3 +54,22 @@
     #### Deployment
     - Use the offically supported helm charts in the [opencadc/deployments](https://github.com/opencadc/deployments/tree/main/helm/applications/skaha) for CANFAR 2025.1 deployments.
     - To test, profile and setup the Kueue scheduling system, see the [deployment guide](https://github.com/opencadc/deployments/tree/main/configs/kueue) for detailed instructions.
+
+### 📦 Release Components
+
+!!! abstract "Python Client & CLI"
+    **canfar 1.0.0** - [PyPI Link](https://pypi.org/project/canfar/1.0.0)
+
+!!! abstract "Platform Components"  
+    - **base** `0.4.0`
+    - **cavern** `0.7.0` → `images.opencadc.org/platform/cavern:0.9.0`
+    - **skaha** `1.0.3` → `images.opencadc.org/platform/skaha:1.0.2`
+    - **posix-mapper** `0.4.4` → `images.opencadc.org/platform/posix-mapper:0.3.2`
+    - **science-portal** `1.0.0` → `images.opencadc.org/platform/science-portal:1.0.0`
+    - **storage-ui** `0.6.0` → `images.opencadc.org/client/storage-ui:1.3.0`
+
+!!! info "Contact & Support"
+
+    For any questions about this release, or for information relating to CANFAR issues or deployment support, please contact us at [support@canfar.net](mailto:support@canfar.net).
+
+    *The CADC and CANFAR science, development, and operations teams.*
