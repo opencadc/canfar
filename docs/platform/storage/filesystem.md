@@ -1,6 +1,6 @@
 # Filesystem Access
 
-**Comprehensive guide to accessing CANFAR's ARC storage systems as filesystems - including direct access within sessions, SSHFS mounting from external computers, and permission management.**
+**CANFAR's ARC storage systems as filesystems, SSHFS mounting from external computers, and permission management.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

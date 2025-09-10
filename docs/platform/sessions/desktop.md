@@ -1,6 +1,6 @@
 # Desktop Sessions
 
-## Full Linux graphical environment in your browser with astronomy software
+**Linux graphical environment in your browser with astronomy software**
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch, connect, and configure desktop sessions

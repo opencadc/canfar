@@ -1,6 +1,6 @@
 # User Management & Permissions
 
-Comprehensive guide to accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.
+**Accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

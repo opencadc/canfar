@@ -1,6 +1,6 @@
 # Storage Systems
 
-**Comprehensive guide to CANFAR's storage systems for astronomy research: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
+**CANFAR's storage systems: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

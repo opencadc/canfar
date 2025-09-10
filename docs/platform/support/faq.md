@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-**Comprehensive answers to common questions about the CANFAR Science Platform across all areas.**
+**Answers to common questions about the CANFAR Science Platform across all areas.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

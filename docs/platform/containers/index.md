@@ -1,6 +1,6 @@
 # Containers
 
-**Working with astronomy software containers on CANFAR - understanding container environments, using pre-built images, and creating custom software stacks.**
+**Working and building software containers on CANFAR.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  
@@ -316,68 +316,16 @@ groups                    # Shows your CANFAR project group memberships
 
 The CANFAR team maintains several core containers that cover most astronomy research needs:
 
-### Core Astronomy Containers
-
-#### `astroml` - General Astronomy Analysis
-
-**Purpose**: Comprehensive Python environment for most astronomy workflows
-
-**Pre-installed software:**
-- **Python stack**: `numpy, scipy, matplotlib, pandas, jupyter, pyarrow`
-- **Astronomy libraries**: `astropy, astroquery, photutils, reproject`
-- **Machine learning**: `scikit-learn, pytorch`
-- **Data formats**: `FITS, HDF5`
-- **Development tools**: `git, vim, nano, ssh`
-
-
-**Best for:**
-- Python-based data analysis and visualisation
-- Statistical analysis and machine learning
-- Multi-wavelength astronomy workflows
-- Educational and tutorial sessions
-
-```bash
-# Launch astroml notebook session
-canfar launch notebook images.canfar.net/skaha/astroml:latest \
-  --name "data-analysis" --cores 4 --memory 16
-```
-
-#### `astroml-cuda` - GPU-Accelerated Analysis
-
-**Purpose**: Extends `astroml` with GPU computing capabilities
-
-**Additional features:**
-- **CUDA libraries**: NVIDIA CUDA toolkit and drivers
-- **GPU frameworks**: all cuda-enabled frameworks of the astroml container
-
-**Best for:**
-- Machine learning with large datasets
-- Image processing and computer vision
-- Simulation and N-body computations
-- Deep learning applications
-
-#### `casa` - Radio Astronomy
-
-**Purpose**: Specialised environment for radio interferometry analysis
-
-
-**Pre-installed software:**
-- **CASA suite**: Complete Common Astronomy Software Applications
-- **Python integration**: CASA Python bindings and tasks
-- **Data formats**: Measurement Set, FITS-IDI, UVFITS support
-- **Visualisation**: CASA plotting and imaging tools
-
-**Best for:**
-- Radio interferometry data reduction
-- Synthesis imaging and deconvolution
-- Calibration and flagging workflows
-- Single-dish radio astronomy
-
-```bash
-# Launch CASA desktop session for GUI tools
-canfar create desktop images.canfar.net/skaha/casa:latest \
-  --name "vla-reduction" --cores 8 --memory 32
-```
+| Container | Description |
+|-----------|-------------|
+| **skaha/base** | Basic UNIX tools, conda, CADC packages |
+| **skaha/astroml** | Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm. |
+| **skaha/improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
+| **skaha/casa** | CASA installations |
+| **skaha/marimo** | Same as astroml stack, with marimo notebook as web interface |
+| **skaha/vscode** | Same as astroml, with VSCode on browser as interface |
+| **skaha/*-cuda** | Same as above, with CUDA-enabled |
+| **lsst/sciplat-lab** | LSST Software stack |
 
 ### Visualisation Containers
 

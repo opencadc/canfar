@@ -1,6 +1,6 @@
 # Getting Help and Support
 
-**Comprehensive support resources for CANFAR users - from self-service documentation to direct technical assistance.**
+**Support resources for CANFAR users - from self-service documentation to direct technical assistance.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

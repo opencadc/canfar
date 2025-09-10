@@ -1,5 +1,8 @@
 # Contributed Applications
 
+**Contributed Web-based Applications on CANFAR**
+
+
 !!! abstract "🎯 What You'll Learn"
     - How to launch contributed applications on CANFAR
     - Where your data is stored and how to save results

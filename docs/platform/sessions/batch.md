@@ -1,6 +1,6 @@
 # Batch Processing
 
-## Headless container execution for automated workflows and large-scale processing
+**Headless container execution for automated workflows and large-scale batch processing**
 
 !!! abstract "🎯 What You'll Learn"
     - How to run containers without interactive interfaces ("headless" batch mode)

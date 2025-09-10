@@ -1,6 +1,6 @@
 # Data Transfers
 
-**Comprehensive guide to moving data between CANFAR storage systems, external sources, and your local computer - including interactive and automated transfer methods.**
+**Moving data between CANFAR storage systems, external sources, and your local computer.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

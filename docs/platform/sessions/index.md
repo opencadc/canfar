@@ -1,6 +1,6 @@
 # Interactive Sessions
 
-**Comprehensive guide to CANFAR's interactive computing environments for astronomical research - from Jupyter notebooks to desktop applications.**
+**CANFAR computing environments for astronomical research - Jupyter notebooks, and non-interactive applications.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

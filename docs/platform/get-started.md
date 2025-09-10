@@ -2,7 +2,7 @@
 
 # 🚀 Getting Started with CANFAR
 
-**Your complete guide to setting up and using the CANFAR Science Platform for astronomical research.**
+**Guide to setting up and using the CANFAR Science Platform for astronomical research.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  

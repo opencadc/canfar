@@ -1,6 +1,6 @@
 # CANFAR Platform Concepts
 
-Understanding the architecture and core concepts behind the CANFAR Science Platform for astronomical research.
+**Understanding the architecture and core concepts behind the CANFAR Science Platform for astronomical research.**
 
 !!! info "Platform Navigation"
     **Platform Sections:**  
