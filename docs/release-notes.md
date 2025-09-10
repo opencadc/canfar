@@ -4,18 +4,13 @@
 
     **Dear CANFAR Community,**
 
-    We are pleased to announce a major milestone for the CANFAR Science Platform:
+    We are pleased to announce a major milestone for the CANFAR Science Platform: On September 9, 2025, we completed a transition from a beta system, initially released in 2021, to our first production release, CanfarSP 2025.1, marking the beginning of an official CANFAR Science Platform production release cycle.
 
-    - **September 9, 2025**: Completed transition from beta system (released 2021) to production
-    - **CanfarSP 2025.1**: Our first official production release 
-    - **Release Cycle**: Beginning of regular CANFAR Science Platform production releases
+    This latest version of CanfarSP is ready for use on www.canfar.net, and is also available for deployments to pick up across SRCNet.
 
-    **Key Highlights:**
-    
-    - **New & Improved Documentation**: Now available at [https://www.opencadc.org/canfar](https://www.opencadc.org/canfar)
-    - **Official Release Notes**: Detailed highlights are provided below
+    One of the highlights of this release is New & Improved documentation, now available here: https://www.opencadc.org/canfar.
 
-    **For Canadian community:** If you have written scripts using the deprecated skaha python package or API v0, please migrate to the new CANFAR python client/CLI and API v1. Note that this release is distinct from the Arbutus cloud refresh (anticipated October 2025) and the maintenance downtime scheduled this weekend.
+    If you have written scripts to launch sessions (headless, interactive, etc.) on the science platform via the now deprecated skaha python package or directly with curl, please switch to the new CANFAR python client or CLI. If you access the API directly, please switch the reference to skaha/v1 from skaha/v0 as soon as possible.
     
     **Status: Released**
 
@@ -58,15 +53,22 @@
 ### 📦 Release Components
 
 !!! abstract "Python Client & CLI"
+    **Python Client for CANFAR Science Platform** - Programmatic access to sessions, storage, and platform features.
+    
     **canfar 1.0.0** - [PyPI Link](https://pypi.org/project/canfar/1.0.0)
 
-!!! abstract "Platform Components"  
-    - **base** `0.4.0`
-    - **cavern** `0.7.0` → `images.opencadc.org/platform/cavern:0.9.0`
-    - **skaha** `1.0.3` → `images.opencadc.org/platform/skaha:1.0.2`
-    - **posix-mapper** `0.4.4` → `images.opencadc.org/platform/posix-mapper:0.3.2`
-    - **science-portal** `1.0.0` → `images.opencadc.org/platform/science-portal:1.0.0`
-    - **storage-ui** `0.6.0` → `images.opencadc.org/client/storage-ui:1.3.0`
+!!! abstract "Helm Charts and Images"
+    
+    | Component | Helm Chart Version | Container Image |
+    |-----------|-------------------|-----------------|
+    | base | 0.4.0 | N/A |
+    | cavern | 0.7.0 | images.opencadc.org/platform/cavern:0.9.0 |
+    | skaha | 1.0.3 | images.opencadc.org/platform/skaha:1.0.2 |
+    | posix-mapper | 0.4.4 | images.opencadc.org/platform/posix-mapper:0.3.2 |
+    | science-portal | 1.0.0 | images.opencadc.org/platform/science-portal:1.0.0 |
+    | storage-ui | 0.6.0 | images.opencadc.org/client/storage-ui:1.3.0 |
+
+---
 
 !!! info "Contact & Support"
 
