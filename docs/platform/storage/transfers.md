@@ -311,13 +311,13 @@ cadc-get-cert --days-valid
 #### Network Timeouts
 
 ```bash
-# bash
 # Retry with exponential backoff
 for i in {1..3}; do
     vcp file.fits vos:[user]/ && break
     sleep $((2**i))
 done
 ```
+
 ### Robust Transfer Script
 
 ```python

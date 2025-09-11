@@ -245,10 +245,10 @@ graph LR
     Container --> Scratch[/scratch/]
     Container --> Tmp[/tmp/]
     
-    Home --> HomeData[(Personal Data<br/>10GB Quota)]
-    Projects --> ProjectData[(Shared Project Data<br/>Variable Quota)]
-    Scratch --> FastStorage[(Fast Temporary Storage<br/>Node-local)]
-    Tmp --> TempFiles[(Temporary Files<br/>Container-local)]
+    Home --> HomeData[Personal Data<br/>10GB Quota]
+    Projects --> ProjectData[Shared Project Data<br/>Variable Quota]
+    Scratch --> FastStorage[Fast Temporary Storage<br/>Node-local]
+    Tmp --> TempFiles[Temporary Files<br/>Container-local]
 ```
 
 #### Storage Hierarchy
@@ -316,11 +316,11 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 |-----------|-------------|
 | **skaha/base** | Basic UNIX tools, conda, CADC packages |
 | **skaha/astroml** | Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm. |
-| **skaha/improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
-| **skaha/casa** | CASA installations |
 | **skaha/marimo** | Same as astroml stack, with marimo notebook as web interface |
 | **skaha/vscode** | Same as astroml, with VSCode on browser as interface |
-| **skaha/*-cuda** | Same as above, with CUDA-enabled |
+| **skaha/*-cuda** | Same as all above containers, with CUDA-enabled |
+| **skaha/improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
+| **skaha/casa** | CASA installations |
 | **lsst/sciplat-lab** | LSST Software stack |
 
 ### Visualisation Containers

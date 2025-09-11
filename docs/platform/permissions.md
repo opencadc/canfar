@@ -57,20 +57,22 @@ CANFAR's security model consists of multiple integrated layers providing flexibl
 Groups form the foundation of collaborative research on CANFAR, providing shared access to computing resources, storage systems, and container environments while maintaining security boundaries between projects.
 
 ### Group-Based Resource Sharing
+
 ```mermaid
-    graph TD
-        Admin["👑 Group Administrator"]
-        Members["👤 Group Members"]
-        Resources["💾 Shared Resources"]
-        
-        Admin --> |"Manages"| Members
-        Admin --> |"Controls access to"| Resources
-        Members --> |"Access"| Resources
-        
-        Resources --> Projects["📁 /arc/projects/[project]/"]
-        Resources --> Storage["💾 Storage Quotas"]
-        Resources --> Containers["🐳 Container Access"]
+graph TD
+    Admin["👑 Group Administrator"]
+    Members["👤 Group Members"]
+    Resources["💾 Shared Resources"]
+    
+    Admin --> |"Manages"| Members
+    Admin --> |"Controls access to"| Resources
+    Members --> |"Access"| Resources
+    
+    Resources --> Projects["📁 /arc/projects/[project]/"]
+    Resources --> Storage["💾 Storage Quotas"]
+    Resources --> Containers["🐳 Container Access"]
 ```
+
 ### Group Administration Interface
 
 **Access Group Management:**
@@ -138,7 +140,7 @@ Groups form the foundation of collaborative research on CANFAR, providing shared
 !!! success "Collaboration Benefits"
     **Groups enable seamless research collaboration** by providing standardized environments, shared data access, and unified resource management across institutional boundaries.
 
-## � Container Registry Access (Harbor)
+## 🐳 Container Registry Access (Harbor)
 
 Harbor serves as CANFAR's container registry for storing, managing, and distributing software environments. Understanding Harbor permissions is essential for teams building custom containers or managing specialized software stacks.
 
@@ -172,24 +174,30 @@ Harbor serves as CANFAR's container registry for storing, managing, and distribu
 
 **Authentication:**
 
-    # Login to Harbor registry
-    docker login images.canfar.net
+```bash
+# Login to Harbor registry
+docker login images.canfar.net
+```
 
 **Pulling Images:**
 
-    # Pull public container images
-    docker pull images.canfar.net/skaha/astroml:latest
-    
-    # Pull private group images (requires permissions)
-    docker pull images.canfar.net/[project]/[container]:[tag]
+```bash
+# Pull public container images
+docker pull images.canfar.net/skaha/astroml:latest
+
+# Pull private group images (requires permissions)
+docker pull images.canfar.net/[project]/[container]:[tag]
+```
 
 **Pushing Images (Developer/Master roles):**
 
-    # Build and tag your container
-    docker build -t images.canfar.net/[project]/[container]:[tag] .
-    
-    # Push to project repository
-    docker push images.canfar.net/[project]/[container]:[tag]
+```bash
+# Build and tag your container
+docker build -t images.canfar.net/[project]/[container]:[tag] .
+
+# Push to project repository
+docker push images.canfar.net/[project]/[container]:[tag]
+```
 
 ### Project Organization
 
@@ -249,21 +257,25 @@ Access Control Lists provide fine-grained file and directory permissions beyond 
 
 **Check Current ACLs:**
 
-    # View detailed ACL information for files or directories
-    getfacl /arc/projects/[project]/[directory]/
+```bash
+# View detailed ACL information for files or directories
+getfacl /arc/projects/[project]/[directory]/
+```
 
 **Example ACL Output:**
 
-    # file: sensitive_data/
-    # owner: alice
-    # group: myproject-team
-    user::rwx                    # Owner permissions
-    user:bob:r--                 # Bob has read-only access
-    user:carol:rw-               # Carol can read and write  
-    group::r--                   # Primary group has read-only
-    group:external-team:r--      # External group has read access
-    mask::rwx                    # Maximum effective permissions
-    other::---                   # No access for others
+```
+# file: sensitive_data/
+# owner: alice
+# group: myproject-team
+user::rwx                    # Owner permissions
+user:bob:r--                 # Bob has read-only access
+user:carol:rw-               # Carol can read and write  
+group::r--                   # Primary group has read-only
+group:external-team:r--      # External group has read access
+mask::rwx                    # Maximum effective permissions
+other::---                   # No access for others
+```
 
 !!! warning "ACL Mask Behavior"
     The ACL "mask" entry limits maximum effective permissions for named users and groups. If permissions seem restricted, check the mask value.
@@ -272,48 +284,56 @@ Access Control Lists provide fine-grained file and directory permissions beyond 
 
 **Grant User Access:**
 
-    # Give user 'bob' read access to a directory
-    setfacl -m u:bob:r-- /arc/projects/[project]/shared_data/
-    
-    # Grant user 'alice' read and write access to specific files
-    setfacl -m u:alice:rw- /arc/projects/[project]/scripts/analysis.py
+```bash
+# Give user 'bob' read access to a directory
+setfacl -m u:bob:r-- /arc/projects/[project]/shared_data/
+
+# Grant user 'alice' read and write access to specific files
+setfacl -m u:alice:rw- /arc/projects/[project]/scripts/analysis.py
+```
 
 **Grant Group Access:**
 
-    # Allow external group read access to results
-    setfacl -m g:external-collab:r-- /arc/projects/[project]/public_results/
-    
-    # Grant write access to multiple collaborating groups
-    setfacl -m g:partner-institution:rw- /arc/projects/[project]/shared_analysis/
+```bash
+# Allow external group read access to results
+setfacl -m g:external-collab:r-- /arc/projects/[project]/public_results/
+
+# Grant write access to multiple collaborating groups
+setfacl -m g:partner-institution:rw- /arc/projects/[project]/shared_analysis/
+```
 
 **Remove ACL Entries:**
 
-    # Remove specific user access
-    setfacl -x u:bob /arc/projects/[project]/sensitive_data/
-    
-    # Remove all ACL entries (revert to POSIX only)
-    setfacl -b /arc/projects/[project]/temp_data/
+```bash
+# Remove specific user access
+setfacl -x u:bob /arc/projects/[project]/sensitive_data/
+
+# Remove all ACL entries (revert to POSIX only)
+setfacl -b /arc/projects/[project]/temp_data/
+```
 
 **Recursive Operations:**
 
-    # Apply ACLs to entire directory trees
-    setfacl -R -m g:collaborators:r-- /arc/projects/[project]/results/
-
-### ACL Best Practices & Directory Organization
+```bash
+# Apply ACLs to entire directory trees
+setfacl -R -m g:collaborators:r-- /arc/projects/[project]/results/
+```
 
 **Recommended Directory Structure:**
 
-    /arc/projects/[project]/
-    ├── public/              # World-readable results
-    │   └── (ACL: group:world:r--)
-    ├── team/                # Full team access  
-    │   └── (ACL: group:myproject-team:rw-)
-    ├── admin/               # Administrator-only access
-    │   └── (ACL: user:pi:rw-, group:admins:rw-)
-    ├── external/            # Controlled external collaboration
-    │   └── (ACL: user:collaborator:r--, group:external-team:r--)
-    └── sensitive/           # Restricted access with specific permissions
-        └── (ACL: user:analyst1:rw-, user:analyst2:r--)
+```
+/arc/projects/[project]/
+├── public/              # World-readable results
+│   └── (ACL: group:world:r--)
+├── team/                # Full team access  
+│   └── (ACL: group:myproject-team:rw-)
+├── admin/               # Administrator-only access
+│   └── (ACL: user:pi:rw-, group:admins:rw-)
+├── external/            # Controlled external collaboration
+│   └── (ACL: user:collaborator:r--, group:external-team:r--)
+└── sensitive/           # Restricted access with specific permissions
+    └── (ACL: user:analyst1:rw-, user:analyst2:r--)
+```
 
 **Security Best Practices:**
 
@@ -350,17 +370,20 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
 ### Authentication Methods
 
 === "🔧 CANFAR CLI (Recommended)"
+
     **Best for:** Interactive use, development, short-term automation
     
     **Setup:**
     
-        # Login and store authentication token
-        canfar auth login
-        
-        # Subsequent commands use stored credentials
-        canfar ps
-        canfar launch notebook skaha/astroml:latest
-        canfar info [session-id]
+    ```bash
+    # Login and store authentication token
+    canfar auth login
+    
+    # Subsequent commands use stored credentials
+    canfar ps
+    canfar launch notebook skaha/astroml:latest
+    canfar info [session-id]
+    ```
     
     **Benefits:**
     - Easy setup and token management
@@ -369,19 +392,21 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
     - Ideal for development and testing workflows
 
 === "🔒 Proxy Certificates"
+
     **Best for:** Long-term automation, production scripts, file operations
     
     **Setup:**
     ```bash
-        # Install CADC utilities
-        pip install cadcutils
-        
-        # Generate 10-day proxy certificate  
-        cadc-get-cert -u [username]
-        
-        # Certificate stored in ~/.ssl/cadcproxy.pem
-        # Automatically used by CADC tools and APIs
-```
+    # Install CADC utilities
+    pip install cadcutils
+    
+    # Generate 10-day proxy certificate  
+    cadc-get-cert -u [username]
+    
+    # Certificate stored in ~/.ssl/cadcproxy.pem
+    # Automatically used by CADC tools and APIs
+    ```
+    
     **Benefits:**
     - Extended validity (10 days)
     - Compatible with all CADC services
@@ -391,35 +416,37 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
 ### API Integration Examples
 
 **Session Management:**
+
 ```python
-    from canfar.sessions import Session
-    
-    # Start authenticated session client
-    session = Session()
-    
-    # Launch computing sessions programmatically
-    job = session.launch('notebook', 'skaha/astroml:latest')
-    
-    # Monitor session status
-    status = session.info(job.id)
-    
-    # List all active sessions
-    active_sessions = session.list()
+from canfar.sessions import Session
+
+# Start authenticated session client
+session = Session()
+
+# Launch computing sessions programmatically
+job = session.launch('notebook', 'skaha/astroml:latest')
+
+# Monitor session status
+status = session.info(job.id)
+
+# List all active sessions
+active_sessions = session.list()
+```
 
 **Batch Processing Integration:**
 
-    # Automated pipeline example
-    from canfar.sessions import Session
-    
-    # Submit batch job with custom parameters
-    session = Session()
-    job = canfar.launch(
-        image='skaha/astroml:latest',
-        command=['python', 'analysis.py'],
-        cpu=4,
-        memory=8
-    )
-    
+```python
+# Automated pipeline example
+from canfar.sessions import Session
+
+# Submit batch job with custom parameters
+session = Session()
+job = canfar.launch(
+    image='skaha/astroml:latest',
+    command=['python', 'analysis.py'],
+    cpu=4,
+    memory=8
+)
 ```
 
 ## 🚨 Common Issues & Troubleshooting
@@ -536,14 +563,3 @@ Understanding and resolving common permission issues helps maintain smooth colla
 
 **Compliance Requirements:**
 :   Support for institutional data governance and compliance requirements through audit logging and access controls.
-
-### Next Steps
-
-**For Users:**
-- **[Storage Systems](storage/index.md)** - Apply permissions to manage research data
-- **[Container Management](containers/index.md)** - Access and build software environments
-- **[API Documentation](../client/home.md)** - Programmatic platform access
-- **[Support Channels](support/index.md)** - Administrative assistance and escalation
-
-!!! success "Permission Management Success"
-    **Effective permission management enables secure, flexible collaboration** across astronomical research teams while maintaining institutional security requirements and supporting complex multi-party projects.

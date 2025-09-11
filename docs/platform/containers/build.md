@@ -40,8 +40,8 @@ Before building custom containers, consider these alternatives:
 
 ```bash
 # Runtime package installation (temporary)
-pip install --user new-package          # Installs to /arc/home/user/.local/
-conda install -c conda-forge package    # If conda is available
+pip install --user new-package          # Installs to /arc/home/[user]/.local/
+mamba install -c conda-forge package    # If mamba or conda is available
 
 # Development in existing containers
 # Use astroml as base and install packages per session
@@ -200,7 +200,9 @@ RUN chmod +x /skaha/startup.sh
 # Set the startup script as entrypoint
 ENTRYPOINT ["/skaha/startup.sh"]
 ```
+
 with the `startup.sh` being:
+
 ```bash
 #!/bin/bash
 
@@ -210,7 +212,7 @@ export DISPLAY=${DISPLAY:-:1}
 # Navigate to user home directory
 cd /arc/home/$USER || cd /tmp
 
-# Launch the application\n\
+# Launch the application
 exec ds9 -title "Custom DS9 - $USER" &
 
 # Keep container running
@@ -364,20 +366,6 @@ if __name__ == "__main__":
 
 ### Debugging Common Issues
 
-#### Permission Problems
-
-```dockerfile
-# Ensure proper user context
-USER root
-# ... install system packages ...
-
-# Switch to non-root user
-USER ${NB_USER}
-# ... install user packages ...
-
-# Set proper ownership for copied files
-COPY --chown=${NB_USER}:${NB_GID} scripts/ /opt/scripts/
-```
 
 #### Package Installation Failures
 

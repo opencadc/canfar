@@ -84,7 +84,7 @@ canfar launch \
   --name "$JOB_NAME" \
   --image "$IMAGE" \
   --cores 8 \
-  --ram 364 \
+  --ram 32 \
   --cmd "$CMD"
 ```
 
@@ -154,6 +154,7 @@ canfar launch \
 
 
 **Memory Optimization:**
+
 ```python
 # Memory-efficient data processing patterns
 import numpy as np
@@ -183,6 +184,7 @@ def process_large_cube(filename):
 ```
 
 **Storage Performance:**
+
 ```bash
 # Use /scratch/ for I/O intensive operations
 #!/bin/bash
@@ -209,10 +211,8 @@ echo "Processing complete"
 
 #### Parallel Processing
 
-!!! tip "Advanced: Distributed Workflows"
-    - For team projects, see [Accounts & Permissions](../permissions.md) for collaboration strategies.
-
 **Multi-core CPU Usage:**
+
 ```python
 from multiprocessing import Pool, cpu_count
 import numpy as np
@@ -243,6 +243,7 @@ def parallel_processing():
 ```
 
 **GPU Acceleration (when available):**
+
 ```python
 import numpy as np
 try:
@@ -275,6 +276,7 @@ def gpu_accelerated_processing(data):
 #### Job Monitoring and Logging
 
 **Comprehensive Logging:**
+
 ```python
 import logging
 import psutil
@@ -298,7 +300,7 @@ def log_system_status():
     memory = psutil.virtual_memory()
     disk = psutil.disk_usage('/scratch')
     
-    logger.info(f"CPU: {cpu_percent:.1f}%", 
+    logger.info(f"CPU: {cpu_percent:.1f}%, "
                 f"Memory: {memory.percent:.1f}% "
                 f"({memory.used//1024**3:.1f}GB used), "
                 f"Scratch: {disk.percent:.1f}% used")
@@ -465,7 +467,7 @@ job_ids = session.create(
 
 #### Private Image Authentication
 
-To use private images, you first need to configure the client with your registry credentials. See the [authentication guide](../permissions.md) for details.
+To use private images, you first need to configure the client with your registry credentials. See the [registry guide](../containers/registry.md) for details.
 
 #### Job Monitoring and Management
 

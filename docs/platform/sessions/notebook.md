@@ -26,23 +26,17 @@ Notebook sessions provide:
 
 From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **notebook** as your session type.
 
-![Select Notebook Session](images/notebook/1_select_notebook_session.png)
-
-![Choose Notebook](images/notebook/2_choose_notebook.png)
-
 ### Step 2: Choose Your Container
 
 Select a container image that includes the software you need. Each container comes pre-configured with specific tools and libraries:
 
-![Choose Container](images/notebook/3_choose_casa_container.png)
-
 #### Available Containers
+There are quite a few containers available, some from the CANFAR team, and the community. Some examples:
 
 | Container | Contents | Best For |
 |-----------|----------|----------|
 | **astroml** ⭐ | Modern Python astronomy stack ([`astropy`](https://docs.astropy.org/), [`numpy`](https://numpy.org), [`scipy`](https://scipy.org), [`matplotlib`](https://matplotlib.org), [`pandas`](https://pandas.pydata.org)) | General astronomy analysis, data science |
-| **CASA 6.5-notebook** | CASA (Common Astronomy Software Applications) + Python stack | Radio astronomy data reduction |
-| **General purpose** | Standard Python data science stack | Basic Python development |
+| **casa-notebook** | [CASA](https://casa.nrao.edu/) + Python stack | Radio astronomy data reduction |
 
 !!! tip "Container Selection"
     Start with **astroml** for most astronomy workflows. It includes the latest astronomy libraries and is actively maintained. Use CASA containers only when you specifically need CASA functionality.
@@ -53,8 +47,6 @@ Select a container image that includes the software you need. Each container com
 
 Choose a descriptive name that helps you identify this session later:
 
-![Choose Name](images/notebook/4_choose_name.png)
-
 **Good session names:**
 - `galaxy-photometry`
 - `pulsar-analysis`
@@ -64,8 +56,6 @@ Choose a descriptive name that helps you identify this session later:
 #### Memory Allocation
 
 Select the maximum amount of RAM you anticipate requiring:
-
-![Select RAM](images/notebook/5_select_RAM.png)
 
 **Memory Guidelines:**
 - **4GB:** Basic analysis, small datasets
@@ -80,8 +70,6 @@ Select the maximum amount of RAM you anticipate requiring:
 
 Select the maximum number of computing cores you anticipate requiring:
 
-![Choose Cores](images/notebook/6_choose_cores.png)
-
 **CPU Guidelines:**
 - **1-2 cores:** Most single-threaded analysis (recommended default)
 - **4-8 cores:** Parallel processing, multi-threaded libraries
@@ -89,13 +77,9 @@ Select the maximum number of computing cores you anticipate requiring:
 
 ### Step 4: Launch Session
 
-Click the **Launch** button to start your notebook session:
-
-![Launch Notebook](images/notebook/7_launch_notebook.png)
+Click the **Launch** button to start your notebook session.
 
 Wait until a notebook icon appears on your dashboard, then click it to access your session:
-
-![Notebook Created](images/notebook/8_notebook_created.png)
 
 ## 🧭 Using Jupyter Lab
 
@@ -132,36 +116,17 @@ Your notebook session has access to:
 
 1. **Navigate** to your target directory in the file browser
 2. **Click** the upload arrow in the top menu bar
-
-![Upload Files](images/transfer_file/1_landing_click_upload.png)
-
 3. **Select files** and click "Open"
-
-![Upload Window](images/transfer_file/2_upload_window.png)
-
 4. **Files appear** in the browser
-
-![File Uploaded](images/transfer_file/3_file_is_uploaded.png)
 
 **Method 2: Copy-Paste Text**
 
 For code snippets or small text files:
 
 1. **Open a terminal** by double-clicking the terminal icon
-
-![Open Terminal](images/transfer_file/4_open_terminal.png)
-
 2. **Create/edit files** using command-line editors
-
-![New Terminal](images/transfer_file/5_new_terminal.png)
-
 3. **Copy text** from your local computer
-
-![Copy Local Text](images/transfer_file/6_copy_local_text.png)
-
 4. **Paste into the editor**
-
-![Paste Text](images/transfer_file/7_paste_text.png)
 
 ### Working with CASA
 

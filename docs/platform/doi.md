@@ -32,6 +32,7 @@ The **CANFAR Data Publication Service (DPS)** creates permanent links between re
 
 **Account Requirements**
 :   First author requires a CADC account for DPS access and VOSpace data management.
+
 ## 📋 DOI Workflow Guide
 
 ### Step 1: Request a DOI
@@ -183,12 +184,14 @@ After manuscript acceptance, coordinate the connection between your data package
 !!! tip "Data Package Success"
     **Plan your data package early in the research process** to ensure all necessary files, documentation, and metadata are preserved and organized for publication.
 
-## Using the DPS {#using}
+## Using the DPS
 
-### Listing current DOIs {#list}
+### Listing current DOIs
+
 [DPS](https://www.canfar.net/citation/) shows your DOIs (status, title, landing page, data directory). From here, you can request, view, edit, or publish depending on status.
 
-### Requesting a new DOI {#new}
+### Requesting a new DOI
+
 Use **New** from the list or go to the [request page](https://www.canfar.net/citation/request).
 
 !!! question "Required"
@@ -201,38 +204,43 @@ Use **New** from the list or go to the [request page](https://www.canfar.net/cit
 
 After submission, a **DOI Reference** number is assigned and displayed.
 
-### DOI Details {#details}
-On the details page (e.g., [DOI.20.0016](https://www.canfar.net/citation/request?doi=20.0016)) you’ll find:
+### DOI Details
+
+On the details page (e.g., [DOI.20.0016](https://www.canfar.net/citation/request?doi=20.0016)) you'll find:
 
 - DOI number / Title
 - Authors / Journal reference
 - DOI status
 - Landing page link
-- Data Directory link (shows :lock: when frozen)
+- Data Directory link (shows 🔒 when frozen)
 
-### Editing details {#edit}
+### Editing details
+
 - **Unpublished** DOIs can be edited by authenticated users; click **Update**.
 - **Published** DOIs require a request to [CANFAR support](mailto:support@canfar.net).
 
-### Viewing the landing page {#landing}
+### Viewing the landing page
+
 - DOI: [10.11570/20.0016](http://doi.org/10.11570/20.0016)
 - Landing page: [landing page](https://www.canfar.net/citation/landing?doi=20.0016)
 
 Published landing pages are publicly accessible.
 
-### Publishing a DOI {#publish-action}
+### Publishing a DOI
+
 If not yet published, a **Publish** button appears at the top right. Publishing:
+
 - Completes registration with DataCite
 - Locks the Data Directory
 
 Related publication info can be added later via support.
 
-### Deleting unpublished DOIs {#delete}
+### Deleting unpublished DOIs
+
 Unpublished records can be deleted via **Delete** on the request page. **Published** DOIs cannot be deleted.
 
----
+## DOI Data Package
 
-## [DOI Data Package](#data-package) {#data-package}
 DPS hosts a Data Directory in the **Vault (VOSpace)** implementation for each DOI. A folder named `data/` is created under the DOI root; you control the structure beneath it.
 
 Example: [Data Directory](https://www.canfar.net/storage/vault/list/AstroDataCitationDOI/CISTI.CANFAR/21.0002/data)
@@ -240,20 +248,26 @@ Example: [Data Directory](https://www.canfar.net/storage/vault/list/AstroDataCit
 !!! warning "Locked after publish"
     After publishing, the directory is **locked**. To modify contents or metadata, contact [CANFAR support](mailto:support@canfar.net).
 
-### Contents {#contents}
+### Contents
+
 You decide what to include: data, figures, software, etc. We recommend a top‑level `README` describing layout and usage.
 
-### Uploading {#uploading}
+### Uploading
+
 - Few/small files: [Web Storage UI](storage/transfers.md#upload-methods).
 - Large/many files: [Use `vcp`, `vos` CLI Tools](storage/transfers.md#large-files-100gb-advanced-methods).
 
-### Refereeing access {#ref-access}
+### Refereeing access
+
 Contact support to obtain a read‑only account and share with the editor/referee. They may request changes prior to publication.
 
-### Publish & discoverability {#discover}
+### Publish & discoverability
+
 After acceptance, click **Publish** to mint the DOI. The directory and metadata freeze; minimal discovery metadata will appear in DataCite search.
 
-### Final linking {#final-link}
+### Final linking
+
 Finally, link the **data package DOI** to the **journal DOI** (currently manual):
+
 - Email support with the publication DOI and updated reference details.
 - Provide the data package DOI to the journal so it appears in the paper.

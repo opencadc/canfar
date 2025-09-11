@@ -185,7 +185,7 @@ nav:
       - Firefly: platform/sessions/firefly.md
       - Desktop: platform/sessions/desktop.md
       - Batch: platform/sessions/batch.md
-      - Contributed Applications: platform/sessions/contributed.md
+      - Contributed: platform/sessions/contributed.md
     - Storage:
       - Overview: platform/storage/index.md
       - Filesystem: platform/storage/filesystem.md

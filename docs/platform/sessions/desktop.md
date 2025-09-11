@@ -46,8 +46,8 @@ graph TB
     AstroMenu --> UserApps[User-Contributed Apps]
     
     Desktop --> Storage[CANFAR Storage]
-    Storage --> ArcHome[/arc/home/[user]/]
-    Storage --> ArcProjects[/arc/projects/[project]/]
+    Storage --> ArcHome[/arc/home/user/]
+    Storage --> ArcProjects[/arc/projects/project/]
     Storage --> Scratch[/scratch/]
 ```
 
@@ -62,11 +62,7 @@ graph TB
 
 From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **desktop** as your session type.
 
-![Launch Desktop](images/desktop/1_launch_desktop.png)
-
 Choose a descriptive session name to help you identify it later:
-
-![Choose Name](images/desktop/3_choose_name.png)
 
 **Good session names:**
 - `data-reduction`
@@ -87,13 +83,9 @@ Desktop sessions use the default container and resource allocation. For most des
 
 Click the **Launch** button and wait for your session to initialise:
 
-![Launch](images/desktop/4_launch.png)
-
 Desktop sessions may take slightly longer to start than other session types as they need to set up the full graphical environment.
 
-Your session will appear on the Science Portal dashboard:
-
-![Active Desktop](images/desktop/5_active_desktop.png)
+Your session will appear on the Science Portal dashboard.
 
 !!! note "Connection Timing"
     Sometimes it takes a few seconds for the session link to work properly. If you see a "Bad gateway" error, wait a moment and try again.
@@ -102,15 +94,11 @@ Your session will appear on the Science Portal dashboard:
 
 ### Initial Connection
 
-Click the desktop icon to access the connection page, then click **Connect** to access your desktop environment:
-
-![Connect Desktop](images/desktop/6_connect_desktop.png)
+Click the desktop icon to access the connection page, then click **Connect** to access your desktop environment.
 
 ### Desktop Environment
 
-When you connect, you'll see a full Linux desktop in your browser:
-
-![Desktop Connected](images/desktop/7_desktop_connected.png)
+When you connect, you'll see a full Linux desktop in your browser with the following features:
 
 #### Key Desktop Features
 
@@ -235,21 +223,15 @@ Since different containers may run on separate remote computers, text transfer b
 2. **Find "Clipboard"** in the application menu (middle of list)
 3. **Click to open** the Clipboard application
 
-![Desktop with Clipboard Menu](images/desktop/clipboard/2_desktop_with_clipboard_menu.png)
-
 #### Using the Clipboard for Text Transfer
 
 The Clipboard functions as an intermediary for text transfer:
-
-![Clipboard Open](images/desktop/clipboard/3_clipboard_open.png)
 
 **Transfer Process:**
 1. **Copy text**: Highlight text in source application, use `Ctrl+Shift+C`
 2. **Transfer to Clipboard**: Text appears in the Clipboard application
 3. **Select in Clipboard**: Highlight the text and copy with `Ctrl+Shift+C`
 4. **Paste to target**: Click in destination application, use `Ctrl+Shift+V`
-
-![Text Transfer Example](images/desktop/clipboard/4_text_into_clipboard.png)
 
 !!! tip "Keyboard Shortcuts"
     - **Copy**: `Ctrl+Shift+C`
@@ -265,13 +247,6 @@ Desktop containers support adjustable font sizes for better readability:
 1. **Access font menu**: Hold `Ctrl` and right-click in a terminal window
 2. **Select size**: Choose from Small, Medium, or Large options
 3. **Apply immediately**: Font changes take effect instantly
-
-![Font Size Popup](images/desktop/font/2_fontsize_popup.png)
-
-**Before and after font size change:**
-
-![Original Font](images/desktop/font/1_terminal_original_font.png)
-![Large Font](images/desktop/font/3_terminal_new_fontsize.png)
 
 **Compatible Applications:**
 - Terminal windows

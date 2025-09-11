@@ -3,13 +3,12 @@
 **Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.**
 
 !!! abstract "🎯 Registry Management Overview"
-
-  **Master Harbor registry operations:**
-
-**Harbor Platform**: Understanding CANFAR's enterprise container registry features
-**Access Control**: Projects, repositories, and role-based permissions
-**Image Management**: Tagging, versioning, and metadata organization
-**Security Features**: Vulnerability scanning and compliance monitoring
+    **Master Harbor registry operations:**
+    
+    - **Harbor Platform**: Understanding CANFAR's enterprise container registry features
+    - **Access Control**: Projects, repositories, and role-based permissions
+    - **Image Management**: Tagging, versioning, and metadata organization
+    - **Security Features**: Vulnerability scanning and compliance monitoring
 
 
 Harbor serves as CANFAR's container registry, providing a secure, feature-rich platform for storing, managing, and distributing container images. Built on Docker Registry v2, Harbor adds enterprise features like role-based access control, vulnerability scanning, and image replication.
@@ -704,41 +703,6 @@ processing-tools-cpu
 analysis-suite-minimal
 ```
 
-### Security Guidelines
-
-#### Access Control
-
-- **Principle of least privilege**: Grant minimum necessary permissions
-- **Regular access reviews**: Audit project memberships quarterly
-- **API token management**: Use tokens with limited scope and expiration
-- **Multi-factor authentication**: Enable when available
-
-#### Container Security
-
-```dockerfile
-# Security best practices in Dockerfiles
-
-# Use specific base image versions
-FROM images.canfar.net/skaha/astroml:2024.03
-
-# Don't run as root in production
-USER ${NB_USER}
-
-# Remove package caches
-RUN apt-get update && apt-get install -y packages \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /var/cache/apt/* /tmp/*
-
-# Use specific package versions
-RUN pip install --no-cache-dir \
-    astropy==5.3.4 \
-    numpy==1.24.3
-
-# Add security labels
-LABEL security.scan="true"
-LABEL security.updates="2024-03-15"
-```
-
 ### Performance Optimization
 
 #### Registry Performance
@@ -870,4 +834,5 @@ dive images.canfar.net/myteam/image:latest
 # Combine RUN commands
 # Remove package caches
 # Use multi-stage builds
+```
 ```

@@ -1,4 +1,3 @@
-
 # CANFAR Science Platform
 
 The Canadian Advanced Network for Astronomy Research lets you access software environments and large datasets on the cloud designed specifically for astronomical research.
@@ -9,9 +8,10 @@ The Canadian Advanced Network for Astronomy Research lets you access software en
     - **Collaborative** tools that make teamwork and data sharing simple.
     - **Well‑tested** default scientific containers plus customizable images and registries for large-team workflows.
 
-## � Quick Access
+## 🚀 Quick Access
 
 === "🆕 New to CANFAR?"
+
     **Start Your Research Journey**
     
     **[📖 Getting Started Guide](get-started.md)**
@@ -24,6 +24,7 @@ The Canadian Advanced Network for Astronomy Research lets you access software en
     :   User management, groups, and collaboration access
 
 === "👤 Experienced Users"
+
     **Direct Platform Access**
     
     **[🌐 Science Portal](https://www.canfar.net/science-portal/)**
@@ -35,7 +36,8 @@ The Canadian Advanced Network for Astronomy Research lets you access software en
     **[👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)**
     :   Manage research teams and collaborative permissions
 
-=== "� Developers & Automation"
+=== "⚙️ Developers & Automation"
+
     **Programmatic Access**
     
     **[⚙️ CANFAR CLI](../cli/cli-help.md)**

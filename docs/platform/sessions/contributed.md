@@ -21,7 +21,6 @@ Contributed applications are specialised, community-developed web tools that exp
 
 Your application will start in 30-90 seconds.
 
-
 !!! warning "Data Persistence"
     Contributed applications can access your files at `/arc/projects/[project]/` and `/arc/home/[user]/`. Always save important results to these paths, as other locations may not persist.
 
