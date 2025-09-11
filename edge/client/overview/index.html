@@ -1645,34 +1645,16 @@
 
 
         <p>Overview of the CANFAR Server.</p>
+<p>This class is a subclass of the <code>HTTPClient</code> class and inherits its
+attributes and methods.</p>
 
 
-<table>
-      <thead>
-        <tr>
-          <th><span class="doc-section-title">PARAMETER</span></th>
-          <th><span>DESCRIPTION</span></th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>HTTPClient</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Configured HTTP Client.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;canfar.client.HTTPClient&lt;/span&gt;" href="../client/#canfar.client.HTTPClient">HTTPClient</a></code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.overview</span><span class="w"> </span><span class="kn">import</span> <span class="n">Overview</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overview</span> <span class="o">=</span> <span class="n">Overview</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">overview</span><span class="o">.</span><span class="n">availability</span><span class="p">()</span>
+<span class="go">True</span>
+</code></pre></div>
 
 
 
@@ -1728,11 +1710,23 @@
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Overview</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Overview</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Overview of the CANFAR Server.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.</span>
+<span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
+<span class="sd">    attributes and methods.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.overview import Overview</span>
+<span class="sd">        &gt;&gt;&gt; overview = Overview()</span>
+<span class="sd">        &gt;&gt;&gt; overview.availability()</span>
+<span class="sd">        True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="nd">@model_validator</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;after&quot;</span><span class="p">)</span>
@@ -1836,13 +1830,7 @@
 
             <details class="quote">
               <summary>Source code in <code>canfar/overview.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span>
-<span class="normal">46</span>
-<span class="normal">47</span>
-<span class="normal">48</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span>
 <span class="normal">51</span>
@@ -1861,7 +1849,13 @@
 <span class="normal">64</span>
 <span class="normal">65</span>
 <span class="normal">66</span>
-<span class="normal">67</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">availability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">availability</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the server backend is available.</span>
 
 <span class="sd">    Returns:</span>

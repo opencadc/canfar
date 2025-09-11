@@ -1675,34 +1675,15 @@
 
 
         <p>CANFAR Context.</p>
+<p>This class is a subclass of the <code>HTTPClient</code> class and inherits its
+attributes and methods.</p>
 
 
-<table>
-      <thead>
-        <tr>
-          <th><span class="doc-section-title">PARAMETER</span></th>
-          <th><span>DESCRIPTION</span></th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>HTTPClient</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Configured HTTP Client.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;canfar.client.HTTPClient&lt;/span&gt;" href="../client/#canfar.client.HTTPClient">HTTPClient</a></code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">()</span>
+</code></pre></div>
 
 
 
@@ -1749,11 +1730,21 @@
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CANFAR Context.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.</span>
+<span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
+<span class="sd">    attributes and methods.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.context import Context</span>
+<span class="sd">        &gt;&gt;&gt; context = Context()</span>
+<span class="sd">        &gt;&gt;&gt; context.resources()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
@@ -1869,12 +1860,7 @@
 
             <details class="quote">
               <summary>Source code in <code>canfar/context.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
@@ -1899,7 +1885,12 @@
 <span class="normal">47</span>
 <span class="normal">48</span>
 <span class="normal">49</span>
-<span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get available resources from the canfar server.</span>
 
 <span class="sd">    Returns:</span>

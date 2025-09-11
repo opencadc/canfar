@@ -1717,56 +1717,15 @@
 
 
         <p>CANFAR Image Management.</p>
+<p>This class is a subclass of the <code>HTTPClient</code> class and inherits its
+attributes and methods.</p>
 
 
-<table>
-      <thead>
-        <tr>
-          <th><span class="doc-section-title">PARAMETER</span></th>
-          <th><span>DESCRIPTION</span></th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>HTTPClient</code>
-            </td>
-            <td class="doc-param-details">
-              <div class="doc-md-description">
-                <p>Configured HTTP Client.</p>
-              </div>
-              <p>
-                  <span class="doc-param-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;canfar.client.HTTPClient&lt;/span&gt;" href="../client/#canfar.client.HTTPClient">HTTPClient</a></code>
-                  </span>
-              </p>
-            </td>
-          </tr>
-      </tbody>
-    </table>
-
-
-<table>
-      <thead>
-        <tr>
-          <th><span class="doc-section-title">RETURNS</span></th>
-          <th><span>DESCRIPTION</span></th>
-        </tr>
-      </thead>
-      <tbody>
-          <tr class="doc-section-item">
-            <td>
-                <code>Images</code>
-            </td>
-            <td class="doc-returns-details">
-              <div class="doc-md-description">
-                <p>CANFAR Image Management Object.</p>
-              </div>
-            </td>
-          </tr>
-      </tbody>
-    </table>
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</code></pre></div>
 
 
 
@@ -1807,14 +1766,18 @@
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Images</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Images</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;CANFAR Image Management.</span>
 
-<span class="sd">    Args:</span>
-<span class="sd">        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.</span>
+<span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
+<span class="sd">    attributes and methods.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">        Images: CANFAR Image Management Object.</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.images import Images</span>
+<span class="sd">        &gt;&gt;&gt; images = Images()</span>
+<span class="sd">        &gt;&gt;&gt; images.fetch()</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1936,9 +1899,7 @@
 
             <details class="quote">
               <summary>Source code in <code>canfar/images.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">26</span>
-<span class="normal">27</span>
-<span class="normal">28</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
 <span class="normal">31</span>
@@ -1957,7 +1918,9 @@
 <span class="normal">44</span>
 <span class="normal">45</span>
 <span class="normal">46</span>
-<span class="normal">47</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get images from CANFAR Server.</span>
 
 <span class="sd">    Args:</span>
