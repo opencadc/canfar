@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.0.1](https://github.com/opencadc/canfar/compare/v1.0.0...v1.0.1) (2025-09-11)
+
+
+### Bug Fixes
+
+* correct typos in release notes ([def5f3c](https://github.com/opencadc/canfar/commit/def5f3c6f966f5857f850a53456d6b080ecfc75f))
+
+
+### Documentation
+
+* **about-page:** removed outedated governance info ([16ff6cc](https://github.com/opencadc/canfar/commit/16ff6ccf6ec2d7a78aa171cd731d6cd028a3827e))
+* **alma:** fix image paths to sessions/images where needed ([a8524e7](https://github.com/opencadc/canfar/commit/a8524e74467f75e9a0b31b7d75772cb7553c4928))
+* **batch:** fix CLI and API syntax errors ([160b801](https://github.com/opencadc/canfar/commit/160b801a066750ca5dc82ebdf3706ffaf147b218))
+* **cleanup:** fixes for relatives paths, removed redundant toc in platform docs, fixes docstrings ([390d10b](https://github.com/opencadc/canfar/commit/390d10be37a5be4905b5793d62350788ced68551))
+* **release-notes:** add CanfarSP 2025.1 announcement and version info ([30c61d1](https://github.com/opencadc/canfar/commit/30c61d13692afad49453174a29c6d980068dd4eb))
+* **release-notes:** fixes ([4aaf24b](https://github.com/opencadc/canfar/commit/4aaf24b8d2bd815ea00fa6914b27a77274c448f5))
+* **release-notes:** update release notes ([9f73c77](https://github.com/opencadc/canfar/commit/9f73c77d54859926c22e4ff50b0839c8410e3215))
+* **release-notes:** v1.0.1 ([d4d4d0d](https://github.com/opencadc/canfar/commit/d4d4d0d1d947b0094e65fa64cd3f16015ff77de3))
+
 ## [1.0.0](https://github.com/opencadc/canfar/compare/canfar-v0.8.0...canfar-v1.0.0) (2025-09-09)
 
 
