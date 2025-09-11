@@ -21,6 +21,26 @@ Batch processing provides several key advantages for astronomical research:
 - **Automation**: Integrate with existing workflows and pipelines
 - **Cost effectiveness**: Run jobs during off-peak hours when resources are available
 
+## 🎛️ Choosing Your Session Type
+
+CANFAR offers two types of resource allocation for batch jobs:
+
+!!! tip "Flexible Sessions"
+    **Optimal for interactive work and development**
+    
+    - **Faster session startup**: Begins immediately with minimal initial resources
+    - **Can burst to higher resource usage**: Auto-scales up to 8 cores and 32GB RAM as needed
+    - **Resource efficient**: Only uses what your workload actually requires
+    - **Best for**: Data exploration, development, testing, educational workshops
+
+!!! info "Fixed Sessions"
+    **Better for production workloads**
+    
+    - **Guaranteed consistent performance**: Gets exactly what you request for the entire session
+    - **Predictable resource availability**: No variation in available CPU/memory during execution
+    - **Better for production workloads**: Suitable for performance-critical analysis and time-sensitive computations
+    - **Best for**: Large-scale processing, production pipelines, longer duration jobs
+
 
 ---
 
@@ -39,11 +59,11 @@ Execute containers programmatically using the `canfar` command-line client:
 # Ensure you are logged in first
 canfar auth login
 
-# Submit a job
-canfar launch \
-  --name "data-reduction-job" \
-  --image "images.canfar.net/skaha/astroml:latest" \
-  --cmd "python /arc/projects/[project]/scripts/reduce_data.py"
+# Submit a flexible session job (default - auto-scaling resources)
+canfar launch -n data-reduction headless skaha/astroml:latest -- python /arc/projects/[project]/scripts/reduce_data.py
+
+# Submit a fixed session job (guaranteed resources)
+canfar launch --name large-simulation --cpu 16 --memory 64 headless skaha/astroml:latest -- python /arc/projects/[project]/scripts/simulation.py
 ```
 
 ### 2. Job Submission Scripts
@@ -86,12 +106,20 @@ image = "images.canfar.net/skaha/casa:6.5"
 project="/arc/projects/[project]"
 data_path = f"{project}/data/{datetime.now().strftime('%Y%m%d')}"
 
-# Submit job
+# Submit flexible job (default - auto-scaling)
+job_ids = session.create(
+    name=job_name,
+    image=image,
+    cmd="python",
+    args=[f"{project}/pipelines/reduce_night.py", data_path]
+)
+
+# Or submit fixed job (guaranteed resources by specifying cores/ram)
 job_ids = session.create(
     name=job_name,
     image=image,
     cores=8,
-    ram=32,
+    ram=32,  # Having cores/ram makes it a fixed session
     cmd="python",
     args=[f"{project}/pipelines/reduce_night.py", data_path]
 )
