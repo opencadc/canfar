@@ -1,8 +1,16 @@
 # CANFAR Science Platform 2025.1
 
-!!! tip "CANFAR Science Platform 2025.1"
+!!! success "CANFAR Science Platform 2025.1"
 
-    The CANFAR Team is proud to announce the first formal release of the CANFAR Science Platform.
+    **Dear CANFAR Community,**
+
+    We are pleased to announce a major milestone for the CANFAR Science Platform: On September 9, 2025, we completed a transition from a beta system, initially released in 2021, to our first production release, CanfarSP 2025.1, marking the beginning of an official CANFAR Science Platform production release cycle.
+
+    This latest version of CanfarSP is ready for use on www.canfar.net, and is also available for deployments to pick up across SRCNet.
+
+    One of the highlights of this release is New & Improved documentation, now available here: https://www.opencadc.org/canfar.
+
+    If you have written scripts to launch sessions (headless, interactive, etc.) on the science platform via the now deprecated skaha python package or directly with curl, please switch to the new CANFAR python client or CLI. If you access the API directly, please switch the reference to skaha/v1 from skaha/v0 as soon as possible.
     
     **Status: Released**
 
@@ -41,3 +49,29 @@
     #### Deployment
     - Use the offically supported helm charts in the [opencadc/deployments](https://github.com/opencadc/deployments/tree/main/helm/applications/skaha) for CANFAR 2025.1 deployments.
     - To test, profile and setup the Kueue scheduling system, see the [deployment guide](https://github.com/opencadc/deployments/tree/main/configs/kueue) for detailed instructions.
+
+### 📦 Release Components
+
+!!! abstract "Python Client & CLI"
+    **Python Client for CANFAR Science Platform** - Programmatic access to sessions, storage, and platform features.
+    
+    **canfar 1.0.0** - [PyPI Link](https://pypi.org/project/canfar/1.0.0)
+
+!!! abstract "Helm Charts and Images"
+    
+    | Component | Helm Chart Version | Container Image |
+    |-----------|-------------------|-----------------|
+    | base | 0.4.0 | N/A |
+    | cavern | 0.7.0 | images.opencadc.org/platform/cavern:0.9.0 |
+    | skaha | 1.0.3 | images.opencadc.org/platform/skaha:1.0.2 |
+    | posix-mapper | 0.4.4 | images.opencadc.org/platform/posix-mapper:0.3.2 |
+    | science-portal | 1.0.0 | images.opencadc.org/platform/science-portal:1.0.0 |
+    | storage-ui | 0.6.0 | images.opencadc.org/client/storage-ui:1.3.0 |
+
+---
+
+!!! info "Contact & Support"
+
+    For any questions about this release, or for information relating to CANFAR issues or deployment support, please contact us at [support@canfar.net](mailto:support@canfar.net).
+
+    *The CADC and CANFAR science, development, and operations teams.*
