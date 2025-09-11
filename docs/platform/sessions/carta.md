@@ -1,6 +1,6 @@
 # CARTA Sessions
 
-**CARTA (Cube Analysis and Rendering Tool for Astronomy) for radio astronomy data visualisation**
+**CARTA (Cube Analysis and Rendering Tool for Astronomy) for astronomy data visualisation**
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch CARTA sessions and choose the right version

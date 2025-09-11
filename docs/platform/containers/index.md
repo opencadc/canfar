@@ -1,13 +1,13 @@
 # Containers
 
-**Working with astronomy software containers on CANFAR - understanding container environments, using pre-built images, and creating custom software stacks.**
+**Working and building software containers on CANFAR.**
 
 !!! info "Platform Navigation"
-    **Containers**: Software environments and containerised applications for astronomy.  
-    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Storage Systems](../storage/index.md)** | **[Support](../support/index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Container Guide Overview"
-    **Master CANFAR's containerised environments:**
+    **Master CANFAR's containerized environments:**
     
     - **[Container Concepts](#what-are-containers)**: Understanding reproducible software environments
     - **[Available Containers](#canfar-supported-containers)**: Pre-built astronomy software stacks
@@ -51,11 +51,11 @@ graph TB
     BaseOS[Ubuntu Linux Base] --> SystemLibs[System Libraries]
     SystemLibs --> CondaPython[Conda + Python]
     CondaPython --> AstroLibs[Astronomy Libraries]
-    AstroLibs --> SpecializedTools[Specialized Tools]
+    AstroLibs --> SpecialisedTools[Specialised Tools]
     
-    SpecializedTools --> Astroml[astroml Container]
-    SpecializedTools --> Casa[casa Container]
-    SpecializedTools --> Custom[Custom Containers]
+    SpecialisedTools --> Astroml[astroml Container]
+    SpecialisedTools --> Casa[casa Container]
+    SpecialisedTools --> Custom[Custom Containers]
     
     Runtime[CANFAR Runtime] --> Storage[Storage Mounting]
     Runtime --> UserContext[User Context]
@@ -69,22 +69,23 @@ graph TB
 Understanding the distinction between build time and runtime is crucial for effective container usage:
 
 ### Build Time
+
 **What happens when containers are created:**
 
-- **Base image selection**: Choose Ubuntu, Python, or specialized astronomy base
+- **Base image selection**: Choose Ubuntu, Python, or specialised astronomy base
 - **Software installation**: Install system packages, Python libraries, astronomy tools
 - **Environment configuration**: Set up paths, environment variables, user permissions
 - **Code packaging**: Include stable scripts and analysis tools
-- **Image optimisation**: Layer caching, size reduction, security patches
+- **Image optimization**: Layer caching, size reduction, security patches
 
 ```dockerfile
 # Build time example
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Install system dependencies (build time)
 RUN apt-get update && apt-get install -y \
     python3-dev \
-    libfitsio-dev \
+    libcfitsio-dev \
     && apt-get clean
 
 # Install Python packages (build time)
@@ -112,7 +113,7 @@ df -h /scratch/                 # Temporary high-speed storage
 ```
 
 !!! warning "Persistence Boundary"
-    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are temporary and lost when the session ends. Keep stable software in the image; keep development scripts in `/arc/`.
+    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are on `/arc` and not on the container. Keep stable software in the image; keep development scripts in `/arc/`.
 
 ## 🔗 How Containers Relate to Sessions
 
@@ -214,7 +215,7 @@ Headless containers execute without graphical interfaces, perfect for automated 
 - **No GUI requirements**: Command-line tools only
 - **Script execution**: Runs your specified command and exits
 - **Background processing**: Perfect for large datasets and automation
-- **Resource optimisation**: Can use different resource priorities
+- **Resource optimization**: Can use different resource priorities
 
 ```bash
 # Example headless execution
@@ -288,9 +289,9 @@ graph LR
 **Temporary Processing (`/scratch/`):**
 ```bash
 # Copy large datasets to fast storage for processing
-cp /arc/projects/survey/large_data.fits /scratch/
+cp /arc/projects/[project]/large_data.fits /scratch/
 process_data /scratch/large_data.fits /scratch/output.fits
-cp /scratch/output.fits /arc/projects/survey/results/
+cp /scratch/output.fits /arc/projects/[project]/results/
 ```
 
 ### User Context and Permissions
@@ -315,66 +316,16 @@ groups                    # Shows your CANFAR project group memberships
 
 The CANFAR team maintains several core containers that cover most astronomy research needs:
 
-### Core Astronomy Containers
-
-#### `astroml` - General Astronomy Analysis
-
-**Purpose**: Comprehensive Python environment for most astronomy workflows
-
-**Pre-installed software:**
-- **Python stack**: numpy, scipy, matplotlib, pandas, jupyter, pyarrow
-- **Astronomy libraries**: astropy, astroquery, photutils, reproject
-- **Machine learning**: scikit-learn, pytorch
-- **Data formats**: FITS, HDF5
-- **Development tools**: Git, vim, nano, SSH client
-
-**Best for:**
-- Python-based data analysis and visualisation
-- Statistical analysis and machine learning
-- Multi-wavelength astronomy workflows
-- Educational and tutorial sessions
-
-```bash
-# Launch astroml notebook session
-canfar launch notebook images.canfar.net/skaha/astroml:latest \
-  --name "data-analysis" --cores 4 --memory 16
-```
-
-#### `astroml-cuda` - GPU-Accelerated Analysis
-
-**Purpose**: Extends `astroml` with GPU computing capabilities
-
-**Additional features:**
-- **CUDA libraries**: NVIDIA CUDA toolkit and drivers
-- **GPU frameworks**: all cuda-enabled frameworks of the astroml container
-
-**Best for:**
-- Machine learning with large datasets
-- Image processing and computer vision
-- Simulation and N-body computations
-- Deep learning applications
-
-#### `casa` - Radio Astronomy
-
-**Purpose**: Specialised environment for radio interferometry analysis
-
-**Pre-installed software:**
-- **CASA suite**: Complete Common Astronomy Software Applications
-- **Python integration**: CASA Python bindings and tasks
-- **Data formats**: Measurement Set, FITS-IDI, UVFITS support
-- **Visualisation**: CASA plotting and imaging tools
-
-**Best for:**
-- Radio interferometry data reduction
-- Synthesis imaging and deconvolution
-- Calibration and flagging workflows
-- Single-dish radio astronomy
-
-```bash
-# Launch CASA desktop session for GUI tools
-canfar create desktop images.canfar.net/skaha/casa:latest \
-  --name "vla-reduction" --cores 8 --memory 32
-```
+| Container | Description |
+|-----------|-------------|
+| **skaha/base** | Basic UNIX tools, conda, CADC packages |
+| **skaha/astroml** | Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm. |
+| **skaha/improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
+| **skaha/casa** | CASA installations |
+| **skaha/marimo** | Same as astroml stack, with marimo notebook as web interface |
+| **skaha/vscode** | Same as astroml, with VSCode on browser as interface |
+| **skaha/*-cuda** | Same as above, with CUDA-enabled |
+| **lsst/sciplat-lab** | LSST Software stack |
 
 ### Visualisation Containers
 
@@ -393,7 +344,7 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 **Purpose**: Advanced visualisation for optical and infrared surveys
 
 **Features:**
-- **Multi-mission support**: LSST, Spitzer, WISE, 2MASS data
+- **Multi-mission support**: LSST, Spitzer, WISE, 2MASS, ...
 - **Interactive catalogues**: Source overlays and cross-matching
 - **Multi-wavelength workflows**: RGB composites and band comparisons
 - **Large dataset handling**: Efficient rendering of survey-scale data
@@ -402,10 +353,10 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 
 #### `desktop` - Ubuntu Environment
 
-**Purpose**: Complete Linux desktop for GUI applications and legacy software
+**Purpose**: Complete Linux desktop for GUI applications and legacy software. Astronomy software applications will each run on dedicated nodes.
 
 **Features:**
-- **Ubuntu 22.04 LTS**: Linux environment
+- **Ubuntu**: Linux environment
 - **Desktop environment**: Full GNOME-based interface
 - **Applications**: Firefox, file managers, terminals, editors
 - **X11 forwarding**: Support for launching astronomy GUI applications
@@ -415,7 +366,6 @@ canfar create desktop images.canfar.net/skaha/casa:latest \
 **Purpose**: Minimal Jupyter environment for basic Python work
 
 **Features:**
-- **Core Python**: NumPy, SciPy, Matplotlib basics
 - **Jupyter Lab**: Web-based notebook interface
 - **Extensible**: Foundation for custom development
 - **Fast startup**: Minimal software for quick sessions

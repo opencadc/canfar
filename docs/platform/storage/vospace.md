@@ -1,10 +1,10 @@
 # Storage 
 
-**Long-term storage, data sharing, and archival - tools, Python API, and web interface.**
+**Long-term storage, data sharing, and archiving - tools, Python API, and web interface.**
 
 !!! info "Platform Navigation"
-    **VOSpace (Vault)**: Long-term storage, sharing, and archival for astronomical data.  
-    **[Storage Home](index.md)** | **[Filesystem Access](filesystem.md)** | **[Data Transfers](transfers.md)** | **[Platform Home](../index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 VOSpace Guide Overview"
     **Master CANFAR's long-term storage system:**
@@ -157,7 +157,7 @@ vcat vos:[user]/catalog.csv
 #### Bulk Operations
 
 ```bash
-# Synchronize directories
+# Synchronise directories
 vsync ./local_data/ vos:[user]/backup/
 vsync vos:[user]/analysis/ ./local_analysis/
 
@@ -386,8 +386,8 @@ vcp local_observations.fits vos:[project]/data/institution_a/
 vcp analysis_results.csv vos:[project]/results/
 
 # Public data release
-vcp vos:[project]/data/final_catalog.fits vos:[project]/public/
-vchmod o+r vos:[project]/public/final_catalog.fits
+vcp vos:[project]/data/final_catalogue.fits vos:[project]/public/
+vchmod o+r vos:[project]/public/final_catalogue.fits
 ```
 
 #### Data Publication

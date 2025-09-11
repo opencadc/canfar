@@ -1,10 +1,10 @@
 # CANFAR Platform Concepts
 
-Understanding the architecture and core concepts behind the CANFAR Science Platform for astronomical research.
+**Understanding the architecture and core concepts behind the CANFAR Science Platform for astronomical research.**
 
 !!! info "Platform Navigation"
-    **Core Platform Concepts**: This comprehensive guide to CANFAR's architecture and concepts.  
-    **[Platform](index.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[Cloud](cloud.md)** | **[DOI](doi.md)**
+    **Platform Sections:**  
+    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
 
 !!! abstract "🎯 Core Concepts"
     **Essential platform knowledge for all users:**
@@ -27,7 +27,7 @@ CANFAR eliminates traditional barriers to astronomical computing:
 - **Minimal Software Installation**: Pre-built environments with astronomy packages ready to use
 - **Browser-Based Access**: Complete workflows accessible through web interfaces
 - **Scalable Resources**: Computing power that grows with your project needs
-- **Collaborative Infrastructure**: Shared storage and standardized environments
+- **Collaborative Infrastructure**: Shared storage and standardised environments
 - **Reproducible Science**: Container-based workflows ensure consistent results
 
 ### Core Benefits
@@ -39,7 +39,7 @@ CANFAR eliminates traditional barriers to astronomical computing:
     - **Data Protection**: Automatic backups and managed storage systems
 
 === "Research Teams"
-    - **Environment Standardization**: Identical software stacks across the team
+    - **Environment Standardisation**: Identical software stacks across the team
     - **Seamless Collaboration**: Shared workspaces and data access
     - **Session Sharing**: Live collaboration on analysis workflows
     - **Project Management**: Centralized resource and permission management
@@ -139,7 +139,7 @@ CANFAR is built on modern cloud-native technologies designed for scalability, re
 :   Manages computing resources automatically, handling container deployment, scaling, and resource allocation behind the scenes.
 
 **Software Environments** (Harbor Registry)
-:   Pre-built and customized container images with astronomy software packages, from basic Python environments to specialized tools like CASA and CARTA.
+:   Pre-built and customised container images with astronomy software packages, from basic Python environments to specialised tools like CASA and CARTA.
 
 **Session Management** (`skaha`)
 :   Orchestrates your computing sessions, connecting containers with storage systems and managing resource allocation.
@@ -187,7 +187,7 @@ Containers are the foundation of CANFAR's flexibility and reproducibility. They 
     
     - Conflicting library versions and dependencies  
     - Missing system requirements and packages
-    - Different behavior across different machines
+    - Different behaviour across different machines
     - Time-consuming setup and configuration
     - Version compatibility issues between tools
     - "It works on my machine" syndrome
@@ -318,17 +318,17 @@ CANFAR provides different session types, each optimised for specific workflows:
     - Integration with astronomical databases
 
 === "⚙️ Contributed Sessions"
-    **Community-Maintained Applications** and specialized tools
+    **Community-Maintained Applications** and specialised tools
 
-    **Best For:** Specialized workflows, experimental features, niche applications
+    **Best For:** Specialised workflows, experimental features, niche applications
     
     **Features:**
     
     - Custom applications contributed by the community
-    - Specialized tools for specific research areas
+    - Specialised tools for specific research areas
     - Experimental features and beta software
     - Domain-specific analysis environments
-    - Research group customizations
+    - Research group customisations
 
 === "🏭 Batch Sessions"
     **Automated Processing** without interactive interfaces

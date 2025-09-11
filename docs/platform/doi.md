@@ -3,14 +3,14 @@
 CANFAR's Data Publication Service (DPS) provides permanent Digital Object Identifiers (DOIs) for research data packages, ensuring long-term accessibility and proper citation of datasets supporting astronomical publications.
 
 !!! info "Platform Navigation"
-    **Data Publication & DOIs**: Permanent identifiers and data preservation for research publications.  
-    **[Platform Home](index.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[Permissions](permissions.md)** | **[Legacy Platform](cloud.md)**
+    **Platform Sections:**  
+    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
 
 !!! abstract "🎯 DOI Service Overview"
     **Essential data publication workflows:**
     
     - **DOI Registration**: Reserve permanent identifiers through DataCite
-    - **Data Packaging**: Organize and upload research datasets
+    - **Data Packaging**: Organise and upload research datasets
     - **Referee Access**: Provide controlled access during peer review
     - **Publication**: Mint final DOIs with locked data directories
     - **Long-term Preservation**: Ensure data accessibility and citation

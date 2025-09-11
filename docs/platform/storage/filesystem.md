@@ -1,10 +1,10 @@
 # Filesystem Access
 
-**Comprehensive guide to accessing CANFAR's ARC storage systems as filesystems - including direct access within sessions, SSHFS mounting from external computers, and permission management.**
+**CANFAR's ARC storage systems as filesystems, SSHFS mounting from external computers, and permission management.**
 
 !!! info "Platform Navigation"
-    **Filesystem Access**: Direct file system operations and external mounting for ARC storage.  
-    **[Storage Home](index.md)** | **[Data Transfers](transfers.md)** | **[VOSpace Guide](vospace.md)** | **[Platform Home](../index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Filesystem Guide Overview"
     **Master direct storage access:**
@@ -68,8 +68,8 @@ Used for team project use. For example, for a propcessing pipeline analysis:
 │   ├── notebooks/          # Jupyter notebooks
 │   └── tools/              # Project-specific utilities
 ├── results/
-│   ├── plots/              # Figures and visualizations
-│   ├── tables/             # Output catalogs and measurements
+│   ├── plots/              # Figures and visualisations
+│   ├── tables/             # Output catalogues and measurements
 │   ├── papers/             # Manuscripts and drafts
 │   └── presentations/      # Conference materials
 ├── docs/
@@ -130,7 +130,7 @@ mv old_observations_2023.tar.gz archives/
 
 ```bash
 # Create symbolic links for easy access
-ln -s /arc/projects/survey/data/master_catalog.fits ~/current_catalog.fits
+ln -s /arc/projects/survey/data/master_catalogue.fits ~/current_catalogue.fits
 ln -s /arc/projects/[project]/ ~/project
 
 # Hard links (same filesystem only)
@@ -169,7 +169,7 @@ SSHFS allows you to mount CANFAR's ARC storage on your local computer as if it w
     # Logout and login again
     ```
 
-=== "Linux (Fedora)"
+=== "Linux (Fedora/RedHat)"
     ```bash
     # Install SSHFS
     sudo dnf install sshfs

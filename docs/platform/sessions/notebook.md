@@ -17,7 +17,6 @@ Notebook sessions provide:
 - **Jupyter Lab:** Full-featured development environment with file browser, terminal, and extensions
 - **Pre-configured containers:** Astronomy-specific software stacks with popular libraries
 - **Persistent storage:** Direct access to your `/arc/home/` and `/arc/projects/` data
-- **Collaborative sharing:** Share session URLs with team members
 - **Terminal access:** Built-in terminal for command-line operations
 - **File transfers:** Upload/download capabilities for data management
 
@@ -41,7 +40,7 @@ Select a container image that includes the software you need. Each container com
 
 | Container | Contents | Best For |
 |-----------|----------|----------|
-| **astroml** ⭐ | Modern Python astronomy stack (AstroPy, NumPy, SciPy, Matplotlib, Pandas) | General astronomy analysis, data science |
+| **astroml** ⭐ | Modern Python astronomy stack ([`astropy`](https://docs.astropy.org/), [`numpy`](https://numpy.org), [`scipy`](https://scipy.org), [`matplotlib`](https://matplotlib.org), [`pandas`](https://pandas.pydata.org)) | General astronomy analysis, data science |
 | **CASA 6.5-notebook** | CASA (Common Astronomy Software Applications) + Python stack | Radio astronomy data reduction |
 | **General purpose** | Standard Python data science stack | Basic Python development |
 
@@ -206,46 +205,26 @@ Many useful extensions are pre-installed:
 
 ### Python Package Management
 
-#### Pre-installed Packages
-
-Most astronomy packages are already available:
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-import astropy
-from astropy.io import fits
-import pandas as pd
-import scipy
-```
-
 #### Installing Additional Packages
 
 ```bash
-# Install packages for current session (may require --user option)
-# Will install in home directory
-pip install package-name
+# Prefer python -m pip for clarity; installs to user site if needed
+python -m pip install --user package-name
 
 # Check installed packages
-pip list
+python -m pip list | less
 ```
 
-## 🤝 Collaboration and Sharing
+## 🤝 Collaboration
 
-### Sharing Sessions
-
-Share your notebook session with team members:
-
-1. **Copy the session URL** from your browser address bar
-2. **Share with colleagues** who have CANFAR accounts
-3. **Coordinate editing** to avoid conflicts
+Focus collaboration on shared project storage and version control, not session URL sharing.
 
 ### Best Practices for Collaboration
 
 - **Use descriptive cell comments** for clarity
 - **Save frequently** to persistent storage
 - **Use version control** (git) for important work
-- **Communicate** who's editing what sections
+- **Coordinate changes** via pull requests or issue tracking
 
 ### Sharing Notebooks
 
@@ -264,12 +243,12 @@ git push origin main
 ### Memory Management
 
 ```python
-# Monitor memory usage
 import psutil
 print(f"Memory usage: {psutil.virtual_memory().percent}%")
 
 # Free up memory by deleting large variables
-del large_array
+if 'large_array' in globals():
+    del large_array
 import gc
 gc.collect()
 ```
@@ -278,32 +257,32 @@ gc.collect()
 
 ```python
 # Use /scratch for intensive I/O operations
-import shutil
+import shutil, pathlib
 
-# Copy to scratch for processing
-shutil.copy('/arc/projects/[project]/large_file.fits', '/scratch/')
+source = '/arc/projects/[project]/large_file.fits'
+target = '/scratch/large_file.fits'
+shutil.copy(source, target)
 
-# Process in scratch
 # ... your analysis code ...
 
 # Copy results back
-shutil.copy('/scratch/results.fits', '/arc/projects/[project]/outputs/')
+pathlib.Path('/arc/projects/[project]/outputs/').mkdir(parents=True, exist_ok=True)
+shutil.copy('/scratch/results.fits', '/arc/projects/[project]/outputs/results.fits')
 ```
 
 ### Efficient Data Loading
 
 ```python
-# For large FITS files, load only needed sections
 from astropy.io import fits
 
-# Load header only
-header = fits.getheader('large_file.fits')
+# Efficient FITS access with context manager and memmap
+with fits.open('huge_file.fits', memmap=True) as hdul:
+    header = hdul[0].header          # Primary header
+    data_section = hdul[1].data      # Access required extension lazily
 
-# Load specific HDU
-data = fits.getdata('large_file.fits', ext=1)
-
-# Use memmap for very large files
-data = fits.getdata('huge_file.fits', memmap=True)
+# If only header needed
+from astropy.io.fits import getheader
+primary_header = getheader('large_file.fits')
 ```
 
 ## 🔧 Troubleshooting
@@ -348,16 +327,3 @@ data = fits.getdata('huge_file.fits', memmap=True)
 2. Use command-line tools for larger files
 3. Check available disk space
 4. Try uploading to `/scratch` first, then moving
-
-### Getting Help
-
-```python
-# Built-in help systems
-help(function_name)
-?function_name          # In JupyterLab
-??function_name         # Show source code
-
-# Package documentation
-import astropy
-astropy.__version__
-```

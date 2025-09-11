@@ -1,10 +1,10 @@
 # Getting Help and Support
 
-**Comprehensive support resources for CANFAR users - from self-service documentation to direct technical assistance.**
+**Support resources for CANFAR users - from self-service documentation to direct technical assistance.**
 
 !!! info "Platform Navigation"
-    **Support Centre**: Help resources, community connections, and technical assistance.  
-    **[FAQ](faq.md)** | **[Platform Home](../index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Support Resources Overview"
     **Find the help you need:**
@@ -301,7 +301,7 @@ For bug reports and feature requests, use our GitHub repositories:
 [Clear, concise description of the bug]
 
 ## Environment
-- OS: [e.g., macOS 14.1, Windows 11, Ubuntu 22.04]
+- OS: [e.g., macOS 14.1, Windows 11, Ubuntu 24.04]
 - Browser: [e.g., Chrome 120.0, Firefox 119.0]
 - Session Type: [notebook, desktop, carta, firefly, headless]
 - Container: [e.g., skaha/astroml:latest]

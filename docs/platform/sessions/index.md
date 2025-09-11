@@ -1,10 +1,10 @@
 # Interactive Sessions
 
-**Comprehensive guide to CANFAR's interactive computing environments for astronomical research - from Jupyter notebooks to desktop applications.**
+**CANFAR computing environments for astronomical research - Jupyter notebooks, and non-interactive applications.**
 
 !!! info "Platform Navigation"
-    **Interactive Sessions**: Your gateway to computing environments and analysis workflows.  
-    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Storage Systems](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Session Types Overview"
     **Choose the right interface for your research:**
@@ -33,22 +33,19 @@ Interactive sessions provide on-demand access to pre-configured computing enviro
 **Persistent Data Access**
 :   All sessions automatically connect to your ARC storage and can access VOSpace for long-term data management.
 
-**Collaborative Computing**
-:   Share session URLs with team members for real-time collaboration and troubleshooting.
-
 **Scalable Resources**
 :   Choose flexible or fixed resource allocation based on your computational requirements.
 
 ## 📊 Session Type Comparison
 
-| Session Type | Interface | Best For | Collaboration | GUI Support |
-|--------------|-----------|----------|---------------|-------------|
-| **[Notebook](notebook.md)** | JupyterLab | Data analysis, prototyping, documentation | ✅ Shareable URLs | ⚠️ Web-based |
-| **[Desktop](desktop.md)** | Full Linux desktop | CASA, image viewers, traditional software | ✅ Screen sharing | ✅ Full GUI |
-| **[CARTA](carta.md)** | CARTA interface | Radio astronomy visualisation | ✅ Shareable sessions | ✅ Specialised |
-| **[Firefly](firefly.md)** | Firefly viewer | Catalogue analysis, image display | ✅ Shareable views | ✅ Web-based |
-| **[Contributed](contributed.md)** | Various | Specialised applications | ⚠️ Varies | ⚠️ Varies |
-| **[Batch](batch.md)** | None (headless) | Large-scale processing | ❌ Non-interactive | ❌ Headless |
+| Session Type | Interface | Best For | GUI Support |
+|--------------|-----------|----------|-------------|
+| **[Notebook](notebook.md)** | JupyterLab | Data analysis, prototyping, documentation | ✅ Web-based |
+| **[Desktop](desktop.md)** | Full Linux desktop | CASA, image viewers, traditional software | ✅ Desktop GUI |
+| **[CARTA](carta.md)** | CARTA interface | Radio astronomy visualisation | ✅ Specialised |
+| **[Firefly](firefly.md)** | Firefly viewer | Catalogue analysis, image display |  ✅ Web-based |
+| **[Contributed](contributed.md)** | Various | Specialised applications | ⚠️ Varies |
+| **[Batch](batch.md)** | None (headless) | Large-scale processing | ❌ Headless |
 
 ## 🔧 Session Management
 

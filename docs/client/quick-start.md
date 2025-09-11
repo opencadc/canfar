@@ -154,7 +154,7 @@ When you're done, delete your session(s) to free resources for other users. :sim
     session.logs(ids, verbose=True)
     ```
     ```python title="Try smaller resources or different image"
-    session.create(..., cores=1, ram=2, image="images.canfar.net/skaha/base-notebook:latest")
+    session.create(..., cores=1, ram=2, image="images.canfar.net/skaha/astroml:latest")
     ```
 
 - Authentication issues?

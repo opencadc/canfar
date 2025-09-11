@@ -60,7 +60,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     asession = AsyncSession()
     response = await asession.create(
         name="test",
-        image="images.canfar.net/skaha/base-notebook:latest",
+        image="images.canfar.net/skaha/astroml:latest",
         cores=2,
         ram=8,
         gpu=1,

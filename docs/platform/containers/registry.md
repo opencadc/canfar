@@ -3,16 +3,18 @@
 **Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.**
 
 !!! info "Platform Navigation"
-    **Registry Management**: Storing, organising, and distributing container images on Harbor.  
-    **[Containers Home](index.md)** | **[Building Containers](build.md)** | **[Platform Home](../index.md)**
+  **Platform Sections:**  
+  **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Registry Management Overview"
-    **Master Harbor registry operations:**
-    
-    - **Harbor Platform**: Understanding CANFAR's enterprise container registry features
-    - **Access Control**: Projects, repositories, and role-based permissions
-    - **Image Management**: Tagging, versioning, and metadata organisation
-    - **Security Features**: Vulnerability scanning and compliance monitoring
+
+  **Master Harbor registry operations:**
+
+**Harbor Platform**: Understanding CANFAR's enterprise container registry features
+**Access Control**: Projects, repositories, and role-based permissions
+**Image Management**: Tagging, versioning, and metadata organization
+**Security Features**: Vulnerability scanning and compliance monitoring
+
 
 Harbor serves as CANFAR's container registry, providing a secure, feature-rich platform for storing, managing, and distributing container images. Built on Docker Registry v2, Harbor adds enterprise features like role-based access control, vulnerability scanning, and image replication.
 
@@ -36,7 +38,7 @@ Harbor is an open-source container registry that provides:
 **Key features on CANFAR:**
 
 - Integration with CADC authentication system
-- Project-based organisation for research teams
+- Project-based organization for research teams
 - Automated vulnerability scanning for public containers
 - Role-based permissions aligned with CANFAR groups
 - API access for automated workflows
@@ -62,11 +64,11 @@ graph TB
     Features --> API[REST API]
 ```
 
-## 🏗️ Projects and Organisation
+## 🏗️ Projects and Organization
 
 ### Project Structure
 
-Harbor organises containers into **projects**, which serve as top-level namespaces:
+Harbor organizes containers into **projects**, which serve as top-level namespaces:
 
 ```text
 images.canfar.net/
@@ -668,7 +670,7 @@ docker push images.canfar.net/myteam/analysis-env:v1.2.0
 
 ### Registry Best Practices
 
-#### Registry Organisation
+#### Registry Organization
 
 ```bash
 # Recommended project organization
@@ -750,7 +752,7 @@ LABEL security.updates="2024-03-15"
 # Order Dockerfile instructions by change frequency
 
 # Use multi-stage builds to reduce final image size
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:24.04 AS builder
 # ... build dependencies ...
 FROM images.canfar.net/skaha/astroml:latest
 COPY --from=builder /app/binary /usr/local/bin/
@@ -776,23 +778,6 @@ RUN apt-get update && apt-get install -y pkg1 pkg2 pkg3 \
 
 ## 🔗 Integration with CANFAR Services
 
-### Session Type Integration
-
-Harbor labels determine how containers integrate with CANFAR sessions:
-
-```dockerfile
-# Notebook container labels
-LABEL ca.nrc.cadc.skaha.type="notebook"
-LABEL ca.nrc.cadc.skaha.description="Custom astronomy analysis environment"
-
-# Desktop-app container labels  
-LABEL ca.nrc.cadc.skaha.type="desktop-app"
-LABEL ca.nrc.cadc.skaha.name="Custom Analysis Tool"
-
-# Contributed application labels
-LABEL ca.nrc.cadc.skaha.type="contributed"
-LABEL ca.nrc.cadc.skaha.port="5000"
-```
 
 ### Storage Integration
 
@@ -800,8 +785,8 @@ Containers automatically receive CANFAR storage mounts:
 
 ```bash
 # Inside any Harbor-deployed container on CANFAR
-ls /arc/home/username/        # Personal storage
-ls /arc/projects/project/     # Project storage  
+ls /arc/home/[user]/        # Personal storage
+ls /arc/projects/[project]/     # Project storage  
 ls /scratch/                  # Temporary storage
 ```
 

@@ -18,19 +18,11 @@ A public SSH key will need to be installed into your Arc home directory. Ensure 
 
 1. Ensure you are logged in using the pulldown in the top right menu.
 
-> ![image](images/sshfs/login.png)
-
 2. Visit your `Home` folder.
-
-> ![image](images/sshfs/home.png)
 
 3. If there is no `.ssh` folder listed, create one.
 
-> ![image](images/sshfs/add-folder.png)
-
-4. Ensure you have a file called `authorized_keys` with your SSH public key in it. This public key should match which ever private key you are using to authenticate with.  For example, if your private key on your local machine is `${HOME}/.ssh/id_rsa`, then your public key is likely `${HOME}/.ssh/id_rsa.pub`.
-
-> ![image](images/sshfs/auth-keys.png)
+4. Ensure you have a file called `authorized_keys` with your SSH public key in it. This public key should match whichever private key you are using to authenticate with. For example, if your private key on your local machine is `${HOME}/.ssh/id_rsa`, then your public key is likely `${HOME}/.ssh/id_rsa.pub`.
 
 ## Mount the Remote File System
 

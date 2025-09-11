@@ -1,10 +1,10 @@
 # Storage Systems
 
-**Comprehensive guide to CANFAR's storage systems for astronomy research: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
+**CANFAR's storage systems: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
 
 !!! info "Platform Navigation"
-    **Storage Systems**: Data management and persistence for astronomical research.  
-    **[Platform Home](../index.md)** | **[Platform Concepts](../concepts.md)** | **[Interactive Sessions](../sessions/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)**
+    **Platform Sections:**  
+    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
 
 !!! abstract "🎯 Storage Guide"
     **Master CANFAR's storage systems:**
@@ -23,7 +23,7 @@ CANFAR provides four distinct storage systems, each optimised for different stag
 | **Scratch**     | `/scratch/` | Fastest SSD | Session only | ❌ Wiped at end | ❌ None | Direct filesystem | High-speed temporary processing |
 | **ARC Home**    | `/arc/home/[user]/` | Shared CephFS | Personal | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Personal configs, scripts, small files |
 | **ARC Projects** | `/arc/projects/[project]/` | Shared CephFS | Shared group | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Active collaborative research |
-| **Vault**       | `vos:[user]/` | Medium | Personal/shared | ✅ Permanent | ✅ Geo-redundant | API/Web only | Long-term archives, data sharing |
+| **Vault**       | `vos:[project|user]/` | Medium | Personal/shared | ✅ Permanent | ✅ Geo-redundant | API/Web only | Long-term archives, data sharing |
 
 ## 🔄 How Sessions Use Storage
 
@@ -106,9 +106,9 @@ graph TD
 ### Storage Speed Hierarchy
 
 ```text
-/scratch/           ← Fastest (SSD)
-/arc/projects/      ← Shared CephFS
-/arc/home/          ← Shared CephFS
+/scratch/           ← Fastest (local SSD)
+/arc/projects/      ← Shared CephFS (Network)
+/arc/home/          ← Shared CephFS (Network)
 vos: (Vault)        ← Medium (Network)
 ```
 
@@ -163,7 +163,7 @@ vchmod o+r vos:[user]/publications/shared_catalogue.fits
 
 - **ARC Home**: 10GB (personal files only)
 - **ARC Projects**: 200GB (can be increased)
-- **Scratch**: Unlimited (temporary only)
+- **Scratch**: ~100GB (temporary only)
 - **Vault**: Project-dependent (request from support)
 
 ### Monitoring Usage

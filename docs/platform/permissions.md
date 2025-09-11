@@ -1,10 +1,10 @@
 # User Management & Permissions
 
-Comprehensive guide to accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.
+**Accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.**
 
 !!! info "Platform Navigation"
-    **User Management & Permissions**: Complete access control and collaboration management.  
-    **[Platform Home](index.md)** | **[Platform Concepts](concepts.md)** | **[Get Started](get-started.md)** | **[DOI Services](doi.md)** | **[Legacy Platform](cloud.md)**
+    **Platform Sections:**  
+    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
 
 !!! abstract "🎯 Permission System Overview"
     **Essential access control concepts for all users:**
@@ -19,7 +19,7 @@ Comprehensive guide to accounts, groups, access control, and API authentication 
 
 CANFAR's security model consists of multiple integrated layers providing flexible, secure access control for astronomical research collaboration.
 
-### Authentication & Authorization Layers
+### Authentication & Authorisation Layers
 
 **CADC Identity System**
 :   Your foundational identity for all Canadian astronomy services, providing single sign-on across CANFAR, data archives, and VO services.

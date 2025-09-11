@@ -1,9 +1,9 @@
 # Batch Processing
 
-## Headless container execution for automated workflows and large-scale processing
+**Headless container execution for automated workflows and large-scale batch processing**
 
 !!! abstract "🎯 What You'll Learn"
-    - How to run containers without interactive interfaces (headless mode)
+    - How to run containers without interactive interfaces ("headless" batch mode)
     - Submitting and managing batch jobs through the Science Portal
     - Using the REST API for programmatic job control and automation
     - Best practices for resource allocation, job scheduling, and monitoring
@@ -57,7 +57,7 @@ Create shell scripts for common workflows using the `canfar` client:
 # Set job parameters
 JOB_NAME="nightly-reduction-$(date +%Y%m%d)"
 IMAGE="images.canfar.net/skaha/casa:6.5"
-CMD="python /arc/projects/survey/pipelines/reduce_night.py /arc/projects/survey/data/$(date +%Y%m%d)"
+CMD="python /arc/projects/[project]/pipelines/reduce_night.py /arc/projects/survey/data/$(date +%Y%m%d)"
 
 # Submit job
 canfar launch \
@@ -99,81 +99,10 @@ job_ids = session.create(
 print(f"Submitted job(s): {job_ids}")
 ```
 
-
-### 3. Workflow Automation
-
-Use workflow managers like [Prefect](https://www.prefect.io/) or [Snakemake](https://snakemake.readthedocs.io/en/stable/):
-
-```python
-# Snakemake example: workflow.smk
-rule all:
-    input:
-        "results/final_catalog.fits"
-
-rule calibrate:
-    input:
-        "data/raw/{observation}.fits"
-    output:
-        "data/calibrated/{observation}.fits"
-    shell:
-        "python scripts/calibrate.py {input} {output}"
-
-rule source_extract:
-    input:
-        "data/calibrated/{observation}.fits"
-    output:
-        "catalogs/{observation}_sources.fits"
-    shell:
-        "python scripts/extract_sources.py {input} {output}"
-```
-
-## Job Types and Use Cases
-
-### Data Reduction Pipelines
-
-**Optical/IR Surveys**:
-- Bias, dark, and flat field correction
-- Astrometric calibration
-- Photometric calibration
-- Source extraction and cataloging
-
-**Radio Astronomy**:
-- Flagging and calibration
-- Imaging and deconvolution
-- Spectral line analysis
-- Polarization processing
-
-### Scientific Analysis
-
-**Large-scale Surveys**:
-- Cross-matching catalogs
-- Statistical analysis
-- Machine learning training
-- Population studies
-
-**Time-domain Astronomy**:
-- Light curve analysis
-- Period finding
-- Variability classification
-- Transient detection
-
-### Simulation and Modeling
-
-**N-body Simulations**:
-- Galaxy formation models
-- Stellar dynamics
-- Dark matter simulations
-
-**Synthetic Observations**:
-- Mock catalog generation
-- Instrument simulation
-- Survey planning
-
-
 ### Performance Optimization
 
 !!! tip "Advanced: Resource Monitoring"
-    - Use `canfar stats <session-id>` and `canfar info <session-id>` to monitor job resource usage.
+    - Use `canfar stats [session-id]` and `canfar info [session-id]` to monitor job resource usage.
     - For parallel workloads, see [Distributed Computing](../../client/helpers.md) for strategies.
 
 #### Resource Allocation Strategy
@@ -231,7 +160,7 @@ def process_large_cube(filename):
 #!/bin/bash
 set -e
 PROJECT="/arc/projects/[project]"
-]
+
 # Copy data to fast scratch storage
 echo "Copying data to scratch..."
 rsync -av $PROJECT/large_dataset/ /scratch/working/
@@ -253,7 +182,6 @@ echo "Processing complete"
 #### Parallel Processing
 
 !!! tip "Advanced: Distributed Workflows"
-    - Use [Snakemake](https://snakemake.readthedocs.io/en/stable/) or [Prefect](https://www.prefect.io/) for complex workflow automation.
     - For team projects, see [Accounts & Permissions](../permissions.md) for collaboration strategies.
 
 **Multi-core CPU Usage:**
@@ -330,7 +258,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('/arc/projects/myproject/logs/processing.log'),
+        logging.FileHandler('/arc/projects/[project]/logs/processing.log'),
         logging.StreamHandler()
     ]
 )
@@ -432,28 +360,28 @@ canfar ps
 #### Get Job Status
 
 ```bash
-canfar info <session-id>
+canfar info [session-id]
 ```
 
 #### Cancel Job
 
 ```bash
-canfar delete <session-id>
+canfar delete [session-id]
 ```
 
 #### Get Job Logs
 
 ```bash
-canfar logs <session-id>
+canfar logs [session-id]
 ```
 
 #### Get Resource Usage
 
 ```bash
-canfar stats <session-id>
+canfar stats [session-id]
 ```
 
-### Method 2: `canfar` Python Client
+### Method 2: `canfar` Python API
 
 The `canfar` Python client provides a convenient interface for batch job management and automation.
 
@@ -463,7 +391,7 @@ The `canfar` Python client provides a convenient interface for batch job managem
 pip install canfar
 ```
 
-#### Basic Python Client Usage
+#### Basic Python API Usage
 
 ```python
 from canfar.sessions import Session
@@ -580,7 +508,7 @@ print(f"Submitted jobs: {job_ids}")
 ## Monitoring and Debugging
 
 !!! tip "Advanced: Debugging Batch Jobs"
-    - Use `canfar logs <session-id>` and `canfar stats <session-id>` for troubleshooting.
+    - Use `canfar logs [session-id]` and `canfar stats [session-id]` for troubleshooting.
     - For persistent issues, see [FAQ](../support/faq.md) and [Support](../support/index.md).
 
 ### Log Analysis
