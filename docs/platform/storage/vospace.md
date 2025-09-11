@@ -23,7 +23,7 @@ VOSpace is a distributed storage service that allows astronomers to:
 - **Access data** programmatically via standardized APIs
 - **Integrate** with Virtual Observatory tools and services
 
-### VOSpace vs Other Storage
+### Vault VOSpace vs ARC VOSpace vs Scratch
 
 | Feature | Vault | ARC Projects | ARC Home | Scratch |
 |---------|-----------------|--------------|----------|---------|
@@ -39,7 +39,9 @@ VOSpace is a distributed storage service that allows astronomers to:
 
 ### Accessing VOSpace
 
-1. **Navigate to**: [VOSpace File Manager](https://www.canfar.net/storage/vault/list/)
+1. **Navigate to**:
+    - [Vault VOSpace File Manager](https://www.canfar.net/storage/vault/list/)
+    - [ARC VOSpace File Manager](https://www.canfar.net/storage/arc/list/)
 2. **Login**: Use your CADC credentials
 3. **Browse**: Navigate through your space and shared spaces
 
@@ -1143,10 +1145,10 @@ client.timeout = 300  # 5 minutes
 # Check file permissions in Vault
 vls -l vos:[user]/file.fits
 # Check file permissions in ARC
-vls -l arc:projects/[project]/file.fits
+vls -l arc:home/[user]/script.py
 
 # Check directory access in Vault
-vls vos:project_name/
+vls vos:[project]/
 # Check directory access in ARC
 vls arc:projects/[project]/
 ```

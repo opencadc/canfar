@@ -19,7 +19,7 @@ CANFAR provides four distinct storage systems, each optimised for different stag
 | **Scratch**     | `/scratch/` | Fastest SSD | Session only | ❌ Wiped at end | ❌ None | Direct filesystem | High-speed temporary processing |
 | **ARC Home**    | `/arc/home/[user]/` | Shared CephFS | Personal | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Personal configs, scripts, small files |
 | **ARC Projects** | `/arc/projects/[project]/` | Shared CephFS | Shared group | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Active collaborative research |
-| **Vault**       | `vos:[project|user]/` | Medium | Personal/shared | ✅ Permanent | ✅ Geo-redundant | API/Web only | Long-term archives, data sharing |
+| **Vault**       | `vos:[project\|user]/` | Medium | Personal/shared | ✅ Permanent | ✅ Geo-redundant | API/Web only | Long-term archives, data sharing |
 
 ## 🔄 How Sessions Use Storage
 
@@ -191,14 +191,17 @@ Contact CANFAR support (`support@canfar.net`) with:
 
 | Session Type | ARC Access | Vault Access | Scratch | Best For |
 |--------------|------------|--------------|---------|----------|
-| **Notebook** | ✅ Direct filesystem | ⚠️ API/Web only | ✅ Direct | Interactive analysis |
-| **Desktop** | ✅ Direct filesystem | ⚠️ API/Web only | ✅ Direct | GUI applications |
-| **Batch Jobs** | ✅ Direct filesystem | ⚠️ API/Web only | ✅ Direct | Automated processing |
-| **External (via SSH)** | ✅ SSHFS mount | ✅ VOSpace API | ❌ Not available | Remote access |
+| **Notebook** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive analysis |
+| **Desktop** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | GUI applications |
+| **CARTA** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive visualization |
+| **Firefly** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive catalogue queries |
+| **Contributed** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Many, e.g. code development |
+| **Batch Jobs** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Automated processing |
+| **External (via SSH)** |  ⚠️ SSHFS mount | ✅ VOSpace API | ❌ Not available | Remote access |
 
 ### Authentication and Permissions
 
-- **ARC storage**: Automatic within sessions, SSHFS for external access
+- **ARC storage**: Automatic within sessions, SSHFS for external access, also requires CADC certificate if using the VOSpace `arc:`
 - **Vault**: Requires CADC certificate (`cadc-get-cert`)
 - **Group permissions**: Managed via CANFAR Group Management tools
 
