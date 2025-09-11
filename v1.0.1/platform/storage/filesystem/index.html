@@ -1,0 +1,2520 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CANFAR Science Platform">
+      
+      
+        <meta name="author" content="Shiny Brar">
+      
+      
+        <link rel="canonical" href="https://opencadc.github.io/canfar/v1.0.1/platform/storage/filesystem/">
+      
+      
+        <link rel="prev" href="../">
+      
+      
+        <link rel="next" href="../transfers/">
+      
+      
+      <link rel="icon" href="../../../static/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.16">
+    
+    
+      
+        <title>Filesystem - CANFAR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.7e37652d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../termynal.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#filesystem-access" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CANFAR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Filesystem
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="canfar" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../client/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Client
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../conduct/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contribute
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    CANFAR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Platform
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Platform
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Concepts
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../doi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    DOI
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud (legacy)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_7" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sessions/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Sessions
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_7" id="__nav_2_7_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_7">
+            <span class="md-nav__icon md-icon"></span>
+            Sessions
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Notebooks
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/carta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    CARTA
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/firefly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Firefly
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Desktop
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/batch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Batch
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/contributed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributed Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_8" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Storage
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            Storage
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Filesystem
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Filesystem
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#arc-storage-as-filesystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗂️ ARC Storage as Filesystems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-filesystem-access-within-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏠 Direct Filesystem Access (Within Sessions)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sshfs-remote-filesystem-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 SSHFS: Remote Filesystem Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-control-and-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Access Control and Permissions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization-and-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Optimization and Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 Integration Examples
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transfers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Transfers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../vospace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    VOSpace
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../containers/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Containers
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            Containers
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../containers/build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Building Containers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../containers/registry/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Registry
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_10" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../community/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Community
+    
+  </span>
+  
+
+            </a>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            Community
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../support/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    Support
+    
+  </span>
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            Support
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../support/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_12" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Releases
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            Releases
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../release-notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2025.1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../client/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Client
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../conduct/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    Contribute
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../about/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    About
+    
+  </span>
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#arc-storage-as-filesystems" class="md-nav__link">
+    <span class="md-ellipsis">
+      🗂️ ARC Storage as Filesystems
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#direct-filesystem-access-within-sessions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏠 Direct Filesystem Access (Within Sessions)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sshfs-remote-filesystem-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      🌐 SSHFS: Remote Filesystem Access
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-control-and-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔐 Access Control and Permissions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optimization-and-best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔧 Optimization and Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      🛠️ Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      🔗 Integration Examples
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/platform/storage/filesystem.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/platform/storage/filesystem.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+    </a>
+  
+
+
+<h1 id="filesystem-access">Filesystem Access<a class="headerlink" href="#filesystem-access" title="Permanent link">&para;</a></h1>
+<p><strong>CANFAR's ARC storage systems as filesystems, SSHFS mounting from external computers, and permission management.</strong></p>
+<div class="admonition abstract">
+<p class="admonition-title">🎯 Filesystem Guide Overview</p>
+<p><strong>Master direct storage access:</strong></p>
+<ul>
+<li><strong>Session Access</strong>: How ARC storage appears within CANFAR computing sessions</li>
+<li><strong>SSHFS Mounting</strong>: Accessing CANFAR storage from your local computer</li>
+<li><strong>Access Control Lists</strong>: Fine-grained permissions for collaborative research  </li>
+<li><strong>Performance Tips</strong>: Optimising filesystem operations and troubleshooting</li>
+</ul>
+</div>
+<p>ARC storage (Home and Projects) can be accessed as standard Unix filesystems both within CANFAR sessions and from external computers via SSHFS. This provides familiar file operations and integrates seamlessly with existing tools and workflows.</p>
+<h2 id="arc-storage-as-filesystems">🗂️ ARC Storage as Filesystems<a class="headerlink" href="#arc-storage-as-filesystems" title="Permanent link">&para;</a></h2>
+<h3 id="within-canfar-sessions">Within CANFAR Sessions<a class="headerlink" href="#within-canfar-sessions" title="Permanent link">&para;</a></h3>
+<p>When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage is automatically mounted as standard directories:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Automatic mounts in every session</span>
+/arc/home/<span class="o">[</span>user<span class="o">]</span>/<span class="w">          </span><span class="c1"># Your personal 10GB space</span>
+/arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="w">   </span><span class="c1"># Shared project spaces (if member)</span>
+/scratch/<span class="w">                  </span><span class="c1"># Temporary session storage</span>
+</code></pre></div>
+<h3 id="directory-structure-and-conventions">Directory Structure and Conventions<a class="headerlink" href="#directory-structure-and-conventions" title="Permanent link">&para;</a></h3>
+<h4 id="arc-home-directory-archomeuser">ARC Home Directory (<code>/arc/home/[user]/</code>)<a class="headerlink" href="#arc-home-directory-archomeuser" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>/arc/home/[user]/
+├── .ssh/                    # SSH keys and config
+│   ├── authorized_keys      # Public keys for SSHFS access
+│   └── config              # SSH client configuration
+├── .jupyter/               # Jupyter configuration
+├── .bashrc                 # Shell configuration
+├── .profile                # Environment setup
+├── bin/                    # Personal scripts and tools
+├── config/                 # Application configurations
+└── work/                   # Personal analysis work
+</code></pre></div>
+<p><strong>Recommended Use:</strong>
+- Configuration files and dotfiles
+- Personal scripts and utilities
+- SSH keys for external access
+- Small reference files and notes</p>
+<h4 id="arc-projects-directory-arcprojectsproject">ARC Projects Directory (<code>/arc/projects/[project]/</code>)<a class="headerlink" href="#arc-projects-directory-arcprojectsproject" title="Permanent link">&para;</a></h4>
+<p>Used for team project use. For example, for a propcessing pipeline analysis:
+<div class="highlight"><pre><span></span><code>/arc/projects/[project]/
+├── data/
+│   ├── raw/                # Original datasets
+│   ├── processed/          # Reduced/calibrated data
+│   ├── catalogs/           # Reference catalogs
+│   └── archives/           # Archived datasets
+├── code/
+│   ├── pipelines/          # Data processing workflows  
+│   ├── analysis/           # Analysis scripts
+│   ├── notebooks/          # Jupyter notebooks
+│   └── tools/              # Project-specific utilities
+├── results/
+│   ├── plots/              # Figures and visualisations
+│   ├── tables/             # Output catalogues and measurements
+│   ├── papers/             # Manuscripts and drafts
+│   └── presentations/      # Conference materials
+├── docs/
+│   ├── README.md           # Project documentation
+│   ├── data_notes.md       # Dataset descriptions
+│   └── procedures.md       # Analysis procedures
+└── scratch_archive/        # Backed up scratch work
+</code></pre></div></p>
+<h2 id="direct-filesystem-access-within-sessions">🏠 Direct Filesystem Access (Within Sessions)<a class="headerlink" href="#direct-filesystem-access-within-sessions" title="Permanent link">&para;</a></h2>
+<h3 id="basic-operations">Basic Operations<a class="headerlink" href="#basic-operations" title="Permanent link">&para;</a></h3>
+<p>All standard Unix filesystem commands work directly:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Navigation</span>
+<span class="nb">cd</span><span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+<span class="nb">pwd</span>
+ls<span class="w"> </span>-la
+
+<span class="c1"># File operations</span>
+cp<span class="w"> </span>source.fits<span class="w"> </span>destination.fits
+mv<span class="w"> </span>old_name.fits<span class="w"> </span>new_name.fits
+rm<span class="w"> </span>unwanted_file.fits
+
+<span class="c1"># Directory operations</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>data/2024/observations/
+rmdir<span class="w"> </span>empty_directory/
+find<span class="w"> </span>.<span class="w"> </span>-name<span class="w"> </span><span class="s2">&quot;*.fits&quot;</span><span class="w"> </span>-type<span class="w"> </span>f
+
+<span class="c1"># Permissions</span>
+chmod<span class="w"> </span><span class="m">644</span><span class="w"> </span>data_file.fits<span class="w">          </span><span class="c1"># Read/write owner, read others</span>
+chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>analysis_script.py<span class="w">      </span><span class="c1"># Executable script</span>
+chgrp<span class="w"> </span>projectgroup<span class="w"> </span>shared_data/<span class="w">   </span><span class="c1"># Change group ownership</span>
+</code></pre></div>
+<h3 id="working-with-large-datasets">Working with Large Datasets<a class="headerlink" href="#working-with-large-datasets" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check available space</span>
+df<span class="w"> </span>-h<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+df<span class="w"> </span>-h<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/
+
+<span class="c1"># Monitor space usage</span>
+du<span class="w"> </span>-sh<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/*
+du<span class="w"> </span>-h<span class="w"> </span>--max-depth<span class="o">=</span><span class="m">2</span><span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Efficient data movement</span>
+rsync<span class="w"> </span>-avP<span class="w"> </span>/scratch/processed_data/<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/results/
+
+<span class="c1"># Archive old data</span>
+tar<span class="w"> </span>-czf<span class="w"> </span>old_observations_2023.tar.gz<span class="w"> </span>data/2023/
+mv<span class="w"> </span>old_observations_2023.tar.gz<span class="w"> </span>archives/
+</code></pre></div>
+<h3 id="linking-and-shortcuts">Linking and Shortcuts<a class="headerlink" href="#linking-and-shortcuts" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create symbolic links for easy access</span>
+ln<span class="w"> </span>-s<span class="w"> </span>/arc/projects/survey/data/master_catalogue.fits<span class="w"> </span>~/current_catalogue.fits
+ln<span class="w"> </span>-s<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="w"> </span>~/project
+
+<span class="c1"># Hard links (same filesystem only)</span>
+ln<span class="w"> </span>/arc/projects/shared/reference.fits<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/my_reference.fits
+
+<span class="c1"># Quick navigation with variables</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PROJECT_DIR</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[project]&quot;</span>
+<span class="nb">cd</span><span class="w"> </span><span class="nv">$PROJECT_DIR</span>/data
+</code></pre></div>
+<h2 id="sshfs-remote-filesystem-access">🌐 SSHFS: Remote Filesystem Access<a class="headerlink" href="#sshfs-remote-filesystem-access" title="Permanent link">&para;</a></h2>
+<p>SSHFS allows you to mount CANFAR's ARC storage on your local computer as if it were a local directory, enabling seamless integration with local tools and workflows.</p>
+<h3 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h3>
+<h4 id="local-computer-setup">Local Computer Setup<a class="headerlink" href="#local-computer-setup" title="Permanent link">&para;</a></h4>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">macOS</label><label for="__tabbed_1_2">Linux (Ubuntu/Debian)</label><label for="__tabbed_1_3">Linux (Fedora/RedHat)</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Install macFUSE and SSHFS</span>
+brew<span class="w"> </span>install<span class="w"> </span>--cask<span class="w"> </span>macfuse
+brew<span class="w"> </span>install<span class="w"> </span>sshfs
+
+<span class="c1"># Restart or logout/login after installation</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Install SSHFS</span>
+sudo<span class="w"> </span>apt<span class="w"> </span>update
+sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>sshfs
+
+<span class="c1"># Add user to fuse group</span>
+sudo<span class="w"> </span>usermod<span class="w"> </span>-a<span class="w"> </span>-G<span class="w"> </span>fuse<span class="w"> </span><span class="nv">$USER</span>
+<span class="c1"># Logout and login again</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code><span class="c1"># Install SSHFS</span>
+sudo<span class="w"> </span>dnf<span class="w"> </span>install<span class="w"> </span>sshfs
+
+<span class="c1"># Add user to fuse group</span>
+sudo<span class="w"> </span>usermod<span class="w"> </span>-a<span class="w"> </span>-G<span class="w"> </span>fuse<span class="w"> </span><span class="nv">$USER</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h4 id="canfar-side-setup">CANFAR Side Setup<a class="headerlink" href="#canfar-side-setup" title="Permanent link">&para;</a></h4>
+<p>You need to set up SSH key authentication on your CANFAR account:</p>
+<ol>
+<li>
+<p><strong>Create SSH key pair</strong> (on your local computer):
+   <div class="highlight"><pre><span></span><code>ssh-keygen<span class="w"> </span>-t<span class="w"> </span>rsa<span class="w"> </span>-b<span class="w"> </span><span class="m">4096</span><span class="w"> </span>-f<span class="w"> </span>~/.ssh/canfar_key
+<span class="c1"># Enter passphrase when prompted (recommended)</span>
+</code></pre></div></p>
+</li>
+<li>
+<p><strong>Upload public key to CANFAR</strong>:</p>
+</li>
+</ol>
+<p><strong>Method 1: Via Web Interface</strong>
+   - Navigate to <a href="https://www.canfar.net/storage/arc/list/home">ARC File Manager</a>
+   - Go to your home directory
+   - Create <code>.ssh</code> folder if it doesn't exist
+   - Upload your <code>~/.ssh/canfar_key.pub</code> as <code>authorized_keys</code></p>
+<p><strong>Method 2: Via existing session</strong>
+   <div class="highlight"><pre><span></span><code><span class="c1"># In a CANFAR session, copy your public key content to:</span>
+mkdir<span class="w"> </span>-p<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/.ssh
+<span class="c1"># Paste your public key content into authorized_keys file</span>
+nano<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/.ssh/authorized_keys
+chmod<span class="w"> </span><span class="m">700</span><span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/.ssh
+chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/.ssh/authorized_keys
+</code></pre></div></p>
+<h3 id="mounting-arc-storage">Mounting ARC Storage<a class="headerlink" href="#mounting-arc-storage" title="Permanent link">&para;</a></h3>
+<h4 id="basic-mount">Basic Mount<a class="headerlink" href="#basic-mount" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create local mount point</span>
+mkdir<span class="w"> </span>~/canfar_arc
+
+<span class="c1"># Mount ARC storage</span>
+sshfs<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span>-i<span class="w"> </span>~/.ssh/canfar_key<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span>~/canfar_arc/
+
+<span class="c1"># On macOS, add defer_permissions option:</span>
+sshfs<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span>-i<span class="w"> </span>~/.ssh/canfar_key<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span>,defer_permissions<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span>~/canfar_arc/
+</code></pre></div>
+<h4 id="advanced-mount-options">Advanced Mount Options<a class="headerlink" href="#advanced-mount-options" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Mount with optimizations for large files</span>
+sshfs<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span>-i<span class="w"> </span>~/.ssh/canfar_key<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span><span class="nv">cache</span><span class="o">=</span>yes,kernel_cache,compression<span class="o">=</span>yes<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span><span class="nv">Ciphers</span><span class="o">=</span>aes128-ctr<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span>~/canfar_arc/
+
+<span class="c1"># Mount specific project only</span>
+sshfs<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span>-i<span class="w"> </span>~/.ssh/canfar_key<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/arc/projects/<span class="o">[</span>project<span class="o">]</span><span class="w"> </span>~/project_mount/
+</code></pre></div>
+<h4 id="connection-configuration">Connection Configuration<a class="headerlink" href="#connection-configuration" title="Permanent link">&para;</a></h4>
+<p>Create <code>~/.ssh/config</code> for easier connections:</p>
+<div class="highlight"><pre><span></span><code>Host canfar
+    HostName ws-uv.canfar.net
+    Port 64022
+    User [user]
+    IdentityFile ~/.ssh/canfar_key
+    ServerAliveInterval 15
+    ServerAliveCountMax 10
+    Compression yes
+</code></pre></div>
+<p>Then mount with simpler command:
+<div class="highlight"><pre><span></span><code>sshfs<span class="w"> </span>canfar:/<span class="w"> </span>~/canfar_arc/
+</code></pre></div></p>
+<h3 id="using-mounted-storage">Using Mounted Storage<a class="headerlink" href="#using-mounted-storage" title="Permanent link">&para;</a></h3>
+<p>Once mounted, use CANFAR storage like any local directory:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Navigate to your project</span>
+<span class="nb">cd</span><span class="w"> </span>~/canfar_arc/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Copy files from local to CANFAR</span>
+cp<span class="w"> </span>~/local_analysis.py<span class="w"> </span>~/canfar_arc/arc/projects/<span class="o">[</span>project<span class="o">]</span>/code/
+
+<span class="c1"># Edit files with local editor</span>
+code<span class="w"> </span>~/canfar_arc/arc/home/<span class="o">[</span>user<span class="o">]</span>/.bashrc
+
+<span class="c1"># Run local tools on CANFAR data</span>
+python<span class="w"> </span>analyze_data.py<span class="w"> </span>~/canfar_arc/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data/observations.fits
+
+<span class="c1"># Sync directories</span>
+rsync<span class="w"> </span>-avz<span class="w"> </span>~/local_scripts/<span class="w"> </span>~/canfar_arc/arc/projects/<span class="o">[</span>project<span class="o">]</span>/code/
+</code></pre></div>
+<h3 id="unmounting">Unmounting<a class="headerlink" href="#unmounting" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Unmount when finished</span>
+umount<span class="w"> </span>~/canfar_arc
+<span class="c1"># or on macOS:</span>
+diskutil<span class="w"> </span>unmount<span class="w"> </span>~/canfar_arc
+
+<span class="c1"># Force unmount if needed</span>
+umount<span class="w"> </span>-f<span class="w"> </span>~/canfar_arc
+<span class="c1"># or</span>
+fusermount<span class="w"> </span>-u<span class="w"> </span>~/canfar_arc
+</code></pre></div>
+<h2 id="access-control-and-permissions">🔐 Access Control and Permissions<a class="headerlink" href="#access-control-and-permissions" title="Permanent link">&para;</a></h2>
+<h3 id="understanding-arc-permissions">Understanding ARC Permissions<a class="headerlink" href="#understanding-arc-permissions" title="Permanent link">&para;</a></h3>
+<p>ARC storage uses traditional Unix permissions combined with group-based access control:</p>
+<h4 id="permission-types">Permission Types<a class="headerlink" href="#permission-types" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># View detailed permissions</span>
+ls<span class="w"> </span>-l<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Example output:</span>
+<span class="c1"># drwxrwxr--  projectgroup  data/</span>
+<span class="c1"># -rw-rw-r--  projectgroup  analysis.py</span>
+<span class="c1"># -rwx------  username      private_script.py</span>
+
+<span class="c1"># Permission breakdown:</span>
+<span class="c1"># d = directory, - = file</span>
+<span class="c1"># rwx = owner permissions (read/write/execute)</span>
+<span class="c1"># rwx = group permissions  </span>
+<span class="c1"># r-- = other permissions</span>
+</code></pre></div>
+<h4 id="user-and-group-information">User and Group Information<a class="headerlink" href="#user-and-group-information" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check your user ID and groups</span>
+id
+whoami
+groups
+
+<span class="c1"># Check file ownership</span>
+stat<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/somefile.fits
+
+<span class="c1"># View group membership</span>
+getent<span class="w"> </span>group<span class="w"> </span><span class="o">[</span>project<span class="o">]</span>
+</code></pre></div>
+<h3 id="managing-permissions">Managing Permissions<a class="headerlink" href="#managing-permissions" title="Permanent link">&para;</a></h3>
+<h4 id="setting-file-permissions">Setting File Permissions<a class="headerlink" href="#setting-file-permissions" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Make file readable by group</span>
+chmod<span class="w"> </span>g+r<span class="w"> </span>data_file.fits
+
+<span class="c1"># Make script executable</span>
+chmod<span class="w"> </span>+x<span class="w"> </span>analysis_script.py
+
+<span class="c1"># Set specific permission modes</span>
+chmod<span class="w"> </span><span class="m">664</span><span class="w"> </span>shared_data.fits<span class="w">     </span><span class="c1"># rw-rw-r--</span>
+chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>public_script.py<span class="w">     </span><span class="c1"># rwxr-xr-x</span>
+chmod<span class="w"> </span><span class="m">600</span><span class="w"> </span>private_config.txt<span class="w">   </span><span class="c1"># rw-------</span>
+
+<span class="c1"># Recursive permission changes</span>
+chmod<span class="w"> </span>-R<span class="w"> </span>g+rw<span class="w"> </span>shared_directory/
+</code></pre></div>
+<h4 id="group-management">Group Management<a class="headerlink" href="#group-management" title="Permanent link">&para;</a></h4>
+<p>Group membership is managed through CANFAR's Group Management system:</p>
+<ol>
+<li><strong>Navigate to</strong>: <a href="https://www.canfar.net/groups/">Group Management</a></li>
+<li><strong>Create or modify groups</strong>: Add/remove users from project groups</li>
+<li><strong>Apply permissions</strong>: Use <code>chgrp</code> to assign files to groups</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="c1"># Change group ownership</span>
+chgrp<span class="w"> </span>projectgroup<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared_data.fits
+
+<span class="c1"># Change recursively</span>
+chgrp<span class="w"> </span>-R<span class="w"> </span>projectgroup<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared_results/
+
+<span class="c1"># Set default group for new files in directory</span>
+chmod<span class="w"> </span>g+s<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared_directory/
+</code></pre></div>
+<h3 id="access-control-lists-acls">Access Control Lists (ACLs)<a class="headerlink" href="#access-control-lists-acls" title="Permanent link">&para;</a></h3>
+<p>For fine-grained permissions beyond standard Unix permissions:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># View current ACLs</span>
+getfacl<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/sensitive_data.fits
+
+<span class="c1"># Set ACL for specific user</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>u:collaborator:r<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data.fits
+
+<span class="c1"># Set ACL for group</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>g:external_collaborators:r<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Remove ACL</span>
+setfacl<span class="w"> </span>-x<span class="w"> </span>u:former_collaborator<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data.fits
+
+<span class="c1"># Set default ACLs for directory</span>
+setfacl<span class="w"> </span>-d<span class="w"> </span>-m<span class="w"> </span>g:projectgroup:rw<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared/
+</code></pre></div>
+<h2 id="optimization-and-best-practices">🔧 Optimization and Best Practices<a class="headerlink" href="#optimization-and-best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
+<h4 id="local-filesystem-operations">Local Filesystem Operations<a class="headerlink" href="#local-filesystem-operations" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use rsync for efficient synchronization</span>
+rsync<span class="w"> </span>-avz<span class="w"> </span>--progress<span class="w"> </span>~/local_data/<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/backup/
+
+<span class="c1"># Monitor I/O performance</span>
+iostat<span class="w"> </span>-x<span class="w"> </span><span class="m">1</span><span class="w">    </span><span class="c1"># Live I/O statistics</span>
+iotop<span class="w">          </span><span class="c1"># Process I/O usage</span>
+
+<span class="c1"># Optimize for large files</span>
+<span class="c1"># Use /scratch/ for intensive processing</span>
+cp<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/large_dataset.fits<span class="w"> </span>/scratch/
+process_data<span class="w"> </span>/scratch/large_dataset.fits
+cp<span class="w"> </span>/scratch/results.fits<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/outputs/
+</code></pre></div>
+<h4 id="sshfs-performance-tips">SSHFS Performance Tips<a class="headerlink" href="#sshfs-performance-tips" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Optimize SSHFS for different use cases</span>
+
+<span class="c1"># For frequent small file access:</span>
+sshfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">cache</span><span class="o">=</span>yes,kernel_cache,attr_timeout<span class="o">=</span><span class="m">3600</span>,entry_timeout<span class="o">=</span><span class="m">3600</span><span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>canfar:/<span class="w"> </span>~/canfar_arc/
+
+<span class="c1"># For large file transfers:</span>
+sshfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">cache</span><span class="o">=</span>no,compression<span class="o">=</span>yes,Ciphers<span class="o">=</span>aes128-ctr<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>canfar:/<span class="w"> </span>~/canfar_arc/
+
+<span class="c1"># For read-only access (faster):</span>
+sshfs<span class="w"> </span>-o<span class="w"> </span>ro,cache<span class="o">=</span>yes,kernel_cache<span class="w"> </span><span class="se">\</span>
+<span class="w">      </span>canfar:/<span class="w"> </span>~/canfar_arc/
+</code></pre></div>
+<h3 id="workflow-integration">Workflow Integration<a class="headerlink" href="#workflow-integration" title="Permanent link">&para;</a></h3>
+<h4 id="local-development-with-canfar-data">Local Development with CANFAR Data<a class="headerlink" href="#local-development-with-canfar-data" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Create development environment</span>
+mkdir<span class="w"> </span>~/canfar_project/
+<span class="nb">cd</span><span class="w"> </span>~/canfar_project/
+
+<span class="c1"># Mount CANFAR storage as subdirectory</span>
+mkdir<span class="w"> </span>canfar_data
+sshfs<span class="w"> </span>canfar:/arc/projects/<span class="o">[</span>project<span class="o">]</span><span class="w"> </span>canfar_data/
+
+<span class="c1"># Create local working directory</span>
+mkdir<span class="w"> </span>local_work
+<span class="nb">cd</span><span class="w"> </span>local_work
+
+<span class="c1"># Symlink to CANFAR data for easy access</span>
+ln<span class="w"> </span>-s<span class="w"> </span>../canfar_data/data<span class="w"> </span>./data
+ln<span class="w"> </span>-s<span class="w"> </span>../canfar_data/code<span class="w"> </span>./shared_code
+
+<span class="c1"># Work locally with CANFAR data</span>
+python<span class="w"> </span>shared_code/analysis.py<span class="w"> </span>data/observations.fits
+</code></pre></div>
+<h4 id="automated-backup-scripts">Automated Backup Scripts<a class="headerlink" href="#automated-backup-scripts" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># backup_to_canfar.sh - Automated backup script</span>
+
+<span class="nv">LOCAL_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/important_work&quot;</span>
+<span class="nv">CANFAR_MOUNT</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/canfar_arc&quot;</span>
+<span class="nv">BACKUP_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$CANFAR_MOUNT</span><span class="s2">/arc/home/[user]/backups&quot;</span>
+
+<span class="c1"># Check if CANFAR is mounted</span>
+<span class="k">if</span><span class="w"> </span>!<span class="w"> </span>mountpoint<span class="w"> </span>-q<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CANFAR_MOUNT</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">    </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Mounting CANFAR storage...&quot;</span>
+<span class="w">    </span>sshfs<span class="w"> </span>canfar:/<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CANFAR_MOUNT</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="c1"># Create backup with timestamp</span>
+<span class="nv">DATE</span><span class="o">=</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d_%H%M%S<span class="k">)</span>
+<span class="nv">BACKUP_PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BACKUP_DIR</span><span class="s2">/backup_</span><span class="nv">$DATE</span><span class="s2">&quot;</span>
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Creating backup: </span><span class="nv">$BACKUP_PATH</span><span class="s2">&quot;</span>
+rsync<span class="w"> </span>-avz<span class="w"> </span>--progress<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_DIR</span><span class="s2">/&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BACKUP_PATH</span><span class="s2">/&quot;</span>
+
+<span class="c1"># Keep only last 5 backups</span>
+<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$BACKUP_DIR</span><span class="s2">&quot;</span>
+ls<span class="w"> </span>-t<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-n<span class="w"> </span>+6<span class="w"> </span><span class="p">|</span><span class="w"> </span>xargs<span class="w"> </span>rm<span class="w"> </span>-rf
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Backup completed successfully&quot;</span>
+</code></pre></div>
+<h2 id="troubleshooting">🛠️ Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="common-issues-and-solutions">Common Issues and Solutions<a class="headerlink" href="#common-issues-and-solutions" title="Permanent link">&para;</a></h3>
+<h4 id="sshfs-connection-problems">SSHFS Connection Problems<a class="headerlink" href="#sshfs-connection-problems" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Debug SSHFS connection</span>
+sshfs<span class="w"> </span>-d<span class="w"> </span>-o<span class="w"> </span>reconnect,ServerAliveInterval<span class="o">=</span><span class="m">15</span>,ServerAliveCountMax<span class="o">=</span><span class="m">10</span>,defer_permissions<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span><span class="nv">$HOME</span>/canfar_arc
+<span class="c1"># Check mount status</span>
+mount<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>sshfs
+df<span class="w"> </span>-h<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>sshfs
+</code></pre></div>
+<h4 id="permission-denied-errors">Permission Denied Errors<a class="headerlink" href="#permission-denied-errors" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check your group membership</span>
+groups
+id
+
+<span class="c1"># Verify file permissions</span>
+ls<span class="w"> </span>-la<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/problematic_file
+
+<span class="c1"># Check directory execute permissions</span>
+ls<span class="w"> </span>-ld<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+</code></pre></div>
+<h4 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check filesystem I/O</span>
+iostat<span class="w"> </span>-x<span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># Monitor network usage (for SSHFS)</span>
+netstat<span class="w"> </span>-i
+iftop
+
+<span class="c1"># Test SSHFS performance</span>
+<span class="nb">time</span><span class="w"> </span>ls<span class="w"> </span>-la<span class="w"> </span>~/canfar_arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Remount with performance options</span>
+umount<span class="w"> </span>~/canfar_arc
+sshfs<span class="w"> </span>-o<span class="w"> </span><span class="nv">cache</span><span class="o">=</span>yes,compression<span class="o">=</span>yes<span class="w"> </span>canfar:/<span class="w"> </span>~/canfar_arc/
+</code></pre></div>
+<h4 id="storage-space-issues">Storage Space Issues<a class="headerlink" href="#storage-space-issues" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check quota usage</span>
+df<span class="w"> </span>-h<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/
+df<span class="w"> </span>-h<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+
+<span class="c1"># Find large files</span>
+find<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]]</span>/<span class="w"> </span>-type<span class="w"> </span>f<span class="w"> </span>-size<span class="w"> </span>+100M<span class="w"> </span>-exec<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span><span class="o">{}</span><span class="w"> </span><span class="se">\;</span>
+
+<span class="c1"># Clean up space</span>
+du<span class="w"> </span>-sh<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/*<span class="w"> </span><span class="p">|</span><span class="w"> </span>sort<span class="w"> </span>-hr
+<span class="c1"># Remove or archive large unnecessary files</span>
+</code></pre></div>
+<h3 id="diagnostic-commands">Diagnostic Commands<a class="headerlink" href="#diagnostic-commands" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># System information</span>
+uname<span class="w"> </span>-a
+mount<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>arc
+df<span class="w"> </span>-h
+
+<span class="c1"># Network connectivity</span>
+ping<span class="w"> </span>ws-uv.canfar.net
+telnet<span class="w"> </span>ws-uv.canfar.net<span class="w"> </span><span class="m">64022</span>
+
+<span class="c1"># SSH key verification</span>
+ssh-keygen<span class="w"> </span>-lf<span class="w"> </span>~/.ssh/canfar_key.pub
+ssh-add<span class="w"> </span>-l
+
+<span class="c1"># SSHFS troubleshooting</span>
+fusermount<span class="w"> </span>-V
+sshfs<span class="w"> </span>--version
+
+<span class="c1"># Permission debugging</span>
+getfacl<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
+namei<span class="w"> </span>-l<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/path/to/file
+</code></pre></div>
+<h2 id="integration-examples">🔗 Integration Examples<a class="headerlink" href="#integration-examples" title="Permanent link">&para;</a></h2>
+<h3 id="ide-and-editor-integration">IDE and Editor Integration<a class="headerlink" href="#ide-and-editor-integration" title="Permanent link">&para;</a></h3>
+<h4 id="vs-code-with-remote-filesystem">VS Code with Remote Filesystem<a class="headerlink" href="#vs-code-with-remote-filesystem" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1">// .vscode/settings.json</span>
+<span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;python.defaultInterpreterPath&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/usr/bin/python&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;files.watcherExclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;**/canfar_arc/**&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">},</span>
+<span class="w">    </span><span class="nt">&quot;search.exclude&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">&quot;**/canfar_arc/**&quot;</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="jupyter-lab-with-sshfs">Jupyter Lab with SSHFS<a class="headerlink" href="#jupyter-lab-with-sshfs" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># In Jupyter Lab, access CANFAR data via mounted filesystem on your laptop</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
+
+<span class="c1"># Read data from mounted CANFAR storage</span>
+<span class="n">data_path</span> <span class="o">=</span> <span class="s2">&quot;$HOME/canfar_arc/arc/projects/[project]/data/&quot;</span>
+<span class="n">catalog</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2">/catalog.csv&quot;</span><span class="p">)</span>
+
+<span class="c1"># Process and save results back to CANFAR</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">process_data</span><span class="p">(</span><span class="n">catalog</span><span class="p">)</span>
+<span class="n">results</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2">/processed_catalog.csv&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="automated-workflows">Automated Workflows<a class="headerlink" href="#automated-workflows" title="Permanent link">&para;</a></h3>
+<h4 id="git-repository-sync">Git Repository Sync<a class="headerlink" href="#git-repository-sync" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
+<span class="c1"># sync_code_to_canfar.sh</span>
+
+<span class="nv">LOCAL_REPO</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/my_analysis_code&quot;</span>
+<span class="nv">CANFAR_CODE</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/canfar_arc/arc/projects/[project]/code&quot;</span>
+
+<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$LOCAL_REPO</span><span class="s2">&quot;</span>
+
+<span class="c1"># Push local changes to git</span>
+git<span class="w"> </span>add<span class="w"> </span>.
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Update analysis code&quot;</span>
+git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+
+<span class="c1"># Sync to CANFAR</span>
+rsync<span class="w"> </span>-avz<span class="w"> </span>--exclude<span class="o">=</span><span class="s1">&#39;.git&#39;</span><span class="w"> </span>.<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CANFAR_CODE</span><span class="s2">/&quot;</span>
+
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Code synchronized to CANFAR&quot;</span>
+</code></pre></div>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 17:54:11 UTC">September 11, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2025 00:42:40 UTC">September 5, 2025</span>
+  </span>
+
+    
+    
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Let us know how we can improve this page.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/opencadc/canfar" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/canfar" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://images.canfar.net" target="_blank" rel="noopener" title="images.canfar.net" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/vcCQ8QBvBa" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:support@canfar.net" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.0.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path fill="currentColor" d="M536.4-26.3c9.8-3.5 20.6-1 28 6.3s9.8 18.2 6.3 28l-178 496.9c-5 13.9-18.1 23.1-32.8 23.1-14.2 0-27-8.6-32.3-21.7l-64.2-158c-4.5-11-2.5-23.6 5.2-32.6l94.5-112.4c5.1-6.1 4.7-15-.9-20.6s-14.6-6-20.6-.9l-112.4 94.3c-9.1 7.6-21.6 9.6-32.6 5.2L38.1 216.8c-13.1-5.3-21.7-18.1-21.7-32.3 0-14.7 9.2-27.8 23.1-32.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.instant.progress", "navigation.prune", "navigation.sections", "navigation.tracking", "navigation.indexes", "navigation.expand", "navigation.instant.prefetch", "toc.follow", "navigation.top", "announce.dismiss", "content.code.annotate", "content.action.edit", "content.action.view", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.50899def.min.js"></script>
+      
+        <script src="../../../termynal.js"></script>
+      
+    
+  </body>
+</html>
