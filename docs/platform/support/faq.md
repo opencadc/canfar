@@ -1,11 +1,5 @@
 # Frequently Asked Questions
 
-**Answers to common questions about the CANFAR Science Platform across all areas.**
-
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Quick Navigation"
     **Find answers by topic:**
     

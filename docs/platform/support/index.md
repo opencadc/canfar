@@ -1,11 +1,5 @@
 # Getting Help and Support
 
-**Support resources for CANFAR users - from self-service documentation to direct technical assistance.**
-
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Support Resources Overview"
     **Find the help you need:**
     
@@ -91,7 +85,7 @@ getfacl /arc/projects/[project]/
 
 !!! tip "Advanced: Optimising Performance"
     - Use [Batch Jobs](../sessions/batch.md) for large-scale or automated processing.
-    - Monitor session resource usage with `canfar stats` and [session info](../cli/cli-help.md#canfar-info).
+    - Monitor session resource usage with [`canfar info [session-id]`](../../cli/cli-help.md#canfar-info).
     - Store temporary files in `/scratch/` for faster I/O.
     - For parallel workloads, see [Distributed Computing](../../client/helpers.md).
 

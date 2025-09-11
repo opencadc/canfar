@@ -2,10 +2,6 @@
 
 **Creating your own astronomy software environments for CANFAR - from development through deployment and maintenance.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Container Building Overview"
     **Master custom container development:**
     

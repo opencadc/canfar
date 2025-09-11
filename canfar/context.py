@@ -13,8 +13,13 @@ if TYPE_CHECKING:
 class Context(HTTPClient):
     """CANFAR Context.
 
-    Args:
-        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.
+    This class is a subclass of the `HTTPClient` class and inherits its
+    attributes and methods.
+
+    Examples:
+        >>> from canfar.context import Context
+        >>> context = Context()
+        >>> context.resources()
     """
 
     def resources(self) -> dict[str, Any]:

@@ -22,10 +22,8 @@ class Session(HTTPClient):
 
     This class provides methods to manage sessions, including fetching
     session details, creating new sessions, retrieving logs, and
-    destroying existing sessions.
-
-    Args:
-        HTTPClient (canfar.client.HTTPClient): Base HTTP client for making API requests.
+    destroying existing sessions. It is a subclass of the `HTTPClient`
+    class and inherits its attributes and methods.
 
     Examples:
         >>> from canfar.session import Session
@@ -386,8 +384,8 @@ class AsyncSession(HTTPClient):
     including fetching session details, creating new sessions,
     retrieving logs, and destroying existing sessions.
 
-    Args:
-        HTTPClient (canfar.client.HTTPClient): Base HTTP client for making API requests.
+    This class is a subclass of the `HTTPClient` class and inherits its
+    attributes and methods.
 
     Examples:
         >>> from canfar.session import AsyncSession

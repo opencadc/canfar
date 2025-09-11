@@ -21,8 +21,14 @@ log = get_logger(__name__)
 class Overview(HTTPClient):
     """Overview of the CANFAR Server.
 
-    Args:
-        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.
+    This class is a subclass of the `HTTPClient` class and inherits its
+    attributes and methods.
+
+    Examples:
+        >>> from canfar.overview import Overview
+        >>> overview = Overview()
+        >>> overview.availability()
+        True
     """
 
     @model_validator(mode="after")

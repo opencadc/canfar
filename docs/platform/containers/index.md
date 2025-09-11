@@ -2,10 +2,6 @@
 
 **Working and building software containers on CANFAR.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Container Guide Overview"
     **Master CANFAR's containerized environments:**
     

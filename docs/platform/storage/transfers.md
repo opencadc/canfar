@@ -2,10 +2,6 @@
 
 **Moving data between CANFAR storage systems, external sources, and your local computer.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Transfer Methods Overview"
     **Efficient data movement strategies:**
     

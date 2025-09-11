@@ -2,10 +2,6 @@
 
 **Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.**
 
-!!! info "Platform Navigation"
-  **Platform Sections:**  
-  **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/)** | **[Storage](../storage/)** | **[Containers](../containers/)** | **[Support](../support/)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Registry Management Overview"
 
   **Master Harbor registry operations:**

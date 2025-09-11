@@ -16,11 +16,13 @@ log = get_logger(__name__)
 class Images(HTTPClient):
     """CANFAR Image Management.
 
-    Args:
-        HTTPClient (canfar.client.HTTPClient): Configured HTTP Client.
+    This class is a subclass of the `HTTPClient` class and inherits its
+    attributes and methods.
 
-    Returns:
-        Images: CANFAR Image Management Object.
+    Examples:
+        >>> from canfar.images import Images
+        >>> images = Images()
+        >>> images.fetch()
     """
 
     def fetch(self, kind: str | None = None) -> list[str]:

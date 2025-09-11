@@ -2,10 +2,6 @@
 
 **CANFAR's ARC storage systems as filesystems, SSHFS mounting from external computers, and permission management.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
-
 !!! abstract "🎯 Filesystem Guide Overview"
     **Master direct storage access:**
     

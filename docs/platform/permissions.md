@@ -2,10 +2,6 @@
 
 **Accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
-
 !!! abstract "🎯 Permission System Overview"
     **Essential access control concepts for all users:**
     

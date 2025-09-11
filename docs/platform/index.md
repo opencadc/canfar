@@ -3,10 +3,6 @@
 
 The Canadian Advanced Network for Astronomy Research lets you access software environments and large datasets on the cloud designed specifically for astronomical research.
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
-
 !!! abstract "🚀 Platform Overview"
     - **Scalable** cloud compute and storage to analyze very large datasets from anywhere.
     - **Browser-based** interactive environments for instant, device-independent data exploration.

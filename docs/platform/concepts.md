@@ -2,10 +2,6 @@
 
 **Understanding the architecture and core concepts behind the CANFAR Science Platform for astronomical research.**
 
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](./)** | **[Get Started](get-started.md)** | **[Concepts](concepts.md)** | **[Sessions](sessions/)** | **[Storage](storage/)** | **[Containers](containers/)** | **[Support](support/)** | **[Permissions](permissions.md)** | **[DOI](doi.md)**
-
 !!! abstract "🎯 Core Concepts"
     **Essential platform knowledge for all users:**
     
@@ -591,7 +587,7 @@ CANFAR provides REST APIs for programmatic access, enabling automation and integ
 | Service | Purpose | Documentation |
 |---------|---------|---------------|
 | **Session Management** | Launch, monitor, and control computing sessions | [Python Client](../client/home.md) |
-| **VOSpace Operations** | File transfer, storage, and metadata operations | [VOSpace API](../storage/vospace.md#python-api) |
+| **VOSpace Operations** | File transfer, storage, and metadata operations | [VOSpace API](storage/vospace.md) |
 | **Access Control** | Authentication and authorization management | [CADC Services](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/ac) |
 
 ### Automation Examples

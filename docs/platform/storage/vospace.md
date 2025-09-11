@@ -1,10 +1,4 @@
-# Storage 
-
-**Long-term storage, data sharing, and archiving - tools, Python API, and web interface.**
-
-!!! info "Platform Navigation"
-    **Platform Sections:**  
-    **[Home](../)** | **[Get Started](../get-started.md)** | **[Concepts](../concepts.md)** | **[Sessions](../sessions/index.md)** | **[Storage](../storage/index.md)** | **[Containers](../containers/index.md)** | **[Support](../support/index.md)** | **[Permissions](../permissions.md)** | **[DOI](../doi.md)**
+# VOSpace
 
 !!! abstract "🎯 VOSpace Guide Overview"
     **Master CANFAR's long-term storage system:**
