@@ -53,7 +53,7 @@
     
     | Component | Version |
     |---------|--------------|
-    | canfar | [v1.0.0](https://pypi.org/project/canfar/1.0.0) |
+    | canfar | [v1.0.1](https://pypi.org/project/canfar/) |
     
     #### Helm Charts & Container Images
         
