@@ -859,6 +859,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choosing-your-session-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎛️ Choosing Your Session Type
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#api-access" class="md-nav__link">
     <span class="md-ellipsis">
       API Reference
@@ -1676,6 +1685,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choosing-your-session-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎛️ Choosing Your Session Type
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#api-access" class="md-nav__link">
     <span class="md-ellipsis">
       API Reference
@@ -1756,6 +1774,28 @@
 <li><strong>Automation</strong>: Integrate with existing workflows and pipelines</li>
 <li><strong>Cost effectiveness</strong>: Run jobs during off-peak hours when resources are available</li>
 </ul>
+<h2 id="choosing-your-session-type">🎛️ Choosing Your Session Type<a class="headerlink" href="#choosing-your-session-type" title="Permanent link">&para;</a></h2>
+<p>CANFAR offers two types of resource allocation for batch jobs:</p>
+<div class="admonition tip">
+<p class="admonition-title">Flexible Sessions</p>
+<p><strong>Optimal for interactive work and development</strong></p>
+<ul>
+<li><strong>Faster session startup</strong>: Begins immediately with minimal initial resources</li>
+<li><strong>Can burst to higher resource usage</strong>: Auto-scales up to 8 cores and 32GB RAM as needed</li>
+<li><strong>Resource efficient</strong>: Only uses what your workload actually requires</li>
+<li><strong>Best for</strong>: Data exploration, development, testing, educational workshops</li>
+</ul>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Fixed Sessions</p>
+<p><strong>Better for production workloads</strong></p>
+<ul>
+<li><strong>Guaranteed consistent performance</strong>: Gets exactly what you request for the entire session</li>
+<li><strong>Predictable resource availability</strong>: No variation in available CPU/memory during execution</li>
+<li><strong>Better for production workloads</strong>: Suitable for performance-critical analysis and time-sensitive computations</li>
+<li><strong>Best for</strong>: Large-scale processing, production pipelines, longer duration jobs</li>
+</ul>
+</div>
 <hr />
 <div class="admonition info">
 <p class="admonition-title">Quick Links</p>
@@ -1772,11 +1812,11 @@
 <div class="highlight"><pre><span></span><code><span class="c1"># Ensure you are logged in first</span>
 canfar<span class="w"> </span>auth<span class="w"> </span>login
 
-<span class="c1"># Submit a job</span>
-canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;data-reduction-job&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/[project]/scripts/reduce_data.py&quot;</span>
+<span class="c1"># Submit a flexible session job (default - auto-scaling resources)</span>
+canfar<span class="w"> </span>launch<span class="w"> </span>-n<span class="w"> </span>data-reduction<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/scripts/reduce_data.py
+
+<span class="c1"># Submit a fixed session job (guaranteed resources)</span>
+canfar<span class="w"> </span>launch<span class="w"> </span>--name<span class="w"> </span>large-simulation<span class="w"> </span>--cpu<span class="w"> </span><span class="m">16</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">64</span><span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/scripts/simulation.py
 </code></pre></div>
 <h3 id="2-job-submission-scripts">2. Job Submission Scripts<a class="headerlink" href="#2-job-submission-scripts" title="Permanent link">&para;</a></h3>
 <p>Create shell scripts for common workflows using the <code>canfar</code> client:</p>
@@ -1812,12 +1852,20 @@ canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</
 <span class="n">project</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[project]&quot;</span>
 <span class="n">data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Submit job</span>
+<span class="c1"># Submit flexible job (default - auto-scaling)</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py&quot;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="c1"># Or submit fixed job (guaranteed resources by specifying cores/ram)</span>
 <span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
     <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+    <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>  <span class="c1"># Having cores/ram makes it a fixed session</span>
     <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py&quot;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">]</span>
 <span class="p">)</span>
@@ -2302,7 +2350,7 @@ For data management strategies, see <a href="../../storage/">Storage Guide</a>.<
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 21:44:49 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 00:19:18 UTC">September 11, 2025</span>
   </span>
 
     
