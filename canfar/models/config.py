@@ -40,7 +40,7 @@ default: dict[str, AuthContext] = {
             name="CADC-CANFAR",
             uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
             url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
-            version="v0",
+            version="v1",
             auths=["x509"],
         ),
     )
