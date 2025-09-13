@@ -18,7 +18,7 @@ log = get_logger(__name__)
 
 
 class Session(HTTPClient):
-    """Session Management Client.
+    """CANFAR Session Management Client.
 
     This class provides methods to manage sessions, including fetching
     session details, creating new sessions, retrieving logs, and
@@ -111,14 +111,10 @@ class Session(HTTPClient):
         # Convert id to list if it is a string
         if isinstance(ids, str):
             ids = [ids]
-        parameters: dict[str, str] = {"view": "event"}
         results: list[dict[str, Any]] = []
         for value in ids:
             try:
-                response: Response = self.client.get(
-                    url=f"session/{value}",
-                    params=parameters,
-                )
+                response: Response = self.client.get(url=f"session/{value}")
                 results.append(response.json())
             except HTTPError:
                 err = f"failed to fetch session info for {value}"
@@ -496,17 +492,13 @@ class AsyncSession(HTTPClient):
         # Convert id to list if it is a string
         if isinstance(ids, str):
             ids = [ids]
-        parameters: dict[str, str] = {"view": "event"}
         results: list[dict[str, Any]] = []
         tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(value: str) -> dict[str, Any]:
             async with semaphore:
-                response = await self.asynclient.get(
-                    url=f"session/{value}",
-                    params=parameters,
-                )
+                response = await self.asynclient.get(url=f"session/{value}")
                 data: dict[str, Any] = response.json()
                 return data
 
