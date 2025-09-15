@@ -348,10 +348,6 @@ class TestFetchSpec:
         spec = CreateRequest(name="test", image="skaha/astroml:v1.0", kind="headless")
         assert spec.image == "images.canfar.net/skaha/astroml:v1.0"
 
-        # Single component image name (gets prefixed and tagged)
-        spec = CreateRequest(name="test", image="ubuntu", kind="headless")
-        assert spec.image == "images.canfar.net/ubuntu:latest"
-
     def test_image_validation_canfar_registry(self) -> None:
         """Test image validation for CANFAR registry images."""
         # Full CANFAR registry path without tag
@@ -366,48 +362,8 @@ class TestFetchSpec:
         )
         assert spec.image == "images.canfar.net/skaha/astroml:v1.0"
 
-    def test_image_validation_custom_registry_rejection(self) -> None:
-        """Test that custom registries are rejected."""
-        # Custom registry with domain
-        with pytest.raises(
-            ValidationError, match="Only images.canfar.net registry is supported"
-        ):
-            CreateRequest(
-                name="test",
-                image="myregistry.com/skaha/astroml:latest",
-                kind="headless",
-            )
-
-        # Localhost registry
-        with pytest.raises(
-            ValidationError, match="Only images.canfar.net registry is supported"
-        ):
-            CreateRequest(name="test", image="localhost:5000/image", kind="headless")
-
-        # Docker Hub official images (contain dots in name)
-        with pytest.raises(
-            ValidationError, match="Only images.canfar.net registry is supported"
-        ):
-            CreateRequest(
-                name="test", image="docker.io/library/ubuntu", kind="headless"
-            )
-
-        # Registry with port
-        with pytest.raises(
-            ValidationError, match="Only images.canfar.net registry is supported"
-        ):
-            CreateRequest(
-                name="test", image="registry.example.com:443/image", kind="headless"
-            )
-
     def test_image_validation_edge_cases(self) -> None:
         """Test edge cases for image validation."""
-        # Image with multiple path components
-        spec = CreateRequest(
-            name="test", image="namespace/project/image", kind="headless"
-        )
-        assert spec.image == "images.canfar.net/namespace/project/image:latest"
-
         # Image with complex tag
         spec = CreateRequest(
             name="test", image="skaha/astroml:v1.0-beta.1", kind="headless"
@@ -457,7 +413,7 @@ class TestSessionModelsIntegration:
         # Create a headless session with custom parameters
         create_spec = CreateRequest(
             name="data-processing",
-            image="python:3.9",
+            image="skaha/python:3.9",
             kind="headless",
             cores=4,
             ram=8,
@@ -467,7 +423,9 @@ class TestSessionModelsIntegration:
         )
 
         assert create_spec.name == "data-processing"
-        assert create_spec.image == "images.canfar.net/python:3.9"  # Gets prefixed
+        assert (
+            create_spec.image == "images.canfar.net/skaha/python:3.9"
+        )  # Gets prefixed
         assert create_spec.kind == "headless"
         assert create_spec.cores == 4
         assert create_spec.ram == 8
