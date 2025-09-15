@@ -47,6 +47,7 @@ class TestStatusType:
             "Running",
             "Terminating",
             "Succeeded",
+            "Completed",
             "Error",
             "Failed",
         )
@@ -63,11 +64,12 @@ class TestStatusType:
         assert "Running" in statuses
         assert "Terminating" in statuses
         assert "Succeeded" in statuses
+        assert "Completed" in statuses
         assert "Error" in statuses
         assert "Failed" in statuses
 
         # Check total count
-        assert len(statuses) == 6
+        assert len(statuses) == 7
 
     def test_status_capitalization(self) -> None:
         """Test that Status values follow proper capitalization."""
