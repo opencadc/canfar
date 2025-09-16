@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/opencadc/canfar/compare/v1.0.2...v1.0.3) (2025-09-16)
+
+
+### Bug Fixes
+
+* **docs:** updated docs with link to the platform ([39aead3](https://github.com/opencadc/canfar/commit/39aead3ac22c2e488a899b171e0414b51f24193b))
+
 ## [1.0.2](https://github.com/opencadc/canfar/compare/v1.0.1...v1.0.2) (2025-09-16)
 
 
