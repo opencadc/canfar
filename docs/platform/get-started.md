@@ -2,13 +2,13 @@
 
 **Guide to setting up and using the CANFAR Science Platform for astronomical research.**
 
-
-    **Essential Resources:**
-    - [Permissions Guide](permissions.md): Account set-up and group management
-    - [Sessions Overview](sessions/index.md): Interactive computing environments
-    - [Storage Guide](storage/index.md): Data management and file systems
-    - [Container Guide](containers/index.md): Software environments and registries
-    - [Support Centre](support/index.md): Help resources and FAQ
+   **Essential Resources:**
+    
+   - [Permissions Guide](permissions.md): Account set-up and group management
+   - [Sessions Overview](sessions/index.md): Interactive computing environments
+   - [Storage Guide](storage/index.md): Data management and file systems
+   - [Container Guide](containers/index.md): Software environments and registries
+   - [Support Centre](support/index.md): Help resources and FAQ
 
 
 ## 1️⃣ Get Your CADC Account
