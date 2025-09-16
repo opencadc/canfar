@@ -50,6 +50,18 @@ Skaha uses *pre-commit* to manage the development workflow. To install the pre-c
 uv run pre-commit install --hook-type commit-msg
 ```
 
+### Contributing to Documentation
+
+To contribute to the documentation, you first need to set up the project as described in the "Set Up Your Development Environment" section. The command `uv sync --all-extras --dev` will install all necessary dependencies, including the ones for building the documentation.
+
+Once the dependencies are installed, you can serve the documentation locally by running:
+
+```bash
+uv run mkdocs serve
+```
+
+This will start a local server, and you can view the documentation in your web browser at the address indicated in the output (usually `http://127.0.0.1:8000`). The documentation will automatically reload when you make changes to the files.
+
 ### 4. Make Your Changes
 
 Make your changes. Please make sure to add tests for your changes if applicable.
