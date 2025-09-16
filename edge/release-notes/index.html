@@ -1645,6 +1645,7 @@
 <li><strong>Skaha API <code>v1</code> Released</strong> — <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API will be sunset with the next major release. Portal users are unaffected; API users should plan to migrate to <code>v1</code> as soon as possible.</li>
 <li><strong>Container Image Labels</strong> — no longer required in the <a href="https://images.canfar.net/">Harbor Image Registry</a>. They are only used to populate dropdown menu options in the Science Portal UI.</li>
 <li><strong>Session Types</strong> — launching via API, omit the <code>type</code> parameter for headless mode; interactive sessions require the <code>type</code> parameter.</li>
+<li><strong>Status Changes</strong> — Job status <code>Succeeded</code> is now <code>Completed</code> for all session types.</li>
 </ul>
 <h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1664,6 +1665,7 @@
 <li><strong>Breaking Changes</strong>:<ul>
 <li>For API users, <code>headless</code> sessions no longer require the <code>type</code> parameter</li>
 <li>For Python Client &amp; CLI users, <code>headless</code> sessions no longer require the <code>kind</code> parameter and the <code>headless</code> session <code>kind</code> will be deprecated in a future release.</li>
+<li><code>Succeeded</code> status is now <code>Completed</code> for all session types, e.g. when performing a <code>session.info()</code> query.</li>
 </ul>
 </li>
 <li><strong>Harbor Labels</strong> are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI and only for publicly visible container images.</li>
@@ -1684,7 +1686,7 @@
 <tbody>
 <tr>
 <td>canfar</td>
-<td><a href="https://pypi.org/project/canfar/">v1.0.1</a></td>
+<td><a href="https://pypi.org/project/canfar/">v1.0.2</a></td>
 </tr>
 </tbody>
 </table>
@@ -1756,7 +1758,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 19:53:25 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 15, 2025 21:20:08 UTC">September 15, 2025</span>
   </span>
 
     
