@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.0.2](https://github.com/opencadc/canfar/compare/v1.0.1...v1.0.2) (2025-09-16)
+
+
+### Bug Fixes
+
+* **defaults:** updated default config to use v1 server api ([447b17e](https://github.com/opencadc/canfar/commit/447b17ec37072bf6b08d279baafe7f8d561d6afd))
+* **session:** default destroy_with not targets `Completed` jobs ([08581be](https://github.com/opencadc/canfar/commit/08581bed48b4530142ae54418ff6b168655dee5b))
+* **sessions:** image parameter now is not locked down to images.canfar.net to support local variations in all SRCnet deployments ([2b69c52](https://github.com/opencadc/canfar/commit/2b69c521b7757a390b97aaac677eecffa8ae4b8b))
+* **sessions:** removed no longer needed view=event param during http get ([6afb91c](https://github.com/opencadc/canfar/commit/6afb91c10b6309090128425331e8e2267e525794))
+
+
+### Documentation
+
+* overhaul and clarify platform guides, containers, sessions, storage, permissions, and mkdocs config ([db52b02](https://github.com/opencadc/canfar/commit/db52b025ccda768fc113b735381a9bc2c3c81b69))
+* **release-notes:** consolidation ([7cbebae](https://github.com/opencadc/canfar/commit/7cbebae106ebc45b902a90c6da625b7ce4b69521))
+* **updates:** for breaking changes between v0 and v1 api ([d58bd6c](https://github.com/opencadc/canfar/commit/d58bd6cf173cc4cf2394a2062a446ab85b8b1def))
+
 ## [1.0.1](https://github.com/opencadc/canfar/compare/v1.0.0...v1.0.1) (2025-09-11)
 
 
