@@ -1,0 +1,22 @@
+[data-md-color-scheme="canfar"] {
+  --md-primary-fg-color:               #005493;
+  --md-accent-fg-color:                #F5AA1C;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 210;
+  --md-primary-fg-color: #005493;
+  --md-accent-fg-color: #F5AA1C;
+}
+
+@keyframes heart {
+  0%, 40%, 80%, 100% {
+    transform: scale(1);
+  }
+  20%, 60% {
+    transform: scale(1.15);
+  }
+}
+.heart {
+  animation: heart 1000ms infinite;
+}
