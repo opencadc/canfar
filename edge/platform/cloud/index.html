@@ -942,7 +942,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1892,15 +1892,17 @@
 <p>After status becomes <strong>Running</strong>:</p>
 <ol>
 <li><strong>Associate floating IP</strong> (menu → <strong>Associate Floating IP</strong>)</li>
-<li><strong>SSH to the instance</strong>:</li>
-</ol>
+<li>
+<p><strong>SSH to the instance</strong>:</p>
 <div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>ubuntu@<span class="o">[</span>floating_ip<span class="o">]</span>
 </code></pre></div>
-<ol>
-<li><strong>Create a local user</strong> matching your CADC account:</li>
-</ol>
+</li>
+<li>
+<p><strong>Create a local user</strong> matching your CADC account:</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>canfar_create_user<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
 </code></pre></div>
+</li>
+</ol>
 <h2 id="vm-configuration-and-tools">🔧 VM Configuration and Tools<a class="headerlink" href="#vm-configuration-and-tools" title="Permanent link">&para;</a></h2>
 <h3 id="pre-built-vm-helpers">Pre-built VM Helpers<a class="headerlink" href="#pre-built-vm-helpers" title="Permanent link">&para;</a></h3>
 <p>The <code>canfar-ubuntu-20.04</code> and <code>canfar-rocky-8</code> images include helpful tools:</p>
@@ -1938,29 +1940,26 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>update
 <li>Submit batch jobs that run your pipeline</li>
 </ul>
 </div>
-<h3 id="create-vm">1. Create a VM<a class="headerlink" href="#create-vm" title="Permanent link">&para;</a></h3>
+<h3 id="1-create-a-vm_1">1. Create a VM<a class="headerlink" href="#1-create-a-vm_1" title="Permanent link">&para;</a></h3>
 <p>Use the DRAC web dashboard.</p>
 <ol>
-<li>Sign in to <a href="https://arbutus-canfar.cloud.computecanada.ca/"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3m-2 16H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2z"/></svg></span> Dashboard</a> with CADC <code>[user]</code>/password.</li>
+<li>Sign in to <a href="https://arbutus-canfar.cloud.computecanada.ca/">Dashboard</a> with CADC <code>[user]</code>/password.</li>
 <li>Each CANFAR allocation maps to an OpenStack <strong><code>[project]</code></strong>. Use the top-left project picker to switch if you belong to multiple.</li>
 </ol>
-<p>Follow DRAC’s <a href="https://docs.alliancecan.ca/wiki/Creating_a_Linux_VM">Creating a Linux VM</a>. Summary below.</p>
-<hr />
+<p>Follow DRAC's <a href="https://docs.alliancecan.ca/wiki/Creating_a_Linux_VM">Creating a Linux VM</a>. Summary below.</p>
 <h3 id="2-import-an-ssh-public-key_1">2. Import an SSH Public Key<a class="headerlink" href="#2-import-an-ssh-public-key_1" title="Permanent link">&para;</a></h3>
 <p>OpenStack prefers SSH key pairs over passwords.</p>
 <ul>
-<li>If you do not have a key pair, run <code>ssh-keygen</code> locally or follow DRAC’s [SSH Keys documentation].</li>
+<li>If you do not have a key pair, run <code>ssh-keygen</code> locally or follow DRAC's SSH Keys documentation.</li>
 <li>In <strong>Compute → Key Pairs</strong>, click <strong>Import Key Pair</strong>.</li>
 <li>Name the key and paste your public key (default path <code>~/.ssh/id_rsa.pub</code>).</li>
 </ul>
-<hr />
 <h3 id="3-allocate-a-public-ip_1">3. Allocate a Public IP<a class="headerlink" href="#3-allocate-a-public-ip_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Go to <strong>Network → Floating IPs</strong>.</li>
 <li>If none is listed, click <strong>Allocate IP to Project</strong>.</li>
-<li>Typically, each project has one public IP; if exhausted you’ll see <em>Quota Exceeded</em>.</li>
+<li>Typically, each project has one public IP; if exhausted you'll see <em>Quota Exceeded</em>.</li>
 </ul>
-<hr />
 <h3 id="4-launch-an-instance_1">4. Launch an Instance<a class="headerlink" href="#4-launch-an-instance_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>In <strong>Compute → Instances → Launch Instance</strong>, choose:</li>
@@ -1969,7 +1968,6 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>update
 <li><strong>Key Pair</strong>: select your SSH key</li>
 <li>Click <strong>Launch</strong>.</li>
 </ul>
-<hr />
 <h3 id="5-connect-to-the-instance_1">5. Connect to the Instance<a class="headerlink" href="#5-connect-to-the-instance_1" title="Permanent link">&para;</a></h3>
 <p>After status becomes <strong>Running</strong>, first <strong>associate</strong> the floating IP (menu → <strong>Associate Floating IP</strong>), then SSH:</p>
 <div class="highlight"><pre><span></span><code>ssh<span class="w"> </span>ubuntu@<span class="o">[</span>floating_ip<span class="o">]</span>
@@ -1986,19 +1984,18 @@ ssh<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>@
 <li>Rocky Linux images: <code>rocky</code></li>
 </ul>
 </div>
-<hr />
 <h3 id="install-software">Install software<a class="headerlink" href="#install-software" title="Permanent link">&para;</a></h3>
 <p>The base VM image comes with only a minimal set of packages.<br />
 For this example, we need to install two additional tools:</p>
 <ul>
 <li><a href="https://sextractor.readthedocs.io/">Source Extractor</a> (source detection): software used to detect astronomical sources in FITS images, producing catalogues of stars and galaxies.</li>
-<li><a href="https://heasarc.gsfc.nasa.gov/fitsio/fpack/">funpack</a> (FITS decompressor; Ubuntu package <code>libcfitsio-bin</code>)：a decompression utility for FITS images. Most FITS images provided by CADC are Rice-compressed and stored with an <code>.fz</code> extension. Since Source Extractor only accepts uncompressed images, we will use <code>funpack</code> to uncompress them. The <code>funpack</code> executable is distributed as part of the <code>libcfitsio-bin</code> package in Debian/Ubuntu.</li>
+<li><a href="https://heasarc.gsfc.nasa.gov/fitsio/fpack/">funpack</a> (FITS decompressor; Ubuntu package <code>libcfitsio-bin</code>): a decompression utility for FITS images. Most FITS images provided by CADC are Rice-compressed and stored with an <code>.fz</code> extension. Since Source Extractor only accepts uncompressed images, we will use <code>funpack</code> to uncompress them. The <code>funpack</code> executable is distributed as part of the <code>libcfitsio-bin</code> package in Debian/Ubuntu.</li>
 </ul>
-<p>Because both tools are available from the Ubuntu software repository, we can install them system-wide after updating the package index:
+<p>Because both tools are available from the Ubuntu software repository, we can install them system-wide after updating the package index:</p>
 <div class="highlight"><span class="filename">Install packages</span><pre><span></span><code>sudo<span class="w"> </span>apt<span class="w"> </span>update<span class="w"> </span>-y
 sudo<span class="w"> </span>apt<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>source-extractor<span class="w"> </span>libcfitsio-bin
-</code></pre></div></p>
-<h3 id="test-vm">Test on the VM<a class="headerlink" href="#test-vm" title="Permanent link">&para;</a></h3>
+</code></pre></div>
+<h3 id="test-on-the-vm">Test on the VM<a class="headerlink" href="#test-on-the-vm" title="Permanent link">&para;</a></h3>
 <p>Use the ephemeral disk (mounted at <code>/mnt</code>) for scratch.</p>
 <div class="highlight"><pre><span></span><code>sudo<span class="w"> </span>canfar_setup_scratch<span class="w">  </span><span class="c1"># create /mnt/scratch with proper permissions</span>
 <span class="nb">cd</span><span class="w"> </span>/mnt/scratch
@@ -2020,7 +2017,7 @@ source-extractor<span class="w"> </span>1056213p.fits<span class="w"> </span>-CA
 <li>In <strong>batch mode</strong>, each job gets its own scratch directory (not <code>/mnt/scratch</code>).</li>
 </ul>
 </div>
-<h3 id="persist-results">Persist results to VOSpace<a class="headerlink" href="#persist-results" title="Permanent link">&para;</a></h3>
+<h3 id="persist-results-to-vospace">Persist results to VOSpace<a class="headerlink" href="#persist-results-to-vospace" title="Permanent link">&para;</a></h3>
 <p>Ephemeral storage is wiped when the VM terminates. Upload the output <code>1056213p.cat</code> to <strong>VOSpace</strong> (the VM includes the <code>vos</code> client).</p>
 <p>Obtain a proxy certificate for automated access:</p>
 <div class="highlight"><pre><span></span><code>cadc_dotnetrc<span class="w">      </span><span class="c1"># one-time helper to create ~/.netrc</span>
@@ -2032,14 +2029,14 @@ cadc-get-cert<span class="w"> </span>-n<span class="w">   </span><span class="c1
 <p class="admonition-title">Credential hygiene</p>
 <p><code>.netrc</code> stores credentials in plaintext. Use only on controlled hosts and restrict permissions: <code>chmod 600 ~/.netrc</code>.</p>
 </div>
-<h3 id="snapshot">Snapshot the instance<a class="headerlink" href="#snapshot" title="Permanent link">&para;</a></h3>
+<h3 id="snapshot-the-instance">Snapshot the instance<a class="headerlink" href="#snapshot-the-instance" title="Permanent link">&para;</a></h3>
 <p>In the <strong>Instances</strong> view, click <strong>Create Snapshot</strong> (e.g., name it <code>image-reduction-2023-08-21</code>).</p>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
 <p>Avoid writes on the VM while a snapshot is being created.</p>
 </div>
 <p>Without a snapshot, <strong>ephemeral</strong> data is lost when the instance is deleted. <strong>Volume-backed</strong> VMs persist data but are <strong>not suitable for batch</strong>.</p>
-<h3 id="batch-script">Automate as a batch script<a class="headerlink" href="#batch-script" title="Permanent link">&para;</a></h3>
+<h3 id="automate-as-a-batch-script">Automate as a batch script<a class="headerlink" href="#automate-as-a-batch-script" title="Permanent link">&para;</a></h3>
 <p>CANFAR batch is powered by <strong>HTCondor</strong>; Cloud Scheduler launches worker VMs on demand.</p>
 <p>Create <code>~/do_catalogue.bash</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env bash</span>
@@ -2057,7 +2054,7 @@ cat<span class="w"> </span>&gt;<span class="w"> </span>default.param<span class=
 source-extractor<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">id</span><span class="si">}</span><span class="s2">.fits&quot;</span><span class="w"> </span>-CATALOG_NAME<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">id</span><span class="si">}</span><span class="s2">.cat&quot;</span>
 vcp<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">id</span><span class="si">}</span><span class="s2">.cat&quot;</span><span class="w"> </span><span class="s2">&quot;vos:[project]/&quot;</span>
 </code></pre></div>
-<h3 id="submission">Write a submission file<a class="headerlink" href="#submission" title="Permanent link">&para;</a></h3>
+<h3 id="write-a-submission-file">Write a submission file<a class="headerlink" href="#write-a-submission-file" title="Permanent link">&para;</a></h3>
 <p>Submit four image IDs: <code>1056215p 1056216p 1056217p 1056218p</code>.</p>
 <div class="highlight"><span class="filename">do_catalogue.sub</span><pre><span></span><code>executable = do_catalogue.bash
 
@@ -2072,10 +2069,12 @@ queue arguments from (
   1056218p
 )
 </code></pre></div>
-<h3 id="submit">Submit jobs<a class="headerlink" href="#submit" title="Permanent link">&para;</a></h3>
-<p>Two authorizations are needed:
-- Access to snapshots in <code>[project]</code>
-- Write access to <code>vos:[project]</code></p>
+<h3 id="submit-jobs">Submit jobs<a class="headerlink" href="#submit-jobs" title="Permanent link">&para;</a></h3>
+<p>Two authorizations are needed:</p>
+<ul>
+<li>Access to snapshots in <code>[project]</code></li>
+<li>Write access to <code>vos:[project]</code></li>
+</ul>
 <p>On the batch login node <code>batch.canfar.net</code>:</p>
 <div class="highlight"><pre><span></span><code>ssh<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>@batch.canfar.net
 .<span class="w"> </span><span class="o">[</span>project<span class="o">]</span>-openrc.sh<span class="w">     </span><span class="c1"># set OpenStack env (once per session)</span>
@@ -2083,16 +2082,17 @@ queue arguments from (
 <p>Submit:</p>
 <div class="highlight"><pre><span></span><code>canfar_submit<span class="w"> </span>do_catalogue.sub<span class="w"> </span>image-reduction-2023-08-21<span class="w"> </span>c2-7.5gb-30
 </code></pre></div>
-<p>Where:
-- <code>do_catalogue.sub</code>: submission file
-- <code>image-reduction-2023-08-21</code>: snapshot image name
-- <code>c2-7.5gb-30</code>: VM flavor (list via <code>openstack flavor list</code>)</p>
+<p>Where:</p>
+<ul>
+<li><code>do_catalogue.sub</code>: submission file</li>
+<li><code>image-reduction-2023-08-21</code>: snapshot image name</li>
+<li><code>c2-7.5gb-30</code>: VM flavor (list via <code>openstack flavor list</code>)</li>
+</ul>
 <p>Monitor:</p>
 <div class="highlight"><pre><span></span><code>condor_q
 condor_q<span class="w"> </span>-all<span class="w">   </span><span class="c1"># all users summary</span>
 </code></pre></div>
 <p>When the interactive VM is no longer needed, delete it from the dashboard (<strong>Delete Instances</strong>).</p>
-<hr />
 <h2 id="extras-helpful-commands-vm-maintenance">Extras: Helpful Commands &amp; VM Maintenance<a class="headerlink" href="#extras-helpful-commands-vm-maintenance" title="Permanent link">&para;</a></h2>
 <p><strong>Keep the OS updated:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Ubuntu/Debian systems</span>
@@ -2224,7 +2224,7 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>update
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 17:11:40 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     
@@ -2252,14 +2252,14 @@ sudo<span class="w"> </span>dnf<span class="w"> </span>update
     
     <nav>
       
-        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
-          
-          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
-        </a>
-      
         <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
           
           <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
         </a>
       
       

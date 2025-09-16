@@ -933,7 +933,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1812,12 +1812,10 @@
 <h2 id="creating-a-notebook-session">🚀 Creating a Notebook Session<a class="headerlink" href="#creating-a-notebook-session" title="Permanent link">&para;</a></h2>
 <h3 id="step-1-access-session-creation">Step 1: Access Session Creation<a class="headerlink" href="#step-1-access-session-creation" title="Permanent link">&para;</a></h3>
 <p>From the Science Portal dashboard, click the <strong>plus sign (+)</strong> to create a new session, then select <strong>notebook</strong> as your session type.</p>
-<p><img alt="Select Notebook Session" src="../images/notebook/1_select_notebook_session.png" /></p>
-<p><img alt="Choose Notebook" src="../images/notebook/2_choose_notebook.png" /></p>
 <h3 id="step-2-choose-your-container">Step 2: Choose Your Container<a class="headerlink" href="#step-2-choose-your-container" title="Permanent link">&para;</a></h3>
 <p>Select a container image that includes the software you need. Each container comes pre-configured with specific tools and libraries:</p>
-<p><img alt="Choose Container" src="../images/notebook/3_choose_casa_container.png" /></p>
 <h4 id="available-containers">Available Containers<a class="headerlink" href="#available-containers" title="Permanent link">&para;</a></h4>
+<p>There are quite a few containers available, some from the CANFAR team, and the community. Some examples:</p>
 <table>
 <thead>
 <tr>
@@ -1833,14 +1831,9 @@
 <td>General astronomy analysis, data science</td>
 </tr>
 <tr>
-<td><strong>CASA 6.5-notebook</strong></td>
-<td>CASA (Common Astronomy Software Applications) + Python stack</td>
+<td><strong>casa-notebook</strong></td>
+<td><a href="https://casa.nrao.edu/">CASA</a> + Python stack</td>
 <td>Radio astronomy data reduction</td>
-</tr>
-<tr>
-<td><strong>General purpose</strong></td>
-<td>Standard Python data science stack</td>
-<td>Basic Python development</td>
 </tr>
 </tbody>
 </table>
@@ -1851,7 +1844,6 @@
 <h3 id="step-3-configure-session-resources">Step 3: Configure Session Resources<a class="headerlink" href="#step-3-configure-session-resources" title="Permanent link">&para;</a></h3>
 <h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
 <p>Choose a descriptive name that helps you identify this session later:</p>
-<p><img alt="Choose Name" src="../images/notebook/4_choose_name.png" /></p>
 <p><strong>Good session names:</strong>
 - <code>galaxy-photometry</code>
 - <code>pulsar-analysis</code>
@@ -1859,7 +1851,6 @@
 - <code>exoplanet-search</code></p>
 <h4 id="memory-allocation">Memory Allocation<a class="headerlink" href="#memory-allocation" title="Permanent link">&para;</a></h4>
 <p>Select the maximum amount of RAM you anticipate requiring:</p>
-<p><img alt="Select RAM" src="../images/notebook/5_select_RAM.png" /></p>
 <p><strong>Memory Guidelines:</strong>
 - <strong>4GB:</strong> Basic analysis, small datasets
 - <strong>16GB:</strong> Standard workflows, moderate datasets (recommended default)
@@ -1871,16 +1862,13 @@
 </div>
 <h4 id="cpu-cores">CPU Cores<a class="headerlink" href="#cpu-cores" title="Permanent link">&para;</a></h4>
 <p>Select the maximum number of computing cores you anticipate requiring:</p>
-<p><img alt="Choose Cores" src="../images/notebook/6_choose_cores.png" /></p>
 <p><strong>CPU Guidelines:</strong>
 - <strong>1-2 cores:</strong> Most single-threaded analysis (recommended default)
 - <strong>4-8 cores:</strong> Parallel processing, multi-threaded libraries
 - <strong>16+ cores:</strong> Highly parallel workflows</p>
 <h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
-<p>Click the <strong>Launch</strong> button to start your notebook session:</p>
-<p><img alt="Launch Notebook" src="../images/notebook/7_launch_notebook.png" /></p>
+<p>Click the <strong>Launch</strong> button to start your notebook session.</p>
 <p>Wait until a notebook icon appears on your dashboard, then click it to access your session:</p>
-<p><img alt="Notebook Created" src="../images/notebook/8_notebook_created.png" /></p>
 <h2 id="using-jupyter-lab">🧭 Using Jupyter Lab<a class="headerlink" href="#using-jupyter-lab" title="Permanent link">&para;</a></h2>
 <h3 id="interface-overview">Interface Overview<a class="headerlink" href="#interface-overview" title="Permanent link">&para;</a></h3>
 <p>Once connected, you'll see the Jupyter Lab interface with several key areas:</p>
@@ -1908,34 +1896,17 @@
 <ol>
 <li><strong>Navigate</strong> to your target directory in the file browser</li>
 <li><strong>Click</strong> the upload arrow in the top menu bar</li>
-</ol>
-<p><img alt="Upload Files" src="../images/transfer_file/1_landing_click_upload.png" /></p>
-<ol>
 <li><strong>Select files</strong> and click "Open"</li>
-</ol>
-<p><img alt="Upload Window" src="../images/transfer_file/2_upload_window.png" /></p>
-<ol>
 <li><strong>Files appear</strong> in the browser</li>
 </ol>
-<p><img alt="File Uploaded" src="../images/transfer_file/3_file_is_uploaded.png" /></p>
 <p><strong>Method 2: Copy-Paste Text</strong></p>
 <p>For code snippets or small text files:</p>
 <ol>
 <li><strong>Open a terminal</strong> by double-clicking the terminal icon</li>
-</ol>
-<p><img alt="Open Terminal" src="../images/transfer_file/4_open_terminal.png" /></p>
-<ol>
 <li><strong>Create/edit files</strong> using command-line editors</li>
-</ol>
-<p><img alt="New Terminal" src="../images/transfer_file/5_new_terminal.png" /></p>
-<ol>
 <li><strong>Copy text</strong> from your local computer</li>
-</ol>
-<p><img alt="Copy Local Text" src="../images/transfer_file/6_copy_local_text.png" /></p>
-<ol>
 <li><strong>Paste into the editor</strong></li>
 </ol>
-<p><img alt="Paste Text" src="../images/transfer_file/7_paste_text.png" /></p>
 <h3 id="working-with-casa">Working with CASA<a class="headerlink" href="#working-with-casa" title="Permanent link">&para;</a></h3>
 <p>If using a CASA container, you can run CASA commands directly in notebook cells:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Import CASA tasks</span>
@@ -2081,7 +2052,7 @@ git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 21:44:49 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     

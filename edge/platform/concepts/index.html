@@ -933,7 +933,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1828,7 +1828,7 @@
 <li><strong>Environment Standardisation</strong>: Identical software stacks across the team</li>
 <li><strong>Seamless Collaboration</strong>: Shared workspaces and data access</li>
 <li><strong>Session Sharing</strong>: Live collaboration on analysis workflows</li>
-<li><strong>Project Management</strong>: Centralized resource and permission management</li>
+<li><strong>Project Management</strong>: Centralised resource and permission management</li>
 </ul>
 </div>
 <div class="tabbed-block">
@@ -1844,76 +1844,75 @@
 <h2 id="platform-architecture">🏗️ Platform Architecture<a class="headerlink" href="#platform-architecture" title="Permanent link">&para;</a></h2>
 <p>CANFAR is built on modern cloud-native technologies designed for scalability, reliability, and ease of use. Understanding the architecture helps you leverage the platform effectively.</p>
 <h3 id="system-components">System Components<a class="headerlink" href="#system-components" title="Permanent link">&para;</a></h3>
-<pre class="mermaid"><code>    %%{init: {'flowchart': {'curve': 'linear'}}}%%
-    graph LR
-        %% User Entry Point
-        User["👤 Scientist"]:::user
+<pre class="mermaid"><code>graph LR
+    %% User Entry Point
+    User["👤 Scientist"]:::user
 
-        %% Portal Layer
-        Portal["🌐 Science Portal&lt;br/&gt;canfar.net"]:::portal
-        Auth["🔐 CADC Authentication"]:::auth
-        Sessions["🖥️ Session Manager&lt;br/&gt;Skaha"]:::sessions
+    %% Portal Layer
+    Portal["🌐 Science Portal&lt;br/&gt;canfar.net"]:::portal
+    Auth["🔐 CADC Authentication"]:::auth
+    Sessions["🖥️ Session Manager&lt;br/&gt;Skaha"]:::sessions
 
-        %% Infrastructure Layer
-        K8s["☸️ Kubernetes Cluster"]:::k8s
-        Containers["🐳 Container Images&lt;br/&gt;Harbor Registry"]:::containers
-        Storage["💾 Storage Systems"]:::storage
+    %% Infrastructure Layer
+    K8s["☸️ Kubernetes Cluster"]:::k8s
+    Containers["🐳 Container Images&lt;br/&gt;Harbor Registry"]:::containers
+    Storage["💾 Storage Systems"]:::storage
 
-        %% Storage Systems
-        arc["📁 arc POSIX Storage&lt;br/&gt;Shared Filesystem"]:::arc
-        VOSpace["☁️ VOSpace Object Store&lt;br/&gt;Long-term Storage"]:::vospace
-        Scratch["⚡ Scratch&lt;br/&gt;Temporary SSDs"]:::scratch
+    %% Storage Systems
+    arc["📁 arc POSIX Storage&lt;br/&gt;Shared Filesystem"]:::arc
+    vault["☁️ VOSpace Object Store&lt;br/&gt;Long-term Storage"]:::vospace
+    scratch["⚡ Scratch&lt;br/&gt;Temporary SSDs"]:::scratch
 
-        %% Session Types
-        Types["Session Types"]:::types
-        Notebook["📓 Jupyter Notebooks"]:::notebooks
-        Desktop["🖥️ Desktop Environment"]:::desktop
-        CARTA["📊 CARTA Viewer"]:::carta
-        Firefly["🔥 Firefly Viewer"]:::firefly
-        Contrib["⚙️ Contributed Apps"]:::contrib
-        Batch["🏭 Batch Jobs"]:::batch
+    %% Session Types
+    Types["Session Types"]:::types
+    Notebook["📓 Jupyter Notebooks"]:::notebooks
+    Desktop["🖥️ Desktop Environment"]:::desktop
+    CARTA["📊 CARTA Viewer"]:::carta
+    Firefly["🔥 Firefly Viewer"]:::firefly
+    Contrib["⚙️ Contributed Apps"]:::contrib
+    Batch["🏭 Batch Jobs"]:::batch
 
-        %% Connections
-        User --&gt; Portal
-        Portal --&gt; Auth
-        Portal --&gt; Sessions
+    %% Connections
+    User --&gt; Portal
+    Portal --&gt; Auth
+    Portal --&gt; Sessions
 
-        Auth --&gt; K8s
-        Sessions --&gt; K8s
+    Auth --&gt; K8s
+    Sessions --&gt; K8s
 
-        K8s --&gt; Containers
-        K8s --&gt; Storage
+    K8s --&gt; Containers
+    K8s --&gt; Storage
 
-        Storage --&gt; arc
-        Storage --&gt; VOSpace
-        Storage --&gt; Scratch
+    Storage --&gt; arc
+    Storage --&gt; vault
+    Storage --&gt; scratch
 
-        Sessions --&gt; Types
-        Types --&gt; Notebook
-        Types --&gt; Desktop
-        Types --&gt; CARTA
-        Types --&gt; Firefly
-        Types --&gt; Contrib
-        Types --&gt; Batch
+    Sessions --&gt; Types
+    Types --&gt; Notebook
+    Types --&gt; Desktop
+    Types --&gt; CARTA
+    Types --&gt; Firefly
+    Types --&gt; Contrib
+    Types --&gt; Batch
 
-        %% Styling
-        classDef user fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
-        classDef portal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-        classDef auth fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
-        classDef sessions fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
-        classDef k8s fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000
-        classDef containers fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
-        classDef storage fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
-        classDef arc fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
-        classDef vospace fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
-        classDef scratch fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
-        classDef types fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
-        classDef notebooks fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-        classDef desktop fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
-        classDef carta fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
-        classDef firefly fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
-        classDef contrib fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
-        classDef batch fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000</code></pre>
+    %% Styling
+    classDef user fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef portal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef auth fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    classDef sessions fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef k8s fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000
+    classDef containers fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    classDef storage fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef arc fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
+    classDef vospace fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
+    classDef scratch fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef types fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
+    classDef notebooks fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef desktop fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef carta fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef firefly fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef contrib fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef batch fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000</code></pre>
 <h3 id="architecture-components">Architecture Components<a class="headerlink" href="#architecture-components" title="Permanent link">&para;</a></h3>
 <dl>
 <dt><strong>Browser-Based Portal</strong> (<code>canfar.net</code>)</dt>
@@ -2002,8 +2001,8 @@
 <tr>
 <td><strong>improc</strong></td>
 <td>Image processing</td>
-<td>CASUTools, SExtractor, SWarp,</td>
-<td>Photometry, astrometry, source detection, PSF</td>
+<td>CASUTools, SExtractor, SWarp, IRAF, STILTS</td>
+<td>Photometry, astrometry, source detection, PSF fitting</td>
 </tr>
 <tr>
 <td><strong>casa</strong></td>
@@ -2015,7 +2014,7 @@
 <td><strong>lsst</strong></td>
 <td>LSST Analysis</td>
 <td>LSST Software Stack</td>
-<td>Image processing, LSST data access</td>
+<td>Image processing, LSST software stack and data access</td>
 </tr>
 <tr>
 <td><strong>carta</strong></td>
@@ -2074,8 +2073,8 @@
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><strong>JupyterLab Interface</strong> for interactive data science workflows</p>
-<p><strong>Best For:</strong> Data exploration, visualization, prototyping, interactive analysis</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: Data exploration, visualization, prototyping, interactive analysis</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Rich text, code, and visualization in unified interface</li>
 <li>Python default, and other languagecustom kernels possible</li>
@@ -2086,20 +2085,20 @@
 </div>
 <div class="tabbed-block">
 <p><strong>Linux Desktop Environment</strong> for traditional GUI applications</p>
-<p><strong>Best For:</strong> CASA, DS9, TOPCAT, Aladin, traditional desktop workflows</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: CASA, DS9, TOPCAT, Aladin, traditional desktop workflows</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Minimal Ubuntu desktop with window manager</li>
-<li>Multiple applications running simultaneously on many nodes</li>
+<li>Multiple applications, each running on a different cluster node</li>
 <li>GUI-based tools and traditional software</li>
 <li>File managers and system utilities</li>
-<li>Firefox browser</li>
+<li>Firefox browser-on-browser</li>
 </ul>
 </div>
 <div class="tabbed-block">
 <p><strong>Visualization and analysis</strong> for FITS and HDF5 astronomy data</p>
-<p><strong>Best For:</strong> Radio astronomy data analysis, FITS file visualization</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: Radio astronomy data analysis, data cubes visualization</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Interactive data exploration and analysis</li>
 <li>Optimised for large radio astronomy datasets</li>
@@ -2109,8 +2108,8 @@
 </div>
 <div class="tabbed-block">
 <p><strong>Table and Image Visualization</strong> tools</p>
-<p><strong>Best For:</strong> Catalogue analysis, image display, multi-wavelength data, LSST</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: Catalogue analysis, image display, multi-wavelength data, LSST</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Astronomical table viewing and analysis</li>
 <li>FITS image display and manipulation</li>
@@ -2121,8 +2120,8 @@
 </div>
 <div class="tabbed-block">
 <p><strong>Community-Maintained Applications</strong> and specialised tools</p>
-<p><strong>Best For:</strong> Specialised workflows, experimental features, niche applications</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: Communitity-supported web apps, Specialised workflows, experimental features, niche applications</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Custom applications contributed by the community</li>
 <li>Specialised tools for specific research areas</li>
@@ -2133,8 +2132,8 @@
 </div>
 <div class="tabbed-block">
 <p><strong>Automated Processing</strong> without interactive interfaces</p>
-<p><strong>Best For:</strong> Large-scale processing, automated workflows, production pipelines</p>
-<p><strong>Features:</strong></p>
+<p><strong>Best For</strong>: Large-scale processing, automated workflows, production pipelines</p>
+<p><strong>Features</strong>:</p>
 <ul>
 <li>Headless execution for automated processing</li>
 <li>Script-based workflows and command execution</li>
@@ -2151,15 +2150,15 @@
 <div class="tabbed-content">
 <div class="tabbed-block">
 <p><strong>Dynamic resource allocation</strong> that adapts to cluster availability</p>
-<p><strong>Characteristics:</strong></p>
+<p><strong>Characteristics</strong>:</p>
 <ul>
 <li><strong>Adaptive Usage</strong>: Can use more CPU/memory when cluster resources available</li>
 <li><strong>Fast Scheduling</strong>: Sessions start quickly as they're easier to place</li>
 <li><strong>Variable Performance</strong>: Performance adapts to cluster load</li>
 <li><strong>Efficient Sharing</strong>: Resources shared optimally across users</li>
 </ul>
-<p><strong>Best For:</strong> Interactive work, development, data exploration, most research workflows</p>
-<p><strong>CLI Usage:</strong>
+<p><strong>Best For</strong>: Interactive work, development, data exploration, most research workflows</p>
+<p><strong>CLI Usage</strong>:
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>launch<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest<span class="w">  </span><span class="c1"># Uses flexible mode</span>
 </code></pre></div></p>
 </div>
@@ -2235,7 +2234,6 @@
 <div class="admonition warning">
 <p class="admonition-title">Critical: Understanding Data Persistence</p>
 <p><strong>Where your files are saved determines whether they survive session restarts:</strong></p>
-</div>
 <table>
 <thead>
 <tr>
@@ -2259,7 +2257,7 @@
 <td>Network-based shared POSIX</td>
 </tr>
 <tr>
-<td><code>vos:[user|project]</code></td>
+<td><code>vos:[user\|project]</code></td>
 <td>✅ <strong>Permanent, archived</strong></td>
 <td>Long-term storage, sharing</td>
 <td>Network-based shared object store</td>
@@ -2272,34 +2270,41 @@
 </tr>
 </tbody>
 </table>
+</div>
 <h3 id="arc-storage-arc-active-research-storage">ARC Storage (<code>/arc/</code>) - Active Research Storage<a class="headerlink" href="#arc-storage-arc-active-research-storage" title="Permanent link">&para;</a></h3>
 <p><strong>High-Performance POSIX Filesystem</strong> for active research workflows:</p>
-<p><strong>Key Features:</strong>
-- <strong>Speed</strong>: Direct filesystem access optimised for large computations
-- <strong>Collaboration</strong>: Group-based access control for team projects
-- <strong>Backup</strong>: Daily snapshots for data protection
-- <strong>Quotas</strong>: Managed per-project and per-user allocations
-- <strong>POSIX Compliance</strong>: Standard Unix/Linux filesystem operations</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Speed</strong>: Direct filesystem access optimised for large computations</li>
+<li><strong>Collaboration</strong>: Group-based access control for team projects</li>
+<li><strong>Backup</strong>: Daily snapshots for data protection</li>
+<li><strong>Quotas</strong>: Managed per-project and per-user allocations</li>
+<li><strong>POSIX Compliance</strong>: Standard Unix/Linux filesystem operations</li>
+</ul>
 <p><strong>Directory Structure:</strong>
 <div class="highlight"><pre><span></span><code>/arc/
 ├── home/[user]/          # Personal user space
 ├── projects/[project]/   # Shared project directories
 /scratch/                 # Fast temporary storage (session-local)
 </code></pre></div></p>
-<p><strong>Best For:</strong>
-- Active data analysis and processing
-- Shared datasets within research teams
-- Large computational workflows requiring fast I/O
-- Collaborative software development</p>
-<h3 id="vospace-vosuserproject-long-term-object-storage">VOSpace (<code>vos:[user|project]</code>) - Long-Term Object Storage<a class="headerlink" href="#vospace-vosuserproject-long-term-object-storage" title="Permanent link">&para;</a></h3>
-<p><strong><a href="https://www.ivoa.net/documents/VOSpace/">IVOA-Compliant VOSpace</a></strong> for archival and sharing:</p>
-<p><strong>Key Features:</strong>
-- <strong>Standards-Based</strong>: International Virtual Observatory Alliance (IVOA) VOSpace standard
-- <strong>Web Access</strong>: RESTful APIs and web interfaces
-- <strong>Metadata Support</strong>: Rich astronomical metadata and annotation capabilities
-- <strong>Versioning</strong>: Track changes to datasets over time
-- <strong>Geo-Redundant</strong>: Multiple copies across different locations
-- <strong>Access Control</strong>: Fine-grained permissions and sharing</p>
+<p><strong>Best For:</strong></p>
+<ul>
+<li>Active data analysis and processing</li>
+<li>Shared datasets within research teams</li>
+<li>Large computational workflows requiring fast I/O</li>
+<li>Collaborative software development</li>
+</ul>
+<h3 id="vault-vospace-vosuserproject-long-term-object-storage">Vault VOSpace (<code>vos:[user|project]</code>) - Long-Term Object Storage<a class="headerlink" href="#vault-vospace-vosuserproject-long-term-object-storage" title="Permanent link">&para;</a></h3>
+<p><strong>Vault is an <a href="https://www.ivoa.net/documents/VOSpace/">IVOA-Compliant VOSpace</a></strong> for archival and sharing.</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Standards-Based</strong>: International Virtual Observatory Alliance (IVOA) VOSpace standard</li>
+<li><strong>Web Access</strong>: RESTful APIs and web interfaces</li>
+<li><strong>Metadata Support</strong>: Rich astronomical metadata and annotation capabilities</li>
+<li><strong>Versioning</strong>: Track changes to datasets over time</li>
+<li><strong>Geo-Redundant</strong>: Multiple copies across different locations</li>
+<li><strong>Access Control</strong>: Fine-grained permissions and sharing</li>
+</ul>
 <p><strong>Access Methods:</strong>
 <div class="highlight"><pre><span></span><code><span class="c1"># Command-line tools</span>
 vcp<span class="w"> </span>myfile.fits<span class="w"> </span>vos:<span class="o">[</span>user<span class="p">|</span>project<span class="o">]</span>/<span class="w">     </span><span class="c1"># Copy to VOSpace</span>
@@ -2312,24 +2317,31 @@ https://www.canfar.net/storage/list
 <span class="c1"># Python APIs</span>
 import<span class="w"> </span>vos
 </code></pre></div></p>
-<p><strong>Best For:</strong>
-- Long-term data archival and preservation
-- Sharing datasets with external collaborators
-- Metadata-rich astronomical data
-- Cross-institutional data exchange
-- Backup copies of important results</p>
+<p>NB: <code>arc</code> is also available through the VOSpace API (<code>arc:</code>).</p>
+<p><strong>Best For</strong>:</p>
+<ul>
+<li>Long-term data archival and preservation</li>
+<li>Sharing datasets with external collaborators</li>
+<li>Metadata-rich astronomical data</li>
+<li>Cross-institutional data exchange</li>
+<li>Backup copies of important results</li>
+</ul>
 <h3 id="scratch-storage-scratch-high-performance-temporary">Scratch Storage (<code>/scratch/</code>) - High-Performance Temporary<a class="headerlink" href="#scratch-storage-scratch-high-performance-temporary" title="Permanent link">&para;</a></h3>
 <p><strong>Fast SSD Storage</strong> for intensive computations:</p>
-<p><strong>Key Features:</strong>
-- <strong>Performance</strong>: Fastest available storage for I/O-intensive operations
-- <strong>Temporary</strong>: Automatically cleared when sessions end
-- <strong>Capacity</strong>: Up to few hundreds GBs per session for big computational jobs
-- <strong>No Backup</strong>: Data is not preserved or backed up</p>
-<p><strong>Best For:</strong>
-- Large intermediate files during processing
-- I/O-intensive computations requiring maximum speed
-- Temporary datasets that don't need preservation
-- Cache storage for repeated computations</p>
+<p><strong>Key Features</strong>:</p>
+<ul>
+<li><strong>Performance</strong>: Fastest available storage for I/O-intensive operations</li>
+<li><strong>Temporary</strong>: Automatically cleared when sessions end</li>
+<li><strong>Capacity</strong>: Up to few hundreds GBs per session for big computational jobs</li>
+<li><strong>No Backup</strong>: Data is not preserved or backed up</li>
+</ul>
+<p><strong>Best For</strong>:</p>
+<ul>
+<li>Large intermediate files during processing</li>
+<li>I/O-intensive computations requiring maximum speed</li>
+<li>Temporary datasets that don't need preservation</li>
+<li>Cache storage for repeated computations</li>
+</ul>
 <div class="admonition danger">
 <p class="admonition-title">Scratch Storage Warning</p>
 <p><strong>All data in <code>/scratch/</code> is permanently deleted when your session ends.</strong> Always copy important results to <code>/arc/</code> or <code>vos:</code> storage before ending sessions.</p>
@@ -2338,7 +2350,7 @@ import<span class="w"> </span>vos
 <div class="tabbed-set tabbed-alternate" data-tabs="5:3"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><input id="__tabbed_5_3" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">📊 Active Research Computing</label><label for="__tabbed_5_2">🗄️ Long-Term Archival Workflow</label><label for="__tabbed_5_3">⚡ High-Performance Computing</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<p><strong>Use <code>/arc/</code> for active work:</strong>
+<p><strong>Use <code>/arc/</code> for active work</strong>
 Example of structure:</p>
 <ol>
 <li><strong>Input Data</strong>: Store working datasets in <code>/arc/projects/[project]/data/</code></li>
@@ -2348,7 +2360,7 @@ Example of structure:</p>
 </ol>
 </div>
 <div class="tabbed-block">
-<p><strong>Use <code>vos:</code> for preservation:</strong></p>
+<p><strong>Use <code>vos:</code> for preservation</strong></p>
 <ol>
 <li><strong>Final Results</strong>: Archive completed analysis results</li>
 <li><strong>Publication Data</strong>: Store data associated with published papers</li>
@@ -2383,13 +2395,15 @@ vmv<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</sp
 
 <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;myimage.fits&quot;</span>
 <span class="n">vclient</span> <span class="o">=</span> <span class="n">vos</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
-<span class="n">vclient</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;vos:[project]/public/</span><span class="si">{filename}</span><span class="s1">)</span>
+<span class="n">vclient</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;vos:[project]/public/</span><span class="si">{filename}</span><span class="s1">&#39;</span><span class="p">)</span>
 </code></pre></div></p>
 <h3 id="storage-quotas-management">Storage Quotas &amp; Management<a class="headerlink" href="#storage-quotas-management" title="Permanent link">&para;</a></h3>
-<p><strong>Quota Information:</strong>
-- <strong>ARC Storage</strong>: Project-based quotas managed by CANFAR administrators, request increase when necessary anytime
-- <strong>Vault</strong>: User and project allocations with expansion available, increase when necessary anytime
-- <strong>Scratch</strong>: Per-session allocation, automatically managed</p>
+<p><strong>Quota Information</strong>:</p>
+<ul>
+<li><strong>ARC Storage</strong>: Project-based quotas managed by CANFAR administrators, request increase when necessary anytime</li>
+<li><strong>Vault</strong>: User and project allocations with expansion available, increase when necessary anytime</li>
+<li><strong>Scratch</strong>: Per-session allocation, automatically managed</li>
+</ul>
 <div class="admonition tip">
 <p class="admonition-title">Storage Efficiency</p>
 <p><strong>Optimise your storage strategy:</strong></p>
@@ -2450,21 +2464,21 @@ vmv<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</sp
 </table>
 <h3 id="automation-examples">Automation Examples<a class="headerlink" href="#automation-examples" title="Permanent link">&para;</a></h3>
 <p><strong>Session Automation:</strong></p>
-<div class="highlight"><pre><span></span><code># Launch and manage sessions programmatically
-from canfar.client import Session
+<div class="highlight"><pre><span></span><code><span class="c1"># Launch and manage sessions programmatically</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-session = Session()
-job = session.create(&#39;notebook&#39;, &#39;skaha/astroml:latest&#39;)
-session.monitor(job.id)
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">job</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">)</span>
+<span class="n">session</span><span class="o">.</span><span class="n">monitor</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
 </code></pre></div>
 <p><strong>Data Workflow Automation:</strong></p>
-<div class="highlight"><pre><span></span><code># Automated data processing pipeline
-from canfar.storage import VOSpace
+<div class="highlight"><pre><span></span><code><span class="c1"># Automated data processing pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">VOSpace</span>
 
-vos = VOSpace()
-vos.upload(&#39;/local/data&#39;, &#39;vos:project/input/&#39;)
-# ... run analysis session ...
-vos.download(&#39;vos:project/results/&#39;, &#39;/local/results/&#39;)
+<span class="n">vos</span> <span class="o">=</span> <span class="n">VOSpace</span><span class="p">()</span>
+<span class="n">vos</span><span class="o">.</span><span class="n">upload</span><span class="p">(</span><span class="s1">&#39;/local/data&#39;</span><span class="p">,</span> <span class="s1">&#39;vos:project/input/&#39;</span><span class="p">)</span>
+<span class="c1"># ... run analysis session ...</span>
+<span class="n">vos</span><span class="o">.</span><span class="n">download</span><span class="p">(</span><span class="s1">&#39;vos:project/results/&#39;</span><span class="p">,</span> <span class="s1">&#39;/local/results/&#39;</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Integration Options</p>
@@ -2547,7 +2561,7 @@ vos.download(&#39;vos:project/results/&#39;, &#39;/local/results/&#39;)
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 17:54:11 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     
@@ -2575,14 +2589,14 @@ vos.download(&#39;vos:project/results/&#39;, &#39;/local/results/&#39;)
     
     <nav>
       
-        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
-          
-          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
-        </a>
-      
         <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
           
           <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
         </a>
       
       

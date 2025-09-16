@@ -915,7 +915,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1815,10 +1815,8 @@
 <li><strong>Click</strong> the plus sign (<strong>+</strong>) to create a new session</li>
 <li><strong>Select</strong> <code>firefly</code> as your session type</li>
 </ol>
-<p><img alt="Select Firefly Session" src="../images/firefly/1_select_firefly_session.png" /></p>
 <h3 id="step-2-choose-container">Step 2: Choose Container<a class="headerlink" href="#step-2-choose-container" title="Permanent link">&para;</a></h3>
 <p>The container selection updates automatically after choosing the session type. Select the Firefly container version you need:</p>
-<p><img alt="Choose Firefly Container" src="../images/firefly/2_select_firefly_container.png" /></p>
 <h4 id="available-versions">Available Versions<a class="headerlink" href="#available-versions" title="Permanent link">&para;</a></h4>
 <ul>
 <li><strong>firefly:latest</strong> - Most recent stable version (recommended)</li>
@@ -1831,7 +1829,6 @@
 <h3 id="step-3-configure-session">Step 3: Configure Session<a class="headerlink" href="#step-3-configure-session" title="Permanent link">&para;</a></h3>
 <h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
 <p>Choose a descriptive name that helps identify your work:</p>
-<p><img alt="Name Firefly Session" src="../images/firefly/3_choose_firefly_name.png" /></p>
 <p><strong>Good session names:</strong>
 - <code>lsst-photometry</code>
 - <code>hsc-catalogue-analysis</code> 
@@ -1855,7 +1852,6 @@
 <li><strong>2 cores</strong>: Default, sufficient for most visualisation tasks</li>
 <li><strong>4 cores</strong>: Large table operations, complex filtering</li>
 </ul>
-<p><img alt="Choose Firefly Cores" src="../images/firefly/5_choose_firefly_cores.png" /></p>
 <h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
 <ol>
 <li><strong>Click</strong> "Launch" button</li>
@@ -1863,16 +1859,15 @@
 <li><strong>Session appears</strong> on your portal dashboard</li>
 <li><strong>Click</strong> the session icon to access Firefly</li>
 </ol>
-<p><img alt="Launch Firefly" src="../images/firefly/6_launch_firefly.png" /></p>
 <h2 id="using-firefly">🔥 Using Firefly<a class="headerlink" href="#using-firefly" title="Permanent link">&para;</a></h2>
 <h3 id="interface-overview">Interface Overview<a class="headerlink" href="#interface-overview" title="Permanent link">&para;</a></h3>
 <p>Firefly's interface consists of several main areas:</p>
 <pre class="mermaid"><code>graph TD
     Interface[Firefly Interface]
-    Interface --&gt; Upload["📁 File Upload Area"]
-    Interface --&gt; Images["🖼️ Image Display"]
-    Interface --&gt; Tables["📊 Table Viewer"]
-    Interface --&gt; Tools["🔧 Analysis Tools"]
+    Interface --&gt; Upload[File Upload Area]
+    Interface --&gt; Images[Image Display]
+    Interface --&gt; Tables[Table Viewer]
+    Interface --&gt; Tools[Analysis Tools]
 
     Upload --&gt; Local[Local Files]
     Upload --&gt; URLs[Remote URLs]
@@ -2072,9 +2067,9 @@ https://irsa.ipac.caltech.edu/data/WISE/cutouts/
 <li>Create colour-magnitude diagram</li>
 <li>Export selected sources</li>
 </ol>
-<div class="highlight"><pre><span></span><code><span class="c1"># Example: Filter for main sequence stars</span>
-<span class="c1"># In Firefly filter box:</span>
-<span class="p">(</span><span class="n">g_mag</span> <span class="o">-</span> <span class="n">r_mag</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.2</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">g_mag</span> <span class="o">-</span> <span class="n">r_mag</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">1.0</span> <span class="o">&amp;&amp;</span> <span class="n">r_mag</span> <span class="o">&lt;</span> <span class="mi">22</span>
+<div class="highlight"><pre><span></span><code><span class="c1">// Example: Filter for main sequence stars</span>
+<span class="c1">// In Firefly filter box:</span>
+<span class="p">(</span><span class="nx">g_mag</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">r_mag</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="nx">g_mag</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">r_mag</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">r_mag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">22</span>
 </code></pre></div>
 <h3 id="multi-object-analysis">Multi-object Analysis<a class="headerlink" href="#multi-object-analysis" title="Permanent link">&para;</a></h3>
 <p><strong>Target List Processing:</strong></p>
@@ -2167,7 +2162,7 @@ vos://cadc.nrc.ca~vault/<span class="o">[</span>user<span class="o">]</span>/
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 21:44:49 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     

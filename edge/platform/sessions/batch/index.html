@@ -915,7 +915,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1833,7 +1833,7 @@ canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</
 <span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$JOB_NAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$IMAGE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--cores<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--ram<span class="w"> </span><span class="m">364</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--ram<span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2">&quot;</span>
 </code></pre></div>
 <p>Or using the Python <code>canfar</code> client:</p>
@@ -1895,7 +1895,7 @@ canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</
 <span class="c1"># Monitor resource usage in the job logs</span>
 <span class="c1"># Scale up for production runs if needed</span>
 </code></pre></div>
-<p><strong>Memory Optimization:</strong>
+<p><strong>Memory Optimization:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Memory-efficient data processing patterns</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
@@ -1921,8 +1921,8 @@ canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</
             <span class="k">del</span> <span class="n">chunk</span>
 
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-</code></pre></div></p>
-<p><strong>Storage Performance:</strong>
+</code></pre></div>
+<p><strong>Storage Performance:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Use /scratch/ for I/O intensive operations</span>
 <span class="c1">#!/bin/bash</span>
 <span class="nb">set</span><span class="w"> </span>-e
@@ -1943,15 +1943,9 @@ cp<span class="w"> </span>*.fits<span class="w"> </span><span class="nv">$PROJEC
 cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT</span>/logs/
 
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing complete&quot;</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="parallel-processing">Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permanent link">&para;</a></h4>
-<div class="admonition tip">
-<p class="admonition-title">Advanced: Distributed Workflows</p>
-<ul>
-<li>For team projects, see <a href="../../permissions/">Accounts &amp; Permissions</a> for collaboration strategies.</li>
-</ul>
-</div>
-<p><strong>Multi-core CPU Usage:</strong>
+<p><strong>Multi-core CPU Usage:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
@@ -1978,8 +1972,8 @@ cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT
         <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">process_func</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">results</span>
-</code></pre></div></p>
-<p><strong>GPU Acceleration (when available):</strong>
+</code></pre></div>
+<p><strong>GPU Acceleration (when available):</strong></p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>  <span class="c1"># GPU arrays</span>
@@ -2006,9 +2000,9 @@ cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using CPU fallback&quot;</span><span class="p">)</span>
         <span class="c1"># CPU-only operations</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-</code></pre></div></p>
+</code></pre></div>
 <h4 id="job-monitoring-and-logging">Job Monitoring and Logging<a class="headerlink" href="#job-monitoring-and-logging" title="Permanent link">&para;</a></h4>
-<p><strong>Comprehensive Logging:</strong>
+<p><strong>Comprehensive Logging:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
@@ -2031,7 +2025,7 @@ cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT
     <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
     <span class="n">disk</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s1">&#39;/scratch&#39;</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%&quot;</span><span class="p">,</span> 
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">used</span><span class="o">//</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">GB used), &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Scratch: </span><span class="si">{</span><span class="n">disk</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% used&quot;</span><span class="p">)</span>
@@ -2051,7 +2045,7 @@ cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT
         <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">raise</span>
-</code></pre></div></p>
+</code></pre></div>
 <hr />
 <div class="admonition info">
 <p class="admonition-title">See Also</p>
@@ -2205,7 +2199,7 @@ For more examples, see <a href="../../../client/examples/">Client Examples</a>.<
 <span class="p">)</span>
 </code></pre></div>
 <h4 id="private-image-authentication">Private Image Authentication<a class="headerlink" href="#private-image-authentication" title="Permanent link">&para;</a></h4>
-<p>To use private images, you first need to configure the client with your registry credentials. See the <a href="../../permissions/">authentication guide</a> for details.</p>
+<p>To use private images, you first need to configure the client with your registry credentials. See the <a href="../../containers/registry/">registry guide</a> for details.</p>
 <h4 id="job-monitoring-and-management">Job Monitoring and Management<a class="headerlink" href="#job-monitoring-and-management" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
@@ -2350,7 +2344,7 @@ For data management strategies, see <a href="../../storage/">Storage Guide</a>.<
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 00:19:18 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     

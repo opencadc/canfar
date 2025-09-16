@@ -632,7 +632,7 @@
         <li class="md-nav__item">
   <a href="#container-registry-access-harbor" class="md-nav__link">
     <span class="md-ellipsis">
-      � Container Registry Access (Harbor)
+      🐳 Container Registry Access (Harbor)
     </span>
   </a>
   
@@ -933,7 +933,7 @@
   
   
   <span class="md-ellipsis">
-    Contributed Applications
+    Contributed
     
   </span>
   
@@ -1714,7 +1714,7 @@
         <li class="md-nav__item">
   <a href="#container-registry-access-harbor" class="md-nav__link">
     <span class="md-ellipsis">
-      � Container Registry Access (Harbor)
+      🐳 Container Registry Access (Harbor)
     </span>
   </a>
   
@@ -1848,18 +1848,18 @@
 <h2 id="group-management-collaboration">👥 Group Management &amp; Collaboration<a class="headerlink" href="#group-management-collaboration" title="Permanent link">&para;</a></h2>
 <p>Groups form the foundation of collaborative research on CANFAR, providing shared access to computing resources, storage systems, and container environments while maintaining security boundaries between projects.</p>
 <h3 id="group-based-resource-sharing">Group-Based Resource Sharing<a class="headerlink" href="#group-based-resource-sharing" title="Permanent link">&para;</a></h3>
-<pre class="mermaid"><code>    graph TD
-        Admin["👑 Group Administrator"]
-        Members["👤 Group Members"]
-        Resources["💾 Shared Resources"]
+<pre class="mermaid"><code>graph TD
+    Admin["👑 Group Administrator"]
+    Members["👤 Group Members"]
+    Resources["💾 Shared Resources"]
 
-        Admin --&gt; |"Manages"| Members
-        Admin --&gt; |"Controls access to"| Resources
-        Members --&gt; |"Access"| Resources
+    Admin --&gt; |"Manages"| Members
+    Admin --&gt; |"Controls access to"| Resources
+    Members --&gt; |"Access"| Resources
 
-        Resources --&gt; Projects["📁 /arc/projects/[project]/"]
-        Resources --&gt; Storage["💾 Storage Quotas"]
-        Resources --&gt; Containers["🐳 Container Access"]</code></pre>
+    Resources --&gt; Projects["📁 /arc/projects/[project]/"]
+    Resources --&gt; Storage["💾 Storage Quotas"]
+    Resources --&gt; Containers["🐳 Container Access"]</code></pre>
 <h3 id="group-administration-interface">Group Administration Interface<a class="headerlink" href="#group-administration-interface" title="Permanent link">&para;</a></h3>
 <dl>
 <dt><strong>Access Group Management:</strong></dt>
@@ -1941,7 +1941,7 @@
 <p class="admonition-title">Collaboration Benefits</p>
 <p><strong>Groups enable seamless research collaboration</strong> by providing standardized environments, shared data access, and unified resource management across institutional boundaries.</p>
 </div>
-<h2 id="container-registry-access-harbor">� Container Registry Access (Harbor)<a class="headerlink" href="#container-registry-access-harbor" title="Permanent link">&para;</a></h2>
+<h2 id="container-registry-access-harbor">🐳 Container Registry Access (Harbor)<a class="headerlink" href="#container-registry-access-harbor" title="Permanent link">&para;</a></h2>
 <p>Harbor serves as CANFAR's container registry for storing, managing, and distributing software environments. Understanding Harbor permissions is essential for teams building custom containers or managing specialized software stacks.</p>
 <h3 id="registry-overview">Registry Overview<a class="headerlink" href="#registry-overview" title="Permanent link">&para;</a></h3>
 <dl>
@@ -1994,22 +1994,22 @@
 </ul>
 <h3 id="working-with-harbor">Working with Harbor<a class="headerlink" href="#working-with-harbor" title="Permanent link">&para;</a></h3>
 <p><strong>Authentication:</strong></p>
-<div class="highlight"><pre><span></span><code># Login to Harbor registry
-docker login images.canfar.net
+<div class="highlight"><pre><span></span><code><span class="c1"># Login to Harbor registry</span>
+docker<span class="w"> </span>login<span class="w"> </span>images.canfar.net
 </code></pre></div>
 <p><strong>Pulling Images:</strong></p>
-<div class="highlight"><pre><span></span><code># Pull public container images
-docker pull images.canfar.net/skaha/astroml:latest
+<div class="highlight"><pre><span></span><code><span class="c1"># Pull public container images</span>
+docker<span class="w"> </span>pull<span class="w"> </span>images.canfar.net/skaha/astroml:latest
 
-# Pull private group images (requires permissions)
-docker pull images.canfar.net/[project]/[container]:[tag]
+<span class="c1"># Pull private group images (requires permissions)</span>
+docker<span class="w"> </span>pull<span class="w"> </span>images.canfar.net/<span class="o">[</span>project<span class="o">]</span>/<span class="o">[</span>container<span class="o">]</span>:<span class="o">[</span>tag<span class="o">]</span>
 </code></pre></div>
 <p><strong>Pushing Images (Developer/Master roles):</strong></p>
-<div class="highlight"><pre><span></span><code># Build and tag your container
-docker build -t images.canfar.net/[project]/[container]:[tag] .
+<div class="highlight"><pre><span></span><code><span class="c1"># Build and tag your container</span>
+docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>images.canfar.net/<span class="o">[</span>project<span class="o">]</span>/<span class="o">[</span>container<span class="o">]</span>:<span class="o">[</span>tag<span class="o">]</span><span class="w"> </span>.
 
-# Push to project repository
-docker push images.canfar.net/[project]/[container]:[tag]
+<span class="c1"># Push to project repository</span>
+docker<span class="w"> </span>push<span class="w"> </span>images.canfar.net/<span class="o">[</span>project<span class="o">]</span>/<span class="o">[</span>container<span class="o">]</span>:<span class="o">[</span>tag<span class="o">]</span>
 </code></pre></div>
 <h3 id="project-organization">Project Organization<a class="headerlink" href="#project-organization" title="Permanent link">&para;</a></h3>
 <dl>
@@ -2095,8 +2095,8 @@ docker push images.canfar.net/[project]/[container]:[tag]
 </table>
 <h3 id="viewing-acl-permissions">Viewing ACL Permissions<a class="headerlink" href="#viewing-acl-permissions" title="Permanent link">&para;</a></h3>
 <p><strong>Check Current ACLs:</strong></p>
-<div class="highlight"><pre><span></span><code># View detailed ACL information for files or directories
-getfacl /arc/projects/[project]/[directory]/
+<div class="highlight"><pre><span></span><code><span class="c1"># View detailed ACL information for files or directories</span>
+getfacl<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="o">[</span>directory<span class="o">]</span>/
 </code></pre></div>
 <p><strong>Example ACL Output:</strong></p>
 <div class="highlight"><pre><span></span><code># file: sensitive_data/
@@ -2116,31 +2116,30 @@ other::---                   # No access for others
 </div>
 <h3 id="setting-and-managing-acls">Setting and Managing ACLs<a class="headerlink" href="#setting-and-managing-acls" title="Permanent link">&para;</a></h3>
 <p><strong>Grant User Access:</strong></p>
-<div class="highlight"><pre><span></span><code># Give user &#39;bob&#39; read access to a directory
-setfacl -m u:bob:r-- /arc/projects/[project]/shared_data/
+<div class="highlight"><pre><span></span><code><span class="c1"># Give user &#39;bob&#39; read access to a directory</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>u:bob:r--<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared_data/
 
-# Grant user &#39;alice&#39; read and write access to specific files
-setfacl -m u:alice:rw- /arc/projects/[project]/scripts/analysis.py
+<span class="c1"># Grant user &#39;alice&#39; read and write access to specific files</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>u:alice:rw-<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/scripts/analysis.py
 </code></pre></div>
 <p><strong>Grant Group Access:</strong></p>
-<div class="highlight"><pre><span></span><code># Allow external group read access to results
-setfacl -m g:external-collab:r-- /arc/projects/[project]/public_results/
+<div class="highlight"><pre><span></span><code><span class="c1"># Allow external group read access to results</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>g:external-collab:r--<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/public_results/
 
-# Grant write access to multiple collaborating groups
-setfacl -m g:partner-institution:rw- /arc/projects/[project]/shared_analysis/
+<span class="c1"># Grant write access to multiple collaborating groups</span>
+setfacl<span class="w"> </span>-m<span class="w"> </span>g:partner-institution:rw-<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/shared_analysis/
 </code></pre></div>
 <p><strong>Remove ACL Entries:</strong></p>
-<div class="highlight"><pre><span></span><code># Remove specific user access
-setfacl -x u:bob /arc/projects/[project]/sensitive_data/
+<div class="highlight"><pre><span></span><code><span class="c1"># Remove specific user access</span>
+setfacl<span class="w"> </span>-x<span class="w"> </span>u:bob<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/sensitive_data/
 
-# Remove all ACL entries (revert to POSIX only)
-setfacl -b /arc/projects/[project]/temp_data/
+<span class="c1"># Remove all ACL entries (revert to POSIX only)</span>
+setfacl<span class="w"> </span>-b<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/temp_data/
 </code></pre></div>
 <p><strong>Recursive Operations:</strong></p>
-<div class="highlight"><pre><span></span><code># Apply ACLs to entire directory trees
-setfacl -R -m g:collaborators:r-- /arc/projects/[project]/results/
+<div class="highlight"><pre><span></span><code><span class="c1"># Apply ACLs to entire directory trees</span>
+setfacl<span class="w"> </span>-R<span class="w"> </span>-m<span class="w"> </span>g:collaborators:r--<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/results/
 </code></pre></div>
-<h3 id="acl-best-practices-directory-organization">ACL Best Practices &amp; Directory Organization<a class="headerlink" href="#acl-best-practices-directory-organization" title="Permanent link">&para;</a></h3>
 <p><strong>Recommended Directory Structure:</strong></p>
 <div class="highlight"><pre><span></span><code>/arc/projects/[project]/
 ├── public/              # World-readable results
@@ -2189,13 +2188,13 @@ setfacl -R -m g:collaborators:r-- /arc/projects/[project]/results/
 <div class="tabbed-block">
 <p><strong>Best for:</strong> Interactive use, development, short-term automation</p>
 <p><strong>Setup:</strong></p>
-<div class="highlight"><pre><span></span><code># Login and store authentication token
-canfar auth login
+<div class="highlight"><pre><span></span><code><span class="c1"># Login and store authentication token</span>
+canfar<span class="w"> </span>auth<span class="w"> </span>login
 
-# Subsequent commands use stored credentials
-canfar ps
-canfar launch notebook skaha/astroml:latest
-canfar info [session-id]
+<span class="c1"># Subsequent commands use stored credentials</span>
+canfar<span class="w"> </span>ps
+canfar<span class="w"> </span>launch<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
 </code></pre></div>
 <p><strong>Benefits:</strong>
 - Easy setup and token management
@@ -2206,54 +2205,52 @@ canfar info [session-id]
 <div class="tabbed-block">
 <p><strong>Best for:</strong> Long-term automation, production scripts, file operations</p>
 <p><strong>Setup:</strong>
-```bash
-    # Install CADC utilities
-    pip install cadcutils</p>
-<div class="highlight"><pre><span></span><code># Generate 10-day proxy certificate  
-cadc-get-cert -u [username]
+<div class="highlight"><pre><span></span><code><span class="c1"># Install CADC utilities</span>
+pip<span class="w"> </span>install<span class="w"> </span>cadcutils
 
-# Certificate stored in ~/.ssl/cadcproxy.pem
-# Automatically used by CADC tools and APIs
-</code></pre></div>
-</div>
-</div>
-</div>
-<p>```
-    <strong>Benefits:</strong>
-    - Extended validity (10 days)
-    - Compatible with all CADC services
-    - Suitable for production automation
-    - Works with VOSpace and data archive APIs</p>
-<h3 id="api-integration-examples">API Integration Examples<a class="headerlink" href="#api-integration-examples" title="Permanent link">&para;</a></h3>
-<p><strong>Session Management:</strong>
-<div class="highlight"><pre><span></span><code>    <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<span class="c1"># Generate 10-day proxy certificate  </span>
+cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[</span>username<span class="o">]</span>
 
-    <span class="c1"># Start authenticated session client</span>
-    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-    <span class="c1"># Launch computing sessions programmatically</span>
-    <span class="n">job</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">)</span>
-
-    <span class="c1"># Monitor session status</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-
-    <span class="c1"># List all active sessions</span>
-    <span class="n">active_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
-
-<span class="o">**</span><span class="n">Batch</span> <span class="n">Processing</span> <span class="n">Integration</span><span class="p">:</span><span class="o">**</span>
-
-    <span class="c1"># Automated pipeline example</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-    <span class="c1"># Submit batch job with custom parameters</span>
-    <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-    <span class="n">job</span> <span class="o">=</span> <span class="n">canfar</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-        <span class="n">image</span><span class="o">=</span><span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">,</span>
-        <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;analysis.py&#39;</span><span class="p">],</span>
-        <span class="n">cpu</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">memory</span><span class="o">=</span><span class="mi">8</span>
-    <span class="p">)</span>
+<span class="c1"># Certificate stored in ~/.ssl/cadcproxy.pem</span>
+<span class="c1"># Automatically used by CADC tools and APIs</span>
 </code></pre></div></p>
+<p><strong>Benefits:</strong>
+- Extended validity (10 days)
+- Compatible with all CADC services
+- Suitable for production automation
+- Works with VOSpace and data archive APIs</p>
+</div>
+</div>
+</div>
+<h3 id="api-integration-examples">API Integration Examples<a class="headerlink" href="#api-integration-examples" title="Permanent link">&para;</a></h3>
+<p><strong>Session Management:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="c1"># Start authenticated session client</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+
+<span class="c1"># Launch computing sessions programmatically</span>
+<span class="n">job</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">)</span>
+
+<span class="c1"># Monitor session status</span>
+<span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+
+<span class="c1"># List all active sessions</span>
+<span class="n">active_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+</code></pre></div>
+<p><strong>Batch Processing Integration:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Automated pipeline example</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="c1"># Submit batch job with custom parameters</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="n">job</span> <span class="o">=</span> <span class="n">canfar</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
+    <span class="n">image</span><span class="o">=</span><span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">,</span>
+    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;analysis.py&#39;</span><span class="p">],</span>
+    <span class="n">cpu</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">memory</span><span class="o">=</span><span class="mi">8</span>
+<span class="p">)</span>
+</code></pre></div>
 <h2 id="common-issues-troubleshooting">🚨 Common Issues &amp; Troubleshooting<a class="headerlink" href="#common-issues-troubleshooting" title="Permanent link">&para;</a></h2>
 <p>Understanding and resolving common permission issues helps maintain smooth collaborative workflows.</p>
 <h3 id="permission-denied-accessing-arcprojectsproject">Permission Denied Accessing <code>/arc/projects/[project]</code><a class="headerlink" href="#permission-denied-accessing-arcprojectsproject" title="Permanent link">&para;</a></h3>
@@ -2349,16 +2346,6 @@ cadc-get-cert -u [username]
 <dt><strong>Compliance Requirements:</strong></dt>
 <dd>Support for institutional data governance and compliance requirements through audit logging and access controls.</dd>
 </dl>
-<h3 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h3>
-<p><strong>For Users:</strong>
-- <strong><a href="../storage/">Storage Systems</a></strong> - Apply permissions to manage research data
-- <strong><a href="../containers/">Container Management</a></strong> - Access and build software environments
-- <strong><a href="../../client/home/">API Documentation</a></strong> - Programmatic platform access
-- <strong><a href="../support/">Support Channels</a></strong> - Administrative assistance and escalation</p>
-<div class="admonition success">
-<p class="admonition-title">Permission Management Success</p>
-<p><strong>Effective permission management enables secure, flexible collaboration</strong> across astronomical research teams while maintaining institutional security requirements and supporting complex multi-party projects.</p>
-</div>
 
 
 
@@ -2381,7 +2368,7 @@ cadc-get-cert -u [username]
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 17:54:11 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
   </span>
 
     
@@ -2409,14 +2396,14 @@ cadc-get-cert -u [username]
     
     <nav>
       
-        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
-          
-          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
-        </a>
-      
         <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
           
           <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
         </a>
       
       
