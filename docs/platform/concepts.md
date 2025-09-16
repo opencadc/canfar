@@ -38,7 +38,7 @@ CANFAR eliminates traditional barriers to astronomical computing:
     - **Environment Standardisation**: Identical software stacks across the team
     - **Seamless Collaboration**: Shared workspaces and data access
     - **Session Sharing**: Live collaboration on analysis workflows
-    - **Project Management**: Centralized resource and permission management
+    - **Project Management**: Centralised resource and permission management
 
 === "Large Projects"
     - **Dynamic Scaling**: Resources adjust to computational demands
@@ -51,78 +51,79 @@ CANFAR eliminates traditional barriers to astronomical computing:
 CANFAR is built on modern cloud-native technologies designed for scalability, reliability, and ease of use. Understanding the architecture helps you leverage the platform effectively.
 
 ### System Components
+
 ```mermaid
-    %%{init: {'flowchart': {'curve': 'linear'}}}%%
-    graph LR
-        %% User Entry Point
-        User["👤 Scientist"]:::user
-        
-        %% Portal Layer
-        Portal["🌐 Science Portal<br/>canfar.net"]:::portal
-        Auth["🔐 CADC Authentication"]:::auth
-        Sessions["🖥️ Session Manager<br/>Skaha"]:::sessions
-        
-        %% Infrastructure Layer
-        K8s["☸️ Kubernetes Cluster"]:::k8s
-        Containers["🐳 Container Images<br/>Harbor Registry"]:::containers
-        Storage["💾 Storage Systems"]:::storage
-        
-        %% Storage Systems
-        arc["📁 arc POSIX Storage<br/>Shared Filesystem"]:::arc
-        VOSpace["☁️ VOSpace Object Store<br/>Long-term Storage"]:::vospace
-        Scratch["⚡ Scratch<br/>Temporary SSDs"]:::scratch
-        
-        %% Session Types
-        Types["Session Types"]:::types
-        Notebook["📓 Jupyter Notebooks"]:::notebooks
-        Desktop["🖥️ Desktop Environment"]:::desktop
-        CARTA["📊 CARTA Viewer"]:::carta
-        Firefly["🔥 Firefly Viewer"]:::firefly
-        Contrib["⚙️ Contributed Apps"]:::contrib
-        Batch["🏭 Batch Jobs"]:::batch
-        
-        %% Connections
-        User --> Portal
-        Portal --> Auth
-        Portal --> Sessions
-        
-        Auth --> K8s
-        Sessions --> K8s
-        
-        K8s --> Containers
-        K8s --> Storage
-        
-        Storage --> arc
-        Storage --> VOSpace
-        Storage --> Scratch
-        
-        Sessions --> Types
-        Types --> Notebook
-        Types --> Desktop
-        Types --> CARTA
-        Types --> Firefly
-        Types --> Contrib
-        Types --> Batch
-        
-        %% Styling
-        classDef user fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
-        classDef portal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-        classDef auth fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
-        classDef sessions fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
-        classDef k8s fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000
-        classDef containers fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
-        classDef storage fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
-        classDef arc fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
-        classDef vospace fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
-        classDef scratch fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
-        classDef types fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
-        classDef notebooks fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
-        classDef desktop fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
-        classDef carta fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
-        classDef firefly fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
-        classDef contrib fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
-        classDef batch fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
+graph LR
+    %% User Entry Point
+    User["👤 Scientist"]:::user
+    
+    %% Portal Layer
+    Portal["🌐 Science Portal<br/>canfar.net"]:::portal
+    Auth["🔐 CADC Authentication"]:::auth
+    Sessions["🖥️ Session Manager<br/>Skaha"]:::sessions
+    
+    %% Infrastructure Layer
+    K8s["☸️ Kubernetes Cluster"]:::k8s
+    Containers["🐳 Container Images<br/>Harbor Registry"]:::containers
+    Storage["💾 Storage Systems"]:::storage
+    
+    %% Storage Systems
+    arc["📁 arc POSIX Storage<br/>Shared Filesystem"]:::arc
+    vault["☁️ VOSpace Object Store<br/>Long-term Storage"]:::vospace
+    scratch["⚡ Scratch<br/>Temporary SSDs"]:::scratch
+    
+    %% Session Types
+    Types["Session Types"]:::types
+    Notebook["📓 Jupyter Notebooks"]:::notebooks
+    Desktop["🖥️ Desktop Environment"]:::desktop
+    CARTA["📊 CARTA Viewer"]:::carta
+    Firefly["🔥 Firefly Viewer"]:::firefly
+    Contrib["⚙️ Contributed Apps"]:::contrib
+    Batch["🏭 Batch Jobs"]:::batch
+    
+    %% Connections
+    User --> Portal
+    Portal --> Auth
+    Portal --> Sessions
+    
+    Auth --> K8s
+    Sessions --> K8s
+    
+    K8s --> Containers
+    K8s --> Storage
+    
+    Storage --> arc
+    Storage --> vault
+    Storage --> scratch
+    
+    Sessions --> Types
+    Types --> Notebook
+    Types --> Desktop
+    Types --> CARTA
+    Types --> Firefly
+    Types --> Contrib
+    Types --> Batch
+    
+    %% Styling
+    classDef user fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef portal fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef auth fill:#ffebee,stroke:#c62828,stroke-width:2px,color:#000
+    classDef sessions fill:#e8f5e8,stroke:#2e7d32,stroke-width:2px,color:#000
+    classDef k8s fill:#fff3e0,stroke:#ef6c00,stroke-width:3px,color:#000
+    classDef containers fill:#f1f8e9,stroke:#558b2f,stroke-width:2px,color:#000
+    classDef storage fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef arc fill:#fce4ec,stroke:#ad1457,stroke-width:2px,color:#000
+    classDef vospace fill:#f3e5f5,stroke:#6a1b9a,stroke-width:2px,color:#000
+    classDef scratch fill:#fff8e1,stroke:#f57f17,stroke-width:2px,color:#000
+    classDef types fill:#e1f5fe,stroke:#0277bd,stroke-width:2px,color:#000
+    classDef notebooks fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#000
+    classDef desktop fill:#e8f5e8,stroke:#388e3c,stroke-width:2px,color:#000
+    classDef carta fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#000
+    classDef firefly fill:#fce4ec,stroke:#c2185b,stroke-width:2px,color:#000
+    classDef contrib fill:#e0f2f1,stroke:#00695c,stroke-width:2px,color:#000
+    classDef batch fill:#ffebee,stroke:#d32f2f,stroke-width:2px,color:#000
 ```
+
 ### Architecture Components
 
 **Browser-Based Portal** (`canfar.net`)
@@ -203,9 +204,9 @@ Containers are the foundation of CANFAR's flexibility and reproducibility. They 
 | Container | Purpose | Key Software | Best For |
 |-----------|---------|--------------|----------|
 | **astroml** | General astronomy analysis | scipy, astropy, matplotlib, pandas, scikit-learn, pytorch, STILTS | Data analysis, visualization, ML, research |
-| **improc** | Image processing | CASUTools, SExtractor, SWarp, | Photometry, astrometry, source detection, PSF |
+| **improc** | Image processing | CASUTools, SExtractor, SWarp, IRAF, STILTS | Photometry, astrometry, source detection, PSF fitting |
 | **casa** | Radio/MM astronomy | CASA software suite, Python | Radio astronomy, interferometry |
-| **lsst** | LSST Analysis | LSST Software Stack | Image processing, LSST data access |
+| **lsst** | LSST Analysis | LSST Software Stack | Image processing, LSST software stack and data access |
 | **carta** | Data visualization | CARTA viewer, analysis tools | Interactive datacubes visualization |
 
 !!! tip "Container Selection"
@@ -265,9 +266,9 @@ CANFAR provides different session types, each optimised for specific workflows:
 === "📓 Notebook Sessions"
     **JupyterLab Interface** for interactive data science workflows
 
-    **Best For:** Data exploration, visualization, prototyping, interactive analysis
+    **Best For**: Data exploration, visualization, prototyping, interactive analysis
     
-    **Features:**
+    **Features**:
     
     - Rich text, code, and visualization in unified interface
     - Python default, and other languagecustom kernels possible
@@ -278,22 +279,22 @@ CANFAR provides different session types, each optimised for specific workflows:
 === "🖥️ Desktop Sessions"
     **Linux Desktop Environment** for traditional GUI applications
 
-    **Best For:** CASA, DS9, TOPCAT, Aladin, traditional desktop workflows
+    **Best For**: CASA, DS9, TOPCAT, Aladin, traditional desktop workflows
     
-    **Features:**
+    **Features**:
     
     - Minimal Ubuntu desktop with window manager
-    - Multiple applications running simultaneously on many nodes
+    - Multiple applications, each running on a different cluster node
     - GUI-based tools and traditional software
     - File managers and system utilities
-    - Firefox browser
+    - Firefox browser-on-browser
 
 === "📊 CARTA Sessions"
     **Visualization and analysis** for FITS and HDF5 astronomy data
 
-    **Best For:** Radio astronomy data analysis, FITS file visualization
+    **Best For**: Radio astronomy data analysis, data cubes visualization
     
-    **Features:**
+    **Features**:
     
     - Interactive data exploration and analysis
     - Optimised for large radio astronomy datasets
@@ -303,9 +304,9 @@ CANFAR provides different session types, each optimised for specific workflows:
 === "🔥 Firefly Sessions"
     **Table and Image Visualization** tools
 
-    **Best For:** Catalogue analysis, image display, multi-wavelength data, LSST
+    **Best For**: Catalogue analysis, image display, multi-wavelength data, LSST
     
-    **Features:**
+    **Features**:
     
     - Astronomical table viewing and analysis
     - FITS image display and manipulation
@@ -316,9 +317,9 @@ CANFAR provides different session types, each optimised for specific workflows:
 === "⚙️ Contributed Sessions"
     **Community-Maintained Applications** and specialised tools
 
-    **Best For:** Specialised workflows, experimental features, niche applications
+    **Best For**: Communitity-supported web apps, Specialised workflows, experimental features, niche applications
     
-    **Features:**
+    **Features**:
     
     - Custom applications contributed by the community
     - Specialised tools for specific research areas
@@ -329,9 +330,9 @@ CANFAR provides different session types, each optimised for specific workflows:
 === "🏭 Batch Sessions"
     **Automated Processing** without interactive interfaces
 
-    **Best For:** Large-scale processing, automated workflows, production pipelines
+    **Best For**: Large-scale processing, automated workflows, production pipelines
     
-    **Features:**
+    **Features**:
     
     - Headless execution for automated processing
     - Script-based workflows and command execution
@@ -346,16 +347,16 @@ CANFAR supports two resource definition approaches:
 === "🔄 Flexible Mode (Default)"
     **Dynamic resource allocation** that adapts to cluster availability
 
-    **Characteristics:**
+    **Characteristics**:
     
     - **Adaptive Usage**: Can use more CPU/memory when cluster resources available
     - **Fast Scheduling**: Sessions start quickly as they're easier to place
     - **Variable Performance**: Performance adapts to cluster load
     - **Efficient Sharing**: Resources shared optimally across users
 
-    **Best For:** Interactive work, development, data exploration, most research workflows
+    **Best For**: Interactive work, development, data exploration, most research workflows
 
-    **CLI Usage:**
+    **CLI Usage**:
     ```bash
     canfar launch notebook skaha/astroml:latest  # Uses flexible mode
     ```
@@ -394,6 +395,7 @@ CANFAR supports two resource definition approaches:
 !!! tip "Advanced Session Management"
     Use the **[CANFAR CLI](../cli/cli-help.md)** to monitor sessions with `canfar stats`, get detailed information with `canfar info`, and manage multiple sessions programmatically.
 
+
 ## 💾 Storage Systems & Data Management
 
 CANFAR provides multiple storage systems optimised for different use cases in astronomical research. Understanding data persistence is crucial for effective platform use.
@@ -403,18 +405,19 @@ CANFAR provides multiple storage systems optimised for different use cases in as
 !!! warning "Critical: Understanding Data Persistence"
     **Where your files are saved determines whether they survive session restarts:**
 
-| Storage Location | Persistence | Purpose | Performance |
-|------------------|-------------|---------|-------------|
-| `/arc/projects/[project]/` | ✅ **Permanent, backed up** | Shared project data, results | Network-based shared POSIX |
-| `/arc/home/[user]/` | ✅ **Permanent, backed up** | Personal configs, scripts | Network-based shared POSIX |
-| `vos:[user|project]` | ✅ **Permanent, archived** | Long-term storage, sharing | Network-based shared object store |
-| `/scratch/` | ❌ **Wiped at session end** | Large temporary computations | Local SSD POSIX|
+    | Storage Location | Persistence | Purpose | Performance |
+    |------------------|-------------|---------|-------------|
+    | `/arc/projects/[project]/` | ✅ **Permanent, backed up** | Shared project data, results | Network-based shared POSIX |
+    | `/arc/home/[user]/` | ✅ **Permanent, backed up** | Personal configs, scripts | Network-based shared POSIX |
+    | `vos:[user\|project]` | ✅ **Permanent, archived** | Long-term storage, sharing | Network-based shared object store |
+    | `/scratch/` | ❌ **Wiped at session end** | Large temporary computations | Local SSD POSIX|
 
 ### ARC Storage (`/arc/`) - Active Research Storage
 
 **High-Performance POSIX Filesystem** for active research workflows:
 
 **Key Features:**
+
 - **Speed**: Direct filesystem access optimised for large computations
 - **Collaboration**: Group-based access control for team projects
 - **Backup**: Daily snapshots for data protection
@@ -430,16 +433,18 @@ CANFAR provides multiple storage systems optimised for different use cases in as
 ```
 
 **Best For:**
+
 - Active data analysis and processing
 - Shared datasets within research teams
 - Large computational workflows requiring fast I/O
 - Collaborative software development
 
-### VOSpace (`vos:[user|project]`) - Long-Term Object Storage
+### Vault VOSpace (`vos:[user|project]`) - Long-Term Object Storage
 
-**[IVOA-Compliant VOSpace](https://www.ivoa.net/documents/VOSpace/)** for archival and sharing:
+**Vault is an [IVOA-Compliant VOSpace](https://www.ivoa.net/documents/VOSpace/)** for archival and sharing.
 
-**Key Features:**
+**Key Features**:
+
 - **Standards-Based**: International Virtual Observatory Alliance (IVOA) VOSpace standard
 - **Web Access**: RESTful APIs and web interfaces
 - **Metadata Support**: Rich astronomical metadata and annotation capabilities
@@ -461,7 +466,10 @@ https://www.canfar.net/storage/list
 import vos
 ```
 
-**Best For:**
+NB: `arc` is also available through the VOSpace API (`arc:`).
+
+**Best For**:
+
 - Long-term data archival and preservation
 - Sharing datasets with external collaborators
 - Metadata-rich astronomical data
@@ -472,13 +480,15 @@ import vos
 
 **Fast SSD Storage** for intensive computations:
 
-**Key Features:**
+**Key Features**:
+
 - **Performance**: Fastest available storage for I/O-intensive operations
 - **Temporary**: Automatically cleared when sessions end
 - **Capacity**: Up to few hundreds GBs per session for big computational jobs
 - **No Backup**: Data is not preserved or backed up
 
-**Best For:**
+**Best For**:
+
 - Large intermediate files during processing
 - I/O-intensive computations requiring maximum speed
 - Temporary datasets that don't need preservation
@@ -490,7 +500,7 @@ import vos
 ### Storage Strategy & Best Practices
 
 === "📊 Active Research Computing"
-    **Use `/arc/` for active work:**
+    **Use `/arc/` for active work**
     Example of structure:
     
     1. **Input Data**: Store working datasets in `/arc/projects/[project]/data/`
@@ -499,7 +509,7 @@ import vos
     4. **Collaboration**: Share via project directory access permissions
 
 === "🗄️ Long-Term Archival Workflow"
-    **Use `vos:` for preservation:**
+    **Use `vos:` for preservation**
     
     1. **Final Results**: Archive completed analysis results
     2. **Publication Data**: Store data associated with published papers
@@ -534,12 +544,13 @@ import vos
 
 filename = "myimage.fits"
 vclient = vos.Client()
-vclient.copy(filename, 'vos:[project]/public/{filename})
+vclient.copy(filename, 'vos:[project]/public/{filename}')
 ```
 
 ### Storage Quotas & Management
 
-**Quota Information:**
+**Quota Information**:
+
 - **ARC Storage**: Project-based quotas managed by CANFAR administrators, request increase when necessary anytime
 - **Vault**: User and project allocations with expansion available, increase when necessary anytime
 - **Scratch**: Per-session allocation, automatically managed
@@ -594,22 +605,26 @@ CANFAR provides REST APIs for programmatic access, enabling automation and integ
 
 **Session Automation:**
 
-    # Launch and manage sessions programmatically
-    from canfar.client import Session
-    
-    session = Session()
-    job = session.create('notebook', 'skaha/astroml:latest')
-    session.monitor(job.id)
+```python
+# Launch and manage sessions programmatically
+from canfar.client import Session
+
+session = Session()
+job = session.create('notebook', 'skaha/astroml:latest')
+session.monitor(job.id)
+```
 
 **Data Workflow Automation:**
 
-    # Automated data processing pipeline
-    from canfar.storage import VOSpace
-    
-    vos = VOSpace()
-    vos.upload('/local/data', 'vos:project/input/')
-    # ... run analysis session ...
-    vos.download('vos:project/results/', '/local/results/')
+```python
+# Automated data processing pipeline
+from canfar.storage import VOSpace
+
+vos = VOSpace()
+vos.upload('/local/data', 'vos:project/input/')
+# ... run analysis session ...
+vos.download('vos:project/results/', '/local/results/')
+```
 
 !!! tip "Integration Options"
     **External Workflow Integration:**
@@ -618,6 +633,7 @@ CANFAR provides REST APIs for programmatic access, enabling automation and integ
     - **Jupyter Notebooks**: Embed CANFAR operations in interactive analysis
     - **CI/CD Pipelines**: Include CANFAR processing in continuous integration
     - **Custom Applications**: Build specialised tools using CANFAR APIs
+
 
 ## 🔗 Platform Integration & Next Steps
 

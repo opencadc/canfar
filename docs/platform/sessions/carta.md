@@ -38,13 +38,9 @@ CARTA provides specialised capabilities for:
 
 From the Science Portal dashboard, click the **plus sign (+)** to create a new session, then select **carta** as your session type.
 
-![Select CARTA Session](images/carta/1_select_carta_session.png)
-
 ### Step 2: Choose Container Version
 
 Note that the menu options update automatically after your session type selection. Choose the CARTA version that meets your needs:
-
-![Select CARTA Container](images/carta/2_select_carta_container.png)
 
 #### Available Versions
 
@@ -59,8 +55,6 @@ Note that the menu options update automatically after your session type selectio
 #### Session Name
 
 Choose a descriptive session name to help you identify it later:
-
-![Choose CARTA Name](images/carta/3_choose_carta_name.png)
 
 **Good session names:**
 - `m87-analysis`
@@ -140,12 +134,11 @@ Once connected to your CARTA session:
 
 #### Moment Maps
 
-```bash
-# CARTA can generate:
-# - Moment 0: Integrated intensity
-# - Moment 1: Velocity field
-# - Moment 2: Velocity dispersion
-```
+CARTA can generate:
+
+- **Moment 0:** Integrated intensity
+- **Moment 1:** Velocity field  
+- **Moment 2:** Velocity dispersion
 
 ### Region Analysis
 

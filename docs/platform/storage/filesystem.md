@@ -29,10 +29,12 @@ When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage
 
 #### ARC Home Directory (`/arc/home/[user]/`)
 
+Typically the home directory tree structure will be as follows:
+
 ```text
 /arc/home/[user]/
-├── .ssh/                    # SSH keys and config
-│   ├── authorized_keys      # Public keys for SSHFS access
+├── .ssh/                   # SSH keys and config
+│   ├── authorized_keys     # Public keys for SSHFS access
 │   └── config              # SSH client configuration
 ├── .jupyter/               # Jupyter configuration
 ├── .bashrc                 # Shell configuration
@@ -44,7 +46,7 @@ When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage
 
 **Recommended Use:**
 - Configuration files and dotfiles
-- Personal scripts and utilities
+- Personal code, scripts and utilities
 - SSH keys for external access
 - Small reference files and notes
 
@@ -190,7 +192,7 @@ You need to set up SSH key authentication on your CANFAR account:
    - Navigate to [ARC File Manager](https://www.canfar.net/storage/arc/list/home)
    - Go to your home directory
    - Create `.ssh` folder if it doesn't exist
-   - Upload your `~/.ssh/canfar_key.pub` as `authorized_keys`
+   - Upload your `~/.ssh/canfar_key.pub` as `authorized_keys` (if it already exists, you will have to append to the end of the file)
    
    **Method 2: Via existing session**
    ```bash
@@ -215,7 +217,7 @@ sshfs -p 64022 -i ~/.ssh/canfar_key \
       -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10 \
       [user]@ws-uv.canfar.net:/ ~/canfar_arc/
 
-# On macOS, add defer_permissions option:
+# On macOS, you may have to add defer_permissions option:
 sshfs -p 64022 -i ~/.ssh/canfar_key \
       -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10,defer_permissions \
       [user]@ws-uv.canfar.net:/ ~/canfar_arc/

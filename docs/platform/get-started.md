@@ -1,17 +1,14 @@
-
-
 # 🚀 Getting Started with CANFAR
 
 **Guide to setting up and using the CANFAR Science Platform for astronomical research.**
 
-!!! info "Quick Links"
+
     **Essential Resources:**
-    
-    - **[Permissions Guide](permissions.md)**: Account set-up and group management
-    - **[Sessions Overview](sessions/index.md)**: Interactive computing environments
-    - **[Storage Guide](storage/index.md)**: Data management and file systems
-    - **[Container Guide](containers/index.md)**: Software environments and registries
-    - **[Support Centre](support/index.md)**: Help resources and FAQ
+    - [Permissions Guide](permissions.md): Account set-up and group management
+    - [Sessions Overview](sessions/index.md): Interactive computing environments
+    - [Storage Guide](storage/index.md): Data management and file systems
+    - [Container Guide](containers/index.md): Software environments and registries
+    - [Support Centre](support/index.md): Help resources and FAQ
 
 
 ## 1️⃣ Get Your CADC Account
@@ -38,6 +35,7 @@ Once you have a CADC account:
 
 === "New Collaboration"
     Email [support@canfar.net](mailto:support@canfar.net) with:
+    
     - Your project description
     - Expected team size
     - Storage requirements
@@ -51,8 +49,7 @@ See [Permissions Guide](permissions.md) for group management details. For advanc
 
 1. Login to [canfar.net](https://www.canfar.net) with your CADC credentials.
 2. Accept Terms of Service to complete set-up.
-3. Access the [Image Registry](https://images.canfar.net) (required for private containers).
-
+3. Optional (for private containers): Access the [Image Registry](https://images.canfar.net)
 
 See [Container Guide](containers/index.md) for more about images and custom software. For building your own containers, see [Building Containers](containers/build.md).
 
@@ -99,14 +96,6 @@ See the [Storage Guide](storage/index.md) for full details. For VOSpace scriptin
 
 See [Permissions Guide](permissions.md) and [Storage Guide](storage/index.md) for collaboration details. For team onboarding, see [Getting Started](get-started.md).
 
-### Session Sharing
-
-Share running sessions with collaborators:
-
-1. In your session, copy the session URL.
-2. Share with team members (must be in the same group).
-3. They can view and interact with your work in real time.
-
 ### Storage Sharing
 
 All group members have access to `/arc/projects/[project]/` – perfect for:
@@ -115,17 +104,6 @@ All group members have access to `/arc/projects/[project]/` – perfect for:
 - Collaborative analysis scripts
 - Common software environments
 - Project documentation
-
-
----
-
-!!! info "Explore More Documentation"
-    **Platform Resources:**
-    
-    - **[Platform Concepts](concepts.md)**: Understanding CANFAR's architecture
-    - **[Sessions Guide](sessions/index.md)**: Interactive computing environments
-    - **[Storage Guide](storage/index.md)**: Data management and file systems
-    - **[Container Guide](containers/index.md)**: Software environments and registries
 
 
 ## 💬 Need Help?

@@ -39,13 +39,9 @@ Firefly offers specialised tools for:
 2. **Click** the plus sign (**+**) to create a new session
 3. **Select** `firefly` as your session type
 
-![Select Firefly Session](images/firefly/1_select_firefly_session.png)
-
 ### Step 2: Choose Container
 
 The container selection updates automatically after choosing the session type. Select the Firefly container version you need:
-
-![Choose Firefly Container](images/firefly/2_select_firefly_container.png)
 
 #### Available Versions
 
@@ -60,8 +56,6 @@ The container selection updates automatically after choosing the session type. S
 #### Session Name
 
 Choose a descriptive name that helps identify your work:
-
-![Name Firefly Session](images/firefly/3_choose_firefly_name.png)
 
 **Good session names:**
 - `lsst-photometry`
@@ -88,16 +82,12 @@ Most Firefly work is I/O bound rather than CPU intensive:
 - **2 cores**: Default, sufficient for most visualisation tasks
 - **4 cores**: Large table operations, complex filtering
 
-![Choose Firefly Cores](images/firefly/5_choose_firefly_cores.png)
-
 ### Step 4: Launch Session
 
 1. **Click** "Launch" button
 2. **Wait** for container initialisation (~30-60 seconds)
 3. **Session appears** on your portal dashboard
 4. **Click** the session icon to access Firefly
-
-![Launch Firefly](images/firefly/6_launch_firefly.png)
 
 ## 🔥 Using Firefly
 
@@ -108,10 +98,10 @@ Firefly's interface consists of several main areas:
 ```mermaid
 graph TD
     Interface[Firefly Interface]
-    Interface --> Upload["📁 File Upload Area"]
-    Interface --> Images["🖼️ Image Display"]
-    Interface --> Tables["📊 Table Viewer"]
-    Interface --> Tools["🔧 Analysis Tools"]
+    Interface --> Upload[File Upload Area]
+    Interface --> Images[Image Display]
+    Interface --> Tables[Table Viewer]
+    Interface --> Tools[Analysis Tools]
     
     Upload --> Local[Local Files]
     Upload --> URLs[Remote URLs]
@@ -347,9 +337,9 @@ File → Export → [Format]
 5. Create colour-magnitude diagram
 6. Export selected sources
 
-```python
-# Example: Filter for main sequence stars
-# In Firefly filter box:
+```javascript
+// Example: Filter for main sequence stars
+// In Firefly filter box:
 (g_mag - r_mag) > 0.2 && (g_mag - r_mag) < 1.0 && r_mag < 22
 ```
 

@@ -92,15 +92,15 @@ After status becomes **Running**:
 1. **Associate floating IP** (menu → **Associate Floating IP**)
 2. **SSH to the instance**:
 
-```bash
-ssh ubuntu@[floating_ip]
-```
+    ```bash
+    ssh ubuntu@[floating_ip]
+    ```
 
 3. **Create a local user** matching your CADC account:
 
-```bash
-sudo canfar_create_user [user]
-```
+    ```bash
+    sudo canfar_create_user [user]
+    ```
 
 ## 🔧 VM Configuration and Tools
 
@@ -148,33 +148,28 @@ This tutorial demonstrates building a basic **source detection** pipeline for CF
     - Access CADC VOSpace from VMs
     - Submit batch jobs that run your pipeline
 
-### 1. Create a VM {#create-vm}
+### 1. Create a VM
+
 Use the DRAC web dashboard.
 
-1. Sign in to [:material-open-in-new: Dashboard](https://arbutus-canfar.cloud.computecanada.ca/) with CADC `[user]`/password.
+1. Sign in to [Dashboard](https://arbutus-canfar.cloud.computecanada.ca/) with CADC `[user]`/password.
 2. Each CANFAR allocation maps to an OpenStack **`[project]`**. Use the top-left project picker to switch if you belong to multiple.
 
-Follow DRAC’s [Creating a Linux VM](https://docs.alliancecan.ca/wiki/Creating_a_Linux_VM). Summary below.
-
----
+Follow DRAC's [Creating a Linux VM](https://docs.alliancecan.ca/wiki/Creating_a_Linux_VM). Summary below.
 
 ### 2. Import an SSH Public Key
 
 OpenStack prefers SSH key pairs over passwords.
 
-- If you do not have a key pair, run `ssh-keygen` locally or follow DRAC’s [SSH Keys documentation].
+- If you do not have a key pair, run `ssh-keygen` locally or follow DRAC's SSH Keys documentation.
 - In **Compute → Key Pairs**, click **Import Key Pair**.
 - Name the key and paste your public key (default path `~/.ssh/id_rsa.pub`).
-
----
 
 ### 3. Allocate a Public IP
 
 - Go to **Network → Floating IPs**.
 - If none is listed, click **Allocate IP to Project**.
-- Typically, each project has one public IP; if exhausted you’ll see _Quota Exceeded_.
-
----
+- Typically, each project has one public IP; if exhausted you'll see _Quota Exceeded_.
 
 ### 4. Launch an Instance
 
@@ -183,8 +178,6 @@ OpenStack prefers SSH key pairs over passwords.
   - **Flavor**: e.g., `c2-7.5gb-30` (2 vCPU / 7.5 GiB RAM / ~31 GiB ephemeral disk)
   - **Key Pair**: select your SSH key
 - Click **Launch**.
-
----
 
 ### 5. Connect to the Instance
 
@@ -206,22 +199,23 @@ ssh [user]@[floating_ip]
     - Ubuntu images: `ubuntu`
     - Rocky Linux images: `rocky`
 
----
+### Install software
 
-### Install software {#install-software}
 The base VM image comes with only a minimal set of packages.  
 For this example, we need to install two additional tools:
 
 - [Source Extractor](https://sextractor.readthedocs.io/) (source detection): software used to detect astronomical sources in FITS images, producing catalogues of stars and galaxies.
-- [funpack](https://heasarc.gsfc.nasa.gov/fitsio/fpack/) (FITS decompressor; Ubuntu package `libcfitsio-bin`)：a decompression utility for FITS images. Most FITS images provided by CADC are Rice-compressed and stored with an `.fz` extension. Since Source Extractor only accepts uncompressed images, we will use `funpack` to uncompress them. The `funpack` executable is distributed as part of the `libcfitsio-bin` package in Debian/Ubuntu.
+- [funpack](https://heasarc.gsfc.nasa.gov/fitsio/fpack/) (FITS decompressor; Ubuntu package `libcfitsio-bin`): a decompression utility for FITS images. Most FITS images provided by CADC are Rice-compressed and stored with an `.fz` extension. Since Source Extractor only accepts uncompressed images, we will use `funpack` to uncompress them. The `funpack` executable is distributed as part of the `libcfitsio-bin` package in Debian/Ubuntu.
 
 Because both tools are available from the Ubuntu software repository, we can install them system-wide after updating the package index:
+
 ```bash title="Install packages"
 sudo apt update -y
 sudo apt install -y source-extractor libcfitsio-bin
 ```
 
-### Test on the VM {#test-vm}
+### Test on the VM
+
 Use the ephemeral disk (mounted at `/mnt`) for scratch.
 
 ```bash
@@ -243,7 +237,8 @@ source-extractor 1056213p.fits -CATALOG_NAME 1056213p.cat
     - Run `canfar_setup_scratch` each time you boot a **new** instance.
     - In **batch mode**, each job gets its own scratch directory (not `/mnt/scratch`).
 
-### Persist results to VOSpace {#persist-results}
+### Persist results to VOSpace
+
 Ephemeral storage is wiped when the VM terminates. Upload the output `1056213p.cat` to **VOSpace** (the VM includes the `vos` client).
 
 Obtain a proxy certificate for automated access:
@@ -260,7 +255,8 @@ vcp 1056213p.cat vos:[project]/
 !!! danger "Credential hygiene"
     `.netrc` stores credentials in plaintext. Use only on controlled hosts and restrict permissions: `chmod 600 ~/.netrc`.
 
-### Snapshot the instance {#snapshot}
+### Snapshot the instance
+
 In the **Instances** view, click **Create Snapshot** (e.g., name it `image-reduction-2023-08-21`).
 
 !!! warning
@@ -268,7 +264,8 @@ In the **Instances** view, click **Create Snapshot** (e.g., name it `image-reduc
 
 Without a snapshot, **ephemeral** data is lost when the instance is deleted. **Volume-backed** VMs persist data but are **not suitable for batch**.
 
-### Automate as a batch script {#batch-script}
+### Automate as a batch script
+
 CANFAR batch is powered by **HTCondor**; Cloud Scheduler launches worker VMs on demand.
 
 Create `~/do_catalogue.bash`:
@@ -290,7 +287,8 @@ source-extractor "${id}.fits" -CATALOG_NAME "${id}.cat"
 vcp "${id}.cat" "vos:[project]/"
 ```
 
-### Write a submission file {#submission}
+### Write a submission file
+
 Submit four image IDs: `1056215p 1056216p 1056217p 1056218p`.
 
 ```text title="do_catalogue.sub"
@@ -308,8 +306,10 @@ queue arguments from (
 )
 ```
 
-### Submit jobs {#submit}
+### Submit jobs
+
 Two authorizations are needed:
+
 - Access to snapshots in `[project]`
 - Write access to `vos:[project]`
 
@@ -327,6 +327,7 @@ canfar_submit do_catalogue.sub image-reduction-2023-08-21 c2-7.5gb-30
 ```
 
 Where:
+
 - `do_catalogue.sub`: submission file
 - `image-reduction-2023-08-21`: snapshot image name
 - `c2-7.5gb-30`: VM flavor (list via `openstack flavor list`)
@@ -339,8 +340,6 @@ condor_q -all   # all users summary
 ```
 
 When the interactive VM is no longer needed, delete it from the dashboard (**Delete Instances**).
-
----
 
 ## Extras: Helpful Commands & VM Maintenance
 
@@ -361,7 +360,6 @@ sudo dnf update
 - `canfar_setup_scratch`: set up `/mnt/scratch`
 - `canfar_create_user [user]`: create a local user and grant sudo
 - `canfar_update`: update CANFAR scripts and CADC clients
-
 
 ### Migration Strategies
 
@@ -389,7 +387,6 @@ Migrate components incrementally:
 2. **Keep batch processing** on VMs initially
 3. **Gradually containerise** pipeline components
 4. **Complete migration** when ready
-
 
 ## 🔗 Migration Resources
 
