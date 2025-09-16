@@ -1,231 +1,112 @@
-# Storage Systems
+# CANFAR Storage Systems
 
-**CANFAR's storage systems: choosing the right storage, understanding how sessions interact with storage, and optimising your data workflows.**
+**A guide to choosing the right storage, understanding how sessions interact with storage, and optimizing your data workflows on the CANFAR platform.**
 
-!!! abstract "🎯 Storage Guide"
-    **Master CANFAR's storage systems:**
-    
-    - **[Filesystem Access](filesystem.md)**: ARC storage, SSHFS mounting, and permissions
-    - **[Data Transfers](transfers.md)**: Moving data between systems and external sources  
-    - **[VOSpace Guide](vospace.md)**: Long-term storage, sharing, and archival
-    - **Storage Strategy**: Choosing optimal storage for your workflows
+CANFAR provides four distinct storage systems, each optimized for different stages of the research lifecycle. Understanding how these systems work together with CANFAR sessions is essential for efficient data management and analysis.
 
-CANFAR provides four distinct storage systems, each optimised for different stages of the research lifecycle. Understanding how these systems work together with CANFAR sessions is essential for efficient data management and analysis workflows.
+!!! abstract "Storage Guides"
+    - **[Filesystem Access](filesystem.md)**: ARC storage, SSHFS mounting, and permissions.
+    - **[Data Transfers](transfers.md)**: Moving data between systems and external sources.
+    - **[VOSpace Guide](vospace.md)**: Long-term storage, sharing, and archival.
 
-## 📊 Storage Types
+## Storage Options Overview
 
-| Storage Type    | Location/URI | Access Speed | Visibility | Persistence | Backup | Session Access | Best For |
-|----------------|--------------|--------------|------------|-------------|--------|----------------|----------|
-| **Scratch**     | `/scratch/` | Fastest SSD | Session only | ❌ Wiped at end | ❌ None | Direct filesystem | High-speed temporary processing |
-| **ARC Home**    | `/arc/home/[user]/` | Shared CephFS | Personal | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Personal configs, scripts, small files |
-| **ARC Projects** | `/arc/projects/[project]/` | Shared CephFS | Shared group | ✅ Permanent | ✅ Daily snapshots | Direct filesystem | Active collaborative research |
-| **Vault**       | `vos:[project\|user]/` | Medium | Personal/shared | ✅ Permanent | ✅ Geo-redundant | API/Web only | Long-term archives, data sharing |
+| Storage         | Path/URI                  | Access (Session/External)      | Speed               | Persistence & Backup      | Default Quota                 | Best For                                       |
+|-----------------|---------------------------|--------------------------------|---------------------|---------------------------|-------------------------------|------------------------------------------------|
+| **Scratch**     | `/scratch`                | Direct FS / N/A                | Fastest (local SSD) | Ephemeral (no backup)     | ~100GB (per session)          | High-speed temporary processing, staging I/O.  |
+| **ARC Home**    | `/arc/home/[user]`        | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 10GB                          | Personal configs, scripts, small files.        |
+| **ARC Projects**| `/arc/projects/[project]` | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 200GB                         | Active collaborative research data and results.|
+| **Vault**       | `vos:[project|user]`      | API / Web UI                   | Medium              | Permanent (geo-redundant) | Project-dependent             | Long-term archives, sharing, publication.      |
 
-## 🔄 How Sessions Use Storage
+### Checking Quotas and Requesting More Space
 
-CANFAR sessions (interactive containers, batch jobs) integrate with storage systems in different ways:
-
-### Direct Filesystem Access (Inside Sessions)
-
-```bash
-# Sessions automatically mount ARC storage as standard directories
-ls /arc/home/[user]/            # Your personal space
-ls /arc/projects/[project]/     # Shared project space  
-ls /scratch/                    # Temporary fast storage
-
-# Standard Unix commands work directly
-cp /arc/projects/[project]/data.fits /scratch/
-python analysis.py /scratch/data.fits
-mv results.png /arc/projects/[project]/figures/
-```
-
-### Session Storage Workflow
-
-```mermaid
-graph TD
-    Start([Session Starts]) --> Mount[ARC Storage Auto-mounted]
-    Mount --> Scratch[Empty /scratch/ Created]
-    Scratch --> Work[Work with Data]
-    Work --> Save[Save Important Results to ARC]
-    Save --> End([Session Ends])
-    End --> Cleanup[/scratch/ Wiped Clean]
-    
-    Work --> Process{Large Processing?}
-    Process -->|Yes| UseScratch[Use /scratch/ for speed]
-    Process -->|No| UseARC[Work directly in ARC]
-    
-    UseScratch --> Save
-    UseARC --> Save
-```
-
-## 🎯 Storage Selection Guide
-
-### By Workflow Type
-
-#### Interactive Analysis Sessions
-
-- **Start in**: `/arc/projects/[project]/` (your data)
-- **Process in**: `/scratch/` (large temporary files)  
-- **Save to**: `/arc/projects/[project]/results/` (permanent results)
-
-#### Batch Processing Jobs
-
-- **Input from**: Vault (long-term storage) or ARC Projects
-- **Process in**: `/scratch/` (fastest I/O)
-- **Output to**: ARC Projects (shared results) or Vault (archives)
-
-#### Data Sharing & Collaboration
-
-- **Active work**: ARC Projects (group members)
-- **External sharing**: Vault (public URLs, fine-grained permissions)
-- **Personal tools**: ARC Home (configurations, scripts)
-
-### By Data Size and Type
-
-=== "Small Files (<1GB)"
-    - **Personal scripts/configs**: ARC Home
-    - **Shared analysis code**: ARC Projects  
-    - **Quick processing**: Direct in ARC (no need for scratch)
-
-=== "Medium Files (1-100GB)"
-    - **Raw datasets**: ARC Projects or Vault
-    - **Processing**: Copy to `/scratch/`, process, save results to ARC
-    - **Results**: ARC Projects for sharing, Vault for archival
-
-=== "Large Files (>100GB)"  
-    - **Storage**: Vault (geo-redundant) or ARC Projects (faster access)
-    - **Processing**: Always use `/scratch/` for performance
-    - **Strategy**: Process in chunks, stream results to permanent storage
-
-## 🚀 Performance Optimization
-
-### Storage Speed Hierarchy
-
-```text
-/scratch/           ← Fastest (local SSD)
-/arc/projects/      ← Shared CephFS (Network)
-/arc/home/          ← Shared CephFS (Network)
-vos: (Vault)        ← Medium (Network)
-```
-
-### Optimal Data Flow Patterns
-
-#### Pattern 1: Large Dataset Analysis
-
-```bash
-# 1. Stage data from slow to fast storage
-vcp vos:project/bigdata.fits /scratch/           # Vault → Scratch
-# or
-cp /arc/projects/[project]/bigdata.fits /scratch/  # ARC → Scratch
-
-# 2. Process on fastest storage  
-casa_analysis.py /scratch/bigdata.fits           # Work in scratch
-
-# 3. Save results to permanent storage
-cp /scratch/results/* /arc/projects/[project]/   # Scratch → ARC
-```
-
-#### Pattern 2: Collaborative Workflow
-
-```bash
-# Team member A prepares data
-cp raw_observations.fits /arc/projects/[project]/data/
-
-# Team member B processes  
-cp /arc/projects/[project]/data/raw_observations.fits /scratch/
-run_pipeline.py /scratch/raw_observations.fits
-cp processed_data.fits /arc/projects/[project]/processed/
-
-# Team member C analyzes results
-python analyze.py /arc/projects/[project]/processed/processed_data.fits
-```
-
-#### Pattern 3: Archive and Share
-
-```bash
-# Work actively in ARC Projects
-python long_analysis.py /arc/projects/[project]/
-
-# Archive final results to Vault
-vcp /arc/projects/[project]/final_paper_data/ vos:[user]/publications/
-
-# Share with external collaborators via Vault
-vchmod o+r vos:[user]/publications/shared_catalogue.fits
-```
-
-## 📈 Quota Management
-
-### Default Quotas
-
-- **ARC Home**: 10GB (personal files only)
-- **ARC Projects**: 200GB (can be increased)
-- **Scratch**: ~100GB (temporary only)
-- **Vault**: Project-dependent (request from support)
-
-### Monitoring Usage
+You can monitor your storage usage with the following commands:
 
 ```bash
 # Check ARC storage usage
 df -h /arc/home/[user]/
 df -h /arc/projects/[project]/
 
-# Detailed breakdown
+# For a detailed breakdown of a project directory
 du -sh /arc/projects/[project]/*
-
-# Check Vault usage via web interface
-# Visit: https://www.canfar.net/storage/vault/list/
 ```
 
-### Requesting Increases
+Vault usage can be monitored via the [web interface](https://www.canfar.net/storage/vault/list/).
 
-Contact CANFAR support (`support@canfar.net`) with:
+To request a quota increase, email `support@canfar.net` with the project name, current usage, requested space, and a brief justification.
 
-- Project name and current usage
-- Estimated additional space needed
-- Justification (dataset size, collaboration needs)
-- Timeline for the project
+## Storage in a Session
 
-## 🔗 Integrations
+When you start a CANFAR session (like a Notebook or Desktop), the storage systems are integrated seamlessly.
 
-### Session Types and Storage Access
+- **ARC Home and Projects** are automatically mounted as standard directories. You can interact with them just like any other folder on a Linux system.
+- **Scratch space** is provided as a temporary, high-speed directory at `/scratch`.
 
-| Session Type | ARC Access | Vault Access | Scratch | Best For |
-|--------------|------------|--------------|---------|----------|
-| **Notebook** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive analysis |
-| **Desktop** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | GUI applications |
-| **CARTA** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive visualization |
-| **Firefly** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Interactive catalogue queries |
-| **Contributed** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Many, e.g. code development |
-| **Batch Jobs** | ✅ Direct filesystem | ✅ VOSpace API | ✅ Direct | Automated processing |
-| **External (via SSH)** |  ⚠️ SSHFS mount | ✅ VOSpace API | ❌ Not available | Remote access |
+This setup allows for a simple and powerful workflow:
 
-### Authentication and Permissions
+```mermaid
+graph TD
+    Start([Session Starts]) --> Mounts["/arc/home & /arc/projects mounted"]
+    Mounts --> Scratch["Empty /scratch created"]
+    Scratch --> DataWork["Analyze data, using /scratch for temporary files"]
+    DataWork --> Save["Save results to /arc/projects"]
+    Save --> End([Session Ends])
+    End --> Cleanup["/scratch is wiped clean"]
+```
 
-- **ARC storage**: Automatic within sessions, SSHFS for external access, also requires CADC certificate if using the VOSpace `arc:`
-- **Vault**: Requires CADC certificate (`cadc-get-cert`)
-- **Group permissions**: Managed via CANFAR Group Management tools
+!!! warning "Scratch is Temporary"
+    Any data left in `/scratch` is **permanently deleted** when your session ends. Always copy important files to `/arc` or `vos:` before stopping a session.
 
-## ❓ Troubleshooting
+## Storage Strategy and Performance
 
-**"No space left on device" in ARC Home**
+Choosing the right storage for each task is key to an efficient workflow. The general principle is to **move data to the fastest storage for processing**.
 
+**Storage Speed Hierarchy:**
+1. Fastest: `/scratch` (local SSD)
+2. Medium: `/arc/projects` & `/arc/home` (Shared network filesystem)
+3. Slower: `vos:` (Vault) (optimized for archival)
+
+### Common Workflows
+
+#### Interactive Analysis
+- **Your data source:** `/arc/projects/[project]`
+- **For large files:** Copy them to `/scratch` before processing.
+- **Save results to:** `/arc/projects/[project]/results`
+
+*Example:*
 ```bash
-# Check usage and clean up
-du -sh /arc/home/[user]/*
-rm -rf /arc/home/[user]/large_old_files/
+# 1. Copy data to fast, temporary storage
+cp /arc/projects/my_project/large_dataset.fits /scratch/
+
+# 2. Process the data in /scratch
+run_analysis.py /scratch/large_dataset.fits
+
+# 3. Save the results back to permanent project storage
+mv /scratch/results.csv /arc/projects/my_project/
 ```
 
-**Can't access project directory**
+#### Batch Processing
+- **Input:** Stage data from Vault (`vos:`), ARC, or the internet into `/scratch`.
+- **Processing:** Run your code on the data in `/scratch`.
+- **Output:** Save results to ARC for collaboration or to Vault for long-term archival.
 
-- Verify you're a member of the project group
-- Contact project PI to add you to the group
+#### Data Sharing and Collaboration
+- **Active collaboration:** Use `/arc/projects` for shared data and code among team members.
+- **External sharing:** Use Vault (`vos:`) to share data with collaborators outside of CANFAR, or for public data releases.
 
-**Session performance issues**
+## Troubleshooting Common Issues
 
-- Move large files from ARC to `/scratch/` for processing
-- Use `/scratch/` for temporary files and intensive I/O operations
+**"No space left on device"**
+- This usually means your `/arc/home` or `/arc/projects` quota is full.
+- Use `du -sh /path/to/storage/*` to find large files and clean up anything you don't need.
 
-**Files disappeared after session**
+**"Can't access project directory"**
+- You may not be a member of the project's group. Contact the project PI to be added.
 
-- Check if files were saved to `/scratch/` (wiped at session end)
-- Always save important results to `/arc/` or Vault before ending session
+**"Session is slow or unresponsive"**
+- If you are performing I/O-intensive operations directly in `/arc`, it can slow down your session.
+- For better performance, move large files to `/scratch` for processing.
+
+**"My files are gone!"**
+- You likely saved them to `/scratch` and the session ended. This data is not recoverable.
+- Always save important results to `/arc` or `vos:` before your session ends.
