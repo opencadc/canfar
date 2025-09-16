@@ -321,14 +321,14 @@ class Session(HTTPClient):
         self,
         prefix: str,
         kind: Kind = "headless",
-        status: Status = "Succeeded",
+        status: Status = "Completed",
     ) -> dict[str, bool]:
         """Destroy session[s] matching search criteria.
 
         Args:
             prefix (str): Prefix to match in the session name.
             kind (Kind): Type of session. Defaults to "headless".
-            status (Status): Status of the session. Defaults to "Succeeded".
+            status (Status): Status of the session. Defaults to "Completed".
 
 
         Returns:
@@ -751,14 +751,14 @@ class AsyncSession(HTTPClient):
         self,
         prefix: str,
         kind: Kind = "headless",
-        status: Status = "Succeeded",
+        status: Status = "Completed",
     ) -> dict[str, bool]:
         """Destroy session[s] matching search criteria.
 
         Args:
             prefix (str): Prefix to match in the session name.
             kind (Kind): Type of session. Defaults to "headless".
-            status (Status): Status of the session. Defaults to "Succeeded".
+            status (Status): Status of the session. Defaults to "Completed".
 
 
         Returns:
