@@ -4,7 +4,7 @@ hide:
   - toc
 ---
 
-<h1>CANFAR Science Platform</h1>
+<h1> <a href="https://www.canfar.net">CANFAR Science Platform</a></h1>
     
 !!! note ""
     
