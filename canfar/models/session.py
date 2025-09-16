@@ -149,18 +149,17 @@ class CreateRequest(BaseModel):
             skaha/astroml:v1.0 -> images.canfar.net/skaha/astroml:v1.0
             images.canfar.net/skaha/astroml -> images.canfar.net/skaha/astroml:latest
         """
-        # Check if a custom registry is being used (not CANFAR registry)
-        # Only reject if there's a slash AND the first component looks like a registry
-        if "/" in value:
-            server = value.split("/")[0]
-            if ("." in server or ":" in server) and not value.startswith(
-                "images.canfar.net/"
-            ):
-                msg = f"Only images.canfar.net registry is supported, got: {value}"
-                raise ValueError(msg)
+        # Image Registry Format
+        # registry.domain/repository/image:tag
 
-        # Add default CANFAR registry if not present
-        if not value.startswith("images.canfar.net/"):
+        msg: str = "invalid image container reference."
+        msg += "must follow the format [registry/]repository/image[:tag]"
+
+        splits: list[str] = value.split("/")
+        if len(splits) < 2 or len(splits) > 3:
+            raise ValueError(msg)
+
+        if len(splits) == 2:
             value = f"images.canfar.net/{value}"
 
         # Add :latest tag if no tag specified (check only the last component)

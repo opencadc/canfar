@@ -122,7 +122,7 @@ def test_session_logs(session: Session) -> None:
     while time() < limit:
         sleep(1)
         info = session.info(pytest.IDENTITY)
-        if info[0]["status"] == "Succeeded":
+        if info[0]["status"] in ("Succeeded", "Completed"):
             logs = session.logs(pytest.IDENTITY)
     success = False
     for line in logs[pytest.IDENTITY[0]].split("\n"):

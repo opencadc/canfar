@@ -47,7 +47,7 @@ class TestConfigurationDefaults:
         assert default_context.server.name == "CADC-CANFAR"
         assert str(default_context.server.uri) == "ivo://cadc.nrc.ca/skaha"
         assert str(default_context.server.url) == "https://ws-uv.canfar.net/skaha"
-        assert default_context.server.version == "v0"
+        assert default_context.server.version == "v1"
 
         # Test default registry
         assert isinstance(config.registry, ContainerRegistry)

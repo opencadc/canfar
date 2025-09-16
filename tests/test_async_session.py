@@ -134,7 +134,7 @@ async def test_delete_session(asession: AsyncSession, name: str) -> None:
     while not done:
         info = await asession.info(ids=pytest.IDENTITY)
         for status in info:
-            if status["status"] == "Succeeded":
+            if status["status"] == "Completed":
                 done = True
     deletion = await asession.destroy_with(prefix=name)
     assert deletion == {pytest.IDENTITY[0]: True}

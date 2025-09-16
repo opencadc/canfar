@@ -24,6 +24,7 @@
     - **Skaha API `v1` Released** — [`v0`](https://ws-uv.canfar.net/skaha/v0) API will be sunset with the next major release. Portal users are unaffected; API users should plan to migrate to `v1` as soon as possible.
     - **Container Image Labels** — no longer required in the [Harbor Image Registry](https://images.canfar.net/). They are only used to populate dropdown menu options in the Science Portal UI.
     - **Session Types** — launching via API, omit the `type` parameter for headless mode; interactive sessions require the `type` parameter.
+    - **Status Changes** — Job status `Succeeded` is now `Completed` for all session types.
     
 
     ### 🐛 Fixes
@@ -42,6 +43,7 @@
       - **Breaking Changes**:
         - For API users, `headless` sessions no longer require the `type` parameter
         - For Python Client & CLI users, `headless` sessions no longer require the `kind` parameter and the `headless` session `kind` will be deprecated in a future release.
+        - `Succeeded` status is now `Completed` for all session types, e.g. when performing a `session.info()` query.
     - **Harbor Labels** are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI and only for publicly visible container images.
 
     ### 📦 Deployment Notes
@@ -53,7 +55,7 @@
     
     | Component | Version |
     |---------|--------------|
-    | canfar | [v1.0.1](https://pypi.org/project/canfar/) |
+    | canfar | [v1.0.2](https://pypi.org/project/canfar/) |
     
     #### Helm Charts & Container Images
         

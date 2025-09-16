@@ -1,13 +1,16 @@
 # skaha → canfar
 
-In summer 2025, this project migrated from [shinybrar/skaha](https://github.com/shinybrar/skaha) to [opencadc/canfar](https://github.com/opencadc/canfar) to be officially supported by the Canadian Astronomy Data Centre (CADC). As part of this move, the Python package was renamed from `skaha` to `canfar` to better reflect a unified naming scheme across the CANFAR Science Platform.
+In summer 2025, the CANFAR Python client was moved from [shinybrar/skaha](https://github.com/shinybrar/skaha) to [opencadc/canfar](https://github.com/opencadc/canfar) to be officially supported by the Canadian Astronomy Data Centre (CADC). As part of this move, the Python package was renamed from `skaha` to `canfar` to better reflect a unified naming scheme across the CANFAR Science Platform.
 
 This guide helps you migrate from the `skaha` Python package to `canfar`.
 
 ## Summary of changes
 
 - Package name: `skaha` → `canfar`.
-- Public API Changes
+- **Breaking Changes**
+  - `skaha.session` → `canfar.sessions`.
+  - `headless` session `kind` parameter is no longer required.
+  - `session.info()` query now returns `Completed` instead of `Succeeded`.
 - Configuration path: `~/.skaha/config.yaml` → `~/.canfar/config.yaml`.
 - Logger name and location: logger `canfar`; logs under `~/.canfar/client.log`.
 - Environment variables: prefix change `SKAHA_…` → `CANFAR_…`.
