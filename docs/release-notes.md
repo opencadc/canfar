@@ -21,30 +21,26 @@
     - **Firefly**: IVOA-compliant catalog browsing and visualization platform
 
     ### 📝 Changes & Deprecations
+    - **Breaking Changes**:
+        - For API users, `headless` sessions no longer require the `type` parameter
+        - For Python Client & CLI users, `headless` sessions no longer require the `kind` parameter and the `headless` session `kind` will be deprecated in a future release.
+        - `Succeeded` status is now `Completed` for all session types, e.g. when performing a `session.info()` query.
     - **Skaha API `v1` Released** — [`v0`](https://ws-uv.canfar.net/skaha/v0) API will be sunset with the next major release. Portal users are unaffected; API users should plan to migrate to `v1` as soon as possible.
-    - **Container Image Labels** — no longer required in the [Harbor Image Registry](https://images.canfar.net/). They are only used to populate dropdown menu options in the Science Portal UI.
+    - **Container Image Labels** are no longer required in the [Harbor Image Registry](https://images.canfar.net/). They are only used to populate dropdown menu options in the Science Portal UI.
     - **Session Types** — launching via API, omit the `type` parameter for headless mode; interactive sessions require the `type` parameter.
     - **Status Changes** — Job status `Succeeded` is now `Completed` for all session types.
-    
+
 
     ### 🐛 Fixes
     - **Resource Monitoring** — RAM and CPU usage for sessions now display correctly in the Science Portal UI.
 
-    ### ⚙️ Technical Notes
-
-    #### System Architecture Changes
+    ### ⚙️ Technical Changes
     - CANFAR deployment requires Kubernetes v1.29 or later
     - **Kueue Scheduling** — optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management.
     - **Monitoring Fixes** — Skaha API now uses the the Job API instead of the Pod API internally to provide more accurate resource usage information.
-    - *Flexible* sessions now use the `Burstable` Kubernetes Quality of Service (QoS) class instead of `Guaranteed`, which provides better resource efficiency on the cluster. Currently, *flexible* sessions can grow up to 8 cores and 32GB of RAM.
-
-    #### API Evolution
-    - Skaha API v1 — supported in the updated Python Client & CLI. 
-      - **Breaking Changes**:
-        - For API users, `headless` sessions no longer require the `type` parameter
-        - For Python Client & CLI users, `headless` sessions no longer require the `kind` parameter and the `headless` session `kind` will be deprecated in a future release.
-        - `Succeeded` status is now `Completed` for all session types, e.g. when performing a `session.info()` query.
-    - **Harbor Labels** are no longer required for session launching and only used to populate dropdown menu options in the Science Portal UI and only for publicly visible container images.
+    - **Flexible** sessions use the `Burstable` Kubernetes Quality of Service (QoS) class instead of `Guaranteed`, which provides better resource efficiency on the cluster. Currently, *flexible* sessions can grow up to 8 cores and 32GB of RAM.
+    - Internal API's have been updated to use the `Job` API instead of the `Pod` API. This provides better resource monitoring and usage information.
+   
 
     ### 📦 Deployment Notes
 
@@ -72,4 +68,7 @@
 
     For any questions about this release, or for information relating to CANFAR issues or deployment support, head over to the [CANFAR Discord Server](https://discord.gg/vcCQ8QBvBa) or please contact us at [support@canfar.net](mailto:support@canfar.net).
 
-    *The CADC and CANFAR science, development, and operations teams.*
+    <br>
+    <div style="text-align: center;">
+    Built with :heart:{.heart} at CADC
+    </div>
