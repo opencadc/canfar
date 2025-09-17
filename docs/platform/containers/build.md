@@ -121,7 +121,7 @@ Always extend existing CANFAR base images rather than starting from scratch:
 FROM images.canfar.net/skaha/astroml:latest
 
 # For radio astronomy
-FROM images.canfar.net/skaha/casa:latest
+FROM images.canfar.net/skaha/casa:[version]
 
 # For minimal environments
 FROM images.canfar.net/skaha/base:latest

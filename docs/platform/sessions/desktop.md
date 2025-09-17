@@ -207,9 +207,9 @@ Click the shortcut icon on the desktop for immediate access to:
 To use CASA with its graphical interface:
 
 1. Launch CASA from the **Astro Software** menu
-2. CASA runs in a dedicated container with full GUI support
-3. Access CASA's plotting and visualisation tools
-4. Use CASA's built-in task interfaces and parameter editors
+2. Start CASA in the terminal by typing either `casa` or `casa --pipeline` as appropriate. 
+3. Run CASA tasks as usual via command line or scripts (e.g., calibration or imaging). 
+4. Access CASA's plotting and visualization tools (e.g., plotms or interactive clean).
 
 ## 🔧 Desktop Session Features
 
@@ -228,6 +228,7 @@ Since different containers may run on separate remote computers, text transfer b
 The Clipboard functions as an intermediary for text transfer:
 
 **Transfer Process:**
+
 1. **Copy text**: Highlight text in source application, use `Ctrl+Shift+C`
 2. **Transfer to Clipboard**: Text appears in the Clipboard application
 3. **Select in Clipboard**: Highlight the text and copy with `Ctrl+Shift+C`
