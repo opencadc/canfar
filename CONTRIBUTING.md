@@ -54,9 +54,10 @@ uv run pre-commit install --hook-type commit-msg
 
 To contribute to the documentation, you first need to set up the project as described in the "Set Up Your Development Environment" section. The command `uv sync --all-extras --dev` will install all necessary dependencies, including the ones for building the documentation.
 
-Once the dependencies are installed, you can serve the documentation locally by running:
+Once the dependencies are installed, you can build and serve the documentation locally by running:
 
 ```bash
+uv run mkdocs build
 uv run mkdocs serve
 ```
 
