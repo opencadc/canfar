@@ -44,14 +44,12 @@ The container ecosystem on CANFAR follows a layered approach:
 
 ```mermaid
 graph TB
-    BaseOS[Ubuntu Linux Base] --> SystemLibs[System Libraries]
-    SystemLibs --> CondaPython[Conda + Python]
-    CondaPython --> AstroLibs[Astronomy Libraries]
-    AstroLibs --> SpecialisedTools[Specialised Tools]
+    BaseOS[Ubuntu Linux Base] --> SystemLibs["OS Packages"]
+    SystemLibs --> CondaPython["conda-forge packages"]
     
-    SpecialisedTools --> Astroml[astroml Container]
-    SpecialisedTools --> Casa[casa Container]
-    SpecialisedTools --> Custom[Custom Containers]
+    CondaPython --> Astroml["astroml Container"]
+    Astroml --> Casa["casa Container"]
+    CondaPython --> Custom[Custom Containers]
     
     Runtime[CANFAR Runtime] --> Storage[Storage Mounting]
     Runtime --> UserContext[User Context]
@@ -92,10 +90,11 @@ COPY analysis_tools/ /opt/tools/
 ```
 
 ### Runtime
+
 **What happens when you launch a session:**
 
 - **User context**: Container runs as your CADC username (not root)
-- **Storage mounting**: `/arc/home/`, `/arc/projects/`, `/scratch/` mounted automatically
+- **Storage mounting**: `/arc/home`, `/arc/projects`, `/scratch` mounted automatically
 - **Resource allocation**: CPU, memory, GPU assigned based on session request
 - **Network access**: Internet connectivity for downloading data or documentation
 - **Session integration**: Jupyter, desktop, or headless execution mode activated
@@ -109,7 +108,7 @@ df -h /scratch/                 # Temporary high-speed storage
 ```
 
 !!! warning "Persistence Boundary"
-    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are on `/arc` and not on the container. Keep stable software in the image; keep development scripts in `/arc/`.
+    **Build time changes** are permanent and part of the container image. **Runtime changes** (like `pip install --user package`) are on `/arc` and not on the container. Keep stable software in the image; keep development scripts in `/arc/home/[user]` or `/arc/projects/[project]`.
 
 ## 🔗 How Containers Relate to Sessions
 
@@ -121,48 +120,57 @@ CANFAR containers are designed to work seamlessly with different session types, 
 graph TB
     Container[Container Image] --> SessionType{Session Type}
     
-    SessionType --> Notebook[Notebook Session]
-    SessionType --> Desktop[Desktop Session]
-    SessionType --> Batch[Batch/Headless Session]
-    SessionType --> Contributed[Contributed Session]
+    SessionType --> Notebook[notebook]
+    SessionType --> Desktop[desktop]
+    SessionType --> Carta[carta]
+    SessionType --> Firefly[firefly]
+    SessionType --> Contributed[contributed]
+    SessionType --> Batch[headless]
     
     Notebook --> JupyterLab[JupyterLab Interface]
-    Desktop --> DesktopEnv[Ubuntu Desktop GUI]
+    Desktop --> DesktopEnv[noVNC Ubuntu GUI]
+    Carta --> CartaWeb[CARTA Interface]
+    Firefly --> FireflyWeb[Firefly Interface]
+    Contributed --> WebApp[Custom Web Interface]
     Batch --> ScriptExec[Script Execution]
-    Contributed --> WebApp[Custom Web App]
     
-    JupyterLab --> Storage[/arc/ Storage]
+    JupyterLab --> Storage[ \/arc and \/scratch Storage]
     DesktopEnv --> Storage
-    ScriptExec --> Storage
+    CartaWeb --> Storage
+    FireflyWeb --> Storage
     WebApp --> Storage
+    ScriptExec --> Storage
 ```
 
-**Same container, different interfaces**: The `astroml` container can run as a notebook (JupyterLab), desktop application (terminal), or batch job (headless script execution).
+Same container, different interfaces: The `astroml` container can run as a **notebook** (`JupyterLab`) session, as a **desktop app**lication (as an `xterm`) in a **desktop** session, or batch job (**headless**) session as an executable script.
 
 ### Notebook Sessions
 
 **Requirements for notebook containers:**
 
-1. **JupyterLab installed**: The `jupyterlab` package must be available
-2. **Container labelling**: Tagged as `notebook` in the registry
+1. **JupyterLab installed**: The `jupyterlab` package must be installed and in path in the container
+2. **Container labelling**: Tagged as **notebook** in the registry
 
 When you launch a notebook session, CANFAR automatically:
-- Starts JupyterLab on port 8888
+
+- Starts JupyterLab on dedicated port
 - Mounts your storage directories
 - Provides web-based access to the Python environment
 
-**The `astroml` container** exemplifies this perfectly - it's a comprehensive Python astronomy stack with Astropy, SciPy, pandas, scikit-learn, PyTorch, and many more packages pre-installed.
+**The `astroml` container** exemplifies this perfectly - it's a comprehensive Python astronomy stack with `astropy`, `scipy`, `pandas`, `matplotlib`, `numpy`, `scikit-learn`, `pytorch` and many more packages pre-installed.
 
 ```bash
 # Check installed packages in a running astroml container
-mamba list                     # Conda/mamba installed packages  
-apt list --installed           # System packages (Ubuntu)
+mamba list                     # conda/mamba/pip installed system packages  
+apt list --installed           # OS system packages (Ubuntu)
 ls /build_info/                # Container build information
 ```
 
 **Runtime package installation:**
+
 ```bash
-# Install Python packages at runtime (saved to /arc/home/)
+# Install Python packages at runtime (will install to /arc/home/[user]/.local)
+# in non-astroml containers, add the --user flag.
 pip install fireducks
 
 # Show where it was installed
@@ -170,25 +178,28 @@ pip show -f fireducks           # Should show ~/.local/lib/python*/
 ```
 
 !!! tip "GPU Support"
-    For GPU acceleration, use the `astroml-cuda` container which extends `astroml` with CUDA libraries and GPU-enabled PyTorch, PyArrow, and other frameworks.
+    For GPU acceleration, use the `astroml-cuda` container which extends `astroml` with CUDA libraries and GPU-enabled `pytorch`, `pyarrow`, and many other CUDA-capable libraries.
 
 ### Desktop Application Sessions
 
 Desktop sessions integrate containers in two ways:
 
 #### 1. Base Desktop Container
-The core **desktop** container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session.
+
+The core **desktop** container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session as a `noVNC` web application. Each desktop application will run and communicate with this desktop session.
 
 #### 2. Desktop-App Containers
+
 Specialised containers that run specific GUI applications within desktop sessions.
 
 **Requirements for desktop-app containers:**
 
-1. **X11/Xorg application**: Must have at least one GUI application (minimum: `xterm`)
-2. **Startup script**: Application launcher at `/skaha/startup.sh`
+1. **X11/Xorg application**: Must have at least one GUI application installed and available
+2. **Startup script**: Application launcher at `/skaha/startup.sh` (if not specified, assumed to be `xterm` which must be installed in the container)
 3. **Container labelling**: Tagged as `desktop-app` in the registry
 
 **How it works:**
+
 - Each desktop-app container runs on its own worker node
 - Applications connect to your desktop session via X11 forwarding
 - Shared storage provides data access across all containers
@@ -223,9 +234,10 @@ python /arc/projects/[project]/scripts/reduce_data.py --input=/arc/projects/[pro
 Contributed applications are custom web-based tools that integrate with CANFAR:
 
 **Requirements:**
+
 1. **Web service**: Application serves HTTP on port 5000
 2. **Startup script**: Service launcher at `/skaha/startup.sh`
-3. **Container labelling**: Tagged appropriately for discovery
+3. **Container labelling**: Tagged appropriately for discovery as **contributed**.
 
 Examples include Marimo (reactive notebooks) and VSCode (browser IDE).
 
@@ -237,32 +249,30 @@ CANFAR automatically mounts storage systems into your container at runtime, prov
 
 ```mermaid
 graph LR
-    Container[Running Container] --> ArcMount[/arc/ Mount Point]
+    Container[Running Container] --> ArcMount["/arc"]
     
-    ArcMount --> Home[/arc/home/[user]/]
-    ArcMount --> Projects[/arc/projects/[project]/]
+    ArcMount --> Home["/arc/home/[user]"]
+    ArcMount --> Projects["/arc/projects/[project]"]
     
-    Container --> Scratch[/scratch/]
-    Container --> Tmp[/tmp/]
+    Container --> Scratch["/scratch"]
     
-    Home --> HomeData[Personal Data<br/>10GB Quota]
-    Projects --> ProjectData[Shared Project Data<br/>Variable Quota]
-    Scratch --> FastStorage[Fast Temporary Storage<br/>Node-local]
-    Tmp --> TempFiles[Temporary Files<br/>Container-local]
+    Home --> HomeData["Personal Data 10GB Quota"]
+    Projects --> ProjectData["Shared Project Data Variable Quota"]
+    Scratch --> FastStorage["Fast Temporary Storage Node-local"]
 ```
 
 #### Storage Hierarchy
 
 | Mount Point | Purpose | Persistence | Quota | Sharing |
 |-------------|---------|-------------|-------|---------|
-| `/arc/home/[user]/` | Personal files, notebooks, configs | Permanent | 10GB | Private |
-| `/arc/projects/[project]/` | Research data, collaboration | Permanent | Variable | Team-based |
-| `/scratch/` | High-speed processing | Session only | Node-dependent | Private |
-| `/tmp/` | Temporary files | Session only | Limited | Private |
+| `/arc/home/[user]` | Personal files, notebooks, configs | Permanent | 10GB | Private |
+| `/arc/projects/[project]` | Research data, collaboration | Permanent | Variable | Team-based |
+| `/scratch` | High-speed processing | Session only | Node-dependent | Private |
 
 #### Storage Best Practices
 
-**Personal Development (`/arc/home/`):**
+**Personal Development (`/arc/home`):**
+
 ```bash
 /arc/home/[user]/
 ├── notebooks/              # Jupyter notebooks
@@ -272,7 +282,8 @@ graph LR
 └── small_datasets/       # Personal research data
 ```
 
-**Project Collaboration (`/arc/projects/`):**
+**Project Collaboration (`/arc/projects`):**
+
 ```bash
 /arc/projects/[project]/
 ├── raw_data/             # Input datasets
@@ -282,7 +293,8 @@ graph LR
 └── results/              # Final outputs
 ```
 
-**Temporary Processing (`/scratch/`):**
+**Temporary Processing (`/scratch`):**
+
 ```bash
 # Copy large datasets to fast storage for processing
 cp /arc/projects/[project]/large_data.fits /scratch/
@@ -303,25 +315,25 @@ groups                    # Shows your CANFAR project group memberships
 ```
 
 **Security model:**
-- **No root access**: Containers cannot perform system administration
-- **File permissions**: Respect standard Unix permissions on `/arc/`
-- **Group membership**: Access to `/arc/projects/` based on CANFAR group membership
+
+- **No root access**: Containers cannot perform system administration at runtime.
+- **File permissions**: Respect standard Unix permissions on `/arc`
+- **Group membership**: Access to `/arc/projects` based on CANFAR group membership
 - **Network isolation**: Containers have internet access but cannot access other users' sessions
 
 ## 🔧 CANFAR-Supported Containers
 
-The CANFAR team maintains several core containers that cover most astronomy research needs:
+The CANFAR team maintains several core containers that cover most astronomy research needs in the **`skaha`** namespace:
 
 | Container | Description |
 |-----------|-------------|
-| **skaha/base** | Basic UNIX tools, conda, CADC packages |
-| **skaha/astroml** | Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm. |
-| **skaha/marimo** | Same as astroml stack, with marimo notebook as web interface |
-| **skaha/vscode** | Same as astroml, with VSCode on browser as interface |
-| **skaha/*-cuda** | Same as all above containers, with CUDA-enabled |
-| **skaha/improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
-| **skaha/casa** | CASA installations |
-| **lsst/sciplat-lab** | LSST Software stack |
+| **base** | Basic UNIX tools, conda, CADC packages |
+| **astroml** | Many astro (STILTS, astropy ecosystem), data sciences (pandas, pyarrow,...), machine learning (sklearn, pytorch) packages. JupyterLab, xterm. |
+| **marimo** | Same as astroml stack, with marimo notebook as web interface |
+| **vscode** | Same as astroml, with VSCode on browser as interface |
+| **\*-cuda** | Same as all above containers, with CUDA-enabled |
+| **improc** | Image processing tools (SWarp, SExtractor, SourceExtractor++, IRAF, CASUTools...) |
+| **casa** | CASA installations |
 
 ### Visualisation Containers
 
@@ -330,16 +342,18 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 **Purpose**: Interactive visualisation of radio astronomy data
 
 **Features:**
+
 - **CARTA application**: Cube Analysis and Rendering Tool for Astronomy
 - **Multi-dimensional data**: Spectral cubes, moment maps, polarisation
 - **Interactive analysis**: Region statistics, profile extraction
 - **Collaboration support**: Session sharing capabilities
 
-#### `firefly` - Optical Survey Data
+#### `firefly` - Catalogue Data Analysis
 
-**Purpose**: Advanced visualisation for optical and infrared surveys
+**Purpose**: Advanced catalogue queries and visualisation
 
 **Features:**
+
 - **Multi-mission support**: LSST, Spitzer, WISE, 2MASS, ...
 - **Interactive catalogues**: Source overlays and cross-matching
 - **Multi-wavelength workflows**: RGB composites and band comparisons
@@ -352,6 +366,7 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 **Purpose**: Complete Linux desktop for GUI applications and legacy software. Astronomy software applications will each run on dedicated nodes.
 
 **Features:**
+
 - **Ubuntu**: Linux environment
 - **Desktop environment**: Full GNOME-based interface
 - **Applications**: Firefox, file managers, terminals, editors
@@ -362,6 +377,7 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 **Purpose**: Minimal Jupyter environment for basic Python work
 
 **Features:**
+
 - **Jupyter Lab**: Web-based notebook interface
 - **Extensible**: Foundation for custom development
 - **Fast startup**: Minimal software for quick sessions
@@ -370,14 +386,15 @@ The CANFAR team maintains several core containers that cover most astronomy rese
 
 | Workflow Type | Recommended Container | Session Type | Typical Resources |
 |---------------|----------------------|--------------|-------------------|
+| **Python core** | `base` | Headless | 1 core, 1GB |
 | **Python data analysis** | `astroml` | Notebook | 2-4 cores, 8-16GB |
 | **GPU machine learning** | `astroml-cuda` | Notebook | 4-8 cores, 16-32GB, 1 GPU |
 | **Radio interferometry** | `casa` | Notebook/Desktop | 4-8 cores, 16-32GB |
-| **Radio data visualisation** | `carta` | CARTA session | 2-4 cores, 8-16GB |
-| **Optical survey analysis** | `firefly` | Firefly session | 2-4 cores, 8-16GB |
+| **Data visualisation** | `carta` | CARTA session | 2-4 cores, 8-16GB |
+| **Catalogue analysis** | `firefly` | Firefly session | 2-4 cores, 8-16GB |
 | **GUI applications** | `desktop` | Desktop | 2-4 cores, 8-16GB |
 | **Legacy software** | `desktop` | Desktop | Variable |
-| **Batch processing** | `astroml`/`casa` | Headless | Variable |
+| **Batch processing** | `astroml` or `casa` | Headless | Variable |
 
 !!! tip "Container Selection Strategy"
     Start with `astroml` for most astronomy work. It includes comprehensive libraries and is actively maintained. Use specialised containers (`casa`, `carta`, `firefly`) only when you need their specific tools.
@@ -405,11 +422,12 @@ images.canfar.net/skaha/astroml:a1b2c3d4
 
 CANFAR containers receive regular updates:
 
-**Monthly releases**: Security patches, library updates, new features
-**Quarterly reviews**: Major version updates, new software additions
+**Monthly releases**: Security patches, library updates, new features  
+**Quarterly reviews**: Major version updates, new software additions  
 **Community feedback**: Feature requests and bug reports incorporated
 
 **Update notifications:**
+
 - Science Portal notifications for major changes
 
 !!! warning "Version Pinning for Reproducibility"
