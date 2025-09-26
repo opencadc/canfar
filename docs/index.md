@@ -29,7 +29,7 @@ hide:
     - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/storage/index.md)
     - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers/index.md)
     - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/permissions.md)
-    - [:material-wrench: __Expert Support__ <small>for research workflows</small>](platform/support/index.md)
+    - [:material-wrench: __Help & Support__ <small>for research workflows</small>](platform/support/index.md)
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
