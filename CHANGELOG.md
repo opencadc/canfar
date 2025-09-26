@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.0.4](https://github.com/opencadc/canfar/compare/v1.0.3...v1.0.4) (2025-09-26)
+
+
+### Bug Fixes
+
+* **docs:** updated colors for better accessibility in dark mode ([a169037](https://github.com/opencadc/canfar/commit/a16903723f8bf4fc740fb49fd046b72dc27ddcfc))
+
+
+### Documentation
+
+* **conduct:** updated links ([03576d1](https://github.com/opencadc/canfar/commit/03576d1d897a42af4e1e8e7cc70b0a5c0ab29096))
+* **fixes:** updates to landing page ([112c5ca](https://github.com/opencadc/canfar/commit/112c5ca4dd2230d3d455d3f6c5918e553edc2b22))
+* **support:** updated support help page to remove repition ([092aae5](https://github.com/opencadc/canfar/commit/092aae5ef5794ce2e1bdae7bc01548e755b7081b))
+
 ## [1.0.3](https://github.com/opencadc/canfar/compare/v1.0.2...v1.0.3) (2025-09-23)
 
 
