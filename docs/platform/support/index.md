@@ -3,490 +3,238 @@
 !!! abstract "🎯 Support Resources Overview"
     **Find the help you need:**
     
-    - **Self-Service**: Documentation, troubleshooting guides, and FAQ resources
-    - **Community Support**: User discussions, office hours, and peer assistance
-    - **Technical Support**: Direct help from CANFAR platform specialists
-    - **Emergency Contacts**: Critical issue resolution and urgent assistance
+    - **Self-service**: Documentation, troubleshooting guides, and FAQs
+    - **Community**: User discussions, office hours, and peer assistance
+    - **Direct support**: Help from CANFAR platform specialists
+    - **Emergency**: Rapid response for critical incidents
 
-The CANFAR Science Platform provides multiple channels for getting help, from self-service documentation to direct support. This section guides you to the right resources for your needs.
+The CANFAR Science Platform offers several ways to get assistance. Start with self-service resources, then move to community channels or direct support as needed.
 
 ## 🚀 Quick Start for Support
 
 ### New to CANFAR?
 
-- **[Get Started Guide](../get-started.md)**: 10-minute quick start
-- **[First Login](../permissions.md)**: Account setup and access
+- **[Get Started Guide](../get-started.md)**: 10-minute overview
+- **[First Login](../permissions.md)**: Account activation and access
 - **[Choose Your Interface](../sessions/index.md)**: Pick the right session type
 
 ### Having Problems?
 
-- **[FAQ](faq.md)**: Common questions and solutions
+- **[FAQ](faq.md)**: Quick answers to common questions
 - **[Troubleshooting](#troubleshooting)**: Diagnostic steps for common issues
-- **[Contact Support](#contact-support)**: Direct help from CANFAR staff
+- **[Contact Support](#contact-support)**: Reach the CANFAR team for help
 
 ## 📚 Self-Help Resources
 
-### Documentation
-
-**User Guide Sections:**
-
-- **[Concepts](../concepts.md)**: Understanding the platform architecture
-- **[Storage](../storage/index.md)**: Managing your data effectively
+- **Documentation search**: Use the search box or browse by topic
+- **[Concepts](../concepts.md)**: Platform architecture and terminology
+- **[Storage](../storage/index.md)**: Managing data effectively
 - **[Containers](../containers/index.md)**: Using and building software environments
-- **[Interactive Sessions](../sessions/index.md)**: Jupyter, Desktop, CARTA
+- **[Interactive Sessions](../sessions/index.md)**: Jupyter, Desktop, CARTA, Firefly
 - **[Batch Jobs](../sessions/batch.md)**: Automated and large-scale processing
 
 ## 🔧 Troubleshooting
 
-### Quick Diagnostic Steps
+### Quick Checks
 
-When you encounter issues, try these steps first:
+1. Confirm there are no current maintenance announcements
+2. Try Chrome or Firefox and clear the browser cache
+3. Use a private/incognito window to rule out extensions
+4. Verify your network connection is stable
 
-1. **Check system status**: Look for maintenance announcements
-2. **Try a different browser**: Chrome and Firefox work best
-3. **Clear browser cache**: Remove cookies and cached data
-4. **Try incognito mode**: Eliminates browser extension conflicts
-5. **Check your network**: Ensure stable internet connection
+### Frequent Issues
 
-### Common Issues and Solutions
+#### Session won't start
 
-#### Session Won't Start
+- Lower memory or CPU requests and retry
+- Try a different container image or launch time
+- Ensure your account has the required group memberships
 
-**Symptoms**: Session creation fails or hangs
-
-**Solutions:**
-
-- Reduce resource requirements (memory/CPU)
-- Try during off-peak hours (evenings, weekends)
-- Select a different container image
-- Check group permissions
-
-#### Can't Access Files
-
-**Symptoms**: Files missing or permission denied
-
-**Solutions:**
+#### Cannot access files
 
 ```bash
-# Check file locations
-ls /arc/home/[user]/     # Personal storage
-ls /arc/projects/[project]           # Group storage
-
-# Check permissions
+# Check locations and permissions
+ls /arc/home/[user]/
+ls /arc/projects/[project]/
 ls -la /arc/projects/[project]/
 getfacl /arc/projects/[project]/
 ```
 
-- Verify you're in the correct group
-- Check file paths are correct
-- Contact group administrator
+- Confirm the path and project name
+- Verify you belong to the correct project group
+- Contact the project administrator if permissions are missing
 
-#### Performance Issues
-
-!!! tip "Advanced: Optimising Performance"
-    - Use [Batch Jobs](../sessions/batch.md) for large-scale or automated processing.
-    - Monitor session resource usage with [`canfar info [session-id]`](../../cli/cli-help.md#canfar-info).
-    - Store temporary files in `/scratch/` for faster I/O.
-    - For parallel workloads, see [Distributed Computing](../../client/helpers.md).
-
-**Symptoms**: Slow processing or unresponsive interface
-
-**Solutions:**
+#### Performance feels slow
 
 - Monitor resource usage with `htop`
-- Close unnecessary applications
-- Use scratch storage (`/scratch/`) for temporary files
-- Consider requesting more resources
+- Close unused applications and tabs
+- Use `/scratch/` for temporary, high-I/O workloads
+- Submit a support request if performance remains degraded
 
-#### Browser Compatibility
+#### Browser quirks
 
-!!! tip "Advanced: Browser Automation"
-    - Use browser profiles/extensions for session isolation.
-    - Automate repetitive browser tasks with [Selenium](https://www.selenium.dev/) or [Playwright](https://playwright.dev/).
+- Stick to Chrome or Firefox and keep them updated
+- Enable JavaScript and cookies for `canfar.net`
+- Disable ad blockers or privacy extensions for the site
 
-**Symptoms**: Interface doesn't load or behaves incorrectly
+### Gather Information Before Asking for Help
 
-**Solutions:**
-
-- Use Chrome or Firefox (recommended)
-- Enable JavaScript and cookies
-- Disable ad blockers for canfar.net
-- Update browser to latest version
-
-### Diagnostic Commands
-
-!!! example "Gathering Diagnostic Info for Support"
-    Use these commands before contacting support to speed up troubleshooting:
-
-Use these commands to gather information for support requests:
+Run these commands to capture context for a support request:
 
 ```bash
-# System information
+# Platform status
 canfar info [session-id]
 canfar stats
 
-# Within session information
+# Session details
 echo $USER
 groups
 env | grep -E "(CANFAR|SKAHA)"
 ```
 
-### When to Contact Support
-
-Contact [support@canfar.net](mailto:support@canfar.net) for:
-
-- **Account issues**: Access problems, group membership
-- **Technical problems**: Persistent errors, system failures
-- **Data recovery**: Lost or corrupted files
-- **Resource requests**: Increased storage or compute allocations
-- **Software installation**: Help with complex software setups
-
 ## 📧 Contact Support
 
-### How to Write Effective Support Requests
+### When to Reach Out
 
-Include these details in your support email:
+Email [support@canfar.net](mailto:support@canfar.net) when you encounter:
 
-**Essential information:**
+- **Account issues**: Login failures, certificate problems, group membership
+- **Technical problems**: Persistent errors, failed sessions, system outages
+- **Data concerns**: Missing files, data corruption, recovery requests
+- **Resource changes**: Requests for additional storage, CPU, or RAM
+- **Software help**: Complex installations or container customization
 
-Example:
+### What to Include
 
-```text
-Subject: [Brief description of problem]
+Provide clear, specific details to speed up triage:
 
-CANFAR Username: your.email@domain.com
-Date/Time of issue: 2024-01-15 14:30 PST
-Session type: desktop | notebook | carta | firefly | headless
-Container used: skaha/astroml:latest
-Browser: Chrome 120.0.6099
-
-Problem description:
-[Detailed description of what you were trying to do]
-
-Error messages:
-[Copy/paste exact error text]
-
-Steps to reproduce:
-1. Login to Science Portal
-2. Create desktop session
-3. [etc.]
-
-What you've already tried:
-
-- Cleared browser cache
-- Tried different browser
-- [etc.]
-
-```
-
-**Additional helpful information:**
-
-- Screenshots of error messages
-- Session IDs for failed jobs
-- File paths for missing data
-- Group names for permission issues
+- **Subject**: Short summary of the problem
+- **Contact**: CANFAR username and email
+- **Timeline**: Date and time (with timezone) when the issue occurred
+- **Environment**: Session type, container, operating system, browser
+- **Steps to reproduce**: Numbered list of actions leading to the issue
+- **Observed vs expected**: What happened and what you expected
+- **Error output**: Copy exact error text and attach screenshots when available
+- **What you tried**: Mention any workarounds attempted
 
 ### Expected Response Times
 
 | Priority | Response Time | Examples |
 |----------|---------------|----------|
 | **Critical** | Same day | System outages, data loss, security issues |
-| **High** | 1-2 business days | Session failures, access problems |
-| **Normal** | 2-3 business days | General questions, documentation requests |
-| **Low** | 3-5 business days | Feature requests, enhancement suggestions |
+| **High** | 1–2 business days | Session failures, access problems |
+| **Normal** | 2–3 business days | General questions, documentation requests |
+| **Low** | 3–5 business days | Feature requests, enhancement suggestions |
 
-### Support Escalation
+### Escalation
 
-If your issue isn't resolved within expected timeframes:
+If a ticket is not progressing within the expected timeframe:
 
-1. **Reply to your original email** with "URGENT" in subject
-2. **Provide additional context** if the situation has changed
-3. **For emergencies**: Use emergency contacts below
+1. Reply to the original email and add "URGENT" to the subject
+2. Share any new details or screenshots gathered since the initial report
+3. For emergencies, follow the contacts listed in [🚨 Emergency Contacts](#emergency-contacts)
 
 ## 👥 Community Support
 
-### Discord Community
+### Discord
 
-!!! tip "Advanced: Community Collaboration"
-    - Share workflow examples in Discord.
-    - Use Discord threads for project-specific discussions.
+Join the [CANFAR Discord](https://discord.gg/vcCQ8QBvBa) for real-time conversations with other users and staff.
 
-Join our Discord server for peer support and community interaction:
+- Search existing threads before posting
+- Use the channel that matches your topic
+- Share concise questions and relevant context
+- Never publish sensitive data or credentials
 
-- **Quick questions**: Get fast answers from other users
-- **Tips and tricks**: Share and learn best practices
-- **Collaboration**: Find research partners and collaborators
-- **Announcements**: Stay updated on new features and maintenance
+### GitHub
 
-**Discord invite**: [Join CANFAR Discord](https://discord.gg/vcCQ8QBvBa)
+Use [GitHub Issues](https://github.com/opencadc/canfar/issues) to track bugs, suggest enhancements, or contribute documentation updates.
 
-**Community guidelines:**
+- Reference related documentation pages or example workflows
+- Tag issues appropriately (e.g., `bug`, `documentation`, `feature-request`)
+- Follow up on discussions to confirm fixes or add clarifications
 
-- Search previous messages before asking
-- Use appropriate channels and threads
-- Be respectful and helpful to other users
-- Don't share sensitive data or credentials
+## 🐛 Helpful Bug Reports
 
-### GitHub Issues
+### Before Filing
 
-!!! tip "Advanced: Effective GitHub Contributions"
-    - Reference related documentation pages in your issue or pull request.
-    - Link to example workflows or scripts.
-    - Tag your issue with relevant labels (e.g., `documentation`, `feature-request`).
+1. Search the documentation and [FAQ](faq.md) for related answers
+2. Look for existing issues on GitHub to avoid duplicates
+3. Ask quick questions on Discord if you are unsure whether something is a bug
 
-For bug reports and feature requests, use our GitHub repositories:
+### What Maintainers Need
 
-- **Platform issues**: Report technical problems
-- **Documentation**: Suggest improvements
-- **Feature requests**: Propose new capabilities
-- **Community contributions**: Submit code and examples
+- Clear, descriptive title
+- Environment details (OS, browser, session type, container)
+- Steps to reproduce, numbered and complete
+- Expected result versus what actually happened
+- Complete error output and supporting screenshots or logs
+- Notes on any temporary workarounds you discovered
 
-### Community Contributions
-
-!!! tip "Advanced: Share Your Expertise"
-    - Submit tutorials or workflow examples to the documentation via GitHub.
-    - Answer questions in Discord and GitHub Issues.
-    - Report bugs and suggest features to improve the platform for all users.
-
-**Ways to help other users:**
-
-- **Answer questions**: Respond to Discord and community discussions
-- **Share tutorials**: Create workflow examples
-- **Report bugs**: Help improve platform stability
-- **Suggest features**: Propose improvements
-
-## 🐛 Filing Issues and Bug Reports
-
-### Before Filing an Issue
-
-**Check existing resources:**
-
-1. **Search documentation**: Use the search function or browse relevant sections
-2. **Check FAQ**: Review [common questions and solutions](faq.md)
-3. **Search existing issues**: Look through [GitHub Issues](https://github.com/opencadc/canfar/issues)
-4. **Try Discord**: Ask quick questions in the community chat
-
-### What Makes a Good Bug Report
-
-#### ✅ Good Bug Reports Include
-
-- **Clear title**: Concise description of the problem
-- **Environment details**: OS, browser, session type, container
-- **Reproduction steps**: Exact steps to trigger the issue
-- **Expected vs actual**: What should happen vs what actually happens
-- **Error messages**: Complete, unedited error text
-- **Screenshots**: Visual evidence of the problem
-- **Workarounds**: Any temporary solutions you've found
-
-#### ❌ Poor Bug Reports
-
-- Vague descriptions like "it doesn't work"
-- Missing reproduction steps
-- No environment information
-- Screenshots without context
-- Duplicate of existing issues
-
-### Creating Effective Issue Reports
-
-**Template for bug reports:**
+This template can help structure a report:
 
 ```markdown
 ## Bug Description
-[Clear, concise description of the bug]
+[Short summary]
 
 ## Environment
-- OS: [e.g., macOS 14.1, Windows 11, Ubuntu 24.04]
-- Browser: [e.g., Chrome 120.0, Firefox 119.0]
-- Session Type: [notebook, desktop, carta, firefly, headless]
-- Container: [e.g., skaha/astroml:latest]
+- OS: [...]
+- Browser: [...]
+- Session Type: [...]
+- Container: [...]
 
 ## Steps to Reproduce
-1. [First step]
-2. [Second step]
-3. [etc.]
+1. [...]
+2. [...]
 
 ## Expected Behavior
-[What you expected to happen]
+[...]
 
 ## Actual Behavior
-[What actually happened]
+[...]
 
 ## Error Messages
-
 ```text
-[Copy/paste exact error text]
+[Paste exact text]
 ```
 
 ## Screenshots
-
-[If applicable, add screenshots]
+If applicable, add screenshots to help explain the problem.
 
 ## Additional Context
-
-[Any other relevant information]
-
-```markdown
-
+[Anything else that helps]
 ```
 
-### After Reporting
-
-After you submit a bug report:
-
-- **Monitor the issue**: Watch for responses from maintainers
-- **Provide additional information**: Be ready to answer follow-up questions
-- **Test fixes**: Help test proposed solutions when available
-- **Update the issue**: Let us know if the problem is resolved
+After submitting, monitor the issue for follow-up questions, provide additional details promptly, and test proposed fixes when available.
 
 ## 🚨 Emergency Contacts
 
 ### System Outages
 
-**Planned maintenance**: Announced 48+ hours in advance via email and Discord
-
-**Unplanned outages:**
-
-- Check status.canfar.net for current status (when available)
-- Email [support@canfar.net](mailto:support@canfar.net) if status unclear
+- Planned maintenance notices go out at least 48 hours in advance via email and Discord
+- For unexpected outages, email [support@canfar.net](mailto:support@canfar.net) and request a status update
 
 ### Critical Data Issues
 
-**Data loss or corruption:**
+1. Stop affected jobs or sessions immediately
+2. Document what happened and when
+3. Email [support@canfar.net](mailto:support@canfar.net) with **URGENT** in the subject
+4. Preserve files and logs so recovery is possible
 
-1. **Stop all activity**: Prevent further damage
-2. **Document the issue**: Note exactly what happened
-3. **Contact support immediately**: Mark email as URGENT
-4. **Preserve evidence**: Don't delete or modify files
-
-**Backup and recovery:**
-
-- Daily snapshots of `/arc/` storage
-- 30-day retention period
-- Point-in-time recovery available
-- Contact support for restoration requests
+Daily snapshots of `/arc/` storage are retained for 30 days; support can coordinate point-in-time recovery when necessary.
 
 ### Security Incidents
 
-**Suspected security breach:**
+1. Revoke and reissue credentials right away
+2. Report the incident to [support@canfar.net](mailto:support@canfar.net)
+3. Describe what you observed, including timestamps and IP addresses if known
+4. Follow instructions from the security team before resuming activity
 
-1. **Change credentials**: Update certificates immediately
-2. **Report incident**: Email [support@canfar.net](mailto:support@canfar.net)
-3. **Document details**: What you observed and when
-4. **Follow instructions**: Wait for security team guidance
+## 📝 Contributing
 
-**Prevention:**
+Documentation is community-driven. If you spot something to improve:
 
-- Never share your certificates
-- Keep software updated
-- Report suspicious activity
+1. Browse the source on [GitHub](https://github.com/opencadc/canfar)
+2. Follow the contribution guidelines in `CONTRIBUTING.md`
+3. Submit a pull request or open an issue describing the change
 
-## 📝 Contributing to Documentation
-
-### How to Contribute
-
-The CANFAR documentation is community-driven and welcomes contributions from users like you. Whether you've discovered a typo, want to clarify an explanation, or have a complete tutorial to share, your input helps make the platform better for everyone.
-
-### Getting Started with Contributions
-
-1. **Browse the documentation source** on [GitHub](https://github.com/opencadc/canfar)
-2. **Set up local development**:
-
-   ```bash
-   git clone https://github.com/opencadc/canfar.git
-   cd canfar
-   pip install mkdocs mkdocs-material
-   mkdocs serve
-   ```
-
-3. **View documentation**: Open `http://127.0.0.1:8000` in your browser
-
-Changes to documentation files will automatically reload in your browser for real-time preview.
-
-### Documentation Structure
-
-Our documentation follows a clear structure designed for different user needs:
-
-- **`get-started/`**: Quick setup for new users
-- **`containers/`**: Container usage and building
-- **`sessions/`**: Jupyter, desktop, and application sessions
-- **`storage/`**: Data management and storage systems
-- **`permissions`**: User management and access control
-- **`concepts`**: Platform architecture and core concepts
-- **`support/`**: Support resources, FAQ, and community information
-
-### Writing Guidelines
-
-**Markdown Style:**
-
-- Use `#` for page titles, `##` for main sections, `###` for subsections
-- Code blocks with language specification: ` ```python ` or ` ```bash `
-- Inline code with single backticks: `variable_name` or `command --option`
-
-**Admonitions for Important Information:**
-
-```markdown
-!!! note
-    General information note
-
-!!! tip "Pro Tip"
-    Helpful advice for users
-
-!!! warning
-    Important cautions
-
-!!! danger "Critical"
-    Critical warnings
-
-!!! example
-    Code examples and demonstrations
-```
-
-**Writing for Different Audiences:**
-
-**New Users:**
-
-- Avoid jargon or explain technical terms clearly
-- Provide step-by-step instructions
-- Focus on common tasks and getting started
-- Include plenty of examples
-
-**Advanced Users:**
-
-- Provide technical details and configuration options
-- Include information on automation, APIs, and advanced workflows
-- Assume familiarity with relevant technologies
-- Link to detailed reference materials
-
-### Contribution Process
-
-1. **Make your changes** in the appropriate documentation files
-2. **Test locally** using `mkdocs serve` to verify formatting
-3. **Commit with clear messages**: `git commit -m "docs: Describe your change"`
-4. **Submit a pull request** to the main repository
-5. **Collaborate** with reviewers to refine your contribution
-
-### Documentation Philosophy
-
-We aim for documentation that is:
-
-- **Accurate**: Technically correct and current
-- **Clear**: Easy to understand without unnecessary jargon
-- **Complete**: Covering essential aspects comprehensively
-- **User-Friendly**: Well-structured and accessible
-
-### Questions About Contributing?
-
-- Open an issue on [GitHub](https://github.com/opencadc/canfar/issues)
-- Ask on Discord in the community channels
-- Email the CANFAR team at [support@canfar.net](mailto:support@canfar.net)
-
-Your contributions help make CANFAR better for the entire astronomy community!
-
-## 📞 Contact Information Summary
-
-| Need | Contact | Response Time |
-|------|---------|---------------|
-| General support | [support@canfar.net](mailto:support@canfar.net) | 1-2 business days |
-| Quick questions | [Discord Community](https://discord.gg/vcCQ8QBvBa) | Minutes to hours |
-
-Remember: The CANFAR team is here to help you succeed in your research. Don't hesitate to reach out with questions, no matter how basic they might seem!
+For help getting started, ask in Discord or email [support@canfar.net](mailto:support@canfar.net).
