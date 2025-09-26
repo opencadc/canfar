@@ -52,3 +52,9 @@
 .md-sidebar--primary .md-nav--primary .md-nav__item > .md-nav .md-nav__link {
   padding-left: 0;
 }
+
+/* Custom styles for dark mode */
+[data-md-color-scheme="slate"] { /* Target the dark mode scheme */
+  --md-typeset-a-color: #57B7E7; /* Example: light blue for links */
+  --md-typeset-a-hl-color: #BEE7F9; /* Example: lighter blue for hover */
+}
