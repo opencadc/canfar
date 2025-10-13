@@ -236,7 +236,7 @@ nav:
       - Contributing: contributing.md
       - Testing: client/testing.md
     - Operations:
-      - Deployments: https://www.opencadc.org/deployments/
+      - Platform Deployments: https://www.opencadc.org/deployments/
     - Security Issues: security.md
     - Changelog: changelog.md
   - About:
