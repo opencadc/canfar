@@ -110,3 +110,31 @@ When dealing with large astronomy datasets, how you handle memory and I/O can ma
     ```
 
 - **Keep Environments Reproducible:** Avoid “it works on my machine | session” issues by documenting dependencies. If you installed something interactively in Jupyter, add it to your with your manager of choice.
+
+
+## Container Packaging
+
+- **Group tools by logical pipeline step:** - Don't create a monolithic container with all tools for every stage or split every tool into its own micro-container. Create one container per logical pipeline step, bundling all tools needed for that step—whether they're interactive or batch-oriented.
+
+- **Reuse** the same container for both interactive testing (e.g. JupyterLab) and headless batch execution of the same code. This ensures consistency, debuggability, and minimizes surprises in batch jobs.
+
+- **Test Locally:** Before scaling up, test your container build and functionality on a small dataset locally or in an interactive session. This ensures the environment has everything needed.
+
+#### Keep Containers Lean 
+
+- **Use Official Base Images (Soon, Work in Progress):** If building your own container image for a pipeline, start with a provided base image rather than starting from scratch. For example, the `base:22.04` image is a good general starting point – and it comes with `uv, pipx, conda` pre-installed and configured.
+    ```dockerfile
+    FROM images.canfar.net/library/base:22.04
+    ```
+
+- **Keep Images Lightweight:** Minimize what you add to the container. Uninstall unnecessary packages and avoid including large test data or docs inside the image. A smaller image pulls faster and uses less storage, benefiting batch runs. Use a .dockerignore file to exclude files like docs, tests, and git directories from the build context
+
+- **Optimize Dockerfile Layers:** Combine related commands into single `RUN` statements and clean up after installations to reduce image size. For example, update and install Linux packages in one layer, then remove package lists and caches:
+
+```dockerfile
+# Combining update, install, and cleanup in one layer
+RUN apt-get update && apt-get install -y \
+    astrometry.net sextractor \
+ && apt-get clean \
+ && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+```
