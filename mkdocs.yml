@@ -175,6 +175,7 @@ nav:
     - Overview: platform/index.md
     - Getting Started: platform/get-started.md
     - Concepts: platform/concepts.md
+    - Best Practices: platform/best-practices.md
     - Permissions: platform/permissions.md
     - DOI: platform/doi.md
     - Cloud (legacy): platform/cloud.md
