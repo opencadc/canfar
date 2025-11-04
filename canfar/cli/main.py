@@ -152,11 +152,9 @@ def main() -> None:
     """Main entry point."""
     try:
         cli()
-    except AuthExpiredError:
-        console.print(
-            "[bold red]Auth Expired:[/bold red] "
-            "Please re-authenticate using [italic cyan]canfar auth login[/italic cyan]"
-        )
+    except AuthExpiredError as err:
+        console.print(err)
+        console.print("Authenticate with [italic cyan] canfar auth login[/italic cyan]")
     except AuthContextError as err:
         console.print(err)
 
