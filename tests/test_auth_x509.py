@@ -126,7 +126,7 @@ def test_expiry_not_yet_valid() -> None:
     with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
         cert_path = Path(temp_cert.name)
         generate_cert(cert_path, not_before_days=2)
-        with pytest.raises(ValueError, match="is not yet valid."):
+        with pytest.raises(x509_auth.CertificateError, match="valid from"):
             x509_auth.expiry(cert_path)
 
 
@@ -136,8 +136,45 @@ def test_expiry_with_invalid_content() -> None:
         temp_cert.write("this is not a valid certificate")
         temp_cert.flush()
         cert_path = Path(temp_cert.name)
-        with pytest.raises(ValueError, match="Unable to load PEM file."):
+        with pytest.raises(x509_auth.CertificateError, match="Unable to load PEM file"):
             x509_auth.expiry(cert_path)
+
+
+def test_expiry_error_message_contains_times(tmp_path) -> None:
+    """Ensure the error message includes validity window and current time."""
+    cert_path = tmp_path / "future.pem"
+    generate_cert(cert_path, not_before_days=2, valid_for_days=5)
+    with pytest.raises(x509_auth.CertificateError) as excinfo:
+        x509_auth.expiry(cert_path)
+
+    message = str(excinfo.value)
+    assert "valid from" in message
+    assert "until" in message
+    assert "current time" in message
+
+
+def test_expiry_handles_missing_not_valid_before_utc(monkeypatch, tmp_path) -> None:
+    """Expiry should fall back to naive datetime attributes when needed."""
+    cert_path = tmp_path / "cert.pem"
+    generate_cert(cert_path, valid_for_days=3)
+
+    original_loader = x509_auth.x509.load_pem_x509_certificate
+
+    class MinimalCert:
+        """Certificate exposing only naive validity attributes."""
+
+        def __init__(self, cert: x509.Certificate) -> None:
+            self.not_valid_before = cert.not_valid_before
+            self.not_valid_after = cert.not_valid_after
+
+    def fake_loader(data: bytes, backend) -> MinimalCert:  # type: ignore[override]
+        cert = original_loader(data, backend)
+        return MinimalCert(cert)
+
+    monkeypatch.setattr(x509_auth.x509, "load_pem_x509_certificate", fake_loader)
+
+    expiry_ts = x509_auth.expiry(cert_path)
+    assert isinstance(expiry_ts, float)
 
 
 # --- Tests for canfar.auth.x509.inspect --- #
