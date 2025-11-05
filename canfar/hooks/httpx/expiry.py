@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
+from canfar.auth import x509
 from canfar.exceptions.context import AuthExpiredError
 
 if TYPE_CHECKING:
@@ -32,7 +33,14 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
             AuthExpiredError: If the authentication context is expired.
 
         """
-        if client.config.context.expired:
+        try:
+            expired = client.config.context.expired
+        except x509.CertificateError as err:
+            raise AuthExpiredError(
+                context=client.config.context.mode, reason=str(err)
+            ) from err
+
+        if expired:
             raise AuthExpiredError(
                 context=client.config.context.mode, reason="auth expired"
             )
@@ -58,7 +66,14 @@ def acheck(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Raises:
             AuthExpiredError: If the authentication context is expired.
         """
-        if client.config.context.expired:
+        try:
+            expired = client.config.context.expired
+        except x509.CertificateError as err:
+            raise AuthExpiredError(
+                context=client.config.context.mode, reason=str(err)
+            ) from err
+
+        if expired:
             raise AuthExpiredError(
                 context=client.config.context.mode, reason="auth expired"
             )

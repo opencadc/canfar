@@ -23,6 +23,75 @@ if TYPE_CHECKING:
 log = get_logger(__name__)
 
 
+class CertificateError(ValueError):
+    """Raised when an X.509 certificate cannot be used."""
+
+
+def _to_utc(value: datetime) -> datetime:
+    """Return timezone aware datetime.
+
+    Args:
+        value (datetime): Input datetime.
+
+    Returns:
+        datetime: Timezone aware datetime.
+    """
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)
+
+
+def _validity_window(cert: x509.Certificate) -> tuple[datetime, datetime]:
+    """Return validity start/end datetimes in UTC.
+
+    Args:
+        cert (x509.Certificate): Certificate to inspect.
+
+    Raises:
+        CertificateError: If certificate is expired or not yet valid.
+
+    Returns:
+        tuple[datetime, datetime]: Validity start and end datetimes in UTC.
+    """
+    try:
+        start = getattr(cert, "not_valid_before_utc", None) or cert.not_valid_before
+        end = getattr(cert, "not_valid_after_utc", None) or cert.not_valid_after
+    except AttributeError as err:  # pragma: no cover - defensive path
+        msg = "Certificate is missing validity information."
+        raise CertificateError(msg) from err
+
+    return _to_utc(start), _to_utc(end)
+
+
+def assert_valid_dates(
+    destination: Path, valid_from: datetime, valid_until: datetime
+) -> None:
+    """Check if x509 cert dates are valid.
+
+    Args:
+        destination (Path): Path to certificate file.
+        valid_from (datetime): Validity start datetime.
+        valid_until (datetime): Validity end datetime.
+
+    Raises:
+        CertificateError: If certificate is expired or not yet valid.
+    """
+    now_utc = datetime.now(timezone.utc)
+    if valid_from > now_utc:
+        msg = (
+            f"Certificate {destination} valid from {valid_from.isoformat()} "
+            f"until {valid_until.isoformat()}; current time {now_utc.isoformat()}."
+        )
+        raise CertificateError(msg)
+
+    if valid_until <= now_utc:
+        msg = (
+            f"Certificate {destination} expired on {valid_until.isoformat()}; "
+            f"current time {now_utc.isoformat()}."
+        )
+        raise CertificateError(msg)
+
+
 def gather(
     username: str | None = None,
     days_valid: int = 30,
@@ -160,22 +229,18 @@ def expiry(path: Path = CERT_PATH) -> float:
         destination = path.resolve(strict=True)
         data = destination.read_bytes()
         cert = x509.load_pem_x509_certificate(data, default_backend())
-        now_utc = datetime.now(timezone.utc)
-
-        if cert.not_valid_before_utc >= now_utc:
-            msg = f"{destination} is not yet valid."
-            raise ValueError(msg)  # noqa: TRY301
-
-        return cert.not_valid_after_utc.timestamp()
+        valid_from, valid_until = _validity_window(cert)
+        assert_valid_dates(destination, valid_from, valid_until)
+        return valid_until.timestamp()
     except FileNotFoundError as err:
         msg = f"x509 cert not found: {err}"
         log.debug(msg)
         return 0.0
+    except CertificateError:
+        raise
     except Exception as err:
-        if isinstance(err, ValueError):
-            raise  # Re-raise ValueError for expired/not-yet-valid certificates
-        msg = f"Unable to load PEM file. {err}"
-        raise ValueError(msg) from err
+        msg = f"Unable to load PEM file at {path.as_posix()}. {err}"
+        raise CertificateError(msg) from err
 
 
 def authenticate(config: auth.X509) -> auth.X509:
