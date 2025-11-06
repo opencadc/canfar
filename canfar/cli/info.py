@@ -8,6 +8,7 @@ from typing import Annotated, Any
 
 import humanize
 import typer
+from pydantic import ValidationError
 from rich import box
 from rich.console import Console
 from rich.table import Table
@@ -42,6 +43,8 @@ ALL_FIELDS: dict[str, str] = {
 
 def _format(field: str, value: Any) -> str:
     """Format the value for display."""
+    if value in (None, "", []):
+        return "[italic]Unknown[/italic]"
     if field == "startTime" and isinstance(value, datetime):
         return humanize.naturaltime(value)
     if field == "expiryTime" and isinstance(value, datetime):
@@ -50,25 +53,80 @@ def _format(field: str, value: Any) -> str:
     return str(value)
 
 
-def _utilization(used: float | str, requested: float | str, unit: str) -> str:
+def _utilization(
+    data: FetchResponse,
+    used_field: str,
+    requested_field: str,
+    unit: str,
+) -> str:
     """Calculate and format resource utilization."""
-    if requested == "<none>":
+    used = getattr(data, used_field)
+    requested = getattr(data, requested_field)
+    requested_display = requested
+
+    if not data.isFixedResources:
+        if used in (None, "<none>", "", []):
+            return "[italic]Unknown[/italic]"
+        return f"{used} {unit}"
+
+    if requested in (None, "<none>", "", []):
         requested = 0
-    if "M" in str(used):
-        used = float(str(used).replace("M", "")) / 1024
-    if "M" in str(requested):
-        requested = float(str(requested).replace("M", "")) / 1024
-    req_val = float(str(requested).replace("G", ""))
+    if used in (None, "<none>", "", []):
+        used = 0
+
+    def _to_number(value: float | str) -> float:
+        """Best-effort conversion of resource strings to floats."""
+        if isinstance(value, (int, float)):
+            return float(value)
+        text = str(value).strip()
+        if text in {"", "<none>"}:
+            return 0.0
+        multiplier = 1.0
+        if text.endswith(("Mi", "mi")):
+            multiplier = 1 / 1024
+            text = text[:-2]
+        elif text.endswith(("M", "m")):
+            multiplier = 1 / 1024 if text.endswith("M") else 1 / 1000
+            text = text[:-1]
+        elif text.endswith(("Gi", "gi")):
+            multiplier = 1.0
+            text = text[:-2]
+        elif text.endswith("G"):
+            multiplier = 1.0
+            text = text[:-1]
+        try:
+            return float(text or 0) * multiplier
+        except ValueError:
+            return 0.0
+
+    req_val = _to_number(requested)
     if req_val == 0:
         return "[italic]Not Requested[/italic]"
-    usage = 0.0 if used == "<none>" else float(used)
+    usage = _to_number(used)
     percentage = (usage / req_val) * 100
-    return f"{percentage:.0f}% [italic]of {requested} {unit}[/italic]"
+    display = requested_display if requested_display not in (None, "", []) else req_val
+    return f"{percentage:.0f}% [italic]of {display} {unit}[/italic]"
 
 
-def _display(session_info: dict[str, Any]) -> None:
+def _display(session_info: dict[str, Any], debug: bool = False) -> None:
     """Display information for a single session."""
-    data = FetchResponse.model_validate(session_info)
+    try:
+        data = FetchResponse.model_validate(session_info)
+    except ValidationError as err:
+        session_id = str(session_info.get("id", "<unknown>"))
+        details = err.errors()[0]["msg"] if err.errors() else str(err)
+        fallback = {
+            "id": session_id,
+            "type": str(session_info.get("type", "Unknown") or "Unknown"),
+            "status": str(session_info.get("status", "Unknown") or "Unknown"),
+            "name": session_info.get("name") or session_id,
+            "isFixedResources": session_info.get("isFixedResources", True),
+        }
+        data = FetchResponse.model_validate(fallback)
+        data.anomalies.append(
+            f"{session_id}: encountered validation issues ({details})"
+        )
+
     table = Table(
         title=f"CANFAR Session Info for {data.id}",
         box=box.SIMPLE,
@@ -80,14 +138,19 @@ def _display(session_info: dict[str, Any]) -> None:
         value = getattr(data, field)
         display_value = _format(field, value)
         table.add_row(header, display_value)
-    cpu_usage = _utilization(data.cpuCoresInUse, data.requestedCPUCores, "core(s)")
-    ram_usage = _utilization(data.ramInUse, data.requestedRAM, "GB")
-    gpu_usage = _utilization(data.gpuRAMInUse, data.requestedGPUCores, "core(s)")
+    cpu_usage = _utilization(data, "cpuCoresInUse", "requestedCPUCores", "core(s)")
+    ram_usage = _utilization(data, "ramInUse", "requestedRAM", "GB")
+    gpu_usage = _utilization(data, "gpuRAMInUse", "requestedGPUCores", "core(s)")
 
     table.add_row("CPU Usage", cpu_usage)
     table.add_row("RAM Usage", ram_usage)
     table.add_row("GPU Usage", gpu_usage)
     console.print(table)
+
+    if debug and data.anomalies:
+        console.print("[yellow]Session Response Warnings:[/yellow]")
+        for note in dict.fromkeys(data.anomalies):
+            console.print(f"[dim]- {note}[/dim]")
 
 
 async def _get_info(
@@ -104,7 +167,7 @@ async def _get_info(
         )
         return
     for response in sessions_info:
-        _display(response)
+        _display(response, debug=debug)
 
 
 @info.callback(invoke_without_command=True)

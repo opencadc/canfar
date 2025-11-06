@@ -6,9 +6,10 @@ including specifications for creating and fetching sessions.
 
 from __future__ import annotations
 
+import contextlib
 import warnings
-from datetime import datetime, timezone
-from typing import Any, get_args
+from datetime import datetime
+from typing import Annotated, Any, get_args
 
 from pydantic import (
     BaseModel,
@@ -193,56 +194,183 @@ class FetchRequest(BaseModel):
 class FetchResponse(BaseModel):
     """Data model for a single session returned by the fetch API."""
 
-    id: str
-    userid: str
-    runAsUID: str
-    runAsGID: str
-    supplementalGroups: list[int]
-    appid: str | None = None
-    image: str
-    type: Kind
-    status: Status
-    name: str
-    startTime: datetime
-    expiryTime: datetime
-    connectURL: str
-    requestedRAM: str = "<none>"
-    requestedCPUCores: str = "<none>"
-    requestedGPUCores: str = "<none>"
-    ramInUse: str = "<none>"
-    gpuRAMInUse: str = "<none>"
-    cpuCoresInUse: str = "<none>"
-    gpuUtilization: str = "<none>"
+    model_config = ConfigDict(extra="allow")
 
-    @model_validator(mode="before")
+    id: str = Field(
+        "Unknown",
+        description="Unique identifier for the session.",
+    )
+    userid: str | None = Field(
+        None,
+        description="User identifier associated with the session.",
+    )
+    runAsUID: str | None = Field(
+        None,
+        description="UID the session runs under.",
+    )
+    runAsGID: str | None = Field(
+        None,
+        description="GID the session runs under.",
+    )
+    supplementalGroups: list[int] = Field(
+        default_factory=list,
+        description="Supplemental groups granted to the session.",
+    )
+    appid: str | None = Field(
+        None,
+        description="Optional application identifier.",
+    )
+    image: str | None = Field(
+        None,
+        description="Container image backing the session.",
+    )
+    type: Kind = Field(
+        "headless",
+        description="Session type as returned by the API.",
+    )
+    status: str = Field(
+        "Unknown",
+        description="Session status as returned by the API.",
+    )
+    name: str = Field(
+        "Unknown",
+        description="Session name supplied at creation time.",
+    )
+    startTime: datetime | None = Field(
+        None,
+        description="Timestamp when the session started.",
+    )
+    expiryTime: datetime | None = Field(
+        None,
+        description="Timestamp when the session will expire.",
+    )
+    connectURL: str | None = Field(
+        None,
+        description="URL to connect to the session.",
+    )
+    requestedRAM: str | None = Field(
+        None,
+        description="Requested RAM.",
+    )
+    requestedCPUCores: str | None = Field(
+        None,
+        description="Requested CPU cores.",
+    )
+    requestedGPUCores: str | None = Field(
+        None,
+        description="Requested GPU cores.",
+    )
+    ramInUse: str | None = Field(
+        None,
+        description="RAM in use.",
+    )
+    gpuRAMInUse: str | None = Field(
+        None,
+        description="GPU RAM in use.",
+    )
+    cpuCoresInUse: str | None = Field(
+        None,
+        description="CPU cores in use.",
+    )
+    gpuUtilization: str | None = Field(
+        None,
+        description="GPU utilization.",
+    )
+    isFixedResources: Annotated[
+        bool,
+        Field(
+            description=(
+                "Whether the session requests fixed resources (limits == requests). "
+                "If False, the session is running in flexible mode."
+            ),
+        ),
+    ] = True
+    anomalies: list[str] = Field(default_factory=list, repr=False, exclude=True)
+
+    @field_validator("type", mode="before")
     @classmethod
-    def _validate_datetime_fields(cls, data: Any) -> Any:
-        """Validate and default startTime and expiryTime fields.
+    def _validate_type(cls, v: Any) -> str:
+        """Validate type field, fall back to 'headless' if invalid."""
+        if v in (None, "", []):
+            return "headless"
+        if isinstance(v, str):
+            # Check if it's a valid Kind value
+            valid_kinds = get_args(Kind)
+            if v in valid_kinds:
+                return v
+            # Invalid type, will be tracked as anomaly in model validator
+            return "headless"
+        return "headless"
 
-        If startTime or expiryTime are not provided with proper type/kind,
-        they are defaulted to datetime.now().
+    @field_validator("status", mode="before")
+    @classmethod
+    def _validate_status(cls, v: Any) -> str:
+        """Validate status field, allow any string value."""
+        if v in (None, "", []):
+            return "Unknown"
+        return str(v)
 
-        Args:
-            data (Any): Raw input data.
+    @field_validator("supplementalGroups", mode="before")
+    @classmethod
+    def _validate_supplemental_groups(cls, v: Any) -> list[int]:
+        """Coerce supplemental groups to list of integers."""
+        if not isinstance(v, list):
+            return []
+        result = []
+        for item in v:
+            with contextlib.suppress(ValueError, TypeError):
+                result.append(int(item))
+        return result
 
-        Returns:
-            Any: Validated data with proper datetime fields.
-        """
-        if not isinstance(data, dict):
-            return data
-        for field in ["startTime", "expiryTime"]:
-            if field in data:
-                value: Any = data[field]
-                if not isinstance(value, datetime):
-                    try:
-                        # Try to parse as datetime if it's a string
-                        if isinstance(value, str):
-                            iso_time = value.replace("Z", "+00:00")
-                            data[field] = datetime.fromisoformat(iso_time)
-                        else:
-                            # If it's not a proper type, default to now
-                            data[field] = datetime.now(timezone.utc)
-                    except (ValueError, TypeError):
-                        # If parsing fails, default to now
-                        data[field] = datetime.now(timezone.utc)
-        return data
+    @field_validator("startTime", "expiryTime", mode="before")
+    @classmethod
+    def _validate_datetime(cls, v: Any) -> datetime | None:
+        """Parse datetime fields, return None if invalid."""
+        if v in (None, "", []):
+            return None
+        if isinstance(v, datetime):
+            return v
+        if isinstance(v, str):
+            try:
+                iso_time = v.replace("Z", "+00:00")
+                return datetime.fromisoformat(iso_time)
+            except (TypeError, ValueError):
+                return None
+        return None
+
+    @field_validator("id", "name", mode="before")
+    @classmethod
+    def _validate_string_fields(cls, v: Any) -> str:
+        """Validate string fields, default to 'Unknown' if missing."""
+        if v in (None, "", []):
+            return "Unknown"
+        return str(v)
+
+    @model_validator(mode="after")
+    def _collect_anomalies(self) -> Self:
+        """Collect anomalies for missing or invalid fields."""
+        notes: list[str] = []
+
+        # Track missing/invalid fields
+        if self.id == "Unknown":
+            notes.append("missing id in response")
+        if self.name == "Unknown":
+            notes.append("missing name in response")
+        if self.type == "headless":
+            # Only track as anomaly if it was actually missing/invalid
+            # We can't easily tell here, so we'll skip this
+            pass
+        if self.startTime is None:
+            notes.append("missing or invalid startTime in response")
+        if self.expiryTime is None:
+            notes.append("missing or invalid expiryTime in response")
+
+        # Track missing resource fields
+        for attr in ["ramInUse", "cpuCoresInUse"]:
+            value = getattr(self, attr)
+            if value in (None, "", []):
+                notes.append(f"missing or invalid {attr} in response")
+
+        if notes:
+            self.anomalies = self.anomalies + notes
+        return self
