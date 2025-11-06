@@ -5,7 +5,7 @@ import warnings
 import pytest
 from pydantic import ValidationError
 
-from canfar.models.session import CreateRequest, FetchRequest
+from canfar.models.session import CreateRequest, FetchRequest, FetchResponse
 
 
 class TestCreateSpec:
@@ -435,3 +435,78 @@ class TestSessionModelsIntegration:
 
         assert fetch_spec.kind == "headless"
         assert fetch_spec.status == "Running"
+
+
+class TestFetchResponse:
+    """Tests for the tolerant FetchResponse model."""
+
+    def test_missing_optional_fields_are_defaulted(self) -> None:
+        """A payload missing optional fields should not raise validation errors."""
+        payload = {
+            "id": "abc123",
+            "status": "Failed (DeadlineExceeded)",
+            "type": "desktop-app",
+            # Deliberately missing: name, startTime, expiryTime, connectURL
+        }
+
+        response = FetchResponse.model_validate(payload)
+
+        assert response.id == "abc123"
+        assert response.name == "Unknown"
+        assert response.status == "Failed (DeadlineExceeded)"
+        assert response.type == "desktop-app"
+        assert response.startTime is None
+        assert response.expiryTime is None
+        assert response.connectURL is None
+        assert any("missing name" in note for note in response.anomalies)
+
+    def test_invalid_datetime_is_ignored(self) -> None:
+        """Invalid datetime values should be converted to None with an anomaly."""
+        payload = {
+            "id": "run-42",
+            "status": "Running",
+            "type": "notebook",
+            "startTime": "not-a-valid-datetime",
+            "expiryTime": 12345,
+        }
+
+        response = FetchResponse.model_validate(payload)
+
+        assert response.startTime is None
+        assert response.expiryTime is None
+        assert any(
+            "missing or invalid startTime in response" in note
+            for note in response.anomalies
+        )
+        assert any(
+            "missing or invalid expiryTime in response" in note
+            for note in response.anomalies
+        )
+
+    def test_is_fixed_resources_defaults_to_true(self) -> None:
+        """IsFixedResources should default to True when not provided."""
+        payload = {
+            "id": "run-44",
+            "status": "Running",
+            "type": "desktop",
+        }
+
+        response = FetchResponse.model_validate(payload)
+
+        assert response.isFixedResources is True
+        assert response.requestedRAM is None
+
+    def test_is_fixed_resources_handles_false(self) -> None:
+        """IsFixedResources should honour falsey values."""
+        payload = {
+            "id": "run-45",
+            "status": "Running",
+            "type": "desktop",
+            "isFixedResources": "false",
+            "ramInUse": "512Mi",
+        }
+
+        response = FetchResponse.model_validate(payload)
+
+        assert response.isFixedResources is False
+        assert response.ramInUse == "512Mi"

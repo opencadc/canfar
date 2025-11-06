@@ -472,6 +472,7 @@ class AsyncSession(HTTPClient):
         parameters = {"view": "stats"}
         response: Response = await self.asynclient.get("session", params=parameters)
         data: dict[str, Any] = response.json()
+        log.debug(data)
         return data
 
     async def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
@@ -480,8 +481,8 @@ class AsyncSession(HTTPClient):
         Args:
             ids (Union[List[str], str]): Session ID[s].
 
-        Returns:
-            Dict[str, Any]: Session information.
+        Returns: d
+            Dict[str, Any]: Session information. d
 
         Examples:
             >>> from canfar.session import AsyncSession
@@ -509,6 +510,7 @@ class AsyncSession(HTTPClient):
                 log.error(reply)
             elif isinstance(reply, dict):
                 results.append(reply)
+        log.debug(results)
         return results
 
     async def logs(
@@ -652,6 +654,7 @@ class AsyncSession(HTTPClient):
                 log.error(reply)
             elif isinstance(reply, str):
                 results.append(reply)
+        log.debug(results)
         return results
 
     async def events(
@@ -705,6 +708,7 @@ class AsyncSession(HTTPClient):
                 for key, value in result.items():
                     log.info("Session ID: %s", key)
                     log.info(value)
+        log.debug(results)
         return results if not verbose else None
 
     async def destroy(self, ids: str | list[str]) -> dict[str, bool]:
@@ -745,6 +749,7 @@ class AsyncSession(HTTPClient):
         for reply in responses:
             if isinstance(reply, tuple):
                 results[reply[0]] = reply[1]
+        log.debug(results)
         return results
 
     async def destroy_with(
@@ -799,6 +804,7 @@ class AsyncSession(HTTPClient):
         if isinstance(ids, str):
             ids = [ids]
         info = await self.info(ids)
+        log.debug(info)
         for session in info:
             connect_url = session.get("connectURL")
             if connect_url:

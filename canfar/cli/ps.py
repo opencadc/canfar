@@ -9,6 +9,7 @@ from typing import Annotated, get_args
 import click
 import humanize
 import typer
+from pydantic import ValidationError
 from rich import box
 from rich.console import Console
 from rich.table import Table
@@ -73,17 +74,30 @@ def show(
         """Asynchronous function to list sessions."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
-            sessions: list[FetchResponse] = []
-            sessions = [
-                FetchResponse.model_validate(item)
-                for item in await session.fetch(kind=kind, status=status)
-            ]
-        sessions = sorted(sessions, key=lambda x: x.startTime, reverse=False)
+            raw = await session.fetch(kind=kind, status=status)
+
+        sanitized: list[FetchResponse] = []
+        anomalies: list[str] = []
+
+        for payload in raw:
+            try:
+                _info = FetchResponse.model_validate(payload)
+                sanitized.append(_info)
+                anomalies.extend(_info.anomalies)
+            except ValidationError as err:
+                console.print(f"[bold red]Error:[/bold red] {err}")
+                continue
+
+        sessions = sorted(
+            sanitized,
+            key=lambda x: x.startTime or datetime.max.replace(tzinfo=timezone.utc),
+            reverse=False,
+        )
 
         if quiet:
             for instance in sessions:
                 console.print(instance.id)
-            return
+                return
 
         table = Table(title="CANFAR Sessions", box=box.SIMPLE)
         table.add_column("SESSION ID", style="cyan")
@@ -97,14 +111,14 @@ def show(
         for instance in sessions:
             if not everything and instance.status not in ["Pending", "Running"]:
                 continue
+            created = "unknown"
+            if instance.startTime:
+                uptime = datetime.now(timezone.utc) - instance.startTime
+                created = humanize.naturaldelta(uptime)
             running += 1
-            uptime = datetime.now(timezone.utc) - instance.startTime
-            # Convert uptime to human readable format using strftime
-            created = humanize.naturaldelta(uptime)
-
             table.add_row(
                 instance.id,
-                instance.name,
+                instance.name or instance.id,
                 instance.type,
                 instance.status,
                 instance.image,
@@ -116,5 +130,10 @@ def show(
             console.print("[dim]Use [italic]--all[/italic] to show all sessions.[/dim]")
         else:
             console.print(table)
+
+        if anomalies and debug:
+            console.print("[yellow]Session Response Warnings:[/yellow]")
+            for message in dict.fromkeys(anomalies):
+                console.print(f"[dim]- {message}[/dim]")
 
     asyncio.run(_list_sessions())

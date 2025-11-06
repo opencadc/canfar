@@ -2,6 +2,46 @@
 
 Stay up to date with the latest features, improvements, and changes in CANFAR.
 
+## Recent Updates
+
+!!! tip "New in v1.1+"
+
+    ### **🛡️ Improved Session Data Validation**
+
+    The CANFAR CLI now features enhanced resilience when handling session data from the Science Platform API. This update improves the user experience when the API returns incomplete or malformed session information.
+
+    **What Changed:**
+
+    - **Graceful Degradation**: The CLI commands (`canfar info`, `canfar ps`) now continue to work even when the API returns incomplete session data, displaying partial information instead of crashing.
+    - **Better Error Reporting**: Missing or invalid fields are tracked internally and can be viewed with the `--debug` flag for troubleshooting.
+    - **Enhanced Display**: Resource usage metrics for flexible sessions is now reported with better readability.
+    - **Type Safety**: Session type validation has been strengthened using Pydantic's built-in validators.
+
+    **Example:**
+
+    ```bash title="Flexible Session Resource Usage"
+    $ canfar info n2tr1rpf
+
+    CANFAR Session Info for n2tr1rpf
+
+      Session ID    n2tr1rpf
+      Name          spy-panda
+      Status        Running
+      Type          notebook
+      CPU Usage     0.001 core(s)
+      RAM Usage     0.22 GB
+      GPU Usage     Unknown # (GPU not requested)
+    ```
+
+    ```bash title="Debug Mode for Troubleshooting"
+    $ canfar info --debug n2tr1rpf 
+
+    # Shows additional warnings about missing/invalid fields
+    ⚠️  Session Response Warnings:
+        • missing or invalid startTime in response
+        • missing or invalid expiryTime in response
+    ```
+
 !!! success "v1.0"
 
     :fontawesome-solid-exclamation-triangle: **Breaking Changes**
@@ -28,8 +68,6 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     
       - Complete overhaul to bring all documentation sources under a single roof.
       - Significant improvements to the Python client and brand new CLI documentation.
-
-## Recent Updates
 
 !!! info "New in v0.7+"
 
