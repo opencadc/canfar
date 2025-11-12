@@ -33,6 +33,7 @@ hide:
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
+    - [:material-kubernetes: __Platform Operations__ <small>Deployments and infrastructure</small>](https://www.opencadc.org/deployments/)
     - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](release-notes.md)
     - [:simple-rocket: __Try out__ <small>CANFAR Science Platform</small>](https://www.canfar.net)
     - [:octicons-telescope-fill-16: and much more...](platform/concepts.md)
