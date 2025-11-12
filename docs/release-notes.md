@@ -1,6 +1,48 @@
-# CANFAR Science Platform 2025.1
+# CANFAR Science Platform Releases
 
-!!! success "CANFAR Science Platform 2025.1"
+!!! success "CANFAR Science Platform 2025.2 - Nov 25, 2025"
+
+    ### ✨ Features
+    - **Cluster-aware resource selection on CANFAR Science Portal** — Memory and Core options reflect size and state of the underlying kubernetes cluster
+    - **GPU selection** — In CANFAR clusters where GPUs are available, a GPU selection option presented in the science portal
+
+    ### 🐛 Fixes
+    - Addresses problem with the incorrect enforcement of the maximum number of sessions allowed
+    - Improved acuracy of Global session statistics on CANFAR portal
+    - canfar CLI fixes
+        - Graceful Degradation: The CLI commands (canfar info, canfar ps) now continue to work even when the API returns incomplete session data, displaying partial information instead of crashing
+        - Better Error Reporting: Missing or invalid fields are tracked internally and can be viewed with the --debug flag for troubleshooting
+        - Enhanced Display: Resource usage metrics for flexible sessions is now reported with better readability
+        - Type Safety: Session type validation has been strengthened using Pydantic's built-in validators
+
+    ### ⚙️ Technical Changes
+    - Cavern controlls user allocations - called by authorized clients such as skaha and prepareData
+    - All registry lookups benefit from registry mirrroring and failover
+   
+    ### 📦 Deployment Notes
+    - Deployers now specify limits of their cluster as LimitRange objects from helm charts [DONE]
+    - Ability to specify a default project for each of the harbor instances configured
+    - Ability to define multiple regsitries to support mirroring
+    - Use the offically supported helm charts in the [opencadc/deployments](https://github.com/opencadc/deployments/tree/main/helm/applications/skaha) for CANFAR 2025.2 deployments.
+
+    #### Python Client & CLI 
+    
+    | Component | Version |
+    |---------|--------------|
+    | canfar | [v1.1+](https://pypi.org/project/canfar/) |
+    
+    #### Helm Charts & Container Images
+        
+    | Component | Helm Chart Version | Container Image |
+    |-----------|-------------------|-----------------|
+    | base | ? | N/A |
+    | cavern | ? | images.opencadc.org/platform/cavern:? |
+    | skaha | ? | images.opencadc.org/platform/skaha:? |
+    | posix-mapper | ? | images.opencadc.org/platform/posix-mapper:? |
+    | science-portal | ? | images.opencadc.org/platform/science-portal:? |
+    | storage-ui | ? | images.opencadc.org/client/storage-ui:? |
+
+!!! success "CANFAR Science Platform 2025.1 - Sept 9, 2025"
 
     **Dear CANFAR Community,**
 
@@ -64,11 +106,10 @@
     | science-portal | 1.0.0 | images.opencadc.org/platform/science-portal:1.0.0 |
     | storage-ui | 0.6.0 | images.opencadc.org/client/storage-ui:1.3.0 |
 
-    ### 💬 Contact & Support
+## 💬 Contact & Support
 
-    For any questions about this release, or for information relating to CANFAR issues or deployment support, head over to the [CANFAR Discord Server](https://discord.gg/vcCQ8QBvBa) or please contact us at [support@canfar.net](mailto:support@canfar.net).
+<div style="text-align: center;">
+For any questions about any of these releases, or for information relating to CANFAR issues or deployment support, head over to the [CANFAR Discord Server](https://discord.gg/vcCQ8QBvBa) or contact us at [support@canfar.net](mailto:support@canfar.net).
+Built with :heart:{.heart} at CADC    
+</div>
 
-    <br>
-    <div style="text-align: center;">
-    Built with :heart:{.heart} at CADC
-    </div>
