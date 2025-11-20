@@ -28,7 +28,7 @@ cd canfar
 
 ### 3. Set Up Your Development Environment
 
-- CANFAR uses *uv* for for package, project and dependency management. To install *uv*, please refer to the [astral-uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
+- CANFAR uses *uv* for package, project and dependency management. To install *uv*, please refer to the [astral-uv documentation](https://docs.astral.sh/uv/getting-started/installation/).
 - You need a valid CANFAR account and access to the CANFAR Science Platform. To request access, [please request an account with the Canadian Astronomy Data Centre (CADC)](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
 
 To setup the development environment, simply run:
@@ -69,7 +69,8 @@ Make your changes. Please make sure to add tests for your changes if applicable.
 
 ### 5. Run the Tests
 
-To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the [get started](client/get-started.md) section.
+To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the [get started](client/get-started.md) section.  It is expected that the certificate
+is installed in the default location (`~/.ssl/cadcproxy.pem`).
 
 ```bash
 uv run pytest
