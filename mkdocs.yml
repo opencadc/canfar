@@ -203,7 +203,9 @@ nav:
       - Help: platform/support/index.md
       - FAQ: platform/support/faq.md
     - Releases:
-      - 2025.1: release-notes.md
+      - CANFAR Releases: releases/releases.md
+      - 2025.2: releases/2025-2.md
+      - 2025.1: releases/2025-1.md
   - Client:
     - Home: client/home.md
     - Authentication: cli/authentication-contexts.md
