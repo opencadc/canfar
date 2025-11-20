@@ -45,12 +45,11 @@ def get_stats(
             show_header=True,
             header_style="bold blue",
         )
-        
-        # Disable Instances column until the underlying query can be made to work efficiently
+
+        # Disable Instances column until the underlying query can be made to work
+        # efficiently.
         # jenkinsd 2025.11.20
         #
-        # table.add_column("Instances", justify="center")
-        
         table.add_column("CPU", justify="center")
         table.add_column("RAM", justify="center")
 
@@ -89,11 +88,11 @@ def get_stats(
         ram_table.add_row("Usage", f"{ram.get('requestedRAM', 'N/A')}")
         ram_table.add_row("Total", f"{ram.get('ramAvailable', 'N/A')}")
 
-        # Commenting out Instances column until the underlying query can be made to work efficiently
+        # Commenting out Instances column until the underlying query can be made to work
+        # efficiently.
         # jenkinsd 2025.11.20
         #
-        # table.add_row(instances_table, cores_table, ram_table)
-        
+
         # Add the first row with nested tables
         table.add_row(cores_table, ram_table)
 
