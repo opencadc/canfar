@@ -83,9 +83,7 @@ class Session(HTTPClient):
             >>> from canfar.session import Session
             >>> session = Session()
             >>> session.stats()
-            {'instances': {
-             'session': 88, 'desktopApp': 30, 'headless': 0, 'total': 118},
-             'cores': {'requestedCPUCores': 377,
+            {'cores': {'requestedCPUCores': 377,
              'coresAvailable': 960,
              'maxCores': {'cores': 32, 'withRam': '147Gi'}},
              'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}
@@ -462,9 +460,7 @@ class AsyncSession(HTTPClient):
             >>> from canfar.session import AsyncSession
             >>> session = AsyncSession()
             >>> await session.stats()
-            {'instances': {
-             'session': 88, 'desktopApp': 30, 'headless': 0, 'total': 118},
-             'cores': {'requestedCPUCores': 377,
+            {'cores': {'requestedCPUCores': 377,
              'coresAvailable': 960,
              'maxCores': {'cores': 32, 'withRam': '147Gi'}},
              'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}
