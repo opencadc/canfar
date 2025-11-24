@@ -1145,7 +1145,7 @@
 </code></pre></div>
 <h3 id="3-set-up-your-development-environment">3. Set Up Your Development Environment<a class="headerlink" href="#3-set-up-your-development-environment" title="Permanent link">&para;</a></h3>
 <ul>
-<li>CANFAR uses <em>uv</em> for for package, project and dependency management. To install <em>uv</em>, please refer to the <a href="https://docs.astral.sh/uv/getting-started/installation/">astral-uv documentation</a>.</li>
+<li>CANFAR uses <em>uv</em> for package, project and dependency management. To install <em>uv</em>, please refer to the <a href="https://docs.astral.sh/uv/getting-started/installation/">astral-uv documentation</a>.</li>
 <li>You need a valid CANFAR account and access to the CANFAR Science Platform. To request access, <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">please request an account with the Canadian Astronomy Data Centre (CADC)</a>.</li>
 </ul>
 <p>To setup the development environment, simply run:</p>
@@ -1171,7 +1171,8 @@ uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </sp
 <h3 id="4-make-your-changes">4. Make Your Changes<a class="headerlink" href="#4-make-your-changes" title="Permanent link">&para;</a></h3>
 <p>Make your changes. Please make sure to add tests for your changes if applicable.</p>
 <h3 id="5-run-the-tests">5. Run the Tests<a class="headerlink" href="#5-run-the-tests" title="Permanent link">&para;</a></h3>
-<p>To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the <a href="../client/get-started/">get started</a> section.</p>
+<p>To run tests for Skaha, you need to have a valid CANFAR account and access to the CANFAR Science Platform. To generate a certificate, please refer to the <a href="../client/get-started/">get started</a> section.  It is expected that the certificate
+is installed in the default location (<code>~/.ssl/cadcproxy.pem</code>).</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest
 </code></pre></div>
 <h4 id="running-tests-efficiently">Running Tests Efficiently<a class="headerlink" href="#running-tests-efficiently" title="Permanent link">&para;</a></h4>
