@@ -53,8 +53,9 @@ def test_fetch_with_malformed_status(session: Session) -> None:
 
 @pytest.mark.slow
 def test_session_stats(session: Session) -> None:
-    """Test fetching images with kind."""
-    assert "instances" in session.stats()
+    """Test fetching stats with kind."""
+    assert "cores" in session.stats()
+    assert "ram" in session.stats()
 
 
 def test_create_session_with_malformed_kind(session: Session, name: str) -> None:
