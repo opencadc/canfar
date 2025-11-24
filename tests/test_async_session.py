@@ -48,7 +48,8 @@ async def test_fetch_with_malformed_view(asession: AsyncSession) -> None:
 async def test_get_session_stats(asession: AsyncSession) -> None:
     """Test fetching images with kind."""
     response = await asession.stats()
-    assert "instances" in response
+    assert "cores" in response
+    assert "ram" in response
 
 
 @pytest.mark.asyncio

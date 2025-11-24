@@ -8,7 +8,7 @@
 
 ### To learn more, [check out the documentation](https://opencadc.github.io/canfar/).
 
-<p align="center">
+<p style="text-align:center;">
   <a href="Some Love">
     <img src="https://forthebadge.com/images/badges/built-with-love.svg">
   </a>
