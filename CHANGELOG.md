@@ -1,5 +1,35 @@
 # Changelog
 
+## [1.1.0](https://github.com/opencadc/canfar/compare/v1.0.4...v1.1.0) (2025-11-25)
+
+
+### Features
+
+* **cli:** enhanced resilience when handling session data from skaha api ([2662f89](https://github.com/opencadc/canfar/commit/2662f891d19e151e3dc5b3e69a0fabbe6d273085))
+
+
+### Bug Fixes
+
+* **auth:** better reporting for x509 cert date validity errors ([47e800b](https://github.com/opencadc/canfar/commit/47e800b273e30564e6d6c4fbcbd4417895a317c2))
+* **build:** updated dependencies to support python 3.14 ([664011c](https://github.com/opencadc/canfar/commit/664011cdd5866e0afbb896b2e17ea23a26f75597))
+* **cli:** properly print cert errors ([7cfe834](https://github.com/opencadc/canfar/commit/7cfe834d6335a5af71329ebc9c502ab07e983ed4))
+* remove instances expectation from stats ([aad2656](https://github.com/opencadc/canfar/commit/aad2656b0819f27df3dfbc66e322863724af3cd3))
+* **sessions:** added debug logging to all async session requests ([bd4b5a4](https://github.com/opencadc/canfar/commit/bd4b5a49c9bc3c2eb3f09fb86ca73ea434bab328))
+
+
+### Documentation
+
+* add deployments documentation link ([2a4cc49](https://github.com/opencadc/canfar/commit/2a4cc49400538eb3dafdede85689243551e3ef1d))
+* **best-practices:** for containerizing ([5d05f80](https://github.com/opencadc/canfar/commit/5d05f80c2cba7626b7c4069446fc2538a6322d48))
+* improve deployments link naming ([76c89ef](https://github.com/opencadc/canfar/commit/76c89ef10728176dd17d8088815df166ba514893))
+* **mkdocs:** added best-practices to the edge docs ([6be501c](https://github.com/opencadc/canfar/commit/6be501c4d178d8b721278fdd74d635e6361a0fc4))
+* **platform:** added best practices for end users ([0c747ea](https://github.com/opencadc/canfar/commit/0c747ea28d1bd7b02792baaafb3403e96f4600ce))
+* **release-notes:** change release notes structure, added 2025.2 ([a876880](https://github.com/opencadc/canfar/commit/a8768806e8e7a871e426c4e52bedecd4448121f0))
+* **releases:** 2025.2 release note updates ([21cd759](https://github.com/opencadc/canfar/commit/21cd7595824c3bcc0c19078b92233f6752154e67))
+* **releases:** Release process, roadmap, and contributions ([ec7e46c](https://github.com/opencadc/canfar/commit/ec7e46c5df15da7429bb630714a91fd02cc50d90))
+* **releases:** typo ([2224c02](https://github.com/opencadc/canfar/commit/2224c02d2d90a8ab4a1adaed76138294d91ddb5b))
+* **releases:** Update of general release information ([4763715](https://github.com/opencadc/canfar/commit/47637158e91ef5d482d7a973c8ca9e8549e6b40d))
+
 ## [1.0.4](https://github.com/opencadc/canfar/compare/v1.0.3...v1.0.4) (2025-09-26)
 
 
