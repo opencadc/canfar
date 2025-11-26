@@ -1,8 +1,3 @@
----
-hide:
-  - navigation
-  - toc
----
 # From Interactive Notebooks to Batch Processing with CANFAR
 
 !!! tip "Who is this for?"
