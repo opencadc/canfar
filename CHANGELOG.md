@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/opencadc/canfar/compare/v1.1.0...v1.1.1) (2025-11-26)
+
+
+### Documentation
+
+* update release versionss ([651fc47](https://github.com/opencadc/canfar/commit/651fc4777f7fba60eb104d8e8129abea7041adfe))
+
 ## [1.1.0](https://github.com/opencadc/canfar/compare/v1.0.4...v1.1.0) (2025-11-25)
 
 
