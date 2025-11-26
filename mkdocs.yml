@@ -230,6 +230,8 @@ nav:
     - CLI:
       - 5-Minute Tutorial: cli/quick-start.md
       - Reference: cli/cli-help.md
+    - Demos:
+      - SRCnet Workshop: demos/srcnet-workshop.md
     - Bug Reports: client/bug-reports.md
   - Contribute:
     - Code of Conduct: conduct.md

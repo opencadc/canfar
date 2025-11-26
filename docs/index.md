@@ -5,8 +5,8 @@ hide:
 ---
 
 <h1>CANFAR Science Platform</h1>
-    
-    ###### Built on **[IVOA standards](https://www.ivoa.net/documents/)** & **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
+
+###### Built on **[IVOA standards](https://www.ivoa.net/documents/)** & **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
     
 !!! note ""
     
