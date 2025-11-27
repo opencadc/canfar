@@ -14,6 +14,40 @@
 
 The `canfar` CLI is the easiest way to get started. It's your interactive mission control for the CANFAR science platform.
 
+### Step 0: Prerequisites
+
+Install `pipx` if you don't have it already. `pipx` is a tool for installing and running Python applications in isolated environments.
+
+```bash
+python3 -m pip install --user pipx
+python3 -m pipx ensurepath
+```
+
+Alternatively, on you can use OS specific package managers:
+
+=== "macOS"
+
+    ```bash
+    brew install pipx
+    pipx ensurepath
+    ```
+
+=== "Linux (Ubuntu/Debian)"
+
+    ```bash
+    sudo apt update
+    sudo apt install pipx
+    pipx ensurepath
+    ```
+
+=== "Windows (scoop)"
+
+    ```powershell
+    scoop install pipx
+    pipx ensurepath
+    ```
+
+
 ### Step 1: Installation
 
 It's a single command. Open your terminal and type:
