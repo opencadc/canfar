@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.2.0](https://github.com/opencadc/canfar/compare/v1.1.1...v1.2.0) (2025-11-28)
+
+
+### Features
+
+* **demos:** added srcnet workshop demo ([f6cbcb9](https://github.com/opencadc/canfar/commit/f6cbcb9d284c68aec6ca15730a4b5137495295c9))
+
+
+### Bug Fixes
+
+* **cli:** added new canfar servers to login process ([fb875ee](https://github.com/opencadc/canfar/commit/fb875eea47e9ed8d762cd32eac445969a7ac1a60))
+* **docs:** added pipx installation instructions ([b2ebfc7](https://github.com/opencadc/canfar/commit/b2ebfc734a06a8b3b9ae9efd4bbb57d329945569))
+* fix versions ([882981a](https://github.com/opencadc/canfar/commit/882981a3cd22f6f3f2fcdb4e6a6b94204cce69d9))
+
+
+### Documentation
+
+* **fix:** toc, navigation ([d965831](https://github.com/opencadc/canfar/commit/d965831e3816089743fbd7ec4e21e1abd035fefe))
+
 ## [1.1.1](https://github.com/opencadc/canfar/compare/v1.1.0...v1.1.1) (2025-11-26)
 
 
