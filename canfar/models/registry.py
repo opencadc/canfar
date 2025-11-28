@@ -31,12 +31,15 @@ class IVOARegistrySearch(BaseModel):
             "ivo://swesrc.chalmers.se/skaha": "Sweden",
             "ivo://canfar.cam.uksrc.org/skaha": "UK-CAM",
             "ivo://canfar.ral.uksrc.org/skaha": "UK-RAL",
-            "ivo://src.skach.org/skaha": "Swiss",
+            "ivo://src.skach.org/skaha": "Switzerland",
             "ivo://espsrc.iaa.csic.es/skaha": "Spain",
-            "ivo://canfar.itsrc.oact.inaf.it/skaha": "Italy",
+            "ivo://canfar.itsrc.oact.inaf.it/skaha": "Italy-INAF",
             "ivo://shion-sp.mtk.nao.ac.jp/skaha": "Japan",
             "ivo://canfar.krsrc.kr/skaha": "Korea",
             "ivo://canfar.ska.zverse.space/skaha": "China",
+            "ivo://canfar.itsrc.ext.cineca.it/skaha": "Italy-CINECA",
+            "ivo://canfar.srcnet.skao.int/skaha": "SKAO",
+            "ivo://aussrc.org/skaha": "Australia",
             "ivo://cadc.nrc.ca/skaha": "CANFAR",
         }
     )
@@ -46,7 +49,16 @@ class IVOARegistrySearch(BaseModel):
     )
 
     excluded: tuple[str, ...] = Field(
-        default=("dev", "development", "test", "demo", "stage", "staging", "rc-")
+        default=(
+            "dev",
+            "development",
+            "test",
+            "demo",
+            "stage",
+            "staging",
+            "rc-",
+            "preprod",
+        )
     )
 
 
