@@ -13,14 +13,13 @@ from typing import Any
 import httpx
 import segno
 from pydantic import SecretStr
-from rich.console import Console
 from rich.progress import BarColumn, Progress, TextColumn, TimeRemainingColumn
 
 from canfar import get_logger
 from canfar.models.auth import OIDC
 from canfar.utils import jwt
+from canfar.utils.console import console
 
-console = Console()
 log = get_logger(__name__)
 
 

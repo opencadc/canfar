@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import logging
 import logging.handlers
+import tempfile
 import threading
 from pathlib import Path
 
@@ -136,15 +137,25 @@ class CanfarLogger:
     ) -> None:
         """Setup rotating file handler for logging."""
         # Ensure log directory exists
-        logfile.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            logfile.parent.mkdir(parents=True, exist_ok=True)
 
-        # Use RotatingFileHandler for automatic log rotation
-        self._file_handler = logging.handlers.RotatingFileHandler(
-            filename=logfile,
-            maxBytes=size,
-            backupCount=count,
-            encoding="utf-8",
-        )
+            # Use RotatingFileHandler for automatic log rotation
+            self._file_handler = logging.handlers.RotatingFileHandler(
+                filename=logfile,
+                maxBytes=size,
+                backupCount=count,
+                encoding="utf-8",
+            )
+        except PermissionError:
+            fallback = Path(tempfile.gettempdir()) / "canfar" / logfile.name
+            fallback.parent.mkdir(parents=True, exist_ok=True)
+            self._file_handler = logging.handlers.RotatingFileHandler(
+                filename=fallback,
+                maxBytes=size,
+                backupCount=count,
+                encoding="utf-8",
+            )
         self._file_handler.setLevel(level)
         # File handler uses detailed format
         file_formatter = logging.Formatter(FORMAT)

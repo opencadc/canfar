@@ -11,15 +11,13 @@ import humanize
 import typer
 from pydantic import ValidationError
 from rich import box
-from rich.console import Console
 from rich.table import Table
 
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
-
-console = Console()
+from canfar.utils.console import console
 
 ps = typer.Typer(
     name="ps",

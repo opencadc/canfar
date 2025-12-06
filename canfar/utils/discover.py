@@ -6,7 +6,6 @@ import asyncio
 import time
 
 import httpx
-from rich.console import Console
 from typing_extensions import Self
 
 from canfar.models.registry import (
@@ -16,6 +15,7 @@ from canfar.models.registry import (
     ServerResults,
 )
 from canfar.utils import display
+from canfar.utils.console import console
 
 
 class Discover:
@@ -40,7 +40,7 @@ class Discover:
             follow_redirects=True,
         )
 
-        self.console = Console()
+        self.console = console
 
     async def __aenter__(self) -> Self:
         """Async context manager entry method.

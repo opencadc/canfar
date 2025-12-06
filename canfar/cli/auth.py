@@ -8,7 +8,6 @@ from typing import Annotated, NoReturn
 import typer
 from pydantic import AnyHttpUrl, AnyUrl
 from rich import box
-from rich.console import Console
 from rich.prompt import Confirm
 from rich.table import Table
 
@@ -27,9 +26,9 @@ from canfar.models.auth import (
 from canfar.models.config import AuthContext, Configuration
 from canfar.models.http import Server
 from canfar.utils import display
+from canfar.utils.console import console
 from canfar.utils.discover import servers
 
-console = Console()
 log = get_logger(__name__)
 
 

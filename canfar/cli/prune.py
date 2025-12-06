@@ -8,12 +8,10 @@ from typing import Annotated, get_args
 import click
 import typer
 import typer.core
-from rich.console import Console
 
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
-
-console = Console()
+from canfar.utils.console import console
 
 
 class PruneUsageMessage(typer.core.TyperGroup):

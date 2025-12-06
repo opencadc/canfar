@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Any
 
 import yaml
 from pydantic import (
@@ -82,6 +82,10 @@ class Configuration(BaseSettings):
     registry: ContainerRegistry = Field(
         default_factory=ContainerRegistry,
         description="Container Registry Settings.",
+    )
+    console: dict[str, Any] = Field(
+        default_factory=lambda: {"width": 120},
+        description="Kwargs forwarded to rich.console.Console.",
     )
 
     @classmethod

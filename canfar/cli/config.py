@@ -3,16 +3,15 @@
 from __future__ import annotations
 
 import typer
-from rich.console import Console
 
 from canfar import CONFIG_PATH
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.config import Configuration
+from canfar.utils.console import console
 
 config: typer.Typer = typer.Typer(
     cls=AliasGroup,
 )
-console = Console(width=120)
 
 
 @config.command("show | list | ls")
