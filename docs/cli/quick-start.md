@@ -246,9 +246,9 @@ You now have a fully-equipped astronomy computing environment running in the clo
         - If using fixed mode, try smaller resource values (fewer cores/RAM)
         - Check session status: `canfar ps`
     - **Can't access notebook URL?**
-      - Wait 1-2 minutes for full startup
-      - Check if you're on a VPN that might block the connection
-      - Verify the session is in "Running" status
+        - Wait 1-2 minutes for full startup
+        - Check if you're on a VPN that might block the connection
+        - Verify the session is in "Running" status
     - **Variable performance in flexible mode?**
-      - This is normal - performance adapts to cluster load
-      - For consistent performance, use fixed mode with specific `--cpu` and `--memory` values
+        - This is normal - performance adapts to cluster load
+        - For consistent performance, use fixed mode with specific `--cpu` and `--memory` values
