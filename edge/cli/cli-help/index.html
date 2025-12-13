@@ -1611,7 +1611,7 @@
 
 
 <h1 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h1>
-<p>The Canfar CLI provides a comprehensive command-line interface for interacting with the Science Platform. This reference covers all available commands and their options.</p>
+<p>The CLI provides a comprehensive command-line interface for interacting with the CANFAR Science Platform. This reference covers all available commands and their options.</p>
 <div class="admonition info">
 <p class="admonition-title">Getting Started</p>
 <p>The CLI can be accessed using the <code>canfar</code> command in your environment:
@@ -1654,7 +1654,7 @@
 <hr />
 <h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-auth"><code>canfar auth</code><a class="headerlink" href="#canfar-auth" title="Permanent link">&para;</a></h3>
-<p>Authenticate with Science Platform.</p>
+<p>This command group provides tools for managing authentication contexts for connecting to Science Platform servers.</p>
 <h4 id="canfar-auth-login"><code>canfar auth login</code><a class="headerlink" href="#canfar-auth-login" title="Permanent link">&para;</a></h4>
 <p>Login to Science Platform with automatic server discovery.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -1726,37 +1726,36 @@
 </code></pre></div>
 </div>
 <h4 id="canfar-auth-list-canfar-auth-ls"><code>canfar auth list</code> / <code>canfar auth ls</code><a class="headerlink" href="#canfar-auth-list-canfar-auth-ls" title="Permanent link">&para;</a></h4>
-<p>Show all available authentication contexts.</p>
+<p>Shows all available authentication contexts.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>list
-</code></pre></div>
-</div>
 <h4 id="canfar-auth-switch-canfar-auth-use"><code>canfar auth switch</code> / <code>canfar auth use</code><a class="headerlink" href="#canfar-auth-switch-canfar-auth-use" title="Permanent link">&para;</a></h4>
 <p>Switch the active authentication context.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>CONTEXT
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>CONTEXT</code> (required): The name of the context to activate</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>CONTEXT</code> (required): The name of the context to activate</li>
+</ul>
 <div class="admonition example">
 <p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>production
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>SRCnet-Sweden
 </code></pre></div>
 </div>
 <h4 id="canfar-auth-remove-canfar-auth-rm"><code>canfar auth remove</code> / <code>canfar auth rm</code><a class="headerlink" href="#canfar-auth-remove-canfar-auth-rm" title="Permanent link">&para;</a></h4>
-<p>Remove a specific authentication context.</p>
+<p>Remove a specific authentication context from the configuration.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>remove<span class="w"> </span>CONTEXT
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>CONTEXT</code> (required): The name of the context to remove</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>CONTEXT</code> (required): The name of the context to remove</li>
+</ul>
 <div class="admonition warning">
 <p class="admonition-title">Permanent Action</p>
 <p>This action permanently removes the authentication context and cannot be undone.</p>
 </div>
 <h4 id="canfar-auth-purge"><code>canfar auth purge</code><a class="headerlink" href="#canfar-auth-purge" title="Permanent link">&para;</a></h4>
-<p>Remove all authentication contexts.</p>
+<p>Remove all authentication contexts and credentials from the configuration.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
 <h5 id="options_1">Options<a class="headerlink" href="#options_1" title="Permanent link">&para;</a></h5>
@@ -1958,8 +1957,10 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <p>Show session events for debugging and monitoring.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>SESSION_IDS...</code> (required): One or more session IDs</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
+</ul>
 <h4 id="options_4">Options<a class="headerlink" href="#options_4" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -1984,8 +1985,10 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <p>Show detailed information about sessions.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>SESSION_IDS...</code> (required): One or more session IDs</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
+</ul>
 <h4 id="options_5">Options<a class="headerlink" href="#options_5" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2010,8 +2013,10 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <p>Open sessions in a web browser.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>open<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>SESSION_IDS...</code> (required): One or more session IDs</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
+</ul>
 <h4 id="options_6">Options<a class="headerlink" href="#options_6" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2040,8 +2045,10 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <p>Show session logs for troubleshooting.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>SESSION_IDS...</code> (required): One or more session IDs</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
+</ul>
 <h4 id="options_7">Options<a class="headerlink" href="#options_7" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2066,8 +2073,10 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <p>Delete one or more sessions.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>SESSION_IDS...</code> (required): One or more session IDs to delete</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>SESSION_IDS...</code> (required): One or more session IDs to delete</li>
+</ul>
 <h4 id="options_8">Options<a class="headerlink" href="#options_8" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2106,12 +2115,14 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 </div>
 <h3 id="canfar-prune"><code>canfar prune</code><a class="headerlink" href="#canfar-prune" title="Permanent link">&para;</a></h3>
 <p>Prune sessions by criteria for bulk cleanup.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>NAME<span class="w"> </span>KIND<span class="w"> </span>STATUS
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>PREFIX<span class="w"> </span>KIND<span class="w"> </span>STATUS
 </code></pre></div>
-<p><strong>Arguments:</strong>
-- <code>NAME</code> (required): Prefix to match session names
-- <code>KIND</code> (optional): Session kind - default: <code>headless</code> (one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code>)
-- <code>STATUS</code> (optional): Session status - default: <code>Succeeded</code> (one of: <code>Pending</code>, <code>Running</code>, <code>Terminating</code>, <code>Succeeded</code>, <code>Error</code>, <code>Failed</code>)</p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>PREFIX</code> (required): Prefix to match session names; regex is used if metacharacters are present</li>
+<li><code>KIND</code> (optional): Session kind - default: <code>headless</code> (one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code>)</li>
+<li><code>STATUS</code> (optional): Session status - default: <code>Succeeded</code> (one of: <code>Pending</code>, <code>Running</code>, <code>Terminating</code>, <code>Succeeded</code>, <code>Error</code>, <code>Failed</code>)</li>
+</ul>
 <h4 id="options_9">Options<a class="headerlink" href="#options_9" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2137,6 +2148,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
 <div class="admonition example">
 <p class="admonition-title">Prune Completed Headless Sessions</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="s2">&quot;test-&quot;</span><span class="w"> </span>headless<span class="w"> </span>Running
+canfar<span class="w"> </span>prune<span class="w"> </span><span class="s2">&quot;.*-was-&quot;</span><span class="w"> </span>notebook<span class="w"> </span>Running<span class="w">  </span><span class="c1"># regex because of metacharacters</span>
 </code></pre></div>
 </div>
 <div class="admonition tip">
@@ -2252,7 +2264,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 13, 2025 01:37:14 UTC">December 13, 2025</span>
   </span>
 
     
@@ -2280,14 +2292,14 @@ canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span clas
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       
