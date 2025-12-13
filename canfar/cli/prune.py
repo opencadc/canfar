@@ -10,7 +10,7 @@ import typer
 import typer.core
 from rich.console import Console
 
-from canfar.models.types import Kind, Status
+from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 
 console = Console()
@@ -32,7 +32,7 @@ class PruneUsageMessage(typer.core.TyperGroup):
         Returns:
             str: The usage message.
         """
-        return "Usage: canfar prune [OPTIONS] NAME KIND STATUS COMMAND [ARGS]..."
+        return "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
 
 
 prune = typer.Typer(
@@ -47,19 +47,19 @@ prune = typer.Typer(
     cls=PruneUsageMessage,
 )
 def prune_sessions(
-    name: Annotated[
+    prefix: Annotated[
         str,
         typer.Argument(
             ...,
-            help="Prefix to match session names.",
-            metavar="NAME",
+            help="Prefix or regex pattern to match session names.",
+            metavar="PREFIX",
         ),
     ],
     kind: Annotated[
-        Kind,
+        Pruneable,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),
-            metavar="|".join(get_args(Kind)),
+            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),
+            metavar="|".join(get_args(Pruneable)),
             help="Filter by session kind.",
         ),
     ] = "headless",
@@ -79,14 +79,16 @@ def prune_sessions(
     """Delete sessions by criteria.
 
     Examples:
-    canfar prune testname-* headless Succeeded
-    canfar prune sample-* notebook Running
+    canfar prune session-name headless Succeeded
+    canfar prune session.* notebook Running
     """
 
     async def _prune() -> None:
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
-            response = await session.destroy_with(prefix=name, kind=kind, status=status)
+            response = await session.destroy_with(
+                prefix=prefix, kind=kind, status=status
+            )
             console.print(
                 f"[bold green] Deleted {len(response)} sessions.[/bold green]"
             )

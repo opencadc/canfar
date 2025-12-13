@@ -2,7 +2,7 @@
 
 from asyncio import sleep
 from time import time
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 from uuid import uuid4
 
 import pytest
@@ -139,6 +139,45 @@ async def test_delete_session(asession: AsyncSession, name: str) -> None:
                 done = True
     deletion = await asession.destroy_with(prefix=name)
     assert deletion == {pytest.IDENTITY[0]: True}
+
+
+@pytest.mark.asyncio
+async def test_destroy_with_regex_match(asession: AsyncSession) -> None:
+    """Regex pattern should match anywhere in the session name."""
+    mock_sessions = [
+        {
+            "id": "abc123",
+            "name": "directwarp-13",
+            "status": "Running",
+            "kind": "headless",
+        }
+    ]
+    pattern = "directwarp-.*"
+
+    with (
+        patch.object(
+            AsyncSession, "fetch", AsyncMock(return_value=mock_sessions)
+        ) as mock_fetch,
+        patch.object(
+            AsyncSession, "destroy", AsyncMock(return_value={"abc123": True})
+        ) as mock_destroy,
+    ):
+        result = await asession.destroy_with(
+            prefix=pattern,
+            kind="headless",
+            status="Running",
+        )
+
+    mock_fetch.assert_called_once_with(kind="headless", status="Running")
+    mock_destroy.assert_called_once_with(["abc123"])
+    assert result == {"abc123": True}
+
+
+@pytest.mark.asyncio
+async def test_destroy_with_name_deprecation(asession: AsyncSession) -> None:
+    """Deprecated name parameter removed; retained for backward-compat check."""
+    with pytest.raises(TypeError):
+        await asession.destroy_with(name="directwarp-.*")  # type: ignore[arg-type]
 
 
 # Unit tests for connect method (covers lines 798-804)

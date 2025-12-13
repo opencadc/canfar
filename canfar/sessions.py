@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from typing import TYPE_CHECKING, Any
 from webbrowser import open_new_tab
 
@@ -318,36 +319,51 @@ class Session(HTTPClient):
     def destroy_with(
         self,
         prefix: str,
+        *,
         kind: Kind = "headless",
         status: Status = "Completed",
     ) -> dict[str, bool]:
-        """Destroy session[s] matching search criteria.
+        """Destroy session[s] matching a prefix or regex.
 
         Args:
-            prefix (str): Prefix to match in the session name.
+            prefix (str): Prefix to match.
+                Treated literally unless regex meta-characters are found.
             kind (Kind): Type of session. Defaults to "headless".
             status (Status): Status of the session. Defaults to "Completed".
-
 
         Returns:
             Dict[str, bool]: A dictionary of session IDs
             and a bool indicating if the session was destroyed.
 
         Notes:
-            The prefix is case-sensitive.
+            - If the value contains regex metacharacters (e.g., `.^$*+?{}[]()|`),
+              it is treated as a regex with :func:`re.search`.
+            - Otherwise it is treated as a literal prefix (anchored with `^`).
             This method is useful for destroying multiple sessions at once.
 
         Examples:
             >>> from canfar.session import Session
             >>> session = Session()
-            >>> session.destroy_with(prefix="test")
-            >>> session.destroy_with(prefix="test", kind="desktop")
-            >>> session.destroy_with(prefix="test", kind="headless", status="Running")
-
+            >>> session.destroy_with(prefix="test")  # literal prefix
+            >>> session.destroy_with(prefix="desktop$")  # regex
         """
+        meta = set(".^$*+?{}[]()|")
+        has_meta = any(ch in meta for ch in prefix)
+        try:
+            if has_meta:
+                log.info("destroy_with using regex pattern: %s", prefix)
+                regex = re.compile(prefix)
+            else:
+                log.info("destroy_with using literal prefix: %s", prefix)
+                regex = re.compile(rf"^{re.escape(prefix)}")
+        except re.error as exc:
+            msg = f"Invalid regex pattern '{prefix}': {exc}"
+            log.exception(msg)
+            raise ValueError(msg) from exc
+
         sessions = self.fetch(kind=kind, status=status)
         ids: list[str] = [
-            session["id"] for session in sessions if session["name"].startswith(prefix)
+            session["id"] for session in sessions if regex.search(session["name"])
         ]
         return self.destroy(ids)
 
@@ -754,10 +770,11 @@ class AsyncSession(HTTPClient):
         kind: Kind = "headless",
         status: Status = "Completed",
     ) -> dict[str, bool]:
-        """Destroy session[s] matching search criteria.
+        """Destroy session[s] matching a prefix or regex pattern.
 
         Args:
-            prefix (str): Prefix to match in the session name.
+            prefix (str): Prefix to match.
+                Treated literally unless regex meta-characters are found.
             kind (Kind): Type of session. Defaults to "headless".
             status (Status): Status of the session. Defaults to "Completed".
 
@@ -767,21 +784,34 @@ class AsyncSession(HTTPClient):
             and a bool indicating if the session was destroyed.
 
         Notes:
-            The prefix is case-sensitive.
+            - If the value contains regex metacharacters (e.g., `.^$*+?{}[]()|`), it is
+                treated as a regex with :func:`re.search`.
+            - Otherwise it is treated as a literal prefix (anchored with `^`).
             This method is useful for destroying multiple sessions at once.
 
         Examples:
             >>> from canfar.session import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.destroy_with(prefix="test")
-            >>> await session.destroy_with(prefix="test", kind="desktop")
-            >>> await session.destroy_with(prefix="car", kind="carta", status="Running")
-
+            >>> await session.destroy_with(prefix="test")  # literal prefix
+            >>> awaitsession.destroy_with(prefix="desktop$")  # regex
         """
+        meta: bool = any(char in set(".^$*+?{}[]()|") for char in prefix)
+        try:
+            if meta:
+                log.info("Regex Pattern: %s", prefix)
+                regex = re.compile(prefix)
+            else:
+                log.info("Literal Prefix: %s", prefix)
+                regex = re.compile(rf"^{re.escape(prefix)}")
+        except re.error as err:
+            msg = f"Invalid regex pattern '{prefix}': {err}"
+            log.exception(msg)
+            raise ValueError(msg) from err
+
         ids: list[str] = [
             session["id"]
             for session in await self.fetch(kind=kind, status=status)
-            if session["name"].startswith(prefix)
+            if regex.search(session["name"])
         ]
         return await self.destroy(ids)
 
