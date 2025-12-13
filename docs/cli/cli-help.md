@@ -1,6 +1,6 @@
 # CLI Reference
 
-The Canfar CLI provides a comprehensive command-line interface for interacting with the Science Platform. This reference covers all available commands and their options.
+The CLI provides a comprehensive command-line interface for interacting with the CANFAR Science Platform. This reference covers all available commands and their options.
 
 !!! info "Getting Started"
     The CLI can be accessed using the `canfar` command in your environment:
@@ -36,7 +36,7 @@ canfar [OPTIONS] COMMAND [ARGS]...
 
 ### `canfar auth`
 
-Authenticate with Science Platform.
+This command group provides tools for managing authentication contexts for connecting to Science Platform servers.
 
 #### `canfar auth login`
 
@@ -72,16 +72,11 @@ canfar auth login [OPTIONS]
 
 #### `canfar auth list` / `canfar auth ls`
 
-Show all available authentication contexts.
+Shows all available authentication contexts.
 
 ```bash
 canfar auth list [OPTIONS]
 ```
-
-!!! example
-    ```bash
-    canfar auth list
-    ```
 
 #### `canfar auth switch` / `canfar auth use`
 
@@ -92,22 +87,24 @@ canfar auth switch CONTEXT
 ```
 
 **Arguments:**
+
 - `CONTEXT` (required): The name of the context to activate
 
 !!! example
     ```bash
-    canfar auth switch production
+    canfar auth switch SRCnet-Sweden
     ```
 
 #### `canfar auth remove` / `canfar auth rm`
 
-Remove a specific authentication context.
+Remove a specific authentication context from the configuration.
 
 ```bash
 canfar auth remove CONTEXT
 ```
 
 **Arguments:**
+
 - `CONTEXT` (required): The name of the context to remove
 
 !!! warning "Permanent Action"
@@ -115,7 +112,7 @@ canfar auth remove CONTEXT
 
 #### `canfar auth purge`
 
-Remove all authentication contexts.
+Remove all authentication contexts and credentials from the configuration.
 
 ```bash
 canfar auth purge [OPTIONS]
@@ -156,9 +153,9 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 
 **Arguments:**
 
-  - `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `contributed`
-  - `IMAGE` (required): Container image to use
-  - `CMD [ARGS]...` (optional): Runtime command and arguments
+- `KIND` (required): Session type - one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `contributed`
+- `IMAGE` (required): Container image to use
+- `CMD [ARGS]...` (optional): Runtime command and arguments
 
 #### Options
 
@@ -237,6 +234,7 @@ canfar events [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
+
 - `SESSION_IDS...` (required): One or more session IDs
 
 #### Options
@@ -259,6 +257,7 @@ canfar info [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
+
 - `SESSION_IDS...` (required): One or more session IDs
 
 #### Options
@@ -281,6 +280,7 @@ canfar open [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
+
 - `SESSION_IDS...` (required): One or more session IDs
 
 #### Options
@@ -306,6 +306,7 @@ canfar logs [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
+
 - `SESSION_IDS...` (required): One or more session IDs
 
 #### Options
@@ -328,6 +329,7 @@ canfar delete [OPTIONS] SESSION_IDS...
 ```
 
 **Arguments:**
+
 - `SESSION_IDS...` (required): One or more session IDs to delete
 
 #### Options
@@ -355,11 +357,12 @@ canfar delete [OPTIONS] SESSION_IDS...
 Prune sessions by criteria for bulk cleanup.
 
 ```bash
-canfar prune [OPTIONS] NAME KIND STATUS
+canfar prune [OPTIONS] PREFIX KIND STATUS
 ```
 
 **Arguments:**
-- `NAME` (required): Prefix to match session names
+
+- `PREFIX` (required): Prefix to match session names; regex is used if metacharacters are present
 - `KIND` (optional): Session kind - default: `headless` (one of: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`)
 - `STATUS` (optional): Session status - default: `Succeeded` (one of: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed`)
 
@@ -373,6 +376,7 @@ canfar prune [OPTIONS] NAME KIND STATUS
 !!! example "Prune Completed Headless Sessions"
     ```bash
     canfar prune "test-" headless Running
+    canfar prune ".*-was-" notebook Running  # regex because of metacharacters
     ```
 
 !!! tip "Bulk Cleanup"

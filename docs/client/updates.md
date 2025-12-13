@@ -165,7 +165,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
 
     session = Session()
     session.destroy_with(prefix="test", kind="headless", status="Running")
-    session.destroy_with(prefix="test", kind="headless", status="Pending")
+    session.destroy_with(prefix=".*-analysis", kind="headless", status="Pending")
     ```
 
 ## Previous Versions

@@ -13,6 +13,11 @@ Kind: TypeAlias = Literal[
 ]
 """Session type constants (new lowercase style)."""
 
+Pruneable: TypeAlias = Literal[
+    "desktop", "notebook", "carta", "headless", "firefly", "contributed"
+]
+"""Session types that can be pruned (destroyed) via the API."""
+
 Status: TypeAlias = Literal[
     "Pending", "Running", "Terminating", "Succeeded", "Completed", "Error", "Failed"
 ]

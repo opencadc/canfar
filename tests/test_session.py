@@ -156,6 +156,35 @@ def test_delete_session(session: Session, name: str) -> None:
     assert deletion == {pytest.IDENTITY[0]: True}
 
 
+def test_destroy_with_regex_match(session: Session) -> None:
+    """Regex pattern should match substring in session name."""
+    mock_sessions = [
+        {
+            "id": "xyz789",
+            "name": "shiny-was-here",
+            "status": "Running",
+            "kind": "headless",
+        }
+    ]
+    pattern = ".*-was-"
+
+    with (
+        patch.object(Session, "fetch", return_value=mock_sessions) as mock_fetch,
+        patch.object(Session, "destroy", return_value={"xyz789": True}) as mock_destroy,
+    ):
+        result = session.destroy_with(prefix=pattern, kind="headless", status="Running")
+
+    mock_fetch.assert_called_once_with(kind="headless", status="Running")
+    mock_destroy.assert_called_once_with(["xyz789"])
+    assert result == {"xyz789": True}
+
+
+def test_destroy_with_name_deprecation(session: Session) -> None:
+    """Deprecated name parameter removed; retained for backward-compat check."""
+    with pytest.raises(TypeError):
+        session.destroy_with(name=".*-was-")  # type: ignore[arg-type]
+
+
 def test_create_session_with_type_field(name: str) -> None:
     """Test creating a session and confirm kind field is changed to type."""
     specification: CreateRequest = CreateRequest(
