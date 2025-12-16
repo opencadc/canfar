@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 from typer.testing import CliRunner
 
 from canfar.cli.config import config
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 runner = CliRunner()
 
@@ -58,4 +61,3 @@ def test_config_set_invalid_value_fails_validation(tmp_path: Path) -> None:
     ):
         result = runner.invoke(config, ["set", "console.width", "not_an_int"])
         assert result.exit_code == 1
-
