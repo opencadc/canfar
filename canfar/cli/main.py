@@ -31,7 +31,7 @@ def callback(ctx: typer.Context) -> None:
 
 cli: typer.Typer = typer.Typer(
     name="canfar",
-    help="CANFAR Science Platform.",
+    help="CANFAR Science Platform",
     no_args_is_help=False,  # Disable automatic help to handle manually
     add_completion=True,
     pretty_exceptions_show_locals=True,
