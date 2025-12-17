@@ -23,30 +23,135 @@ from canfar import get_logger
 
 log = get_logger(__name__)
 
+CONN_ERR_MSG = (
+    "Failed to establish connection within the timeout period. "
+    "The server may be unreachable or not responding."
+)
+READ_ERR_MSG = (
+    "Failed to receive response within the timeout period. "
+    "The server may be overloaded or not responding."
+)
+WRITE_ERR_MSG = (
+    "Failed to send request within the timeout period. "
+    "There may be network issues or the server is not accepting requests."
+)
+POOL_ERR_MSG = (
+    "Failed to acquire a connection from the pool within the timeout period. "
+    "All connections are currently in use."
+)
+
 
 def catch(response: httpx.Response) -> None:
     """Reads the response body and raises HTTPStatusError for error responses.
 
+    Handles various httpx exceptions with informative error messages:
+    - Timeout exceptions (ConnectTimeout, ReadTimeout, WriteTimeout, PoolTimeout)
+      are caught and logged with specific timeout information
+    - HTTP status errors (4xx, 5xx) are logged with response details
+    - Other request errors are caught and logged generally
+
     Args:
         response: An httpx.Response object.
+
+    Raises:
+        httpx.TimeoutException: When a timeout occurs during the request
+        httpx.HTTPStatusError: When the response has an error status code
+        httpx.RequestError: For other request-related errors
     """
-    response.read()
     try:
+        response.read()
         response.raise_for_status()
+    except httpx.ConnectTimeout as err:
+        log.exception(
+            CONN_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.ReadTimeout as err:
+        log.exception(
+            READ_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.WriteTimeout as err:
+        log.exception(
+            WRITE_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.PoolTimeout as err:
+        log.exception(
+            POOL_ERR_MSG,
+            err.request.url,
+        )
+        raise
     except httpx.HTTPStatusError as err:
-        log.exception(err.response.text, exc_info=False, stack_info=False, stacklevel=1)  # noqa: LOG007
-        raise err from err
+        log.exception(
+            "HTTP %d error for %s %s: %s",
+            err.response.status_code,
+            err.request.method,
+            err.request.url,
+            err.response.text if err.response.text else "No response body",
+        )
+        raise
+    except httpx.RequestError:
+        log.exception("Request Error", stack_info=True, stacklevel=1)
+        raise
 
 
-async def acatch(response: httpx.Response) -> None:  # Renamed function
+async def acatch(response: httpx.Response) -> None:
     """Reads the response body and raises HTTPStatusError for error responses (async).
 
+    Handles various httpx exceptions with informative error messages:
+    - Timeout exceptions (ConnectTimeout, ReadTimeout, WriteTimeout, PoolTimeout)
+      are caught and logged with specific timeout information
+    - HTTP status errors (4xx, 5xx) are logged with response details
+    - Other request errors are caught and logged generally
+
     Args:
         response: An httpx.Response object.
+
+    Raises:
+        httpx.TimeoutException: When a timeout occurs during the request
+        httpx.HTTPStatusError: When the response has an error status code
+        httpx.RequestError: For other request-related errors
     """
-    await response.aread()
     try:
+        await response.aread()
         response.raise_for_status()
+    except httpx.ConnectTimeout as err:
+        log.exception(
+            CONN_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.ReadTimeout as err:
+        log.exception(
+            READ_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.WriteTimeout as err:
+        log.exception(
+            WRITE_ERR_MSG,
+            err.request.url,
+        )
+        raise
+    except httpx.PoolTimeout as err:
+        log.exception(
+            POOL_ERR_MSG,
+            err.request.url,
+        )
+        raise
     except httpx.HTTPStatusError as err:
-        log.exception(err.response.text, exc_info=False, stack_info=False, stacklevel=1)  # noqa: LOG007
-        raise err from err
+        log.exception(
+            "HTTP %d error for %s %s: %s",
+            err.response.status_code,
+            err.request.method,
+            err.request.url,
+            err.response.text if err.response.text else "No response body",
+        )
+        raise
+    except httpx.RequestError:
+        log.exception("Request Error", stack_info=True, stacklevel=1)
+        raise
