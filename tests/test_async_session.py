@@ -194,7 +194,13 @@ class TestAsyncSessionConnect:
         asession = AsyncSession()
 
         # Mock the info method to return session data with connectURL
-        mock_info.return_value = [{"connectURL": "https://example.com/connect"}]
+        mock_info.return_value = [
+            {
+                "id": "session-123",
+                "status": "Running",
+                "connectURL": "https://example.com/connect",
+            }
+        ]
 
         await asession.connect("session-123")
 
@@ -215,8 +221,16 @@ class TestAsyncSessionConnect:
 
         # Mock the info method to return session data for all IDs
         mock_info.return_value = [
-            {"sessionId": "session-1", "connectURL": "https://example.com/connect1"},
-            {"sessionId": "session-2", "connectURL": "https://example.com/connect2"},
+            {
+                "id": "session-1",
+                "status": "Running",
+                "connectURL": "https://example.com/connect1",
+            },
+            {
+                "id": "session-2",
+                "status": "Running",
+                "connectURL": "https://example.com/connect2",
+            },
         ]
 
         await asession.connect(["session-1", "session-2"])
@@ -240,9 +254,17 @@ class TestAsyncSessionConnect:
 
         # Mock the info method to return mixed session data
         mock_info.return_value = [
-            {"sessionId": "session-1", "connectURL": "https://example.com/connect1"},
-            {"sessionId": "session-2", "status": "Running"},  # No connectURL
-            {"sessionId": "session-3", "connectURL": "https://example.com/connect3"},
+            {
+                "id": "session-1",
+                "status": "Running",
+                "connectURL": "https://example.com/connect1",
+            },
+            {"id": "session-2", "status": "Running"},  # No connectURL
+            {
+                "id": "session-3",
+                "status": "Running",
+                "connectURL": "https://example.com/connect3",
+            },
         ]
 
         await asession.connect(["session-1", "session-2", "session-3"])
@@ -266,7 +288,13 @@ class TestAsyncSessionConnect:
         asession = AsyncSession()
 
         # Mock the info method
-        mock_info.return_value = [{"connectURL": "https://example.com/connect"}]
+        mock_info.return_value = [
+            {
+                "id": "session-123",
+                "status": "Running",
+                "connectURL": "https://example.com/connect",
+            }
+        ]
 
         # Call with string (should be converted to list internally)
         await asession.connect("session-123")
@@ -292,4 +320,29 @@ class TestAsyncSessionConnect:
         mock_info.assert_called_once_with(["session-123"])
 
         # Verify open_new_tab was not called
+        mock_open_tab.assert_not_called()
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(AsyncSession, "info")
+    @pytest.mark.asyncio
+    async def test_connect_non_running_session(self, mock_info, mock_open_tab) -> None:
+        """Test connect when session is not in Running status."""
+        asession = AsyncSession()
+
+        # Mock the info method to return session with non-Running status
+        mock_info.return_value = [
+            {
+                "id": "session-123",
+                "status": "Pending",
+                "connectURL": "https://example.com/connect",
+            }
+        ]
+
+        # Should not raise any exception, just skip the session
+        await asession.connect("session-123")
+
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-123"])
+
+        # Verify open_new_tab was not called because status is not Running
         mock_open_tab.assert_not_called()
