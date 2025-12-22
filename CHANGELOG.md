@@ -1,5 +1,32 @@
 # Changelog
 
+## [1.2.0](https://github.com/opencadc/canfar/compare/v1.1.1...v1.2.0) (2025-12-22)
+
+
+### Features
+
+* **cli:** added console configuration parameter, which allows the user to overload any parameter for the rich.console.Console ([9336383](https://github.com/opencadc/canfar/commit/933638395a57a53d793617a5fa323ef30880787b))
+* **console:** added functionality to change the console width of the output from the cli ([72719b3](https://github.com/opencadc/canfar/commit/72719b321bc6e723c26f7a01d1c2a71fc7021c65))
+* **demos:** added srcnet workshop demo ([f6cbcb9](https://github.com/opencadc/canfar/commit/f6cbcb9d284c68aec6ca15730a4b5137495295c9))
+* **prune:** allow regex-aware prefix matching with logging when using `canfar prune` or session api function `destroy_with` ([16e5f25](https://github.com/opencadc/canfar/commit/16e5f257663687bd2f3b6639f173ec811dd72f24)), closes [#68](https://github.com/opencadc/canfar/issues/68)
+
+
+### Bug Fixes
+
+* **cli:** added new canfar servers to login process ([fb875ee](https://github.com/opencadc/canfar/commit/fb875eea47e9ed8d762cd32eac445969a7ac1a60))
+* **docs:** added pipx installation instructions ([b2ebfc7](https://github.com/opencadc/canfar/commit/b2ebfc734a06a8b3b9ae9efd4bbb57d329945569))
+* fix versions ([882981a](https://github.com/opencadc/canfar/commit/882981a3cd22f6f3f2fcdb4e6a6b94204cce69d9))
+* formatting issues in quick-start documentation ([33df44a](https://github.com/opencadc/canfar/commit/33df44a3f438379b158c0645c49932d971caf385))
+* **httpx:** added much better timeout handling error msgs for users and improve https status errors for both sync and async clients ([187305b](https://github.com/opencadc/canfar/commit/187305b53d7b6546c74e2507f40ade4cd73eb6e8)), closes [#67](https://github.com/opencadc/canfar/issues/67)
+* **session:** improved httpx error message ([848ce15](https://github.com/opencadc/canfar/commit/848ce15cb5603119227a7c5c85fa373f9327b685))
+* **session:** session.connect now first checks if the session is Running before trying to open it ([b06ad86](https://github.com/opencadc/canfar/commit/b06ad86b61e984ae181e0ef251b6764d9d1f8730)), closes [#70](https://github.com/opencadc/canfar/issues/70)
+
+
+### Documentation
+
+* **canfar:** added placeholder docs for 2026.1 release notes with the currently released bugfixes ([6046e9e](https://github.com/opencadc/canfar/commit/6046e9e4a6644a584a02e843af79e57c065692f9))
+* **fix:** toc, navigation ([d965831](https://github.com/opencadc/canfar/commit/d965831e3816089743fbd7ec4e21e1abd035fefe))
+
 ## [1.1.1](https://github.com/opencadc/canfar/compare/v1.1.0...v1.1.1) (2025-11-26)
 
 
