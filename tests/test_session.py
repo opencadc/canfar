@@ -232,12 +232,18 @@ class TestSessionConnect:
         session = Session()
 
         # Mock the info method to return session data with connectURL
-        mock_info.return_value = [{"connectURL": "https://example.com/connect"}]
+        mock_info.return_value = [
+            {
+                "id": "session-123",
+                "status": "Running",
+                "connectURL": "https://example.com/connect",
+            }
+        ]
 
         session.connect("session-123")
 
-        # Verify info was called with the session ID
-        mock_info.assert_called_once_with("session-123")
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-123"])
 
         # Verify open_new_tab was called with the connectURL
         mock_open_tab.assert_called_once_with("https://example.com/connect")
@@ -248,22 +254,24 @@ class TestSessionConnect:
         """Test connect with multiple session IDs as list."""
         session = Session()
 
-        # Mock the info method to return session data for each ID
-        def mock_info_side_effect(session_id):
-            if session_id == "session-1":
-                return [{"connectURL": "https://example.com/connect1"}]
-            if session_id == "session-2":
-                return [{"connectURL": "https://example.com/connect2"}]
-            return []
-
-        mock_info.side_effect = mock_info_side_effect
+        # Mock the info method to return session data for all IDs
+        mock_info.return_value = [
+            {
+                "id": "session-1",
+                "status": "Running",
+                "connectURL": "https://example.com/connect1",
+            },
+            {
+                "id": "session-2",
+                "status": "Running",
+                "connectURL": "https://example.com/connect2",
+            },
+        ]
 
         session.connect(["session-1", "session-2"])
 
-        # Verify info was called for each session ID
-        assert mock_info.call_count == 2
-        mock_info.assert_any_call("session-1")
-        mock_info.assert_any_call("session-2")
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-1", "session-2"])
 
         # Verify open_new_tab was called for each connectURL
         assert mock_open_tab.call_count == 2
@@ -273,18 +281,17 @@ class TestSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(Session, "info")
     def test_connect_empty_info_response(self, mock_info, mock_open_tab) -> None:
-        """Test connect when info returns empty list (covers error path)."""
+        """Test connect when info returns empty list."""
         session = Session()
 
         # Mock the info method to return empty list
         mock_info.return_value = []
 
-        # Should raise IndexError when trying to access info[0]
-        with pytest.raises(IndexError):
-            session.connect("session-123")
+        # Should not raise any exception, just do nothing
+        session.connect("session-123")
 
-        # Verify info was called
-        mock_info.assert_called_once_with("session-123")
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-123"])
 
         # Verify open_new_tab was not called
         mock_open_tab.assert_not_called()
@@ -292,18 +299,41 @@ class TestSessionConnect:
     @patch("canfar.sessions.open_new_tab")
     @patch.object(Session, "info")
     def test_connect_missing_connect_url(self, mock_info, mock_open_tab) -> None:
-        """Test connect when session info lacks connectURL (covers error path)."""
+        """Test connect when session info lacks connectURL."""
         session = Session()
 
         # Mock the info method to return session without connectURL
-        mock_info.return_value = [{"sessionId": "session-123", "status": "Running"}]
+        mock_info.return_value = [{"id": "session-123", "status": "Running"}]
 
-        # Should raise KeyError when trying to access info[0]["connectURL"]
-        with pytest.raises(KeyError):
-            session.connect("session-123")
+        # Should not raise any exception, just skip the session
+        session.connect("session-123")
 
-        # Verify info was called
-        mock_info.assert_called_once_with("session-123")
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-123"])
 
         # Verify open_new_tab was not called
+        mock_open_tab.assert_not_called()
+
+    @patch("canfar.sessions.open_new_tab")
+    @patch.object(Session, "info")
+    def test_connect_non_running_session(self, mock_info, mock_open_tab) -> None:
+        """Test connect when session is not in Running status."""
+        session = Session()
+
+        # Mock the info method to return session with non-Running status
+        mock_info.return_value = [
+            {
+                "id": "session-123",
+                "status": "Pending",
+                "connectURL": "https://example.com/connect",
+            }
+        ]
+
+        # Should not raise any exception, just skip the session
+        session.connect("session-123")
+
+        # Verify info was called with the session ID list
+        mock_info.assert_called_once_with(["session-123"])
+
+        # Verify open_new_tab was not called because status is not Running
         mock_open_tab.assert_not_called()

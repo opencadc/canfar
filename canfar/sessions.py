@@ -104,8 +104,8 @@ class Session(HTTPClient):
             Dict[str, Any]: Session information.
 
         Examples:
-            >>> session.info(session_id="hjko98yghj")
-            >>> session.info(id=["hjko98yghj", "ikvp1jtp"])
+            >>> session.info(ids="hjko98yghj")
+            >>> session.info(ids=["hjko98yghj", "ikvp1jtp"])
         """
         # Convert id to list if it is a string
         if isinstance(ids, str):
@@ -376,15 +376,22 @@ class Session(HTTPClient):
         Examples:
             >>> from canfar.session import Session
             >>> session = Session()
-            >>> session.browse(id="hjko98yghj")
-            >>> session.browse(id=["hjko98yghj", "ikvp1jtp"])
+            >>> session.connect(ids="hjko98yghj")
+            >>> session.connect(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
-        for value in ids:
-            info = self.info(value)
-            connect_url = info[0]["connectURL"]
-            open_new_tab(connect_url)
+        info = self.info(ids)
+        log.debug(info)
+        for session in info:
+            status: str = session.get("status", "unknown")
+            if status != "Running":
+                log.warning("Session %s is currently %s.", session["id"], status)
+                log.warning("Please wait for the session to be ready.")
+                continue
+            connect_url = session.get("connectURL")
+            if connect_url:
+                open_new_tab(connect_url)
 
 
 class AsyncSession(HTTPClient):
@@ -493,8 +500,8 @@ class AsyncSession(HTTPClient):
         Args:
             ids (Union[List[str], str]): Session ID[s].
 
-        Returns: d
-            Dict[str, Any]: Session information. d
+        Returns:
+            Dict[str, Any]: Session information.
 
         Examples:
             >>> from canfar.session import AsyncSession
@@ -793,7 +800,7 @@ class AsyncSession(HTTPClient):
             >>> from canfar.session import AsyncSession
             >>> session = AsyncSession()
             >>> await session.destroy_with(prefix="test")  # literal prefix
-            >>> awaitsession.destroy_with(prefix="desktop$")  # regex
+            >>> await session.destroy_with(prefix="desktop$")  # regex
         """
         meta: bool = any(char in set(".^$*+?{}[]()|") for char in prefix)
         try:
@@ -824,14 +831,19 @@ class AsyncSession(HTTPClient):
         Examples:
             >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.connect(id="hjko98yghj")
-            >>> await session.connect(id=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.connect(ids="hjko98yghj")
+            >>> await session.connect(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
         info = await self.info(ids)
         log.debug(info)
         for session in info:
+            status: str = session.get("status", "unknown")
+            if status != "Running":
+                log.warning("Session %s is currently %s.", session["id"], status)
+                log.warning("Please wait for the session to be ready.")
+                continue
             connect_url = session.get("connectURL")
             if connect_url:
                 open_new_tab(connect_url)
