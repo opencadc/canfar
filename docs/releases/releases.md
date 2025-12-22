@@ -6,15 +6,29 @@
 
 ## 🎯 CANFAR Releases
 
-The CADC team is releasing the CANFAR Science Platform (CanfarSP) on a fixed, predictable schedule.  This is to allow deployers to build into their schedules the rollout of new versions of CanfarSP.
+The CADC team releases the CANFAR Science Platform (CanfarSP) on a fixed, predictable schedule so users and deployers can plan upgrades.
 
-CanfarSP releases are named using the year and number, in the form **CanfarSP <year>.<number>**.  For example, the first release of 2025 was named **CanfarSP 2025.1**.
+### Who is this page for?
 
-We currently aiming for a CanfarSP release every 3 months.
+If you use the CANFAR Python Client or CLI:
+
+- Use the release notes in this section to see user-visible changes in the client, CLI, and documentation.
+- Each release page focuses on what changed and how it might affect your workflows.
+
+If you deploy the Canfar Science Platform:
+
+- Use these release notes to understand user-facing changes that may drive support or rollout timing.
+- Track backend deployment changes in the [opencadc/deployments](https://github.com/opencadc/deployments) repository.
+
+### Release Naming
+
+CanfarSP releases are named using the year and number, in the form `CanfarSP YYYY.MM`. For example, the first release of 2025 was named **CanfarSP 2025.1**.
+
+We currently aim for a CanfarSP release every 3 months.
 
 In the subpages of this section of documentation, detailed notes about each release can be found.
 
-CanfarSP releases include a time of dedicated integration and regression testing, and internal user testing.  Generally:
+CanfarSP releases include dedicated integration and regression testing, plus internal user testing. Generally:
 
 - New features can only be added to CanfarSP in a fixed cycle release
 - Bug fixes are added to CanfarSP immediately and result in a patch release
@@ -22,12 +36,12 @@ CanfarSP releases include a time of dedicated integration and regression testing
 
 ### Roadmap
 
-Currently, the CanfarSP Roadmap is managed interally by CADC, though we plan on making it public in the near future.  For questions or suggestions about the CanfarSP Roadmap, please reach out to the CADC team.
+Currently, the CanfarSP Roadmap is managed internally by CADC, though we plan on making it public in the near future. For questions or suggestions about the CanfarSP Roadmap, please reach out to the CADC team.
 
 ### Development Contributions
 
-We welcome and encourage contributions to all areas of the CANFAR and OpenCADC code bases!  For information on how to start, please see the contributing guidelines in these OpenCADC repositories:
+We welcome and encourage contributions to all areas of the CANFAR and OpenCADC code bases! For information on how to start, please see the contributing guidelines in these OpenCADC repositories:
 
-- [CANFAR Client and Documentation](https://github.com/opencadc/canfar)
-- [Science Platform Infrastructure](https://github.com/opencadc/science-platform)
-- [Deployment Configuration](https://github.com/opencadc/deployments)
+- [CANFAR Python Client, CLI, and Documentation](https://github.com/opencadc/canfar)
+- [CANFAR Backend Services](https://github.com/opencadc/science-platform)
+- [CANFAR Helm Charts](https://github.com/opencadc/deployments)
