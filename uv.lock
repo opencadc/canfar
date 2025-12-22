@@ -110,7 +110,7 @@ wheels = [
 
 [[package]]
 name = "canfar"
-version = "1.1.1"
+version = "1.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "cadcutils" },
