@@ -1913,14 +1913,7 @@ attributes and methods.</p>
 
               <details class="quote">
                 <summary>Source code in <code>canfar/sessions.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">397</span>
 <span class="normal">398</span>
 <span class="normal">399</span>
 <span class="normal">400</span>
@@ -2360,7 +2353,19 @@ attributes and methods.</p>
 <span class="normal">834</span>
 <span class="normal">835</span>
 <span class="normal">836</span>
-<span class="normal">837</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AsyncSession</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">AsyncSession</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Asynchronous CANFAR Session Management Client.</span>
 
 <span class="sd">    This class provides methods to manage sessions in the system,</span>
@@ -2466,8 +2471,8 @@ attributes and methods.</p>
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
 
-<span class="sd">        Returns: d</span>
-<span class="sd">            Dict[str, Any]: Session information. d</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, Any]: Session information.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.session import AsyncSession</span>
@@ -2766,7 +2771,7 @@ attributes and methods.</p>
 <span class="sd">            &gt;&gt;&gt; from canfar.session import AsyncSession</span>
 <span class="sd">            &gt;&gt;&gt; session = AsyncSession()</span>
 <span class="sd">            &gt;&gt;&gt; await session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
-<span class="sd">            &gt;&gt;&gt; awaitsession.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
+<span class="sd">            &gt;&gt;&gt; await session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">meta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="s2">&quot;.^$*+?</span><span class="si">{}</span><span class="s2">[]()|&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -2797,14 +2802,19 @@ attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import AsyncSession</span>
 <span class="sd">            &gt;&gt;&gt; session = AsyncSession()</span>
-<span class="sd">            &gt;&gt;&gt; await session.connect(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; await session.connect(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; await session.connect(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; await session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
         <span class="n">info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+            <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;Running&quot;</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please wait for the session to be ready.&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
             <span class="n">connect_url</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;connectURL&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">connect_url</span><span class="p">:</span>
                 <span class="n">open_new_tab</span><span class="p">(</span><span class="n">connect_url</span><span class="p">)</span>
@@ -2875,21 +2885,14 @@ attributes and methods.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">818</span>
-<span class="normal">819</span>
-<span class="normal">820</span>
-<span class="normal">821</span>
-<span class="normal">822</span>
-<span class="normal">823</span>
-<span class="normal">824</span>
-<span class="normal">825</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">825</span>
 <span class="normal">826</span>
 <span class="normal">827</span>
 <span class="normal">828</span>
@@ -2901,7 +2904,19 @@ attributes and methods.</p>
 <span class="normal">834</span>
 <span class="normal">835</span>
 <span class="normal">836</span>
-<span class="normal">837</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">837</span>
+<span class="normal">838</span>
+<span class="normal">839</span>
+<span class="normal">840</span>
+<span class="normal">841</span>
+<span class="normal">842</span>
+<span class="normal">843</span>
+<span class="normal">844</span>
+<span class="normal">845</span>
+<span class="normal">846</span>
+<span class="normal">847</span>
+<span class="normal">848</span>
+<span class="normal">849</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Connect to a session[s] in a web browser.</span>
 
 <span class="sd">    Args:</span>
@@ -2910,14 +2925,19 @@ attributes and methods.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import AsyncSession</span>
 <span class="sd">        &gt;&gt;&gt; session = AsyncSession()</span>
-<span class="sd">        &gt;&gt;&gt; await session.connect(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; await session.connect(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; await session.connect(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; await session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
     <span class="n">info</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
     <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
+        <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;Running&quot;</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please wait for the session to be ready.&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
         <span class="n">connect_url</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;connectURL&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">connect_url</span><span class="p">:</span>
             <span class="n">open_new_tab</span><span class="p">(</span><span class="n">connect_url</span><span class="p">)</span>
@@ -3224,14 +3244,7 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">587</span>
 <span class="normal">588</span>
 <span class="normal">589</span>
 <span class="normal">590</span>
@@ -3314,7 +3327,14 @@ Defaults to None.</p>
 <span class="normal">667</span>
 <span class="normal">668</span>
 <span class="normal">669</span>
-<span class="normal">670</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
+<span class="normal">670</span>
+<span class="normal">671</span>
+<span class="normal">672</span>
+<span class="normal">673</span>
+<span class="normal">674</span>
+<span class="normal">675</span>
+<span class="normal">676</span>
+<span class="normal">677</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -3505,14 +3525,7 @@ Defaults to None.</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">726</span>
-<span class="normal">727</span>
-<span class="normal">728</span>
-<span class="normal">729</span>
-<span class="normal">730</span>
-<span class="normal">731</span>
-<span class="normal">732</span>
-<span class="normal">733</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">733</span>
 <span class="normal">734</span>
 <span class="normal">735</span>
 <span class="normal">736</span>
@@ -3544,7 +3557,14 @@ Defaults to None.</p>
 <span class="normal">762</span>
 <span class="normal">763</span>
 <span class="normal">764</span>
-<span class="normal">765</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="normal">765</span>
+<span class="normal">766</span>
+<span class="normal">767</span>
+<span class="normal">768</span>
+<span class="normal">769</span>
+<span class="normal">770</span>
+<span class="normal">771</span>
+<span class="normal">772</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy session[s].</span>
 
 <span class="sd">    Args:</span>
@@ -3729,20 +3749,13 @@ This method is useful for destroying multiple sessions at once.</li>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># literal prefix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">awaitsession</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;desktop$&quot;</span><span class="p">)</span>  <span class="c1"># regex</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;desktop$&quot;</span><span class="p">)</span>  <span class="c1"># regex</span>
 </code></pre></div>
 
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">767</span>
-<span class="normal">768</span>
-<span class="normal">769</span>
-<span class="normal">770</span>
-<span class="normal">771</span>
-<span class="normal">772</span>
-<span class="normal">773</span>
-<span class="normal">774</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">774</span>
 <span class="normal">775</span>
 <span class="normal">776</span>
 <span class="normal">777</span>
@@ -3784,7 +3797,14 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="normal">813</span>
 <span class="normal">814</span>
 <span class="normal">815</span>
-<span class="normal">816</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
+<span class="normal">816</span>
+<span class="normal">817</span>
+<span class="normal">818</span>
+<span class="normal">819</span>
+<span class="normal">820</span>
+<span class="normal">821</span>
+<span class="normal">822</span>
+<span class="normal">823</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
@@ -3813,7 +3833,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        &gt;&gt;&gt; from canfar.session import AsyncSession</span>
 <span class="sd">        &gt;&gt;&gt; session = AsyncSession()</span>
 <span class="sd">        &gt;&gt;&gt; await session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
-<span class="sd">        &gt;&gt;&gt; awaitsession.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
+<span class="sd">        &gt;&gt;&gt; await session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">meta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">char</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="s2">&quot;.^$*+?</span><span class="si">{}</span><span class="s2">[]()|&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">char</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
@@ -3947,14 +3967,7 @@ This method is useful for destroying multiple sessions at once.</li>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">672</span>
-<span class="normal">673</span>
-<span class="normal">674</span>
-<span class="normal">675</span>
-<span class="normal">676</span>
-<span class="normal">677</span>
-<span class="normal">678</span>
-<span class="normal">679</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">679</span>
 <span class="normal">680</span>
 <span class="normal">681</span>
 <span class="normal">682</span>
@@ -3999,7 +4012,14 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="normal">721</span>
 <span class="normal">722</span>
 <span class="normal">723</span>
-<span class="normal">724</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+<span class="normal">724</span>
+<span class="normal">725</span>
+<span class="normal">726</span>
+<span class="normal">727</span>
+<span class="normal">728</span>
+<span class="normal">729</span>
+<span class="normal">730</span>
+<span class="normal">731</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -4219,14 +4239,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">419</span>
 <span class="normal">420</span>
 <span class="normal">421</span>
 <span class="normal">422</span>
@@ -4274,7 +4287,14 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">464</span>
 <span class="normal">465</span>
 <span class="normal">466</span>
-<span class="normal">467</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -4387,7 +4407,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <table>
       <thead>
         <tr>
-          <th><span class="doc-section-title">D</span></th>
+          <th><span class="doc-section-title">RETURNS</span></th>
           <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
@@ -4400,7 +4420,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>Dict[str, Any]: Session information. d</p>
+                <p>Dict[str, Any]: Session information.</p>
               </div>
             </td>
           </tr>
@@ -4418,14 +4438,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">490</span>
-<span class="normal">491</span>
-<span class="normal">492</span>
-<span class="normal">493</span>
-<span class="normal">494</span>
-<span class="normal">495</span>
-<span class="normal">496</span>
-<span class="normal">497</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">497</span>
 <span class="normal">498</span>
 <span class="normal">499</span>
 <span class="normal">500</span>
@@ -4454,14 +4467,21 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">523</span>
 <span class="normal">524</span>
 <span class="normal">525</span>
-<span class="normal">526</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="normal">526</span>
+<span class="normal">527</span>
+<span class="normal">528</span>
+<span class="normal">529</span>
+<span class="normal">530</span>
+<span class="normal">531</span>
+<span class="normal">532</span>
+<span class="normal">533</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get information about session[s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
 
-<span class="sd">    Returns: d</span>
-<span class="sd">        Dict[str, Any]: Session information. d</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: Session information.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.session import AsyncSession</span>
@@ -4599,14 +4619,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">528</span>
-<span class="normal">529</span>
-<span class="normal">530</span>
-<span class="normal">531</span>
-<span class="normal">532</span>
-<span class="normal">533</span>
-<span class="normal">534</span>
-<span class="normal">535</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">535</span>
 <span class="normal">536</span>
 <span class="normal">537</span>
 <span class="normal">538</span>
@@ -4649,7 +4662,14 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">575</span>
 <span class="normal">576</span>
 <span class="normal">577</span>
-<span class="normal">578</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -4763,14 +4783,7 @@ set to 'all', all user sessions are listed (with limited information).</p>
 
             <details class="quote">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
-<span class="normal">476</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">476</span>
 <span class="normal">477</span>
 <span class="normal">478</span>
 <span class="normal">479</span>
@@ -4782,7 +4795,14 @@ set to 'all', all user sessions are listed (with limited information).</p>
 <span class="normal">485</span>
 <span class="normal">486</span>
 <span class="normal">487</span>
-<span class="normal">488</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">488</span>
+<span class="normal">489</span>
+<span class="normal">490</span>
+<span class="normal">491</span>
+<span class="normal">492</span>
+<span class="normal">493</span>
+<span class="normal">494</span>
+<span class="normal">495</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Get statistics for the canfar cluster.</span>
 
 <span class="sd">    Returns:</span>
