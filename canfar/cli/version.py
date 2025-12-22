@@ -7,12 +7,10 @@ import sys
 from importlib import metadata
 
 import typer
-from rich.console import Console
 from rich.table import Table
 
 from canfar import __version__
-
-console = Console()
+from canfar.utils.console import console
 
 
 def callback(

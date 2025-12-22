@@ -523,7 +523,10 @@ class TestErrorHandling:
             logger._cleanup_handlers()  # noqa: SLF001
 
     def test_file_logging_permission_error(self, temp_log_dir: Path) -> None:
-        """Test handling of file permission errors."""
+        """Test handling of file permission errors.
+
+        Current behavior: falls back to a temp log location instead of raising.
+        """
         # Create a directory where we can't write
         readonly_dir = temp_log_dir / "readonly"
         readonly_dir.mkdir()
@@ -534,13 +537,11 @@ class TestErrorHandling:
         logger = CanfarLogger()
 
         try:
-            with (
-                patch("canfar.utils.logging.LOGFILE_PATH", log_file),
-                pytest.raises(PermissionError),
-            ):
-                # Currently the logging module raises PermissionError
-                # This test documents the current behavior
+            with patch("canfar.utils.logging.LOGFILE_PATH", log_file):
                 logger.configure(filelog=True)
+
+            assert logger._file_handler is not None  # noqa: SLF001
+            assert logger._file_handler.baseFilename != str(log_file)  # noqa: SLF001
 
         finally:
             logger._cleanup_handlers()  # noqa: SLF001

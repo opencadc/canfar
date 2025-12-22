@@ -6,11 +6,9 @@ import asyncio
 from typing import Annotated
 
 import typer
-from rich.console import Console
 
 from canfar.sessions import AsyncSession
-
-console = Console()
+from canfar.utils.console import console
 
 logs = typer.Typer(
     name="logs",

@@ -445,6 +445,32 @@ canfar config path [OPTIONS]
 !!! tip "Configuration Location"
     Use this command to find where your configuration file is stored for manual editing if needed.
 
+#### `canfar config get`
+
+Get a single configuration value by dotted path.
+
+```bash
+canfar config get PATH
+```
+
+!!! example
+    ```bash
+    canfar config get console.width
+    ```
+
+#### `canfar config set`
+
+Set a single configuration value by dotted path (value is parsed as YAML).
+
+```bash
+canfar config set PATH VALUE
+```
+
+!!! example
+    ```bash
+    canfar config set console.width 130
+    ```
+
 ### `canfar version`
 
 View client version and system information.

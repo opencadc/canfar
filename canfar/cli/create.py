@@ -7,14 +7,12 @@ from typing import Annotated, Any, get_args
 
 import click
 import typer
-from rich.console import Console
 
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
-
-console = Console()
+from canfar.utils.console import console
 
 kinds: list[str] = list(get_args(Kind))
 # Remove desktop-app from the list of kinds for usage message since,

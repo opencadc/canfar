@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Any
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 import questionary
@@ -322,10 +322,7 @@ class TestDisplayCapabilitiesIntegration:
     @pytest.mark.asyncio
     async def test_capabilities_console_output_empty(self) -> None:
         """Print error when capabilities are empty."""
-        with patch("canfar.utils.display.Console") as mock_console_class:
-            mock_console = Mock()
-            mock_console_class.return_value = mock_console
-
+        with patch("canfar.utils.display.console") as mock_console:
             with pytest.raises(SystemExit):
                 await capabilities([])
 
@@ -342,11 +339,9 @@ class TestDisplayCapabilitiesIntegration:
         ]
 
         with (
-            patch("canfar.utils.display.Console") as mock_console_class,
+            patch("canfar.utils.display.console") as mock_console,
             patch("canfar.utils.display.questionary.select") as mock_select,
         ):
-            mock_console = Mock()
-            mock_console_class.return_value = mock_console
             mock_select.return_value.ask_async = AsyncMock(return_value=caps_no_auth[0])
 
             with pytest.raises(SystemExit):

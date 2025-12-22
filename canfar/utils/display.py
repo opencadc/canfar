@@ -4,9 +4,9 @@ import sys
 from typing import TYPE_CHECKING, Any
 
 import questionary
-from rich.console import Console
 
 from canfar.models.registry import Server, ServerResults
+from canfar.utils.console import console
 
 if TYPE_CHECKING:  # pragma: no cover - typing only
     from canfar.utils.vosi import Capability
@@ -30,8 +30,6 @@ async def servers(
     Raises:
         SystemExit: If no endpoints are available for selection
     """
-    console = Console()
-
     alive: list[Server] = [
         endpoint for endpoint in results.endpoints if endpoint.status == 200
     ]
@@ -149,8 +147,6 @@ async def capabilities(
     Raises:
         SystemExit: If no capabilities are available for selection
     """
-    console = Console()
-
     # Check if capabilities are available
     if not capabilities:
         console.print("\n[bold red]No server capabilities available.[/bold red]")

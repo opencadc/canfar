@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import typer
-from rich.console import Console
 
 from canfar.cli.auth import auth
 from canfar.cli.config import config
@@ -19,8 +18,7 @@ from canfar.cli.stats import stats
 from canfar.cli.version import version
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
-
-console = Console()
+from canfar.utils.console import console
 
 
 def callback(ctx: typer.Context) -> None:
@@ -33,7 +31,7 @@ def callback(ctx: typer.Context) -> None:
 
 cli: typer.Typer = typer.Typer(
     name="canfar",
-    help="CANFAR Science Platform.",
+    help="CANFAR Science Platform",
     no_args_is_help=False,  # Disable automatic help to handle manually
     add_completion=True,
     pretty_exceptions_show_locals=True,
