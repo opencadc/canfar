@@ -63,24 +63,28 @@ def catch(response: httpx.Response) -> None:
         response.raise_for_status()
     except httpx.ConnectTimeout as err:
         log.exception(
+            "%s URL: %s",
             CONN_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.ReadTimeout as err:
         log.exception(
+            "%s URL: %s",
             READ_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.WriteTimeout as err:
         log.exception(
+            "%s URL: %s",
             WRITE_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.PoolTimeout as err:
         log.exception(
+            "%s URL: %s",
             POOL_ERR_MSG,
             err.request.url,
         )
@@ -121,24 +125,28 @@ async def acatch(response: httpx.Response) -> None:
         response.raise_for_status()
     except httpx.ConnectTimeout as err:
         log.exception(
+            "%s URL: %s",
             CONN_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.ReadTimeout as err:
         log.exception(
+            "%s URL: %s",
             READ_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.WriteTimeout as err:
         log.exception(
+            "%s URL: %s",
             WRITE_ERR_MSG,
             err.request.url,
         )
         raise
     except httpx.PoolTimeout as err:
         log.exception(
+            "%s URL: %s",
             POOL_ERR_MSG,
             err.request.url,
         )
