@@ -1,0 +1,3220 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CANFAR Science Platform">
+      
+      
+        <meta name="author" content="Shiny Brar">
+      
+      
+        <link rel="canonical" href="https://opencadc.github.io/canfar/v1.2.0/platform/containers/registry/">
+      
+      
+        <link rel="prev" href="../build/">
+      
+      
+        <link rel="next" href="../../community/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../static/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+    
+    
+      
+        <title>Registry - CANFAR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../termynal.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#harbor-container-registry" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CANFAR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Registry
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="canfar" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../client/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Client
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../conduct/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contribute
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    CANFAR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Platform
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../best-practices/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Best Practices
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../permissions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Permissions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../doi/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DOI
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Cloud (legacy)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_8" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../sessions/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sessions
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_8" id="__nav_2_8_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sessions
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/notebook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Notebooks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/carta/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CARTA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/firefly/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Firefly
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/desktop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Desktop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/batch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Batch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sessions/contributed/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contributed
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_9" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../storage/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Storage
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_9" id="__nav_2_9_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Storage
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/filesystem/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filesystem
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/transfers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Transfers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/vospace/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_10" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Containers
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_10" id="__nav_2_10_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_10">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Containers
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Building Containers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registry
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Registry
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#harbor-registry-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Harbor Registry Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#projects-and-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏗️ Projects and Organization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗂️ Repository Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-control-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Access Control and Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#harbor-web-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Harbor Web Interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-and-api-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ CLI and API Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registry-maintenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Registry Maintenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-canfar-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Integration with CANFAR Services
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🆘 Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_11" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../community/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Community
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_11" id="__nav_2_11_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_11">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Community
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/CASA_and_more/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_12" >
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../../support/" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Support
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_2_12" id="__nav_2_12_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_12">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Support
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../support/faq/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FAQ
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_13" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_13" id="__nav_2_13_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Releases
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_13">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Releases
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../releases/releases/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CANFAR Releases
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../releases/2025-2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025.2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../releases/2025-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025.1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../releases/2026-1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2026.1
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../client/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../conduct/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../about/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#harbor-registry-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📋 Harbor Registry Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#projects-and-organization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🏗️ Projects and Organization
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repository-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🗂️ Repository Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#access-control-and-security" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔐 Access Control and Security
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#harbor-web-interface" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔍 Harbor Web Interface
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cli-and-api-usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🛠️ CLI and API Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#registry-maintenance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        📊 Registry Maintenance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🚀 Best Practices
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-canfar-services" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🔗 Integration with CANFAR Services
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        🆘 Troubleshooting
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/platform/containers/registry.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/platform/containers/registry.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+    </a>
+  
+
+
+<h1 id="harbor-container-registry">Harbor Container Registry<a class="headerlink" href="#harbor-container-registry" title="Permanent link">&para;</a></h1>
+<p><strong>Managing container images on CANFAR's Harbor-based registry for secure distribution and deployment.</strong></p>
+<div class="admonition abstract">
+<p class="admonition-title">🎯 Registry Management Overview</p>
+<p><strong>Master Harbor registry operations:</strong></p>
+<ul>
+<li><strong>Harbor Platform</strong>: Understanding CANFAR's enterprise container registry features</li>
+<li><strong>Access Control</strong>: Projects, repositories, and role-based permissions</li>
+<li><strong>Image Management</strong>: Tagging, versioning, and metadata organization</li>
+<li><strong>Security Features</strong>: Vulnerability scanning and compliance monitoring</li>
+</ul>
+</div>
+<p>Harbor serves as CANFAR's container registry, providing a secure, feature-rich platform for storing, managing, and distributing container images. Built on Docker Registry v2, Harbor adds enterprise features like role-based access control, vulnerability scanning, and image replication.</p>
+<h2 id="harbor-registry-overview">📋 Harbor Registry Overview<a class="headerlink" href="#harbor-registry-overview" title="Permanent link">&para;</a></h2>
+<h3 id="what-is-harbor">What is Harbor?<a class="headerlink" href="#what-is-harbor" title="Permanent link">&para;</a></h3>
+<p>Harbor is an open-source container registry that provides:</p>
+<ul>
+<li><strong>Secure storage</strong>: Role-based access control and authentication integration</li>
+<li><strong>Image management</strong>: Tagging, versioning, and metadata handling</li>
+<li><strong>Vulnerability scanning</strong>: Automated security analysis of container images</li>
+<li><strong>Replication</strong>: Multi-site synchronisation and backup capabilities</li>
+<li><strong>Web interface</strong>: User-friendly management portal</li>
+<li><strong>API access</strong>: Programmatic integration with development workflows</li>
+</ul>
+<h3 id="canfar-harbor-instance">CANFAR Harbor Instance<a class="headerlink" href="#canfar-harbor-instance" title="Permanent link">&para;</a></h3>
+<p><strong>Registry URL</strong>: <a href="https://images.canfar.net">https://images.canfar.net</a></p>
+<p><strong>Key features on CANFAR:</strong></p>
+<ul>
+<li>Integration with CADC authentication system</li>
+<li>Project-based organization for research teams</li>
+<li>Automated vulnerability scanning for public containers</li>
+<li>Role-based permissions aligned with CANFAR groups</li>
+<li>API access for automated workflows</li>
+</ul>
+<pre class="mermaid"><code>graph TB
+    Users[CANFAR Users] --&gt; Harbor[Harbor Registry]
+    Harbor --&gt; Projects[Projects/Organizations]
+
+    Projects --&gt; Public[Public Projects]
+    Projects --&gt; Private[Private Projects]
+
+    Public --&gt; CADCContainers[CADC/Official Containers]
+    Public --&gt; CommunityContainers[Community Containers]
+
+    Private --&gt; TeamProjects[Research Team Projects]
+    Private --&gt; PersonalProjects[Individual Projects]
+
+    Harbor --&gt; Features[Harbor Features]
+    Features --&gt; RBAC[Role-Based Access]
+    Features --&gt; Scanning[Vulnerability Scanning]
+    Features --&gt; Replication[Image Replication]
+    Features --&gt; API[REST API]</code></pre>
+<h2 id="projects-and-organization">🏗️ Projects and Organization<a class="headerlink" href="#projects-and-organization" title="Permanent link">&para;</a></h2>
+<h3 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h3>
+<p>Harbor organizes containers into <strong>projects</strong>, which serve as top-level namespaces:</p>
+<div class="highlight"><pre><span></span><code>images.canfar.net/
+├── skaha/                    # Official CANFAR containers
+│   ├── astroml:latest
+│   ├── casa:latest
+│   └── desktop:latest
+├── [project]/                # Research team project
+│   ├── custom-pipeline:latest
+│   └── analysis-env:v2.1
+└── [user]/                   # Personal project
+    ├── development:latest
+    └── testing:experimental
+</code></pre></div>
+<h3 id="project-types">Project Types<a class="headerlink" href="#project-types" title="Permanent link">&para;</a></h3>
+<h4 id="public-projects">Public Projects<a class="headerlink" href="#public-projects" title="Permanent link">&para;</a></h4>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Visible to all CANFAR users</li>
+<li>Images can be pulled without authentication</li>
+<li>Suitable for community-shared tools</li>
+<li>Used for official CANFAR containers</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>skaha/</code> - Core CANFAR containers</li>
+<li><code>lsst/</code> - LSST Community-contributed containers</li>
+</ul>
+<h4 id="private-projects">Private Projects<a class="headerlink" href="#private-projects" title="Permanent link">&para;</a></h4>
+<p><strong>Characteristics:</strong></p>
+<ul>
+<li>Access restricted to project members</li>
+<li>Require authentication for all operations</li>
+<li>Support proprietary or sensitive software</li>
+<li>Can be shared with specific research teams</li>
+</ul>
+<p><strong>Examples:</strong></p>
+<ul>
+<li><code>myuniversity-xray/</code> - Institutional X-ray analysis tools</li>
+<li><code>survey-collaboration/</code> - Multi-institutional survey project</li>
+<li><code>proprietary-software/</code> - Licensed commercial software</li>
+</ul>
+<h3 id="project-creation-and-management">Project Creation and Management<a class="headerlink" href="#project-creation-and-management" title="Permanent link">&para;</a></h3>
+<h4 id="requesting-new-projects">Requesting New Projects<a class="headerlink" href="#requesting-new-projects" title="Permanent link">&para;</a></h4>
+<p>Contact <a href="mailto:support@canfar.net">support@canfar.net</a> to create new projects:</p>
+<p><strong>Required information:</strong></p>
+<ul>
+<li>Project name (must be unique, lowercase, alphanumeric)</li>
+<li>Description and purpose</li>
+<li>Visibility (public/private)</li>
+<li>Initial project members and their roles</li>
+<li>Resource requirements (storage quota)</li>
+</ul>
+<p><strong>Naming conventions:</strong></p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Good project names</span>
+myteam-radio-analysis
+survey-processing-tools
+xray-spectroscopy
+
+<span class="c1"># Avoid</span>
+MyTeam_Radio_Analysis<span class="w">    </span><span class="c1"># Mixed case, underscores</span>
+my<span class="w"> </span>team<span class="w"> </span>radio<span class="w">            </span><span class="c1"># Spaces</span>
+special-chars-@#$<span class="w">        </span><span class="c1"># Special characters</span>
+</code></pre></div>
+<h4 id="project-membership-management">Project Membership Management<a class="headerlink" href="#project-membership-management" title="Permanent link">&para;</a></h4>
+<p>Project owners can manage membership through the Harbor web interface:</p>
+<p><strong>Role levels:</strong></p>
+<ul>
+<li><strong>Guest</strong>: Pull images only</li>
+<li><strong>Developer</strong>: Pull and push images, manage tags</li>
+<li><strong>Master</strong>: Full project management, member administration</li>
+<li><strong>ProjectAdmin</strong>: Complete project control including deletion</li>
+</ul>
+<h2 id="repository-management">🗂️ Repository Management<a class="headerlink" href="#repository-management" title="Permanent link">&para;</a></h2>
+<h3 id="understanding-repositories">Understanding Repositories<a class="headerlink" href="#understanding-repositories" title="Permanent link">&para;</a></h3>
+<p>Within each project, <strong>repositories</strong> contain the actual container images:</p>
+<div class="highlight"><pre><span></span><code>[project]/                       # Project
+├── analysis-pipeline/        # Repository
+│   ├── latest               # Tag
+│   ├── v1.0.0               # Tag
+│   └── 2024.03              # Tag
+└── visualization-tools/      # Repository
+    ├── latest               # Tag
+    └── beta                 # Tag
+</code></pre></div>
+<h3 id="repository-naming">Repository Naming<a class="headerlink" href="#repository-naming" title="Permanent link">&para;</a></h3>
+<p>Follow consistent naming conventions for repositories:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Good repository names</span>
+analysis-pipeline
+data-processing-tools
+visualization-suite
+radio-astronomy-env
+
+<span class="c1"># Specific use cases</span>
+survey-reduction-v2
+xray-spectral-analysis
+machine-learning-gpu
+</code></pre></div>
+<h3 id="tagging-strategy">Tagging Strategy<a class="headerlink" href="#tagging-strategy" title="Permanent link">&para;</a></h3>
+<p>Implement systematic tagging for version control:</p>
+<h4 id="semantic-versioning">Semantic Versioning<a class="headerlink" href="#semantic-versioning" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Major.Minor.Patch format</span>
+myteam/analysis-env:1.0.0<span class="w">     </span><span class="c1"># Initial release</span>
+myteam/analysis-env:1.1.0<span class="w">     </span><span class="c1"># New features</span>
+myteam/analysis-env:1.1.1<span class="w">     </span><span class="c1"># Bug fixes</span>
+myteam/analysis-env:2.0.0<span class="w">     </span><span class="c1"># Breaking changes</span>
+</code></pre></div>
+<h4 id="date-based-versioning">Date-Based Versioning<a class="headerlink" href="#date-based-versioning" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Monthly releases</span>
+myteam/analysis-env:2024.03<span class="w">   </span><span class="c1"># March 2024 release</span>
+myteam/analysis-env:2024.04<span class="w">   </span><span class="c1"># April 2024 release</span>
+
+<span class="c1"># Daily builds (development)</span>
+myteam/analysis-env:2024.03.15
+myteam/analysis-env:2024.03.16
+</code></pre></div>
+<h4 id="feature-and-environment-tags">Feature and Environment Tags<a class="headerlink" href="#feature-and-environment-tags" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Environment-specific</span>
+myteam/analysis-env:production
+myteam/analysis-env:development
+myteam/analysis-env:testing
+
+<span class="c1"># Feature branches</span>
+myteam/analysis-env:feature-gpu-support
+myteam/analysis-env:experimental-ml
+
+<span class="c1"># Special purpose</span>
+myteam/analysis-env:conference-demo
+myteam/analysis-env:paper-reproduction
+</code></pre></div>
+<h3 id="managing-image-metadata">Managing Image Metadata<a class="headerlink" href="#managing-image-metadata" title="Permanent link">&para;</a></h3>
+<p>Harbor stores rich metadata for each image:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;analysis-env&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;v1.2.0&quot;</span><span class="p">,</span><span class="w"> </span>
+<span class="w">  </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Custom astronomy analysis environment&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;created&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2024-03-15T10:30:00Z&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;size&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;2.1GB&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;labels&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="nt">&quot;maintainer&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;research-team@university.edu&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;version&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;1.2.0&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;description&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;X-ray astronomy analysis with XSPEC&quot;</span><span class="p">,</span>
+<span class="w">    </span><span class="nt">&quot;ca.nrc.cadc.skaha.type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;notebook&quot;</span>
+<span class="w">  </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">&quot;vulnerabilities&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;scanned&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">&quot;signature&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;verified&quot;</span>
+<span class="p">}</span>
+</code></pre></div>
+<h2 id="access-control-and-security">🔐 Access Control and Security<a class="headerlink" href="#access-control-and-security" title="Permanent link">&para;</a></h2>
+<h3 id="authentication-methods">Authentication Methods<a class="headerlink" href="#authentication-methods" title="Permanent link">&para;</a></h3>
+<h4 id="web-interface-access">Web Interface Access<a class="headerlink" href="#web-interface-access" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Visit</strong>: <a href="https://images.canfar.net">https://images.canfar.net</a></li>
+<li><strong>Login</strong>: Use your CADC credentials</li>
+<li><strong>Navigate</strong>: Browse projects and repositories</li>
+<li><strong>Manage</strong>: Create, tag, and delete images (with appropriate permissions)</li>
+</ol>
+<h4 id="docker-cli-authentication">Docker CLI Authentication<a class="headerlink" href="#docker-cli-authentication" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Login to Harbor registry</span>
+docker<span class="w"> </span>login<span class="w"> </span>images.canfar.net
+<span class="c1"># Enter CADC username and password when prompted</span>
+<span class="c1"># Paste the Habor CLI Secret copied from the images.canfar.net User Profile-&gt;</span>
+
+<span class="c1"># Verify authentication</span>
+docker<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;Registry Mirrors&quot;</span>
+</code></pre></div>
+<h4 id="api-access">API Access<a class="headerlink" href="#api-access" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get authentication token</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/users/current&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-u<span class="w"> </span><span class="s2">&quot;username:password&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;accept: application/json&quot;</span>
+
+<span class="c1"># Use token for API calls</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Bearer YOUR_TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;accept: application/json&quot;</span>
+</code></pre></div>
+<h3 id="permission-matrix">Permission Matrix<a class="headerlink" href="#permission-matrix" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Guest</th>
+<th>Developer</th>
+<th>Master</th>
+<th>ProjectAdmin</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>View public projects</strong></td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>View private projects</strong></td>
+<td>❌</td>
+<td>✅*</td>
+<td>✅*</td>
+<td>✅*</td>
+</tr>
+<tr>
+<td><strong>Pull images</strong></td>
+<td>✅**</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Push images</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Delete images</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Manage tags</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Scan images</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Add/remove members</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+</tr>
+<tr>
+<td><strong>Delete project</strong></td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅</td>
+</tr>
+</tbody>
+</table>
+<p>*Only if member of project<br />
+**Public images only</p>
+<h2 id="harbor-web-interface">🔍 Harbor Web Interface<a class="headerlink" href="#harbor-web-interface" title="Permanent link">&para;</a></h2>
+<h3 id="navigation-and-features">Navigation and Features<a class="headerlink" href="#navigation-and-features" title="Permanent link">&para;</a></h3>
+<h4 id="project-dashboard">Project Dashboard<a class="headerlink" href="#project-dashboard" title="Permanent link">&para;</a></h4>
+<p>The project dashboard provides an overview of:</p>
+<ul>
+<li><strong>Repositories</strong>: List of container repositories</li>
+<li><strong>Members</strong>: Project access control</li>
+<li><strong>Logs</strong>: Activity and audit trail  </li>
+<li><strong>Configuration</strong>: Project settings and policies</li>
+<li><strong>Summary</strong>: Storage usage and statistics</li>
+</ul>
+<h4 id="repository-view">Repository View<a class="headerlink" href="#repository-view" title="Permanent link">&para;</a></h4>
+<p>For each repository, you can:</p>
+<ul>
+<li><strong>Browse tags</strong>: View all available versions</li>
+<li><strong>Inspect images</strong>: Examine layers, metadata, and vulnerabilities</li>
+<li><strong>Manage artifacts</strong>: Add/remove tags, delete images</li>
+<li><strong>View history</strong>: Track changes and updates</li>
+<li><strong>Configure policies</strong>: Set retention and scanning rules</li>
+</ul>
+<h4 id="image-details">Image Details<a class="headerlink" href="#image-details" title="Permanent link">&para;</a></h4>
+<p>Each image provides detailed information:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Image Information</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Digest</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">sha256:a1b2c3d4e5f6...</span>
+<span class="w">  </span><span class="nt">Size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2.1 GB</span>
+<span class="w">  </span><span class="nt">Created</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-03-15 10:30:00 UTC</span>
+<span class="w">  </span><span class="nt">OS/Arch</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">linux/amd64</span>
+
+<span class="nt">Labels</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">maintainer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">research-team@university.edu</span>
+<span class="w">  </span><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.2.0</span>
+<span class="w">  </span><span class="nt">ca.nrc.cadc.skaha.type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notebook</span>
+
+<span class="nt">Vulnerabilities</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Critical</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span>
+<span class="w">  </span><span class="nt">High</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">  </span><span class="nt">Medium</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">Low</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12</span>
+
+<span class="nt">Build Information</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Dockerfile</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Available</span>
+<span class="w">  </span><span class="nt">Build Args</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Recorded</span>
+<span class="w">  </span><span class="nt">Layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">15 layers, optimized</span>
+</code></pre></div>
+<h3 id="vulnerability-scanning">Vulnerability Scanning<a class="headerlink" href="#vulnerability-scanning" title="Permanent link">&para;</a></h3>
+<p>Harbor automatically scans container images for security vulnerabilities:</p>
+<h4 id="scanning-process">Scanning Process<a class="headerlink" href="#scanning-process" title="Permanent link">&para;</a></h4>
+<ol>
+<li><strong>Automatic scanning</strong>: Public containers scanned on push</li>
+<li><strong>Manual scanning</strong>: Trigger scans for private repositories</li>
+<li><strong>Scheduled scanning</strong>: Regular updates with latest vulnerability database</li>
+<li><strong>Policy enforcement</strong>: Block pulls based on vulnerability thresholds</li>
+</ol>
+<h4 id="vulnerability-reports">Vulnerability Reports<a class="headerlink" href="#vulnerability-reports" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nt">Vulnerability Report</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Scanner</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Trivy</span>
+<span class="w">  </span><span class="nt">Scan Time</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-03-15 11:00:00 UTC</span>
+<span class="w">  </span><span class="nt">Database Version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-03-14</span>
+
+<span class="nt">Critical Vulnerabilities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">None found</span>
+
+<span class="nt">High Vulnerabilities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">CVE-2024-1234</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">OpenSSL vulnerability</span>
+<span class="w">    </span><span class="nt">Severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">High</span>
+<span class="w">    </span><span class="nt">Package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openssl 3.0.1</span>
+<span class="w">    </span><span class="nt">Fix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upgrade to openssl 3.0.2</span>
+
+<span class="nt">Medium Vulnerabilities</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">CVE-2024-5678</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Python vulnerability</span>
+<span class="w">    </span><span class="nt">Severity</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Medium</span><span class="w">  </span>
+<span class="w">    </span><span class="nt">Package</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">python 3.11.1</span>
+<span class="w">    </span><span class="nt">Fix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Upgrade to python 3.11.2</span>
+</code></pre></div>
+<h4 id="addressing-vulnerabilities">Addressing Vulnerabilities<a class="headerlink" href="#addressing-vulnerabilities" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c"># Update base image to address vulnerabilities</span>
+<span class="k">FROM</span><span class="w"> </span><span class="s">images.canfar.net/skaha/astroml:latest</span>
+
+<span class="c"># Update system packages</span>
+<span class="k">USER</span><span class="w"> </span><span class="s">root</span>
+<span class="k">RUN</span><span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>upgrade<span class="w"> </span>-y<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+
+<span class="c"># Update Python packages</span>
+<span class="k">RUN</span><span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>package-with-vulnerability
+</code></pre></div>
+<h2 id="cli-and-api-usage">🛠️ CLI and API Usage<a class="headerlink" href="#cli-and-api-usage" title="Permanent link">&para;</a></h2>
+<h3 id="harbor-cli-operations">Harbor CLI Operations<a class="headerlink" href="#harbor-cli-operations" title="Permanent link">&para;</a></h3>
+<h4 id="basic-image-operations">Basic Image Operations<a class="headerlink" href="#basic-image-operations" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># List repositories in a project</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Get repository information</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories/analysis-env&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># List tags for a repository</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories/analysis-env/artifacts&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h4 id="docker-registry-v2-api">Docker Registry v2 API<a class="headerlink" href="#docker-registry-v2-api" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Get manifest for specific tag</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/v2/myteam/analysis-env/manifests/latest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Accept: application/vnd.docker.distribution.manifest.v2+json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Get blob (layer) information</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/v2/myteam/analysis-env/blobs/sha256:digest&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h3 id="automated-workflows">Automated Workflows<a class="headerlink" href="#automated-workflows" title="Permanent link">&para;</a></h3>
+<h4 id="cicd-integration">CI/CD Integration<a class="headerlink" href="#cicd-integration" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># GitHub Actions example</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build and Push to Harbor</span>
+
+<span class="nt">on</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">push</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">branches</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">main</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;v*&#39;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">jobs</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">build</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">runs-on</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ubuntu-latest</span>
+<span class="w">    </span><span class="nt">steps</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">actions/checkout@v4</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Login to Harbor</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/login-action@v3</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">registry</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images.canfar.net</span>
+<span class="w">        </span><span class="nt">username</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.HARBOR_USERNAME }}</span>
+<span class="w">        </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ secrets.HARBOR_PASSWORD }}</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Extract metadata</span>
+<span class="w">      </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">meta</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/metadata-action@v5</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">images</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">images.canfar.net/myteam/analysis-env</span>
+<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="w">          </span><span class="no">type=ref,event=branch</span>
+<span class="w">          </span><span class="no">type=semver,pattern={{version}}</span>
+<span class="w">          </span><span class="no">type=raw,value=latest,enable={{is_default_branch}}</span>
+
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Build and push</span>
+<span class="w">      </span><span class="nt">uses</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/build-push-action@v5</span>
+<span class="w">      </span><span class="nt">with</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">push</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">        </span><span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ steps.meta.outputs.tags }}</span>
+<span class="w">        </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">${{ steps.meta.outputs.labels }}</span>
+</code></pre></div>
+<h4 id="automated-scanning-and-deployment">Automated Scanning and Deployment<a class="headerlink" href="#automated-scanning-and-deployment" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python3</span>
+<span class="c1"># automated_scan_deploy.py</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">base64</span><span class="w"> </span><span class="kn">import</span> <span class="n">b64encode</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">HarborManager</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">registry_url</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">registry_url</span> <span class="o">=</span> <span class="n">registry_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">auth_header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_auth_header</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_auth_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">password</span><span class="p">):</span>
+        <span class="n">credentials</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">password</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">encoded_credentials</span> <span class="o">=</span> <span class="n">b64encode</span><span class="p">(</span><span class="n">credentials</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Basic </span><span class="si">{</span><span class="n">encoded_credentials</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">scan_repository</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger vulnerability scan for repository.&quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_url</span><span class="si">}</span><span class="s2">/api/v2.0/projects/</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/repositories/</span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/artifacts&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_header</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get artifacts: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="n">artifacts</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">artifact</span> <span class="ow">in</span> <span class="n">artifacts</span><span class="p">:</span>
+            <span class="n">scan_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">artifact</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">/scan&quot;</span>
+            <span class="n">scan_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">scan_url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_header</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">scan_response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">202</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan triggered for </span><span class="si">{</span><span class="n">artifact</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">][:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Scan failed for </span><span class="si">{</span><span class="n">artifact</span><span class="p">[</span><span class="s1">&#39;digest&#39;</span><span class="p">][:</span><span class="mi">12</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">scan_response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_vulnerability_report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">project</span><span class="p">,</span> <span class="n">repository</span><span class="p">,</span> <span class="n">tag</span><span class="o">=</span><span class="s2">&quot;latest&quot;</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get vulnerability scan results.&quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">registry_url</span><span class="si">}</span><span class="s2">/api/v2.0/projects/</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/repositories/</span><span class="si">{</span><span class="n">repository</span><span class="si">}</span><span class="s2">/artifacts/</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">/scan/overview&quot;</span>
+
+        <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">auth_header</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">200</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get scan results: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">check_vulnerabilities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scan_results</span><span class="p">,</span> <span class="n">max_critical</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">max_high</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if vulnerability levels are within acceptable limits.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">scan_results</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># Extract vulnerability counts</span>
+        <span class="n">summary</span> <span class="o">=</span> <span class="n">scan_results</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vulnerabilities&#39;</span><span class="p">,</span> <span class="p">{})</span>
+        <span class="n">critical</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;critical&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">high</span> <span class="o">=</span> <span class="n">summary</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;high&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Vulnerabilities found - Critical: </span><span class="si">{</span><span class="n">critical</span><span class="si">}</span><span class="s2">, High: </span><span class="si">{</span><span class="n">high</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">critical</span> <span class="o">&lt;=</span> <span class="n">max_critical</span> <span class="ow">and</span> <span class="n">high</span> <span class="o">&lt;=</span> <span class="n">max_high</span>
+
+<span class="c1"># Usage example</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">harbor</span> <span class="o">=</span> <span class="n">HarborManager</span><span class="p">(</span>
+        <span class="s2">&quot;https://images.canfar.net&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;your-username&quot;</span><span class="p">,</span> 
+        <span class="s2">&quot;your-password&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">project</span> <span class="o">=</span> <span class="s2">&quot;myteam&quot;</span>
+    <span class="n">repository</span> <span class="o">=</span> <span class="s2">&quot;analysis-env&quot;</span>
+
+    <span class="c1"># Trigger scan</span>
+    <span class="k">if</span> <span class="n">harbor</span><span class="o">.</span><span class="n">scan_repository</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">repository</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Scan triggered, waiting for completion...&quot;</span><span class="p">)</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">60</span><span class="p">)</span>  <span class="c1"># Wait for scan to complete</span>
+
+        <span class="c1"># Check results</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">harbor</span><span class="o">.</span><span class="n">get_vulnerability_report</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">repository</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">harbor</span><span class="o">.</span><span class="n">check_vulnerabilities</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Vulnerability check passed&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;❌ Vulnerability check failed&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="registry-maintenance">📊 Registry Maintenance<a class="headerlink" href="#registry-maintenance" title="Permanent link">&para;</a></h2>
+<h3 id="storage-management">Storage Management<a class="headerlink" href="#storage-management" title="Permanent link">&para;</a></h3>
+<h4 id="repository-cleanup">Repository Cleanup<a class="headerlink" href="#repository-cleanup" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Remove old tags (manual approach)</span>
+<span class="c1"># List all tags first</span>
+docker<span class="w"> </span>images<span class="w"> </span>images.canfar.net/myteam/analysis-env
+
+<span class="c1"># Remove specific old tags</span>
+docker<span class="w"> </span>rmi<span class="w"> </span>images.canfar.net/myteam/analysis-env:old-tag
+
+<span class="c1"># Remove all untagged images</span>
+docker<span class="w"> </span>image<span class="w"> </span>prune<span class="w"> </span>-f
+
+<span class="c1"># Remove all unused images</span>
+docker<span class="w"> </span>system<span class="w"> </span>prune<span class="w"> </span>-a<span class="w"> </span>-f
+</code></pre></div>
+<h4 id="automated-retention-policies">Automated Retention Policies<a class="headerlink" href="#automated-retention-policies" title="Permanent link">&para;</a></h4>
+<p>Configure Harbor retention policies through web interface:</p>
+<p><strong>Policy examples:</strong></p>
+<ul>
+<li>Keep latest 10 versions</li>
+<li>Retain images pushed within last 30 days</li>
+<li>Preserve all tagged releases (v*.<em>.</em>)</li>
+<li>Delete untagged artifacts after 7 days</li>
+</ul>
+<h3 id="monitoring-and-analytics">Monitoring and Analytics<a class="headerlink" href="#monitoring-and-analytics" title="Permanent link">&para;</a></h3>
+<h4 id="usage-statistics">Usage Statistics<a class="headerlink" href="#usage-statistics" title="Permanent link">&para;</a></h4>
+<p>Harbor provides metrics on:</p>
+<ul>
+<li>Storage usage per project</li>
+<li>Pull/push activity</li>
+<li>Popular repositories</li>
+<li>User access patterns</li>
+<li>Vulnerability trends</li>
+</ul>
+<h4 id="audit-logging">Audit Logging<a class="headerlink" href="#audit-logging" title="Permanent link">&para;</a></h4>
+<p>Track all registry activities:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">Audit Log Entry</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">Timestamp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2024-03-15T10:30:00Z</span>
+<span class="w">  </span><span class="nt">User</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">research-user</span>
+<span class="w">  </span><span class="nt">Action</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">PUSH</span>
+<span class="w">  </span><span class="nt">Resource</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">myteam/analysis-env:v1.2.0</span>
+<span class="w">  </span><span class="nt">IP Address</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">192.168.1.100</span>
+<span class="w">  </span><span class="nt">User Agent</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docker/24.0.0</span>
+<span class="w">  </span><span class="nt">Status</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">SUCCESS</span>
+</code></pre></div>
+<h3 id="backup-and-disaster-recovery">Backup and Disaster Recovery<a class="headerlink" href="#backup-and-disaster-recovery" title="Permanent link">&para;</a></h3>
+<h4 id="exportimport-procedures">Export/Import Procedures<a class="headerlink" href="#exportimport-procedures" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Export project (including images)</span>
+<span class="c1"># Contact CANFAR support for full project exports</span>
+
+<span class="c1"># Export image metadata only</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories/analysis-env/artifacts&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>&gt;<span class="w"> </span>repository-metadata.json
+
+<span class="c1"># Backup individual images</span>
+docker<span class="w"> </span>pull<span class="w"> </span>images.canfar.net/myteam/analysis-env:v1.2.0
+docker<span class="w"> </span>save<span class="w"> </span>images.canfar.net/myteam/analysis-env:v1.2.0<span class="w"> </span>&gt;<span class="w"> </span>analysis-env-v1.2.0.tar
+
+<span class="c1"># Restore from backup</span>
+docker<span class="w"> </span>load<span class="w"> </span>&lt;<span class="w"> </span>analysis-env-v1.2.0.tar
+docker<span class="w"> </span>push<span class="w"> </span>images.canfar.net/myteam/analysis-env:v1.2.0
+</code></pre></div>
+<h2 id="best-practices">🚀 Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<h3 id="registry-best-practices">Registry Best Practices<a class="headerlink" href="#registry-best-practices" title="Permanent link">&para;</a></h3>
+<h4 id="registry-organization">Registry Organization<a class="headerlink" href="#registry-organization" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Recommended project organization</span>
+university-astronomy/<span class="w">        </span><span class="c1"># Institution-wide project</span>
+├──<span class="w"> </span>public-tools/<span class="w">            </span><span class="c1"># Publicly available tools</span>
+├──<span class="w"> </span>course-materials/<span class="w">        </span><span class="c1"># Educational containers</span>
+└──<span class="w"> </span>research-environments/<span class="w">   </span><span class="c1"># General research tools</span>
+
+survey-collaboration/<span class="w">        </span><span class="c1"># Multi-institutional project</span>
+├──<span class="w"> </span>data-processing/<span class="w">         </span><span class="c1"># Survey data pipeline</span>
+├──<span class="w"> </span>analysis-tools/<span class="w">          </span><span class="c1"># Shared analysis software</span>
+└──<span class="w"> </span>visualization/<span class="w">           </span><span class="c1"># Survey-specific viz tools</span>
+
+personal-research/<span class="w">           </span><span class="c1"># Individual development</span>
+├──<span class="w"> </span>experimental/<span class="w">            </span><span class="c1"># Development and testing</span>
+├──<span class="w"> </span>paper-environments/<span class="w">      </span><span class="c1"># Publication reproducibility</span>
+└──<span class="w"> </span>conference-demos/<span class="w">        </span><span class="c1"># Presentation materials</span>
+</code></pre></div>
+<h4 id="naming-conventions">Naming Conventions<a class="headerlink" href="#naming-conventions" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Clear, descriptive names</span>
+radio-interferometry-pipeline
+optical-photometry-tools
+xray-spectral-analysis
+
+<span class="c1"># Version-specific names for major releases</span>
+survey-pipeline-v2
+analysis-environment-2024
+
+<span class="c1"># Environment-specific variants</span>
+ml-environment-gpu
+processing-tools-cpu
+analysis-suite-minimal
+</code></pre></div>
+<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
+<h4 id="registry-performance">Registry Performance<a class="headerlink" href="#registry-performance" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use layer caching effectively</span>
+<span class="c1"># Order Dockerfile instructions by change frequency</span>
+
+<span class="c1"># Use multi-stage builds to reduce final image size</span>
+FROM<span class="w"> </span>ubuntu:24.04<span class="w"> </span>AS<span class="w"> </span>builder
+<span class="c1"># ... build dependencies ...</span>
+FROM<span class="w"> </span>images.canfar.net/skaha/astroml:latest
+COPY<span class="w"> </span>--from<span class="o">=</span>builder<span class="w"> </span>/app/binary<span class="w"> </span>/usr/local/bin/
+
+<span class="c1"># Optimize layer sizes</span>
+RUN<span class="w"> </span>apt-get<span class="w"> </span>update<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>pkg1<span class="w"> </span>pkg2<span class="w"> </span>pkg3<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="o">&amp;&amp;</span><span class="w"> </span>apt-get<span class="w"> </span>clean<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>/var/lib/apt/lists/*
+<span class="c1"># Instead of multiple RUN commands</span>
+</code></pre></div>
+<h4 id="network-optimization">Network Optimization<a class="headerlink" href="#network-optimization" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use Harbor proximity</span>
+<span class="c1"># CANFAR Harbor is optimized for Canadian academic networks</span>
+
+<span class="c1"># Leverage local caching</span>
+<span class="c1"># Images are cached at compute nodes for faster session startup</span>
+
+<span class="c1"># Consider image size for session startup time</span>
+<span class="c1"># Smaller images start faster, especially for batch jobs</span>
+</code></pre></div>
+<h2 id="integration-with-canfar-services">🔗 Integration with CANFAR Services<a class="headerlink" href="#integration-with-canfar-services" title="Permanent link">&para;</a></h2>
+<h3 id="storage-integration">Storage Integration<a class="headerlink" href="#storage-integration" title="Permanent link">&para;</a></h3>
+<p>Containers automatically receive CANFAR storage mounts:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Inside any Harbor-deployed container on CANFAR</span>
+ls<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/<span class="w">        </span><span class="c1"># Personal storage</span>
+ls<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="w">     </span><span class="c1"># Project storage  </span>
+ls<span class="w"> </span>/scratch/<span class="w">                  </span><span class="c1"># Temporary storage</span>
+</code></pre></div>
+<h3 id="authentication-integration">Authentication Integration<a class="headerlink" href="#authentication-integration" title="Permanent link">&para;</a></h3>
+<p>Harbor integrates with CADC authentication:</p>
+<ul>
+<li>Single sign-on with CADC credentials</li>
+<li>Group membership determines project access</li>
+<li>API tokens respect CADC account policies</li>
+<li>Audit logs integrate with CADC security monitoring</li>
+</ul>
+<h2 id="troubleshooting">🆘 Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
+<h4 id="authentication-problems">Authentication Problems<a class="headerlink" href="#authentication-problems" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check Docker login status</span>
+docker<span class="w"> </span>system<span class="w"> </span>info<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-A<span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="s2">&quot;Registry&quot;</span>
+
+<span class="c1"># Clear cached credentials</span>
+docker<span class="w"> </span><span class="nb">logout</span><span class="w"> </span>images.canfar.net
+
+<span class="c1"># Login with explicit credentials</span>
+docker<span class="w"> </span>login<span class="w"> </span>images.canfar.net<span class="w"> </span>-u<span class="w"> </span>username
+
+<span class="c1"># Test authentication</span>
+docker<span class="w"> </span>pull<span class="w"> </span>images.canfar.net/skaha/astroml:latest
+</code></pre></div>
+<h4 id="pushpull-failures">Push/Pull Failures<a class="headerlink" href="#pushpull-failures" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check repository permissions</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Verify image format</span>
+docker<span class="w"> </span>inspect<span class="w"> </span>local-image:tag
+
+<span class="c1"># Check Harbor service status</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/systeminfo&quot;</span>
+</code></pre></div>
+<h4 id="vulnerability-scan-issues">Vulnerability Scan Issues<a class="headerlink" href="#vulnerability-scan-issues" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Manually trigger scan</span>
+curl<span class="w"> </span>-X<span class="w"> </span>POST<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories/image/artifacts/tag/scan&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="c1"># Check scan status</span>
+curl<span class="w"> </span>-X<span class="w"> </span>GET<span class="w"> </span><span class="s2">&quot;https://images.canfar.net/api/v2.0/projects/myteam/repositories/image/artifacts/tag/scan/overview&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Authorization: Basic </span><span class="k">$(</span><span class="nb">echo</span><span class="w"> </span>-n<span class="w"> </span>username:password<span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="k">)</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h3 id="performance-issues">Performance Issues<a class="headerlink" href="#performance-issues" title="Permanent link">&para;</a></h3>
+<h4 id="slow-pushpull-operations">Slow Push/Pull Operations<a class="headerlink" href="#slow-pushpull-operations" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check network connectivity</span>
+ping<span class="w"> </span>images.canfar.net
+
+<span class="c1"># Use Docker BuildKit for faster builds</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">DOCKER_BUILDKIT</span><span class="o">=</span><span class="m">1</span>
+docker<span class="w"> </span>build<span class="w"> </span>.
+
+<span class="c1"># Enable Docker layer caching</span>
+docker<span class="w"> </span>build<span class="w"> </span>--cache-from<span class="o">=</span>images.canfar.net/myteam/image:latest<span class="w"> </span>.
+</code></pre></div>
+<h4 id="large-image-size">Large Image Size<a class="headerlink" href="#large-image-size" title="Permanent link">&para;</a></h4>
+<p><div class="highlight"><pre><span></span><code><span class="c1"># Analyze image layers</span>
+docker<span class="w"> </span><span class="nb">history</span><span class="w"> </span>images.canfar.net/myteam/image:latest
+
+<span class="c1"># Use dive tool for detailed analysis</span>
+dive<span class="w"> </span>images.canfar.net/myteam/image:latest
+
+<span class="c1"># Optimize Dockerfile layers</span>
+<span class="c1"># Combine RUN commands</span>
+<span class="c1"># Remove package caches</span>
+<span class="c1"># Use multi-stage builds</span>
+</code></pre></div>
+```</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2025 00:42:40 UTC">September 5, 2025</span>
+  </span>
+
+    
+    
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Let us know how we can improve this page.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/opencadc/canfar" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/canfar" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://images.canfar.net" target="_blank" rel="noopener" title="images.canfar.net" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/vcCQ8QBvBa" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:support@canfar.net" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M536.4-26.3c9.8-3.5 20.6-1 28 6.3s9.8 18.2 6.3 28l-178 496.9c-5 13.9-18.1 23.1-32.8 23.1-14.2 0-27-8.6-32.3-21.7l-64.2-158c-4.5-11-2.5-23.6 5.2-32.6l94.5-112.4c5.1-6.1 4.7-15-.9-20.6s-14.6-6-20.6-.9l-112.4 94.3c-9.1 7.6-21.6 9.6-32.6 5.2L38.1 216.8c-13.1-5.3-21.7-18.1-21.7-32.3 0-14.7 9.2-27.8 23.1-32.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.instant.progress", "navigation.prune", "navigation.sections", "navigation.tracking", "navigation.indexes", "navigation.expand", "navigation.instant.prefetch", "toc.follow", "navigation.top", "announce.dismiss", "content.code.annotate", "content.action.edit", "content.action.view", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../termynal.js"></script>
+      
+    
+  </body>
+</html>
