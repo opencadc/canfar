@@ -30,6 +30,9 @@ def ls(
 ) -> None:
     """List available images."""
     images = Images().fetch(kind=image_filter)
+    if not images:
+        console.print("[yellow]No images found.[/yellow]")
+        return
 
     table = Table(title="CANFAR Images", box=box.SIMPLE, header_style="bold cyan")
     table.add_column("IMAGE", style="cyan")

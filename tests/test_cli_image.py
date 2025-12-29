@@ -20,3 +20,14 @@ def test_image_ls_outputs_table_and_passes_filter() -> None:
     assert "CANFAR Images" in result.stdout
     assert "images.canfar.net/skaha/base-notebook:latest" in result.stdout
     fetch.assert_called_once_with(kind="notebook")
+
+
+def test_image_ls_no_images_message() -> None:
+    """Ensure image ls reports when no images are available."""
+    with patch("canfar.cli.image.Images.fetch") as fetch:
+        fetch.return_value = []
+
+        result = runner.invoke(cli, ["image", "ls"])
+
+    assert result.exit_code == 0
+    assert "No images found" in result.stdout
