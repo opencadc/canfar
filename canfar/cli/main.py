@@ -9,6 +9,7 @@ from canfar.cli.config import config
 from canfar.cli.create import create
 from canfar.cli.delete import delete
 from canfar.cli.events import events
+from canfar.cli.image import image
 from canfar.cli.info import info
 from canfar.cli.logs import logs
 from canfar.cli.open import open_command
@@ -127,6 +128,14 @@ cli.add_typer(
     help="Show cluster stats",
     no_args_is_help=False,
     rich_help_panel="Cluster Information",
+)
+
+cli.add_typer(
+    image,
+    name="image",
+    help="Manage images",
+    no_args_is_help=True,
+    rich_help_panel="Image Management",
 )
 
 
