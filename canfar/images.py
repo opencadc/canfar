@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 from canfar import get_logger
 from canfar.client import HTTPClient
+from canfar.models.containers import Image
 
 if TYPE_CHECKING:
     from httpx import Response
@@ -47,3 +48,13 @@ class Images(HTTPClient):
         response: Response = self.client.get("image", params=data)
         payload: list[dict[str, str]] = response.json()
         return [str(image["id"]) for image in payload]
+
+    def details(self) -> list[Image]:
+        """Get image details from CANFAR Server.
+
+        Returns:
+            list[Image]: Parsed image details payload from the server.
+        """
+        response: Response = self.client.get("image")
+        payload: list[dict[str, object]] = response.json()
+        return [Image.model_validate(item) for item in payload]
