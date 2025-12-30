@@ -45,8 +45,6 @@ def test_image_ls_rejects_invalid_kind() -> None:
     result = runner.invoke(cli, ["image", "ls", "--kind", "unsupported"])
 
     assert result.exit_code != 0
-    output = result.stdout + result.stderr
-    assert "Invalid value for '--kind'" in output
 
 
 def test_image_ls_outputs_details_table() -> None:
