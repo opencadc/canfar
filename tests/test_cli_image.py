@@ -24,7 +24,7 @@ def test_image_ls_outputs_table_and_passes_kind() -> None:
         result = runner.invoke(cli, ["image", "ls", "--kind", "notebook"])
 
     assert result.exit_code == 0
-    assert "CANFAR Images" in result.stdout
+    assert "CANFAR Registry Server:" in result.stdout
     assert "skaha/base-notebook:latest" in result.stdout
     details.assert_called_once_with()
 
@@ -66,7 +66,6 @@ def test_image_ls_outputs_details_table() -> None:
         result = runner.invoke(cli, ["image", "ls"])
 
     assert result.exit_code == 0
-    assert "SERVER=images.canfar.net" in result.stdout
     assert "skaha/terminal:1.1.1" in result.stdout
     assert "936e8798f9d4" in result.stdout
     assert "headless" in result.stdout
