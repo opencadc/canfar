@@ -2310,16 +2310,16 @@
 <h3 id="medium-files-1-100gb-command-line">Medium Files (1-100GB): Command Line<a class="headerlink" href="#medium-files-1-100gb-command-line" title="Permanent link">&para;</a></h3>
 <h4 id="using-direct-urls-arc-only">Using Direct URLs (ARC only)<a class="headerlink" href="#using-direct-urls-arc-only" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Authenticate first</span>
-cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
+cadc-get-cert<span class="w"> </span>--user<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
 
 <span class="c1"># Upload to ARC Home</span>
-curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-T<span class="w"> </span>myfile.fits<span class="w"> </span><span class="se">\</span>
+curl<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--upload-file<span class="w"> </span>myfile.fits<span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>https://ws-uv.canfar.net/arc/files/home/<span class="o">[</span>user<span class="o">]</span>/myfile.fits
 
 <span class="c1"># Upload to ARC Projects  </span>
-curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-T<span class="w"> </span>myfile.fits<span class="w"> </span><span class="se">\</span>
+curl<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--upload-file<span class="w"> </span>myfile.fits<span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>https://ws-uv.canfar.net/arc/files/projects/<span class="o">[</span>project<span class="o">]</span>/myfile.fits
 </code></pre></div>
 <h4 id="using-vospace-cli">Using VOSpace CLI<a class="headerlink" href="#using-vospace-cli" title="Permanent link">&para;</a></h4>
@@ -2327,7 +2327,7 @@ curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span 
 pip<span class="w"> </span>install<span class="w"> </span>vos
 
 <span class="c1"># Authenticate</span>
-cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
+cadc-get-cert<span class="w"> </span>--user<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
 
 <span class="c1"># Upload to Vault</span>
 vcp<span class="w"> </span>myfile.fits<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/data/
@@ -2345,7 +2345,7 @@ mkdir<span class="w"> </span>~/canfar_mount
 sshfs<span class="w"> </span>-p<span class="w"> </span><span class="m">64022</span><span class="w"> </span><span class="o">[</span>user<span class="o">]</span>@ws-uv.canfar.net:/<span class="w"> </span>~/canfar_mount
 
 <span class="c1"># 2. Sync large datasets with rsync</span>
-rsync<span class="w"> </span>-avzP<span class="w"> </span>--partial<span class="w"> </span><span class="se">\</span>
+rsync<span class="w"> </span>--archive<span class="w"> </span>--verbose<span class="w"> </span>--compress<span class="w"> </span>--progress<span class="w"> </span>--partial<span class="w"> </span><span class="se">\</span>
 <span class="w">      </span>./large_dataset/<span class="w"> </span><span class="se">\</span>
 <span class="w">      </span>~/canfar_mount/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data/
 
@@ -2357,7 +2357,7 @@ umount<span class="w"> </span>~/canfar_mount
 vsync<span class="w"> </span>./local_data/<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/backup/
 
 <span class="c1"># Parallel transfers (faster for many files)</span>
-vcp<span class="w"> </span>--nstreams<span class="o">=</span><span class="m">4</span><span class="w"> </span>large_file.tar<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/archives/
+vsync<span class="w"> </span>--nstreams<span class="o">=</span><span class="m">4</span><span class="w"> </span>large_file.tar<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/archives/
 </code></pre></div>
 <h2 id="download-methods">📥 Download Methods<a class="headerlink" href="#download-methods" title="Permanent link">&para;</a></h2>
 <h3 id="from-arc-storage">From ARC Storage<a class="headerlink" href="#from-arc-storage" title="Permanent link">&para;</a></h3>
@@ -2372,9 +2372,9 @@ vcp<span class="w"> </span>--nstreams<span class="o">=</span><span class="m">4</
 </ol>
 <h4 id="command-line">Command Line<a class="headerlink" href="#command-line" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Direct URL download</span>
-curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
+curl<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>https://ws-uv.canfar.net/arc/files/home/<span class="o">[</span>user<span class="o">]</span>/myfile.fits<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-o<span class="w"> </span>myfile.fits
+<span class="w">     </span>--output<span class="w"> </span>myfile.fits
 
 <span class="c1"># Via VOSpace API</span>
 vcp<span class="w"> </span>arc:home/<span class="o">[</span>user<span class="o">]</span>/myfile.fits<span class="w"> </span>./
@@ -2453,7 +2453,7 @@ vcp<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</sp
 
 <span class="c1"># 3. Save intermediate results to ARC</span>
 <span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Saving calibrated data...&quot;</span>
-mkdir<span class="w"> </span>-p<span class="w"> </span><span class="si">${</span><span class="nv">PROJECT_DIR</span><span class="si">}</span>/calibrated/
+mkdir<span class="w"> </span>--parents<span class="w"> </span><span class="si">${</span><span class="nv">PROJECT_DIR</span><span class="si">}</span>/calibrated/
 cp<span class="w"> </span>cal_*.fits<span class="w"> </span><span class="si">${</span><span class="nv">PROJECT_DIR</span><span class="si">}</span>/calibrated/
 
 <span class="c1"># 4. Further analysis</span>
@@ -2474,7 +2474,7 @@ vcp<span class="w"> </span><span class="si">${</span><span class="nv">PROJECT_DI
 <h3 id="transfer-speed-optimization">Transfer Speed Optimization<a class="headerlink" href="#transfer-speed-optimization" title="Permanent link">&para;</a></h3>
 <h4 id="for-many-small-files">For Many Small Files<a class="headerlink" href="#for-many-small-files" title="Permanent link">&para;</a></h4>
 <div class="highlight"><pre><span></span><code><span class="c1"># Bundle small files into archives</span>
-tar<span class="w"> </span>-czf<span class="w"> </span>analysis_scripts.tar.gz<span class="w"> </span>scripts/
+tar<span class="w"> </span>--create<span class="w"> </span>--gzip<span class="w"> </span>--file<span class="w"> </span>analysis_scripts.tar.gz<span class="w"> </span>scripts/
 vcp<span class="w"> </span>analysis_scripts.tar.gz<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/code/
 
 <span class="c1"># Use directory sync instead of individual copies</span>
@@ -2500,7 +2500,7 @@ ping<span class="w"> </span>ws-uv.canfar.net
 ERROR::<span class="w"> </span>Expired<span class="w"> </span>cert.<span class="w"> </span>Update<span class="w"> </span>by<span class="w"> </span>running<span class="w"> </span>cadc-get-cert
 
 <span class="c1"># Solution: Refresh certificate</span>
-cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
+cadc-get-cert<span class="w"> </span>--user<span class="w"> </span><span class="o">[</span>user<span class="o">]</span>
 
 <span class="c1"># Check certificate validity</span>
 cadc-get-cert<span class="w"> </span>--days-valid
@@ -2564,7 +2564,7 @@ cadc-get-cert<span class="w"> </span>--days-valid
 </ul>
 <h3 id="post-transfer-verification">Post-Transfer Verification<a class="headerlink" href="#post-transfer-verification" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Verify file integrity</span>
-vls<span class="w"> </span>-l<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/transferred_file.fits<span class="w">  </span><span class="c1"># Check size and timestamp</span>
+vls<span class="w"> </span>--long<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/transferred_file.fits<span class="w">  </span><span class="c1"># Check size and timestamp</span>
 
 <span class="c1"># Compare checksums (if available)</span>
 vcp<span class="w"> </span>--head<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/data.fits<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>MD5
@@ -2618,28 +2618,28 @@ python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;f
 <span class="c1"># Download input data</span>
 vcp<span class="w"> </span>vos:project/input_data.tar.gz<span class="w"> </span>/scratch/
 <span class="nb">cd</span><span class="w"> </span>/scratch
-tar<span class="w"> </span>-xzf<span class="w"> </span>input_data.tar.gz
+tar<span class="w"> </span>--extract<span class="w"> </span>--gzip<span class="w"> </span>--file<span class="w"> </span>input_data.tar.gz
 
 <span class="c1"># Process data</span>
 python<span class="w"> </span>analysis.py<span class="w"> </span>input_data/
 
 <span class="c1"># Upload results</span>
-tar<span class="w"> </span>-czf<span class="w"> </span>results_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.tar.gz<span class="w"> </span>results/
+tar<span class="w"> </span>--create<span class="w"> </span>--gzip<span class="w"> </span>--file<span class="w"> </span>results_<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>.tar.gz<span class="w"> </span>results/
 vcp<span class="w"> </span>results_*.tar.gz<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/job_outputs/
 
 <span class="c1"># Cleanup</span>
-rm<span class="w"> </span>-rf<span class="w"> </span>/scratch/*
+rm<span class="w"> </span>--recursive<span class="w"> </span>--force<span class="w"> </span>/scratch/*
 </code></pre></div>
 <h3 id="external-data-import">External Data Import<a class="headerlink" href="#external-data-import" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Download from astronomical archives</span>
-wget<span class="w"> </span>-O<span class="w"> </span>survey_data.fits<span class="w"> </span><span class="s2">&quot;https://archive.eso.org/...&quot;</span>
+wget<span class="w"> </span>--output-document<span class="o">=</span>survey_data.fits<span class="w"> </span><span class="s2">&quot;https://archive.eso.org/...&quot;</span>
 
 <span class="c1"># Upload to CANFAR</span>
 vcp<span class="w"> </span>survey_data.fits<span class="w"> </span>vos:<span class="o">[</span>user<span class="o">]</span>/external_data/
 
 <span class="c1"># Or direct to project space</span>
-curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
-<span class="w">     </span>-T<span class="w"> </span>survey_data.fits<span class="w"> </span><span class="se">\</span>
+curl<span class="w"> </span>--cert<span class="w"> </span>~/.ssl/cadcproxy.pem<span class="w"> </span><span class="se">\</span>
+<span class="w">     </span>--upload-file<span class="w"> </span>survey_data.fits<span class="w"> </span><span class="se">\</span>
 <span class="w">     </span>https://ws-uv.canfar.net/arc/files/projects/<span class="o">[</span>project<span class="o">]</span>/survey_data.fits
 </code></pre></div>
 
@@ -2664,7 +2664,7 @@ curl<span class="w"> </span>-E<span class="w"> </span>~/.ssl/cadcproxy.pem<span 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 13, 2026 17:29:12 UTC">January 13, 2026</span>
   </span>
 
     
