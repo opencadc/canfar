@@ -62,16 +62,16 @@ Note on a notebook session you can also use the JupyterLab **Upload** button.
 
 ```bash
 # Authenticate first
-cadc-get-cert -u [user]
+cadc-get-cert --user [user]
 
 # Upload to ARC Home
-curl -E ~/.ssl/cadcproxy.pem \
-     -T myfile.fits \
+curl --cert ~/.ssl/cadcproxy.pem \
+     --upload-file myfile.fits \
      https://ws-uv.canfar.net/arc/files/home/[user]/myfile.fits
 
 # Upload to ARC Projects  
-curl -E ~/.ssl/cadcproxy.pem \
-     -T myfile.fits \
+curl --cert ~/.ssl/cadcproxy.pem \
+     --upload-file myfile.fits \
      https://ws-uv.canfar.net/arc/files/projects/[project]/myfile.fits
 ```
 
@@ -82,7 +82,7 @@ curl -E ~/.ssl/cadcproxy.pem \
 pip install vos
 
 # Authenticate
-cadc-get-cert -u [user]
+cadc-get-cert --user [user]
 
 # Upload to Vault
 vcp myfile.fits vos:[user]/data/
@@ -104,7 +104,7 @@ mkdir ~/canfar_mount
 sshfs -p 64022 [user]@ws-uv.canfar.net:/ ~/canfar_mount
 
 # 2. Sync large datasets with rsync
-rsync -avzP --partial \
+rsync --archive --verbose --compress --progress --partial \
       ./large_dataset/ \
       ~/canfar_mount/arc/projects/[project]/data/
 
@@ -119,7 +119,7 @@ umount ~/canfar_mount
 vsync ./local_data/ vos:[user]/backup/
 
 # Parallel transfers (faster for many files)
-vcp --nstreams=4 large_file.tar vos:[user]/archives/
+vsync --nstreams=4 large_file.tar vos:[user]/archives/
 ```
 
 ## 📥 Download Methods
@@ -139,9 +139,9 @@ vcp --nstreams=4 large_file.tar vos:[user]/archives/
 
 ```bash
 # Direct URL download
-curl -E ~/.ssl/cadcproxy.pem \
+curl --cert ~/.ssl/cadcproxy.pem \
      https://ws-uv.canfar.net/arc/files/home/[user]/myfile.fits \
-     -o myfile.fits
+     --output myfile.fits
 
 # Via VOSpace API
 vcp arc:home/[user]/myfile.fits ./
@@ -241,7 +241,7 @@ done
 
 # 3. Save intermediate results to ARC
 echo "Saving calibrated data..."
-mkdir -p ${PROJECT_DIR}/calibrated/
+mkdir --parents ${PROJECT_DIR}/calibrated/
 cp cal_*.fits ${PROJECT_DIR}/calibrated/
 
 # 4. Further analysis
@@ -267,7 +267,7 @@ echo "Pipeline completed successfully!"
 
 ```bash
 # Bundle small files into archives
-tar -czf analysis_scripts.tar.gz scripts/
+tar --create --gzip --file analysis_scripts.tar.gz scripts/
 vcp analysis_scripts.tar.gz vos:[user]/code/
 
 # Use directory sync instead of individual copies
@@ -302,7 +302,7 @@ time vcp test_file.fits vos:[user]/speed_test/
 ERROR:: Expired cert. Update by running cadc-get-cert
 
 # Solution: Refresh certificate
-cadc-get-cert -u [user]
+cadc-get-cert --user [user]
 
 # Check certificate validity
 cadc-get-cert --days-valid
@@ -376,7 +376,7 @@ if __name__ == "__main__":
 
 ```bash
 # Verify file integrity
-vls -l vos:[user]/transferred_file.fits  # Check size and timestamp
+vls --long vos:[user]/transferred_file.fits  # Check size and timestamp
 
 # Compare checksums (if available)
 vcp --head vos:[user]/data.fits | grep MD5
@@ -441,30 +441,30 @@ shutil.copy('/arc/projects/[project]/data.fits', '/scratch/')
 # Download input data
 vcp vos:project/input_data.tar.gz /scratch/
 cd /scratch
-tar -xzf input_data.tar.gz
+tar --extract --gzip --file input_data.tar.gz
 
 # Process data
 python analysis.py input_data/
 
 # Upload results
-tar -czf results_$(date +%Y%m%d).tar.gz results/
+tar --create --gzip --file results_$(date +%Y%m%d).tar.gz results/
 vcp results_*.tar.gz vos:[user]/job_outputs/
 
 # Cleanup
-rm -rf /scratch/*
+rm --recursive --force /scratch/*
 ```
 
 ### External Data Import
 
 ```bash
 # Download from astronomical archives
-wget -O survey_data.fits "https://archive.eso.org/..."
+wget --output-document=survey_data.fits "https://archive.eso.org/..."
 
 # Upload to CANFAR
 vcp survey_data.fits vos:[user]/external_data/
 
 # Or direct to project space
-curl -E ~/.ssl/cadcproxy.pem \
-     -T survey_data.fits \
+curl --cert ~/.ssl/cadcproxy.pem \
+     --upload-file survey_data.fits \
      https://ws-uv.canfar.net/arc/files/projects/[project]/survey_data.fits
 ```
