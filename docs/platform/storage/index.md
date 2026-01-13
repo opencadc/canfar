@@ -13,7 +13,7 @@ CANFAR provides four distinct storage systems, each optimized for different stag
 
 | Storage         | Path/URI                  | Access (Session/External)      | Speed               | Persistence & Backup      | Default Quota                 | Best For                                       |
 |-----------------|---------------------------|--------------------------------|---------------------|---------------------------|-------------------------------|------------------------------------------------|
-| **Scratch**     | `/scratch`                | Direct FS / N/A                | Fastest (local SSD) | Ephemeral (no backup)     | ~100GB (per session)          | High-speed temporary processing, staging I/O.  |
+| **Scratch**     | `/scratch`                | Direct FS / N/A                | Fastest (local SSD) | Ephemeral (no backup)     | ~200GB (per session)          | High-speed temporary processing, staging I/O.  |
 | **ARC Home**    | `/arc/home/[user]`        | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 10GB                          | Personal configs, scripts, small files.        |
 | **ARC Projects**| `/arc/projects/[project]` | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 200GB                         | Active collaborative research data and results.|
 | **Vault**       | `vos:[project|user]`      | API / Web UI                   | Medium              | Permanent (geo-redundant) | Project-dependent             | Long-term archives, sharing, publication.      |
