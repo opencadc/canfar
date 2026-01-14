@@ -227,6 +227,7 @@ nav:
         - Context: client/context.md
         - Overview: client/overview.md
         - HTTPClient: client/client.md
+        - VOSpaceClient: client/vospace.md
         - Helpers: client/helpers.md
     - CLI:
       - 5-Minute Tutorial: cli/quick-start.md
