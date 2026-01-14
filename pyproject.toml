@@ -52,6 +52,7 @@ dependencies = [
     "segno>=1.6.6",
     "toml>=0.10.2",
     "typer>=0.16.0",
+    "vostools>=3.5.1",
 ]
 
 [tool.uv]
