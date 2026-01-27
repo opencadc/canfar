@@ -180,15 +180,37 @@ pip show -f fireducks           # Should show ~/.local/lib/python*/
 !!! tip "GPU Support"
     For GPU acceleration, use the `astroml-cuda` container which extends `astroml` with CUDA libraries and GPU-enabled `pytorch`, `pyarrow`, and many other CUDA-capable libraries.
 
-### Desktop Application Sessions
+### Desktop Container
 
-Desktop sessions integrate containers in two ways:
+There is a single Desktop container maintained by CANFAR that provides a full Ubuntu desktop environment with GUI applications like Firefox, file managers, and terminal access. This container is ideal for workflows requiring graphical interfaces, such as legacy astronomy software or interactive data visualization tools.
 
-#### 1. Base Desktop Container
+The Desktop Session provides access to the full desktop environment through a VNC connection in your browser via a web-based VNC client.
 
-The core **desktop** container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session as a `noVNC` web application. Each desktop application will run and communicate with this desktop session.
+#### Technical Details
+Given that Desktop Application run in their own containers in the cluster (see [below](#desktop-app-containers)), the Desktop Session is hard-coded with low resource requirements:
+```yaml
+resources:
+    requests:
+        memory: "1Gi"
+        cpu: "250m"
+        ephemeral-storage: "2Gi"
+    limits:
+        memory: "4Gi"
+        cpu: "1"
+        ephemeral-storage: "10Gi"
+```
 
-#### 2. Desktop-App Containers
+The Desktop container uses SupervisorD to manage two main processes:
+- [TigerVNC](https://tigervnc.org/) server for remote desktop access
+- [noVNC](https://novnc.com/info.html) web client for browser-based access
+  - The noVNC client connects to the TigerVNC server over WebSockets, and has a slightly customized interface to better fit within the CANFAR web portal.
+  
+Other technical features:
+- X11 with remote sharing enabled to allow multiple simultaneous connections to the same desktop session (through `xhost`).  Wayland support is disabled.
+- Ubuntu 24.04 LTS base with standard desktop packages and CANFAR-specific configurations.
+- Auto (remote) resize of the desktop session to fit the browser window.
+
+#### Desktop-App Containers
 
 Specialised containers that run specific GUI applications within desktop sessions.
 
