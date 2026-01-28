@@ -1,17 +1,31 @@
-FROM python:3.13-alpine@sha256:18159b2be11db91f84b8f8f655cd860f805dbd9e49a583ddaac8ab39bf4fe1a7 AS base
+# syntax=docker/dockerfile:1
 
-FROM base AS builder
-COPY . /canfar
-WORKDIR /canfar
+# renovate: datasource=docker depName=ghcr.io/astral-sh/uv versioning=semver
+FROM ghcr.io/astral-sh/uv:alpine AS uv
 
-# Install UV
-RUN set -ex \
-    && apk add --no-cache curl \
-    && curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && source $HOME/.local/bin/env \
-    && uv build
+# renovate: datasource=docker depName=python versioning=python
+FROM python:alpine AS builder
 
-FROM base AS production
-COPY --from=builder /canfar/dist /canfar/dist
-RUN pip install --no-cache-dir /canfar/dist/*.whl
-CMD ["/bin/sh", "-c", "canfar"]
+WORKDIR /build
+
+COPY --from=uv /usr/local/bin/uv /usr/local/bin/uv
+COPY --from=uv /usr/local/bin/uvx /usr/local/bin/uvx
+
+COPY pyproject.toml uv.lock README.md LICENSE ./
+COPY canfar/ ./canfar/
+
+RUN uv build --wheel --out-dir /dist \
+    && uv pip install --prefix=/install /dist/*.whl
+
+# renovate: datasource=docker depName=python versioning=python
+FROM python:alpine AS runtime
+
+LABEL org.opencontainers.image.title="CANFAR Python CLI" \
+      org.opencontainers.image.description="CLI for CANFAR Science Platform" \
+      org.opencontainers.image.vendor="Canadian Astronomy Data Centre" \
+      org.opencontainers.image.source="https://github.com/opencadc/canfar" \
+      org.opencontainers.image.licenses="AGPL-3.0-or-later"
+
+COPY --from=builder /install /usr/local
+
+CMD ["canfar"]
