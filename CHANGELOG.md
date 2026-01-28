@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.3.0](https://github.com/opencadc/canfar/compare/v1.2.0...v1.3.0) (2026-01-28)
+
+
+### Features
+
+* add image ls CLI command ([1343a13](https://github.com/opencadc/canfar/commit/1343a1312148000c57e8fa375a81af0817dd06e4))
+* handle empty image list ([249e8a3](https://github.com/opencadc/canfar/commit/249e8a3ed0f2d88a0b9bcaec312ebd2ff547fb25))
+
+
+### Bug Fixes
+
+* **cli:** image ([f46d0dd](https://github.com/opencadc/canfar/commit/f46d0dd3dfdf696984f4bb188736aadb494f7ce9))
+* **cli:** image ([e4e16a7](https://github.com/opencadc/canfar/commit/e4e16a72aa41b5ab2007d1d7e7e949f41ce56840))
+* **cli:** images ([c6a9d04](https://github.com/opencadc/canfar/commit/c6a9d0414c1efced88aefe10b1c11532cd4f6d61))
+* **package:** updated dockerfile and build ([a3cbe1b](https://github.com/opencadc/canfar/commit/a3cbe1b9de647f158341186a46f2d6ab8283a0f3))
+
+
+### Documentation
+
+* documentation corrections and clarity with long switches ([8873395](https://github.com/opencadc/canfar/commit/887339515817c4e69ce64893dba0ff1df8659b56))
+
 ## [1.2.0](https://github.com/opencadc/canfar/compare/v1.1.1...v1.2.0) (2025-12-22)
 
 

@@ -16,6 +16,6 @@ set_log_level(LOG_LEVEL)
 
 # Kept in sync with pyproject.toml by release-please
 # DO NOT EDIT MANUALLY
-__version__: str = "1.2.0"  # x-release-please-version
+__version__: str = "1.3.0"  # x-release-please-version
 
 __all__ = ["__version__", "configure_logging", "get_logger", "set_log_level"]
