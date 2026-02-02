@@ -2164,11 +2164,30 @@ pip<span class="w"> </span>show<span class="w"> </span>-f<span class="w"> </span
 <p class="admonition-title">GPU Support</p>
 <p>For GPU acceleration, use the <code>astroml-cuda</code> container which extends <code>astroml</code> with CUDA libraries and GPU-enabled <code>pytorch</code>, <code>pyarrow</code>, and many other CUDA-capable libraries.</p>
 </div>
-<h3 id="desktop-application-sessions">Desktop Application Sessions<a class="headerlink" href="#desktop-application-sessions" title="Permanent link">&para;</a></h3>
-<p>Desktop sessions integrate containers in two ways:</p>
-<h4 id="1-base-desktop-container">1. Base Desktop Container<a class="headerlink" href="#1-base-desktop-container" title="Permanent link">&para;</a></h4>
-<p>The core <strong>desktop</strong> container provides the Ubuntu desktop environment with Firefox, file managers, and terminals. This runs as your main desktop session as a <code>noVNC</code> web application. Each desktop application will run and communicate with this desktop session.</p>
-<h4 id="2-desktop-app-containers">2. Desktop-App Containers<a class="headerlink" href="#2-desktop-app-containers" title="Permanent link">&para;</a></h4>
+<h3 id="desktop-container">Desktop Container<a class="headerlink" href="#desktop-container" title="Permanent link">&para;</a></h3>
+<p>There is a single Desktop container maintained by CANFAR that provides a full Ubuntu desktop environment with GUI applications like Firefox, file managers, and terminal access. This container is ideal for workflows requiring graphical interfaces, such as legacy astronomy software or interactive data visualization tools.</p>
+<p>The Desktop Session provides access to the full desktop environment through a VNC connection in your browser via a web-based VNC client.</p>
+<h4 id="technical-details">Technical Details<a class="headerlink" href="#technical-details" title="Permanent link">&para;</a></h4>
+<p>Given that Desktop Application run in their own containers in the cluster (see <a href="#desktop-app-containers">below</a>), the Desktop Session is hard-coded with low resource requirements:
+<div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">requests</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1Gi&quot;</span>
+<span class="w">        </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;250m&quot;</span>
+<span class="w">        </span><span class="nt">ephemeral-storage</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;2Gi&quot;</span>
+<span class="w">    </span><span class="nt">limits</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">memory</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;4Gi&quot;</span>
+<span class="w">        </span><span class="nt">cpu</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;1&quot;</span>
+<span class="w">        </span><span class="nt">ephemeral-storage</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;10Gi&quot;</span>
+</code></pre></div></p>
+<p>The Desktop container uses SupervisorD to manage two main processes:
+- <a href="https://tigervnc.org/">TigerVNC</a> server for remote desktop access
+- <a href="https://novnc.com/info.html">noVNC</a> web client for browser-based access
+  - The noVNC client connects to the TigerVNC server over WebSockets, and has a slightly customized interface to better fit within the CANFAR web portal.</p>
+<p>Other technical features:
+- X11 with remote sharing enabled to allow multiple simultaneous connections to the same desktop session (through <code>xhost</code>).  Wayland support is disabled.
+- Ubuntu 24.04 LTS base with standard desktop packages and CANFAR-specific configurations.
+- Auto (remote) resize of the desktop session to fit the browser window.</p>
+<h4 id="desktop-app-containers">Desktop-App Containers<a class="headerlink" href="#desktop-app-containers" title="Permanent link">&para;</a></h4>
 <p>Specialised containers that run specific GUI applications within desktop sessions.</p>
 <p><strong>Requirements for desktop-app containers:</strong></p>
 <ol>
@@ -2496,7 +2515,7 @@ images.canfar.net/skaha/astroml:a1b2c3d4
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2025 20:50:41 UTC">September 16, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="January 27, 2026 19:37:34 UTC">January 27, 2026</span>
   </span>
 
     
