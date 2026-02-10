@@ -1,0 +1,60 @@
+[data-md-color-scheme="canfar"] {
+  --md-primary-fg-color:               #005493;
+  --md-accent-fg-color:                #F5AA1C;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 210;
+  --md-primary-fg-color: #005493;
+  --md-accent-fg-color: #F5AA1C;
+}
+
+@keyframes heart {
+  0%, 40%, 80%, 100% {
+    transform: scale(1);
+  }
+  20%, 60% {
+    transform: scale(1.15);
+  }
+}
+.heart {
+  animation: heart 1000ms infinite;
+}
+
+/* Indentation for nested items in the primary sidebar navigation */
+:root {
+  /* Tune this to increase/decrease the indent */
+  --canfar-nav-indent: 0.6rem;
+  --canfar-nav-border-color: var(--md-default-fg-color--lighter);
+}
+
+/* Clear active page: color only (no left bar, no bold) */
+:root {
+  --canfar-nav-active-color: var(--md-accent-fg-color);
+}
+
+/* Current page link and its parent trail */
+.md-sidebar--primary .md-nav--primary .md-nav__link--active,
+.md-sidebar--primary .md-nav--primary .md-nav__item--active > .md-nav__link,
+.md-sidebar--primary .md-nav--primary .md-nav__item--active > label.md-nav__link,
+.md-sidebar--primary .md-nav--primary a.md-nav__link[aria-current="page"],
+.md-sidebar--primary .md-nav--primary a.md-nav__link[aria-current="location"] {
+  color: var(--canfar-nav-active-color);
+}
+
+/* Indent nested nav via container padding (no borders) */
+.md-sidebar--primary .md-nav--primary .md-nav__item > .md-nav {
+  margin-left: 0;
+  padding-left: var(--canfar-nav-indent);
+}
+
+/* Reset link padding so text aligns with the container indent */
+.md-sidebar--primary .md-nav--primary .md-nav__item > .md-nav .md-nav__link {
+  padding-left: 0;
+}
+
+/* Custom styles for dark mode */
+[data-md-color-scheme="slate"] { /* Target the dark mode scheme */
+  --md-typeset-a-color: #57B7E7; /* Example: light blue for links */
+  --md-typeset-a-hl-color: #BEE7F9; /* Example: lighter blue for hover */
+}
