@@ -3,5 +3,12 @@
     "version": "edge",
     "title": "edge",
     "aliases": []
+  },
+  {
+    "version": "v1.3.0",
+    "title": "v1.3.0",
+    "aliases": [
+      "latest"
+    ]
   }
 ]
