@@ -1,6 +1,7 @@
 # CANFAR Releases
 
 !!! abstract "CanfarSP Releases"
+    - Feb 26, 2026 **[2026.1](2026-1.md)**
     - Nov 25, 2025 **[2025.2](2025-2.md)**
     - Sept 9, 2025 **[2025.1](2025-1.md)**
 
