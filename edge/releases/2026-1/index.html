@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#canfar-science-platform-release-20261-date-tbd" class="md-skip">
+        <a href="#canfar-science-platform-release-20261-february-26-2026" class="md-skip">
           Skip to content
         </a>
       
@@ -1987,10 +1987,16 @@
   
 
 
-<h1 id="canfar-science-platform-release-20261-date-tbd">CANFAR Science Platform Release 2026.1 - Date TBD<a class="headerlink" href="#canfar-science-platform-release-20261-date-tbd" title="Permanent link">&para;</a></h1>
+<h1 id="canfar-science-platform-release-20261-february-26-2026">CANFAR Science Platform Release 2026.1 - February 26, 2026<a class="headerlink" href="#canfar-science-platform-release-20261-february-26-2026" title="Permanent link">&para;</a></h1>
 <div class="admonition success">
-<p class="admonition-title">CanfarSP 2026.1 - Date TBD</p>
+<p class="admonition-title">CanfarSP 2026.1 - February 26, 2026</p>
 <h3 id="features">✨ Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p>Updated <strong>Desktop</strong> and <strong>Desktop Terminal</strong> — The CANFAR Desktop session and the associated Desktop Terminal (1.2.0) have been updated and refreshed.  The previous version of the Terminal (1.1.2) is still available from the drop-down menu under: Applications → AstroSoftware → skaha</p>
+</li>
+<li>
+<p>In the <strong>CANFAR CLI</strong> and <strong>Python Library</strong></p>
 <ul>
 <li><strong>Active Server Context</strong> — Every <code>canfar</code> cli command now shows the active server context (<code>@&lt;server-name&gt;</code>) in the CLI output.</li>
 <li><strong>New CLI Commands</strong> — <code>canfar config get/set</code> to retrieve and update configuration values with dotted paths with editing YAML by hand. For example:<ul>
@@ -2002,21 +2008,54 @@
 <li><strong>Configurable CLI Width</strong> — control table and log/event output width via configuration parameter <code>console.width</code> which can be set via <code>canfar config set console.width 160</code>.</li>
 <li><strong>Regex-aware prune</strong> — <code>canfar prune</code> now accepts literal prefixes or regex patterns for bulk cleanup.</li>
 </ul>
+</li>
+<li>
+<p><strong>CVMFS</strong> enabled — All sessions and jobs now have access to the CernVM File System, providing instant access to software stacks maintained by the <strong>Digital Research Alliance of Canada (Alliance)</strong>. <a href="https://www.opencadc.org/canfar/latest/platform/cvmfs/">More on using CVMFS on CANFAR.</a></p>
+</li>
+<li>
+<p>New <strong>WebTerminal</strong> image available under contributed sessions.  A simple but affective way to interact with your data in CANFAR, based on <code>ttyd</code></p>
+</li>
+<li>
+<p><strong>Scripting functions</strong> now available on <strong>CARTA sessions</strong>.  Like with Firefly sessions, you can now programatically interact with your CARTA sessions through the CARTA API.  See the documentation on <a href="https://www.opencadc.org/canfar/latest/platform/sessions/#api-access-to-sessions">Session API Access</a> for more information.</p>
+</li>
+</ul>
 <h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>On the Science Portal, Desktop sessions won't be available until fully intialized, thus avoiding the "503 Service Unavailable" message that would occur for about 30 seconds.</li>
+<li>
+<p>An issue was fixed where, in the SRCNet deployments, the incorrect userid was sometimes shown on the Science Portal.</p>
+</li>
+<li>
+<p>CANFAR CLI and Python Library bug fixes:</p>
 <ul>
 <li><strong>Pending Session Open</strong> — <code>canfar open</code> now skip <code>Pending</code> sessions and warn until they are <code>Running</code>.</li>
 <li><strong>Improved Timeout + HTTP Error Messages</strong> — clearer diagnostics for stalled or failing requests (sync and async clients), including replica creation workflows.</li>
 <li><strong>Logging fallback</strong> — CLI logging falls back to a temp directory when the default log path is not writable.</li>
+<li><code>canfar ps</code> reporting correct values and match with those reported by top</li>
+</ul>
+</li>
 </ul>
 <h3 id="technical-changes">⚙️ Technical Changes<a class="headerlink" href="#technical-changes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>
+<p><strong>eBackwards Compatability Note: Removal of the skaha API 'v0' endpoint</strong> — The v0 endpoint of skaha was replaced by v1 in the CanfarSP 2025.1 release of September 2025. v0 continued in parallel with v1 for the last few months, but has now been removed. This change only affects people with clients or scripts that communicate with the API directly (e.g. with curl), not those using the Science Portal or the canfar CLI and python package which all use v1. If there are any remaining users of the old skaha python package (that uses v0), they should update their workflows with the new canfar package: <code>pip install --upgrade canfar</code></p>
+</li>
+<li>
+<p>CANFAR CLI and Python Library:</p>
 <ul>
 <li><strong>Destroy-with matching</strong> — <code>destroy_with</code> uses regex when metacharacters are present, otherwise a literal prefix.</li>
 <li><strong>Shared console output</strong> — CLI commands now use a single Rich console configured from <code>canfar.utils.console</code>, and always shows the active server context.</li>
 <li><strong>Registry discovery updates</strong> — expanded SRCNet registry names/endpoints (Australia, SKAO, Italy-CINECA) and excluded preprod endpoints.</li>
 </ul>
+</li>
+</ul>
 <h3 id="deployment-notes">📦 Deployment Notes<a class="headerlink" href="#deployment-notes" title="Permanent link">&para;</a></h3>
 <ul>
-<li>TBD</li>
+<li>Initial values for flexible jobs now configurable in the skaha helm charts</li>
+<li>Logos on the CANFAR Portal can be customized.  SRCNet nodes can brand their portals with the national logos.</li>
+<li>Removal of the skaha/v0 API endpoint</li>
+<li>Official CVMFS support (must also be supported in your kubernetes infrastructure).</li>
+<li>The CANFAR Portal reflects image registry options when multiple are configured</li>
 </ul>
 <h4 id="python-client-cli">Python Client &amp; CLI<a class="headerlink" href="#python-client-cli" title="Permanent link">&para;</a></h4>
 <table>
@@ -2104,7 +2143,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 22, 2025 23:11:56 UTC">December 22, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="February 25, 2026 19:38:46 UTC">February 25, 2026</span>
   </span>
 
     
