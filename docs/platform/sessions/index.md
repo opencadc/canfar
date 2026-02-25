@@ -170,3 +170,14 @@ Sessions inherit your [CANFAR permissions](../permissions.md):
 **Large-Scale Processing** → **[Batch Sessions](batch.md)**
 :   Automated workflows for processing large datasets without interactive interfaces
 
+### API Access to Sessions
+
+If you have a session running and it exposes an API, you can programatically
+interact with it remotely, either from another session or from your laptop.
+
+The base of the session API will be available at the session URL.  For more
+details, consult the API docs for each of the session types:
+- [CARTA API Docs](https://carta-python.readthedocs.io/en/latest/quickstart.html#opening-and-appending-images)
+- [Firefly API Docs](https://caltech-ipac.github.io/firefly_client/)
+- [JupyterLab API Docs](https://jupyterlab-server.readthedocs.io/en/latest/api/rest.html)
+
