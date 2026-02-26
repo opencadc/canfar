@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.3.1](https://github.com/opencadc/canfar/compare/v1.3.0...v1.3.1) (2026-02-26)
+
+
+### Bug Fixes
+
+* **ci:** added timeouts to workflows and fixed Dockerfile ([a6ec24b](https://github.com/opencadc/canfar/commit/a6ec24bcfa747dc790e833cd580c3436afa1dc7d))
+* **dockerfile:** added healthcheck ([95c6e05](https://github.com/opencadc/canfar/commit/95c6e051c53b39718b9628325f7ead8e413267eb))
+
+
+### Documentation
+
+* **2026.1-release-notes:** Docs ready for review ([44a97bf](https://github.com/opencadc/canfar/commit/44a97bfe6d046834b9a3c1dcde15b003d00620a2))
+* **2026.1-release-notes:** First draft of release 2026.1 release notes ([3f98fc9](https://github.com/opencadc/canfar/commit/3f98fc94bc0200b913e5dbd3abf3213ccd7ce595))
+* add comprehensive CVMFS software repository guide ([7ee0e1e](https://github.com/opencadc/canfar/commit/7ee0e1e425605b47263824f660b9f6c2c94223d9))
+* **New-Session-API-section:** Draft for new section describing how to use the API of some interactive sessions ([d1dae3e](https://github.com/opencadc/canfar/commit/d1dae3eb7377d73344f2dee7f54c469f37eb572f))
+* refine CVMFS guide for beginner and advanced users ([da02025](https://github.com/opencadc/canfar/commit/da020257065eaff85f2d4f2b1cd7a26d570c5bac))
+* update release versions ([8fffcde](https://github.com/opencadc/canfar/commit/8fffcded8c9a5ce024c600b91b1a35655151f361))
+
 ## [1.3.0](https://github.com/opencadc/canfar/compare/v1.2.0...v1.3.0) (2026-02-10)
 
 
