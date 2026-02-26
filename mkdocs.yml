@@ -205,9 +205,9 @@ nav:
       - FAQ: platform/support/faq.md
     - Releases:
       - CANFAR Releases: releases/releases.md
+      - 2026.1: releases/2026-1.md
       - 2025.2: releases/2025-2.md
       - 2025.1: releases/2025-1.md
-      - 2026.1: releases/2026-1.md
   - Client:
     - Home: client/home.md
     - Authentication: cli/authentication-contexts.md
