@@ -357,7 +357,7 @@ chmod -R g+rw shared_directory/
 
 Group membership is managed through CANFAR's Group Management system:
 
-1. **Navigate to**: [Group Management](https://www.canfar.net/groups/)
+1. **Navigate to**: [Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
 2. **Create or modify groups**: Add/remove users from project groups
 3. **Apply permissions**: Use `chgrp` to assign files to groups
 
@@ -407,7 +407,7 @@ rsync -avz --progress ~/local_data/ /arc/projects/[project]/backup/
 iostat -x 1    # Live I/O statistics
 iotop          # Process I/O usage
 
-# Optimize for large files
+# Optimise for large files
 # Use /scratch/ for intensive processing
 cp /arc/projects/[project]/large_dataset.fits /scratch/
 process_data /scratch/large_dataset.fits
@@ -417,7 +417,7 @@ cp /scratch/results.fits /arc/projects/[project]/outputs/
 #### SSHFS Performance Tips
 
 ```bash
-# Optimize SSHFS for different use cases
+# Optimise SSHFS for different use cases
 
 # For frequent small file access:
 sshfs -o cache=yes,kernel_cache,attr_timeout=3600,entry_timeout=3600 \

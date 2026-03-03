@@ -144,7 +144,7 @@ Click **Publish** in the DPS interface to:
 **Best Practices:**
 
 - Include a top-level README describing package layout and usage instructions
-- Organize files in logical subdirectories (e.g., `raw_data/`, `processed/`, `scripts/`, `figures/`)
+- Organise files in logical subdirectories (e.g., `raw_data/`, `processed/`, `scripts/`, `figures/`)
 - Use descriptive filenames and provide metadata where appropriate
 
 ### Upload Methods

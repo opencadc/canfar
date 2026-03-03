@@ -17,7 +17,7 @@ Harbor serves as CANFAR's container registry, providing a secure, feature-rich p
 
 ### What is Harbor?
 
-Harbor is an open-source container registry that provides:
+[Harbor](https://goharbor.io/) is an open-source container registry that provides:
 
 - **Secure storage**: Role-based access control and authentication integration
 - **Image management**: Tagging, versioning, and metadata handling
@@ -717,7 +717,7 @@ FROM ubuntu:24.04 AS builder
 FROM images.canfar.net/skaha/astroml:latest
 COPY --from=builder /app/binary /usr/local/bin/
 
-# Optimize layer sizes
+# Optimise layer sizes
 RUN apt-get update && apt-get install -y pkg1 pkg2 pkg3 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 # Instead of multiple RUN commands
@@ -824,13 +824,13 @@ docker build --cache-from=images.canfar.net/myteam/image:latest .
 #### Large Image Size
 
 ```bash
-# Analyze image layers
+# Analyse image layers
 docker history images.canfar.net/myteam/image:latest
 
 # Use dive tool for detailed analysis
 dive images.canfar.net/myteam/image:latest
 
-# Optimize Dockerfile layers
+# Optimise Dockerfile layers
 # Combine RUN commands
 # Remove package caches
 # Use multi-stage builds

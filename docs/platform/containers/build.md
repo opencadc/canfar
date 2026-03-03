@@ -79,7 +79,7 @@ cd ~/canfar-containers
 mkdir my-analysis-container
 cd my-analysis-container
 
-# Initialize version control
+# Initialise version control
 git init
 git remote add origin https://github.com/myteam/my-analysis-container.git
 

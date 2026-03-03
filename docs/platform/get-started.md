@@ -70,11 +70,11 @@ See [Sessions Overview](sessions/index.md) for more session types and workflows.
 
 
 !!! tip "Recommended Starting Point"
-    Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated.
+    Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated. If you need thousands of pre-built software packages, see [Accessing CVMFS](cvmfs.md).
 
 !!! tip "Advanced: Custom Containers"
     - Build your own containers for specialised workflows. See [Building Containers](containers/build.md).
-    - Use [Harbor Registry](https://images.canfar.net/) to browse and manage images.
+    - Use [Harbor Registry](containers/registry.md) at [images.canfar.net](https://images.canfar.net/) to browse and manage images.
 
 
 

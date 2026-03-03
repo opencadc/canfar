@@ -7,7 +7,7 @@ You will need a CADC account to access the system. If you do not have one, you c
 
 To request authorization to use the Science Portal, send an email to <support@canfar.net>. You may also wish to consider the following:
 
-- *Project space*: If you intend to work on a dataset with collaborators, it is recommended that you set up a [project space](/science-containers/general/NewUser/ProjectSpace), where a designated group of users all has common access to the files contained within it.
+- *Project space*: If you intend to work on a dataset with collaborators, it is recommended that you set up a [project space](ProjectSpace.md), where a designated group of users all has common access to the files contained within it.
 - *Communications on Discord*: a Discord workspace is used for some aspects of communication around the Science Portal, including notice of service outages and some trouble-shooting support. You can request that you be added to this space also by contacting the email address listed above.
 
 Once your access has been confirmed, go to the CANFAR page: <https://www.canfar.net> and log in to access the Science Portal.

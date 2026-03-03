@@ -97,7 +97,7 @@ Or using the Python `canfar` client:
 from canfar.sessions import Session
 from datetime import datetime
 
-# Initialize session manager
+# Initialise session manager
 session = Session()
 
 # Set job parameters
@@ -426,7 +426,7 @@ pip install canfar
 ```python
 from canfar.sessions import Session
 
-# Initialize session manager
+# Initialise session manager
 session = Session()
 
 # Simple job submission
@@ -524,7 +524,7 @@ job_ids = session.create(
     name="parameter-study",
     image="images.canfar.net/skaha/astroml:latest",
     kind="headless",
-    cmd="python /arc/projects/[project]/scripts/analyze.py",
+    cmd="python /arc/projects/[project]/scripts/analyse.py",
     replicas=10 # Creates 10 jobs named parameter-study-1, parameter-study-2, etc.
 )
 print(f"Submitted jobs: {job_ids}")
