@@ -23,7 +23,7 @@ CANFAR eliminates traditional barriers to astronomical computing:
 - **Minimal Software Installation**: Pre-built environments with astronomy packages ready to use
 - **Browser-Based Access**: Complete workflows accessible through web interfaces
 - **Scalable Resources**: Computing power that grows with your project needs
-- **Collaborative Infrastructure**: Shared storage and standardised environments
+- **Collaborative Infrastructure**: Shared storage and standardized environments
 - **Reproducible Science**: Container-based workflows ensure consistent results
 
 ### Core Benefits
@@ -136,13 +136,13 @@ graph LR
 :   Manages computing resources automatically, handling container deployment, scaling, and resource allocation behind the scenes.
 
 **Software Environments** (Harbor Registry)
-:   Pre-built and customised container images with astronomy software packages, from basic Python environments to specialised tools like CASA and CARTA.
+:   Pre-built and customized container images with astronomy software packages, from basic Python environments to specialised tools like CASA and CARTA.
 
 **Session Management** (`skaha`)
 :   Orchestrates your computing sessions, connecting containers with storage systems and managing resource allocation.
 
 **Storage Infrastructure**
-:   Multiple storage systems optimised for different use cases - from high-performance computing to long-term archival.
+:   Multiple storage systems optimized for different use cases - from high-performance computing to long-term archival.
 
 ### Key Architectural Principles
 
@@ -261,7 +261,7 @@ CANFAR uses Kubernetes to manage your computing sessions automatically. Sessions
 
 ### Session Types & Interfaces
 
-CANFAR provides different session types, each optimised for specific workflows:
+CANFAR provides different session types, each optimized for specific workflows:
 
 === "📓 Notebook Sessions"
     **JupyterLab Interface** for interactive data science workflows
@@ -297,7 +297,7 @@ CANFAR provides different session types, each optimised for specific workflows:
     **Features**:
     
     - Interactive data exploration and analysis
-    - Optimised for large radio astronomy datasets
+    - Optimized for large radio astronomy datasets
     - Advanced visualization and measurement tools
     - Browser-native interface with desktop-class performance
 
@@ -398,7 +398,7 @@ CANFAR supports two resource definition approaches:
 
 ## 💾 Storage Systems & Data Management
 
-CANFAR provides multiple storage systems optimised for different use cases in astronomical research. Understanding data persistence is crucial for effective platform use.
+CANFAR provides multiple storage systems optimized for different use cases in astronomical research. Understanding data persistence is crucial for effective platform use.
 
 ### Data Persistence Fundamentals
 
@@ -419,7 +419,7 @@ CANFAR provides multiple storage systems optimised for different use cases in as
 
 **Key Features:**
 
-- **Speed**: Direct filesystem access optimised for large computations
+- **Speed**: Direct filesystem access optimized for large computations
 - **Collaboration**: Group-based access control for team projects
 - **Backup**: Daily snapshots for data protection
 - **Quotas**: Managed per-project and per-user allocations
@@ -558,7 +558,7 @@ vclient.copy(filename, 'vos:[project]/public/{filename}')
 
 
 !!! tip "Storage Efficiency"
-    **Optimise your storage strategy:**
+    **Optimize your storage strategy:**
     
     - Use `/arc/` for active work requiring file system access
     - Archive to `vos:` for long-term preservation and sharing

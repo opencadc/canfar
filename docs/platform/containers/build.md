@@ -10,7 +10,7 @@
     - **Testing & Debugging**: Ensuring containers work correctly in CANFAR sessions
     - **Harbor Registry**: Publishing and maintaining custom containers
 
-Building custom containers becomes necessary when existing CANFAR containers don't meet your specific software requirements or when creating standardised environments for research teams. This guide covers the complete development workflow from initial setup through deployment and maintenance.
+Building custom containers becomes necessary when existing CANFAR containers don't meet your specific software requirements or when creating standardized environments for research teams. This guide covers the complete development workflow from initial setup through deployment and maintenance.
 
 ## 📋 When to Build Custom Containers
 
@@ -29,7 +29,7 @@ Building custom containers becomes necessary when existing CANFAR containers don
 - Project-specific data processing tools
 
 **Performance Optimization:**
-- GPU-optimised builds for specific hardware
+- GPU-optimized builds for specific hardware
 - Memory-efficient configurations for large datasets
 - Custom compilation flags for scientific software
 - Minimized container size for batch processing

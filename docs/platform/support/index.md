@@ -186,10 +186,10 @@ This template can help structure a report:
 1. [...]
 2. [...]
 
-## Expected Behavior
+## Expected Behaviour
 [...]
 
-## Actual Behavior
+## Actual Behaviour
 [...]
 
 ## Error Messages

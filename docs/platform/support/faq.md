@@ -109,7 +109,7 @@ Containers include general astronomy stacks (AstroPy ecosystem), Jupyter, data s
 ## Session Resources
 
 ### Why is my session performance variable?
-If you're using flexible mode (the default), performance variation is normal and expected. Your session can use more resources when the cluster has capacity available, but may use fewer resources during peak usage times. This adaptive behavior allows for better overall cluster utilization.
+If you're using flexible mode (the default), performance variation is normal and expected. Your session can use more resources when the cluster has capacity available, but may use fewer resources during peak usage times. This adaptive behaviour allows for better overall cluster utilization.
 
 For consistent performance, use fixed mode by specifying exact `--cpu` and `--memory` values (CLI) or `cores` and `ram` parameters (Python API).
 
@@ -347,7 +347,7 @@ canfar auth login
 1. **Check this FAQ** for common solutions
 2. **Search existing issues** on GitHub
 3. **Try basic troubleshooting steps** (restart browser, clear cache)
-4. **Gather diagnostic information** using commands in [index.md](index.md#diagnostic-commands)
+4. **Gather diagnostic information** using commands in [index.md](index.md#gather-information-before-asking-for-help)
 
 ### What to Include in Support Requests
 

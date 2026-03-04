@@ -1,6 +1,6 @@
 # Firefly Sessions
 
-**The LSST table and image visualiser for astronomical data exploration**
+**The LSST table and image visualizer for astronomical data exploration**
 
 !!! abstract "🎯 What You'll Learn"
     - How to launch a Firefly session and choose the right version
@@ -248,7 +248,7 @@ ra > 180 && ra < 200                     // RA range
 2. Choose plot type (scatter, histogram, line)
 3. Apply colour coding by third column
 4. Add error bars if available
-5. Customise symbols and colours
+5. Customize symbols and colours
 
 **Image-Catalogue Overlay:**
 
@@ -361,7 +361,7 @@ File → Export → [Format]
 1. Load your source catalogue
 2. Load Gaia reference catalogue
 3. Perform spatial cross-match
-4. Analyse proper motions and parallaxes
+4. Analyze proper motions and parallaxes
 5. Create clean stellar sample
 6. Export matched catalogue
 
@@ -420,7 +420,7 @@ vos://cadc.nrc.ca~vault/[user]/
 
 **Integration Patterns:**
 
-- **Notebooks → Firefly**: Prepare data in Python, visualise in Firefly
+- **Notebooks → Firefly**: Prepare data in Python, visualize in Firefly
 - **Firefly → Desktop**: Export results for further analysis in CASA/DS9
-- **Batch → Firefly**: Process large datasets, visualise results
+- **Batch → Firefly**: Process large datasets, visualize results
 - **CARTA → Firefly**: Radio analysis in CARTA, optical follow-up in Firefly

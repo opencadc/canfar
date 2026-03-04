@@ -277,7 +277,7 @@ mask::rwx                    # Maximum effective permissions
 other::---                   # No access for others
 ```
 
-!!! warning "ACL Mask Behavior"
+!!! warning "ACL Mask Behaviour"
     The ACL "mask" entry limits maximum effective permissions for named users and groups. If permissions seem restricted, check the mask value.
 
 ### Setting and Managing ACLs
@@ -451,86 +451,14 @@ job = canfar.launch(
 
 ## 🚨 Common Issues & Troubleshooting
 
-Understanding and resolving common permission issues helps maintain smooth collaborative workflows.
+For solutions to common permission and access issues, including:
+- Permission Denied Accessing `/arc/projects/[project]`
+- Harbor Container Registry Access Issues
+- API Authentication Failures
+- ACL Changes Not Taking Effect
+- Group Changes Not Visible
 
-### Permission Denied Accessing `/arc/projects/[project]`
-
-**Symptoms:** Cannot access shared project directories
-
-**Common Causes:**
-- Not a member of the required project group
-- Group membership not yet propagated to storage systems
-- Incorrect project name or path
-
-**Solutions:**
-
-1. **Verify Group Membership:** Check your groups at [CADC Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
-2. **Contact Project Administrator:** Request addition to the appropriate project group
-3. **Wait for Propagation:** Group changes may take several minutes to propagate to storage systems
-4. **Check Path:** Ensure you're using the correct project directory path
-
-### Harbor Container Registry Access Issues
-
-**Symptoms:** Cannot push to or pull from private container repositories
-
-**Common Causes:**
-- Insufficient Harbor permissions for the target project
-- Not logged into Harbor registry
-- Attempting to access non-existent or private repositories
-
-**Solutions:**
-
-1. **Check Harbor Login:** `docker login images.canfar.net`
-2. **Request Permissions:** Contact [support@canfar.net](mailto:support@canfar.net) for repository access
-3. **Verify Project Access:** Confirm you have developer or master role for the target project
-4. **Check Repository Names:** Ensure correct project and container naming
-
-### API Authentication Failures
-
-**Symptoms:** 401 Unauthorized errors when using APIs or CLI tools
-
-**Common Causes:**
-- Expired authentication tokens
-- Invalid token format in API calls
-- Missing or corrupt proxy certificates
-
-**Solutions:**
-
-1. **Refresh CLI Token:** `canfar auth login`
-2. **Generate New Proxy Certificate:** `cadc-get-cert -u [username]`
-3. **Check Token Format:** Ensure API calls use `Bearer YOUR_TOKEN` format
-4. **Verify Certificate Location:** Check `~/.ssl/cadcproxy.pem` exists and is valid
-
-### ACL Changes Not Taking Effect
-
-**Symptoms:** File permissions don't match expected ACL settings
-
-**Common Causes:**
-- Restrictive ACL mask limiting effective permissions
-- Missing default ACLs on directories
-- Incorrect user or group names in ACL entries
-
-**Solutions:**
-
-1. **Check Effective Permissions:** `getfacl [filename]`
-2. **Update ACL Mask:** `setfacl -m m::rwx [filename]`
-3. **Set Default ACLs:** `setfacl -d -m g:[groupname]:rw [directory]/`
-4. **Verify Names:** Confirm user and group names exist and are spelled correctly
-
-### Group Changes Not Visible
-
-**Symptoms:** New group memberships not recognized by platform services
-
-**Common Causes:**
-- Recent group changes not yet propagated
-- Cache timing issues across distributed services
-- Session authentication using stale group information
-
-**Solutions:**
-
-1. **Wait for Propagation:** Allow 5-10 minutes for changes to propagate
-2. **Refresh Authentication:** Log out and back in to refresh group memberships
-3. **Contact Support:** For persistent issues, contact [support@canfar.net](mailto:support@canfar.net)
+Please refer to the **[Troubleshooting section of the FAQ](support/faq.md#troubleshooting)**.
 
 !!! warning "Security Best Practices"
     **Protect Your Credentials:**

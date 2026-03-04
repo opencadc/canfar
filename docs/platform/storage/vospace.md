@@ -9,7 +9,7 @@
     - **Python API**: Programmatic access for workflows and integration
     - **Metadata & Sharing**: Rich data descriptions and collaborative access
 
-VOSpace is CANFAR's implementation of the International Virtual Observatory Alliance (IVOA) VOSpace standard, providing long-term, secure, and collaborative storage for astronomy data. It serves as both an archive and a data sharing platform.
+VOSpace is CANFAR's implementation of the International Virtual Observatory Alliance (IVOA) [VOSpace standard](https://www.ivoa.net/documents/VOSpace/), providing long-term, secure, and collaborative storage for astronomy data. It serves as both an archive and a data sharing platform.
 
 ## 🌐 VOSpace Overview
 
@@ -153,7 +153,7 @@ vcat vos:[user]/catalog.csv
 #### Bulk Operations
 
 ```bash
-# Synchronise directories
+# Synchronize directories
 vsync ./local_data/ vos:[user]/backup/
 vsync vos:[user]/analysis/ ./local_analysis/
 

@@ -17,7 +17,7 @@ Harbor serves as CANFAR's container registry, providing a secure, feature-rich p
 
 ### What is Harbor?
 
-Harbor is an open-source container registry that provides:
+[Harbor](https://goharbor.io/) is an open-source container registry that provides:
 
 - **Secure storage**: Role-based access control and authentication integration
 - **Image management**: Tagging, versioning, and metadata handling

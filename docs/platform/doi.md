@@ -6,7 +6,7 @@ CANFAR's Data Publication Service (DPS) provides permanent Digital Object Identi
     **Essential data publication workflows:**
     
     - **DOI Registration**: Reserve permanent identifiers through DataCite
-    - **Data Packaging**: Organise and upload research datasets
+    - **Data Packaging**: Organize and upload research datasets
     - **Referee Access**: Provide controlled access during peer review
     - **Publication**: Mint final DOIs with locked data directories
     - **Long-term Preservation**: Ensure data accessibility and citation

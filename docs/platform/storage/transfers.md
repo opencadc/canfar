@@ -10,7 +10,7 @@
     - **Automated Workflows**: Scripted transfers and synchronisation
     - **Performance Optimisation**: Choosing the right method for your data size
 
-Efficient data transfer is essential for astronomy workflows. CANFAR provides multiple transfer methods optimised for different scenarios, from small file uploads to large dataset synchronisation.
+Efficient data transfer is essential for astronomy workflows. CANFAR provides multiple transfer methods optimized for different scenarios, from small file uploads to large dataset synchronisation.
 
 ## 🔄 Transfer Overview
 

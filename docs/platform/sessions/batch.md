@@ -9,7 +9,7 @@
     - Best practices for resource allocation, job scheduling, and monitoring
     - Advanced workflows including parameter sweeps and pipeline automation
 
-Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyses automatically while you focus on other work.
+Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyzes automatically while you focus on other work.
 
 ## 📋 Overview
 

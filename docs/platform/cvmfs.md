@@ -60,9 +60,9 @@ Where this can go next:
 
 ### Pointers for Advanced Readers
 
-*   **CVMFS documentation**: architecture, client/cache behavior, and operations guidance.
-*   **Kubernetes CVMFS CSI driver**: mounting CVMFS repositories into pods in cloud-native environments.
-*   **EESSI (European Environment for Scientific Software Installations)**: an example of a large cross-site scientific software stack distributed via CVMFS.
+*   **[CVMFS Official Documentation](https://cvmfs.readthedocs.io/en/stable/)**: architecture, client/cache behaviour, and operations guidance.
+*   **[Kubernetes CVMFS CSI driver](https://github.com/cvmfs-contrib/cvmfs-csi)**: mounting CVMFS repositories into pods in cloud-native environments.
+*   **[EESSI (European Environment for Scientific Software Installations)](https://www.eessi.io/)**: an example of a large cross-site scientific software stack distributed via CVMFS.
 ## 🛠️ Accessing the Software
 
 The Alliance software stack is mounted at `/cvmfs/soft.computecanada.ca/`. Accessing it is a two-step process:

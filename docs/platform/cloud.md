@@ -9,7 +9,7 @@
     - VM management and batch processing workflows
     - Migration strategies to the modern platform
 
-The legacy CANFAR cloud services are hosted on the Digital Research Alliance Canada OpenStack infrastructure. This platform provides traditional virtual machines for users who require persistent compute environments or have specific legacy workflow requirements.
+The legacy CANFAR cloud services are hosted on the Digital Research Alliance Canada [OpenStack](https://www.openstack.org/) infrastructure. This platform provides traditional virtual machines for users who require persistent compute environments or have specific legacy workflow requirements.
 
 ## 🔄 Migration to Modern Platform
 
@@ -19,7 +19,7 @@ Before proceeding with OpenStack VMs, consider whether the [modern CANFAR Scienc
 
 - **Container-based sessions**: Faster startup, better resource utilisation
 - **Browser-native access**: No SSH or complex networking required
-- **Automated resource management**: Dynamic scaling and optimised allocation
+- **Automated resource management**: Dynamic scaling and optimized allocation
 - **Integrated storage**: Seamless access to shared `/arc/`
 - **Pre-configured environments**: Ready-to-use astronomy software stacks
 
@@ -81,7 +81,7 @@ OpenStack prefers SSH key pairs over passwords:
 
 - In **Compute → Instances → Launch Instance**, choose:
   - **Source**: _canfar-ubuntu-20.04_ (important for batch compatibility)
-  - **Flavor**: e.g., `c2-7.5gb-30` (2 vCPU / 7.5 GiB RAM / ~31 GiB ephemeral disk)
+  - **Flavour**: e.g., `c2-7.5gb-30` (2 vCPU / 7.5 GiB RAM / ~31 GiB ephemeral disk)
   - **Key Pair**: select your SSH key
 - Click **Launch**
 
@@ -175,7 +175,7 @@ OpenStack prefers SSH key pairs over passwords.
 
 - In **Compute → Instances → Launch Instance**, choose:
   - **Source**: _canfar-ubuntu-20.04_ (important for batch)
-  - **Flavor**: e.g., `c2-7.5gb-30` (2 vCPU / 7.5 GiB RAM / ~31 GiB ephemeral disk)
+  - **Flavour**: e.g., `c2-7.5gb-30` (2 vCPU / 7.5 GiB RAM / ~31 GiB ephemeral disk)
   - **Key Pair**: select your SSH key
 - Click **Launch**.
 
@@ -266,7 +266,7 @@ Without a snapshot, **ephemeral** data is lost when the instance is deleted. **V
 
 ### Automate as a batch script
 
-CANFAR batch is powered by **HTCondor**; Cloud Scheduler launches worker VMs on demand.
+CANFAR batch is powered by **[HTCondor](https://htcondor.org/)**; Cloud Scheduler launches worker VMs on demand.
 
 Create `~/do_catalogue.bash`:
 
@@ -330,7 +330,7 @@ Where:
 
 - `do_catalogue.sub`: submission file
 - `image-reduction-2023-08-21`: snapshot image name
-- `c2-7.5gb-30`: VM flavor (list via `openstack flavor list`)
+- `c2-7.5gb-30`: VM flavour (list via `openstack flavor list`)
 
 Monitor:
 

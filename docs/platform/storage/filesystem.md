@@ -357,7 +357,7 @@ chmod -R g+rw shared_directory/
 
 Group membership is managed through CANFAR's Group Management system:
 
-1. **Navigate to**: [Group Management](https://www.canfar.net/groups/)
+1. **Navigate to**: [Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
 2. **Create or modify groups**: Add/remove users from project groups
 3. **Apply permissions**: Use `chgrp` to assign files to groups
 

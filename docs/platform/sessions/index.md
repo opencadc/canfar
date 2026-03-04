@@ -16,7 +16,7 @@
 
 ### What are Interactive Sessions?
 
-Interactive sessions provide on-demand access to pre-configured computing environments running in containers. Each session type offers different interfaces optimised for specific astronomical workflows.
+Interactive sessions provide on-demand access to pre-configured computing environments running in containers. Each session type offers different interfaces optimized for specific astronomical workflows.
 
 ### Key Benefits
 
@@ -157,7 +157,7 @@ Sessions inherit your [CANFAR permissions](../permissions.md):
 ### For Astronomy Specialisations
 
 **Radio Astronomy** → **[CARTA Viewer](carta.md)**
-:   Optimised for radio interferometry data visualisation and analysis
+:   Optimized for radio interferometry data visualisation and analysis
 
 **Survey Data** → **[Firefly Viewer](firefly.md)**
 :   Efficient table and image viewing for large astronomical catalogues

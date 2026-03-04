@@ -112,7 +112,7 @@ df -h /scratch/                 # Temporary high-speed storage
 
 ## 🔗 How Containers Relate to Sessions
 
-CANFAR containers are designed to work seamlessly with different session types, each optimised for specific workflows:
+CANFAR containers are designed to work seamlessly with different session types, each optimized for specific workflows:
 
 ### Session Type Integration
 
@@ -331,7 +331,7 @@ Containers run with your CADC user identity, not as root or container-defined us
 ```bash
 # Inside any CANFAR container
 whoami                    # [user]
-id                        # uid=1234([user]) gid=1234([user]) groups=[user](and-all-your-CADC-groups)
+id                        # uid=1234([user]) gid=1234([user]) groups=[user] (and-all-your-CADC-groups)
 echo $HOME                # /arc/home/[user]
 groups                    # Shows your CANFAR project group memberships
 ```
