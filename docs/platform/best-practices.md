@@ -71,7 +71,7 @@ When dealing with large astronomy datasets, how you handle memory and I/O can ma
 
 - **Unique and Descriptive Output Names:** When running many tasks in parallel, never have them all write to the same filename (like `output.fits` in the same folder). This would cause conflicts and overwrites. Instead, generate output filenames that incorporate a unique element, such as the input name or an index.
 
-- **Organise Outputs Predictably:** Consider writing outputs of different pipeline stages to separate directories. For instance, raw data stays in `raw/`, calibration results in `calib/`, intermediate analysis in `analysis/`, and final catalogs or plots in `results/`. This structure helps both humans and programs (like a next-stage script) to locate what they need. It’s much easier to point a plotting script at a `results/` directory of processed files than to pick through one huge directory of mixed files.
+- **Organize Outputs Predictably:** Consider writing outputs of different pipeline stages to separate directories. For instance, raw data stays in `raw/`, calibration results in `calib/`, intermediate analysis in `analysis/`, and final catalogs or plots in `results/`. This structure helps both humans and programs (like a next-stage script) to locate what they need. It’s much easier to point a plotting script at a `results/` directory of processed files than to pick through one huge directory of mixed files.
 
 - **Implement Checkpoints and Resume Logic:** If your pipeline can take hours or days to run, add checkpointing to save progress periodically. Break the pipeline into logical stages e.g., data reduction -> feature extraction -> modeling -> results. After each stage, output data to disk (or a database). If a later stage needs to be re-run, you don’t have to redo earlier stages.
 
@@ -129,7 +129,7 @@ When dealing with large astronomy datasets, how you handle memory and I/O can ma
 
 - **Keep Images Lightweight:** Minimize what you add to the container. Uninstall unnecessary packages and avoid including large test data or docs inside the image. A smaller image pulls faster and uses less storage, benefiting batch runs. Use a .dockerignore file to exclude files like docs, tests, and git directories from the build context
 
-- **Optimise Dockerfile Layers:** Combine related commands into single `RUN` statements and clean up after installations to reduce image size. For example, update and install Linux packages in one layer, then remove package lists and caches:
+- **Optimize Dockerfile Layers:** Combine related commands into single `RUN` statements and clean up after installations to reduce image size. For example, update and install Linux packages in one layer, then remove package lists and caches:
 
 ```dockerfile
 # Combining update, install, and cleanup in one layer

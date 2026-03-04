@@ -147,7 +147,7 @@ job_ids = session.create(
     cores=4,
     ram=16,
     kind="headless",
-    cmd="python /arc/projects/[project]/scripts/analyse.py",
+    cmd="python /arc/projects/[project]/scripts/analyze.py",
 )
 ```
 

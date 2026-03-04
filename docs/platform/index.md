@@ -3,7 +3,7 @@
 The Canadian Advanced Network for Astronomy Research lets you access software environments and large datasets on the cloud designed specifically for astronomical research.
 
 !!! abstract "🚀 Platform Overview"
-    - **Scalable** cloud compute and storage to analyse very large datasets from anywhere.
+    - **Scalable** cloud compute and storage to analyze very large datasets from anywhere.
     - **Browser-based** interactive environments for instant, device-independent data exploration.
     - **Collaborative** tools that make teamwork and data sharing simple.
     - **Well‑tested** default scientific containers plus customizable images and registries for large-team workflows.
@@ -31,7 +31,7 @@ The Canadian Advanced Network for Astronomy Research lets you access software en
     :   Launch interactive sessions and manage computing resources
     
     **[📁 File Manager](https://www.canfar.net/storage/arc/list)**
-    :   Access and organise your research data and project files
+    :   Access and organize your research data and project files
     
     **[👥 Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)**
     :   Manage research teams and collaborative permissions

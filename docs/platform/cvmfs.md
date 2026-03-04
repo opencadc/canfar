@@ -67,7 +67,7 @@ Where this can go next:
 
 The Alliance software stack is mounted at `/cvmfs/soft.computecanada.ca/`. Accessing it is a two-step process:
 
-1.  **Initialise the environment**: Source the profile to enable `module` commands.
+1.  **Initialize the environment**: Source the profile to enable `module` commands.
 2.  **Load your software**: Use `module load` to add specific packages to your path.
 
 ### Example: Before vs. After CVMFS

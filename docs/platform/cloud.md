@@ -19,7 +19,7 @@ Before proceeding with OpenStack VMs, consider whether the [modern CANFAR Scienc
 
 - **Container-based sessions**: Faster startup, better resource utilisation
 - **Browser-native access**: No SSH or complex networking required
-- **Automated resource management**: Dynamic scaling and optimised allocation
+- **Automated resource management**: Dynamic scaling and optimized allocation
 - **Integrated storage**: Seamless access to shared `/arc/`
 - **Pre-configured environments**: Ready-to-use astronomy software stacks
 

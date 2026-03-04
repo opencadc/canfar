@@ -717,7 +717,7 @@ FROM ubuntu:24.04 AS builder
 FROM images.canfar.net/skaha/astroml:latest
 COPY --from=builder /app/binary /usr/local/bin/
 
-# Optimise layer sizes
+# Optimize layer sizes
 RUN apt-get update && apt-get install -y pkg1 pkg2 pkg3 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 # Instead of multiple RUN commands
@@ -824,13 +824,13 @@ docker build --cache-from=images.canfar.net/myteam/image:latest .
 #### Large Image Size
 
 ```bash
-# Analyse image layers
+# Analyze image layers
 docker history images.canfar.net/myteam/image:latest
 
 # Use dive tool for detailed analysis
 dive images.canfar.net/myteam/image:latest
 
-# Optimise Dockerfile layers
+# Optimize Dockerfile layers
 # Combine RUN commands
 # Remove package caches
 # Use multi-stage builds

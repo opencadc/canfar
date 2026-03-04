@@ -23,7 +23,7 @@ CARTA provides specialised capabilities for:
 | **Region Analysis** | Statistical analysis of user-defined image regions |
 | **Animation** | Time-series and frequency animations through data cubes |
 | **Collaboration** | Real-time session sharing with multiple users |
-| **Performance** | Optimised rendering for large astronomical datasets |
+| **Performance** | Optimized rendering for large astronomical datasets |
 
 ### Data Format Support
 
@@ -64,7 +64,7 @@ Choose a descriptive session name to help you identify it later:
 
 #### Resource Allocation
 
-Start with a "flexible" session for most analyses. Switch to a fixed resource allocation if you need guaranteed performance for demanding visualisations.
+Start with a "flexible" session for most analyzes. Switch to a fixed resource allocation if you need guaranteed performance for demanding visualisations.
 
 **Resource Guidelines:**
 - **Flexible:** Good for most CARTA workflows
@@ -72,7 +72,7 @@ Start with a "flexible" session for most analyses. Switch to a fixed resource al
 
 ### Step 4: Launch Session
 
-Click the **Launch** button and wait for your session to initialise. CARTA sessions typically start within 30-60 seconds.
+Click the **Launch** button and wait for your session to initialize. CARTA sessions typically start within 30-60 seconds.
 
 ## 🧭 Using CARTA
 
@@ -82,7 +82,7 @@ Once connected to your CARTA session:
 
 1. **File Menu:** Use "Open Image" to load your data
 2. **File Browser:** Navigate to `/arc/projects/[project]/` or `/arc/home/[user]/`
-3. **Load Data:** Select FITS or HDF5 files to visualise
+3. **Load Data:** Select FITS or HDF5 files to visualize
 
 ### Data Loading
 
@@ -130,7 +130,7 @@ Once connected to your CARTA session:
 1. **Draw regions** on the image
 2. **Open Spectral Profiler** panel
 3. **Select region** to view spectrum
-4. **Analyse lines** with built-in fitting tools
+4. **Analyze lines** with built-in fitting tools
 
 #### Moment Maps
 
@@ -169,7 +169,7 @@ CARTA automatically computes:
 #### Multi-Panel Views
 
 - **Compare datasets:** Load multiple images simultaneously
-- **Linked panels:** Synchronise zoom, pan, and navigation
+- **Linked panels:** Synchronize zoom, pan, and navigation
 - **Layout control:** Arrange panels as needed
 
 ## ⚡ Performance Optimisation
@@ -207,7 +207,7 @@ CARTA supports collaborative analysis:
 
 1. **Share session URL** with team members
 2. **Simultaneous access:** Multiple users can connect
-3. **Synchronised views:** All users see the same state
+3. **Synchronized views:** All users see the same state
 4. **Coordinate activities:** Communicate to avoid conflicts
 
 ### Best Practices for Collaboration
@@ -215,7 +215,7 @@ CARTA supports collaborative analysis:
 - **Designate a lead:** Have one person control navigation
 - **Use voice/chat:** Coordinate complex operations
 - **Save work frequently:** Export regions and analysis results
-- **Plan sessions:** Organise collaborative time in advance
+- **Plan sessions:** Organize collaborative time in advance
 
 ## 🔧 Advanced Features
 

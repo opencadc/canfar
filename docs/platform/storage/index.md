@@ -48,7 +48,7 @@ This setup allows for a simple and powerful workflow:
 graph TD
     Start([Session Starts]) --> Mounts["/arc/home & /arc/projects mounted"]
     Mounts --> Scratch["Empty /scratch created"]
-    Scratch --> DataWork["Analyse data, using /scratch for temporary files"]
+    Scratch --> DataWork["Analyze data, using /scratch for temporary files"]
     DataWork --> Save["Save results to /arc/projects"]
     Save --> End([Session Ends])
     End --> Cleanup["/scratch is wiped clean"]

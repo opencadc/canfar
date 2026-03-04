@@ -9,7 +9,7 @@
     - Best practices for resource allocation, job scheduling, and monitoring
     - Advanced workflows including parameter sweeps and pipeline automation
 
-Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyses automatically while you focus on other work.
+Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyzes automatically while you focus on other work.
 
 ## 📋 Overview
 
@@ -97,7 +97,7 @@ Or using the Python `canfar` client:
 from canfar.sessions import Session
 from datetime import datetime
 
-# Initialise session manager
+# Initialize session manager
 session = Session()
 
 # Set job parameters
@@ -426,7 +426,7 @@ pip install canfar
 ```python
 from canfar.sessions import Session
 
-# Initialise session manager
+# Initialize session manager
 session = Session()
 
 # Simple job submission
@@ -524,7 +524,7 @@ job_ids = session.create(
     name="parameter-study",
     image="images.canfar.net/skaha/astroml:latest",
     kind="headless",
-    cmd="python /arc/projects/[project]/scripts/analyse.py",
+    cmd="python /arc/projects/[project]/scripts/analyze.py",
     replicas=10 # Creates 10 jobs named parameter-study-1, parameter-study-2, etc.
 )
 print(f"Submitted jobs: {job_ids}")

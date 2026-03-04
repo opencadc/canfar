@@ -26,7 +26,7 @@ Desktop sessions offer:
 - **Multi-step workflows**: Combine several applications in sequence
 - **Teaching and demonstrations**: Share desktop for educational purposes
 - **Legacy software**: Applications requiring a desktop environment
-- **Visual file management**: Organise data with graphical tools
+- **Visual file management**: Organize data with graphical tools
 
 ### How Desktop Sessions Work
 
@@ -81,7 +81,7 @@ Desktop sessions use the default container and resource allocation. For most des
 
 ### Step 3: Launch Session
 
-Click the **Launch** button and wait for your session to initialise:
+Click the **Launch** button and wait for your session to initialize:
 
 Desktop sessions may take slightly longer to start than other session types as they need to set up the full graphical environment.
 
@@ -201,7 +201,7 @@ Click the shortcut icon on the desktop for immediate access to:
 
 **Optical Astronomy Analysis:**
 
-1. **File Management**: Organise data using the graphical file manager
+1. **File Management**: Organize data using the graphical file manager
 2. **Image Display**: Open FITS files in DS9 for visual inspection
 3. **Catalogue Analysis**: Load source lists in TOPCAT for analysis
 4. **Cross-matching**: Use TOPCAT to cross-match with online catalogues
@@ -315,7 +315,7 @@ Desktop sessions can be shared for collaborative work:
 **Team Analysis:**
 - Multiple researchers access same desktop
 - Share applications and data simultaneously
-- Coordinate complex multi-step analyses
+- Coordinate complex multi-step analyzes
 
 ### Best Practices for Collaboration
 

@@ -407,7 +407,7 @@ rsync -avz --progress ~/local_data/ /arc/projects/[project]/backup/
 iostat -x 1    # Live I/O statistics
 iotop          # Process I/O usage
 
-# Optimise for large files
+# Optimize for large files
 # Use /scratch/ for intensive processing
 cp /arc/projects/[project]/large_dataset.fits /scratch/
 process_data /scratch/large_dataset.fits
@@ -417,7 +417,7 @@ cp /scratch/results.fits /arc/projects/[project]/outputs/
 #### SSHFS Performance Tips
 
 ```bash
-# Optimise SSHFS for different use cases
+# Optimize SSHFS for different use cases
 
 # For frequent small file access:
 sshfs -o cache=yes,kernel_cache,attr_timeout=3600,entry_timeout=3600 \

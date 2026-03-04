@@ -19,7 +19,7 @@ VOSpace is a distributed storage service that allows astronomers to:
 
 - **Store data persistently** with geographic redundancy
 - **Share data** with collaborators and the public
-- **Organise data** with hierarchical directories and metadata
+- **Organize data** with hierarchical directories and metadata
 - **Access data** programmatically via standardized APIs
 - **Integrate** with Virtual Observatory tools and services
 
@@ -153,7 +153,7 @@ vcat vos:[user]/catalog.csv
 #### Bulk Operations
 
 ```bash
-# Synchronise directories
+# Synchronize directories
 vsync ./local_data/ vos:[user]/backup/
 vsync vos:[user]/analysis/ ./local_analysis/
 
@@ -199,7 +199,7 @@ vcat --head vos:[user]/observation.fits
 import vos
 from vos import Client
 
-# Initialise client (uses existing authentication)
+# Initialize client (uses existing authentication)
 client = Client()
 
 # Alternative: specify authentication
@@ -433,7 +433,7 @@ import tempfile
 import os
 
 def analyze_vospace_fits(vospace_path):
-    """Analyse FITS file stored in VOSpace"""
+    """Analyze FITS file stored in VOSpace"""
     
     # Download to temporary file
     with tempfile.NamedTemporaryFile(suffix='.fits', delete=False) as tmp:
@@ -740,7 +740,7 @@ vsync ./results/ arc:projects/[project]/analysis_outputs/
 ```python
 import vos
 
-# Initialise client
+# Initialize client
 client = vos.Client()
 
 
@@ -866,7 +866,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def setup_vospace():
-    """Initialise VOSpace client with authentication"""
+    """Initialize VOSpace client with authentication"""
     try:
         client = vos.Client()
         # Test connection
@@ -1061,13 +1061,13 @@ from astropy.table import Table
 
 
 def analyze_vospace_catalog(client, catalog_path):
-    """Analyse a catalog stored in VOSpace"""
+    """Analyze a catalog stored in VOSpace"""
 
     # Download catalog
     local_path = "./temp_catalog.fits"
     client.copy(catalog_path, local_path)
 
-    # Load and analyse
+    # Load and analyze
     table = Table.read(local_path)
 
     # Example analysis

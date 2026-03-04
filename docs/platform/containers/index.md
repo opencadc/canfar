@@ -112,7 +112,7 @@ df -h /scratch/                 # Temporary high-speed storage
 
 ## 🔗 How Containers Relate to Sessions
 
-CANFAR containers are designed to work seamlessly with different session types, each optimised for specific workflows:
+CANFAR containers are designed to work seamlessly with different session types, each optimized for specific workflows:
 
 ### Session Type Integration
 
