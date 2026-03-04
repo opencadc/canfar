@@ -2509,7 +2509,7 @@ mask::rwx                    # Maximum effective permissions
 other::---                   # No access for others
 </code></pre></div>
 <div class="admonition warning">
-<p class="admonition-title">ACL Mask Behavior</p>
+<p class="admonition-title">ACL Mask Behaviour</p>
 <p>The ACL "mask" entry limits maximum effective permissions for named users and groups. If permissions seem restricted, check the mask value.</p>
 </div>
 <h3 id="setting-and-managing-acls">Setting and Managing ACLs<a class="headerlink" href="#setting-and-managing-acls" title="Permanent link">&para;</a></h3>
@@ -2650,71 +2650,13 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="common-issues-troubleshooting">🚨 Common Issues &amp; Troubleshooting<a class="headerlink" href="#common-issues-troubleshooting" title="Permanent link">&para;</a></h2>
-<p>Understanding and resolving common permission issues helps maintain smooth collaborative workflows.</p>
-<h3 id="permission-denied-accessing-arcprojectsproject">Permission Denied Accessing <code>/arc/projects/[project]</code><a class="headerlink" href="#permission-denied-accessing-arcprojectsproject" title="Permanent link">&para;</a></h3>
-<p><strong>Symptoms:</strong> Cannot access shared project directories</p>
-<p><strong>Common Causes:</strong>
-- Not a member of the required project group
-- Group membership not yet propagated to storage systems
-- Incorrect project name or path</p>
-<p><strong>Solutions:</strong></p>
-<ol>
-<li><strong>Verify Group Membership:</strong> Check your groups at <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/">CADC Group Management</a></li>
-<li><strong>Contact Project Administrator:</strong> Request addition to the appropriate project group</li>
-<li><strong>Wait for Propagation:</strong> Group changes may take several minutes to propagate to storage systems</li>
-<li><strong>Check Path:</strong> Ensure you're using the correct project directory path</li>
-</ol>
-<h3 id="harbor-container-registry-access-issues">Harbor Container Registry Access Issues<a class="headerlink" href="#harbor-container-registry-access-issues" title="Permanent link">&para;</a></h3>
-<p><strong>Symptoms:</strong> Cannot push to or pull from private container repositories</p>
-<p><strong>Common Causes:</strong>
-- Insufficient Harbor permissions for the target project
-- Not logged into Harbor registry
-- Attempting to access non-existent or private repositories</p>
-<p><strong>Solutions:</strong></p>
-<ol>
-<li><strong>Check Harbor Login:</strong> <code>docker login images.canfar.net</code></li>
-<li><strong>Request Permissions:</strong> Contact <a href="mailto:support@canfar.net">support@canfar.net</a> for repository access</li>
-<li><strong>Verify Project Access:</strong> Confirm you have developer or master role for the target project</li>
-<li><strong>Check Repository Names:</strong> Ensure correct project and container naming</li>
-</ol>
-<h3 id="api-authentication-failures">API Authentication Failures<a class="headerlink" href="#api-authentication-failures" title="Permanent link">&para;</a></h3>
-<p><strong>Symptoms:</strong> 401 Unauthorized errors when using APIs or CLI tools</p>
-<p><strong>Common Causes:</strong>
-- Expired authentication tokens
-- Invalid token format in API calls
-- Missing or corrupt proxy certificates</p>
-<p><strong>Solutions:</strong></p>
-<ol>
-<li><strong>Refresh CLI Token:</strong> <code>canfar auth login</code></li>
-<li><strong>Generate New Proxy Certificate:</strong> <code>cadc-get-cert -u [username]</code></li>
-<li><strong>Check Token Format:</strong> Ensure API calls use <code>Bearer YOUR_TOKEN</code> format</li>
-<li><strong>Verify Certificate Location:</strong> Check <code>~/.ssl/cadcproxy.pem</code> exists and is valid</li>
-</ol>
-<h3 id="acl-changes-not-taking-effect">ACL Changes Not Taking Effect<a class="headerlink" href="#acl-changes-not-taking-effect" title="Permanent link">&para;</a></h3>
-<p><strong>Symptoms:</strong> File permissions don't match expected ACL settings</p>
-<p><strong>Common Causes:</strong>
-- Restrictive ACL mask limiting effective permissions
-- Missing default ACLs on directories
-- Incorrect user or group names in ACL entries</p>
-<p><strong>Solutions:</strong></p>
-<ol>
-<li><strong>Check Effective Permissions:</strong> <code>getfacl [filename]</code></li>
-<li><strong>Update ACL Mask:</strong> <code>setfacl -m m::rwx [filename]</code></li>
-<li><strong>Set Default ACLs:</strong> <code>setfacl -d -m g:[groupname]:rw [directory]/</code></li>
-<li><strong>Verify Names:</strong> Confirm user and group names exist and are spelled correctly</li>
-</ol>
-<h3 id="group-changes-not-visible">Group Changes Not Visible<a class="headerlink" href="#group-changes-not-visible" title="Permanent link">&para;</a></h3>
-<p><strong>Symptoms:</strong> New group memberships not recognized by platform services</p>
-<p><strong>Common Causes:</strong>
-- Recent group changes not yet propagated
-- Cache timing issues across distributed services
-- Session authentication using stale group information</p>
-<p><strong>Solutions:</strong></p>
-<ol>
-<li><strong>Wait for Propagation:</strong> Allow 5-10 minutes for changes to propagate</li>
-<li><strong>Refresh Authentication:</strong> Log out and back in to refresh group memberships</li>
-<li><strong>Contact Support:</strong> For persistent issues, contact <a href="mailto:support@canfar.net">support@canfar.net</a></li>
-</ol>
+<p>For solutions to common permission and access issues, including:
+- Permission Denied Accessing <code>/arc/projects/[project]</code>
+- Harbor Container Registry Access Issues
+- API Authentication Failures
+- ACL Changes Not Taking Effect
+- Group Changes Not Visible</p>
+<p>Please refer to the <strong><a href="../support/faq/#troubleshooting">Troubleshooting section of the FAQ</a></strong>.</p>
 <div class="admonition warning">
 <p class="admonition-title">Security Best Practices</p>
 <p><strong>Protect Your Credentials:</strong></p>
@@ -2766,7 +2708,7 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 11, 2025 20:01:21 UTC">September 11, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 3, 2026 18:48:17 UTC">March 3, 2026</span>
   </span>
 
     
