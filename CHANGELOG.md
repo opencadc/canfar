@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.3](https://github.com/opencadc/canfar/compare/v1.3.2...v1.3.3) (2026-03-04)
+
+
+### Documentation
+
+* **platform:** Refine Canadian spelling preference to use -ize ([b8d9d5d](https://github.com/opencadc/canfar/commit/b8d9d5d776f67c8c50f9481f6729015831396d8a))
+* **platform:** Review, Canadian English, fix links, reduce redundancy, tone & external refs ([5abd45b](https://github.com/opencadc/canfar/commit/5abd45b3b5d857a5f2d67ae995a6aa5b1eca588e))
+
 ## [1.3.2](https://github.com/opencadc/canfar/compare/v1.3.1...v1.3.2) (2026-02-26)
 
 
