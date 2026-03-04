@@ -1,0 +1,12 @@
+/* Admonition title weight */
+.md-typeset .admonition-title { font-weight: 600; }
+
+/* Compact code blocks */
+.md-typeset pre > code { line-height: 1.3; }
+
+/* Simple badges */
+.badge { display: inline-block; padding: .1rem .4rem; border-radius: .25rem; font-size: .75rem; }
+.badge.success { background: #2e7d32; color: #fff; }
+.badge.warning { background: #f9a825; color: #000; }
+.badge.info { background: #0288d1; color: #fff; }
+
