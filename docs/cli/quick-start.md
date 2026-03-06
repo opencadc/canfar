@@ -192,6 +192,40 @@ Opening session tcgle3m3 in a new tab.
 
 CANFAR Science Platform supports two resource allocation modes, see [platform concepts](../platform/concepts.md#resource-allocation-modes) for more information.
 
+## Work with Your Data (VOSpace)
+
+VOSpace is CANFAR's persistent storage system. You can manage your files directly from the CLI using the same authentication.
+
+<!-- termynal -->
+```
+# List your VOSpace root directory
+$ canfar vos ls vos:
+arc/
+vault/
+
+# Upload data to VOSpace
+$ canfar vos cp my_observations.fits vos:/arc/home/username/data/
+my_observations.fits -> vos:/arc/home/username/data/my_observations.fits
+
+# List uploaded files
+$ canfar vos ls -lh vos:/arc/home/username/data/
+-rw-r--r--  username    512M  Jan 14 10:30  my_observations.fits
+```
+
+!!! success "What just happened?"
+    - We listed your VOSpace directories using the same authentication from login
+    - We uploaded a local FITS file to your persistent VOSpace storage
+    - The file is now accessible from any CANFAR session at `/arc/home/username/data/`
+
+!!! tip "VOSpace + Sessions Workflow"
+    A typical workflow combines VOSpace and sessions:
+
+    1. **Upload data**: `canfar vos cp local_data/ vos:/arc/home/username/project/`
+    2. **Launch session**: `canfar create notebook skaha/astroml:latest`
+    3. **Process data** in your notebook (files available at `/arc/home/username/project/`)
+    4. **Download results**: `canfar vos cp vos:/arc/home/username/project/results/ ./`
+
+For more VOSpace commands, see the [CLI Reference](cli-help.md#file-management-vospace).
 
 ## Start Analyzing!
 
