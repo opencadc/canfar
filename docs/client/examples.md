@@ -353,3 +353,230 @@ Logs contain the output from your session's containers.
         result = await session.destroy_with(prefix="test-", kind="headless", status="Succeeded")
         print(result)  # {"id": True, ...}
     ```
+
+## VOSpace File Management
+
+The `VOSpaceClient` provides programmatic access to VOSpace storage using your CANFAR authentication.
+
+### Basic Operations
+
+=== "List Directory"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # List root directory
+    files = client.listdir("vos:")
+    for f in files:
+        print(f)
+    ```
+
+=== "Upload Files"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Upload a file
+    client.copy("local_data.fits", "vos:/data/remote_data.fits")
+
+    # Upload a directory (recursive)
+    client.copy("./local_dir/", "vos:/data/remote_dir/")
+    ```
+
+=== "Download Files"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Download a file
+    client.copy("vos:/data/file.fits", "./local_file.fits")
+
+    # Download multiple files with glob
+    for remote in client.glob("vos:/data/*.fits"):
+        name = remote.split("/")[-1]
+        client.copy(remote, f"./{name}")
+    ```
+
+### Directory Management
+
+=== "Create Directory"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Create a directory
+    client.mkdir("vos:/data/new_project")
+
+    # Check if exists first
+    if not client.access("vos:/data/new_project"):
+        client.mkdir("vos:/data/new_project")
+    ```
+
+=== "Delete Files"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Delete a file
+    client.delete("vos:/data/old_file.fits")
+
+    # Delete directory recursively
+    successes, failures = client.recursive_delete("vos:/data/old_dir/")
+    print(f"Deleted {successes}, failed {failures}")
+    ```
+
+=== "Move/Rename"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Rename a file
+    client.move("vos:/data/old.fits", "vos:/data/new.fits")
+
+    # Move to another directory
+    client.move("vos:/data/file.fits", "vos:/archive/file.fits")
+    ```
+
+### Node Information & Properties
+
+=== "Get Node Info"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Get node details
+    node = client.get_node("vos:/data/file.fits")
+    info = node.get_info()
+
+    print(f"Size: {info['size']} bytes")
+    print(f"Permissions: {info['permissions']}")
+    print(f"Owner: {info['creator']}")
+    print(f"Is locked: {node.is_locked}")
+    ```
+
+=== "Set Properties"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    # Get node and set custom property
+    node = client.get_node("vos:/data/file.fits", force=True)
+    node.props["quality"] = "verified"
+    node.props["processing_date"] = "2026-01-14"
+    client.update(node)
+
+    # Read properties
+    print(node.props)
+    ```
+
+=== "Manage Permissions"
+
+    ```python
+    from canfar.vospace import VOSpaceClient
+
+    vospace = VOSpaceClient()
+    client = vospace.vos_client
+
+    node = client.get_node("vos:/data/file.fits")
+
+    # Make public
+    client.update(node, {"ispublic": "true"})
+
+    # Add group read permission
+    client.update(node, {"readgroup": "ivo://cadc.nrc.ca/gms#MyGroup"})
+
+    # Make private again
+    client.update(node, {"ispublic": "false"})
+    ```
+
+### Combined Session + VOSpace Workflow
+
+A typical data processing workflow using both Sessions and VOSpace:
+
+```python
+from canfar.vospace import VOSpaceClient
+from canfar.sessions import Session
+import time
+
+# Initialize clients
+vospace = VOSpaceClient()
+vos = vospace.vos_client
+session = Session()
+
+# 1. Create project directory
+if not vos.access("vos:/arc/home/user/analysis"):
+    vos.mkdir("vos:/arc/home/user/analysis")
+
+# 2. Upload input data
+print("Uploading input data...")
+vos.copy("./observations/", "vos:/arc/home/user/analysis/input/")
+
+# 3. Upload processing script
+vos.copy("./process_data.py", "vos:/arc/home/user/analysis/process_data.py")
+
+# 4. Launch headless processing session
+print("Starting processing session...")
+ids = session.create(
+    name="data-analysis",
+    image="images.canfar.net/skaha/astroml:latest",
+    kind="headless",
+    cmd="python",
+    args=["/arc/home/user/analysis/process_data.py"],
+    cores=4,
+    ram=16
+)
+print(f"Session started: {ids[0]}")
+
+# 5. Monitor progress
+while True:
+    info = session.fetch()
+    current = next((s for s in info if s.id == ids[0]), None)
+    if current:
+        print(f"Status: {current.status}")
+        if current.status in ["Succeeded", "Failed", "Error"]:
+            break
+    time.sleep(30)
+
+# 6. Download results
+print("Downloading results...")
+for result_file in vos.glob("vos:/arc/home/user/analysis/output/*.fits"):
+    local_name = result_file.split("/")[-1]
+    vos.copy(result_file, f"./results/{local_name}")
+    print(f"Downloaded: {local_name}")
+
+# 7. Clean up session
+session.destroy(ids)
+print("Done!")
+```
+
+!!! tip "VOSpace Paths in Sessions"
+    Files in VOSpace are automatically mounted in sessions:
+
+    - `vos:/arc/home/username/` → `/arc/home/username/`
+    - `vos:/arc/projects/myproject/` → `/arc/projects/myproject/`
+
+    You can read and write directly to these paths from within your session.

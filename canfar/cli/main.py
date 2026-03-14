@@ -17,6 +17,7 @@ from canfar.cli.prune import prune
 from canfar.cli.ps import ps
 from canfar.cli.stats import stats
 from canfar.cli.version import version
+from canfar.cli.storage import storage_cli
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.utils.console import console
@@ -138,6 +139,13 @@ cli.add_typer(
     rich_help_panel="Image Management",
 )
 
+cli.add_typer(
+    storage_cli,
+    name="storage",
+    help="Manage files in Cavern storage",
+    no_args_is_help=True,
+    rich_help_panel="File Management",
+)
 
 cli.add_typer(
     config,
