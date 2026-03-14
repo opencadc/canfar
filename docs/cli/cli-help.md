@@ -3,10 +3,10 @@
 The CLI provides a comprehensive command-line interface for interacting with the CANFAR Science Platform. This reference covers all available commands and their options.
 
 !!! info "Getting Started"
-    The CLI can be accessed using the `canfar` command in your environment:
-    ```bash
+The CLI can be accessed using the `canfar` command in your environment:
+`bash
     canfar --help
-    ```
+    `
 
 ## Main Command
 
@@ -18,17 +18,17 @@ canfar [OPTIONS] COMMAND [ARGS]...
 
 ### Global Options
 
-| Option | Description |
-|--------|-------------|
-| `--install-completion` | Install completion for the current shell |
-| `--show-completion` | Show completion for the current shell, to copy it or customize the installation |
-| `--help` | Show help message and exit |
+| Option                 | Description                                                                     |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| `--install-completion` | Install completion for the current shell                                        |
+| `--show-completion`    | Show completion for the current shell, to copy it or customize the installation |
+| `--help`               | Show help message and exit                                                      |
 
 !!! tip "Shell Completion"
-    Enable shell completion for a better CLI experience by running:
-    ```bash
+Enable shell completion for a better CLI experience by running:
+`bash
     canfar --install-completion
-    ```
+    `
 
 ---
 
@@ -50,25 +50,25 @@ canfar auth login [OPTIONS]
 
 ##### Options
 
-| Option | Type | Default | Description |
-|--------|------|---------|-------------|
-| `--force` | Flag | - | Force re-authentication |
-| `--debug` | Flag | - | Enable debug logging |
-| `--dead` | Flag | - | Include dead servers in discovery |
-| `--dev` | Flag | - | Include dev servers in discovery |
-| `--details` | Flag | - | Include server details in discovery |
-| `--timeout`, `-t` | INTEGER | 2 | Timeout for server response |
-| `--discovery-url` | TEXT | `https://ska-iam.stfc.ac.uk/.well-known/openid-configuration` | OIDC Discovery URL |
+| Option            | Type    | Default                                                       | Description                         |
+| ----------------- | ------- | ------------------------------------------------------------- | ----------------------------------- |
+| `--force`         | Flag    | -                                                             | Force re-authentication             |
+| `--debug`         | Flag    | -                                                             | Enable debug logging                |
+| `--dead`          | Flag    | -                                                             | Include dead servers in discovery   |
+| `--dev`           | Flag    | -                                                             | Include dev servers in discovery    |
+| `--details`       | Flag    | -                                                             | Include server details in discovery |
+| `--timeout`, `-t` | INTEGER | 2                                                             | Timeout for server response         |
+| `--discovery-url` | TEXT    | `https://ska-iam.stfc.ac.uk/.well-known/openid-configuration` | OIDC Discovery URL                  |
 
 !!! example "Basic Login"
-    ```bash
+`bash
     canfar auth login
-    ```
+    `
 
 !!! example "Login with Debug Information"
-    ```bash
+`bash
     canfar auth login --debug --details
-    ```
+    `
 
 #### `canfar auth list` / `canfar auth ls`
 
@@ -91,9 +91,9 @@ canfar auth switch CONTEXT
 - `CONTEXT` (required): The name of the context to activate
 
 !!! example
-    ```bash
+`bash
     canfar auth switch SRCnet-Sweden
-    ```
+    `
 
 #### `canfar auth remove` / `canfar auth rm`
 
@@ -108,7 +108,7 @@ canfar auth remove CONTEXT
 - `CONTEXT` (required): The name of the context to remove
 
 !!! warning "Permanent Action"
-    This action permanently removes the authentication context and cannot be undone.
+This action permanently removes the authentication context and cannot be undone.
 
 #### `canfar auth purge`
 
@@ -120,12 +120,12 @@ canfar auth purge [OPTIONS]
 
 ##### Options
 
-| Option | Description |
-|--------|-------------|
+| Option        | Description              |
+| ------------- | ------------------------ |
 | `--yes`, `-y` | Skip confirmation prompt |
 
 !!! danger "Destructive Action"
-    This command removes ALL authentication contexts. Use with caution!
+This command removes ALL authentication contexts. Use with caution!
 
 ---
 
@@ -159,39 +159,39 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 
 #### Options
 
-| Option | Short | Type | Default | Description |
-|--------|-------|------|---------|-------------|
-| `--name` | `-n` | TEXT | Auto-generated | Name of the session |
-| `--cpu` | `-c` | INTEGER | flexible | Number of CPU cores (optional - uses flexible allocation if not specified) |
-| `--memory` | `-m` | INTEGER | flexible | Amount of RAM in GB (optional - uses flexible allocation if not specified) |
-| `--gpu` | `-g` | INTEGER | None | Number of GPUs |
-| `--env` | `-e` | TEXT | None | Environment variables (e.g., `--env KEY=VALUE`) |
-| `--replicas` | `-r` | INTEGER | 1 | Number of replicas to create |
-| `--debug` | - | Flag | - | Enable debug logging |
-| `--dry-run` | - | Flag | - | Dry run. Parse parameters and exit |
+| Option       | Short | Type    | Default        | Description                                                                |
+| ------------ | ----- | ------- | -------------- | -------------------------------------------------------------------------- |
+| `--name`     | `-n`  | TEXT    | Auto-generated | Name of the session                                                        |
+| `--cpu`      | `-c`  | INTEGER | flexible       | Number of CPU cores (optional - uses flexible allocation if not specified) |
+| `--memory`   | `-m`  | INTEGER | flexible       | Amount of RAM in GB (optional - uses flexible allocation if not specified) |
+| `--gpu`      | `-g`  | INTEGER | None           | Number of GPUs                                                             |
+| `--env`      | `-e`  | TEXT    | None           | Environment variables (e.g., `--env KEY=VALUE`)                            |
+| `--replicas` | `-r`  | INTEGER | 1              | Number of replicas to create                                               |
+| `--debug`    | -     | Flag    | -              | Enable debug logging                                                       |
+| `--dry-run`  | -     | Flag    | -              | Dry run. Parse parameters and exit                                         |
 
 !!! example "Create a Flexible Notebook Session (Default)"
-    ```bash
+`bash
     # Uses flexible resource allocation - adapts to user load
     canfar create notebook skaha/astroml:latest
-    ```
+    `
 
 !!! example "Create a Fixed Resource Notebook Session"
-    ```bash
+`bash
     # Uses fixed resource allocation - guaranteed resources
     canfar create --cpu 4 --memory 8 notebook skaha/astroml:latest
-    ```
+    `
 
 !!! example "Create a Headless Session with Command & Arguments"
-    ```bash
+`bash
     canfar create headless skaha/terminal:1.1.2 -- python3 /path/to/script.py --arg1 --arg2
-    ```
+    `
 
 !!! example "Create Replicated Headless Sessions"
-    ```bash
+``bash
     # Create 10 headless replicas running the `env` command
     canfar create --replicas 10 headless skaha/terminal:1.1.2 -- env
-    ```
+    ``
 
 #### Resource Allocation Modes
 
@@ -207,23 +207,23 @@ canfar ps [OPTIONS]
 
 #### Options
 
-| Option | Short | Type | Description |
-|--------|-------|------|-------------|
-| `--all` | `-a` | Flag | Show all sessions (default shows just running) |
-| `--quiet` | `-q` | Flag | Only show session IDs |
-| `--kind` | `-k` | Choice | Filter by session kind: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed` |
-| `--status` | `-s` | Choice | Filter by status: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed` |
-| `--debug` | - | Flag | Enable debug logging |
+| Option     | Short | Type   | Description                                                                                                 |
+| ---------- | ----- | ------ | ----------------------------------------------------------------------------------------------------------- |
+| `--all`    | `-a`  | Flag   | Show all sessions (default shows just running)                                                              |
+| `--quiet`  | `-q`  | Flag   | Only show session IDs                                                                                       |
+| `--kind`   | `-k`  | Choice | Filter by session kind: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed` |
+| `--status` | `-s`  | Choice | Filter by status: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed`                       |
+| `--debug`  | -     | Flag   | Enable debug logging                                                                                        |
 
 !!! example "List All Sessions"
-    ```bash
+`bash
     canfar ps --all
-    ```
+    `
 
 !!! example "List Only Notebook Sessions"
-    ```bash
+`bash
     canfar ps --kind notebook
-    ```
+    `
 
 ### `canfar events`
 
@@ -239,14 +239,14 @@ canfar events [OPTIONS] SESSION_IDS...
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! example
-    ```bash
+`bash
     canfar events abc123 def456
-    ```
+    `
 
 ### `canfar info`
 
@@ -262,14 +262,14 @@ canfar info [OPTIONS] SESSION_IDS...
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! example
-    ```bash
+`bash
     canfar info abc123
-    ```
+    `
 
 ### `canfar open`
 
@@ -285,17 +285,17 @@ canfar open [OPTIONS] SESSION_IDS...
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! tip "Browser Integration"
-    This command automatically opens the session URLs in your default web browser.
+This command automatically opens the session URLs in your default web browser.
 
 !!! example
-    ```bash
+`bash
     canfar open abc123 def456
-    ```
+    `
 
 ### `canfar logs`
 
@@ -311,14 +311,14 @@ canfar logs [OPTIONS] SESSION_IDS...
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! example
-    ```bash
+`bash
     canfar logs abc123
-    ```
+    `
 
 ### `canfar delete`
 
@@ -334,23 +334,23 @@ canfar delete [OPTIONS] SESSION_IDS...
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--force` | `-f` | Force deletion without confirmation |
-| `--debug` | - | Enable debug logging |
+| Option    | Short | Description                         |
+| --------- | ----- | ----------------------------------- |
+| `--force` | `-f`  | Force deletion without confirmation |
+| `--debug` | -     | Enable debug logging                |
 
 !!! warning "Permanent Action"
-    Deleted sessions cannot be recovered. Use `--force` to skip confirmation prompts.
+Deleted sessions cannot be recovered. Use `--force` to skip confirmation prompts.
 
 !!! example "Delete with Confirmation"
-    ```bash
+`bash
     canfar delete abc123
-    ```
+    `
 
 !!! example "Force Delete Multiple Sessions"
-    ```bash
+`bash
     canfar delete abc123 def456 --force
-    ```
+    `
 
 ### `canfar prune`
 
@@ -368,19 +368,19 @@ canfar prune [OPTIONS] PREFIX KIND STATUS
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--debug` | - | Enable debug logging |
-| `--help` | `-h` | Show help message and exit |
+| Option    | Short | Description                |
+| --------- | ----- | -------------------------- |
+| `--debug` | -     | Enable debug logging       |
+| `--help`  | `-h`  | Show help message and exit |
 
 !!! example "Prune Completed Headless Sessions"
-    ```bash
+`bash
     canfar prune "test-" headless Running
     canfar prune ".*-was-" notebook Running  # regex because of metacharacters
-    ```
+    `
 
 !!! tip "Bulk Cleanup"
-    Use prune to clean up multiple sessions that match specific criteria, especially useful for automated workflows.
+Use prune to clean up multiple sessions that match specific criteria, especially useful for automated workflows.
 
 ---
 
@@ -396,17 +396,17 @@ canfar stats [OPTIONS]
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! example
-    ```bash
+`bash
     canfar stats
-    ```
+    `
 
 !!! info "Resource Monitoring"
-    This command provides insights into cluster resource usage, helping you understand available capacity.
+This command provides insights into cluster resource usage, helping you understand available capacity.
 
 ---
 
@@ -425,9 +425,9 @@ canfar config show [OPTIONS]
 ```
 
 !!! example
-    ```bash
+`bash
     canfar config ls
-    ```
+    `
 
 #### `canfar config path`
 
@@ -438,12 +438,12 @@ canfar config path [OPTIONS]
 ```
 
 !!! example
-    ```bash
+`bash
     canfar config path
-    ```
+    `
 
 !!! tip "Configuration Location"
-    Use this command to find where your configuration file is stored for manual editing if needed.
+Use this command to find where your configuration file is stored for manual editing if needed.
 
 #### `canfar config get`
 
@@ -454,9 +454,9 @@ canfar config get PATH
 ```
 
 !!! example
-    ```bash
+`bash
     canfar config get console.width
-    ```
+    `
 
 #### `canfar config set`
 
@@ -467,9 +467,9 @@ canfar config set PATH VALUE
 ```
 
 !!! example
-    ```bash
+`bash
     canfar config set console.width 130
-    ```
+    `
 
 ### `canfar version`
 
@@ -481,35 +481,35 @@ canfar version [OPTIONS]
 
 #### Options
 
-| Option | Default | Description |
-|--------|---------|-------------|
+| Option                   | Default      | Description                               |
+| ------------------------ | ------------ | ----------------------------------------- |
 | `--debug` / `--no-debug` | `--no-debug` | Show detailed information for bug reports |
 
 !!! example "Basic Version Info"
-    ```bash
+`bash
     canfar version
-    ```
+    `
 
 !!! example "Detailed Debug Information"
-    ```bash
+`bash
     canfar version --debug
-    ```
+    `
 
 ---
 
 ## File Management (VOSpace)
 
-The `canfar vos` command group provides comprehensive file management capabilities for VOSpace, CANFAR's persistent storage system. These commands use the same authentication context as session management, providing a unified experience.
+The `canfar storage` command group provides comprehensive file management capabilities for VOSpace, CANFAR's persistent storage system. These commands use the same authentication context as session management, providing a unified experience.
 
 !!! info "VOSpace Paths"
-    VOSpace paths use the `vos:` prefix, e.g., `vos:/data/file.txt` or `vos:` for the root directory.
+VOSpace paths use the `vos:` prefix, e.g., `vos:/data/file.txt` or `vos:` for the root directory.
 
-### `canfar vos ls`
+### `canfar storage ls`
 
 List VOSpace directory contents.
 
 ```bash
-canfar vos ls [OPTIONS] URI
+canfar storage ls [OPTIONS] URI
 ```
 
 **Arguments:**
@@ -518,37 +518,37 @@ canfar vos ls [OPTIONS] URI
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--long` | `-l` | Verbose listing with permissions, owner, size, and date |
-| `--group` | `-g` | Display group read/write information |
-| `--human` | `-h` | Make sizes human readable (K, M, G, T) |
-| `--Size` | `-S` | Sort files by size |
-| `--reverse` | `-r` | Reverse the sort order |
-| `--time` | `-t` | Sort by time copied to VOSpace |
-| `--debug` | - | Enable debug logging |
+| Option      | Short | Description                                             |
+| ----------- | ----- | ------------------------------------------------------- |
+| `--long`    | `-l`  | Verbose listing with permissions, owner, size, and date |
+| `--group`   | `-g`  | Display group read/write information                    |
+| `--human`   | `-h`  | Make sizes human readable (K, M, G, T)                  |
+| `--Size`    | `-S`  | Sort files by size                                      |
+| `--reverse` | `-r`  | Reverse the sort order                                  |
+| `--time`    | `-t`  | Sort by time copied to VOSpace                          |
+| `--debug`   | -     | Enable debug logging                                    |
 
 !!! example "List Root Directory"
-    ```bash
+`bash
     canfar vos ls vos:
-    ```
+    `
 
 !!! example "Long Listing with Human-Readable Sizes"
-    ```bash
+`bash
     canfar vos ls -lh vos:/data/
-    ```
+    `
 
 !!! example "List FITS Files Sorted by Size"
-    ```bash
-    canfar vos ls -lhS vos:/data/*.fits
-    ```
+`bash
+    canfar storage ls -lhS vos:/data/*.fits
+    `
 
-### `canfar vos cp`
+### `canfar storage cp`
 
 Copy files to and from VOSpace.
 
 ```bash
-canfar vos cp [OPTIONS] SOURCE... DESTINATION
+canfar storage cp [OPTIONS] SOURCE... DESTINATION
 ```
 
 **Arguments:**
@@ -558,48 +558,42 @@ canfar vos cp [OPTIONS] SOURCE... DESTINATION
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--exclude` | - | Skip files matching pattern (overrides include) |
-| `--include` | - | Only copy files matching pattern |
-| `--interrogate` | `-i` | Ask before overwriting files |
-| `--follow-links` | `-L` | Follow symbolic links |
-| `--ignore` | - | Ignore errors and continue with recursive copy |
-| `--head` | - | Copy only the headers of a FITS file from VOSpace |
-| `--debug` | - | Enable debug logging |
+| Option           | Short | Description                                       |
+| ---------------- | ----- | ------------------------------------------------- |
+| `--exclude`      | -     | Skip files matching pattern (overrides include)   |
+| `--include`      | -     | Only copy files matching pattern                  |
+| `--interrogate`  | `-i`  | Ask before overwriting files                      |
+| `--follow-links` | `-L`  | Follow symbolic links                             |
+| `--ignore`       | -     | Ignore errors and continue with recursive copy    |
+| `--head`         | -     | Copy only the headers of a FITS file from VOSpace |
+| `--debug`        | -     | Enable debug logging                              |
 
 !!! example "Upload a File"
-    ```bash
-    canfar vos cp myfile.txt vos:/data/
-    ```
+`bash
+    canfar storage cp myfile.txt vos:/data/
+    `
 
 !!! example "Download Files with Wildcard"
-    ```bash
-    canfar vos cp vos:/data/*.fits ./local_dir/
-    ```
+`bash
+    canfar storage cp vos:/data/*.fits ./local_dir/
+    `
 
 !!! example "Copy with Confirmation"
-    ```bash
-    canfar vos cp -i local_dir/ vos:/backup/
-    ```
+`bash
+    canfar storage cp -i local_dir/ vos:/backup/
+    `
 
 !!! example "Copy FITS Header Only"
-    ```bash
-    canfar vos cp --head vos:/data/image.fits ./header.txt
-    ```
+`bash
+    canfar storage cp --head vos:/data/image.fits ./header.txt
+    `
 
-!!! tip "Cutout Support"
-    VOSpace copy supports FITS cutouts using standard notation:
-    ```bash
-    canfar vos cp "vos:/data/image.fits[1:100,1:100]" ./cutout.fits
-    ```
-
-### `canfar vos rm`
+### `canfar storage rm`
 
 Remove VOSpace files or directories.
 
 ```bash
-canfar vos rm [OPTIONS] NODE...
+canfar storage rm [OPTIONS] NODE...
 ```
 
 **Arguments:**
@@ -608,30 +602,30 @@ canfar vos rm [OPTIONS] NODE...
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--recursive` | `-R` | Delete directory even if not empty |
-| `--debug` | - | Enable debug logging |
+| Option        | Short | Description                        |
+| ------------- | ----- | ---------------------------------- |
+| `--recursive` | `-R`  | Delete directory even if not empty |
+| `--debug`     | -     | Enable debug logging               |
 
 !!! warning "Permanent Action"
-    Deleted files cannot be recovered. Use with caution!
+Deleted files cannot be recovered. Use with caution!
 
 !!! example "Delete a File"
-    ```bash
-    canfar vos rm vos:/data/file.txt
-    ```
+`bash
+    canfar storage rm vos:/data/file.txt
+    `
 
 !!! example "Delete a Directory Recursively"
-    ```bash
-    canfar vos rm -R vos:/data/old_dir/
-    ```
+`bash
+    canfar storage rm -R vos:/data/old_dir/
+    `
 
-### `canfar vos mkdir`
+### `canfar storage mkdir`
 
 Create a new VOSpace directory (ContainerNode).
 
 ```bash
-canfar vos mkdir [OPTIONS] CONTAINER_NODE
+canfar storage mkdir [OPTIONS] CONTAINER_NODE
 ```
 
 **Arguments:**
@@ -640,27 +634,27 @@ canfar vos mkdir [OPTIONS] CONTAINER_NODE
 
 #### Options
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--parents` | `-p` | Create intermediate directories as required |
-| `--debug` | - | Enable debug logging |
+| Option      | Short | Description                                 |
+| ----------- | ----- | ------------------------------------------- |
+| `--parents` | `-p`  | Create intermediate directories as required |
+| `--debug`   | -     | Enable debug logging                        |
 
 !!! example "Create a Directory"
-    ```bash
-    canfar vos mkdir vos:/data/new_dir
-    ```
+`bash
+    canfar storage mkdir vos:/data/new_dir
+    `
 
 !!! example "Create Nested Directories"
-    ```bash
-    canfar vos mkdir -p vos:/data/path/to/new_dir
-    ```
+`bash
+    canfar storage mkdir -p vos:/data/path/to/new_dir
+    `
 
-### `canfar vos mv`
+### `canfar storage mv`
 
 Move or rename a VOSpace node.
 
 ```bash
-canfar vos mv [OPTIONS] SOURCE DESTINATION
+canfar storage mv [OPTIONS] SOURCE DESTINATION
 ```
 
 **Arguments:**
@@ -670,213 +664,16 @@ canfar vos mv [OPTIONS] SOURCE DESTINATION
 
 #### Options
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description          |
+| --------- | -------------------- |
 | `--debug` | Enable debug logging |
 
 !!! example "Rename a File"
-    ```bash
+`bash
     canfar vos mv vos:/data/old.txt vos:/data/new.txt
-    ```
+    `
 
 !!! example "Move to Another Directory"
-    ```bash
-    canfar vos mv vos:/data/file.txt vos:/archive/
-    ```
-
-### `canfar vos cat`
-
-Display contents of a VOSpace file.
-
-```bash
-canfar vos cat [OPTIONS] URI
-```
-
-**Arguments:**
-
-- `URI` (required): VOSpace file to display
-
-#### Options
-
-| Option | Description |
-|--------|-------------|
-| `--head` | Display only the header (useful for FITS files) |
-| `--debug` | Enable debug logging |
-
-!!! example "Display File Contents"
-    ```bash
-    canfar vos cat vos:/data/readme.txt
-    ```
-
-!!! example "Display FITS Header"
-    ```bash
-    canfar vos cat --head vos:/data/image.fits
-    ```
-
-### `canfar vos ln`
-
-Create a symbolic link in VOSpace.
-
-```bash
-canfar vos ln [OPTIONS] SOURCE TARGET
-```
-
-**Arguments:**
-
-- `SOURCE` (required): Source location (can be `vos:`, `https:`, or `file:` URI)
-- `TARGET` (required): Target VOSpace LinkNode to create
-
-#### Options
-
-| Option | Description |
-|--------|-------------|
-| `--debug` | Enable debug logging |
-
-!!! example "Link to Another VOSpace Node"
-    ```bash
-    canfar vos ln vos:/data/original.txt vos:/data/link.txt
-    ```
-
-!!! example "Link to External URL"
-    ```bash
-    canfar vos ln https://example.com/data.fits vos:/data/external_link
-    ```
-
-### `canfar vos lock`
-
-Lock, unlock, or check lock status of a VOSpace node.
-
-```bash
-canfar vos lock [OPTIONS] NODE
-```
-
-**Arguments:**
-
-- `NODE` (required): VOSpace node to lock/unlock/check
-
-#### Options
-
-| Option | Description |
-|--------|-------------|
-| `--lock` | Lock the node (prevents modifications) |
-| `--unlock` | Unlock the node |
-| `--debug` | Enable debug logging |
-
-!!! info "Lock Behavior"
-    A locked node cannot be copied to, moved, or deleted. Without `--lock` or `--unlock`, displays the current lock status.
-
-!!! example "Lock a File"
-    ```bash
-    canfar vos lock vos:/data/important.txt --lock
-    ```
-
-!!! example "Unlock a File"
-    ```bash
-    canfar vos lock vos:/data/important.txt --unlock
-    ```
-
-!!! example "Check Lock Status"
-    ```bash
-    canfar vos lock vos:/data/important.txt
-    ```
-
-### `canfar vos chmod`
-
-Change read/write permissions on VOSpace nodes.
-
-```bash
-canfar vos chmod [OPTIONS] MODE NODE [GROUPS...]
-```
-
-**Arguments:**
-
-- `MODE` (required): Permission mode in format `(o|g|og)[+|-|=](r|w|rw)`
-    - `o` = other/public
-    - `g` = group
-    - `r` = read
-    - `w` = write
-- `NODE` (required): VOSpace node to modify
-- `GROUPS...` (optional): Group name(s) for group permissions (up to 4)
-
-#### Options
-
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--recursive` | `-R` | Apply permissions recursively |
-| `--debug` | - | Enable debug logging |
-
-!!! example "Make a File Public"
-    ```bash
-    canfar vos chmod o+r vos:/data/file.txt
-    ```
-
-!!! example "Make a File Private"
-    ```bash
-    canfar vos chmod o-r vos:/data/file.txt
-    ```
-
-!!! example "Add Group Read Permission"
-    ```bash
-    canfar vos chmod g+r vos:/data/file.txt MyGroup1 MyGroup2
-    ```
-
-!!! example "Add Group Read/Write Permission"
-    ```bash
-    canfar vos chmod g+rw vos:/data/project/ ProjectTeam -R
-    ```
-
-!!! example "Remove Group Permissions"
-    ```bash
-    canfar vos chmod g-rw vos:/data/file.txt
-    ```
-
-### `canfar vos tag`
-
-Manage properties (tags/metadata) on VOSpace nodes.
-
-```bash
-canfar vos tag [OPTIONS] NODE [PROPERTIES...]
-```
-
-**Arguments:**
-
-- `NODE` (required): VOSpace node to manage properties on
-- `PROPERTIES...` (optional): Property operations:
-    - `key=value` to set a property
-    - `key` to read a property value
-    - `key=` to delete a property
-
-#### Options
-
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--remove` | - | Remove the specified properties |
-| `--recursive` | `-R` | Apply operation recursively |
-| `--debug` | - | Enable debug logging |
-
-!!! example "Set a Property"
-    ```bash
-    canfar vos tag vos:/data/file.fits quality=good
-    ```
-
-!!! example "Read a Property"
-    ```bash
-    canfar vos tag vos:/data/file.fits quality
-    ```
-
-!!! example "List All Properties"
-    ```bash
-    canfar vos tag vos:/data/file.fits
-    ```
-
-!!! example "Delete a Property"
-    ```bash
-    canfar vos tag vos:/data/file.fits quality=
-    # or
-    canfar vos tag vos:/data/file.fits quality --remove
-    ```
-
-!!! example "Set Properties Recursively"
-    ```bash
-    canfar vos tag vos:/data/ status=verified -R
-    ```
+`bash
+    canfar storage mv vos:/data/file.txt vos:/archive/
+    `
