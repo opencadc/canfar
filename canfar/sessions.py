@@ -18,6 +18,16 @@ if TYPE_CHECKING:
 log = get_logger(__name__)
 
 
+def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
+    """Log a failed HTTP task with caller context.
+
+    Status codes, bodies, and timeouts are already logged by httpx response hooks
+    (``catch`` / ``acatch``); this adds identifying context (payload or session id)
+    without duplicating tracebacks.
+    """
+    log.error("%s: %s: %s", operation, context, exc)
+
+
 class Session(HTTPClient):
     """CANFAR Session Management Client.
 
@@ -115,9 +125,8 @@ class Session(HTTPClient):
             try:
                 response: Response = self.client.get(url=f"session/{value}")
                 results.append(response.json())
-            except HTTPError:
-                err = f"failed to fetch session info for {value}"
-                log.exception(err)
+            except HTTPError as err:
+                _log_http_task_failure("failed to fetch session info for", value, err)
         return results
 
     def logs(
@@ -150,9 +159,8 @@ class Session(HTTPClient):
                     params=parameters,
                 )
                 results[value] = response.text
-            except HTTPError:
-                err = f"failed to fetch logs for session {value}"
-                log.exception(err)
+            except HTTPError as err:
+                _log_http_task_failure("failed to fetch logs for session", value, err)
 
         if verbose:
             for key, value in results.items():
@@ -202,7 +210,9 @@ class Session(HTTPClient):
                 * REPLICA_COUNT - The total number of replicas
 
         Returns:
-            List[str]: A list of session IDs for the launched sessions.
+            List[str]: Session IDs for launched sessions. On HTTP or network failure
+                for a given attempt, that attempt is omitted; if all attempts fail,
+                returns an empty list. Does not raise for those errors.
 
         Examples:
             >>> from canfar.session import Session
@@ -238,9 +248,12 @@ class Session(HTTPClient):
             try:
                 response: Response = self.client.post(url="session", params=payload)
                 results.append(response.text.rstrip("\r\n"))
-            except HTTPError:
-                err = f"Failed to create session with payload: {payload}"
-                log.exception(err)
+            except HTTPError as err:
+                _log_http_task_failure(
+                    "Failed to create session with payload",
+                    payload,
+                    err,
+                )
         return results
 
     def events(
@@ -277,9 +290,8 @@ class Session(HTTPClient):
                     params=parameters,
                 )
                 results.append({value: response.text})
-            except HTTPError:
-                err = f"Failed to fetch events for session {value}"
-                log.exception(err)
+            except HTTPError as err:
+                _log_http_task_failure("Failed to fetch events for session", value, err)
         if verbose and results:
             for result in results:
                 for key, value in result.items():
@@ -524,12 +536,12 @@ class AsyncSession(HTTPClient):
 
         tasks = [bounded(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for reply in responses:
+        for value, reply in zip(ids, responses, strict=True):
             if isinstance(reply, Exception):
-                log.error(reply)
+                _log_http_task_failure("failed to fetch session info for", value, reply)
             elif isinstance(reply, dict):
                 results.append(reply)
-        log.debug(results)
+        log.debug("Session info records collected: %s", results)
         return results
 
     async def logs(
@@ -570,9 +582,9 @@ class AsyncSession(HTTPClient):
 
         tasks = [bounded(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for reply in responses:
+        for value, reply in zip(ids, responses, strict=True):
             if isinstance(reply, Exception):
-                log.error(reply)
+                _log_http_task_failure("failed to fetch logs for session", value, reply)
             elif isinstance(reply, tuple):
                 results[reply[0]] = reply[1]
 
@@ -624,7 +636,9 @@ class AsyncSession(HTTPClient):
                 * REPLICA_COUNT - The total number of replicas
 
         Returns:
-            List[str]: A list of session IDs for the launched sessions.
+            List[str]: Session IDs for launched sessions. On HTTP or network failure
+                for a given attempt, that attempt is omitted; if all attempts fail,
+                returns an empty list. Does not raise for those errors.
 
         Examples:
             >>> from canfar.session import AsyncSession
@@ -668,12 +682,16 @@ class AsyncSession(HTTPClient):
         msg = f"Creating {replicas} {kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for reply in responses:
+        for payload, reply in zip(payloads, responses, strict=True):
             if isinstance(reply, Exception):
-                log.error(reply)
+                _log_http_task_failure(
+                    "Failed to create session with payload",
+                    payload,
+                    reply,
+                )
             elif isinstance(reply, str):
                 results.append(reply)
-        log.debug(results)
+        log.debug("Session IDs collected from create: %s", results)
         return results
 
     async def events(
@@ -716,9 +734,13 @@ class AsyncSession(HTTPClient):
 
         tasks = [bounded(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for reply in responses:
+        for value, reply in zip(ids, responses, strict=True):
             if isinstance(reply, Exception):
-                log.error(reply)
+                _log_http_task_failure(
+                    "Failed to fetch events for session",
+                    value,
+                    reply,
+                )
             elif isinstance(reply, dict):
                 results.append(dict(reply))
 
@@ -727,7 +749,7 @@ class AsyncSession(HTTPClient):
                 for key, value in result.items():
                     log.info("Session ID: %s", key)
                     log.info(value)
-        log.debug(results)
+        log.debug("Session events collected: %s", results)
         return results if not verbose else None
 
     async def destroy(self, ids: str | list[str]) -> dict[str, bool]:
