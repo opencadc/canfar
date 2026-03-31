@@ -176,6 +176,13 @@ def creation(
                     )
                     return
                 console.print("[bold red]Failed to create session(s).[/bold red]")
+                console.print(
+                    "[dim]No session IDs were returned. Run with --debug for request "
+                    "details, or set a longer client timeout (environment variable "
+                    "CANFAR_TIMEOUT, in seconds) if the image pull or platform is "
+                    "slow. You can also set CANFAR_LOGLEVEL=DEBUG for library logs."
+                    "[/dim]"
+                )
             except KeyboardInterrupt:
                 console.print(
                     "\n[bold yellow]Operation cancelled by user.[/bold yellow]"

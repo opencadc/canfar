@@ -240,6 +240,12 @@ You now have a fully-equipped astronomy computing environment running in the clo
 
 !!! warning "Common Issues"
 
+    - **`canfar create` reports failure with no session ID**
+        - Run the same command with `--debug` to print request parameters and
+          library logs (timeouts, HTTP status, and response bodies are logged by
+          the HTTP client).
+        - Library-only debugging: set `CANFAR_LOGLEVEL=DEBUG` for verbose logs
+          from the `canfar` package.
     - **Notebook won't start?**
         - Check available resources: `canfar stats`
         - Try flexible mode (default) for faster scheduling
