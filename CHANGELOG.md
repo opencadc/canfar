@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/opencadc/canfar/compare/v1.3.3...v1.3.4) (2026-03-31)
+
+
+### Bug Fixes
+
+* **logging:** enhanced error handling in session management for HTTP task failures. ([0b57d75](https://github.com/opencadc/canfar/commit/0b57d7532b93ab839d21141701ff4ad0a92b8dca))
+
 ## [1.3.3](https://github.com/opencadc/canfar/compare/v1.3.2...v1.3.3) (2026-03-04)
 
 
