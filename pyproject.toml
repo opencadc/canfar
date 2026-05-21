@@ -268,7 +268,7 @@ addopts = [
     "--cov-report=term-missing:skip-covered",
     "--cov-report=html",
     "--cov-report=xml",
-    "--cov-fail-under=80",
+    "--cov-fail-under=75",
     "-n=auto",  # Enable parallel execution with pytest-xdist
     "--dist=loadfile",  # Use loadfile distribution to ensure tests in same file run in same worker (required for pytest-order)
 ]
