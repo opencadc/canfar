@@ -41,6 +41,22 @@
          <lastmod>2026-05-21</lastmod>
     </url>
     <url>
+         <loc>https://opencadc.github.io/canfar/edge/agents/architecture/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/agents/domain/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/agents/issue-tracker/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/agents/triage-labels/</loc>
+         <lastmod>2026-05-21</lastmod>
+    </url>
+    <url>
          <loc>https://opencadc.github.io/canfar/edge/cli/authentication-contexts/</loc>
          <lastmod>2026-05-21</lastmod>
     </url>
