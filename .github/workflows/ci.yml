@@ -95,9 +95,9 @@ jobs:
       run: |
         set -euo pipefail
         if [ -n "${CANFAR_BASEURL}" ] && [ -n "${CANFAR_USERNAME}" ] && [ -n "${CANFAR_PASSWORD}" ]; then
-          uv run pytest tests --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+          uv run pytest tests -m "not slow" --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
         else
-          uv run pytest tests -m "not slow and not integration" --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+          uv run pytest tests -m "not slow" --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
         fi
     -
       name: Remove CANFAR Certificate
