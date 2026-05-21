@@ -1,6 +1,6 @@
 repos:
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.17.1
+    rev: v2.1.0
     hooks:
       - id: mypy
         additional_dependencies:
@@ -48,7 +48,7 @@ repos:
       args: ["cc", "--min=C","--total-average","--exclude=tests/*.py"]
 
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.30.0
     hooks:
       - id: gitleaks
 
@@ -60,7 +60,7 @@ repos:
         exclude: (^|/)uv\.lock$|^tests/
   # Python code formatting and linting with Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.12.10
+    rev: v0.15.14
     hooks:
       # Linter
       - id: ruff
@@ -76,13 +76,13 @@ repos:
 
   # GitHub Actions workflow linting
   - repo: https://github.com/rhysd/actionlint
-    rev: v1.7.7
+    rev: v1.7.12
     hooks:
       - id: actionlint
 
   # Check for Python version compatibility
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.20.0
+    rev: v3.21.2
     hooks:
       - id: pyupgrade
         args: [--py39-plus]
