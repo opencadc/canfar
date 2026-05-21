@@ -10,6 +10,8 @@ on:
     paths-ignore:
       - 'docs/**'
 
+permissions: read-all
+
 jobs:
   pre-commit-checks:
     runs-on: ubuntu-latest
