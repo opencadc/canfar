@@ -2065,7 +2065,7 @@ attributes and methods.</p>
         <span class="k">if</span> <span class="n">availaibility</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No availability information found in the response.&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">notify</span> <span class="k">if</span> <span class="n">notify</span> <span class="k">else</span> <span class="s2">&quot;No additional information provided.&quot;</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">notify</span> <span class="ow">or</span> <span class="s2">&quot;No additional information provided.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">availaibility</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -2178,7 +2178,7 @@ attributes and methods.</p>
     <span class="k">if</span> <span class="n">availaibility</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">log</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;No availability information found in the response.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">False</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">notify</span> <span class="k">if</span> <span class="n">notify</span> <span class="k">else</span> <span class="s2">&quot;No additional information provided.&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">notify</span> <span class="ow">or</span> <span class="s2">&quot;No additional information provided.&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">availaibility</span> <span class="o">==</span> <span class="s2">&quot;true&quot;</span>
 </code></pre></div></td></tr></table></div>
             </details>
