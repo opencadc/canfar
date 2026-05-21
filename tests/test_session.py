@@ -28,6 +28,8 @@ def session():
     del session
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_fetch_with_kind(session: Session) -> None:
     """Test fetching images with kind."""
     session.fetch(kind="headless")

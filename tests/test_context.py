@@ -13,6 +13,8 @@ def context():
     del context
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_context(context) -> None:
     """Test context fetch."""
     assert "cores" in context.resources()

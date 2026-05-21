@@ -24,6 +24,8 @@ def asession():
 
 
 @pytest.mark.asyncio
+@pytest.mark.integration
+@pytest.mark.slow
 async def test_fetch_with_kind(asession: AsyncSession) -> None:
     """Test fetching images with kind."""
     await asession.fetch(kind="headless")

@@ -16,11 +16,15 @@ def images():
     del images
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_images_fetch(images: Images) -> None:
     """Test fetching images."""
     assert len(images.fetch()) > 0
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_images_with_kind(images: Images) -> None:
     """Test fetching images with kind."""
     assert "images.canfar.net/skaha/base-notebook:latest" in images.fetch(
