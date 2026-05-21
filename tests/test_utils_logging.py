@@ -277,9 +277,7 @@ class TestConvenienceFunctions:
 
     def test_get_logger_without_name(self) -> None:
         """Test get_logger without name returns main logger."""
-        with patch.object(
-            CanfarLogger, "logger", new_callable=lambda: Mock()
-        ) as mock_logger:
+        with patch.object(CanfarLogger, "logger", new_callable=Mock) as mock_logger:
             result = get_logger()
             assert result is mock_logger
 
