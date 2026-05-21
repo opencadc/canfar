@@ -95,7 +95,7 @@ def catch(response: httpx.Response) -> None:
             err.response.status_code,
             err.request.method,
             err.request.url,
-            err.response.text if err.response.text else "No response body",
+            err.response.text or "No response body",
         )
         raise
     except httpx.RequestError:
@@ -157,7 +157,7 @@ async def acatch(response: httpx.Response) -> None:
             err.response.status_code,
             err.request.method,
             err.request.url,
-            err.response.text if err.response.text else "No response body",
+            err.response.text or "No response body",
         )
         raise
     except httpx.RequestError:

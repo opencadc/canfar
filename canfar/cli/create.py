@@ -155,9 +155,9 @@ def creation(
                     ram=memory,
                     kind=kind,
                     gpu=gpu,
-                    cmd=cmd if cmd else None,
-                    args=args if args else None,
-                    env=environment if environment else None,
+                    cmd=cmd or None,
+                    args=args or None,
+                    env=environment or None,
                     replicas=replicas,
                 )
                 if session_ids:
