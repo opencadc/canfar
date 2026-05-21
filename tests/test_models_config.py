@@ -20,9 +20,11 @@ from canfar.models.registry import ContainerRegistry
 class TestConfigurationDefaults:
     """Test default state and initialization."""
 
-    def test_default_initialization(self) -> None:
+    def test_default_initialization(self, tmp_path: Path) -> None:
         """Test Configuration with correct defaults when no arguments provided."""
-        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
 
         # Test default active context
         assert config.active == "default"
