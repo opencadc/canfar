@@ -39,3 +39,18 @@ Use the canonical triage label vocabulary in GitHub. See `docs/agents/triage-lab
 ### Domain docs
 
 This repo uses a single-context domain glossary at root `CONTEXT.md`; ADRs are created lazily under `docs/adr/`. See `docs/agents/domain.md`.
+
+## Learned User Preferences
+
+- Use caveman style only when the user explicitly invokes it; otherwise use normal concise style.
+- During design grilling, ask one question at a time and converge decisions incrementally.
+- During broad refactors, preserve existing tests and avoid API/CLI output regressions unless the user explicitly approves those changes.
+
+## Learned Workspace Facts
+
+- Issue tracking for this repo uses Jira on `herzberg.atlassian.net`, CADC project, with `CANFAR` label required for canfar work.
+- PRDs/spec work for this repo is tracked in Jira (for example `CADC-15643`), not in GitHub Issues.
+- Triage is status-based in Jira: `needs-triage` -> To Do, `needs-info` -> On Hold, `ready-for-agent` -> In Progress, `ready-for-human` -> Review, `wontfix` -> On Hold.
+- Domain documentation is multi-context via `CONTEXT-MAP.md` with `client` and `cli` contexts.
+- Specs/decisions are Jira-first; this repo does not keep ADR/RFC directories as the source of truth.
+- `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
