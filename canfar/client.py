@@ -283,7 +283,8 @@ class HTTPClient(BaseSettings):
                 kwargs["verify"] = self._get_ssl_context(ctx.path)
             except FileNotFoundError as err:
                 raise AuthContextError(
-                    self.config.active, f"x509 cert {ctx.path} does not exist."
+                    self.config.active.authentication,
+                    f"x509 cert {ctx.path} does not exist.",
                 ) from err
             return kwargs
         return kwargs

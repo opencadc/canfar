@@ -81,7 +81,7 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
         result = runner.invoke(config, ["show"])
 
     assert result.exit_code == 0
-    assert "showing defaults" in result.stdout
+    assert "'version': 1" in result.stdout
 
     result = runner.invoke(config, ["path"])
     assert result.exit_code == 0

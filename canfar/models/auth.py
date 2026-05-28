@@ -170,6 +170,57 @@ class X509(BaseModel):
         return self.expiry < time.time()
 
 
+class X509Credential(BaseModel):
+    """X.509 authentication credential decoupled from server selection."""
+
+    idp: Annotated[str, Field(description="Canonical identity provider key.")]
+    mode: Literal["x509"] = "x509"
+    path: Annotated[
+        Path | None,
+        Field(
+            title="x509 Certificate",
+            description="Pathlike to PEM certificate",
+        ),
+    ] = None
+    expiry: Annotated[
+        float,
+        Field(
+            default=0.0,
+            title="x509 Expiry Time",
+            description="ctime of cert expiration",
+        ),
+    ]
+
+
+class OIDCCredential(BaseModel):
+    """OIDC authentication credential decoupled from server selection."""
+
+    idp: Annotated[str, Field(description="Canonical identity provider key.")]
+    mode: Literal["oidc"] = "oidc"
+    endpoints: Annotated[
+        Endpoint,
+        Field(default_factory=Endpoint, description="OIDC Endpoints."),
+    ]
+    client: Annotated[
+        Client,
+        Field(default_factory=Client, description="OIDC Client Credentials."),
+    ]
+    token: Annotated[
+        Token,
+        Field(default_factory=Token, description="OIDC Tokens"),
+    ]
+    expiry: Annotated[
+        Expiry,
+        Field(default_factory=Expiry, description="OIDC Token Expiry."),
+    ]
+
+
+AuthenticationCredential = Annotated[
+    OIDCCredential | X509Credential, Field(discriminator="mode")
+]
+"""Discriminated union of v1 authentication credentials without embedded server."""
+
+
 class TokenAuth(BaseModel):
     """Token authentication configuration."""
 

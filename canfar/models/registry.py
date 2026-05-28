@@ -17,7 +17,7 @@ class IVOARegistrySearch(BaseModel):
 
     registries: dict[str, str] = Field(
         default={
-            "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCnet",
+            "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCNet",
             "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
             (
                 "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
@@ -27,20 +27,20 @@ class IVOARegistrySearch(BaseModel):
 
     names: dict[str, str] = Field(
         default={
-            "ivo://canfar.net/src/skaha": "Canada",
-            "ivo://swesrc.chalmers.se/skaha": "Sweden",
-            "ivo://canfar.cam.uksrc.org/skaha": "UK-CAM",
-            "ivo://canfar.ral.uksrc.org/skaha": "UK-RAL",
-            "ivo://src.skach.org/skaha": "Switzerland",
-            "ivo://espsrc.iaa.csic.es/skaha": "Spain",
-            "ivo://canfar.itsrc.oact.inaf.it/skaha": "Italy-INAF",
-            "ivo://shion-sp.mtk.nao.ac.jp/skaha": "Japan",
-            "ivo://canfar.krsrc.kr/skaha": "Korea",
-            "ivo://canfar.ska.zverse.space/skaha": "China",
-            "ivo://canfar.itsrc.ext.cineca.it/skaha": "Italy-CINECA",
-            "ivo://canfar.srcnet.skao.int/skaha": "SKAO",
-            "ivo://aussrc.org/skaha": "Australia",
-            "ivo://cadc.nrc.ca/skaha": "CANFAR",
+            "ivo://canfar.net/src/skaha": "canSRC",
+            "ivo://swesrc.chalmers.se/skaha": "sweSRC",
+            "ivo://canfar.cam.uksrc.org/skaha": "ukCAM",
+            "ivo://canfar.ral.uksrc.org/skaha": "ukRAL",
+            "ivo://src.skach.org/skaha": "chSRC",
+            "ivo://espsrc.iaa.csic.es/skaha": "espSRC",
+            "ivo://canfar.itsrc.oact.inaf.it/skaha": "itaINAF",
+            "ivo://shion-sp.mtk.nao.ac.jp/skaha": "jpSRC",
+            "ivo://canfar.krsrc.kr/skaha": "krSRC",
+            "ivo://canfar.ska.zverse.space/skaha": "cnSRC",
+            "ivo://canfar.itsrc.ext.cineca.it/skaha": "itCINECA",
+            "ivo://canfar.srcnet.skao.int/skaha": "skaSRC",
+            "ivo://aussrc.org/skaha": "ausSRC",
+            "ivo://cadc.nrc.ca/skaha": "cadc",
         }
     )
 

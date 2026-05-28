@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Any
 
 from rich.console import Console
 
@@ -15,15 +14,12 @@ def get_console() -> Console:
     """Get a Rich console configured from the user configuration.
 
     Returns:
-        Console: Rich console instance.
+        Rich console instance with active server name banner when available.
     """
     cfg = Configuration()
-    config: dict[str, Any] = cfg.model_dump(mode="python")
-    width = config.get("console", {}).get("width", 120)
-    active = config.get("active", "default")
-    context = config.get("contexts", {}).get(active, {})
-    server = context.get("server", {})
-    name = server.get("name", "unknown")
+    width = cfg.console.width
+    active_server = cfg.get_active_server()
+    name = active_server.name if active_server is not None else "unknown"
     terminal = Console(width=width)
     terminal.print(f"@{name}", style="dim underline")
     return terminal

@@ -10,8 +10,8 @@ from pydantic import SecretStr
 from canfar.client import HTTPClient
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
 from canfar.models.auth import OIDC, X509
-from canfar.models.config import Configuration
 from canfar.models.http import Server
+from tests.helpers.config_v1 import configuration_from_legacy_context
 from tests.test_auth_x509 import generate_cert
 
 
@@ -36,7 +36,7 @@ def oidc_client() -> HTTPClient:
             "refresh": time.time() + 3600,  # Valid
         },
     )
-    config = Configuration(active="TestOIDC", contexts={"TestOIDC": oidc_context})
+    config = configuration_from_legacy_context("TestOIDC", oidc_context)
     client = HTTPClient(config=config)
     # Mock the internal httpx clients to check header updates
     client._client = Mock(spec=httpx.Client, headers={})  # noqa: SLF001
@@ -89,7 +89,7 @@ class TestSyncHook:
             ),
             path=cert_path,
         )
-        config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
+        config = configuration_from_legacy_context("TestX509", x509_context)
         client = HTTPClient(config=config)
         hook_func = refresh(client)
         request = httpx.Request("GET", "/")
@@ -169,7 +169,7 @@ class TestAsyncHook:
             ),
             path=cert_path,
         )
-        config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
+        config = configuration_from_legacy_context("TestX509", x509_context)
         client = HTTPClient(config=config)
         hook_func = arefresh(client)
         request = httpx.Request("GET", "/")

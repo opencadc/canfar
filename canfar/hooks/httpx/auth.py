@@ -105,7 +105,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             context = OIDC(**data)
 
             # Update the configuration and save it
-            client.config.contexts[client.config.active] = context
+            client.config.contexts[client.config.active.authentication] = context
             client.config.save()
             log.debug("Authentication refreshed and configuration saved.")
 
@@ -171,7 +171,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
             context = OIDC(**data)
 
             # Update the configuration and save it
-            client.config.contexts[client.config.active] = context
+            client.config.contexts[client.config.active.authentication] = context
             client.config.save()
             log.debug("Authentication refreshed and configuration saved.")
 

@@ -14,7 +14,7 @@ _Avoid_: Base URL, host, cluster
 
 **Identity Provider (IDP)**:
 Organization that issues user identity for CANFAR authentication.
-Initial IDPs are `Canadian Astronomy Data Centre (CADC)` and `SKA Regional Network (SRCNet)`.
+Initial IDPs are `Canadian Astronomy Data Centre (CADC)` and `SKA Regional Centre Network (SRCNet)`.
 _Avoid_: Provider
 
 **Authentication**:

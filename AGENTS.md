@@ -54,3 +54,6 @@ This repo uses a single-context domain glossary at root `CONTEXT.md`; ADRs are c
 - Domain documentation is multi-context via `CONTEXT-MAP.md` with `client` and `cli` contexts.
 - Specs/decisions are Jira-first; this repo does not keep ADR/RFC directories as the source of truth.
 - `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
+- CLI layout is kubectl-style across domain seams: `canfar auth` (Authentication), `canfar server` (Platform), `canfar login`, and `canfar context` for combined views.
+- `canfar login` is the supported login entrypoint; `canfar auth login` is a deprecated compatibility alias.
+- Built-in default CADC/CANFAR server metadata lists `x509` only; `oidc` and other auth modes are merged from VOSI capabilities enrichment after discovery/login, not static defaults.

@@ -1,0 +1,202 @@
+"""Tests for the top-level ``canfar login`` CLI command."""
+
+from __future__ import annotations
+
+from pathlib import Path
+from unittest.mock import patch
+
+import yaml
+from pydantic import AnyHttpUrl, AnyUrl
+from typer.testing import CliRunner
+
+from canfar.cli.main import cli
+from canfar.models.auth import X509Credential
+from canfar.models.config import Configuration
+from canfar.models.http import Server
+
+runner = CliRunner()
+_CADC_URI = "ivo://cadc.nrc.ca/skaha"
+
+
+def _patch_config(path: Path):
+    return patch.multiple(
+        "canfar",
+        CONFIG_PATH=path,
+    )
+
+
+def _write_config(path: Path, data: dict) -> None:
+    path.write_text(yaml.dump(data), encoding="utf-8")
+
+
+def _merge_servers(config: Configuration, discovered: list[Server], idp: str) -> None:  # noqa: ARG001
+    config.server = discovered
+
+
+def test_login_help_is_available() -> None:
+    """Top-level login exposes help text."""
+    result = runner.invoke(cli, ["login", "--help"])
+    assert result.exit_code == 0
+    assert "Login to CANFAR Science Platform" in result.stdout
+
+
+def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> None:
+    """Default in-memory credentials do not block first login."""
+    config_path = tmp_path / "config.yaml"
+    credential = X509Credential(
+        idp="cadc",
+        path=Path("/new/cert.pem"),
+        expiry=456.0,
+    )
+    discovered = [
+        Server(
+            idp="cadc",
+            name="CADC-CANFAR",
+            uri=AnyUrl(_CADC_URI),
+            url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+            version="v1",
+            auths=["x509"],
+        )
+    ]
+    validated = discovered[0].model_copy(deep=True)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
+        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch(
+            "canfar.cli.login._discover_and_merge",
+            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+        ),
+    ):
+        result = runner.invoke(cli, ["login", "cadc"])
+
+    assert result.exit_code == 0
+    assert "already exists" not in result.stdout
+
+
+def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
+    """``canfar auth login`` remains a compatibility alias."""
+    config_path = tmp_path / "config.yaml"
+    credential = X509Credential(
+        idp="cadc",
+        path=Path("/new/cert.pem"),
+        expiry=123.0,
+    )
+    discovered = [
+        Server(
+            idp="cadc",
+            name="CADC-CANFAR",
+            uri=AnyUrl(_CADC_URI),
+            url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+            version="v1",
+            auths=["x509"],
+        )
+    ]
+    validated = discovered[0].model_copy(deep=True)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
+        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch(
+            "canfar.cli.login._discover_and_merge",
+            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+        ),
+    ):
+        result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
+
+    assert result.exit_code == 0
+    assert "canfar auth login` is deprecated" in result.stdout
+    assert "canfar login" in result.stdout
+    with (
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        saved = Configuration()
+    assert saved.active.authentication == "cadc"
+    assert str(saved.active.server) == _CADC_URI
+
+
+def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
+    """Login persists active Authentication and Server in one save."""
+    config_path = tmp_path / "config.yaml"
+    credential = X509Credential(
+        idp="cadc",
+        path=Path("/new/cert.pem"),
+        expiry=456.0,
+    )
+    discovered = [
+        Server(
+            idp="cadc",
+            name="CADC-CANFAR",
+            uri=AnyUrl(_CADC_URI),
+            url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+            version="v1",
+            auths=["x509"],
+        )
+    ]
+    validated = discovered[0].model_copy(deep=True)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
+        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch(
+            "canfar.cli.login._discover_and_merge",
+            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+        ),
+    ):
+        result = runner.invoke(cli, ["login", "cadc", "--force"])
+
+    assert result.exit_code == 0
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        saved = Configuration()
+    assert saved.active.authentication == "cadc"
+    assert str(saved.active.server) == _CADC_URI
+    assert saved.get_credential("cadc").path == Path("/new/cert.pem")
+
+
+def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
+    """Repeated login without --force is rejected."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(
+        config_path,
+        {
+            "version": 1,
+            "active": {"authentication": "cadc", "server": _CADC_URI},
+            "authentication": [
+                {
+                    "idp": "cadc",
+                    "mode": "x509",
+                    "path": "/existing/cert.pem",
+                    "expiry": 1.0,
+                }
+            ],
+            "server": [
+                {
+                    "idp": "cadc",
+                    "name": "CADC-CANFAR",
+                    "uri": _CADC_URI,
+                    "url": "https://ws-uv.canfar.net/skaha",
+                    "version": "v1",
+                    "auths": ["x509"],
+                }
+            ],
+        },
+    )
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(cli, ["login", "cadc"])
+
+    assert result.exit_code == 1
+    assert "already exists" in result.stdout
