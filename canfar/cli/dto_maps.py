@@ -9,7 +9,6 @@ from canfar.models.dto.auth import (
     AuthenticationListDto,
     AuthenticationShowDto,
 )
-from canfar.models.dto.context import ContextListDto, ContextPairDto, ContextShowDto
 from canfar.models.dto.server import ServerListDto, ServerSummaryDto
 
 if TYPE_CHECKING:
@@ -81,32 +80,3 @@ def server_summary_dto(
 def server_list_dto(servers: list[Server]) -> ServerListDto:
     """Build the ``server ls`` machine payload."""
     return ServerListDto(servers=[server_summary_dto(server) for server in servers])
-
-
-def context_show_dto(
-    authentication: Authentication | None,
-    server: Server | None,
-) -> ContextShowDto:
-    """Build the ``context show`` machine payload."""
-    return ContextShowDto(
-        authentication=(
-            authentication_dto(authentication) if authentication is not None else None
-        ),
-        server=server_summary_dto(server) if server is not None else None,
-    )
-
-
-def context_list_dto(
-    pairs: list[tuple[Authentication, Server | None, bool]],
-) -> ContextListDto:
-    """Build the ``context ls`` machine payload."""
-    return ContextListDto(
-        pairs=[
-            ContextPairDto(
-                authentication=authentication_dto(auth),
-                server=server_summary_dto(server) if server is not None else None,
-                active=active,
-            )
-            for auth, server, active in pairs
-        ],
-    )

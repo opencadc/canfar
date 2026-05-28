@@ -115,6 +115,18 @@ def test_auth_ls_lists_saved_records(tmp_path: Path) -> None:
     assert "srcnet" in result.stdout
 
 
+def test_auth_list_alias_is_not_supported() -> None:
+    """``auth list`` is not a supported command alias."""
+    result = runner.invoke(auth, ["list"])
+    assert result.exit_code != 0
+
+
+def test_auth_remove_alias_is_not_supported() -> None:
+    """``auth remove`` is not a supported command alias."""
+    result = runner.invoke(auth, ["remove", "cadc"])
+    assert result.exit_code != 0
+
+
 def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
     """``auth use`` selects Authentication by canonical IDP key."""
     config_path = tmp_path / "config.yaml"

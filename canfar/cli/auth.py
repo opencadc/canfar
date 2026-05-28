@@ -53,6 +53,7 @@ auth = typer.Typer(
     help="Manage Authentication state.",
     no_args_is_help=False,
     invoke_without_command=True,
+    rich_markup_mode="rich",
     cls=AliasGroup,
 )
 
@@ -220,7 +221,7 @@ def auth_default(
         typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
     ] = False,
 ) -> None:
-    """Show active Authentication state."""
+    """Active authentication state."""
     output_mode_callback(ctx, json_output, yaml_output)
     if ctx.invoked_subcommand is not None:
         return
@@ -250,7 +251,7 @@ def auth_show_command(
         typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
     ] = False,
 ) -> None:
-    """Show active Authentication state."""
+    """Active authentication state."""
     output_mode_callback(ctx, json_output, yaml_output)
     mode = resolve_output_mode_or_exit(ctx)
     if mode is not output.OutputMode.HUMAN:
@@ -264,7 +265,7 @@ def auth_show_command(
     _render_auth_show_table()
 
 
-@auth.command("list, ls")
+@auth.command("ls")
 def auth_list_command(
     ctx: typer.Context,
     json_output: Annotated[
@@ -276,7 +277,7 @@ def auth_list_command(
         typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
     ] = False,
 ) -> None:
-    """List saved Authentication records."""
+    """Available auth providers."""
     output_mode_callback(ctx, json_output, yaml_output)
     mode = resolve_output_mode_or_exit(ctx)
     summaries = auth_list()
@@ -298,7 +299,7 @@ def auth_login_command(
         typer.Option("-f", "--force", help="Force re-authentication."),
     ] = False,
 ) -> None:
-    """Compatibility alias for ``canfar login``."""
+    """Alias for canfar login."""
     from canfar.cli.login import _login_flow  # noqa: PLC0415
     from canfar.cli.prompts import select_idp  # noqa: PLC0415
     from canfar.idp import list_idps  # noqa: PLC0415
@@ -318,7 +319,7 @@ def auth_use_command(
     ctx: typer.Context,
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
 ) -> None:
-    """Switch active Authentication by canonical IDP key."""
+    """Switch auth provider."""
     unsupported_machine_output(ctx)
     config = Configuration()
 
@@ -348,7 +349,7 @@ def auth_use_command(
     _activate_auth_with_server(config, idp, selector)
 
 
-@auth.command("remove, rm")
+@auth.command("rm")
 def auth_remove_command(
     ctx: typer.Context,
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
@@ -357,7 +358,7 @@ def auth_remove_command(
         typer.Option("-f", "--force", help="Remove active authentication."),
     ] = False,
 ) -> None:
-    """Remove Authentication and associated servers for an IDP."""
+    """Remove auth and associated servers."""
     unsupported_machine_output(ctx)
     config = Configuration()
     if config.active.authentication == idp and not force:
@@ -392,7 +393,7 @@ def auth_purge_command(
         typer.Option("--force", help="Required to reset authentication state."),
     ] = False,
 ) -> None:
-    """Reset Authentication and Server state while preserving other settings."""
+    """Remove all auths and servers."""
     unsupported_machine_output(ctx)
     if not force:
         console.print("[bold red]Authentication purge requires --force.[/bold red]")

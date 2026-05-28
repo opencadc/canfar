@@ -121,7 +121,7 @@ def test_conflicting_output_flags_exit_two() -> None:
 
 def test_unsupported_machine_output_exit_one() -> None:
     """Unsupported machine output commands exit 1 with exact stderr text."""
-    result = runner.invoke(cli, ["context", "ls", "--json"])
+    result = runner.invoke(cli, ["--json", "auth", "purge", "--force"])
     assert result.exit_code == 1
     assert "machine output not supported for this command yet" in result.stderr
     assert "use default human output for now" in result.stderr

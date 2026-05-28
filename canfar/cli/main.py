@@ -9,7 +9,6 @@ import typer
 from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
-from canfar.cli.context import context
 from canfar.cli.create import create
 from canfar.cli.delete import delete
 from canfar.cli.events import events
@@ -98,14 +97,6 @@ cli.add_typer(
     server,
     name="server",
     help="Manage Science Platform server selection.",
-    no_args_is_help=True,
-    rich_help_panel="Auth Management",
-)
-
-cli.add_typer(
-    context,
-    name="context",
-    help="Inspect Authentication and Server routing state.",
     no_args_is_help=True,
     rich_help_panel="Auth Management",
 )

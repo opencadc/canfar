@@ -64,3 +64,10 @@ def test_human_cli_runs_when_active_server_is_null(tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     assert result.stdout.startswith("@unknown")
+
+
+def test_context_command_group_is_removed() -> None:
+    """``canfar context`` is no longer a supported command group."""
+    result = runner.invoke(cli, ["context", "show"])
+    assert result.exit_code != 0
+    assert "No such command 'context'" in result.output

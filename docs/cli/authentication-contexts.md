@@ -73,12 +73,12 @@ canfar auth login
 
 Once you have one or more authentication contexts, you can easily manage them:
 
-#### Listing Contexts (`canfar auth list`)
+#### Listing Providers (`canfar auth ls`)
 
-View all your saved authentication contexts:
+View saved authentication providers:
 
 ```bash
-canfar auth list
+canfar auth ls
 ```
 
 **Example Output:**
@@ -94,31 +94,28 @@ canfar auth list
 
 The active context (marked with ✅) determines where your commands are sent.
 
-#### Switching Contexts (`canfar auth switch`)
+#### Switching Providers (`canfar auth use`)
 
-Switch between your saved contexts safely:
+Switch between saved authentication providers:
 
 ```bash
-canfar auth switch <CONTEXT_NAME>
+canfar auth use <IDP>
 ```
 
 !!! example "Switching Examples"
     ```bash
-    # Switch to a different server
-    canfar auth switch SRCnet-Sweden
-
-    # Switch back to CANFAR
-    canfar auth use CADC-CANFAR
+    canfar auth use srcnet
+    canfar auth use cadc
     ```
 
 All subsequent commands will use the newly active context.
 
-#### Removing Contexts (`canfar auth remove`)
+#### Removing Providers (`canfar auth rm`)
 
-Remove contexts you no longer need:
+Remove authentication providers you no longer need:
 
 ```bash
-canfar auth remove <CONTEXT_NAME>
+canfar auth rm <IDP>
 ```
 
 !!! warning "Safety Features"
@@ -223,14 +220,14 @@ session = Session()
 
     **No active context found**
 
-    - Run `canfar auth list` to see available contexts
+    - Run `canfar auth ls` to see available providers
     - Use `canfar auth switch <context>` to activate one
     - If no contexts exist, run `canfar auth login`
 
     **Cannot remove active context**
 
     - Switch to a different context first: `canfar auth switch <other>`
-    - Then remove the unwanted context: `canfar auth remove <unwanted>`
+    - Then remove the unwanted provider: `canfar auth rm <IDP>`
 
 ### Debug Mode
 

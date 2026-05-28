@@ -38,81 +38,87 @@ canfar [OPTIONS] COMMAND [ARGS]...
 
 This command group provides tools for managing authentication contexts for connecting to Science Platform servers.
 
-#### `canfar auth login`
+#### `canfar auth show`
 
-Login to Science Platform with automatic server discovery.
+Show active authentication state.
 
 ```bash
-canfar auth login [OPTIONS]
+canfar auth show [OPTIONS]
 ```
 
-**Description:** This command guides you through the authentication process, automatically discovering the upstream server and choosing the appropriate authentication method based on the server's configuration.
+Running `canfar auth` with no subcommand behaves the same as `canfar auth show`.
+
+#### `canfar auth login`
+
+!!! warning "Deprecated"
+    Use `canfar login` instead. `canfar auth login` remains as a compatibility alias.
+
+Alias for `canfar login`.
+
+```bash
+canfar auth login [IDP] [OPTIONS]
+```
 
 ##### Options
 
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
-| `--force` | Flag | - | Force re-authentication |
-| `--debug` | Flag | - | Enable debug logging |
-| `--dead` | Flag | - | Include dead servers in discovery |
-| `--dev` | Flag | - | Include dev servers in discovery |
-| `--details` | Flag | - | Include server details in discovery |
-| `--timeout`, `-t` | INTEGER | 2 | Timeout for server response |
-| `--discovery-url` | TEXT | `https://ska-iam.stfc.ac.uk/.well-known/openid-configuration` | OIDC Discovery URL |
+| `--force`, `-f` | Flag | - | Force re-authentication |
 
 !!! example "Basic Login"
     ```bash
-    canfar auth login
+    canfar login cadc
     ```
 
-!!! example "Login with Debug Information"
-    ```bash
-    canfar auth login --debug --details
-    ```
+#### `canfar auth ls`
 
-#### `canfar auth list` / `canfar auth ls`
-
-Shows all available authentication contexts.
+List available authentication providers.
 
 ```bash
-canfar auth list [OPTIONS]
+canfar auth ls [OPTIONS]
 ```
 
-#### `canfar auth switch` / `canfar auth use`
+#### `canfar auth use`
 
-Switch the active authentication context.
+Switch authentication provider.
 
 ```bash
-canfar auth switch CONTEXT
+canfar auth use IDP
 ```
 
 **Arguments:**
 
-- `CONTEXT` (required): The name of the context to activate
+- `IDP` (required): Canonical Identity Provider key
 
 !!! example
     ```bash
-    canfar auth switch SRCnet-Sweden
+    canfar auth use srcnet
     ```
 
-#### `canfar auth remove` / `canfar auth rm`
+#### `canfar auth rm`
 
-Remove a specific authentication context from the configuration.
+Remove an authentication provider and associated servers.
 
 ```bash
-canfar auth remove CONTEXT
+canfar auth rm IDP [OPTIONS]
 ```
 
 **Arguments:**
 
-- `CONTEXT` (required): The name of the context to remove
+- `IDP` (required): Canonical Identity Provider key
+
+##### Options
+
+| Option | Description |
+|--------|-------------|
+| `--force`, `-f` | Remove the active authentication provider without confirmation |
 
 !!! warning "Permanent Action"
-    This action permanently removes the authentication context and cannot be undone.
+    This action permanently removes the authentication provider and cannot be undone.
 
 #### `canfar auth purge`
 
-Remove all authentication contexts and credentials from the configuration.
+Remove all authentication providers and servers.
 
 ```bash
 canfar auth purge [OPTIONS]
@@ -122,10 +128,10 @@ canfar auth purge [OPTIONS]
 
 | Option | Description |
 |--------|-------------|
-| `--yes`, `-y` | Skip confirmation prompt |
+| `--force` | Required to reset authentication state |
 
 !!! danger "Destructive Action"
-    This command removes ALL authentication contexts. Use with caution!
+    This command removes all saved authentication providers and servers. Use with caution!
 
 ---
 
