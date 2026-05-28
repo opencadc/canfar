@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import os
 import subprocess
 import sys
@@ -13,21 +14,6 @@ import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
 import canfar
-from canfar import authentication as canfar_authentication
-from canfar.authentication import (
-    Authentication,
-    AuthenticationError,
-    login,
-    show,
-    use,
-)
-from canfar.authentication import (
-    list as auth_list,
-)
-from canfar.errors import ErrorCode
-from canfar.models.auth import X509Credential
-from canfar.models.config import Configuration
-from canfar.models.http import Server
 
 
 def _write_config(path: Path, data: dict) -> None:
@@ -80,10 +66,12 @@ class TestAuthenticationList:
         _write_config(config_path, config_data)
 
         with _patch_config(config_path):
-            summaries = auth_list()
+            summaries = canfar.authentication.list()
 
         assert len(summaries) == 2
-        assert all(isinstance(item, Authentication) for item in summaries)
+        assert all(
+            isinstance(item, canfar.authentication.Authentication) for item in summaries
+        )
 
         by_idp = {summary.idp: summary for summary in summaries}
         assert by_idp["cadc"].name == "Canadian Astronomy Data Centre"
@@ -129,7 +117,7 @@ class TestAuthenticationShow:
         _write_config(config_path, config_data)
 
         with _patch_config(config_path):
-            summary = show()
+            summary = canfar.authentication.show()
 
         assert summary.idp == "cadc"
         assert summary.name == "Canadian Astronomy Data Centre"
@@ -189,8 +177,8 @@ class TestAuthenticationUse:
         _write_config(config_path, config_data)
 
         with _patch_config(config_path):
-            use("srcnet")
-            config = Configuration()
+            canfar.authentication.use("srcnet")
+            config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "srcnet"
 
@@ -241,8 +229,8 @@ class TestAuthenticationUse:
         _write_config(config_path, config_data)
 
         with _patch_config(config_path):
-            use("srcnet")
-            config = Configuration()
+            canfar.authentication.use("srcnet")
+            config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "srcnet"
         assert config.active.server is None
@@ -338,8 +326,8 @@ class TestAuthenticationUse:
         _write_config(config_path, config_data)
 
         with _patch_config(config_path):
-            use("srcnet")
-            config = Configuration()
+            canfar.authentication.use("srcnet")
+            config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "srcnet"
         assert str(config.active.server) == "ivo://srcnet.example/skaha"
@@ -347,7 +335,7 @@ class TestAuthenticationUse:
     def test_use_unknown_idp_raises_key_error(self) -> None:
         """Unknown IDP keys are rejected by the built-in catalog."""
         with pytest.raises(KeyError, match="Unknown IDP"):
-            use("unknown")
+            canfar.authentication.use("unknown")
 
     def test_use_unconfigured_idp_raises_authentication_required(
         self, tmp_path: Path
@@ -356,11 +344,13 @@ class TestAuthenticationUse:
         config_path = tmp_path / "config.yaml"
         with (
             _patch_config(config_path),
-            pytest.raises(AuthenticationError) as exc_info,
+            pytest.raises(canfar.authentication.AuthenticationError) as exc_info,
         ):
-            use("srcnet")
+            canfar.authentication.use("srcnet")
 
-        assert exc_info.value.error.code == ErrorCode.AUTHENTICATION_REQUIRED
+        assert (
+            exc_info.value.error.code == canfar.errors.ErrorCode.AUTHENTICATION_REQUIRED
+        )
 
 
 class TestAuthenticationLogin:
@@ -369,7 +359,7 @@ class TestAuthenticationLogin:
     def test_login_unknown_idp_raises_key_error(self) -> None:
         """Unknown IDP keys are rejected by the built-in catalog."""
         with pytest.raises(KeyError, match="Unknown IDP"):
-            login("unknown")
+            canfar.authentication.login("unknown")
 
     def test_login_existing_without_force_is_noop(self, tmp_path: Path) -> None:
         """Existing authentication is preserved when force is false."""
@@ -409,11 +399,11 @@ class TestAuthenticationLogin:
                 new=AsyncMock(return_value=[]),
             ),
         ):
-            login("cadc")
+            canfar.authentication.login("cadc")
 
         mock_auth.assert_not_called()
         with _patch_config(config_path):
-            config = Configuration()
+            config = canfar.models.config.Configuration()
         assert config.authentication[0].path == Path("/existing/cert.pem")
 
     def test_login_saves_auth_and_servers_without_changing_active(
@@ -421,13 +411,13 @@ class TestAuthenticationLogin:
     ) -> None:
         """login() persists authentication and servers but not active selection."""
         config_path = tmp_path / "config.yaml"
-        credential = X509Credential(
+        credential = canfar.models.auth.X509Credential(
             idp="cadc",
             path=Path("/new/cert.pem"),
             expiry=777.0,
         )
         discovered = [
-            Server(
+            canfar.models.http.Server(
                 idp="cadc",
                 name="CADC-CANFAR",
                 uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
@@ -446,10 +436,10 @@ class TestAuthenticationLogin:
                 new=AsyncMock(return_value=discovered),
             ),
         ):
-            login("cadc", force=True)
+            canfar.authentication.login("cadc", force=True)
 
         with _patch_config(config_path):
-            config = Configuration()
+            config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "cadc"
         assert str(config.active.server) == "ivo://cadc.nrc.ca/skaha"
@@ -489,7 +479,7 @@ class TestAuthenticationLogin:
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
-        credential = X509Credential(
+        credential = canfar.models.auth.X509Credential(
             idp="cadc",
             path=Path("/new/cert.pem"),
             expiry=888.0,
@@ -506,10 +496,10 @@ class TestAuthenticationLogin:
                 new=AsyncMock(return_value=[]),
             ),
         ):
-            login("cadc", force=True)
+            canfar.authentication.login("cadc", force=True)
 
         with _patch_config(config_path):
-            config = Configuration()
+            config = canfar.models.config.Configuration()
 
         assert config.get_credential("cadc").path == Path("/new/cert.pem")
         assert config.get_credential("cadc").expiry == 888.0
@@ -520,12 +510,12 @@ class TestAuthenticationModuleExports:
 
     def test_canfar_exports_authentication_module(self) -> None:
         """canfar.authentication is importable from the package root."""
-        assert canfar.authentication is canfar_authentication
-        assert callable(canfar_authentication.login)
-        assert callable(canfar_authentication.use)
-        assert callable(canfar_authentication.list)
-        assert callable(canfar_authentication.show)
+        assert canfar.authentication is importlib.import_module("canfar.authentication")
+        assert callable(canfar.authentication.login)
+        assert callable(canfar.authentication.use)
+        assert callable(canfar.authentication.list)
+        assert callable(canfar.authentication.show)
 
     def test_canfar_exports_login_helper(self) -> None:
         """canfar.login aliases authentication.login."""
-        assert canfar.login is canfar_authentication.login
+        assert canfar.login is canfar.authentication.login
