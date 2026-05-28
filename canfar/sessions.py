@@ -419,7 +419,7 @@ class AsyncSession(HTTPClient):
     Examples:
         >>> from canfar.session import AsyncSession
         >>> session = AsyncSession(
-                server="https://something.example.com",
+                url="https://something.example.com",
                 version="v1",
                 token="token",
                 timeout=30,
