@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
@@ -243,6 +246,50 @@ class TestAuthenticationUse:
 
         assert config.active.authentication == "srcnet"
         assert config.active.server is None
+
+    def test_import_canfar_with_null_active_server(self, tmp_path: Path) -> None:
+        """Importing canfar stays safe when active server selection is cleared."""
+        home = tmp_path / "home"
+        config_dir = home / ".canfar"
+        config_dir.mkdir(parents=True)
+        config_data = {
+            "version": 1,
+            "active": {"authentication": "srcnet", "server": None},
+            "authentication": [
+                {
+                    "idp": "srcnet",
+                    "mode": "oidc",
+                    "endpoints": {},
+                    "client": {},
+                    "token": {},
+                    "expiry": {},
+                }
+            ],
+            "server": [
+                {
+                    "idp": "srcnet",
+                    "name": "SRCNet",
+                    "uri": "ivo://srcnet.example/skaha",
+                    "url": "https://srcnet.example/skaha",
+                    "version": "v1",
+                    "auths": ["oidc"],
+                }
+            ],
+        }
+        (config_dir / "config.yaml").write_text(
+            yaml.dump(config_data), encoding="utf-8"
+        )
+
+        result = subprocess.run(
+            [sys.executable, "-c", "import canfar; print('ok')"],
+            env={**os.environ, "HOME": str(home)},
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        assert result.returncode == 0, result.stderr
+        assert result.stdout.strip() == "ok"
 
     def test_use_keeps_compatible_active_server(self, tmp_path: Path) -> None:
         """use() preserves active server when it matches the selected IDP."""

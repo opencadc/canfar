@@ -34,8 +34,10 @@ def emit_active_server_banner() -> None:
         return
     _banner_emitted.set(True)
     cfg = Configuration()
-    active_server = cfg.get_active_server()
-    name = active_server.name if active_server is not None else "unknown"
+    try:
+        name = cfg.get_active_server().name
+    except KeyError:
+        name = "unknown"
     console.print(f"@{name}", style="dim underline")
 
 
