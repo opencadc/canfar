@@ -170,8 +170,8 @@ class TestServerUse:
             ):
                 use("CANFAR")
 
-        assert "URI" in (exc_info.value.hint or "")
-        assert str(Configuration().active.server) == previous
+            assert "URI" in (exc_info.value.hint or "")
+            assert str(Configuration().active.server) == previous
 
     def test_use_runs_discovery_on_miss_then_succeeds(self, tmp_path: Path) -> None:
         """Unknown selectors trigger one discovery pass before retry."""
@@ -228,7 +228,7 @@ class TestServerUse:
             ):
                 use("missing-server")
 
-        assert str(Configuration().active.server) == previous
+            assert str(Configuration().active.server) == previous
 
     def test_use_fetch_failure_leaves_active_unchanged(self, tmp_path: Path) -> None:
         """Fetch or validation failure leaves the previous active server."""
@@ -250,7 +250,7 @@ class TestServerUse:
             ):
                 use(_CADC_URI)
 
-        assert str(Configuration().active.server) == previous
+            assert str(Configuration().active.server) == previous
 
 
 class TestServerFetch:

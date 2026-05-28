@@ -207,13 +207,15 @@ class TestConfigurationSerialization:
 
     def test_yaml_file_content_structure(self, tmp_path: Path) -> None:
         """Saved YAML uses v1 top-level keys."""
-        config = Configuration(
-            authentication=[
-                X509Credential(idp="cadc", path=Path("/test.pem"), expiry=1234567890.0),
-            ],
-        )
         temp_config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
+            config = Configuration(
+                authentication=[
+                    X509Credential(
+                        idp="cadc", path=Path("/test.pem"), expiry=1234567890.0
+                    ),
+                ],
+            )
             config.save()
 
         yaml_data = yaml.safe_load(temp_config_path.read_text(encoding="utf-8"))

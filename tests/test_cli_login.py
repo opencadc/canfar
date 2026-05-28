@@ -111,7 +111,7 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
 
     assert result.exit_code == 0
-    assert "canfar auth login` is deprecated" in result.stdout
+    assert "canfar auth login will be removed soon" in result.stdout
     assert "canfar login" in result.stdout
     with (
         patch("canfar.models.config.CONFIG_PATH", config_path),
