@@ -6,7 +6,7 @@ from typing import Annotated
 
 import typer
 
-from canfar.cli._machine import output_mode_callback, reset_output_modes
+from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
 from canfar.cli.context import context
@@ -17,8 +17,12 @@ from canfar.cli.image import image
 from canfar.cli.info import info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
+from canfar.cli.machine import (
+    maybe_emit_cli_banner,
+    output_mode_callback,
+    reset,
+)
 from canfar.cli.open import open_command
-from canfar.cli.output import OutputConflictError
 from canfar.cli.prune import prune
 from canfar.cli.ps import ps
 from canfar.cli.server import server
@@ -41,12 +45,14 @@ def callback(
     ] = False,
 ) -> None:
     """Main callback that handles no subcommand case."""
-    reset_output_modes()
+    reset()
     try:
         output_mode_callback(ctx, json_output, yaml_output)
-    except OutputConflictError as exc:
+    except output.OutputConflictError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(exc.exit_code) from exc
+
+    maybe_emit_cli_banner(ctx)
 
     if ctx.invoked_subcommand is None:
         console.print(ctx.get_help())
@@ -204,7 +210,7 @@ cli.add_typer(
 
 def main() -> None:
     """Main entry point."""
-    reset_output_modes()
+    reset()
     try:
         cli()
     except AuthExpiredError as err:
@@ -213,7 +219,7 @@ def main() -> None:
     except AuthContextError as err:
         console.print(err)
     finally:
-        reset_output_modes()
+        reset()
 
 
 if __name__ == "__main__":

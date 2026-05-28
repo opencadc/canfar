@@ -80,7 +80,7 @@ def _modes_from_context(ctx: typer.Context) -> list[OutputMode]:
     return modes
 
 
-def _resolve_output_modes(modes: list[OutputMode]) -> OutputMode:
+def resolve(modes: list[OutputMode]) -> OutputMode:
     """Resolve collected output modes to a single effective mode.
 
     Args:
@@ -102,7 +102,7 @@ def _resolve_output_modes(modes: list[OutputMode]) -> OutputMode:
     return unique_modes[0]
 
 
-def parse_top_level_output_flags(argv: list[str]) -> OutputMode | None:
+def parse_prefix(argv: list[str]) -> OutputMode | None:
     """Parse machine output flags from the top-level argv prefix.
 
     Top-level flags appear before the command path, for example
@@ -123,10 +123,10 @@ def parse_top_level_output_flags(argv: list[str]) -> OutputMode | None:
     modes = _collect_output_modes(prefix)
     if not modes:
         return None
-    return _resolve_output_modes(modes)
+    return resolve(modes)
 
 
-def parse_leaf_output_flags(argv: list[str]) -> OutputMode | None:
+def parse_suffix(argv: list[str]) -> OutputMode | None:
     """Parse machine output flags from the leaf argv suffix.
 
     Leaf flags appear after the command path, for example
@@ -147,10 +147,10 @@ def parse_leaf_output_flags(argv: list[str]) -> OutputMode | None:
     modes = _collect_output_modes(suffix)
     if not modes:
         return None
-    return _resolve_output_modes(modes)
+    return resolve(modes)
 
 
-def parse_output_flags(
+def parse(
     argv: list[str] | None = None,
     *,
     ctx: typer.Context | None = None,
@@ -175,13 +175,13 @@ def parse_output_flags(
     if ctx is not None:
         modes.extend(_modes_from_context(ctx))
     if argv is not None:
-        top_level = parse_top_level_output_flags(argv)
-        if top_level is not None:
-            modes.append(top_level)
-        leaf = parse_leaf_output_flags(argv)
-        if leaf is not None:
-            modes.append(leaf)
-    return _resolve_output_modes(modes)
+        prefix_mode = parse_prefix(argv)
+        if prefix_mode is not None:
+            modes.append(prefix_mode)
+        suffix_mode = parse_suffix(argv)
+        if suffix_mode is not None:
+            modes.append(suffix_mode)
+    return resolve(modes)
 
 
 def _serialize_payload(data: Any) -> Any:
@@ -232,11 +232,11 @@ def render_stderr_error(error: StructuredError, mode: OutputMode) -> str:
     return structured_error_to_yaml(error)
 
 
-def write_stdout(data: Any, mode: OutputMode) -> None:
+def to_stdout(data: Any, mode: OutputMode) -> None:
     """Write rendered command data to stdout."""
     sys.stdout.write(render_stdout(data, mode))
 
 
-def write_stderr_error(error: StructuredError, mode: OutputMode) -> None:
+def to_stderr(error: StructuredError, mode: OutputMode) -> None:
     """Write rendered structured error data to stderr."""
     sys.stderr.write(render_stderr_error(error, mode))

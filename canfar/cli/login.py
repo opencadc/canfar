@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 
 from canfar import CONFIG_PATH
-from canfar.cli._machine import unsupported_machine_output
 from canfar.cli.login_auth import authenticate_for_cli
+from canfar.cli.machine import unsupported_machine_output
 from canfar.cli.prompts import select_idp, select_server
 from canfar.idp import get_idp, list_idps
 from canfar.models.config import Configuration

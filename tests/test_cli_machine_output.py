@@ -56,6 +56,19 @@ def _write_v1_config(path: Path) -> None:
     path.write_text(yaml.dump(data), encoding="utf-8")
 
 
+def test_auth_ls_json_stdout_is_data_only(tmp_path: Path) -> None:
+    """``auth ls --json`` emits JSON on stdout without the human-mode banner."""
+    config_path = tmp_path / "config.yaml"
+    _write_v1_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(cli, ["auth", "ls", "--json"])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+    json.loads(result.stdout)
+
+
 def test_auth_default_json_matches_show(tmp_path: Path) -> None:
     """Default ``auth`` emits the same payload as ``auth show --json``."""
     config_path = tmp_path / "config.yaml"

@@ -26,13 +26,13 @@ from canfar.authentication import (
 from canfar.authentication import (
     show as auth_show,
 )
-from canfar.cli._machine import (
+from canfar.cli import output
+from canfar.cli.dto_maps import authentication_list_dto, authentication_show_dto
+from canfar.cli.machine import (
     output_mode_callback,
     resolve_output_mode_or_exit,
     unsupported_machine_output,
 )
-from canfar.cli.dto_maps import authentication_list_dto, authentication_show_dto
-from canfar.cli.output import OutputMode, write_stderr_error, write_stdout
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.idp import get_idp
 from canfar.models.config import Configuration
@@ -226,13 +226,13 @@ def auth_default(
         return
 
     mode = resolve_output_mode_or_exit(ctx)
-    if mode is not OutputMode.HUMAN:
+    if mode is not output.OutputMode.HUMAN:
         try:
             summary = auth_show()
         except AuthenticationError as exc:
-            write_stderr_error(exc.error, mode)
+            output.to_stderr(exc.error, mode)
             raise typer.Exit(1) from exc
-        write_stdout(authentication_show_dto(summary), mode)
+        output.to_stdout(authentication_show_dto(summary), mode)
         return
 
     _render_auth_show_table()
@@ -253,13 +253,13 @@ def auth_show_command(
     """Show active Authentication state."""
     output_mode_callback(ctx, json_output, yaml_output)
     mode = resolve_output_mode_or_exit(ctx)
-    if mode is not OutputMode.HUMAN:
+    if mode is not output.OutputMode.HUMAN:
         try:
             summary = auth_show()
         except AuthenticationError as exc:
-            write_stderr_error(exc.error, mode)
+            output.to_stderr(exc.error, mode)
             raise typer.Exit(1) from exc
-        write_stdout(authentication_show_dto(summary), mode)
+        output.to_stdout(authentication_show_dto(summary), mode)
         return
     _render_auth_show_table()
 
@@ -280,8 +280,8 @@ def auth_list_command(
     output_mode_callback(ctx, json_output, yaml_output)
     mode = resolve_output_mode_or_exit(ctx)
     summaries = auth_list()
-    if mode is not OutputMode.HUMAN:
-        write_stdout(authentication_list_dto(summaries), mode)
+    if mode is not output.OutputMode.HUMAN:
+        output.to_stdout(authentication_list_dto(summaries), mode)
         return
     _render_auth_list_table()
 

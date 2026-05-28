@@ -10,13 +10,13 @@ from rich.table import Table
 
 from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
-from canfar.cli._machine import (
+from canfar.cli import output
+from canfar.cli.dto_maps import server_list_dto
+from canfar.cli.machine import (
     output_mode_callback,
     resolve_output_mode_or_exit,
     unsupported_machine_output,
 )
-from canfar.cli.dto_maps import server_list_dto
-from canfar.cli.output import OutputMode, write_stderr_error, write_stdout
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.server import (
@@ -98,8 +98,8 @@ def server_list_command(
         auth_show()
         servers = server_list()
     except AuthenticationError as exc:
-        if mode is not OutputMode.HUMAN:
-            write_stderr_error(exc.error, mode)
+        if mode is not output.OutputMode.HUMAN:
+            output.to_stderr(exc.error, mode)
         else:
             console.print(f"[bold red]{exc.error.message}[/bold red]")
             if exc.error.hint:
@@ -111,15 +111,15 @@ def server_list_command(
             message=str(exc),
             hint="Verify registry connectivity and retry.",
         )
-        if mode is not OutputMode.HUMAN:
-            write_stderr_error(error, mode)
+        if mode is not output.OutputMode.HUMAN:
+            output.to_stderr(error, mode)
         else:
             console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    if mode is not OutputMode.HUMAN:
+    if mode is not output.OutputMode.HUMAN:
         if not servers:
-            write_stderr_error(
+            output.to_stderr(
                 StructuredError(
                     code=ErrorCode.SERVER_NONE_AVAILABLE,
                     message="No compatible servers available for active IDP.",
@@ -128,7 +128,7 @@ def server_list_command(
                 mode,
             )
             raise typer.Exit(1)
-        write_stdout(server_list_dto(servers), mode)
+        output.to_stdout(server_list_dto(servers), mode)
         return
 
     _render_server_list_table()

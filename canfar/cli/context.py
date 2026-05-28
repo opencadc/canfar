@@ -8,13 +8,13 @@ import typer
 from rich import box
 from rich.table import Table
 
-from canfar.cli._machine import (
+from canfar.cli import output
+from canfar.cli.dto_maps import context_show_dto
+from canfar.cli.machine import (
     output_mode_callback,
     resolve_output_mode_or_exit,
     unsupported_machine_output,
 )
-from canfar.cli.dto_maps import context_show_dto
-from canfar.cli.output import OutputMode, write_stdout
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.platform_state import list_pairs
 from canfar.platform_state import show as context_show
@@ -90,8 +90,8 @@ def context_show_command(
     mode = resolve_output_mode_or_exit(ctx)
     authentication, server = context_show()
 
-    if mode is not OutputMode.HUMAN:
-        write_stdout(context_show_dto(authentication, server), mode)
+    if mode is not output.OutputMode.HUMAN:
+        output.to_stdout(context_show_dto(authentication, server), mode)
         return
     _render_context_show()
 

@@ -8,19 +8,8 @@ from io import StringIO
 import pytest
 import yaml
 
-from canfar.cli.output import (
-    OUTPUT_CONFLICT_EXIT_CODE,
-    OutputConflictError,
-    OutputMode,
-    StructuredError,
-    parse_leaf_output_flags,
-    parse_output_flags,
-    parse_top_level_output_flags,
-    render_stderr_error,
-    render_stdout,
-    write_stderr_error,
-    write_stdout,
-)
+from canfar.cli import output
+from canfar.errors import StructuredError
 from canfar.models.dto.base import DtoBase, dto_dump
 
 
@@ -33,72 +22,72 @@ class SampleDto(DtoBase):
 
 def test_output_mode_values() -> None:
     """OutputMode exposes human, json, and yaml members."""
-    assert OutputMode.HUMAN.value == "human"
-    assert OutputMode.JSON.value == "json"
-    assert OutputMode.YAML.value == "yaml"
+    assert output.OutputMode.HUMAN.value == "human"
+    assert output.OutputMode.JSON.value == "json"
+    assert output.OutputMode.YAML.value == "yaml"
 
 
 def test_parse_top_level_output_flags_before_command_path() -> None:
     """Top-level flags before the command path select machine output mode."""
-    assert parse_top_level_output_flags(["--json", "auth", "ls"]) == OutputMode.JSON
-    assert parse_top_level_output_flags(["--yaml", "ps"]) == OutputMode.YAML
-    assert parse_top_level_output_flags(["auth", "ls"]) is None
+    assert output.parse_prefix(["--json", "auth", "ls"]) == output.OutputMode.JSON
+    assert output.parse_prefix(["--yaml", "ps"]) == output.OutputMode.YAML
+    assert output.parse_prefix(["auth", "ls"]) is None
 
 
 def test_parse_leaf_output_flags_after_command_path() -> None:
     """Leaf flags after the command path select machine output mode."""
-    assert parse_leaf_output_flags(["auth", "ls", "--json"]) == OutputMode.JSON
-    assert parse_leaf_output_flags(["ps", "--yaml"]) == OutputMode.YAML
-    assert parse_leaf_output_flags(["auth", "ls"]) is None
+    assert output.parse_suffix(["auth", "ls", "--json"]) == output.OutputMode.JSON
+    assert output.parse_suffix(["ps", "--yaml"]) == output.OutputMode.YAML
+    assert output.parse_suffix(["auth", "ls"]) is None
 
 
 def test_parse_output_flags_ignores_middle_group_placement() -> None:
     """Intermediate group placement is not a supported output flag location."""
-    assert parse_output_flags(["auth", "--json", "ls"]) == OutputMode.HUMAN
+    assert output.parse(["auth", "--json", "ls"]) == output.OutputMode.HUMAN
 
 
 def test_parse_output_flags_defaults_to_human() -> None:
     """No machine flags resolves to human output mode."""
-    assert parse_output_flags(["auth", "ls"]) == OutputMode.HUMAN
+    assert output.parse(["auth", "ls"]) == output.OutputMode.HUMAN
 
 
 def test_parse_output_flags_top_level_only() -> None:
     """Top-level placement alone selects machine output mode."""
-    assert parse_output_flags(["--json", "auth", "ls"]) == OutputMode.JSON
+    assert output.parse(["--json", "auth", "ls"]) == output.OutputMode.JSON
 
 
 def test_parse_output_flags_leaf_only() -> None:
     """Leaf placement alone selects machine output mode."""
-    assert parse_output_flags(["auth", "ls", "--yaml"]) == OutputMode.YAML
+    assert output.parse(["auth", "ls", "--yaml"]) == output.OutputMode.YAML
 
 
 def test_parse_output_flags_same_mode_at_both_placements_is_idempotent() -> None:
     """Duplicate same-mode flags across placements remain idempotent."""
-    assert parse_output_flags(["--json", "ps", "--json"]) == OutputMode.JSON
-    assert parse_output_flags(["--yaml", "auth", "ls", "--yaml"]) == OutputMode.YAML
+    assert output.parse(["--json", "ps", "--json"]) == output.OutputMode.JSON
+    assert output.parse(["--yaml", "auth", "ls", "--yaml"]) == output.OutputMode.YAML
 
 
 def test_parse_output_flags_duplicate_same_mode_at_top_level_is_idempotent() -> None:
     """Duplicate same-mode flags at one placement remain idempotent."""
-    assert parse_output_flags(["--json", "--json", "auth", "ls"]) == OutputMode.JSON
+    assert output.parse(["--json", "--json", "auth", "ls"]) == output.OutputMode.JSON
 
 
 def test_parse_output_flags_conflicting_modes_exit_two() -> None:
     """Different machine modes across placements raise output.conflict."""
-    with pytest.raises(OutputConflictError) as exc_info:
-        parse_output_flags(["--json", "ps", "--yaml"])
+    with pytest.raises(output.OutputConflictError) as exc_info:
+        output.parse(["--json", "ps", "--yaml"])
 
     assert exc_info.value.code == "output.conflict"
-    assert exc_info.value.exit_code == OUTPUT_CONFLICT_EXIT_CODE
+    assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE
 
 
 def test_parse_output_flags_conflicting_modes_at_top_level() -> None:
     """Different machine modes at the same placement raise output.conflict."""
-    with pytest.raises(OutputConflictError) as exc_info:
-        parse_output_flags(["--json", "--yaml", "auth", "ls"])
+    with pytest.raises(output.OutputConflictError) as exc_info:
+        output.parse(["--json", "--yaml", "auth", "ls"])
 
     assert exc_info.value.code == "output.conflict"
-    assert exc_info.value.exit_code == OUTPUT_CONFLICT_EXIT_CODE
+    assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE
 
 
 def test_dto_dump_includes_null_fields() -> None:
@@ -109,19 +98,19 @@ def test_dto_dump_includes_null_fields() -> None:
 
 def test_render_stdout_json_is_data_only() -> None:
     """JSON stdout rendering emits serialized data without diagnostics."""
-    rendered = render_stdout({"idp": "cadc"}, OutputMode.JSON)
+    rendered = output.render_stdout({"idp": "cadc"}, output.OutputMode.JSON)
     assert json.loads(rendered) == {"idp": "cadc"}
 
 
 def test_render_stdout_yaml_is_data_only() -> None:
     """YAML stdout rendering emits serialized data without diagnostics."""
-    rendered = render_stdout({"idp": "cadc"}, OutputMode.YAML)
+    rendered = output.render_stdout({"idp": "cadc"}, output.OutputMode.YAML)
     assert yaml.safe_load(rendered) == {"idp": "cadc"}
 
 
 def test_render_stdout_human_is_empty() -> None:
     """Human mode does not emit machine payloads on stdout."""
-    assert render_stdout({"idp": "cadc"}, OutputMode.HUMAN) == ""
+    assert output.render_stdout({"idp": "cadc"}, output.OutputMode.HUMAN) == ""
 
 
 def test_render_stderr_error_json_on_stderr_channel() -> None:
@@ -131,7 +120,7 @@ def test_render_stderr_error_json_on_stderr_channel() -> None:
         message="Conflicting output flags.",
         hint="Use only one of --json or --yaml.",
     )
-    rendered = render_stderr_error(error, OutputMode.JSON)
+    rendered = output.render_stderr_error(error, output.OutputMode.JSON)
     payload = json.loads(rendered)
     assert payload["code"] == "output.conflict"
     assert payload["message"] == "Conflicting output flags."
@@ -145,7 +134,7 @@ def test_render_stderr_error_yaml_on_stderr_channel() -> None:
         message="No active server selected.",
         hint="Run canfar server use.",
     )
-    rendered = render_stderr_error(error, OutputMode.YAML)
+    rendered = output.render_stderr_error(error, output.OutputMode.YAML)
     payload = yaml.safe_load(rendered)
     assert payload["code"] == "server.required"
     assert payload["message"] == "No active server selected."
@@ -159,13 +148,13 @@ def test_write_stdout_and_stderr_separation(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr("sys.stdout", stdout)
     monkeypatch.setattr("sys.stderr", stderr)
 
-    write_stdout({"sessions": []}, OutputMode.JSON)
-    write_stderr_error(
+    output.to_stdout({"sessions": []}, output.OutputMode.JSON)
+    output.to_stderr(
         StructuredError(
             code="transport.failure",
             message="Request failed.",
         ),
-        OutputMode.JSON,
+        output.OutputMode.JSON,
     )
 
     assert json.loads(stdout.getvalue()) == {"sessions": []}
@@ -175,5 +164,7 @@ def test_write_stdout_and_stderr_separation(monkeypatch: pytest.MonkeyPatch) -> 
 
 def test_render_stdout_accepts_pydantic_dto() -> None:
     """Stdout rendering accepts DTO models via shared dump helpers."""
-    rendered = render_stdout(SampleDto(name="srcnet", optional=None), OutputMode.JSON)
+    rendered = output.render_stdout(
+        SampleDto(name="srcnet", optional=None), output.OutputMode.JSON
+    )
     assert json.loads(rendered) == {"name": "srcnet", "optional": None}
