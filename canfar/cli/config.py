@@ -18,9 +18,9 @@ config: typer.Typer = typer.Typer(
 )
 
 
-@config.command("show | list | ls")
+@config.command("show", help="Display client configuration")
 def show() -> None:
-    """Displays the current configuration."""
+    """Display client configuration."""
     try:
         cfg = Configuration()
         exists: bool = CONFIG_PATH.exists()
@@ -96,7 +96,7 @@ def set_value(
         raise typer.Exit(1) from err
 
 
-@config.command("path")
+@config.command("path", help="Local path of config")
 def path() -> None:
-    """Displays the path to the configuration file."""
+    """Local path of config."""
     console.print(f"[green]{CONFIG_PATH}[/green]")

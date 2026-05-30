@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Annotated
 
 import typer
 
-from canfar import CONFIG_PATH
+from canfar import CONFIG_PATH, get_logger, set_log_level
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.machine import unsupported_machine_output
 from canfar.cli.prompts import select_idp, select_server
@@ -23,6 +23,8 @@ from canfar.utils.console import console
 
 if TYPE_CHECKING:
     from canfar.models.auth import AuthenticationCredential
+
+log = get_logger(__name__)
 
 
 def _authentication_exists_on_disk(idp: str) -> bool:
@@ -66,7 +68,13 @@ def _upsert_credential(
     config.authentication = updated
 
 
-def _login_flow(idp: str, *, force: bool = False) -> None:
+def _login_flow(
+    idp: str,
+    *,
+    force: bool = False,
+    dev: bool = False,
+    timeout: int = 2,
+) -> None:
     """Run the guided login flow for ``idp``.
 
     Authenticates interactively, discovers servers, selects a server, and
@@ -75,6 +83,8 @@ def _login_flow(idp: str, *, force: bool = False) -> None:
     Args:
         idp: Canonical Identity Provider key.
         force: When ``True``, overwrite an existing saved Authentication record.
+        dev: Include development registries and endpoints during server discovery.
+        timeout: HTTP timeout in seconds for login HTTP requests.
     """
     if _authentication_exists_on_disk(idp) and not force:
         console.print(
@@ -85,7 +95,7 @@ def _login_flow(idp: str, *, force: bool = False) -> None:
 
     idp_info = get_idp(idp)
     try:
-        credential = authenticate_for_cli(idp_info)
+        credential = authenticate_for_cli(idp_info, timeout=timeout)
     except (ValueError, RuntimeError) as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
@@ -94,7 +104,7 @@ def _login_flow(idp: str, *, force: bool = False) -> None:
     _upsert_credential(config, credential)
 
     try:
-        _discover_and_merge(config, idp)
+        _discover_and_merge(config, idp, dev=dev, timeout=timeout)
     except ServerDiscoveryError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
@@ -119,7 +129,7 @@ def _login_flow(idp: str, *, force: bool = False) -> None:
         raise typer.Exit(1)
 
     try:
-        validated = _validate_server(resolved)
+        validated = _validate_server(resolved, timeout=timeout)
     except ServerFetchError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
@@ -137,7 +147,8 @@ def register_login_command(app: typer.Typer) -> None:
 
     @app.command(
         "login",
-        help="Login to CANFAR Science Platform",
+        help="Login to CANFAR Science Platform.",
+        rich_help_panel="Auth Management",
     )
     def login_command(
         ctx: typer.Context,
@@ -149,9 +160,29 @@ def register_login_command(app: typer.Typer) -> None:
             bool,
             typer.Option("-f", "--force", help="Force re-authentication."),
         ] = False,
+        debug: Annotated[
+            bool,
+            typer.Option("--debug", help="Enable debug logging."),
+        ] = False,
+        dev: Annotated[
+            bool,
+            typer.Option("--dev", help="Include dev servers in discovery."),
+        ] = False,
+        timeout: Annotated[
+            int,
+            typer.Option(
+                "-t",
+                "--timeout",
+                help="Timeout for HTTP requests during login.",
+                min=1,
+            ),
+        ] = 2,
     ) -> None:
         """Login to CANFAR Science Platform."""
         unsupported_machine_output(ctx)
+        if debug:
+            set_log_level("DEBUG")
+            log.debug("Debug logging enabled")
 
         selected_idp = idp or select_idp(list_idps())
         try:
@@ -160,4 +191,4 @@ def register_login_command(app: typer.Typer) -> None:
             console.print(f"[bold red]{exc}[/bold red]")
             raise typer.Exit(1) from exc
 
-        _login_flow(selected_idp, force=force)
+        _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)

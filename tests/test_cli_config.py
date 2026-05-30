@@ -83,6 +83,10 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert "'version': 1" in result.stdout
 
+    result = runner.invoke(config, ["ls"])
+    assert result.exit_code == 2
+    assert "No such command 'ls'" in result.stderr
+
     result = runner.invoke(config, ["path"])
     assert result.exit_code == 0
     assert ".canfar" in result.stdout
@@ -110,3 +114,14 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
 
     assert result.exit_code == 1
     assert "wrong" in result.stdout
+
+
+def test_config_help_uses_config_command_descriptions() -> None:
+    """Config help exposes the canonical command descriptions."""
+    result = runner.invoke(config, ["--help"])
+
+    assert result.exit_code == 0
+    assert "show  Display client configuration" in result.stdout
+    assert "get   Retrieve a config value." in result.stdout
+    assert "set   Set a config value." in result.stdout
+    assert "path  Local path of config" in result.stdout

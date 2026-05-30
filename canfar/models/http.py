@@ -104,17 +104,23 @@ class Server(BaseSettings):
         ge=0,
     )
 
-    def capabilities(self) -> list[Capability]:
+    def capabilities(self, *, timeout: int | None = None) -> list[Capability]:
         """Fetch and parse the server's VOSI capabilities.
+
+        Args:
+            timeout: HTTP timeout in seconds.
 
         Returns:
             list[Capability]: Parsed session capability families for the server.
         """
-        return vosi.capabilities(url=f"{self.url}/capabilities")
+        return vosi.capabilities(url=f"{self.url}/capabilities", timeout=timeout)
 
-    def fetch(self) -> Server:
+    def fetch(self, *, timeout: int | None = None) -> Server:
         """Fetch server resource settings using active persisted authentication.
 
+        Args:
+            timeout: HTTP timeout in seconds.
+
         Returns:
             Server: New model populated with resource settings from the context
             endpoint, or default resource settings when the context endpoint
@@ -123,11 +129,14 @@ class Server(BaseSettings):
         Raises:
             ValueError: If URL or version is missing.
         """
-        return self._fetch_sync()
+        return self._fetch_sync(timeout=timeout)
 
-    async def afetch(self) -> Server:
+    async def afetch(self, *, timeout: int | None = None) -> Server:
         """Asynchronously fetch server resource settings using active auth.
 
+        Args:
+            timeout: HTTP timeout in seconds.
+
         Returns:
             Server: New model populated with resource settings from the context
             endpoint, or default resource settings when the context endpoint
@@ -136,17 +145,21 @@ class Server(BaseSettings):
         Raises:
             ValueError: If URL or version is missing.
         """
-        return await self._fetch_async()
+        return await self._fetch_async(timeout=timeout)
 
-    def _fetch_sync(self) -> Server:
+    def _fetch_sync(self, *, timeout: int | None = None) -> Server:
         from canfar.client import HTTPClient  # noqa: PLC0415
         from canfar.models.config import Configuration  # noqa: PLC0415
 
         base_url = self._require_fetch_base_url()
-        client = HTTPClient(
-            config=Configuration(),
-            url=AnyHttpUrl(base_url),
-        )
+        if timeout is None:
+            client = HTTPClient(config=Configuration(), url=AnyHttpUrl(base_url))
+        else:
+            client = HTTPClient(
+                config=Configuration(),
+                url=AnyHttpUrl(base_url),
+                timeout=timeout,
+            )
         try:
             response = client.client.get("context")
             response.raise_for_status()
@@ -154,15 +167,19 @@ class Server(BaseSettings):
         except (httpx.HTTPError, OSError, ValueError, TypeError):
             return self.with_resource_defaults()
 
-    async def _fetch_async(self) -> Server:
+    async def _fetch_async(self, *, timeout: int | None = None) -> Server:
         from canfar.client import HTTPClient  # noqa: PLC0415
         from canfar.models.config import Configuration  # noqa: PLC0415
 
         base_url = self._require_fetch_base_url()
-        client = HTTPClient(
-            config=Configuration(),
-            url=AnyHttpUrl(base_url),
-        )
+        if timeout is None:
+            client = HTTPClient(config=Configuration(), url=AnyHttpUrl(base_url))
+        else:
+            client = HTTPClient(
+                config=Configuration(),
+                url=AnyHttpUrl(base_url),
+                timeout=timeout,
+            )
         try:
             response = await client.asynclient.get("context")
             response.raise_for_status()

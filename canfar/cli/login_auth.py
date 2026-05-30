@@ -23,11 +23,16 @@ if TYPE_CHECKING:
     from canfar.idp import IdpInfo
 
 
-def authenticate_for_cli(idp_info: IdpInfo) -> AuthenticationCredential:
+def authenticate_for_cli(
+    idp_info: IdpInfo,
+    *,
+    timeout: int | None = None,
+) -> AuthenticationCredential:
     """Acquire Authentication credentials interactively for CLI login.
 
     Args:
         idp_info: Built-in Identity Provider metadata.
+        timeout: HTTP timeout in seconds for OIDC requests.
 
     Returns:
         Saved-ready authentication credential without embedded server.
@@ -38,7 +43,7 @@ def authenticate_for_cli(idp_info: IdpInfo) -> AuthenticationCredential:
     """
     if idp_info.auth_mode == "x509":
         return _authenticate_x509(idp_info.key)
-    return _authenticate_oidc(idp_info)
+    return _authenticate_oidc(idp_info, timeout=timeout)
 
 
 def _authenticate_x509(idp: str) -> X509Credential:
@@ -58,11 +63,16 @@ def _authenticate_x509(idp: str) -> X509Credential:
     )
 
 
-def _authenticate_oidc(idp_info: IdpInfo) -> OIDCCredential:
+def _authenticate_oidc(
+    idp_info: IdpInfo,
+    *,
+    timeout: int | None = None,
+) -> OIDCCredential:
     """Run interactive OIDC device authorization for an IDP.
 
     Args:
         idp_info: Built-in Identity Provider metadata.
+        timeout: HTTP timeout in seconds for OIDC requests.
 
     Returns:
         OIDC credential record for config v1.
@@ -81,7 +91,7 @@ def _authenticate_oidc(idp_info: IdpInfo) -> OIDCCredential:
         expiry=Expiry(),
         server=Server(),
     )
-    updated = asyncio.run(oidc.authenticate(legacy))
+    updated = asyncio.run(oidc.authenticate(legacy, timeout=timeout))
     return OIDCCredential(
         idp=idp_info.key,
         endpoints=updated.endpoints,

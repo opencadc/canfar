@@ -68,23 +68,47 @@ def test_ps_outputs_running_table_and_debug_anomalies() -> None:
     session.fetch.assert_awaited_once_with(kind=None, status=None)
 
 
-def test_ps_quiet_prints_first_session_id() -> None:
-    """Test ps quiet mode prints the first session ID."""
+def test_ps_quiet_prints_all_matching_session_ids() -> None:
+    """Test ps quiet mode prints every matching session ID."""
+    payloads = [
+        {
+            "id": "running-1",
+            "name": "run",
+            "type": "headless",
+            "status": "Running",
+            "isFixedResources": True,
+        },
+        {
+            "id": "done-1",
+            "name": "done",
+            "type": "headless",
+            "status": "Completed",
+            "isFixedResources": True,
+        },
+        {
+            "id": "running-2",
+            "name": "run-2",
+            "type": "headless",
+            "status": "Running",
+            "isFixedResources": True,
+        },
+    ]
+
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
-        session.fetch.return_value = [
-            {
-                "id": "first-id",
-                "name": "run",
-                "type": "headless",
-                "status": "Running",
-                "isFixedResources": True,
-            }
-        ]
+        session.fetch.return_value = payloads
         result = runner.invoke(ps, ["--quiet"])
 
     assert result.exit_code == 0
-    assert result.stdout.strip() == "first-id"
+    assert result.stdout.splitlines() == ["running-1", "running-2"]
+
+    with patch("canfar.cli.ps.AsyncSession") as session_cls:
+        session = _mock_async_session(session_cls)
+        session.fetch.return_value = payloads
+        result = runner.invoke(ps, ["--quiet", "--all"])
+
+    assert result.exit_code == 0
+    assert result.stdout.splitlines() == ["running-1", "done-1", "running-2"]
 
 
 def test_ps_allows_empty_running_view() -> None:

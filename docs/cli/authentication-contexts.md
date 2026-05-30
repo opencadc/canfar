@@ -35,38 +35,40 @@ CANFAR supports several authentication methods:
 The CANFAR CLI provides comprehensive commands for managing your authentication contexts.
 
 
-### Initial Login (`canfar auth login`)
+### Initial Login (`canfar login`)
 
 The `login` command is your starting point for connecting to any Science Platform server:
 
 ```bash
-canfar auth login
+canfar login
 ```
+
+`canfar auth login` remains available as a deprecated compatibility alias.
 
 **What happens during login:**
 
-1. **Server Discovery** - Automatically finds available Science Platform servers worldwide
-2. **Server Selection** - Interactive prompt to choose your target server
-3. **Authentication Flow** - Guides you through the server's authentication method
-4. **Context Creation** - Saves your credentials and server configuration
-5. **Activation** - Sets the new context as active for immediate use
+1. **IDP Selection** - Choose a built-in Identity Provider, or pass `cadc` or `srcnet` explicitly
+2. **Authentication Flow** - Guides you through the selected IDP's authentication method
+3. **Server Discovery** - Finds Science Platform servers scoped to the selected IDP
+4. **Server Selection** - Selects or prompts for a compatible Science Platform server
+5. **Activation** - Saves the active Authentication and Server Selection for immediate use
 
 !!! example "Login Options"
     ```bash
-    # Basic login with server discovery
-    canfar auth login
+    # Guided login
+    canfar login
 
-    # Include development/testing servers
-    canfar auth login --dev
+    # Explicit IDP login
+    canfar login cadc
 
-    # Include non-responsive servers in discovery
-    canfar auth login --dead
+    # Include development servers during discovery
+    canfar login --dev
 
-    # Show detailed server information during selection
-    canfar auth login --details
+    # Increase login HTTP request timeout
+    canfar login --timeout 10
 
-    # Force re-authentication for existing context
-    canfar auth login --force
+    # Force re-authentication for an existing IDP
+    canfar login --force
     ```
 
 ### Managing Multiple Contexts
@@ -87,7 +89,7 @@ canfar auth ls
                                                                      
   Active   Name          Auth Mode   Server URL                      
  ─────────────────────────────────────────────────────────────────── 
-    ✅     CADC-CANFAR     x509      https://ws-uv.canfar.net/skaha  
+    ✅     canfar          x509      https://ws-uv.canfar.net/skaha  
                                                                      
            SRCnet-Sweden   oidc      https://services.swesrc.chalmers.se/skaha
 ```
@@ -201,7 +203,8 @@ session = Session()
     **No servers found during discovery**
 
     - Check your internet connection
-    - Try `canfar auth login --dead` to include non-responsive servers
+    - Use `canfar login --dev` only when you need development servers
+    - Increase request timeouts with `canfar login --timeout 10`
     - Verify you're not behind a restrictive firewall
 
     **Authentication failed**
@@ -213,7 +216,7 @@ session = Session()
     **Certificate expired**
 
     - X.509 certificates typically last 10 days
-    - Run `canfar auth login --force` to refresh
+    - Run `canfar login --force` to refresh
     - Check expiry with your authentication status code above
 
 !!! question "Context Management Issues"
@@ -221,12 +224,12 @@ session = Session()
     **No active context found**
 
     - Run `canfar auth ls` to see available providers
-    - Use `canfar auth switch <context>` to activate one
-    - If no contexts exist, run `canfar auth login`
+    - Use `canfar auth use <idp>` to activate one
+    - If no contexts exist, run `canfar login`
 
     **Cannot remove active context**
 
-    - Switch to a different context first: `canfar auth switch <other>`
+    - Switch to a different authentication first: `canfar auth use <idp>`
     - Then remove the unwanted provider: `canfar auth rm <IDP>`
 
 ### Debug Mode
@@ -235,5 +238,5 @@ Enable detailed authentication logging:
 
 ```bash
 # CLI debug mode
-canfar auth login --debug
+canfar login --debug
 ```

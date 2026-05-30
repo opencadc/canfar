@@ -64,6 +64,9 @@ canfar auth login [IDP] [OPTIONS]
 | Option | Type | Default | Description |
 |--------|------|---------|-------------|
 | `--force`, `-f` | Flag | - | Force re-authentication |
+| `--debug` | Flag | - | Enable debug logging |
+| `--dev` | Flag | - | Include dev servers in discovery |
+| `--timeout`, `-t` | Integer | `2` | Timeout for HTTP requests during login |
 
 !!! example "Basic Login"
     ```bash
@@ -422,9 +425,9 @@ canfar stats [OPTIONS]
 
 Manage client configuration settings.
 
-#### `canfar config show` / `canfar config list` / `canfar config ls`
+#### `canfar config show`
 
-Display the current configuration.
+Display client configuration.
 
 ```bash
 canfar config show [OPTIONS]
@@ -432,12 +435,12 @@ canfar config show [OPTIONS]
 
 !!! example
     ```bash
-    canfar config ls
+    canfar config show
     ```
 
 #### `canfar config path`
 
-Display the path to the configuration file.
+Local path of config.
 
 ```bash
 canfar config path [OPTIONS]

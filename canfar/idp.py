@@ -18,6 +18,8 @@ class IdpInfo(BaseModel):
         name: Human-readable IDP name for CLI prompts.
         auth_mode: Default authentication mode for the IDP.
         registry_url: IVOA registry resource-caps URL for server discovery.
+        registry_name: Registry display name used for server discovery.
+        dev_registries: Development registry resource-caps URLs keyed by URL.
         oidc_discovery_url: OIDC discovery URL when ``auth_mode`` is ``oidc``.
     """
 
@@ -28,6 +30,14 @@ class IdpInfo(BaseModel):
     auth_mode: AuthMode = Field(description="Default authentication mode.")
     registry_url: AnyHttpUrl = Field(
         description="IVOA registry resource-caps URL for server discovery."
+    )
+    registry_name: str | None = Field(
+        default=None,
+        description="Registry display name used for server discovery.",
+    )
+    dev_registries: dict[str, str] = Field(
+        default_factory=dict,
+        description="Development registry resource-caps URLs keyed by URL.",
     )
     oidc_discovery_url: AnyHttpUrl | None = Field(
         default=None,
@@ -40,14 +50,21 @@ _BUILTIN_IDPS: dict[str, IdpInfo] = {
         key="cadc",
         name="Canadian Astronomy Data Centre",
         auth_mode="x509",
+        registry_name="CADC",
         registry_url=AnyHttpUrl(
             "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
         ),
+        dev_registries={
+            "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": (
+                "CADC@keel-dev"
+            ),
+        },
     ),
     "srcnet": IdpInfo(
         key="srcnet",
         name="SKA Regional Centre Network",
         auth_mode="oidc",
+        registry_name="SRCNet",
         registry_url=AnyHttpUrl("https://spsrc27.iaa.csic.es/reg/resource-caps"),
         oidc_discovery_url=AnyHttpUrl(
             "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
@@ -94,3 +111,23 @@ def is_valid_idp(key: str) -> bool:
         bool: ``True`` when ``key`` is a built-in IDP, otherwise ``False``.
     """
     return key in _BUILTIN_IDPS
+
+
+def registry_sources(key: str, *, include_dev: bool = False) -> dict[str, str]:
+    """Return registry resource-caps sources for an IDP.
+
+    Args:
+        key: Canonical IDP key.
+        include_dev: Include development registries and endpoints when true.
+
+    Returns:
+        Mapping of registry resource-caps URL to registry display name.
+
+    Raises:
+        KeyError: If ``key`` is not a built-in IDP.
+    """
+    idp = get_idp(key)
+    sources = {str(idp.registry_url): idp.registry_name or idp.name}
+    if include_dev:
+        sources.update(idp.dev_registries)
+    return sources

@@ -22,7 +22,7 @@ COMMANDS = [
     ["server", "ls"],
     ["server", "use"],
     ["config"],
-    ["config", "list"],
+    ["config", "show"],
     ["config", "path"],
     ["create"],
     ["delete"],

@@ -9,7 +9,7 @@ from pydantic import AnyHttpUrl, AnyUrl
 
 from canfar import get_logger
 from canfar.errors import ErrorCode, StructuredError
-from canfar.idp import get_idp
+from canfar.idp import registry_sources
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import IVOARegistrySearch
@@ -57,7 +57,12 @@ class ServerFetchError(RuntimeError):
         self.structured = StructuredError(code=code, message=message)
 
 
-def list_servers(*, discover_if_empty: bool = True) -> list[Server]:
+def list_servers(
+    *,
+    discover_if_empty: bool = True,
+    dev: bool = False,
+    timeout: int = 2,
+) -> list[Server]:
     """Return known servers scoped to the active Identity Provider.
 
     When no servers are saved for the active IDP and ``discover_if_empty`` is
@@ -65,6 +70,8 @@ def list_servers(*, discover_if_empty: bool = True) -> list[Server]:
 
     Args:
         discover_if_empty: Whether to discover servers when none are saved.
+        dev: Include development registries and endpoints during discovery.
+        timeout: HTTP timeout in seconds for discovery requests.
 
     Returns:
         list[Server]: Saved server records for the active IDP.
@@ -78,12 +85,12 @@ def list_servers(*, discover_if_empty: bool = True) -> list[Server]:
     if servers or not discover_if_empty:
         return servers
 
-    _discover_and_merge(config, active_idp)
+    _discover_and_merge(config, active_idp, dev=dev, timeout=timeout)
     config.save()
     return [server for server in config.server if server.idp == active_idp]
 
 
-def use(selector: str) -> None:
+def use(selector: str, *, dev: bool = False, timeout: int = 2) -> None:
     """Select and persist the active server by name or URI.
 
     Resolves ``selector`` within servers for the active IDP. When no known
@@ -93,6 +100,8 @@ def use(selector: str) -> None:
 
     Args:
         selector: Server display name or IVOA URI.
+        dev: Include development registries and endpoints during discovery.
+        timeout: HTTP timeout in seconds for discovery and validation requests.
 
     Raises:
         ServerSelectorError: If ``selector`` is ambiguous or still not found.
@@ -103,7 +112,7 @@ def use(selector: str) -> None:
     active_idp = config.active.authentication
     resolved = _resolve_selector(config, selector, active_idp)
     if resolved is None:
-        _discover_and_merge(config, active_idp)
+        _discover_and_merge(config, active_idp, dev=dev, timeout=timeout)
         resolved = _resolve_selector(config, selector, active_idp)
     if resolved is None:
         msg = f"Server '{selector}' not found for IDP '{active_idp}'."
@@ -112,7 +121,7 @@ def use(selector: str) -> None:
             hint="Use a server URI or run discovery with `canfar server ls`.",
         )
 
-    validated = _validate_server(resolved)
+    validated = _validate_server(resolved, timeout=timeout)
 
     config._upsert_server(validated)  # noqa: SLF001
     config.active = config.active.model_copy(update={"server": validated.uri})
@@ -168,17 +177,25 @@ def _resolve_selector(
     return None
 
 
-def _discover_and_merge(config: Configuration, idp: str) -> None:
+def _discover_and_merge(
+    config: Configuration,
+    idp: str,
+    *,
+    dev: bool = False,
+    timeout: int = 2,
+) -> None:
     """Discover servers for ``idp`` and merge them into ``config``.
 
     Args:
         config: Configuration to update in place.
         idp: Canonical IDP key.
+        dev: Include development registries and endpoints during discovery.
+        timeout: HTTP timeout in seconds for discovery requests.
 
     Raises:
         ServerDiscoveryError: If registry fetch fails.
     """
-    discovered = asyncio.run(_discover_for_idp(idp))
+    discovered = asyncio.run(_discover_for_idp(idp, dev=dev, timeout=timeout))
     if not discovered:
         msg = f"No servers discovered for IDP '{idp}'."
         raise ServerDiscoveryError(
@@ -189,11 +206,18 @@ def _discover_and_merge(config: Configuration, idp: str) -> None:
         config._upsert_server(server)  # noqa: SLF001
 
 
-async def _discover_for_idp(idp: str) -> list[Server]:
+async def _discover_for_idp(
+    idp: str,
+    *,
+    dev: bool = False,
+    timeout: int = 2,
+) -> list[Server]:
     """Discover active servers for a single Identity Provider.
 
     Args:
         idp: Canonical IDP key.
+        dev: Include development registries and endpoints.
+        timeout: HTTP timeout in seconds for discovery requests.
 
     Returns:
         list[Server]: Validated HTTP server models for reachable endpoints.
@@ -201,18 +225,25 @@ async def _discover_for_idp(idp: str) -> list[Server]:
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
-    idp_info = get_idp(idp)
-    search = IVOARegistrySearch()
-    async with Discover(search) as discovery:
-        registry = await discovery.fetch(
-            str(idp_info.registry_url),
-            idp_info.name,
+    sources = registry_sources(idp, include_dev=dev)
+    search = IVOARegistrySearch(registries=sources)
+    async with Discover(search, timeout=timeout) as discovery:
+        registries = await asyncio.gather(
+            *(discovery.fetch(url, name) for url, name in sources.items())
         )
-        if not registry.success:
-            msg = f"Failed to discover servers for IDP '{idp}': {registry.error}"
+        successful_registries = [
+            registry for registry in registries if registry.success
+        ]
+        if not successful_registries:
+            errors = "; ".join(
+                f"{registry.name}: {registry.error}" for registry in registries
+            )
+            msg = f"Failed to discover servers for IDP '{idp}': {errors}"
             raise ServerDiscoveryError(msg)
 
-        endpoints = await discovery.extract(registry)
+        endpoints = []
+        for registry in successful_registries:
+            endpoints.extend(await discovery.extract(registry, dev=dev))
         if not endpoints:
             return []
 
@@ -220,18 +251,24 @@ async def _discover_for_idp(idp: str) -> list[Server]:
             *(discovery.check(endpoint) for endpoint in endpoints)
         )
         return [
-            _discovered_to_server(endpoint, idp)
+            _discovered_to_server(endpoint, idp, timeout=timeout)
             for endpoint in checked
             if endpoint.status == 200
         ]
 
 
-def _discovered_to_server(endpoint: DiscoveredServer, idp: str) -> Server:
+def _discovered_to_server(
+    endpoint: DiscoveredServer,
+    idp: str,
+    *,
+    timeout: int = 2,
+) -> Server:
     """Convert a registry discovery record to a persisted HTTP server model.
 
     Args:
         endpoint: Discovered registry endpoint.
         idp: Canonical IDP key.
+        timeout: HTTP timeout in seconds for VOSI capabilities requests.
 
     Returns:
         Server: Persisted server model with capabilities metadata when available.
@@ -242,10 +279,15 @@ def _discovered_to_server(endpoint: DiscoveredServer, idp: str) -> Server:
         uri=AnyUrl(endpoint.uri),
         url=AnyHttpUrl(endpoint.url),
     )
-    return _enrich_from_capabilities(server, strict=False)
+    return _enrich_from_capabilities(server, strict=False, timeout=timeout)
 
 
-def _enrich_from_capabilities(server: Server, *, strict: bool = True) -> Server:
+def _enrich_from_capabilities(
+    server: Server,
+    *,
+    strict: bool = True,
+    timeout: int = 2,
+) -> Server:
     """Populate version and auth modes from VOSI capabilities when missing.
 
     Args:
@@ -253,6 +295,7 @@ def _enrich_from_capabilities(server: Server, *, strict: bool = True) -> Server:
         strict: When ``False``, return the original server if capabilities
             cannot be retrieved or parsed. Discovery uses non-strict mode so
             one malformed endpoint does not abort listing for an IDP.
+        timeout: HTTP timeout in seconds for VOSI capabilities requests.
 
     Returns:
         Server: Copy with version and auth modes populated when discoverable.
@@ -269,7 +312,7 @@ def _enrich_from_capabilities(server: Server, *, strict: bool = True) -> Server:
         return server.model_copy(deep=True)
 
     try:
-        capabilities = server.capabilities()
+        capabilities = server.capabilities(timeout=timeout)
     except Exception as exc:
         if strict:
             msg = f"Failed to fetch capabilities for {server.url}: {exc}"
@@ -302,11 +345,12 @@ def _enrich_from_capabilities(server: Server, *, strict: bool = True) -> Server:
     )
 
 
-def _validate_server(server: Server) -> Server:
+def _validate_server(server: Server, *, timeout: int = 2) -> Server:
     """Fetch and validate a server before persisting it as active.
 
     Args:
         server: Candidate server record.
+        timeout: HTTP timeout in seconds for validation requests.
 
     Returns:
         Server: Enriched, validated server model.
@@ -314,8 +358,8 @@ def _validate_server(server: Server) -> Server:
     Raises:
         ServerFetchError: If capability enrichment fails or URL/version are missing.
     """
-    enriched = _enrich_from_capabilities(server, strict=True)
+    enriched = _enrich_from_capabilities(server, strict=True, timeout=timeout)
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."
         raise ServerFetchError(msg)
-    return enriched.fetch()
+    return enriched.fetch(timeout=timeout)

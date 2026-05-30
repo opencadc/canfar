@@ -21,29 +21,15 @@ Installed
 ## Authentication
 
 ```bash title='Login to CANFAR Science Platform'
-canfar auth login
+canfar login cadc
 ```
 
 <!-- termynal -->
 ```
-$ canfar auth login
-Starting Science Platform Login
-Fetched CADC in 0.12s
-Fetched SRCnet in 1.15s
-Discovery completed in 3.32s (5/18 active)
-$ Select a Canfar Server: (Use arrow keys)
-   🟢 Canada  SRCnet
-   🟢 UK-CAM  SRCnet
-   🟢 Swiss   SRCnet
-   🟢 Spain   SRCnet
- » 🟢 CANFAR  CADC
-$ Selected a Canfar Server: 🟢 CANFAR  CADC
-X509 Certificate Authentication
+$ canfar login cadc
 $ Username: username
-username@ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca
 $ Password: ***********
-✓ Saving configuration
-Login completed successfully!
+✓ Login completed successfully
 ```
 
 
@@ -54,10 +40,7 @@ Login completed successfully!
         If you’re using the [CADC CANFAR Science Platform](https://canfar.net) and already have a valid certificate at `~/.ssl/cadcproxy.pem`, the CLI will log in automatically
 
         ```bash
-        Starting Science Platform Login
-        ✓ Credentials valid
-        ✓ Authenticated with CADC-CANFAR @ https://ws-uv.canfar.net/skaha
-        Use --force to re-authenticate.
+        Authentication for 'cadc' already exists. Use --force to re-authenticate.
         ```
 
     === "SRCnet Users"
@@ -65,13 +48,7 @@ Login completed successfully!
         If you are a SRCnet user, you will be required to go through the OpenID Connect login process in your web browser.
 
         ```bash
-        Starting Science Platform Login
-        Fetched CADC in 0.13s
-        Fetched SRCnet in 1.03s
-        Discovery completed in 3.20s (13/19 active)
-        ? Select a Canfar Server: 🟢 Canada  SRCnet
-        Discovering capabilities for https://src.canfar.net/skaha
-        OIDC Authentication for https://src.canfar.net/skaha
+        canfar login srcnet
         Starting OIDC Device Authentication
         ✓ OIDC Configuration discovered successfully
         ✓ OIDC device registered successfully
@@ -79,11 +56,12 @@ Login completed successfully!
         ```
 
 ```bash title="Force Re-Login"
-canfar auth login --force
+canfar login --force
 ```
 
 !!! success "What just happened?"
-    - `canfar` discovered all available Science Platform servers around the world
+    - `canfar` authenticated with the selected IDP
+    - `canfar` discovered compatible Science Platform servers for that IDP
     - You selected the `CADC CANFAR Server`
     - You logged into the Science Platform using your CADC credentials
     - The Science Platform generated a certificate for you valid for 30 days

@@ -37,6 +37,10 @@ _Avoid_: Provider
 User's chosen **Science Platform Server** for new platform requests.
 _Avoid_: Platform Context, target
 
+**Server Discovery Scope**:
+Boundary that determines which **Science Platform Servers** are considered during discovery, such as production-only or development-inclusive.
+_Avoid_: Discovery flag, server environment
+
 **Session**:
 User-owned compute environment launched on a Science Platform Server.
 _Avoid_: Job, pod, container
@@ -65,6 +69,7 @@ _Avoid_: Resource profile, quota
 - An **Authentication Context** belongs to one **Identity Provider (IDP)**.
 - An **Authentication Context** uses one **Authentication Mode**.
 - A **Server Selection** belongs to one **Science Platform Server**.
+- A **Server Discovery Scope** constrains candidate **Science Platform Servers** before **Server Selection**.
 - A **Server Selection** and **Authentication Context** together determine where new platform requests go.
 - A **Session** runs on one **Science Platform Server**.
 - A **Session** has one **Session Kind**.

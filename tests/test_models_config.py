@@ -62,7 +62,7 @@ class TestConfigurationDefaults:
         assert len(config.authentication) == 1
         assert isinstance(config.authentication[0], X509Credential)
         assert len(config.server) == 1
-        assert config.server[0].name == "CADC-CANFAR"
+        assert config.server[0].name == "canfar"
         assert isinstance(config.registry, ContainerRegistry)
 
     def test_model_config_settings(self) -> None:

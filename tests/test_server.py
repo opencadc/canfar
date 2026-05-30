@@ -21,6 +21,7 @@ from canfar.server import (
     _discover_for_idp,
     _discovered_to_server,
     _enrich_from_capabilities,
+    _validate_server,
     use,
 )
 from canfar.server import (
@@ -188,7 +189,11 @@ class TestServerUse:
             config.server = [known]
             config.save()
 
-            def merge_discovered(config_obj: Configuration, _idp: str) -> None:
+            def merge_discovered(
+                config_obj: Configuration,
+                _idp: str,
+                **_kwargs: object,
+            ) -> None:
                 config_obj._upsert_server(discovered)  # noqa: SLF001
 
             with (
@@ -458,6 +463,58 @@ class TestServerDiscovery:
             pytest.raises(ServerDiscoveryError, match="Failed to discover"),
         ):
             await _discover_for_idp("cadc")
+
+    @pytest.mark.asyncio
+    async def test_discover_for_idp_honors_dev_sources_and_timeout(self) -> None:
+        """Dev discovery includes dev registries and propagates request timeout."""
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.side_effect = [
+            MagicMock(name="CADC", success=True, content="prod"),
+            MagicMock(name="CADC@keel-dev", success=True, content="dev"),
+        ]
+        mock_discovery.extract.return_value = []
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("canfar.server.Discover", return_value=mock_discovery) as factory:
+            servers = await _discover_for_idp("cadc", dev=True, timeout=11)
+
+        assert servers == []
+        search = factory.call_args.args[0]
+        assert (
+            "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+            in search.registries
+        )
+        assert factory.call_args.kwargs["timeout"] == 11
+        assert mock_discovery.extract.call_args.kwargs["dev"] is True
+
+    def test_validate_server_honors_timeout(self) -> None:
+        """Server validation passes login timeout to capabilities and fetch."""
+        server = _cadc_server(version=None, auths=None)
+        fetched = server.model_copy(
+            update={"version": "v1", "auths": ["x509"], "cores": 16},
+            deep=True,
+        )
+
+        with (
+            patch.object(
+                Server,
+                "capabilities",
+                return_value=[
+                    {
+                        "baseurl": _CADC_URL,
+                        "version": "v1",
+                        "auth_modes": ["x509"],
+                    }
+                ],
+            ) as capabilities,
+            patch.object(Server, "fetch", return_value=fetched) as fetch,
+        ):
+            validated = _validate_server(server, timeout=13)
+
+        assert validated.cores == 16
+        capabilities.assert_called_once_with(timeout=13)
+        fetch.assert_called_once_with(timeout=13)
 
 
 class TestServerModelFields:

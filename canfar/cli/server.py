@@ -34,7 +34,7 @@ from canfar.utils.console import console
 
 server = typer.Typer(
     name="server",
-    help="Manage Science Platform server selection.",
+    help="Manage science platform servers.",
     no_args_is_help=True,
     cls=AliasGroup,
 )

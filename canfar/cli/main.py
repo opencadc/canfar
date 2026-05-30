@@ -79,7 +79,7 @@ register_login_command(cli)
 cli.add_typer(
     auth,
     name="auth",
-    help="Manage Authentication state.",
+    help="Manage authentication providers.",
     no_args_is_help=False,
     rich_help_panel="Auth Management",
 )
@@ -96,7 +96,7 @@ cli.add_typer(
 cli.add_typer(
     server,
     name="server",
-    help="Manage Science Platform server selection.",
+    help="Manage science platform servers.",
     no_args_is_help=True,
     rich_help_panel="Auth Management",
 )

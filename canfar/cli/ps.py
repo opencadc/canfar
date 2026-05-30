@@ -94,8 +94,10 @@ def show(
 
         if quiet:
             for instance in sessions:
+                if not everything and instance.status not in ["Pending", "Running"]:
+                    continue
                 console.print(instance.id)
-                return
+            return
 
         table = Table(title="CANFAR Sessions", box=box.SIMPLE)
         table.add_column("SESSION ID", style="cyan")

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from canfar.idp import IdpInfo, get_idp, is_valid_idp, list_idps
+from canfar.idp import IdpInfo, get_idp, is_valid_idp, list_idps, registry_sources
 
 
 class TestListIdps:
@@ -53,6 +53,27 @@ class TestGetIdpCadc:
         idp = get_idp("cadc")
 
         assert idp.key == "cadc"
+
+    def test_registry_sources_cadc_default_excludes_dev(self) -> None:
+        """CADC discovery uses only production registries by default."""
+        sources = registry_sources("cadc")
+
+        assert sources == {
+            "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
+        }
+
+    def test_registry_sources_cadc_can_include_dev(self) -> None:
+        """CADC discovery can opt into development registries."""
+        sources = registry_sources("cadc", include_dev=True)
+
+        assert (
+            sources["https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"]
+            == "CADC"
+        )
+        assert (
+            sources["https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"]
+            == "CADC@keel-dev"
+        )
 
 
 class TestGetIdpSrcnet:

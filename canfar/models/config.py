@@ -59,7 +59,7 @@ default_authentication: list[AuthenticationCredential] = [
 default_servers: list[Server] = [
     Server(
         idp="cadc",
-        name="CADC-CANFAR",
+        name="canfar",
         uri=_CADC_URI,
         url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
         version="v1",

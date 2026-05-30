@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
@@ -68,7 +68,11 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
         patch("canfar.cli.login._validate_server", return_value=validated),
         patch(
             "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+            side_effect=lambda config, idp, **_kwargs: _merge_servers(
+                config,
+                discovered,
+                idp,
+            ),
         ),
     ):
         result = runner.invoke(cli, ["login", "cadc"])
@@ -105,7 +109,11 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         patch("canfar.cli.login._validate_server", return_value=validated),
         patch(
             "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+            side_effect=lambda config, idp, **_kwargs: _merge_servers(
+                config,
+                discovered,
+                idp,
+            ),
         ),
     ):
         result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
@@ -149,7 +157,11 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
         patch("canfar.cli.login._validate_server", return_value=validated),
         patch(
             "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp: _merge_servers(config, discovered, idp),
+            side_effect=lambda config, idp, **_kwargs: _merge_servers(
+                config,
+                discovered,
+                idp,
+            ),
         ),
     ):
         result = runner.invoke(cli, ["login", "cadc", "--force"])
@@ -160,6 +172,65 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
     assert saved.active.authentication == "cadc"
     assert str(saved.active.server) == _CADC_URI
     assert saved.get_credential("cadc").path == Path("/new/cert.pem")
+
+
+def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
+    """Login --dev and --timeout flow into auth, discovery, and validation."""
+    config_path = tmp_path / "config.yaml"
+    credential = X509Credential(
+        idp="cadc",
+        path=Path("/new/cert.pem"),
+        expiry=456.0,
+    )
+    discovered = [
+        Server(
+            idp="cadc",
+            name="CADC-CANFAR",
+            uri=AnyUrl(_CADC_URI),
+            url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+            version="v1",
+            auths=["x509"],
+        )
+    ]
+    validated = discovered[0].model_copy(deep=True)
+    authenticate = MagicMock(return_value=credential)
+    validate = MagicMock(return_value=validated)
+
+    def discover(config: Configuration, idp: str, *, dev: bool, timeout: int) -> None:
+        assert idp == "cadc"
+        assert dev is True
+        assert timeout == 9
+        _merge_servers(config, discovered, idp)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.login.authenticate_for_cli", authenticate),
+        patch("canfar.cli.login._validate_server", validate),
+        patch("canfar.cli.login._discover_and_merge", side_effect=discover),
+    ):
+        result = runner.invoke(
+            cli,
+            ["login", "cadc", "--force", "--dev", "--timeout", "9"],
+        )
+
+    assert result.exit_code == 0
+    authenticate.assert_called_once()
+    assert authenticate.call_args.kwargs["timeout"] == 9
+    validate.assert_called_once_with(discovered[0], timeout=9)
+
+
+def test_auth_login_alias_passes_dev_and_timeout_to_login_flow() -> None:
+    """Compatibility alias keeps the same discovery options as canfar login."""
+    with patch("canfar.cli.login._login_flow") as login_flow:
+        result = runner.invoke(
+            cli,
+            ["auth", "login", "cadc", "--dev", "--timeout", "7"],
+        )
+
+    assert result.exit_code == 0
+    login_flow.assert_called_once_with("cadc", force=False, dev=True, timeout=7)
 
 
 def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:

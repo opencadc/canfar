@@ -38,11 +38,16 @@ class TestConfigV1Defaults:
         assert len(config.server) == 1
         srv = config.server[0]
         assert srv.idp == "cadc"
-        assert srv.name == "CADC-CANFAR"
+        assert srv.name == "canfar"
         assert str(srv.uri) == "ivo://cadc.nrc.ca/skaha"
         assert str(srv.url) == "https://ws-uv.canfar.net/skaha"
         assert srv.version == "v1"
         assert srv.auths == ["x509"]
+        assert srv.cores == 2
+        assert srv.ram == 16
+        assert srv.gpus == 0
+        assert config.registry.model_dump(exclude_none=True) == {}
+        assert config.console.width == 120
 
     def test_authentication_credentials_have_no_embedded_server(
         self, tmp_path: Path

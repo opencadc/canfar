@@ -50,7 +50,7 @@ if TYPE_CHECKING:
 
 auth = typer.Typer(
     name="auth",
-    help="Manage Authentication state.",
+    help="Manage authentication providers.",
     no_args_is_help=False,
     invoke_without_command=True,
     rich_markup_mode="rich",
@@ -298,8 +298,26 @@ def auth_login_command(
         bool,
         typer.Option("-f", "--force", help="Force re-authentication."),
     ] = False,
+    debug: Annotated[
+        bool,
+        typer.Option("--debug", help="Enable debug logging."),
+    ] = False,
+    dev: Annotated[
+        bool,
+        typer.Option("--dev", help="Include dev servers in discovery."),
+    ] = False,
+    timeout: Annotated[
+        int,
+        typer.Option(
+            "-t",
+            "--timeout",
+            help="Timeout for HTTP requests during login.",
+            min=1,
+        ),
+    ] = 2,
 ) -> None:
     """Alias for canfar login."""
+    from canfar import get_logger, set_log_level  # noqa: PLC0415
     from canfar.cli.login import _login_flow  # noqa: PLC0415
     from canfar.cli.prompts import select_idp  # noqa: PLC0415
     from canfar.idp import list_idps  # noqa: PLC0415
@@ -310,8 +328,11 @@ def auth_login_command(
         " Use [green][bold]canfar login[/bold][/green] instead.\n"
     )
     unsupported_machine_output(ctx)
+    if debug:
+        set_log_level("DEBUG")
+        get_logger(__name__).debug("Debug logging enabled")
     selected_idp = idp or select_idp(list_idps())
-    _login_flow(selected_idp, force=force)
+    _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)
 
 
 @auth.command("use")
