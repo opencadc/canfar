@@ -282,6 +282,25 @@ class TestServerFetch:
         assert populated.ram == 192
         assert populated.gpus == 4
 
+    def test_fetch_uses_provided_config_for_http_client(self) -> None:
+        """fetch() authenticates context requests with the provided config."""
+        server = _cadc_server()
+        config = Configuration()
+        response = MagicMock()
+        response.json.return_value = _CONTEXT_PAYLOAD
+        response.raise_for_status = MagicMock()
+
+        mock_client = MagicMock()
+        mock_client.client.get.return_value = response
+
+        with patch("canfar.client.HTTPClient", return_value=mock_client) as factory:
+            server.fetch(timeout=7, config=config)
+
+        factory.assert_called_once()
+        assert factory.call_args.kwargs["config"] is config
+        assert factory.call_args.kwargs["timeout"] == 7
+        assert factory.call_args.kwargs["raise_http_errors"] is False
+
     @pytest.mark.asyncio
     async def test_afetch_returns_new_model_without_mutating_original(self) -> None:
         """afetch() returns a populated copy and leaves the source unchanged."""
@@ -425,14 +444,19 @@ class TestServerDiscovery:
         """Non-strict enrichment preserves registry metadata for listing."""
         server = _cadc_server(version=None, auths=None)
 
-        with patch(
-            "canfar.models.http.vosi.capabilities",
-            side_effect=ValueError("mismatched tag"),
+        with (
+            patch(
+                "canfar.models.http.vosi.capabilities",
+                side_effect=ValueError("mismatched tag"),
+            ),
+            patch("canfar.server.log") as log,
         ):
             enriched = _enrich_from_capabilities(server, strict=False)
 
         assert enriched.version is None
         assert enriched.auths is None
+        log.debug.assert_called_once()
+        log.warning.assert_not_called()
 
     def test_enrich_from_capabilities_strict_raises_on_failure(self) -> None:
         """Strict enrichment fails when capabilities cannot be parsed."""
@@ -514,7 +538,62 @@ class TestServerDiscovery:
 
         assert validated.cores == 16
         capabilities.assert_called_once_with(timeout=13)
-        fetch.assert_called_once_with(timeout=13)
+        fetch.assert_called_once()
+        assert fetch.call_args.kwargs["timeout"] == 13
+        assert isinstance(fetch.call_args.kwargs["config"], Configuration)
+
+    def test_validate_server_uses_candidate_authentication_pair(self) -> None:
+        """Validation uses the selected IDP before active state is saved."""
+        cadc = _cadc_server(version=None, auths=None)
+        srcnet = _cadc_server(
+            idp="srcnet",
+            name="SRCNet",
+            uri=AnyUrl("ivo://srcnet.example/skaha"),
+            url=AnyHttpUrl("https://srcnet.example/skaha"),
+            auths=["oidc"],
+        )
+        config = Configuration()
+        config.authentication = [
+            OIDCCredential(idp="srcnet"),
+            X509Credential(idp="cadc", path=Path("/cadc.pem"), expiry=9999999999.0),
+        ]
+        config.server = [srcnet, cadc]
+        config.active = config.active.model_copy(
+            update={"authentication": "srcnet", "server": srcnet.uri}
+        )
+        captured: dict[str, Configuration] = {}
+
+        def fetch(
+            self: Server,
+            *,
+            timeout: int | None = None,
+            config: Configuration | None = None,
+        ) -> Server:
+            assert timeout == 5
+            assert config is not None
+            captured["config"] = config
+            return self
+
+        with (
+            patch.object(
+                Server,
+                "capabilities",
+                return_value=[
+                    {
+                        "baseurl": _CADC_URL,
+                        "version": "v1",
+                        "auth_modes": ["x509"],
+                    }
+                ],
+            ),
+            patch.object(Server, "fetch", fetch),
+        ):
+            _validate_server(cadc, config=config, idp="cadc", timeout=5)
+
+        validation_config = captured["config"]
+        assert validation_config.active.authentication == "cadc"
+        assert str(validation_config.active.server) == _CADC_URI
+        assert config.active.authentication == "srcnet"
 
 
 class TestServerModelFields:

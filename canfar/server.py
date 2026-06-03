@@ -121,10 +121,14 @@ def use(selector: str, *, dev: bool = False, timeout: int = 2) -> None:
             hint="Use a server URI or run discovery with `canfar server ls`.",
         )
 
-    validated = _validate_server(resolved, timeout=timeout)
+    validated = _validate_server(
+        resolved,
+        config=config,
+        idp=active_idp,
+        timeout=timeout,
+    )
 
-    config._upsert_server(validated)  # noqa: SLF001
-    config.active = config.active.model_copy(update={"server": validated.uri})
+    config.set_active_selection(active_idp, validated)
     config.save()
 
 
@@ -317,7 +321,7 @@ def _enrich_from_capabilities(
         if strict:
             msg = f"Failed to fetch capabilities for {server.url}: {exc}"
             raise ServerFetchError(msg) from exc
-        log.warning(
+        log.debug(
             "Skipping capability enrichment for %s during discovery: %s",
             server.url,
             exc,
@@ -328,7 +332,7 @@ def _enrich_from_capabilities(
         if strict:
             msg = f"No session capabilities found for {server.url}."
             raise ServerFetchError(msg)
-        log.warning(
+        log.debug(
             "No session capabilities found for %s during discovery; "
             "keeping registry metadata only.",
             server.url,
@@ -345,11 +349,19 @@ def _enrich_from_capabilities(
     )
 
 
-def _validate_server(server: Server, *, timeout: int = 2) -> Server:
+def _validate_server(
+    server: Server,
+    *,
+    config: Configuration | None = None,
+    idp: str | None = None,
+    timeout: int = 2,
+) -> Server:
     """Fetch and validate a server before persisting it as active.
 
     Args:
         server: Candidate server record.
+        config: Configuration to use while validating the candidate selection.
+        idp: Authentication Context IDP to pair with the candidate server.
         timeout: HTTP timeout in seconds for validation requests.
 
     Returns:
@@ -362,4 +374,8 @@ def _validate_server(server: Server, *, timeout: int = 2) -> Server:
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."
         raise ServerFetchError(msg)
-    return enriched.fetch(timeout=timeout)
+
+    base_config = config or Configuration()
+    active_idp = idp or enriched.idp or base_config.active.authentication
+    validation_config = base_config.with_active_selection(active_idp, enriched)
+    return enriched.fetch(timeout=timeout, config=validation_config)

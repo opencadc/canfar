@@ -129,15 +129,17 @@ def _login_flow(
         raise typer.Exit(1)
 
     try:
-        validated = _validate_server(resolved, timeout=timeout)
+        validated = _validate_server(
+            resolved,
+            config=config,
+            idp=idp,
+            timeout=timeout,
+        )
     except ServerFetchError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    config._upsert_server(validated)  # noqa: SLF001
-    config.active = config.active.model_copy(
-        update={"authentication": idp, "server": validated.uri},
-    )
+    config.set_active_selection(idp, validated)
     config.save()
     console.print("[green]✓[/green] Login completed successfully")
 

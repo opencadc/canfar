@@ -94,7 +94,7 @@ def _switch_auth_only(config: Configuration, idp: str) -> bool:
         return False
     if active_server.idp != idp:
         return False
-    config.active = config.active.model_copy(update={"authentication": idp})
+    config.set_active_selection(idp, active_server)
     config.save()
     _print_auth_switched(idp)
     return True
@@ -138,6 +138,28 @@ def _prompt_server_selector(servers: list[Server]) -> str:
         return str(selected.uri)
 
 
+def _remembered_server_selector(
+    config: Configuration,
+    idp: str,
+    servers: list[Server],
+) -> str | None:
+    """Return a remembered server URI for ``idp`` when available."""
+    remembered = config.get_remembered_server_for_idp(idp)
+    if remembered is None or remembered.uri is None:
+        return None
+    if not any(
+        server.uri is not None and str(server.uri) == str(remembered.uri)
+        for server in servers
+    ):
+        return None
+
+    selector = str(remembered.uri)
+    console.print(
+        f"[green]✓[/green] Auto-selected server {remembered.name or selector}",
+    )
+    return selector
+
+
 def _activate_auth_with_server(
     config: Configuration,
     idp: str,
@@ -152,15 +174,12 @@ def _activate_auth_with_server(
         raise typer.Exit(1)
 
     try:
-        validated = _validate_server(resolved)
+        validated = _validate_server(resolved, config=config, idp=idp)
     except ServerFetchError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    config._upsert_server(validated)  # noqa: SLF001
-    config.active = config.active.model_copy(
-        update={"authentication": idp, "server": validated.uri},
-    )
+    config.set_active_selection(idp, validated)
     config.save()
     _print_auth_switched(idp)
 
@@ -366,7 +385,9 @@ def auth_use_command(
         )
         raise typer.Exit(1)
 
-    selector = _prompt_server_selector(servers)
+    selector = _remembered_server_selector(config, idp, servers)
+    if selector is None:
+        selector = _prompt_server_selector(servers)
     _activate_auth_with_server(config, idp, selector)
 
 

@@ -218,7 +218,11 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     assert result.exit_code == 0
     authenticate.assert_called_once()
     assert authenticate.call_args.kwargs["timeout"] == 9
-    validate.assert_called_once_with(discovered[0], timeout=9)
+    validate.assert_called_once()
+    assert validate.call_args.args == (discovered[0],)
+    assert validate.call_args.kwargs["idp"] == "cadc"
+    assert validate.call_args.kwargs["timeout"] == 9
+    assert isinstance(validate.call_args.kwargs["config"], Configuration)
 
 
 def test_auth_login_alias_passes_dev_and_timeout_to_login_flow() -> None:

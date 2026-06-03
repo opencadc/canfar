@@ -136,10 +136,15 @@ def use(idp: str) -> None:
             hint="Run canfar.login() for this IDP before selecting it.",
         ) from exc
 
-    config.active.authentication = idp
-
-    if not _active_server_compatible(config, idp):
-        config.active.server = None
+    remembered = config.get_remembered_server_for_idp(idp)
+    if remembered is not None:
+        config.set_active_selection(idp, remembered)
+    else:
+        selections = config._server_selection_history()  # noqa: SLF001
+        config.active.authentication = idp
+        if not _active_server_compatible(config, idp):
+            config.active.server = None
+        config.active.servers = selections
 
     config.save()
 
@@ -188,6 +193,7 @@ def remove(idp: str, *, force: bool = False) -> None:
         credential for credential in config.authentication if credential.idp != idp
     ]
     config.server = [server for server in config.server if server.idp != idp]
+    config.active.servers.pop(idp, None)
 
     if config.active.authentication == idp:
         if config.authentication:

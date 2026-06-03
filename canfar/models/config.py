@@ -245,9 +245,30 @@ class Configuration(BaseSettings):
             raise ValueError(msg)
 
         if self.active.server is not None:
-            server_uris = {str(srv.uri) for srv in self.server if srv.uri is not None}
-            if str(self.active.server) not in server_uris:
+            servers_by_uri = {
+                str(srv.uri): srv for srv in self.server if srv.uri is not None
+            }
+            if str(self.active.server) not in servers_by_uri:
                 msg = f"Active server '{self.active.server}' not found in server list."
+                raise ValueError(msg)
+
+        servers_by_uri = {
+            str(srv.uri): srv for srv in self.server if srv.uri is not None
+        }
+        for idp, uri in self.active.servers.items():
+            if idp not in auth_idps:
+                msg = (
+                    f"Remembered server authentication '{idp}' "
+                    "not found in authentication list."
+                )
+                raise ValueError(msg)
+            try:
+                server = servers_by_uri[str(uri)]
+            except KeyError as exc:
+                msg = f"Remembered server '{uri}' not found in server list."
+                raise ValueError(msg) from exc
+            if server.idp != idp:
+                msg = f"Remembered server '{uri}' does not belong to IDP '{idp}'."
                 raise ValueError(msg)
 
         return self
@@ -357,6 +378,85 @@ class Configuration(BaseSettings):
                 return server
         msg = f"No server found for IDP '{idp}'."
         raise KeyError(msg)
+
+    def get_remembered_server_for_idp(self, idp: str) -> Server | None:
+        """Return the last selected server for ``idp`` when still valid.
+
+        Args:
+            idp: Canonical identity provider key.
+
+        Returns:
+            Matching server record, or ``None`` when no remembered selection is
+            available for ``idp``.
+        """
+        uri = self._server_selection_history().get(idp)
+        if uri is None:
+            return None
+        try:
+            server = self.get_server_by_uri(uri)
+        except KeyError:
+            return None
+        if server.idp != idp:
+            return None
+        return server
+
+    def _server_selection_history(self) -> dict[str, AnyUrl]:
+        """Return remembered selections seeded with the current active pair."""
+        selections = dict(self.active.servers)
+        if self.active.server is None:
+            return selections
+        try:
+            server = self.get_active_server()
+        except KeyError:
+            return selections
+        if server.idp == self.active.authentication and server.uri is not None:
+            selections[self.active.authentication] = server.uri
+        return selections
+
+    def set_active_selection(self, idp: str, server: Server) -> None:
+        """Persist ``idp`` and ``server`` as the active pair.
+
+        Args:
+            idp: Canonical identity provider key.
+            server: Server record to activate.
+
+        Raises:
+            ValueError: If the server has no URI.
+        """
+        if server.uri is None:
+            msg = "Server URI is required for active selection."
+            raise ValueError(msg)
+
+        uri = server.uri
+        selected = server.model_copy(update={"idp": idp}, deep=True)
+        self._upsert_server(selected)
+        selections = self._server_selection_history()
+        selections[idp] = uri
+        self.active = self.active.model_copy(
+            update={
+                "authentication": idp,
+                "server": uri,
+                "servers": selections,
+            },
+        )
+
+    def with_active_selection(self, idp: str, server: Server) -> Configuration:
+        """Return a copy using ``idp`` and ``server`` as the active pair.
+
+        Args:
+            idp: Canonical identity provider key.
+            server: Server record to use for active server resolution.
+
+        Returns:
+            Configuration: Deep copy with the candidate Authentication and
+            Server Selection installed.
+
+        Raises:
+            ValueError: If the server has no URI.
+        """
+        config = self.model_copy(deep=True)
+        config.set_active_selection(idp, server)
+        return config
 
     @property
     def context(self) -> AuthContext:

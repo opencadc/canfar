@@ -21,6 +21,7 @@ if TYPE_CHECKING:
 
 runner = CliRunner()
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
+_SRCNET_URI = "ivo://canfar.net/src/skaha"
 
 
 def _patch_config(path: Path):
@@ -61,6 +62,56 @@ def _write_v1_config(path: Path) -> None:
                 "name": "SRCNet",
                 "uri": "ivo://srcnet.example/skaha",
                 "url": "https://srcnet.example/skaha",
+                "version": "v1",
+                "auths": ["oidc"],
+            },
+        ],
+    }
+    path.write_text(yaml.dump(data), encoding="utf-8")
+
+
+def _write_v1_config_with_multiple_srcnet_servers(path: Path) -> None:
+    data = {
+        "version": 1,
+        "active": {"authentication": "srcnet", "server": _SRCNET_URI},
+        "authentication": [
+            {
+                "idp": "cadc",
+                "mode": "x509",
+                "path": "/saved/cadc.pem",
+                "expiry": 123.0,
+            },
+            {
+                "idp": "srcnet",
+                "mode": "oidc",
+                "endpoints": {},
+                "client": {},
+                "token": {},
+                "expiry": {},
+            },
+        ],
+        "server": [
+            {
+                "idp": "cadc",
+                "name": "cadc",
+                "uri": _CADC_URI,
+                "url": "https://ws-uv.canfar.net/skaha",
+                "version": "v1",
+                "auths": ["x509"],
+            },
+            {
+                "idp": "srcnet",
+                "name": "canSRC",
+                "uri": _SRCNET_URI,
+                "url": "https://src.canfar.net/skaha",
+                "version": "v1",
+                "auths": ["oidc"],
+            },
+            {
+                "idp": "srcnet",
+                "name": "sweSRC",
+                "uri": "ivo://swesrc.chalmers.se/skaha",
+                "url": "https://services.swesrc.chalmers.se/skaha",
                 "version": "v1",
                 "auths": ["oidc"],
             },
@@ -136,13 +187,60 @@ def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
         _patch_config(config_path),
         patch("canfar.cli.auth._validate_server") as mock_validate,
     ):
-        mock_validate.side_effect = lambda server: server
+        mock_validate.side_effect = lambda server, **_kwargs: server
         result = runner.invoke(auth, ["use", "srcnet"])
 
     assert result.exit_code == 0
     with _patch_config(config_path):
         saved = Configuration()
     assert saved.active.authentication == "srcnet"
+
+
+def test_auth_use_validates_with_selected_idp_before_save(tmp_path: Path) -> None:
+    """``auth use`` validates using the target Authentication Context."""
+    config_path = tmp_path / "config.yaml"
+    _write_v1_config(config_path)
+    captured: dict[str, object] = {}
+
+    def validate(server, *, config: Configuration, idp: str):
+        captured["config_active"] = config.active.authentication
+        captured["idp"] = idp
+        return server
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.auth._validate_server", side_effect=validate),
+    ):
+        result = runner.invoke(auth, ["use", "srcnet"])
+
+    assert result.exit_code == 0
+    assert captured["config_active"] == "cadc"
+    assert captured["idp"] == "srcnet"
+
+
+def test_auth_use_reuses_previous_server_for_idp(tmp_path: Path) -> None:
+    """``auth use`` reuses the previous Server Selection for an IDP."""
+    config_path = tmp_path / "config.yaml"
+    _write_v1_config_with_multiple_srcnet_servers(config_path)
+
+    with (
+        _patch_config(config_path),
+        patch(
+            "canfar.cli.auth._validate_server",
+            side_effect=lambda server, **_: server,
+        ),
+    ):
+        cadc_result = runner.invoke(auth, ["use", "cadc"])
+        srcnet_result = runner.invoke(auth, ["use", "srcnet"])
+
+    assert cadc_result.exit_code == 0
+    assert srcnet_result.exit_code == 0
+    assert "Select compatible server" not in srcnet_result.stdout
+    assert "Auto-selected server canSRC" in srcnet_result.stdout
+    with _patch_config(config_path):
+        saved = Configuration()
+    assert saved.active.authentication == "srcnet"
+    assert str(saved.active.server) == _SRCNET_URI
 
 
 def test_auth_remove_requires_force_for_active_idp(tmp_path: Path) -> None:

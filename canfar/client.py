@@ -95,6 +95,12 @@ class HTTPClient(BaseSettings):
         ge=1,
         le=128,
     )
+    raise_http_errors: bool = Field(
+        default=True,
+        title="Raise HTTP Errors",
+        description="Install response hooks that raise HTTP status errors.",
+        exclude=True,
+    )
     loglevel: int | str = Field(
         default="INFO",
         title="Logging level for the client.",
@@ -242,9 +248,10 @@ class HTTPClient(BaseSettings):
         """
         checker = expiry.acheck(self) if asynchronous else expiry.check(self)
         catcher = errors.acatch if asynchronous else errors.catch
+        response_hooks = [catcher] if self.raise_http_errors else []
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
-            "event_hooks": {"request": [checker], "response": [catcher]},
+            "event_hooks": {"request": [checker], "response": response_hooks},
             "base_url": self._get_base_url(),
         }
         # Configure connection pooling for async clients

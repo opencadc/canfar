@@ -25,3 +25,7 @@ class ActiveConfig(BaseModel):
             "when no compatible server is selected."
         ),
     )
+    servers: dict[str, AnyUrl] = Field(
+        default_factory=dict,
+        description="Last selected science platform server URI by IDP.",
+    )
