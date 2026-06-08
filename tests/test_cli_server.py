@@ -25,7 +25,7 @@ def _patch_config(path: Path):
     return patch("canfar.models.config.CONFIG_PATH", path)
 
 
-def _write_v1_config(path: Path) -> None:
+def _write_config(path: Path) -> None:
     data = {
         "version": 1,
         "active": {"authentication": "cadc", "server": _CADC_URI},
@@ -54,7 +54,7 @@ def _write_v1_config(path: Path) -> None:
 def test_server_ls_lists_active_idp_servers(tmp_path: Path) -> None:
     """``server ls`` renders known servers for the active IDP."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(cli, ["server", "ls"])
@@ -67,7 +67,7 @@ def test_server_ls_lists_active_idp_servers(tmp_path: Path) -> None:
 def test_server_use_selects_by_uri(tmp_path: Path) -> None:
     """``server use`` accepts a server URI selector."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
     target = Server(
         idp="cadc",
         name="CADC-CANFAR",
@@ -93,7 +93,7 @@ def test_server_use_selects_by_uri(tmp_path: Path) -> None:
 def test_server_ls_json_output(tmp_path: Path) -> None:
     """``server ls --json`` emits DTO payloads on stdout."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(cli, ["server", "ls", "--json"])

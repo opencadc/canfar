@@ -1,4 +1,4 @@
-"""Focused behavior tests for config v1 and legacy migration."""
+"""Focused behavior tests for persisted CANFAR configuration."""
 
 from __future__ import annotations
 
@@ -8,19 +8,22 @@ from unittest.mock import patch
 import pytest
 import yaml
 
+from canfar.config.editor import set_value as set_config_value
 from canfar.config.migration import (
-    ConfigMigrationError,
-    backup_path,
-    migrate_legacy_config,
+    ConfigResetRequiredError,
+    ensure_current_config,
 )
+from canfar.config.selection import set_active_selection as select_active_server
+from canfar.config.store import save_config
 from canfar.models.config import Configuration
+from canfar.models.http import Server
 
 
-class TestConfigV1Defaults:
-    """Test default v1 configuration shape."""
+class TestConfigDefaults:
+    """Test default configuration shape."""
 
-    def test_default_v1_shape_has_cadc_placeholder(self, tmp_path: Path) -> None:
-        """Fresh config uses version 1 with default CADC authentication and server."""
+    def test_default_shape_has_cadc_placeholder(self, tmp_path: Path) -> None:
+        """Fresh config uses the default CADC authentication and server."""
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -52,7 +55,7 @@ class TestConfigV1Defaults:
     def test_authentication_credentials_have_no_embedded_server(
         self, tmp_path: Path
     ) -> None:
-        """V1 authentication records are decoupled from server selection."""
+        """Authentication records are decoupled from server selection."""
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -61,7 +64,7 @@ class TestConfigV1Defaults:
         assert not hasattr(cred, "server") or "server" not in cred.model_fields
 
 
-class TestConfigV1EnvOverrides:
+class TestConfigEnvOverrides:
     """Test nested active environment variable overrides."""
 
     def test_active_env_overrides_yaml(
@@ -122,13 +125,52 @@ class TestConfigV1EnvOverrides:
         assert str(config.active.server) == "ivo://srcnet.example/skaha"
 
 
-class TestConfigV1LegacyMigration:
-    """Test legacy configuration backup and reset behavior."""
+class TestConfigServices:
+    """Test configuration storage and action helpers."""
 
-    def test_legacy_config_is_backed_up_and_reset_to_v1_defaults(
+    def test_editor_and_store_update_config_without_model_io(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Config editing and persistence live outside the Pydantic model."""
+        config_path = tmp_path / "config.yaml"
+        config = Configuration()
+
+        updated = set_config_value(config, "console.width", 132)
+        save_config(updated, config_path)
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            loaded = Configuration()
+
+        assert loaded.console.width == 132
+
+    def test_selection_service_sets_active_server(self) -> None:
+        """Active server selection is provided as a config action helper."""
+        config = Configuration()
+        server = Server(
+            idp="cadc",
+            name="CADC-CANFAR",
+            uri="ivo://cadc.example/skaha",
+            url="https://cadc.example/skaha",
+            version="v1",
+            auths=["x509"],
+        )
+
+        select_active_server(config, "cadc", server)
+
+        assert str(config.active.server) == "ivo://cadc.example/skaha"
+        assert config.get_server_by_uri("ivo://cadc.example/skaha").name == (
+            "CADC-CANFAR"
+        )
+
+
+class TestConfigManualReset:
+    """Test legacy configuration reset-required behavior."""
+
+    def test_legacy_config_requires_manual_reset_without_backup(
         self, tmp_path: Path
     ) -> None:
-        """Missing version triggers backup and default v1 rewrite."""
+        """Missing version raises reset-needed without rewriting config."""
         legacy = {
             "active": "default",
             "contexts": {
@@ -141,99 +183,31 @@ class TestConfigV1LegacyMigration:
         }
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.dump(legacy), encoding="utf-8")
-
-        fixed_time = 1_700_000_000.0
-        clock = lambda: fixed_time  # noqa: E731
-
-        assert migrate_legacy_config(config_path, clock=clock) is True
-
-        backup = backup_path(config_path, clock)
-        assert backup.exists()
-        assert backup.read_text(encoding="utf-8") == yaml.dump(legacy)
-
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-
-        assert config.version == 1
-        assert config.active.authentication == "cadc"
-        assert config.authentication[0].path == Path.home() / ".ssl" / "cadcproxy.pem"
-
-    def test_legacy_migration_preserves_registry_and_console(
-        self, tmp_path: Path
-    ) -> None:
-        """Registry and console sections survive legacy reset."""
-        legacy = {
-            "active": "default",
-            "contexts": {"default": {"mode": "x509", "expiry": 0.0}},
-            "registry": {
-                "url": "https://registry.example.com",
-                "username": "legacy-user",
-                "secret": "legacy-secret",
-            },
-            "console": {"width": 80},
-        }
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(yaml.dump(legacy), encoding="utf-8")
-
-        migrate_legacy_config(config_path, clock=lambda: 1_700_000_000.0)
-
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-
-        assert config.registry.username == "legacy-user"
-        assert str(config.registry.url).rstrip("/") == "https://registry.example.com"
-        assert config.console.width == 80
-
-    def test_backup_failure_leaves_original_untouched(self, tmp_path: Path) -> None:
-        """Failed backup raises config.invalid and does not rewrite config."""
-        legacy = {"active": "default", "contexts": {}}
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(yaml.dump(legacy), encoding="utf-8")
         original = config_path.read_text(encoding="utf-8")
 
-        copy_patch = patch(
-            "canfar.config.migration.shutil.copy2",
-            side_effect=OSError("denied"),
-        )
-        with copy_patch, pytest.raises(ConfigMigrationError) as exc_info:
-            migrate_legacy_config(config_path, clock=lambda: 1_700_000_000.0)
+        with pytest.raises(ConfigResetRequiredError) as exc_info:
+            ensure_current_config(config_path)
 
         assert exc_info.value.code == "config.invalid"
+        assert str(exc_info.value) == (
+            "CANFAR configuration reset needed. "
+            f"Run `rm -rf {config_path}` and perform a new login"
+        )
         assert config_path.read_text(encoding="utf-8") == original
+        assert list(tmp_path.glob("*.back*")) == []
 
-    def test_existing_backup_is_not_overwritten(self, tmp_path: Path) -> None:
-        """Migration uses a new backup name when the first candidate exists."""
-        legacy = {"active": "default", "contexts": {}}
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(yaml.dump(legacy), encoding="utf-8")
-
-        clock = lambda: 1_700_000_000.0  # noqa: E731
-        first_backup = backup_path(config_path, clock)
-        first_backup.write_text("existing backup", encoding="utf-8")
-
-        migrate_legacy_config(config_path, clock=clock)
-
-        assert first_backup.read_text(encoding="utf-8") == "existing backup"
-        suffix_backups = list(tmp_path.glob("config.yaml.*.back*"))
-        assert len(suffix_backups) >= 2
-
-    def test_unsupported_version_triggers_migration(self, tmp_path: Path) -> None:
-        """Configs with unsupported version values are treated as legacy."""
+    def test_unsupported_version_requires_reset(self, tmp_path: Path) -> None:
+        """Unsupported version requires manual reset."""
         legacy = {"version": 99, "active": {"authentication": "cadc", "server": "x"}}
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.dump(legacy), encoding="utf-8")
 
-        assert migrate_legacy_config(config_path, clock=lambda: 1_700_000_000.0) is True
+        with pytest.raises(ConfigResetRequiredError):
+            ensure_current_config(config_path)
 
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-
-        assert config.version == 1
-        assert config.active.authentication == "cadc"
-
-    def test_v1_config_loads_without_migration(self, tmp_path: Path) -> None:
-        """Valid v1 files load unchanged and create no backup."""
-        v1 = {
+    def test_current_config_loads_without_reset(self, tmp_path: Path) -> None:
+        """Valid current config files load unchanged and create no backup."""
+        current = {
             "version": 1,
             "active": {
                 "authentication": "cadc",
@@ -259,7 +233,7 @@ class TestConfigV1LegacyMigration:
             ],
         }
         config_path = tmp_path / "config.yaml"
-        config_path.write_text(yaml.dump(v1), encoding="utf-8")
+        config_path.write_text(yaml.dump(current), encoding="utf-8")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -270,8 +244,8 @@ class TestConfigV1LegacyMigration:
     def test_legacy_canfar_active_env_is_not_used(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """Legacy CANFAR_ACTIVE env var does not override v1 active selection."""
-        v1 = {
+        """Legacy CANFAR_ACTIVE env var does not override active selection."""
+        current = {
             "version": 1,
             "active": {
                 "authentication": "cadc",
@@ -297,7 +271,7 @@ class TestConfigV1LegacyMigration:
             ],
         }
         config_path = tmp_path / "config.yaml"
-        config_path.write_text(yaml.dump(v1), encoding="utf-8")
+        config_path.write_text(yaml.dump(current), encoding="utf-8")
         monkeypatch.setenv("CANFAR_ACTIVE", "legacy-context-name")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):

@@ -28,7 +28,7 @@ def _patch_config(path: Path):
     return patch("canfar.models.config.CONFIG_PATH", path)
 
 
-def _write_v1_config(path: Path) -> None:
+def _write_config(path: Path) -> None:
     data = {
         "version": 1,
         "active": {"authentication": "cadc", "server": _CADC_URI},
@@ -70,7 +70,7 @@ def _write_v1_config(path: Path) -> None:
     path.write_text(yaml.dump(data), encoding="utf-8")
 
 
-def _write_v1_config_with_multiple_srcnet_servers(path: Path) -> None:
+def _write_config_with_multiple_srcnet_servers(path: Path) -> None:
     data = {
         "version": 1,
         "active": {"authentication": "srcnet", "server": _SRCNET_URI},
@@ -123,7 +123,7 @@ def _write_v1_config_with_multiple_srcnet_servers(path: Path) -> None:
 def test_auth_default_shows_active_authentication(tmp_path: Path) -> None:
     """Default ``canfar auth`` behaves like ``auth show``."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(auth, [])
@@ -156,7 +156,7 @@ def test_auth_show_humanizes_expiry() -> None:
 def test_auth_ls_lists_saved_records(tmp_path: Path) -> None:
     """``auth ls`` lists saved Authentication records."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(auth, ["ls"])
@@ -181,11 +181,11 @@ def test_auth_remove_alias_is_not_supported() -> None:
 def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
     """``auth use`` selects Authentication by canonical IDP key."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.auth._validate_server") as mock_validate,
+        patch("canfar.server._validate_server") as mock_validate,
     ):
         mock_validate.side_effect = lambda server, **_kwargs: server
         result = runner.invoke(auth, ["use", "srcnet"])
@@ -199,17 +199,17 @@ def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
 def test_auth_use_validates_with_selected_idp_before_save(tmp_path: Path) -> None:
     """``auth use`` validates using the target Authentication Context."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
     captured: dict[str, object] = {}
 
-    def validate(server, *, config: Configuration, idp: str):
+    def validate(server, *, config: Configuration, idp: str, **_kwargs: object):
         captured["config_active"] = config.active.authentication
         captured["idp"] = idp
         return server
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.auth._validate_server", side_effect=validate),
+        patch("canfar.server._validate_server", side_effect=validate),
     ):
         result = runner.invoke(auth, ["use", "srcnet"])
 
@@ -221,12 +221,12 @@ def test_auth_use_validates_with_selected_idp_before_save(tmp_path: Path) -> Non
 def test_auth_use_reuses_previous_server_for_idp(tmp_path: Path) -> None:
     """``auth use`` reuses the previous Server Selection for an IDP."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config_with_multiple_srcnet_servers(config_path)
+    _write_config_with_multiple_srcnet_servers(config_path)
 
     with (
         _patch_config(config_path),
         patch(
-            "canfar.cli.auth._validate_server",
+            "canfar.server._validate_server",
             side_effect=lambda server, **_: server,
         ),
     ):
@@ -246,7 +246,7 @@ def test_auth_use_reuses_previous_server_for_idp(tmp_path: Path) -> None:
 def test_auth_remove_requires_force_for_active_idp(tmp_path: Path) -> None:
     """Removing the active IDP requires confirmation or ``--force``."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(auth, ["rm", "cadc"], input="n\n")
@@ -258,7 +258,7 @@ def test_auth_remove_requires_force_for_active_idp(tmp_path: Path) -> None:
 def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:
     """``auth rm --force`` removes the active IDP and associated servers."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(auth, ["rm", "cadc", "--force"])
@@ -273,7 +273,7 @@ def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:
 def test_auth_purge_requires_force(tmp_path: Path) -> None:
     """``auth purge`` requires ``--force``."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(auth, ["purge"])
@@ -284,7 +284,7 @@ def test_auth_purge_requires_force(tmp_path: Path) -> None:
 def test_auth_purge_force_preserves_registry_and_console(tmp_path: Path) -> None:
     """``auth purge --force`` resets auth/server while preserving other settings."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         before = Configuration()
@@ -301,7 +301,7 @@ def test_auth_purge_force_preserves_registry_and_console(tmp_path: Path) -> None
 def test_authentication_alias_is_wired(tmp_path: Path) -> None:
     """``canfar authentication`` aliases ``canfar auth``."""
     config_path = tmp_path / "config.yaml"
-    _write_v1_config(config_path)
+    _write_config(config_path)
 
     with _patch_config(config_path):
         result = runner.invoke(cli, ["authentication"])

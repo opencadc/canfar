@@ -17,11 +17,14 @@ from canfar.models.registry import Server as DiscoveredServer
 from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
+    ServerSelectionRequiredError,
     ServerSelectorError,
     _discover_for_idp,
     _discovered_to_server,
     _enrich_from_capabilities,
     _validate_server,
+    activate,
+    discover,
     use,
 )
 from canfar.server import (
@@ -190,15 +193,17 @@ class TestServerUse:
             config.save()
 
             def merge_discovered(
-                config_obj: Configuration,
                 _idp: str,
+                *,
+                config: Configuration,
                 **_kwargs: object,
-            ) -> None:
-                config_obj._upsert_server(discovered)  # noqa: SLF001
+            ) -> list[Server]:
+                config._upsert_server(discovered)  # noqa: SLF001
+                return [discovered]
 
             with (
                 patch(
-                    "canfar.server._discover_and_merge",
+                    "canfar.server.discover",
                     side_effect=merge_discovered,
                 ),
                 patch("canfar.server._validate_server", return_value=fetched),
@@ -225,7 +230,7 @@ class TestServerUse:
             with (
                 patch("canfar.server._resolve_selector", return_value=None),
                 patch(
-                    "canfar.server._discover_and_merge",
+                    "canfar.server.discover",
                     side_effect=ServerDiscoveryError("registry down"),
                 ),
                 patch("canfar.server.Configuration", Configuration),
@@ -380,6 +385,58 @@ class TestServerFetch:
 
 class TestServerDiscovery:
     """Tests for IDP-scoped discovery helpers."""
+
+    def test_discover_merges_servers_through_public_api(self, tmp_path: Path) -> None:
+        """Public discovery persists newly discovered servers for an IDP."""
+        discovered = _cadc_server(
+            name="Discovered-CADC",
+            uri=AnyUrl("ivo://cadc.example/skaha"),
+            url=AnyHttpUrl("https://cadc.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch("canfar.server.Configuration", Configuration),
+        ):
+            servers = discover("cadc")
+
+        assert servers == [discovered]
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            saved = Configuration()
+        assert str(saved.get_server_by_uri("ivo://cadc.example/skaha").url) == (
+            "https://cadc.example/skaha"
+        )
+
+    def test_activate_without_selector_requires_prompt_for_multiple_servers(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Activation reports promptable choices when no selector can be inferred."""
+        first = _cadc_server(name="First", uri=AnyUrl("ivo://first.example/skaha"))
+        second = _cadc_server(
+            name="Second",
+            uri=AnyUrl("ivo://second.example/skaha"),
+            url=AnyHttpUrl("https://second.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.server = [first, second]
+            config.active = config.active.model_copy(update={"server": None})
+            config.save()
+
+            with (
+                patch("canfar.server.Configuration", Configuration),
+                pytest.raises(ServerSelectionRequiredError) as exc_info,
+            ):
+                activate("cadc")
+
+        assert [server.name for server in exc_info.value.servers] == [
+            "First",
+            "Second",
+        ]
 
     @pytest.mark.asyncio
     async def test_discover_for_idp_converts_active_endpoints(self) -> None:

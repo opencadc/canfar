@@ -1,4 +1,4 @@
-"""Comprehensive tests for the Configuration model (v1)."""
+"""Comprehensive tests for the Configuration model."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
 
 
-def _sample_v1_config(**overrides: Any) -> dict[str, Any]:
+def _sample_config(**overrides: Any) -> dict[str, Any]:
     payload: dict[str, Any] = {
         "version": 1,
         "active": {
@@ -51,7 +51,7 @@ class TestConfigurationDefaults:
     """Test default state and initialization."""
 
     def test_default_initialization(self, tmp_path: Path) -> None:
-        """Configuration defaults to v1 CADC placeholder when no file exists."""
+        """Configuration defaults to the CADC placeholder when no file exists."""
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -149,7 +149,7 @@ class TestConfigurationSerialization:
     """Test save/load functionality and round-trip serialization."""
 
     def test_complex_round_trip_serialization(self, tmp_path: Path) -> None:
-        """Complex v1 configuration can be saved and loaded back."""
+        """Complex configuration can be saved and loaded back."""
         oidc = OIDCCredential(idp="srcnet")
         x509 = X509Credential(
             idp="cadc",
@@ -206,7 +206,7 @@ class TestConfigurationSerialization:
         assert nested_path.exists()
 
     def test_yaml_file_content_structure(self, tmp_path: Path) -> None:
-        """Saved YAML uses v1 top-level keys."""
+        """Saved YAML uses current top-level keys."""
         temp_config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration(
@@ -232,7 +232,7 @@ class TestConfigurationSettingsPrecedence:
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
         """Nested active env vars override YAML active selection."""
-        config_data = _sample_v1_config()
+        config_data = _sample_config()
         config_data["server"].append(
             {
                 "idp": "srcnet",
@@ -270,7 +270,7 @@ class TestConfigurationSettingsPrecedence:
     ) -> None:
         """Init arguments take precedence over env and YAML."""
         temp_config_path = tmp_path / "config.yaml"
-        temp_config_path.write_text(yaml.dump(_sample_v1_config()), encoding="utf-8")
+        temp_config_path.write_text(yaml.dump(_sample_config()), encoding="utf-8")
         monkeypatch.setenv("CANFAR_ACTIVE__AUTHENTICATION", "srcnet")
         monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "ivo://srcnet.example/skaha")
 
@@ -285,7 +285,7 @@ class TestConfigurationSettingsPrecedence:
 
     def test_yaml_loads_when_no_env_or_init(self, tmp_path: Path) -> None:
         """YAML settings apply when no env or init overrides exist."""
-        config_data = _sample_v1_config(
+        config_data = _sample_config(
             registry={
                 "url": "https://yaml.registry.com",
                 "username": "yaml_user",

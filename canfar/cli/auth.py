@@ -39,9 +39,11 @@ from canfar.models.config import Configuration
 from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
-    _discover_and_merge,
-    _resolve_selector,
-    _validate_server,
+    ServerSelectionRequiredError,
+    ServerSelectorError,
+)
+from canfar.server import (
+    activate as activate_server,
 )
 from canfar.utils.console import console
 
@@ -80,35 +82,6 @@ def _print_auth_switched(idp: str) -> None:
     )
 
 
-def _switch_auth_only(config: Configuration, idp: str) -> bool:
-    """Switch authentication when the active server already matches ``idp``.
-
-    Returns:
-        True when auth was switched and saved without server selection.
-    """
-    if config.active.server is None:
-        return False
-    try:
-        active_server = config.get_active_server()
-    except KeyError:
-        return False
-    if active_server.idp != idp:
-        return False
-    config.set_active_selection(idp, active_server)
-    config.save()
-    _print_auth_switched(idp)
-    return True
-
-
-def _servers_for_idp(config: Configuration, idp: str) -> list[Server]:
-    """Return saved servers for ``idp``, running discovery when none exist."""
-    servers = [server for server in config.server if server.idp == idp]
-    if servers:
-        return servers
-    _discover_and_merge(config, idp)
-    return [server for server in config.server if server.idp == idp]
-
-
 def _prompt_server_selector(servers: list[Server]) -> str:
     """Prompt until the user selects a server URI or list index."""
     if len(servers) == 1 and servers[0].uri is not None:
@@ -136,52 +109,6 @@ def _prompt_server_selector(servers: list[Server]) -> str:
             console.print("[red]Enter a valid server URI or number.[/red]")
             continue
         return str(selected.uri)
-
-
-def _remembered_server_selector(
-    config: Configuration,
-    idp: str,
-    servers: list[Server],
-) -> str | None:
-    """Return a remembered server URI for ``idp`` when available."""
-    remembered = config.get_remembered_server_for_idp(idp)
-    if remembered is None or remembered.uri is None:
-        return None
-    if not any(
-        server.uri is not None and str(server.uri) == str(remembered.uri)
-        for server in servers
-    ):
-        return None
-
-    selector = str(remembered.uri)
-    console.print(
-        f"[green]✓[/green] Auto-selected server {remembered.name or selector}",
-    )
-    return selector
-
-
-def _activate_auth_with_server(
-    config: Configuration,
-    idp: str,
-    selector: str,
-) -> None:
-    """Validate ``selector`` and persist active authentication and server."""
-    resolved = _resolve_selector(config, selector, idp)
-    if resolved is None:
-        console.print(
-            f"[bold red]Server '{selector}' not found for IDP '{idp}'.[/bold red]",
-        )
-        raise typer.Exit(1)
-
-    try:
-        validated = _validate_server(resolved, config=config, idp=idp)
-    except ServerFetchError as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
-        raise typer.Exit(1) from exc
-
-    config.set_active_selection(idp, validated)
-    config.save()
-    _print_auth_switched(idp)
 
 
 def _render_auth_show_table() -> None:
@@ -241,6 +168,12 @@ def auth_default(
     ] = False,
 ) -> None:
     """Active authentication state."""
+    if ctx.invoked_subcommand in {"show", "ls"} and (json_output or yaml_output):
+        typer.echo(
+            "Place --json or --yaml after the command that emits machine output.",
+            err=True,
+        )
+        raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
     output_mode_callback(ctx, json_output, yaml_output)
     if ctx.invoked_subcommand is not None:
         return
@@ -370,25 +303,26 @@ def auth_use_command(
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    if _switch_auth_only(config, idp):
-        return
-
     try:
-        servers = _servers_for_idp(config, idp)
-    except ServerDiscoveryError as exc:
+        activation = activate_server(idp, config=config)
+    except ServerSelectionRequiredError as exc:
+        selector = _prompt_server_selector(exc.servers)
+        try:
+            activation = activate_server(idp, selector, config=config)
+        except (ServerDiscoveryError, ServerFetchError, ServerSelectorError) as err:
+            console.print(f"[bold red]{err}[/bold red]")
+            raise typer.Exit(1) from err
+    except (ServerDiscoveryError, ServerFetchError, ServerSelectorError) as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    if not servers:
+    if activation.reason in {"remembered", "single"}:
+        selector = str(activation.server.uri) if activation.server.uri else ""
         console.print(
-            f"[bold red]No compatible servers available for IDP '{idp}'.[/bold red]",
+            f"[green]✓[/green] Auto-selected server "
+            f"{activation.server.name or selector}",
         )
-        raise typer.Exit(1)
-
-    selector = _remembered_server_selector(config, idp, servers)
-    if selector is None:
-        selector = _prompt_server_selector(servers)
-    _activate_auth_with_server(config, idp, selector)
+    _print_auth_switched(idp)
 
 
 @auth.command("rm")

@@ -1,1 +1,1 @@
-"""Configuration package for loading and migration."""
+"""Configuration loading, storage, and compatibility helpers."""

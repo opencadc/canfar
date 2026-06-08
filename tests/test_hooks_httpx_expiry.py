@@ -12,7 +12,7 @@ from canfar.exceptions.context import AuthExpiredError
 from canfar.hooks.httpx.expiry import acheck, check
 from canfar.models.auth import OIDC
 from canfar.models.http import Server
-from tests.helpers.config_v1 import configuration_from_legacy_context
+from tests.helpers.config import configuration_from_legacy_context
 
 
 class TestCheck:

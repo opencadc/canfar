@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Annotated
 
 import typer
 
+import canfar.server as server_service
 from canfar import CONFIG_PATH, get_logger, set_log_level
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.machine import unsupported_machine_output
@@ -15,9 +16,7 @@ from canfar.models.config import Configuration
 from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
-    _discover_and_merge,
-    _resolve_selector,
-    _validate_server,
+    ServerSelectorError,
 )
 from canfar.utils.console import console
 
@@ -104,12 +103,17 @@ def _login_flow(
     _upsert_credential(config, credential)
 
     try:
-        _discover_and_merge(config, idp, dev=dev, timeout=timeout)
+        servers = server_service.discover(
+            idp,
+            config=config,
+            dev=dev,
+            timeout=timeout,
+            save=False,
+        )
     except ServerDiscoveryError as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    servers = [server for server in config.server if server.idp == idp]
     if not servers:
         console.print(f"[bold red]No servers discovered for IDP '{idp}'.[/bold red]")
         raise typer.Exit(1)
@@ -121,26 +125,12 @@ def _login_flow(
         raise typer.Exit(1)
 
     selector = str(selected.uri)
-    resolved = _resolve_selector(config, selector, idp)
-    if resolved is None:
-        console.print(
-            f"[bold red]Server '{selector}' not found for IDP '{idp}'.[/bold red]"
-        )
-        raise typer.Exit(1)
-
     try:
-        validated = _validate_server(
-            resolved,
-            config=config,
-            idp=idp,
-            timeout=timeout,
-        )
-    except ServerFetchError as exc:
+        server_service.activate(idp, selector, config=config, dev=dev, timeout=timeout)
+    except (ServerFetchError, ServerSelectorError) as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    config.set_active_selection(idp, validated)
-    config.save()
     console.print("[green]✓[/green] Login completed successfully")
 
 

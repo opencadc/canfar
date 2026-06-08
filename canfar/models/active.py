@@ -1,4 +1,4 @@
-"""Active selection models for config v1."""
+"""Active selection models for persisted configuration."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ from pydantic import AnyUrl, BaseModel, ConfigDict, Field
 
 
 class ActiveConfig(BaseModel):
-    """Active authentication and server selection for config v1.
+    """Active authentication and server selection.
 
     Attributes:
         authentication: Canonical IDP key for the active authentication record.

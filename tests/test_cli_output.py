@@ -27,13 +27,6 @@ def test_output_mode_values() -> None:
     assert output.OutputMode.YAML.value == "yaml"
 
 
-def test_parse_top_level_output_flags_before_command_path() -> None:
-    """Top-level flags before the command path select machine output mode."""
-    assert output.parse_prefix(["--json", "auth", "ls"]) == output.OutputMode.JSON
-    assert output.parse_prefix(["--yaml", "ps"]) == output.OutputMode.YAML
-    assert output.parse_prefix(["auth", "ls"]) is None
-
-
 def test_parse_leaf_output_flags_after_command_path() -> None:
     """Leaf flags after the command path select machine output mode."""
     assert output.parse_suffix(["auth", "ls", "--json"]) == output.OutputMode.JSON
@@ -51,9 +44,9 @@ def test_parse_output_flags_defaults_to_human() -> None:
     assert output.parse(["auth", "ls"]) == output.OutputMode.HUMAN
 
 
-def test_parse_output_flags_top_level_only() -> None:
-    """Top-level placement alone selects machine output mode."""
-    assert output.parse(["--json", "auth", "ls"]) == output.OutputMode.JSON
+def test_parse_output_flags_ignores_root_prefix_placement() -> None:
+    """Root prefix placement is not a supported output flag location."""
+    assert output.parse(["--json", "auth", "ls"]) == output.OutputMode.HUMAN
 
 
 def test_parse_output_flags_leaf_only() -> None:
@@ -61,30 +54,16 @@ def test_parse_output_flags_leaf_only() -> None:
     assert output.parse(["auth", "ls", "--yaml"]) == output.OutputMode.YAML
 
 
-def test_parse_output_flags_same_mode_at_both_placements_is_idempotent() -> None:
-    """Duplicate same-mode flags across placements remain idempotent."""
-    assert output.parse(["--json", "ps", "--json"]) == output.OutputMode.JSON
-    assert output.parse(["--yaml", "auth", "ls", "--yaml"]) == output.OutputMode.YAML
+def test_parse_output_flags_duplicate_same_mode_at_leaf_is_idempotent() -> None:
+    """Duplicate same-mode flags at the supported leaf placement are idempotent."""
+    assert output.parse(["ps", "--json", "--json"]) == output.OutputMode.JSON
+    assert output.parse(["auth", "ls", "--yaml", "--yaml"]) == output.OutputMode.YAML
 
 
-def test_parse_output_flags_duplicate_same_mode_at_top_level_is_idempotent() -> None:
-    """Duplicate same-mode flags at one placement remain idempotent."""
-    assert output.parse(["--json", "--json", "auth", "ls"]) == output.OutputMode.JSON
-
-
-def test_parse_output_flags_conflicting_modes_exit_two() -> None:
-    """Different machine modes across placements raise output.conflict."""
+def test_parse_output_flags_conflicting_leaf_modes_exit_two() -> None:
+    """Different machine modes at the supported leaf placement raise conflict."""
     with pytest.raises(output.OutputConflictError) as exc_info:
-        output.parse(["--json", "ps", "--yaml"])
-
-    assert exc_info.value.code == "output.conflict"
-    assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE
-
-
-def test_parse_output_flags_conflicting_modes_at_top_level() -> None:
-    """Different machine modes at the same placement raise output.conflict."""
-    with pytest.raises(output.OutputConflictError) as exc_info:
-        output.parse(["--json", "--yaml", "auth", "ls"])
+        output.parse(["ps", "--json", "--yaml"])
 
     assert exc_info.value.code == "output.conflict"
     assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE

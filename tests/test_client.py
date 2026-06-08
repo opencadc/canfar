@@ -21,7 +21,7 @@ from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
-from tests.helpers.config_v1 import configuration_from_legacy_context
+from tests.helpers.config import configuration_from_legacy_context
 
 
 # Test Fixtures

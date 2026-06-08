@@ -53,7 +53,7 @@ def _authenticate_x509(idp: str) -> X509Credential:
         idp: Canonical Identity Provider key.
 
     Returns:
-        X509 credential record for config v1.
+        X509 credential record for persisted configuration.
     """
     context = x509.authenticate(X509(expiry=0.0))
     return X509Credential(
@@ -75,7 +75,7 @@ def _authenticate_oidc(
         timeout: HTTP timeout in seconds for OIDC requests.
 
     Returns:
-        OIDC credential record for config v1.
+        OIDC credential record for persisted configuration.
 
     Raises:
         RuntimeError: If the IDP has no configured OIDC discovery URL.

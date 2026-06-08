@@ -11,7 +11,7 @@ from canfar.client import HTTPClient
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
 from canfar.models.auth import OIDC, X509
 from canfar.models.http import Server
-from tests.helpers.config_v1 import configuration_from_legacy_context
+from tests.helpers.config import configuration_from_legacy_context
 from tests.test_auth_x509 import generate_cert
 
 

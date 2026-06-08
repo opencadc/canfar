@@ -68,6 +68,11 @@ def _collect_output_modes(tokens: list[str]) -> list[OutputMode]:
     return modes
 
 
+def has_output_flag(argv: list[str]) -> bool:
+    """Return whether raw CLI tokens contain a machine-output flag."""
+    return any(token in _OUTPUT_FLAG_TOKENS for token in argv)
+
+
 def _modes_from_context(ctx: typer.Context) -> list[OutputMode]:
     """Collect output modes stored on a Typer context chain."""
     modes: list[OutputMode] = []
@@ -102,30 +107,6 @@ def resolve(modes: list[OutputMode]) -> OutputMode:
     return unique_modes[0]
 
 
-def parse_prefix(argv: list[str]) -> OutputMode | None:
-    """Parse machine output flags from the top-level argv prefix.
-
-    Top-level flags appear before the command path, for example
-    ``canfar --json auth ls``.
-
-    Args:
-        argv: Command arguments excluding the program name.
-
-    Returns:
-        The selected machine output mode, or ``None`` when no top-level flags
-        are present.
-    """
-    prefix: list[str] = []
-    for token in argv:
-        if token not in _OUTPUT_FLAG_TOKENS:
-            break
-        prefix.append(token)
-    modes = _collect_output_modes(prefix)
-    if not modes:
-        return None
-    return resolve(modes)
-
-
 def parse_suffix(argv: list[str]) -> OutputMode | None:
     """Parse machine output flags from the leaf argv suffix.
 
@@ -157,9 +138,10 @@ def parse(
 ) -> OutputMode:
     """Resolve the effective CLI output mode from argv and Typer context.
 
-    Supported flag placements are the top-level prefix and leaf suffix only.
-    Intermediate group placement is ignored. Duplicate same-mode flags are
-    idempotent; different modes raise :class:`OutputConflictError`.
+    Supported flag placement is the leaf suffix only. Root and intermediate
+    group placement are ignored here; Typer rejects unsupported root flags.
+    Duplicate same-mode flags are idempotent; different modes raise
+    :class:`OutputConflictError`.
 
     Args:
         argv: Command arguments excluding the program name.
@@ -175,9 +157,6 @@ def parse(
     if ctx is not None:
         modes.extend(_modes_from_context(ctx))
     if argv is not None:
-        prefix_mode = parse_prefix(argv)
-        if prefix_mode is not None:
-            modes.append(prefix_mode)
         suffix_mode = parse_suffix(argv)
         if suffix_mode is not None:
             modes.append(suffix_mode)

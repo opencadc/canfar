@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Annotated
-
 import typer
 
-from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
 from canfar.cli.create import create
@@ -18,7 +15,6 @@ from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
 from canfar.cli.machine import (
     maybe_emit_cli_banner,
-    output_mode_callback,
     reset,
 )
 from canfar.cli.open import open_command
@@ -27,30 +23,15 @@ from canfar.cli.ps import ps
 from canfar.cli.server import server
 from canfar.cli.stats import stats
 from canfar.cli.version import version
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.utils.console import console
 
 
-def callback(
-    ctx: typer.Context,
-    json_output: Annotated[
-        bool,
-        typer.Option("--json", help="Emit machine-readable JSON on stdout."),
-    ] = False,
-    yaml_output: Annotated[
-        bool,
-        typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-    ] = False,
-) -> None:
+def callback(ctx: typer.Context) -> None:
     """Main callback that handles no subcommand case."""
     reset()
-    try:
-        output_mode_callback(ctx, json_output, yaml_output)
-    except output.OutputConflictError as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
-        raise typer.Exit(exc.exit_code) from exc
-
     maybe_emit_cli_banner(ctx)
 
     if ctx.invoked_subcommand is None:
@@ -209,6 +190,9 @@ def main() -> None:
         console.print("Authenticate with [italic cyan]canfar login[/italic cyan]")
     except AuthContextError as err:
         console.print(err)
+    except ConfigResetRequiredError as err:
+        console.print(err)
+        raise typer.Exit(1) from err
     finally:
         reset()
 

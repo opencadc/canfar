@@ -1,30 +1,17 @@
-"""Legacy configuration detection and migration to config v1."""
+"""Configuration compatibility checks for the current schema."""
 
 from __future__ import annotations
 
-import shutil
-import time
-from collections.abc import Callable
-from datetime import datetime, timezone
-from pathlib import Path  # noqa: TC003
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
-from canfar.models.config import (
-    ConsoleConfig,
-    default_active,
-    default_authentication,
-    default_servers,
-)
-from canfar.models.registry import ContainerRegistry
-
-Clock = Callable[[], float]
-"""Callable returning Unix timestamp seconds for backup naming."""
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
-class ConfigMigrationError(Exception):
-    """Raised when configuration migration cannot complete safely.
+class ConfigResetRequiredError(Exception):
+    """Raised when an existing configuration must be manually reset.
 
     Attributes:
         code: Stable dotted error code for automation.
@@ -37,139 +24,38 @@ class ConfigMigrationError(Exception):
         self.message = message
 
 
-def is_legacy_config(data: dict[str, Any]) -> bool:
-    """Return True when YAML data is not config v1.
-
-    Args:
-        data: Parsed configuration mapping.
-
-    Returns:
-        True if the config lacks version 1.
-    """
+def requires_manual_reset(data: dict[str, Any]) -> bool:
+    """Return True when YAML data cannot be loaded as current configuration."""
     version = data.get("version")
     return version not in (1, "1")
 
 
-def backup_path(config_path: Path, clock: Clock) -> Path:
-    """Build a timestamped backup path for a config file.
-
-    Args:
-        config_path: Path to the live configuration file.
-        clock: Injectable clock returning Unix epoch seconds.
-
-    Returns:
-        Backup path using ``<config-path>.<timestamp>.back`` naming.
-    """
-    instant = datetime.fromtimestamp(clock(), tz=timezone.utc)
-    timestamp = instant.strftime("%Y%m%dT%H%M%SZ")
-    return config_path.with_name(f"{config_path.name}.{timestamp}.back")
+def _reset_message(config_path: Path) -> str:
+    return (
+        "CANFAR configuration reset needed. "
+        f"Run `rm -rf {config_path}` and perform a new login"
+    )
 
 
-def _unique_backup_path(config_path: Path, clock: Clock) -> Path:
-    candidate = backup_path(config_path, clock)
-    if not candidate.exists():
-        return candidate
-
-    offset = 1
-    while True:
-        stamped = backup_path(config_path, clock)
-        unique = stamped.with_name(f"{stamped.name}.{offset}")
-        if not unique.exists():
-            return unique
-        offset += 1
-
-
-def _preserve_sections(data: dict[str, Any]) -> dict[str, Any]:
-    preserved: dict[str, Any] = {}
-    if "registry" in data:
-        preserved["registry"] = data["registry"]
-    if "console" in data:
-        preserved["console"] = data["console"]
-    return preserved
-
-
-def _default_v1_payload(preserved: dict[str, Any]) -> dict[str, Any]:
-    payload: dict[str, Any] = {
-        "version": 1,
-        "active": default_active.model_dump(mode="json"),
-        "authentication": [
-            cred.model_dump(mode="json") for cred in default_authentication
-        ],
-        "server": [srv.model_dump(mode="json") for srv in default_servers],
-        "registry": ContainerRegistry().model_dump(mode="json", exclude_none=True),
-        "console": ConsoleConfig().model_dump(mode="json", exclude_none=True),
-    }
-    payload.update(preserved)
-    return payload
-
-
-def migrate_legacy_config(
-    config_path: Path,
-    *,
-    clock: Clock | None = None,
-) -> bool:
-    """Migrate legacy configuration to v1 when needed.
-
-    Legacy configs are backed up, then replaced with default v1 content
-    while preserving ``registry`` and ``console`` sections.
+def ensure_current_config(config_path: Path) -> None:
+    """Require existing config files to use the current schema.
 
     Args:
         config_path: Path to the YAML configuration file.
-        clock: Injectable clock for backup timestamps.
-
-    Returns:
-        True if migration ran, False if the file was already v1 or absent.
 
     Raises:
-        ConfigMigrationError: If backup fails; the original file is untouched.
+        ConfigResetRequiredError: If the file is malformed or unsupported.
     """
-    if clock is None:
-        clock = time.time
-
     if not config_path.exists():
-        return False
+        return
 
     with config_path.open(encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
 
     if not isinstance(data, dict):
-        msg = f"Configuration file {config_path} is not a mapping."
         code = "config.invalid"
-        raise ConfigMigrationError(code, msg)
+        raise ConfigResetRequiredError(code, _reset_message(config_path))
 
-    if not is_legacy_config(data):
-        return False
-
-    destination = _unique_backup_path(config_path, clock)
-    try:
-        shutil.copy2(config_path, destination)
-    except OSError as err:
-        msg = f"Failed to back up configuration to {destination}: {err}"
+    if requires_manual_reset(data):
         code = "config.invalid"
-        raise ConfigMigrationError(code, msg) from err
-
-    preserved = _preserve_sections(data)
-    payload = _default_v1_payload(preserved)
-
-    config_path.parent.mkdir(parents=True, exist_ok=True)
-    with config_path.open("w", encoding="utf-8") as handle:
-        yaml.dump(payload, handle, default_flow_style=False, sort_keys=True, indent=2)
-
-    return True
-
-
-def ensure_v1_config(
-    config_path: Path,
-    *,
-    clock: Clock | None = None,
-) -> None:
-    """Ensure configuration on disk is config v1.
-
-    Args:
-        config_path: Path to the YAML configuration file.
-        clock: Injectable clock for backup timestamps.
-
-    Raises:
-        ConfigMigrationError: If migration cannot complete safely.
-    """
-    migrate_legacy_config(config_path, clock=clock)
+        raise ConfigResetRequiredError(code, _reset_message(config_path))

@@ -1,4 +1,4 @@
-"""Test helpers for config v1 fixtures."""
+"""Test helpers for configuration fixtures."""
 
 from __future__ import annotations
 
@@ -16,14 +16,14 @@ if TYPE_CHECKING:
 
 
 def configuration_from_legacy_context(key: str, context: OIDC | X509) -> Configuration:
-    """Build a v1 ``Configuration`` from a legacy auth context fixture.
+    """Build a ``Configuration`` from a legacy auth context fixture.
 
     Args:
         key: Legacy context name used as the canonical IDP key (lowercased).
         context: Legacy authentication context with optional embedded server.
 
     Returns:
-        Valid config v1 instance mirroring the legacy fixture.
+        Valid configuration instance mirroring the legacy fixture.
     """
     idp = key.lower()
     credential = legacy_context_to_credential(context, idp)

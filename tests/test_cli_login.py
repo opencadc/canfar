@@ -65,13 +65,16 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
         patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
-        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp, **_kwargs: _merge_servers(
-                config,
-                discovered,
-                idp,
+            "canfar.cli.login.server_service.discover",
+            side_effect=lambda idp, *, config, **_kwargs: (
+                _merge_servers(
+                    config,
+                    discovered,
+                    idp,
+                )
+                or discovered
             ),
         ),
     ):
@@ -106,13 +109,16 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
-        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp, **_kwargs: _merge_servers(
-                config,
-                discovered,
-                idp,
+            "canfar.cli.login.server_service.discover",
+            side_effect=lambda idp, *, config, **_kwargs: (
+                _merge_servers(
+                    config,
+                    discovered,
+                    idp,
+                )
+                or discovered
             ),
         ),
     ):
@@ -154,13 +160,16 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
         patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
-        patch("canfar.cli.login._validate_server", return_value=validated),
+        patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login._discover_and_merge",
-            side_effect=lambda config, idp, **_kwargs: _merge_servers(
-                config,
-                discovered,
-                idp,
+            "canfar.cli.login.server_service.discover",
+            side_effect=lambda idp, *, config, **_kwargs: (
+                _merge_servers(
+                    config,
+                    discovered,
+                    idp,
+                )
+                or discovered
             ),
         ),
     ):
@@ -196,19 +205,28 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     authenticate = MagicMock(return_value=credential)
     validate = MagicMock(return_value=validated)
 
-    def discover(config: Configuration, idp: str, *, dev: bool, timeout: int) -> None:
+    def discover(
+        idp: str,
+        *,
+        config: Configuration,
+        dev: bool,
+        timeout: int,
+        save: bool,
+    ) -> list[Server]:
         assert idp == "cadc"
         assert dev is True
         assert timeout == 9
+        assert save is False
         _merge_servers(config, discovered, idp)
+        return discovered
 
     with (
         _patch_config(config_path),
         patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", authenticate),
-        patch("canfar.cli.login._validate_server", validate),
-        patch("canfar.cli.login._discover_and_merge", side_effect=discover),
+        patch("canfar.server._validate_server", validate),
+        patch("canfar.cli.login.server_service.discover", side_effect=discover),
     ):
         result = runner.invoke(
             cli,

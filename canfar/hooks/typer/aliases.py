@@ -10,7 +10,7 @@ from typer.core import TyperGroup
 from canfar.cli.machine import set_invoke_argv
 
 if TYPE_CHECKING:
-    from click.core import Command, Context
+    from typer._click.core import Command, Context
 
 
 class AliasGroup(TyperGroup):

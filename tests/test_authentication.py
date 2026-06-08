@@ -7,7 +7,7 @@ import os
 import subprocess
 import sys
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import patch
 
 import pytest
 import yaml
@@ -22,6 +22,13 @@ def _write_config(path: Path, data: dict) -> None:
 
 def _patch_config(path: Path):
     return patch("canfar.models.config.CONFIG_PATH", path)
+
+
+def _merge_servers(
+    config: canfar.models.config.Configuration,
+    discovered: list,
+) -> None:
+    config.server = discovered
 
 
 class TestAuthenticationList:
@@ -394,14 +401,12 @@ class TestAuthenticationLogin:
         with (
             _patch_config(config_path),
             patch("canfar.authentication._authenticate") as mock_auth,
-            patch(
-                "canfar.authentication._discover_servers",
-                new=AsyncMock(return_value=[]),
-            ),
+            patch("canfar.authentication.server_service.discover") as mock_discover,
         ):
             canfar.authentication.login("cadc")
 
         mock_auth.assert_not_called()
+        mock_discover.assert_not_called()
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
         assert config.authentication[0].path == Path("/existing/cert.pem")
@@ -432,8 +437,14 @@ class TestAuthenticationLogin:
                 return_value=credential,
             ),
             patch(
-                "canfar.authentication._discover_servers",
-                new=AsyncMock(return_value=discovered),
+                "canfar.authentication.server_service.discover",
+                side_effect=lambda _idp, *, config, **_kwargs: (
+                    _merge_servers(
+                        config,
+                        discovered,
+                    )
+                    or discovered
+                ),
             ),
         ):
             canfar.authentication.login("cadc", force=True)
@@ -492,8 +503,8 @@ class TestAuthenticationLogin:
                 return_value=credential,
             ),
             patch(
-                "canfar.authentication._discover_servers",
-                new=AsyncMock(return_value=[]),
+                "canfar.authentication.server_service.discover",
+                return_value=[],
             ),
         ):
             canfar.authentication.login("cadc", force=True)

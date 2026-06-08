@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING, Literal, NoReturn
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
+import canfar.server as server_service
 from canfar.errors import ErrorCode, StructuredError
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
@@ -15,10 +15,6 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.config import Configuration
-from canfar.models.http import Server
-from canfar.models.registry import IVOARegistrySearch
-from canfar.models.registry import Server as RegistryServer
-from canfar.utils.discover import Discover
 
 if TYPE_CHECKING:
     import builtins
@@ -104,11 +100,8 @@ def login(idp: str, force: bool = False) -> None:
         return
 
     credential = _authenticate(idp_info)
-    servers = asyncio.run(_discover_servers(idp_info))
-
     _upsert_credential(config, credential)
-    for server in servers:
-        config._upsert_server(server)  # noqa: SLF001
+    server_service.discover(idp, config=config, save=False)
     config.save()
 
 
@@ -353,36 +346,6 @@ def _authenticate_oidc(idp: str) -> OIDCCredential:
         code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
         message=f"OIDC authentication for IDP '{idp}' requires interactive login.",
         hint="Use the CLI login flow for first-time OIDC authentication.",
-    )
-
-
-async def _discover_servers(idp_info: IdpInfo) -> builtins.list[Server]:
-    registry_config = IVOARegistrySearch(
-        registries={str(idp_info.registry_url): idp_info.name}
-    )
-    async with Discover(registry_config) as discovery:
-        results = await discovery.servers()
-
-    servers: builtins.list[Server] = []
-    for endpoint in results.endpoints:
-        if endpoint.status != 200:
-            continue
-        servers.append(_registry_server_to_config_server(endpoint, idp_info))
-    return servers
-
-
-def _registry_server_to_config_server(
-    endpoint: RegistryServer,
-    idp_info: IdpInfo,
-) -> Server:
-    name = endpoint.name
-    if name is None:
-        name = f"{idp_info.name}-{endpoint.uri.rsplit('/', maxsplit=1)[-1]}"
-    return Server(
-        idp=idp_info.key,
-        name=name,
-        uri=AnyUrl(endpoint.uri),
-        url=AnyHttpUrl(endpoint.url),
     )
 
 

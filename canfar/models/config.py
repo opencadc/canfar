@@ -1,18 +1,16 @@
-"""CANFAR Client Configuration - v1."""
+"""CANFAR client configuration models."""
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated, Any, Callable, Literal
+from typing import TYPE_CHECKING, Annotated, Any, Literal
 
-import yaml
 from pydantic import (
     AnyHttpUrl,
     AnyUrl,
     BaseModel,
     ConfigDict,
     Field,
-    ValidationError,
     model_validator,
 )
 
@@ -30,12 +28,7 @@ from pydantic_settings.sources import EnvSettingsSource
 from canfar import CONFIG_PATH, get_logger
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import AuthenticationCredential, X509Credential
-from canfar.models.config_compat import (
-    AuthContext,
-    LegacyContextsMapping,
-    credential_to_legacy_context,
-    legacy_context_to_credential,
-)
+from canfar.models.config_compat import AuthContext, LegacyContextsMapping
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
 
@@ -68,63 +61,6 @@ default_servers: list[Server] = [
 ]
 
 
-def _parse_dotted_path(path: str) -> list[str | int]:
-    segments: list[str | int] = []
-    for raw in path.split("."):
-        if not raw:
-            msg = f"Invalid path {path!r}: empty segment"
-            raise ValueError(msg)
-        segments.append(int(raw) if raw.isdigit() else raw)
-    return segments
-
-
-def _get_from_container(container: Any, key: str | int) -> Any:
-    if isinstance(key, int):
-        if not isinstance(container, list):
-            msg = f"Expected list for index {key}"
-            raise TypeError(msg)
-        return container[key]
-
-    if isinstance(container, BaseModel):
-        return getattr(container, key)
-
-    if isinstance(container, dict):
-        return container[key]
-
-    msg = f"Expected mapping or model for key {key!r}"
-    raise TypeError(msg)
-
-
-def _set_in_container(container: Any, key: str | int, value: Any) -> None:
-    if isinstance(key, int):
-        if not isinstance(container, list):
-            msg = f"Expected list for index {key}"
-            raise TypeError(msg)
-        container[key] = value
-        return
-
-    if isinstance(container, dict):
-        container[key] = value
-        return
-
-    msg = f"Expected mapping for key {key!r}"
-    raise TypeError(msg)
-
-
-def _ensure_child_container(parent: Any, key: str | int) -> Any:
-    if isinstance(key, int):
-        msg = "List indices are not supported for intermediate path segments"
-        raise TypeError(msg)
-
-    if not isinstance(parent, dict):
-        msg = f"Expected mapping for key {key!r}"
-        raise TypeError(msg)
-
-    if key not in parent or parent[key] is None:
-        parent[key] = {}
-    return parent[key]
-
-
 class ConsoleConfig(BaseModel):
     """Configuration for the CLI Console output.
 
@@ -150,8 +86,8 @@ class ConsoleConfig(BaseModel):
 class Configuration(BaseSettings):
     """Unified configuration settings for CANFAR client and authentication.
 
-    Config v1 separates authentication credentials from science platform
-    servers. Active selection references an IDP key and server URI.
+    Current configuration separates authentication credentials from science
+    platform servers. Active selection references an IDP key and server URI.
     """
 
     model_config = SettingsConfigDict(
@@ -222,7 +158,7 @@ class Configuration(BaseSettings):
         return (
             init_settings,
             _CanfarEnvSettingsSource(settings_cls),
-            _MigratedYamlConfigSettingsSource(settings_cls, yaml_file=CONFIG_PATH),
+            _CheckedYamlConfigSettingsSource(settings_cls, yaml_file=CONFIG_PATH),
             file_secret_settings,
         )
 
@@ -275,37 +211,21 @@ class Configuration(BaseSettings):
 
     def save(self) -> None:
         """Save the current configuration to the default YAML file."""
-        CONFIG_PATH.parent.mkdir(parents=True, exist_ok=True)
-        try:
-            data = self.model_dump(mode="json", exclude_none=True)
-            with CONFIG_PATH.open(mode="w", encoding="utf-8") as f:
-                yaml.dump(data, f, default_flow_style=False, sort_keys=True, indent=2)
-        except (OSError, TypeError, ValidationError) as e:
-            msg = f"Failed to save configuration to {CONFIG_PATH}: {e}"
-            raise OSError(msg) from e
+        from canfar.config.store import save_config  # noqa: PLC0415
+
+        save_config(self)
 
     def get_value(self, path: str) -> Any:
         """Get a nested configuration value via dotted path (e.g. 'console.width')."""
-        value: Any = self
-        for segment in _parse_dotted_path(path):
-            value = _get_from_container(value, segment)
-        return value
+        from canfar.config.editor import get_value  # noqa: PLC0415
+
+        return get_value(self, path)
 
     def set_value(self, path: str, value: Any) -> Configuration:
         """Return a new validated Configuration with a dotted-path value updated."""
-        segments = _parse_dotted_path(path)
-        if not segments:
-            msg = "Path cannot be empty"
-            raise ValueError(msg)
+        from canfar.config.editor import set_value  # noqa: PLC0415
 
-        data = self.model_dump(mode="python")
-        cursor: Any = data
-
-        for segment in segments[:-1]:
-            cursor = _ensure_child_container(cursor, segment)
-
-        _set_in_container(cursor, segments[-1], value)
-        return self.__class__.model_validate(data)
+        return set_value(self, path, value)
 
     def get_credential(self, idp: str) -> AuthenticationCredential:
         """Return the saved authentication credential for an IDP key.
@@ -319,11 +239,9 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no credential exists for ``idp``.
         """
-        for credential in self.authentication:
-            if credential.idp == idp:
-                return credential
-        msg = f"Authentication record for IDP '{idp}' not found."
-        raise KeyError(msg)
+        from canfar.config.selection import get_credential  # noqa: PLC0415
+
+        return get_credential(self, idp)
 
     def get_server_by_uri(self, uri: str | AnyUrl) -> Server:
         """Return a known server by IVOA URI.
@@ -337,12 +255,9 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``uri``.
         """
-        target = str(uri)
-        for server in self.server:
-            if server.uri is not None and str(server.uri) == target:
-                return server
-        msg = f"Server '{target}' not found."
-        raise KeyError(msg)
+        from canfar.config.selection import get_server_by_uri  # noqa: PLC0415
+
+        return get_server_by_uri(self, uri)
 
     def get_active_server(self) -> Server:
         """Return the active science platform server record.
@@ -350,10 +265,9 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no active server is selected.
         """
-        if self.active.server is None:
-            msg = "No active server selected."
-            raise KeyError(msg)
-        return self.get_server_by_uri(self.active.server)
+        from canfar.config.selection import get_active_server  # noqa: PLC0415
+
+        return get_active_server(self)
 
     def get_server_for_idp(self, idp: str) -> Server:
         """Return the best-known server for an IDP.
@@ -370,14 +284,9 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``idp``.
         """
-        if self.active.authentication == idp and self.active.server is not None:
-            return self.get_active_server()
+        from canfar.config.selection import get_server_for_idp  # noqa: PLC0415
 
-        for server in self.server:
-            if server.idp == idp:
-                return server
-        msg = f"No server found for IDP '{idp}'."
-        raise KeyError(msg)
+        return get_server_for_idp(self, idp)
 
     def get_remembered_server_for_idp(self, idp: str) -> Server | None:
         """Return the last selected server for ``idp`` when still valid.
@@ -389,29 +298,17 @@ class Configuration(BaseSettings):
             Matching server record, or ``None`` when no remembered selection is
             available for ``idp``.
         """
-        uri = self._server_selection_history().get(idp)
-        if uri is None:
-            return None
-        try:
-            server = self.get_server_by_uri(uri)
-        except KeyError:
-            return None
-        if server.idp != idp:
-            return None
-        return server
+        from canfar.config.selection import (  # noqa: PLC0415
+            get_remembered_server_for_idp,
+        )
+
+        return get_remembered_server_for_idp(self, idp)
 
     def _server_selection_history(self) -> dict[str, AnyUrl]:
         """Return remembered selections seeded with the current active pair."""
-        selections = dict(self.active.servers)
-        if self.active.server is None:
-            return selections
-        try:
-            server = self.get_active_server()
-        except KeyError:
-            return selections
-        if server.idp == self.active.authentication and server.uri is not None:
-            selections[self.active.authentication] = server.uri
-        return selections
+        from canfar.config.selection import server_selection_history  # noqa: PLC0415
+
+        return server_selection_history(self)
 
     def set_active_selection(self, idp: str, server: Server) -> None:
         """Persist ``idp`` and ``server`` as the active pair.
@@ -423,22 +320,9 @@ class Configuration(BaseSettings):
         Raises:
             ValueError: If the server has no URI.
         """
-        if server.uri is None:
-            msg = "Server URI is required for active selection."
-            raise ValueError(msg)
+        from canfar.config.selection import set_active_selection  # noqa: PLC0415
 
-        uri = server.uri
-        selected = server.model_copy(update={"idp": idp}, deep=True)
-        self._upsert_server(selected)
-        selections = self._server_selection_history()
-        selections[idp] = uri
-        self.active = self.active.model_copy(
-            update={
-                "authentication": idp,
-                "server": uri,
-                "servers": selections,
-            },
-        )
+        set_active_selection(self, idp, server)
 
     def with_active_selection(self, idp: str, server: Server) -> Configuration:
         """Return a copy using ``idp`` and ``server`` as the active pair.
@@ -454,9 +338,9 @@ class Configuration(BaseSettings):
         Raises:
             ValueError: If the server has no URI.
         """
-        config = self.model_copy(deep=True)
-        config.set_active_selection(idp, server)
-        return config
+        from canfar.config.selection import with_active_selection  # noqa: PLC0415
+
+        return with_active_selection(self, idp, server)
 
     @property
     def context(self) -> AuthContext:
@@ -465,17 +349,16 @@ class Configuration(BaseSettings):
         Returns:
             Legacy ``OIDC`` or ``X509`` model with embedded active server.
         """
-        credential = self.get_credential(self.active.authentication)
-        try:
-            server = self.get_active_server()
-        except KeyError:
-            server = None
-        return credential_to_legacy_context(credential, server)
+        from canfar.config.selection import active_context  # noqa: PLC0415
+
+        return active_context(self)
 
     @property
     def contexts(self) -> LegacyContextsMapping:
         """Return a legacy dict-like view keyed by IDP."""
-        return LegacyContextsMapping(self)
+        from canfar.config.selection import legacy_contexts  # noqa: PLC0415
+
+        return legacy_contexts(self)
 
     def set_legacy_context(self, idp: str, context: AuthContext) -> None:
         """Update saved authentication (and optional server) from legacy context.
@@ -484,41 +367,18 @@ class Configuration(BaseSettings):
             idp: Canonical identity provider key.
             context: Legacy authentication context to persist.
         """
-        credential = legacy_context_to_credential(context, idp)
-        updated: list[AuthenticationCredential] = []
-        replaced = False
-        for existing in self.authentication:
-            if existing.idp == idp:
-                updated.append(credential)
-                replaced = True
-            else:
-                updated.append(existing)
-        if not replaced:
-            updated.append(credential)
-        self.authentication = updated
+        from canfar.config.selection import set_legacy_context  # noqa: PLC0415
 
-        if context.server is not None:
-            self._upsert_server(context.server.model_copy(update={"idp": idp}))
+        set_legacy_context(self, idp, context)
 
     def _upsert_server(self, server: Server) -> None:
         """Insert or replace a server record keyed by URI."""
-        if server.uri is None:
-            return
-        target = str(server.uri)
-        updated: list[Server] = []
-        replaced = False
-        for existing in self.server:
-            if existing.uri is not None and str(existing.uri) == target:
-                updated.append(server)
-                replaced = True
-            else:
-                updated.append(existing)
-        if not replaced:
-            updated.append(server)
-        self.server = updated
+        from canfar.config.selection import upsert_server  # noqa: PLC0415
+
+        upsert_server(self, server)
 
 
-__all__ = ["AuthContext", "Configuration", "ConsoleConfig"]
+__all__ = ["CONFIG_PATH", "AuthContext", "Configuration", "ConsoleConfig"]
 
 
 class _CanfarEnvSettingsSource(EnvSettingsSource):
@@ -539,17 +399,16 @@ class _CanfarEnvSettingsSource(EnvSettingsSource):
         return env_val, field_key, value_is_complex
 
 
-class _MigratedYamlConfigSettingsSource(YamlConfigSettingsSource):
-    """YAML settings source that migrates legacy configuration before loading."""
+class _CheckedYamlConfigSettingsSource(YamlConfigSettingsSource):
+    """YAML settings source that rejects unsupported configuration before loading."""
 
     def __init__(
         self,
         settings_cls: type[BaseSettings],
         *,
         yaml_file: Path,
-        clock: Callable[[], float] | None = None,
     ) -> None:
-        from canfar.config.migration import ensure_v1_config  # noqa: PLC0415
+        from canfar.config.migration import ensure_current_config  # noqa: PLC0415
 
-        ensure_v1_config(yaml_file, clock=clock)
+        ensure_current_config(yaml_file)
         super().__init__(settings_cls, yaml_file=yaml_file)

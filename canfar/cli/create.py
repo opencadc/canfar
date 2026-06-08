@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Annotated, Any, get_args
+from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import click
 import typer
@@ -13,6 +13,9 @@ from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
 from canfar.utils.console import console
+
+if TYPE_CHECKING:
+    from typer._click.core import Context
 
 kinds: list[str] = list(get_args(Kind))
 # Remove desktop-app from the list of kinds for usage message since,
@@ -27,7 +30,7 @@ class CreateUsageMessage(AliasGroup):
         typer (TyperGroup): Base class for grouping commands in Typer.
     """
 
-    def get_usage(self, ctx: click.core.Context) -> str:  # noqa: ARG002
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
         """Get the usage message for the prune command.
 
         Args:

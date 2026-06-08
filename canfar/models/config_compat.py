@@ -1,4 +1,4 @@
-"""Transitional compatibility between config v1 and legacy auth-context callers."""
+"""Compatibility between current config and legacy auth-context callers."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ def credential_to_legacy_context(
     credential: AuthenticationCredential,
     server: Server | None,
 ) -> AuthContext:
-    """Combine a v1 credential and server into a legacy auth context.
+    """Combine a saved credential and server into a legacy auth context.
 
     Args:
         credential: Saved authentication credential for an IDP.
@@ -54,7 +54,7 @@ def legacy_context_to_credential(
     context: AuthContext,
     idp: str,
 ) -> AuthenticationCredential:
-    """Extract a v1 credential from a legacy auth context.
+    """Extract a saved credential from a legacy auth context.
 
     Args:
         context: Legacy authentication context.
@@ -75,7 +75,7 @@ def legacy_context_to_credential(
 
 
 class LegacyContextsMapping:
-    """Dict-like view over v1 authentication records keyed by IDP."""
+    """Dict-like view over authentication records keyed by IDP."""
 
     def __init__(self, configuration: Configuration) -> None:
         self._configuration = configuration

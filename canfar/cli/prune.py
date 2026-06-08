@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Annotated, get_args
+from typing import TYPE_CHECKING, Annotated, get_args
 
 import click
 import typer
@@ -13,6 +13,9 @@ from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
 
+if TYPE_CHECKING:
+    from typer._click.core import Context
+
 
 class PruneUsageMessage(typer.core.TyperGroup):
     """Custom usage message for prune command.
@@ -21,7 +24,7 @@ class PruneUsageMessage(typer.core.TyperGroup):
         typer (TyperGroup): Base class for grouping commands in Typer.
     """
 
-    def get_usage(self, ctx: click.core.Context) -> str:  # noqa: ARG002
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
         """Get the usage message for the prune command.
 
         Args:

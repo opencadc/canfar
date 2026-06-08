@@ -45,6 +45,8 @@ def maybe_emit_cli_banner(ctx: typer.Context) -> None:
         mode = output.parse(argv, ctx=ctx)
     except output.OutputConflictError:
         return
+    if mode is output.OutputMode.HUMAN and output.has_output_flag(argv):
+        return
     if mode is output.OutputMode.HUMAN:
         emit_active_server_banner()
 
@@ -81,9 +83,12 @@ def output_mode_callback(
     if yaml_output:
         local_modes.append(output.OutputMode.YAML)
     if local_modes:
-        mode = output.resolve(local_modes)
+        _register_output_modes(local_modes)
+        try:
+            mode = output.resolve(local_modes)
+        except output.OutputConflictError:
+            return
         ctx.meta["output_mode"] = mode
-        _register_output_modes([mode])
 
 
 def resolve_output_mode(ctx: typer.Context) -> output.OutputMode:  # noqa: ARG001
