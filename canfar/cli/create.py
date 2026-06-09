@@ -3,16 +3,21 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Annotated, Any, get_args
+from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import click
 import typer
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
 from canfar.utils.console import console
+
+if TYPE_CHECKING:
+    from typer._click.core import Context
 
 kinds: list[str] = list(get_args(Kind))
 # Remove desktop-app from the list of kinds for usage message since,
@@ -27,7 +32,7 @@ class CreateUsageMessage(AliasGroup):
         typer (TyperGroup): Base class for grouping commands in Typer.
     """
 
-    def get_usage(self, ctx: click.core.Context) -> str:  # noqa: ARG002
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
         """Get the usage message for the prune command.
 
         Args:
@@ -126,6 +131,7 @@ def creation(
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
+    maybe_emit_banner(OutputMode.HUMAN)
     cmd = None
     args = ""
     environment: dict[str, Any] = {}
@@ -155,9 +161,9 @@ def creation(
                     ram=memory,
                     kind=kind,
                     gpu=gpu,
-                    cmd=cmd if cmd else None,
-                    args=args if args else None,
-                    env=environment if environment else None,
+                    cmd=cmd or None,
+                    args=args or None,
+                    env=environment or None,
                     replicas=replicas,
                 )
                 if session_ids:

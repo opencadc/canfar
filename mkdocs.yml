@@ -84,9 +84,9 @@ plugins:
               ignore_init_summary: true
               trim_doctest_flags: true
   - git-revision-date-localized:
-        type: date
-        enable_creation_date: true
-        fallback_to_build_date: true
+      type: date
+      enable_creation_date: true
+      fallback_to_build_date: true
   - git-committers:
       enabled: true
       repository: opencadc/canfar
@@ -172,82 +172,115 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Platform:
-    - Overview: platform/index.md
-    - Getting Started: platform/get-started.md
-    - Concepts: platform/concepts.md
-    - Best Practices: platform/best-practices.md
-    - Permissions: platform/permissions.md
-    - DOI: platform/doi.md
-    - Software Repositories (CVMFS): platform/cvmfs.md
-    - Cloud (legacy): platform/cloud.md
-    - Sessions:
-      - Overview: platform/sessions/index.md
-      - Notebooks: platform/sessions/notebook.md
-      - CARTA: platform/sessions/carta.md
-      - Firefly: platform/sessions/firefly.md
-      - Desktop: platform/sessions/desktop.md
-      - Batch: platform/sessions/batch.md
-      - Contributed: platform/sessions/contributed.md
-    - Storage:
-      - Overview: platform/storage/index.md
-      - Filesystem: platform/storage/filesystem.md
-      - Data Transfers: platform/storage/transfers.md
-      - VOSpace: platform/storage/vospace.md
-    - Containers:
-      - Overview: platform/containers/index.md
-      - Building Containers: platform/containers/build.md
-      - Registry: platform/containers/registry.md
-    - Community:
-      - Overview: platform/community/index.md
-      - CASA: platform/community/CASA_and_more.md
-    - Support:
-      - Help: platform/support/index.md
-      - FAQ: platform/support/faq.md
-    - Releases:
-      - CANFAR Releases: releases/releases.md
-      - 2026.1: releases/2026-1.md
-      - 2025.2: releases/2025-2.md
-      - 2025.1: releases/2025-1.md
+      - Overview: platform/index.md
+      - Getting Started: platform/get-started.md
+      - Concepts: platform/concepts.md
+      - Best Practices: platform/best-practices.md
+      - Permissions: platform/permissions.md
+      - DOI: platform/doi.md
+      - Software Repositories (CVMFS): platform/cvmfs.md
+      - Cloud (legacy): platform/cloud.md
+      - Sessions:
+          - Overview: platform/sessions/index.md
+          - Notebooks: platform/sessions/notebook.md
+          - CARTA: platform/sessions/carta.md
+          - Firefly: platform/sessions/firefly.md
+          - Desktop: platform/sessions/desktop.md
+          - Batch: platform/sessions/batch.md
+          - Contributed: platform/sessions/contributed.md
+      - Storage:
+          - Overview: platform/storage/index.md
+          - Filesystem: platform/storage/filesystem.md
+          - Data Transfers: platform/storage/transfers.md
+          - VOSpace: platform/storage/vospace.md
+      - Containers:
+          - Overview: platform/containers/index.md
+          - Building Containers: platform/containers/build.md
+          - Registry: platform/containers/registry.md
+      - Community:
+          - Overview: platform/community/index.md
+          - CASA: platform/community/CASA_and_more.md
+        # - ALMA:
+        #   - Overview: platform/community/alma/index.md
+        #   - Desktop:
+        #     - Archive Download: platform/community/alma/ALMA_Desktop/archive_download.md
+        #     - Archive Script Download: platform/community/alma/ALMA_Desktop/archive_script_download.md
+        #     - CASA Containers: platform/community/alma/ALMA_Desktop/casa_containers.md
+        #     - Start CASA: platform/community/alma/ALMA_Desktop/start_casa.md
+        #     - Typical Reduction: platform/community/alma/ALMA_Desktop/typical_reduction.md
+        #   - General Tools:
+        #     - File Transfers: platform/community/alma/General_tools/File_transfers.md
+        #     - Group Management: platform/community/alma/General_tools/Group_management.md
+        #     - SSHFS: platform/community/alma/General_tools/Using_sshfs.md
+        #     - VOS Tools: platform/community/alma/General_tools/Using_vostools.md
+        #     - Web Storage: platform/community/alma/General_tools/Using_webstorage.md
+        #   - New Users:
+        #     - Overview: platform/community/alma/NewUser/Overview.md
+        #     - Login: platform/community/alma/NewUser/Login.md
+        #     - Launch CARTA: platform/community/alma/NewUser/LaunchCARTA.md
+        #     - Launch Desktop: platform/community/alma/NewUser/LaunchDesktop.md
+        #     - Launch Notebook: platform/community/alma/NewUser/LaunchNotebook.md
+        #     - Project Space: platform/community/alma/NewUser/ProjectSpace.md
+        #   - Notebook:
+        #     - Transfer Files: platform/community/alma/Notebook/transfer_file.md
+        #   - Tips:
+        #     - Direct URL: platform/community/alma/TipsTricks/Direct_url.md
+        #     - Increase Font: platform/community/alma/TipsTricks/Increase_font.md
+        #     - Clipboard: platform/community/alma/TipsTricks/Using_clipboard.md
+      - Support:
+          - Help: platform/support/index.md
+          - FAQ: platform/support/faq.md
+      - Releases:
+          - CANFAR Releases: releases/releases.md
+          - 2026.1: releases/2026-1.md
+          - 2025.2: releases/2025-2.md
+          - 2025.1: releases/2025-1.md
   - Client:
-    - Home: client/home.md
-    - Authentication: cli/authentication-contexts.md
-    - What's New:
-      - Updates: client/updates.md
-      - Migration Guide: client/migration.md
-    - Get Started:
-      - Installation & Setup: client/get-started.md
-      - 5-Minute Tutorial: client/quick-start.md
-    - Examples:
-      - Basic: client/examples.md
-      - Advanced: client/advanced-examples.md
-    - Reference:
-      - Python API:
-        - AsyncSession: client/async_session.md
-        - Session: client/session.md
-        - Images: client/images.md
-        - Context: client/context.md
-        - Overview: client/overview.md
-        - HTTPClient: client/client.md
-        - Helpers: client/helpers.md
-    - CLI:
-      - 5-Minute Tutorial: cli/quick-start.md
-      - Reference: cli/cli-help.md
-    - Demos:
-      - SRCnet Workshop: demos/srcnet-workshop.md
-    - Bug Reports: client/bug-reports.md
+      - Home: client/home.md
+      - Authentication and Servers: cli/authentication-contexts.md
+      - What's New:
+          - Updates: client/updates.md
+          - Migration Guide: client/migration.md
+      - Get Started:
+          - Installation & Setup: client/get-started.md
+          - 5-Minute Tutorial: client/quick-start.md
+      - Examples:
+          - Basic: client/examples.md
+          - Advanced: client/advanced-examples.md
+      - Reference:
+          - Python API:
+              - AsyncSession: client/async_session.md
+              - Session: client/session.md
+              - Images: client/images.md
+              - Context: client/context.md
+              - Overview: client/overview.md
+              - HTTPClient: client/client.md
+              - Helpers: client/helpers.md
+      - CLI:
+          - 5-Minute Tutorial: cli/quick-start.md
+          - Authentication and Servers: cli/authentication-contexts.md
+          - Reference: cli/cli-help.md
+      - Demos:
+          - SRCnet Workshop: demos/srcnet-workshop.md
+      - Bug Reports: client/bug-reports.md
   - Contribute:
-    - Code of Conduct: conduct.md
-    - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
-    - License: license.md
-    - Dev Guide:
-      - Contributing: contributing.md
-      - Testing: client/testing.md
-    - Operations:
-      - Platform Deployments: https://www.opencadc.org/deployments/
-    - Security Issues: security.md
-    - Changelog: changelog.md
+      - Code of Conduct: conduct.md
+      - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
+      - License: license.md
+      - Dev Guide:
+          - Contributing: contributing.md
+          - Testing: client/testing.md
+          - Agent Guidance:
+              - Architecture: agents/architecture.md
+              - Domain Docs: agents/domain.md
+              - Issue Tracker: agents/issue-tracker.md
+              - Triage Statuses: agents/triage-labels.md
+      - Operations:
+          - Platform Deployments: https://www.opencadc.org/deployments/
+      - Security Issues: security.md
+      - Changelog: changelog.md
   - About:
-    - Home: about/home.md
-    - Terms of Reference: about/terms.md
-    - Partners: about/partners.md
-    - Acknowledgement: about/acknowledgement.md
+      - Home: about/home.md
+      - Terms of Reference: about/terms.md
+      - Partners: about/partners.md
+      - Acknowledgement: about/acknowledgement.md

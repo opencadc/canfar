@@ -1,6 +1,6 @@
 """Test Canfar Images API."""
 
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -16,11 +16,15 @@ def images():
     del images
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_images_fetch(images: Images) -> None:
     """Test fetching images."""
     assert len(images.fetch()) > 0
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_images_with_kind(images: Images) -> None:
     """Test fetching images with kind."""
     assert "images.canfar.net/skaha/base-notebook:latest" in images.fetch(
@@ -47,3 +51,18 @@ def test_images_details_returns_models() -> None:
     assert results[0].id == payload[0]["id"]
     assert results[0].types == payload[0]["types"]
     assert results[0].digest == payload[0]["digest"]
+
+
+def test_images_fetch_uses_http_client_params() -> None:
+    """Fetch returns image IDs and passes optional kind as request parameter."""
+    images = Images(token="token", url="https://example.test/skaha/v1")
+    mock_client = MagicMock()
+    mock_client.get.return_value.json.return_value = [
+        {"id": "images.canfar.net/skaha/terminal:latest"}
+    ]
+    images._client = mock_client  # noqa: SLF001
+
+    assert images.fetch() == ["images.canfar.net/skaha/terminal:latest"]
+    assert images.fetch(kind="headless") == ["images.canfar.net/skaha/terminal:latest"]
+    mock_client.get.assert_any_call("image", params={})
+    mock_client.get.assert_any_call("image", params={"type": "headless"})

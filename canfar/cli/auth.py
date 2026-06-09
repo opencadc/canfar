@@ -1,310 +1,358 @@
-"""Login command for Science Platform CLI."""
+"""Authentication management commands for CANFAR CLI."""
 
 from __future__ import annotations
 
-import asyncio
-from typing import Annotated, NoReturn
+from datetime import datetime, timezone
+from typing import TYPE_CHECKING, Annotated
 
+import humanize
 import typer
-from pydantic import AnyHttpUrl, AnyUrl
 from rich import box
-from rich.prompt import Confirm
+from rich.prompt import Confirm, Prompt
 from rich.table import Table
 
-from canfar import CONFIG_PATH, get_logger, set_log_level
-from canfar.auth import oidc, x509
-from canfar.exceptions.context import AuthContextError
-from canfar.hooks.typer.aliases import AliasGroup
-from canfar.models.auth import (
-    OIDC,
-    X509,
-    Client,
-    Endpoint,
-    Expiry,
-    Token,
+from canfar.authentication import (
+    AuthenticationError,
 )
-from canfar.models.config import AuthContext, Configuration
-from canfar.models.http import Server
-from canfar.utils import display
+from canfar.authentication import (
+    list as auth_list,
+)
+from canfar.authentication import (
+    purge as auth_purge,
+)
+from canfar.authentication import (
+    remove as auth_remove,
+)
+from canfar.authentication import (
+    show as auth_show,
+)
+from canfar.cli import output
+from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.hooks.typer.aliases import AliasGroup
+from canfar.idp import get_idp
+from canfar.models.config import Configuration
+from canfar.server import (
+    ServerDiscoveryError,
+    ServerFetchError,
+    ServerSelectionRequiredError,
+    ServerSelectorError,
+)
+from canfar.server import (
+    activate as activate_server,
+)
 from canfar.utils.console import console
-from canfar.utils.discover import servers
 
-log = get_logger(__name__)
-
+if TYPE_CHECKING:
+    from canfar.models.http import Server
 
 auth = typer.Typer(
     name="auth",
-    help="Authentication Commands",
-    no_args_is_help=True,
-    rich_help_panel="Authentication",
+    help="Manage authentication providers.",
+    no_args_is_help=False,
+    invoke_without_command=True,
+    rich_markup_mode="rich",
     cls=AliasGroup,
 )
 
 
-@auth.command("login")
-def login(  # noqa: PLR0915 too many statements
-    force: Annotated[
-        bool,
-        typer.Option(
-            "-f",
-            "--force",
-            help="Force re-authentication",
-        ),
-    ] = False,
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging",
-        ),
-    ] = False,
-    dead: Annotated[
-        bool,
-        typer.Option(
-            "--dead",
-            help="Include dead servers in discovery",
-        ),
-    ] = False,
-    dev: Annotated[
-        bool,
-        typer.Option(
-            "--dev",
-            help="Include dev servers in discovery",
-        ),
-    ] = False,
-    details: Annotated[
-        bool,
-        typer.Option(
-            "--details",
-            help="Include server details in discovery",
-        ),
-    ] = False,
-    timeout: Annotated[
-        int, typer.Option("-t", "--timeout", help="Timeout for server response.")
-    ] = 2,
-    discovery_url: Annotated[
-        str,
-        typer.Option(
-            "--discovery-url",
-            help="OIDC Discovery URL",
-        ),
-    ] = "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration",
-) -> None:
-    """Login to Science Platform.
+def _format_expiry(expiry: float | None) -> str:
+    """Format credential expiry for human-readable CLI output.
 
-    This command will guide you through the authentication process,
-    automatically discovering the upstream server and choosing the
-    appropriate authentication method based on the server's configuration.
+    Args:
+        expiry: Credential expiry as Unix timestamp when applicable.
+
+    Returns:
+        Humanized relative time, or ``N/A`` when expiry is unknown.
     """
-    if debug:
-        set_log_level("DEBUG")
-        log.debug("Debug logging enabled")
+    if expiry is None:
+        return "N/A"
+    when = datetime.fromtimestamp(expiry, tz=timezone.utc)
+    return humanize.naturaltime(when)
 
+
+def _print_auth_switched(idp: str) -> None:
+    """Print confirmation after switching active authentication."""
+    console.print(
+        f"[green]✓[/green] Switched active authentication to [bold]{idp}[/bold]",
+    )
+
+
+def _prompt_server_selector(servers: list[Server]) -> str:
+    """Prompt until the user selects a server URI or list index."""
+    if len(servers) == 1 and servers[0].uri is not None:
+        selector = str(servers[0].uri)
+        console.print(
+            f"[green]✓[/green] Auto-selected server {servers[0].name or selector}",
+        )
+        return selector
+
+    console.print("[bold blue]Select compatible server[/bold blue]")
+    for index, server in enumerate(servers, start=1):
+        label = server.name or str(server.uri)
+        console.print(f"  {index}. {label} ({server.uri})")
+    while True:
+        choice = Prompt.ask("Server URI or number")
+        uri_matches = [item for item in servers if str(item.uri) == choice]
+        if uri_matches:
+            return choice
+        try:
+            selected = servers[int(choice) - 1]
+        except (ValueError, IndexError):
+            console.print("[red]Enter a valid server URI or number.[/red]")
+            continue
+        if selected.uri is None:
+            console.print("[red]Enter a valid server URI or number.[/red]")
+            continue
+        return str(selected.uri)
+
+
+def _render_auth_show_table() -> None:
+    """Render the active Authentication summary for human output."""
     try:
-        console.print("[bold blue]Starting Science Platform Login[/bold blue]")
-        config = Configuration()
-        if not force and not config.context.expired and config.context.server:
-            console.print("[green]✓[/green] Credentials valid")
-            console.print(
-                f"[green]✓[/green] Authenticated with {config.context.server.name} @ "
-                f"{config.context.server.url}"
-            )
-            console.print("[dim] Use --force to re-authenticate.[dim]")
-            return
+        summary = auth_show()
+    except AuthenticationError as exc:
+        console.print(f"[bold red]{exc.error.message}[/bold red]")
+        if exc.error.hint:
+            console.print(exc.error.hint)
+        raise typer.Exit(1) from exc
 
-        # Run discovery and get selected server
-        selected = asyncio.run(
-            servers(dev=dev, dead=dead, details=details, timeout=timeout)
-        )
-
-        # Inspect the Server Configuration
-        log.debug("selected server: %s", selected)
-        server: Server = Server(
-            name=f"{selected.registry}-{selected.name}",
-            uri=AnyUrl(selected.uri),
-            url=AnyHttpUrl(selected.url),
-        )
-        console.print(f"Discovering capabilities for {server.url}")
-        capabilities = server.capabilities()
-        log.debug("server caps: %s", capabilities)
-
-        # Initialize selection variables for consistent typing
-        auth_choice: str
-
-        # Helper to raise unsupported auth selection
-        def _unsupported() -> NoReturn:
-            raise AuthContextError(  # noqa: TRY301
-                context=auth_choice, reason="not supported"
-            )
-
-        # Assign server auth modes based on capabilities
-        server.auths = capabilities[0].get("auth_modes", ["x509"])
-
-        if dev:
-            server.version, auth_choice = asyncio.run(
-                display.capabilities(capabilities)
-            )
-        else:
-            server.version = capabilities[0].get("version", None)
-            auth_choice = server.auths[0]
-
-        log.debug("server: %s", server.model_dump_json(indent=2))
-        log.debug("auth choice: %s", auth_choice)
-
-        if not dev and selected.registry.upper() == "CADC":
-            log.debug("cadc only supports x509 auth in prod")
-            auth_choice = "x509"
-
-        # Step 7-8: Choose authentication method based on registry
-        context: AuthContext
-        if auth_choice == "x509":
-            console.print("[bold blue]X509 Certificate Authentication[/bold blue]")
-            # Create new X509 context with server information
-            x509_context = X509(server=server, expiry=0.0)
-            # Authenticate and get updated context
-            context = x509.authenticate(x509_context)
-        elif auth_choice == "oidc":
-            console.print(
-                f"[bold blue]OIDC Authentication for {selected.url}[/bold blue]"
-            )
-            # Create new OIDC context with server and discovery information
-            oidc_context = OIDC(
-                server=server,
-                endpoints=Endpoint(discovery=discovery_url),
-                client=Client(),
-                token=Token(),
-                expiry=Expiry(),
-            )
-            # Authenticate and get updated context
-            context = asyncio.run(oidc.authenticate(oidc_context))
-        else:
-            _unsupported()
-
-        name = server.name or f"{selected.registry}-{selected.name}"
-        config.contexts[name] = context
-        config.active = name
-        console.print("[green]✓[/green] Saving configuration")
-        config.save()
-        console.print("[bold green]Login completed successfully![/bold green]")
-
-    except Exception as error:
-        console.print(f"[bold red]Login failed: {error}[/bold red]")
-        raise typer.Exit(1) from error
+    table = Table(title="Active Authentication", show_lines=True, box=box.SIMPLE)
+    table.add_column("Field", style="cyan")
+    table.add_column("Value", style="magenta")
+    table.add_row("IDP", summary.idp)
+    table.add_row("Name", summary.name)
+    table.add_row("Mode", summary.mode)
+    table.add_row("Expiry", _format_expiry(summary.expiry))
+    table.add_row("Server", summary.server or "N/A")
+    console.print(table)
 
 
-@auth.command("list, ls")
-def show() -> None:
-    """Show all available auth contexts."""
-    config = Configuration()
+def _render_auth_list_table() -> None:
+    """Render saved Authentication records for human output."""
+    summaries = auth_list()
     table = Table(
-        title="Available Authentication Contexts",
+        title="Saved Authentication Records",
         show_lines=True,
         box=box.SIMPLE,
     )
     table.add_column("Active", justify="center", style="cyan")
-    table.add_column("Name", style="magenta")
-    table.add_column("Auth Mode", justify="center", style="green")
-    table.add_column("Server URL", style="blue")
+    table.add_column("IDP", style="magenta")
+    table.add_column("Mode", justify="center", style="green")
+    table.add_column("Server", style="blue")
 
-    for name, context in config.contexts.items():
-        is_active = "✅" if name == config.active else ""
+    for summary in summaries:
         table.add_row(
-            is_active,
-            name,
-            context.mode,
-            str(context.server.url) if context.server else "N/A",
+            "✅" if summary.active else "",
+            summary.idp,
+            summary.mode,
+            summary.server or "N/A",
         )
     console.print(table)
 
 
-@auth.command("switch, use")
-def switch_context(
-    context: Annotated[
-        str,
-        typer.Argument(help="The name of the context to activate."),
-    ],
+def _auth_show(mode: output.OutputMode) -> None:
+    """Emit the active Authentication record in the resolved output mode.
+
+    Args:
+        mode: Effective CLI output mode.
+
+    Raises:
+        typer.Exit: Exit code 1 when no active authentication is available.
+    """
+    if mode is not output.OutputMode.HUMAN:
+        try:
+            summary = auth_show()
+        except AuthenticationError as exc:
+            output.to_stderr(exc.error, mode)
+            raise typer.Exit(1) from exc
+        output.to_stdout(summary, mode)
+        return
+    _render_auth_show_table()
+
+
+@auth.callback(invoke_without_command=True)
+def auth_default(
+    ctx: typer.Context,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
 ) -> None:
-    """Switch the active auth context."""
+    """Active authentication state."""
+    if ctx.invoked_subcommand is not None:
+        if json_output or yaml_output:
+            typer.echo(
+                "Place --json or --yaml after the subcommand.",
+                err=True,
+            )
+            raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
+        return
+
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+    _auth_show(mode)
+
+
+@auth.command("show")
+def auth_show_command(
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
+) -> None:
+    """Active authentication state."""
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+    _auth_show(mode)
+
+
+@auth.command("ls")
+def auth_list_command(
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
+) -> None:
+    """Available auth providers."""
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+    summaries = auth_list()
+    if mode is not output.OutputMode.HUMAN:
+        output.to_stdout(summaries, mode)
+        return
+    _render_auth_list_table()
+
+
+@auth.command("login")
+def auth_login_command(
+    idp: Annotated[
+        str | None,
+        typer.Argument(help="Canonical Identity Provider key."),
+    ] = None,
+    force: Annotated[
+        bool,
+        typer.Option("-f", "--force", help="Force re-authentication."),
+    ] = False,
+    debug: Annotated[
+        bool,
+        typer.Option("--debug", help="Enable debug logging."),
+    ] = False,
+    dev: Annotated[
+        bool,
+        typer.Option("--dev", help="Include dev servers in discovery."),
+    ] = False,
+    timeout: Annotated[
+        int,
+        typer.Option(
+            "-t",
+            "--timeout",
+            help="Timeout for HTTP requests during login.",
+            min=1,
+        ),
+    ] = 2,
+) -> None:
+    """Alias for canfar login."""
+    from canfar import get_logger, set_log_level  # noqa: PLC0415
+    from canfar.cli.login import _login_flow  # noqa: PLC0415
+    from canfar.cli.prompts import select_idp  # noqa: PLC0415
+    from canfar.idp import list_idps  # noqa: PLC0415
+
+    maybe_emit_banner(output.OutputMode.HUMAN)
+    console.print(
+        "\n[red]Deprecation Notice:[/red]"
+        "\n[yellow]canfar auth login[/yellow] will be removed soon."
+        " Use [green][bold]canfar login[/bold][/green] instead.\n"
+    )
+    if debug:
+        set_log_level("DEBUG")
+        get_logger(__name__).debug("Debug logging enabled")
+    selected_idp = idp or select_idp(list_idps())
+    _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)
+
+
+@auth.command("use")
+def auth_use_command(
+    idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
+) -> None:
+    """Switch auth provider."""
+    maybe_emit_banner(output.OutputMode.HUMAN)
     config = Configuration()
-    if context not in config.contexts:
-        console.print(
-            f"[bold red]Context [italic]{context}[/italic] not found.[/bold red]"
-        )
-        console.print(f"Available contexts are: {list(config.contexts.keys())}")
-        raise typer.Exit(1)
 
-    config.active = context
-    config.save()
-    console.print(f"[green]✓[/green] Switched active context to [bold]{context}[/bold]")
-
-
-@auth.command("remove, rm")
-def remove_context(
-    context: Annotated[
-        str,
-        typer.Argument(help="The name of the context to remove."),
-    ],
-) -> None:
-    """Remove specific auth context."""
     try:
-        config = Configuration()
-    except Exception as error:
-        console.print(f"[bold red]Error: {error}[/bold red]")
-        raise typer.Exit(1) from error
+        get_idp(idp)
+        config.get_credential(idp)
+    except KeyError as exc:
+        console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(1) from exc
 
-    if context not in config.contexts:
-        console.print(f"[bold red]Error:[/bold red] Context '{context}' not found.")
-        console.print(f"Available contexts are: {list(config.contexts.keys())}")
-        raise typer.Exit(1)
+    try:
+        activation = activate_server(idp, config=config)
+    except ServerSelectionRequiredError as exc:
+        selector = _prompt_server_selector(exc.servers)
+        try:
+            activation = activate_server(idp, selector, config=config)
+        except (ServerDiscoveryError, ServerFetchError, ServerSelectorError) as err:
+            console.print(f"[bold red]{err}[/bold red]")
+            raise typer.Exit(1) from err
+    except (ServerDiscoveryError, ServerFetchError, ServerSelectorError) as exc:
+        console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(1) from exc
 
-    if context == "default":
+    if activation.reason in {"remembered", "single"}:
+        selector = str(activation.server.uri) if activation.server.uri else ""
         console.print(
-            "[bold red]Cannot remove the default context. Its always there![/bold red] "
+            f"[green]✓[/green] Auto-selected server "
+            f"{activation.server.name or selector}",
         )
-        raise typer.Exit(1)
+    _print_auth_switched(idp)
 
-    if context == config.active:
-        console.print(
-            f"[bold red]Cannot remove the active context '{context}'[/bold red] ."
+
+@auth.command("rm")
+def auth_remove_command(
+    idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
+    force: Annotated[
+        bool,
+        typer.Option("-f", "--force", help="Remove active authentication."),
+    ] = False,
+) -> None:
+    """Remove auth and associated servers."""
+    maybe_emit_banner(output.OutputMode.HUMAN)
+    config = Configuration()
+    if config.active.authentication == idp and not force:
+        should_remove = Confirm.ask(
+            f"Remove active authentication '{idp}'?",
+            default=False,
         )
-        console.print("Switch to another context `canfar auth switch <CONTEXT>`")
-        raise typer.Exit(1)
+        if not should_remove:
+            console.print("[yellow]Removal cancelled[/yellow]")
+            raise typer.Exit(0)
+        force = True
 
-    del config.contexts[context]
-    config.save()
-    console.print(f"[green]✓[/green] Removed context [bold]{context}[/bold]")
+    try:
+        auth_remove(idp, force=force)
+    except AuthenticationError as exc:
+        console.print(f"[bold red]{exc.error.message}[/bold red]")
+        if exc.error.hint:
+            console.print(exc.error.hint)
+        raise typer.Exit(1) from exc
+    except KeyError as exc:
+        console.print(f"[bold red]{exc}[/bold red]")
+        raise typer.Exit(1) from exc
+
+    console.print(f"[green]✓[/green] Removed authentication for [bold]{idp}[/bold]")
 
 
 @auth.command("purge")
-def purge(
-    confirm: Annotated[
+def auth_purge_command(
+    force: Annotated[
         bool,
-        typer.Option(
-            "--yes",
-            "-y",
-            help="Skip confirmation prompt",
-        ),
+        typer.Option("--force", help="Required to reset authentication state."),
     ] = False,
 ) -> None:
-    """Remove all auth contexts."""
-    if not confirm:
-        should_purge = Confirm.ask(
-            "This will remove all stored authentication credentials. Continue?"
-        )
-        if not should_purge:
-            console.print("[yellow]Logout cancelled[/yellow]")
-            raise typer.Exit(0)
+    """Remove all auths and servers."""
+    maybe_emit_banner(output.OutputMode.HUMAN)
+    if not force:
+        console.print("[bold red]Authentication purge requires --force.[/bold red]")
+        raise typer.Exit(1)
 
     try:
-        # Delete the configuration file entirely
-        CONFIG_PATH.unlink()
-        console.print("[green]✓[/green] Authentication credentials cleared")
-    except FileNotFoundError:
-        console.print("[yellow]No configuration found to clear[/yellow]")
-    except Exception as error:
-        console.print(f"[bold red]Error during purge: {error}[/bold red]")
-        raise typer.Exit(1) from error
+        auth_purge(force=True)
+    except AuthenticationError as exc:
+        console.print(f"[bold red]{exc.error.message}[/bold red]")
+        raise typer.Exit(1) from exc
 
-
-if __name__ == "__main__":
-    auth()
+    console.print("[green]✓[/green] Authentication and server state reset")

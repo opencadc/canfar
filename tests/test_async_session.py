@@ -2,11 +2,12 @@
 
 from asyncio import sleep
 from time import time
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
+import httpx
 import pytest
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from canfar.sessions import AsyncSession
 
@@ -24,9 +25,89 @@ def asession():
 
 
 @pytest.mark.asyncio
+@pytest.mark.integration
+@pytest.mark.slow
 async def test_fetch_with_kind(asession: AsyncSession) -> None:
     """Test fetching images with kind."""
     await asession.fetch(kind="headless")
+
+
+def _sync_response(json_data=None, text: str = "") -> MagicMock:
+    response = MagicMock()
+    response.json.return_value = json_data
+    response.text = text
+    return response
+
+
+def _http_error(method: str, url: str) -> httpx.HTTPStatusError:
+    request = httpx.Request(method, url)
+    response = httpx.Response(500, request=request)
+    return httpx.HTTPStatusError("boom", request=request, response=response)
+
+
+@pytest.mark.asyncio
+async def test_async_session_methods_handle_success_and_failures() -> None:
+    """AsyncSession methods return parsed data and tolerate per-ID failures."""
+    session = AsyncSession(
+        token=SecretStr("token"), url="https://example.test/skaha/v1", concurrency=2
+    )
+    client = MagicMock()
+    client.get = AsyncMock()
+    client.post = AsyncMock()
+    client.delete = AsyncMock()
+    session._asynclient = client  # noqa: SLF001
+
+    client.get.return_value = _sync_response([{"id": "s1"}])
+    assert await session.fetch(kind="headless") == [{"id": "s1"}]
+
+    client.get.return_value = _sync_response({"cores": {}})
+    assert await session.stats() == {"cores": {}}
+
+    client.get.side_effect = [
+        _sync_response({"id": "s1"}),
+        RuntimeError("info failed"),
+    ]
+    with patch("canfar.sessions._log_http_task_failure") as log_failure:
+        assert await session.info(["s1", "s2"]) == [{"id": "s1"}]
+    log_failure.assert_called_once()
+
+    client.get.side_effect = [
+        _sync_response(text="log text"),
+        RuntimeError("logs failed"),
+    ]
+    with patch("canfar.sessions._log_http_task_failure") as log_failure:
+        assert await session.logs(["s1", "s2"]) == {"s1": "log text"}
+    log_failure.assert_called_once()
+
+    client.post.side_effect = [
+        _sync_response(text="created-1\n"),
+        RuntimeError("create failed"),
+    ]
+    with patch("canfar.sessions._log_http_task_failure") as log_failure:
+        assert await session.create(
+            name="batch",
+            image="skaha/terminal:latest",
+            kind="headless",
+            replicas=2,
+        ) == ["created-1"]
+    log_failure.assert_called_once()
+
+    client.get.side_effect = [
+        _sync_response(text="event text"),
+        RuntimeError("events failed"),
+    ]
+    with patch("canfar.sessions._log_http_task_failure") as log_failure:
+        assert await session.events(["s1", "s2"]) == [{"s1": "event text"}]
+    log_failure.assert_called_once()
+
+    client.get.side_effect = [_sync_response(text="event text")]
+    assert await session.events("s1", verbose=True) is None
+
+    client.delete.side_effect = [
+        None,
+        _http_error("DELETE", "https://example.test/skaha/v1/session/s2"),
+    ]
+    assert await session.destroy(["s1", "s2"]) == {"s1": True, "s2": False}
 
 
 @pytest.mark.asyncio

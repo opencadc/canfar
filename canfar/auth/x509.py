@@ -7,7 +7,6 @@ using the cadcutils.net.auth library as the backbone for X509 authentication.
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from os import R_OK, access
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -203,9 +202,12 @@ def valid(path: Path = CERT_PATH) -> str:
         msg = f"{destination} is not a file."
         raise ValueError(msg)
 
-    if not access(destination, R_OK):
+    try:
+        with destination.open("rb"):
+            pass
+    except PermissionError as err:
         msg = f"{destination} is not readable."
-        raise PermissionError(msg)
+        raise PermissionError(msg) from err
 
     return destination.absolute().as_posix()
 

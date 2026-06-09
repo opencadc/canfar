@@ -79,7 +79,7 @@ class TestStatusType:
             # All statuses should start with capital letter
             assert status[0].isupper()
             # Rest should be lowercase (except for proper nouns)
-            assert status == status.capitalize() or status in ["Error"]
+            assert status == status.capitalize() or status == "Error"
 
 
 class TestViewType:

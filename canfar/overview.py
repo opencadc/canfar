@@ -69,5 +69,5 @@ class Overview(HTTPClient):
         if availaibility is None:
             log.error("No availability information found in the response.")
             return False
-        log.info(notify if notify else "No additional information provided.")
+        log.info(notify or "No additional information provided.")
         return availaibility == "true"

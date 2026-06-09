@@ -284,16 +284,24 @@ def test_stripe_vs_chunk_no_overlap() -> None:
 
 # Edge case and error condition tests
 def test_stripe_zero_total() -> None:
-    """Test stripe function with zero total (should handle gracefully)."""
+    """Test stripe function with zero total raises ValueError."""
     data = [1, 2, 3]
-    # This might raise an error or return empty - test actual behavior
-    try:
-        result = list(stripe(data, replica=1, total=0))
-        # If it doesn't raise an error, it should return empty
-        assert result == []
-    except (ZeroDivisionError, ValueError):
-        # This is also acceptable behavior
-        pass
+    with pytest.raises(ValueError, match="Step for islice"):
+        list(stripe(data, replica=1, total=0))
+
+
+def test_stripe_replica_less_than_one_returns_empty() -> None:
+    """Test stripe function with replica < 1 returns empty (no validation error)."""
+    data = list(range(10))
+    assert list(stripe(data, replica=0, total=3)) == []
+    assert list(stripe(data, replica=-1, total=3)) == []
+
+
+def test_stripe_replica_exceeds_total_returns_empty() -> None:
+    """Test stripe function with replica > total returns empty (no validation error)."""
+    data = list(range(10))
+    assert list(stripe(data, replica=4, total=3)) == []
+    assert list(stripe(data, replica=11, total=10)) == []
 
 
 def test_chunk_zero_total() -> None:

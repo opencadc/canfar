@@ -2,11 +2,12 @@
 
 from time import sleep, time
 from typing import Any
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
+import httpx
 import pytest
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from canfar.models.session import CreateRequest
 from canfar.sessions import Session
@@ -28,9 +29,58 @@ def session():
     del session
 
 
+@pytest.mark.integration
+@pytest.mark.slow
 def test_fetch_with_kind(session: Session) -> None:
     """Test fetching images with kind."""
     session.fetch(kind="headless")
+
+
+def _sync_response(json_data: Any = None, text: str = "") -> MagicMock:
+    response = MagicMock()
+    response.json.return_value = json_data
+    response.text = text
+    return response
+
+
+def _http_error(method: str, url: str) -> httpx.HTTPStatusError:
+    request = httpx.Request(method, url)
+    response = httpx.Response(500, request=request)
+    return httpx.HTTPStatusError("boom", request=request, response=response)
+
+
+def test_sync_session_methods_handle_success_and_failures() -> None:
+    """Sync Session methods return parsed data and tolerate per-ID failures."""
+    session = Session(token=SecretStr("token"), url="https://example.test/skaha/v1")
+    client = MagicMock()
+    session._client = client  # noqa: SLF001
+
+    client.get.return_value = _sync_response([{"id": "s1"}])
+    assert session.fetch(kind="headless") == [{"id": "s1"}]
+    client.get.assert_called_with(url="session", params={"type": "headless"})
+
+    client.get.return_value = _sync_response({"cores": {}})
+    assert session.stats() == {"cores": {}}
+    client.get.assert_called_with("session", params={"view": "stats"})
+
+    client.get.side_effect = [
+        _sync_response({"id": "s1"}),
+        _http_error("GET", "https://example.test/skaha/v1/session/s2"),
+    ]
+    with patch("canfar.sessions._log_http_task_failure") as log_failure:
+        assert session.info(["s1", "s2"]) == [{"id": "s1"}]
+    log_failure.assert_called_once()
+
+    client.get.side_effect = None
+    client.get.return_value = _sync_response(text="hello")
+    assert session.logs("s1") == {"s1": "hello"}
+    assert session.logs("s1", verbose=True) is None
+
+    client.delete.side_effect = [
+        None,
+        _http_error("DELETE", "https://example.test/skaha/v1/session/s2"),
+    ]
+    assert session.destroy(["s1", "s2"]) == {"s1": True, "s2": False}
 
 
 def test_fetch_malformed_kind(session: Session) -> None:

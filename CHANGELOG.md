@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.5](https://github.com/opencadc/canfar/compare/v1.3.4...v1.3.5) (2026-04-28)
+
+
+### Bug Fixes
+
+* release note versions ([1df92d9](https://github.com/opencadc/canfar/commit/1df92d97ed4eb68ff8820ca7fb816552b0b7a239))
+
 ## [1.3.4](https://github.com/opencadc/canfar/compare/v1.3.3...v1.3.4) (2026-03-31)
 
 

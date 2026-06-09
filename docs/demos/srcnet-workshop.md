@@ -64,7 +64,7 @@ pipx install canfar
 Tell `canfar` who you are. This command discovers all available servers worldwide and guides you through a one-time login.
 
 ```bash
-canfar auth login -f
+canfar login srcnet -f
 ```
 
 ??? info "Auth Walkthrough"
@@ -76,7 +76,7 @@ You'll be prompted for your credentials, and the CLI handles the rest, saving a 
 
     - We installed the `canfar` python package, which provides the `canfar` command-line interface (CLI).
     - We authenticated with the CANFAR Science Platform.
-    - All future commands will use this secure authentication context automatically.
+    - All future commands will use this active Authentication and Server selection automatically.
 
 ---
 
@@ -210,7 +210,7 @@ Here is the complete workflow, from launching jobs programmatically to processin
 ```python title="Launching Jobs Programmatically"
 from canfar.sessions import Session
 
-# This uses the same authentication from 'canfar auth login'
+# This uses the same Authentication from `canfar login`
 session = Session()
 
 # Launch 100 replicas, each running our processing script
@@ -219,7 +219,7 @@ ids = session.create(
     kind="headless",
     image="skaha/astroml:latest",
     cmd="python",
-    args=["my_script.py"],
+    args="my_script.py",
     replicas=100,
 )
 

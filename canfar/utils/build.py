@@ -16,16 +16,22 @@ def fetch_parameters(
     status: Status | None = None,
     view: View | None = None,
 ) -> dict[str, Any]:
-    """Build parameters for fetching sessions."""
-    values: dict[str, Any] = {
-        key: value
-        for key, value in {"kind": kind, "status": status, "view": view}.items()
-        if value
-    }
+    """Build query parameters for fetching sessions.
+
+    Args:
+        kind: Session kind filter (serialized as ``type``).
+        status: Session status filter.
+        view: View scope filter.
+
+    Returns:
+        dict[str, Any]: Serialized fetch parameters with ``None`` fields omitted.
+    """
     # Kind is an alias for type in the API.
     # It is renamed as kind to avoid conflicts with the built-in type function.
     # by_alias=true, returns, {"type": "headless"} instead of {"kind": "headless"}
-    return FetchRequest(**values).model_dump(exclude_none=True, by_alias=True)
+    return FetchRequest(kind=kind, status=status, view=view).model_dump(
+        exclude_none=True, by_alias=True
+    )
 
 
 def create_parameters(
@@ -40,7 +46,23 @@ def create_parameters(
     env: dict[str, Any] | None = None,
     replicas: int = 1,
 ) -> list[list[tuple[str, Any]]]:
-    """Build parameters for creating sessions."""
+    """Build form-encoded payloads for creating one or more sessions.
+
+    Args:
+        name: Base session name (suffixed per replica when ``replicas`` > 1).
+        image: Container image reference.
+        cores: CPU core count.
+        ram: RAM in gigabytes.
+        kind: Session kind.
+        gpu: GPU count (serialized as ``gpus``).
+        cmd: Container command (headless sessions only).
+        args: Container arguments (headless sessions only).
+        env: Additional environment variables.
+        replicas: Number of session replicas to create.
+
+    Returns:
+        list[list[tuple[str, Any]]]: One tuple payload per replica.
+    """
     specification: CreateRequest = CreateRequest(
         name=name,
         image=image,

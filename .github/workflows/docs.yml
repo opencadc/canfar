@@ -10,10 +10,13 @@ env:
   TAG: ${{ github.event.client_payload.tag_name }}
 
 permissions:
-  contents: write
+  contents: read
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@0080882f6c36860b6ba35c610c98ce87d4e2f26f # v2.10.2

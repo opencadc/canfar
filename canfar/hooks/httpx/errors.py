@@ -17,6 +17,8 @@ This is because:
    empty or incomplete information being logged.
 """
 
+import re
+
 import httpx
 
 from canfar import get_logger
@@ -39,6 +41,24 @@ POOL_ERR_MSG = (
     "Failed to acquire a connection from the pool within the timeout period. "
     "All connections are currently in use."
 )
+_BEARER_TOKEN = re.compile(
+    r"(?P<prefix>\b(?:Authorization\s+)?Bearer\s+)"
+    r"(?P<token>[A-Za-z0-9._~+/=-]+)",
+    re.IGNORECASE,
+)
+
+
+def _request_url(error: httpx.RequestError) -> str:
+    try:
+        request = error.request
+    except RuntimeError:
+        return "unknown"
+    return str(request.url)
+
+
+def _response_text(response: httpx.Response) -> str:
+    text = response.text or "No response body"
+    return _BEARER_TOKEN.sub(r"\g<prefix><redacted>", text)
 
 
 def catch(response: httpx.Response) -> None:
@@ -62,44 +82,60 @@ def catch(response: httpx.Response) -> None:
         response.read()
         response.raise_for_status()
     except httpx.ConnectTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             CONN_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Connect timeout details", exc_info=True)
         raise
     except httpx.ReadTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             READ_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Read timeout details", exc_info=True)
         raise
     except httpx.WriteTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             WRITE_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Write timeout details", exc_info=True)
         raise
     except httpx.PoolTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             POOL_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Pool timeout details", exc_info=True)
         raise
     except httpx.HTTPStatusError as err:
-        log.exception(
+        log.warning(
             "HTTP %d error for %s %s: %s",
             err.response.status_code,
             err.request.method,
             err.request.url,
-            err.response.text if err.response.text else "No response body",
+            _response_text(err.response),
+            exc_info=False,
         )
+        log.debug("HTTP status error details", exc_info=True)
         raise
-    except httpx.RequestError:
-        log.exception("Request Error", stack_info=True, stacklevel=1)
+    except httpx.RequestError as err:
+        log.warning(
+            "Request error for %s: %s",
+            _request_url(err),
+            err,
+            exc_info=False,
+        )
+        log.debug("Request error details", exc_info=True)
         raise
 
 
@@ -124,42 +160,58 @@ async def acatch(response: httpx.Response) -> None:
         await response.aread()
         response.raise_for_status()
     except httpx.ConnectTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             CONN_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Connect timeout details", exc_info=True)
         raise
     except httpx.ReadTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             READ_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Read timeout details", exc_info=True)
         raise
     except httpx.WriteTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             WRITE_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Write timeout details", exc_info=True)
         raise
     except httpx.PoolTimeout as err:
-        log.exception(
+        log.warning(
             "%s URL: %s",
             POOL_ERR_MSG,
-            err.request.url,
+            _request_url(err),
+            exc_info=False,
         )
+        log.debug("Pool timeout details", exc_info=True)
         raise
     except httpx.HTTPStatusError as err:
-        log.exception(
+        log.warning(
             "HTTP %d error for %s %s: %s",
             err.response.status_code,
             err.request.method,
             err.request.url,
-            err.response.text if err.response.text else "No response body",
+            _response_text(err.response),
+            exc_info=False,
         )
+        log.debug("HTTP status error details", exc_info=True)
         raise
-    except httpx.RequestError:
-        log.exception("Request Error", stack_info=True, stacklevel=1)
+    except httpx.RequestError as err:
+        log.warning(
+            "Request error for %s: %s",
+            _request_url(err),
+            err,
+            exc_info=False,
+        )
+        log.debug("Request error details", exc_info=True)
         raise
