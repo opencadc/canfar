@@ -12,6 +12,8 @@ from pydantic import ValidationError
 from rich import box
 from rich.table import Table
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.models.session import FetchResponse
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
@@ -183,4 +185,5 @@ def get_info(
     ] = False,
 ) -> None:
     """Get detailed information about one or more sessions."""
+    maybe_emit_banner(OutputMode.HUMAN)
     asyncio.run(_get_info(session_ids, debug))

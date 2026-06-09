@@ -1,242 +1,145 @@
-# Authentication Guide
+# Authentication and Servers
 
-CANFAR Python Client and CLI are designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic set-up to advanced scenarios.
+CANFAR separates identity from routing:
 
-## Authentication Overview
+- **Authentication** answers "who am I?"
+- **Identity Provider (IDP)** names the organization that authenticates you,
+  such as `cadc` or `srcnet`.
+- **Science Platform Server** is the endpoint that runs Sessions.
+- **Server selection** chooses which compatible Server receives new requests.
 
-CANFAR clients use an **Authentication Context** system to manage connections to different Science Platform servers. This system supports multiple authentication methods and makes it easy to switch between servers.
+`canfar login` handles the full interactive path: choose an IDP, authenticate,
+discover compatible Servers, select one, and save the active pair.
 
-### What is an Authentication Context?
-
-Think of an authentication context (*context* for short) as a saved profile that contains:
-
-- **Server information** (URL, capabilities)
-- **Authentication credentials** (X.509 certificate, OIDC tokens, etc.)
-- **User preferences** for that specific server
-
-When you use CANFAR, one context is always **active**, and all commands and API calls are directed to that server.
-
-### Authentication Methods
-
-CANFAR supports several authentication methods:
-
-!!! info "Authentication Methods"
-    - **X.509 Certificates** - Most common, uses `.pem` certificate files
-    - **OIDC Tokens** - OpenID Connect for modern authentication flows
-    - **Bearer Tokens** - Direct token authentication for API access
-
-!!! tip "Automatic Configuration"
-    CANFAR automatically configures the appropriate authentication method based on the server's capabilities and your configuration.
-
----
-
-## CLI Authentication Management
-
-The CANFAR CLI provides comprehensive commands for managing your authentication contexts.
-
-
-### Initial Login (`canfar auth login`)
-
-The `login` command is your starting point for connecting to any Science Platform server:
+## Log in
 
 ```bash
-canfar auth login
+canfar login
+canfar login cadc
+canfar login srcnet
 ```
 
-**What happens during login:**
+Useful options:
 
-1. **Server Discovery** - Automatically finds available Science Platform servers worldwide
-2. **Server Selection** - Interactive prompt to choose your target server
-3. **Authentication Flow** - Guides you through the server's authentication method
-4. **Context Creation** - Saves your credentials and server configuration
-5. **Activation** - Sets the new context as active for immediate use
+| Option | Use |
+| --- | --- |
+| `--force`, `-f` | Re-authenticate an IDP that already has saved credentials. |
+| `--dev` | Include development Servers during discovery. |
+| `--timeout`, `-t` | Increase HTTP timeout for login, discovery, and validation. |
+| `--debug` | Print debug logs while logging in. |
 
-!!! example "Login Options"
-    ```bash
-    # Basic login with server discovery
-    canfar auth login
+`canfar auth login` still exists as a deprecated compatibility alias. New docs
+and scripts should use `canfar login`.
 
-    # Include development/testing servers
-    canfar auth login --dev
-
-    # Include non-responsive servers in discovery
-    canfar auth login --dead
-
-    # Show detailed server information during selection
-    canfar auth login --details
-
-    # Force re-authentication for existing context
-    canfar auth login --force
-    ```
-
-### Managing Multiple Contexts
-
-Once you have one or more authentication contexts, you can easily manage them:
-
-#### Listing Contexts (`canfar auth list`)
-
-View all your saved authentication contexts:
+## Inspect authentication
 
 ```bash
-canfar auth list
+canfar auth
+canfar auth show
+canfar auth ls
 ```
 
-**Example Output:**
-```
-                  Available Authentication Contexts                  
-                                                                     
-  Active   Name          Auth Mode   Server URL                      
- ─────────────────────────────────────────────────────────────────── 
-    ✅     CADC-CANFAR     x509      https://ws-uv.canfar.net/skaha  
-                                                                     
-           SRCnet-Sweden   oidc      https://services.swesrc.chalmers.se/skaha
-```
+`canfar auth` defaults to `canfar auth show`.
 
-The active context (marked with ✅) determines where your commands are sent.
-
-#### Switching Contexts (`canfar auth switch`)
-
-Switch between your saved contexts safely:
+Use machine output when a script needs stable stdout:
 
 ```bash
-canfar auth switch <CONTEXT_NAME>
+canfar auth show --json
+canfar auth ls --yaml
 ```
 
-!!! example "Switching Examples"
-    ```bash
-    # Switch to a different server
-    canfar auth switch SRCnet-Sweden
-
-    # Switch back to CANFAR
-    canfar auth use CADC-CANFAR
-    ```
-
-All subsequent commands will use the newly active context.
-
-#### Removing Contexts (`canfar auth remove`)
-
-Remove contexts you no longer need:
+## Switch IDP
 
 ```bash
-canfar auth remove <CONTEXT_NAME>
+canfar auth use srcnet
+canfar auth use cadc
 ```
 
-!!! warning "Safety Features"
-    - You cannot remove the currently active context
-    - Switch to a different context first, then remove the unwanted one
-    - Removed contexts cannot be recovered (you'll need to login again)
+When you switch IDP, CANFAR tries to keep routing usable:
 
-#### Purging All Contexts (`canfar auth purge`)
+1. Reuse the current Server when it belongs to the target IDP.
+2. Reuse the remembered Server for that IDP when it is still valid.
+3. Auto-select the only compatible Server.
+4. Prompt when multiple compatible Servers exist.
 
-Remove **all** authentication contexts and credentials:
+## Manage Servers
 
 ```bash
-canfar auth purge
+canfar server ls
+canfar server use canfar
+canfar server use ivo://cadc.nrc.ca/skaha
 ```
 
-!!! danger "Complete Removal"
-    This command permanently deletes:
+Server names are convenient for humans. Server URIs are stable for scripts.
 
-    - All saved authentication contexts
-    - Your entire canfar configuration file (`~/.config/canfar/config.yaml`)
-    - You'll need to login again to use canfar
+`canfar server ls` shows Servers for the active IDP. If no saved Servers exist
+for that IDP, the command runs discovery and stores the results.
 
-**Options:**
+## Remove saved auth state
+
 ```bash
-# Skip confirmation prompt
-canfar auth purge --yes
-
-# Interactive confirmation (default)
-canfar auth purge
+canfar auth rm srcnet
+canfar auth purge --force
 ```
 
----
+`auth rm <idp>` removes the Authentication record and Servers associated with
+that IDP. Removing the active IDP asks for confirmation unless `--force` is
+passed.
 
-## Programmatic Authentication
+`auth purge --force` resets Authentication and Server state while preserving
+unrelated configuration such as console and Container Registry settings.
 
-Once you have authentication contexts set up via the CLI, you can use them programmatically in your Python code.
-
-### Using Active Context
-
-The simplest approach uses your currently active authentication context:
+## Python equivalents
 
 ```python
-from canfar.session import Session
+import canfar
 
-# Uses the active authentication context automatically
-session = Session()
-
-# Check which context is being used
-print(f"Active context: {session.config.active}")
-print(f"Auth Context: {session.config.context}")
+canfar.login("cadc")
+canfar.server.use("ivo://cadc.nrc.ca/skaha")
+canfar.authentication.use("srcnet")
 ```
 
-### Authentication Priority
+Python helpers are noninteractive. CLI commands own prompts and human rendering.
 
-When creating a session, canfar follows this priority order:
+## Configuration
 
-1. **User-provided token** (highest priority)
-2. **User-provided certificate**
-3. **Active authentication context**
-4. **Default certificate location** (`~/.ssl/cadcproxy.pem`)
+The current config shape is versioned with `version: 1`.
 
-```python
-from pathlib import Path
-from pydantic import SecretStr
-from canfar.session import Session
-
-# Priority 1: Direct token (overrides everything)
-session = Session(token=SecretStr("your-bearer-token"))
-
-# Priority 2: Direct certificate (overrides context)
-session = Session(certificate=Path("/path/to/cert.pem"))
-
-# Priority 3: Uses active context (most common)
-session = Session()
+```yaml
+version: 1
+active:
+  authentication: cadc
+  server: ivo://cadc.nrc.ca/skaha
+authentication:
+  - idp: cadc
+    mode: x509
+server:
+  - idp: cadc
+    name: canfar
+    uri: ivo://cadc.nrc.ca/skaha
 ```
 
-## Troubleshooting
-
-### Common Authentication Issues
-
-!!! question "Login Problems"
-
-    **No servers found during discovery**
-
-    - Check your internet connection
-    - Try `canfar auth login --dead` to include non-responsive servers
-    - Verify you're not behind a restrictive firewall
-
-    **Authentication failed**
-
-    - Verify your username and password are correct
-    - Check if your account is active on the Science Platform
-    - Try logging into the web interface first
-
-    **Certificate expired**
-
-    - X.509 certificates typically last 10 days
-    - Run `canfar auth login --force` to refresh
-    - Check expiry with your authentication status code above
-
-!!! question "Context Management Issues"
-
-    **No active context found**
-
-    - Run `canfar auth list` to see available contexts
-    - Use `canfar auth switch <context>` to activate one
-    - If no contexts exist, run `canfar auth login`
-
-    **Cannot remove active context**
-
-    - Switch to a different context first: `canfar auth switch <other>`
-    - Then remove the unwanted context: `canfar auth remove <unwanted>`
-
-### Debug Mode
-
-Enable detailed authentication logging:
+Environment overrides use nested active fields:
 
 ```bash
-# CLI debug mode
-canfar auth login --debug
+CANFAR_ACTIVE__AUTHENTICATION=srcnet
+CANFAR_ACTIVE__SERVER=ivo://example.org/skaha
 ```
+
+Legacy or unsupported config files are backed up to
+`<config-path>.<timestamp>.back` before a default config is written.
+
+## Machine output rules
+
+| Rule | Behavior |
+| --- | --- |
+| Supported flags | `--json` and `--yaml` |
+| Placement | Put the flag after the command that emits data, for example `canfar auth ls --json`. |
+| Unsupported placement | `canfar auth --json ls` exits 2. |
+| Conflicts | `--json --yaml` exits 2. |
+| stdout | Data only in machine mode. |
+| stderr | Diagnostics and errors. |
+| Unsupported commands | Exit 1 with `machine output not supported for this command yet` and `use default human output for now`. |
+
+Lists have no ordering guarantee. Scripts should select by IDP key, URI,
+Session ID, or another stable field.

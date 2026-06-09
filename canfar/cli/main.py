@@ -11,12 +11,16 @@ from canfar.cli.delete import delete
 from canfar.cli.events import events
 from canfar.cli.image import image
 from canfar.cli.info import info
+from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
+from canfar.cli.machine import reset
 from canfar.cli.open import open_command
 from canfar.cli.prune import prune
 from canfar.cli.ps import ps
+from canfar.cli.server import server
 from canfar.cli.stats import stats
 from canfar.cli.version import version
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.utils.console import console
@@ -24,8 +28,9 @@ from canfar.utils.console import console
 
 def callback(ctx: typer.Context) -> None:
     """Main callback that handles no subcommand case."""
+    reset()
+
     if ctx.invoked_subcommand is None:
-        # No subcommand was invoked, show help and exit cleanly
         console.print(ctx.get_help())
         raise typer.Exit(0)
 
@@ -33,7 +38,7 @@ def callback(ctx: typer.Context) -> None:
 cli: typer.Typer = typer.Typer(
     name="canfar",
     help="CANFAR Science Platform",
-    no_args_is_help=False,  # Disable automatic help to handle manually
+    no_args_is_help=False,
     add_completion=True,
     pretty_exceptions_show_locals=True,
     pretty_exceptions_enable=True,
@@ -42,14 +47,33 @@ cli: typer.Typer = typer.Typer(
     rich_markup_mode="rich",
     rich_help_panel="CANFAR CLI Commands",
     callback=callback,
-    invoke_without_command=True,  # Allow callback to be called without subcommand
+    invoke_without_command=True,
     cls=AliasGroup,
 )
+
+register_login_command(cli)
 
 cli.add_typer(
     auth,
     name="auth",
-    help="Authenticate with Science Platform",
+    help="Manage authentication providers.",
+    no_args_is_help=False,
+    rich_help_panel="Auth Management",
+)
+
+cli.add_typer(
+    auth,
+    name="authentication",
+    help="Alias for auth.",
+    no_args_is_help=False,
+    rich_help_panel="Aliases",
+    hidden=True,
+)
+
+cli.add_typer(
+    server,
+    name="server",
+    help="Manage science platform servers.",
     no_args_is_help=True,
     rich_help_panel="Auth Management",
 )
@@ -105,8 +129,6 @@ cli.add_typer(
     rich_help_panel="Session Management",
 )
 
-# Aliases
-
 cli.add_typer(
     create,
     name="run | launch",
@@ -138,7 +160,6 @@ cli.add_typer(
     rich_help_panel="Image Management",
 )
 
-
 cli.add_typer(
     config,
     name="config",
@@ -157,13 +178,19 @@ cli.add_typer(
 
 def main() -> None:
     """Main entry point."""
+    reset()
     try:
         cli()
     except AuthExpiredError as err:
         console.print(err)
-        console.print("Authenticate with [italic cyan] canfar auth login[/italic cyan]")
+        console.print("Authenticate with [italic cyan]canfar login[/italic cyan]")
     except AuthContextError as err:
         console.print(err)
+    except ConfigResetRequiredError as err:
+        console.print(err)
+        raise typer.Exit(1) from err
+    finally:
+        reset()
 
 
 if __name__ == "__main__":

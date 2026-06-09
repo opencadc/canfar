@@ -10,12 +10,31 @@ from pydantic import AnyHttpUrl, AnyUrl
 from canfar.models.auth import (
     OIDC,
     X509,
+    Authentication,
     Client,
     Endpoint,
     Expiry,
     Token,
 )
 from canfar.models.http import Server
+
+
+class TestAuthenticationModel:
+    """Test Authentication domain record."""
+
+    def test_model_dump_includes_null_fields(self) -> None:
+        """Serialization keeps declared null fields for stable machine keys."""
+        record = Authentication(
+            idp="cadc",
+            name="CADC",
+            mode="x509",
+            expiry=None,
+            active=True,
+            server=None,
+        )
+        payload = record.model_dump(mode="json", exclude_none=False)
+        assert set(payload) == {"idp", "name", "mode", "expiry", "active", "server"}
+        assert payload["server"] is None
 
 
 class TestOIDCURLConfig:

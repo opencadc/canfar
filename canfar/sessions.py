@@ -37,7 +37,7 @@ class Session(HTTPClient):
     class and inherits its attributes and methods.
 
     Examples:
-        >>> from canfar.session import Session
+        >>> from canfar.sessions import Session
         >>> session = Session(
                 timeout=120,
                 concurrency=100, # No effect on sync client
@@ -62,7 +62,7 @@ class Session(HTTPClient):
             list[dict[str, str]]: Session[s] information.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.fetch(kind="notebook")
             [{'id': 'ikvp1jtp',
@@ -91,7 +91,7 @@ class Session(HTTPClient):
             Dict[str, Any]: Cluster statistics.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.stats()
             {'cores': {'requestedCPUCores': 377,
@@ -111,7 +111,7 @@ class Session(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
 
         Returns:
-            Dict[str, Any]: Session information.
+            list[dict[str, Any]]: Session information.
 
         Examples:
             >>> session.info(ids="hjko98yghj")
@@ -144,8 +144,8 @@ class Session(HTTPClient):
             Dict[str, str]: Logs in text/plain format.
 
         Examples:
-            >>> session.logs(id="hjko98yghj")
-            >>> session.logs(id=["hjko98yghj", "ikvp1jtp"])
+            >>> session.logs(ids="hjko98yghj")
+            >>> session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
@@ -215,7 +215,7 @@ class Session(HTTPClient):
                 returns an empty list. Does not raise for those errors.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.create(
                     name="test",
@@ -274,7 +274,7 @@ class Session(HTTPClient):
             When verbose is True, the events will be printed to stdout only.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.events(ids="hjko98yghj")
             >>> session.events(ids=["hjko98yghj", "ikvp1jtp"])
@@ -310,10 +310,10 @@ class Session(HTTPClient):
             and a bool indicating if the session was destroyed.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
-            >>> session.destroy(id="hjko98yghj")
-            >>> session.destroy(id=["hjko98yghj", "ikvp1jtp"])
+            >>> session.destroy(ids="hjko98yghj")
+            >>> session.destroy(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
@@ -354,7 +354,7 @@ class Session(HTTPClient):
             This method is useful for destroying multiple sessions at once.
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.destroy_with(prefix="test")  # literal prefix
             >>> session.destroy_with(prefix="desktop$")  # regex
@@ -386,7 +386,7 @@ class Session(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
 
         Examples:
-            >>> from canfar.session import Session
+            >>> from canfar.sessions import Session
             >>> session = Session()
             >>> session.connect(ids="hjko98yghj")
             >>> session.connect(ids=["hjko98yghj", "ikvp1jtp"])
@@ -417,10 +417,9 @@ class AsyncSession(HTTPClient):
     attributes and methods.
 
     Examples:
-        >>> from canfar.session import AsyncSession
+        >>> from canfar.sessions import AsyncSession
         >>> session = AsyncSession(
-                url="https://something.example.com",
-                version="v1",
+                url="https://ws-uv.canfar.net/skaha",
                 token="token",
                 timeout=30,
                 concurrency=100,
@@ -449,7 +448,7 @@ class AsyncSession(HTTPClient):
             list: Sessions information.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
             >>> await session.fetch(kind="notebook")
             [{'id': 'vl91sfzz',
@@ -492,7 +491,7 @@ class AsyncSession(HTTPClient):
             Dict[str, Any]: Cluster statistics.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
             >>> await session.stats()
             {'cores': {'requestedCPUCores': 377,
@@ -513,13 +512,13 @@ class AsyncSession(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
 
         Returns:
-            Dict[str, Any]: Session information.
+            list[dict[str, Any]]: Session information.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.info(session_id="hjko98yghj")
-            >>> await session.info(id=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.info(ids="hjko98yghj")
+            >>> await session.info(ids=["hjko98yghj", "ikvp1jtp"])
         """
         # Convert id to list if it is a string
         if isinstance(ids, str):
@@ -559,10 +558,10 @@ class AsyncSession(HTTPClient):
             Dict[str, str]: Logs in text/plain format.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.logs(id="hjko98yghj")
-            >>> await session.logs(id=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.logs(ids="hjko98yghj")
+            >>> await session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
@@ -641,9 +640,9 @@ class AsyncSession(HTTPClient):
                 returns an empty list. Does not raise for those errors.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> session.create(
+            >>> await session.create(
                     name="test",
                     image='images.canfar.net/skaha/terminal:1.1.1',
                     cores=2,
@@ -712,10 +711,10 @@ class AsyncSession(HTTPClient):
             When verbose is True, the events will be printed to stdout only.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.events(id="hjko98yghj")
-            >>> await session.events(id=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.events(ids="hjko98yghj")
+            >>> await session.events(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
@@ -763,10 +762,10 @@ class AsyncSession(HTTPClient):
             and a bool indicating if the session was destroyed.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
-            >>> await session.destroy(id="hjko98yghj")
-            >>> await session.destroy(id=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.destroy(ids="hjko98yghj")
+            >>> await session.destroy(ids=["hjko98yghj", "ikvp1jtp"])
         """
         if isinstance(ids, str):
             ids = [ids]
@@ -819,7 +818,7 @@ class AsyncSession(HTTPClient):
             This method is useful for destroying multiple sessions at once.
 
         Examples:
-            >>> from canfar.session import AsyncSession
+            >>> from canfar.sessions import AsyncSession
             >>> session = AsyncSession()
             >>> await session.destroy_with(prefix="test")  # literal prefix
             >>> await session.destroy_with(prefix="desktop$")  # regex

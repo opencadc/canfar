@@ -1,0 +1,26 @@
+"""Phase-1 stable dotted error codes for CANFAR CLI and API contracts."""
+
+from __future__ import annotations
+
+from enum import Enum
+
+
+class ErrorCode(str, Enum):
+    """Stable dotted-domain error codes for machine-mode automation.
+
+    Values are contractual; message and hint text may evolve independently.
+    """
+
+    OUTPUT_CONFLICT = "output.conflict"
+    OUTPUT_UNSUPPORTED_MODE = "output.unsupported_mode"
+    AUTHENTICATION_REQUIRED = "authentication.required"
+    AUTHENTICATION_CREDENTIAL_MISSING = "authentication.credential_missing"
+    AUTHENTICATION_EXPIRED = "authentication.expired"
+    AUTHENTICATION_CREDENTIAL_INVALID = "authentication.credential_invalid"
+    SERVER_REQUIRED = "server.required"
+    SERVER_DISCOVERY_FAILED = "server.discovery_failed"
+    SERVER_NONE_AVAILABLE = "server.none_available"
+    CONFIG_INVALID = "config.invalid"
+    CONFIG_LOGIN_REQUIRED_AFTER_RESET = "config.login_required_after_reset"
+    TRANSPORT_FAILURE = "transport.failure"
+    COMMAND_VALIDATION_FAILED = "command.validation_failed"

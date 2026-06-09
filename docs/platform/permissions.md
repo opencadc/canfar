@@ -377,11 +377,11 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
     
     ```bash
     # Login and store authentication token
-    canfar auth login
+    canfar login cadc
     
     # Subsequent commands use stored credentials
     canfar ps
-    canfar launch notebook skaha/astroml:latest
+    canfar create notebook skaha/astroml:latest
     canfar info [session-id]
     ```
     
@@ -420,32 +420,34 @@ CANFAR provides comprehensive REST APIs enabling automation, integration, and cu
 ```python
 from canfar.sessions import Session
 
-# Start authenticated session client
 session = Session()
-
-# Launch computing sessions programmatically
-job = session.launch('notebook', 'skaha/astroml:latest')
+ids = session.create(
+    name="permission-check",
+    image="skaha/astroml:latest",
+    kind="notebook",
+)
 
 # Monitor session status
-status = session.info(job.id)
+status = session.info(ids)
 
 # List all active sessions
-active_sessions = session.list()
+active_sessions = session.fetch()
 ```
 
 **Batch Processing Integration:**
 
 ```python
-# Automated pipeline example
 from canfar.sessions import Session
 
-# Submit batch job with custom parameters
 session = Session()
-job = canfar.launch(
-    image='skaha/astroml:latest',
-    command=['python', 'analysis.py'],
-    cpu=4,
-    memory=8
+job_ids = session.create(
+    name="automated-analysis",
+    image="skaha/astroml:latest",
+    kind="headless",
+    cmd="python",
+    args="analysis.py",
+    cores=4,
+    ram=8,
 )
 ```
 

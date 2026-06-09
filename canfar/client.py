@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import ssl
 from contextlib import asynccontextmanager, contextmanager
+from datetime import datetime, timezone
+from email.utils import formatdate
 from pathlib import Path
-from time import asctime, gmtime
 from typing import TYPE_CHECKING, Any
 
 from httpx import URL, AsyncClient, Client, Limits, Timeout
@@ -46,8 +47,9 @@ class HTTPClient(BaseSettings):
 
     1.  **Runtime Arguments/Environment Variables**: A `token` or `certificate`
         provided at instantiation (e.g., `CANFAR_TOKEN="..."`).
-    2.  **Active Configuration Context**: The context specified by `active_context`
-        in the loaded configuration file.
+    2.  **Active Configuration Context**: Credentials and server from
+        ``active.authentication`` and ``active.server`` in the loaded configuration
+        file.
 
     Raises:
         ValueError: If configuration is invalid.
@@ -94,6 +96,12 @@ class HTTPClient(BaseSettings):
         description="Max concurrent connections for async client.",
         ge=1,
         le=128,
+    )
+    raise_http_errors: bool = Field(
+        default=True,
+        title="Raise HTTP Errors",
+        description="Install response hooks that raise HTTP status errors.",
+        exclude=True,
     )
     loglevel: int | str = Field(
         default="INFO",
@@ -184,7 +192,7 @@ class HTTPClient(BaseSettings):
 
         if self.certificate:
             info = x509.inspect(self.certificate)
-            expiry = {asctime(gmtime(info["expiry"]))}
+            expiry = datetime.fromtimestamp(info["expiry"], tz=timezone.utc).isoformat()
             msg = f"{self.certificate} valid till {expiry}"
             log.debug(msg)
 
@@ -224,7 +232,7 @@ class HTTPClient(BaseSettings):
         """
         if self.url:
             return URL(str(self.url))
-        # Get the active context
+        # Resolve the active legacy auth view from the current Authentication.
         ctx: AuthContext = self.config.context
         if not ctx.server:
             msg = f"Server not found in auth context: {ctx}"
@@ -242,9 +250,10 @@ class HTTPClient(BaseSettings):
         """
         checker = expiry.acheck(self) if asynchronous else expiry.check(self)
         catcher = errors.acatch if asynchronous else errors.catch
+        response_hooks = [catcher] if self.raise_http_errors else []
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
-            "event_hooks": {"request": [checker], "response": [catcher]},
+            "event_hooks": {"request": [checker], "response": response_hooks},
             "base_url": self._get_base_url(),
         }
         # Configure connection pooling for async clients
@@ -283,7 +292,8 @@ class HTTPClient(BaseSettings):
                 kwargs["verify"] = self._get_ssl_context(ctx.path)
             except FileNotFoundError as err:
                 raise AuthContextError(
-                    self.config.active, f"x509 cert {ctx.path} does not exist."
+                    self.config.active.authentication,
+                    f"x509 cert {ctx.path} does not exist.",
                 ) from err
             return kwargs
         return kwargs
@@ -313,7 +323,7 @@ class HTTPClient(BaseSettings):
         headers: dict[str, str] = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
-            "Date": asctime(gmtime()),
+            "Date": formatdate(usegmt=True),
             "User-Agent": f"python-canfar/{__version__}",
         }
 

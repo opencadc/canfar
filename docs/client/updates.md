@@ -54,7 +54,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     :simple-gnubash: **CLI Support**
     
       - Comprehensive CLI support has been added to the client under the `canfar` entry point. See [CLI Reference](../cli/cli-help.md) for more information.
-      - The `canfar` CLI is the recommended way to manage authentication. See [Authentication Contexts](../cli/authentication-contexts.md) for more information.
+      - The `canfar` CLI is the recommended way to manage Authentication and Server selection. See [Authentication and Servers](../cli/authentication-contexts.md) for more information.
     
     **🌎 SRCnet Support**
     
@@ -93,7 +93,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     Canfar now supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
 
     ```python title="Asynchronous Session Creation"
-    from canfar.session import AsyncSession
+    from canfar.sessions import AsyncSession
 
     asession = AsyncSession()
     response = await asession.create(
@@ -121,7 +121,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     The `[Session|AsyncSession].logs` method now prints colored output to `stdout` instead of returning them as a string with `verbose=True` flag.
 
     ```python title="Session Logs"
-    from canfar.session import AsyncSession
+    from canfar.sessions import AsyncSession
 
     asession = AsyncSession()
     await asession.logs(ids=["some-uuid"], verbose=True)
@@ -134,6 +134,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
     session.create(
         name="firefly",
         image="images.canfar.net/skaha/firefly:latest",
+        kind="firefly",
     )
     ```
 
@@ -145,7 +146,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
 
     ```python title="Private Image Registry Configuration"
     from canfar.models import ContainerRegistry
-    from canfar.session import Session
+    from canfar.sessions import Session
 
     registry = ContainerRegistry(username="username", secret="sUp3rS3cr3t")
     session = Session(registry=registry)
@@ -161,7 +162,7 @@ Stay up to date with the latest features, improvements, and changes in CANFAR.
 
     ### **💣 Destroy Sessions**
     ```python title="Destroying Sessions"
-    from canfar.session import Session
+    from canfar.sessions import Session
 
     session = Session()
     session.destroy_with(prefix="test", kind="headless", status="Running")

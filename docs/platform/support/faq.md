@@ -121,16 +121,22 @@ Yes. The Python client supports creating, monitoring, and cleaning up sessions p
 Example:
 ```python
 import time
-from canfar import Session
+from canfar.sessions import Session
 
 session = Session()
-sid = session.launch(name="automated", kind="headless", cmd="python", args=["script.py"])
+ids = session.create(
+    name="automated",
+    image="skaha/astroml:latest",
+    kind="headless",
+    cmd="python",
+    args="script.py",
+)
 
-while session.info(sid)[0]["status"] != "Completed":
+while session.info(ids)[0]["status"] not in {"Succeeded", "Failed", "Error"}:
     time.sleep(60)
 
-session.logs([sid])
-session.destroy([sid])
+session.logs(ids, verbose=True)
+session.destroy(ids)
 ```
 
 ### How do I call the REST API directly?
@@ -147,7 +153,8 @@ job_ids = session.create(
     cores=4,
     ram=16,
     kind="headless",
-    cmd="python /arc/projects/[project]/scripts/analyze.py",
+    cmd="python",
+    args="/arc/projects/[project]/scripts/analyze.py",
 )
 ```
 
@@ -171,7 +178,7 @@ job_ids = session.create(
 - OIDC (SRCNet‑aware):
 
     ```bash
-    canfar auth login
+    canfar login srcnet
     ```
 
 Certificates typically last ~10 days; renew as needed.
@@ -298,7 +305,7 @@ cadc-get-cert -u [username]
 cadc-get-cert --days-valid
 
 # For OIDC authentication
-canfar auth login
+canfar login srcnet
 ```
 
 #### Permission denied errors

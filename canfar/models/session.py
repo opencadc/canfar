@@ -83,20 +83,15 @@ class CreateRequest(BaseModel):
     @field_validator("kind", mode="after")
     @classmethod
     def _validate_kind(cls, value: Kind, context: ValidationInfo) -> Kind:
-        """Validate kind.
+        """Warn when headless-only fields are set on interactive session kinds.
 
         Args:
-            value (Kind): Value to validate.
-            context (ValidationInfo): Class validation context.
+            value: Session kind being validated.
+            context: Pydantic validation context for cross-field checks.
 
         Returns:
-            Kind: Validated value.
+            Kind: Validated session kind.
         """
-        valid: tuple[str] = get_args(Kind)
-        if value not in valid:
-            msg = f"invalid session kind: {value}"
-            raise ValueError(msg)
-
         if value in {"firefly", "desktop"} and (
             context.data.get("cmd")
             or context.data.get("args")

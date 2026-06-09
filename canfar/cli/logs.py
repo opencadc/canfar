@@ -7,6 +7,8 @@ from typing import Annotated
 
 import typer
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
 
@@ -32,6 +34,7 @@ def get_logs(
     ] = False,
 ) -> None:
     """Get logs from the science platform server."""
+    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_logs() -> None:
         log_level = "DEBUG" if debug else "INFO"

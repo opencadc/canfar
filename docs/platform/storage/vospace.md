@@ -668,7 +668,7 @@ for path in test_paths:
         print(f"✗ {path}: {e}")
 ```
 
-## 🔗 Next Steps
+## Related Storage Docs
 
 - **[Data Transfers →](transfers.md)** - Moving data between storage systems
 - **[Filesystem Access →](filesystem.md)** - ARC storage and SSHFS mounting

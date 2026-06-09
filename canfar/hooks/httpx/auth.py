@@ -99,13 +99,18 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.debug("Synchronous OIDC token refresh successful.")
 
             # Create a new context with the updated token
-            data = ctx.model_dump()
-            data["token"]["access"] = token.get_secret_value()
-            data["expiry"]["access"] = jwt.expiry(token.get_secret_value())
-            context = OIDC(**data)
+            access_value = token.get_secret_value()
+            context = ctx.model_copy(
+                update={
+                    "token": ctx.token.model_copy(update={"access": access_value}),
+                    "expiry": ctx.expiry.model_copy(
+                        update={"access": jwt.expiry(access_value)}
+                    ),
+                }
+            )
 
             # Update the configuration and save it
-            client.config.contexts[client.config.active] = context
+            client.config.contexts[client.config.active.authentication] = context
             client.config.save()
             log.debug("Authentication refreshed and configuration saved.")
 
@@ -165,13 +170,18 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
             log.debug("Asynchronous OIDC token refresh successful.")
 
             # Create a new context with the updated token
-            data = ctx.model_dump()
-            data["token"]["access"] = token.get_secret_value()
-            data["expiry"]["access"] = jwt.expiry(token.get_secret_value())
-            context = OIDC(**data)
+            access_value = token.get_secret_value()
+            context = ctx.model_copy(
+                update={
+                    "token": ctx.token.model_copy(update={"access": access_value}),
+                    "expiry": ctx.expiry.model_copy(
+                        update={"access": jwt.expiry(access_value)}
+                    ),
+                }
+            )
 
             # Update the configuration and save it
-            client.config.contexts[client.config.active] = context
+            client.config.contexts[client.config.active.authentication] = context
             client.config.save()
             log.debug("Authentication refreshed and configuration saved.")
 
