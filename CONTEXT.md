@@ -1,6 +1,6 @@
 # CANFAR
 
-CANFAR is a science platform context for authenticated astronomical compute, container images, and user sessions. This glossary names domain concepts only; implementation details live in code and ADRs.
+CANFAR is a science platform for authenticated astronomical compute, Container Images, and user Sessions. This glossary names domain concepts only; implementation details live in code and issue-tracker records.
 
 ## Language
 
@@ -25,12 +25,12 @@ _Avoid_: Auth service, login system
 Domain seam that owns Science Platform Server discovery, selection, and platform metadata.
 _Avoid_: Target service, environment service
 
-**Authentication Context**:
-Saved profile for Authentication state, including selected IDP and authentication method.
-_Avoid_: Account, config, login
+**Authentication Record**:
+Saved Authentication state for one Identity Provider, including credential mode and expiry.
+_Avoid_: Context, account, login
 
 **Authentication Mode**:
-Credential mechanism used by an Authentication Context.
+Credential mechanism used by an Authentication Record.
 _Avoid_: Provider
 
 **Server Selection**:
@@ -66,11 +66,11 @@ _Avoid_: Resource profile, quota
 - A **CANFAR Science Platform** exposes one or more **Science Platform Servers**.
 - An **Identity Provider (IDP)** can support one or more **Science Platform Servers**.
 - **Authentication** and **Platform** are separate seams with independent ownership.
-- An **Authentication Context** belongs to one **Identity Provider (IDP)**.
-- An **Authentication Context** uses one **Authentication Mode**.
+- An **Authentication Record** belongs to one **Identity Provider (IDP)**.
+- An **Authentication Record** uses one **Authentication Mode**.
 - A **Server Selection** belongs to one **Science Platform Server**.
 - A **Server Discovery Scope** constrains candidate **Science Platform Servers** before **Server Selection**.
-- A **Server Selection** and **Authentication Context** together determine where new platform requests go.
+- A **Server Selection** and **Authentication Record** together determine where new platform requests go.
 - A **Session** runs on one **Science Platform Server**.
 - A **Session** has one **Session Kind**.
 - A **Session** starts from one **Container Image**.
@@ -79,9 +79,9 @@ _Avoid_: Resource profile, quota
 
 ## Example dialogue
 
-> **Dev:** "When user switches Authentication Context, does existing Session move?"
-> **Domain expert:** "No. Authentication Context changes active identity for new requests; existing Session remains on the Science Platform Server where it was launched."
+> **Dev:** "When a user switches Authentication, does an existing Session move?"
+> **Domain expert:** "No. Authentication changes active identity for new requests; existing Sessions remain on the Science Platform Server where they were launched."
 
 ## Flagged ambiguities
 
-- "context" can mean Python execution context, config context, or **Authentication Context**. In CANFAR domain docs, use explicit term names and avoid bare "context".
+- "context" can mean Python execution context or legacy config context. In CANFAR domain docs, use explicit term names and avoid bare "context".

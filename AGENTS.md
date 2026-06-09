@@ -30,15 +30,15 @@ Run the full test suite only when a valid CANFAR auth context and certificate ar
 
 ### Issue tracker
 
-Issues and PRDs are tracked in GitHub Issues for `opencadc/canfar`. See `docs/agents/issue-tracker.md`.
+Issues and PRDs are tracked in Jira for the CADC project on `herzberg.atlassian.net`. Use the `CANFAR` label for canfar work. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Use the canonical triage label vocabulary in GitHub. See `docs/agents/triage-labels.md`.
+Use the canonical triage status mapping in Jira. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-This repo uses a single-context domain glossary at root `CONTEXT.md`; ADRs are created lazily under `docs/adr/`. See `docs/agents/domain.md`.
+This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decisions are Jira-first, not ADR/RFC-first. See `docs/agents/domain.md`.
 
 ## Learned User Preferences
 
@@ -51,7 +51,7 @@ This repo uses a single-context domain glossary at root `CONTEXT.md`; ADRs are c
 - Issue tracking for this repo uses Jira on `herzberg.atlassian.net`, CADC project, with `CANFAR` label required for canfar work.
 - PRDs/spec work for this repo is tracked in Jira (for example `CADC-15643`), not in GitHub Issues.
 - Triage is status-based in Jira: `needs-triage` -> To Do, `needs-info` -> On Hold, `ready-for-agent` -> In Progress, `ready-for-human` -> Review, `wontfix` -> On Hold.
-- Domain documentation is multi-context via `CONTEXT-MAP.md` with `client` and `cli` contexts.
+- Domain documentation currently uses root `CONTEXT.md` as the glossary.
 - Specs/decisions are Jira-first; this repo does not keep ADR/RFC directories as the source of truth.
 - `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
 - CLI layout is kubectl-style across domain seams: `canfar auth` (Authentication), `canfar server` (Platform), and `canfar login`.

@@ -48,12 +48,13 @@ Developing astronomy data-processing pipelines for modern, cloud-native platform
     from canfar.sessions import Session
 
     session = Session()
-    session_info = session.create(
+    ids = session.create(
+        name="threaded-pipeline",
         kind="headless",
         image="images.canfar.net/library/pipeline:latest",
         cores=4,
         ram=16,
-        env={"OMP_NUM_THREADS": "4"}
+        env={"OMP_NUM_THREADS": "4"},
     )
     ```
 

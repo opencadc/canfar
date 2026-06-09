@@ -348,27 +348,6 @@ def _resolve_selector(
     return None
 
 
-def _discover_and_merge(
-    config: Configuration,
-    idp: str,
-    *,
-    dev: bool = False,
-    timeout: int = 2,
-) -> None:
-    """Discover servers for ``idp`` and merge them into ``config``.
-
-    Args:
-        config: Configuration to update in place.
-        idp: Canonical IDP key.
-        dev: Include development registries and endpoints during discovery.
-        timeout: HTTP timeout in seconds for discovery requests.
-
-    Raises:
-        ServerDiscoveryError: If registry fetch fails.
-    """
-    discover(idp, config=config, dev=dev, timeout=timeout, save=False)
-
-
 async def _discover_for_idp(
     idp: str,
     *,
@@ -520,7 +499,7 @@ def _validate_server(
     Args:
         server: Candidate server record.
         config: Configuration to use while validating the candidate selection.
-        idp: Authentication Context IDP to pair with the candidate server.
+        idp: Authentication IDP to pair with the candidate server.
         timeout: HTTP timeout in seconds for validation requests.
 
     Returns:

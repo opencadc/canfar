@@ -1,80 +1,91 @@
-# CANFAR Clients
+# Python Client
 
-A powerful Python API and CLI for the CANFAR Science Platform.
+The CANFAR Python client wraps the Science Platform APIs for Sessions,
+Container Images, Authentication-aware HTTP clients, and automation scripts.
 
-=== ":fontawesome-solid-wand-magic-sparkles: Client"
+## Install and authenticate
 
-    !!! example ":material-language-python: API"
+```bash
+pip install canfar --upgrade
+canfar login cadc
+```
 
-        === "`sync`"
+## Core workflows
 
-            ```python
-            from canfar.sessions import Session
+<div class="grid cards" markdown>
 
-            session = Session()
-            ids = session.create(
-                name="test",
-                image="images.canfar.net/skaha/astroml:latest",
-                kind="headless",
-                cmd="env",
-                env={"KEY": "VALUE"},
-                replicas=3,
-            )
-            print(ids)
-            ```
+-   **Create Sessions**
 
-        === "`async`"
+    Launch notebooks, desktops, CARTA, Firefly, contributed apps, or headless
+    jobs.
 
-            ```python
-            from canfar.sessions import AsyncSession
-            
-            session = AsyncSession()
-            ids = await session.create(
-                name="test",
-                image="images.canfar.net/skaha/astroml:latest",
-                kind="headless",
-                cmd="env",
-                env={"KEY": "VALUE"},
-                replicas=3,
-            )
-            print(ids)
-            ```
-        
-        === "`async context`"
+    [:octicons-arrow-right-16: Quickstart](quick-start.md)
 
-            ```python
-            from canfar.sessions import AsyncSession
-            
-            async with AsyncSession() as session:
-                ids = await session.create(
-                    name="test",
-                    image="images.canfar.net/skaha/astroml:latest",
-                    kind="headless",
-                    cmd="env",
-                    env={"KEY": "VALUE"},
-                    replicas=3,
-                )
-                print(ids)
-            ```
+-   **Automate jobs**
 
-    !!! example ":simple-gnubash: CLI"
+    Use `Session` or `AsyncSession` to create, inspect, log, and destroy
+    Sessions from Python.
 
-        ```bash title="Create a Session"
-        canfar launch headless --env KEY=VALUE --replicas 3 images.canfar.net/skaha/astroml:latest 
-        ```
+    [:octicons-arrow-right-16: Examples](examples.md)
 
-=== ":material-download: Download"
+-   **Choose Servers**
 
-    !!! info "Installation"
+    Authenticate with an IDP, select a Science Platform Server, and keep scripts
+    noninteractive.
 
-        ```bash title="Install from PyPI"
-        pip install canfar
-        ```
+    [:octicons-arrow-right-16: Auth and Servers](../cli/authentication-contexts.md)
 
-        ```bash title="Add as Dependency"
-        uv add canfar
-        ```
+-   **Use references**
 
-[:simple-python: Python Client](quick-start.md){: .md-button .md-button--primary }
-[:simple-gnubash: Explore the CLI](../cli/quick-start.md){: .md-button .md-button--primary }
-[:fontawesome-brands-github: Codebase](https://github.com/opencadc/canfar){: .md-button .md-button--primary }
+    Jump to generated API pages for method signatures and model details.
+
+    [:octicons-arrow-right-16: API reference](session.md)
+
+</div>
+
+## Minimal example
+
+```python
+from canfar.sessions import Session
+
+session = Session()
+ids = session.create(
+    kind="notebook",
+    image="images.canfar.net/skaha/astroml:latest",
+    name="my-analysis",
+)
+session.connect(ids)
+```
+
+## Async example
+
+```python
+from canfar.sessions import AsyncSession
+
+async with AsyncSession() as session:
+    ids = await session.create(
+        kind="headless",
+        image="images.canfar.net/skaha/astroml:latest",
+        name="batch-job",
+        cmd="python",
+        args="/arc/projects/demo/run.py",
+    )
+    await session.events(ids, verbose=True)
+```
+
+## Main modules
+
+| Module | Use |
+| --- | --- |
+| `canfar.sessions` | Create, fetch, inspect, connect, log, and destroy Sessions. |
+| `canfar.images` | List and inspect available Container Images. |
+| `canfar.authentication` | Noninteractive Authentication helpers. |
+| `canfar.server` | Server discovery, validation, and selection helpers. |
+| `canfar.client` | Lower-level HTTP client composition. |
+
+## Read next
+
+- [Install and set up](get-started.md)
+- [Python quickstart](quick-start.md)
+- [Examples](examples.md)
+- [Migration guide](migration.md)

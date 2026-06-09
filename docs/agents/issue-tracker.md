@@ -1,23 +1,24 @@
-# Issue Tracker: GitHub
+# Issue Tracker: Jira
 
-Issues and PRDs for this repo live in GitHub Issues for `opencadc/canfar`.
+Issues and PRDs for this repo live in Jira on `herzberg.atlassian.net`.
+Use the CADC project and the `CANFAR` label for canfar work.
 
-Use the `gh` CLI from the repository checkout so the repository is inferred from `git remote -v`.
+Use the Atlassian/Jira connector when available. If it is not available, ask
+for the ticket text instead of creating a parallel GitHub issue.
 
 ## Conventions
 
-- Create issue: `gh issue create --title "..." --body "..."`
-- Read issue: `gh issue view <number> --comments`
-- List issues: `gh issue list --state open --json number,title,body,labels,comments`
-- Comment: `gh issue comment <number> --body "..."`
-- Add label: `gh issue edit <number> --add-label "..."`
-- Remove label: `gh issue edit <number> --remove-label "..."`
-- Close issue: `gh issue close <number> --comment "..."`
+- Project: CADC
+- Required label: `CANFAR`
+- Ticket examples use keys such as `CADC-15643`
+- Specs, PRDs, and implementation decisions are Jira-first
 
 ## Skill Rules
 
-When a skill says "publish to the issue tracker", create a GitHub issue.
+When a skill says "publish to the issue tracker", create or update a Jira
+ticket in the CADC project with the `CANFAR` label.
 
-When a skill says "fetch the relevant ticket", run `gh issue view <number> --comments`.
+When a skill says "fetch the relevant ticket", fetch the Jira issue by key.
 
-Do not use Jira, local markdown, or another tracker for repo work unless the user explicitly overrides this file.
+Do not create GitHub Issues, local markdown tickets, ADRs, or RFCs as the source
+of truth unless the user explicitly overrides this file.

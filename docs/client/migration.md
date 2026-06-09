@@ -56,7 +56,17 @@ This guide helps you migrate from the `skaha` Python package to `canfar`.
 ## Configuration
 
 - The default config file moves from `~/.skaha/config.yaml` to `~/.canfar/config.yaml`.
-- The structure of the YAML file remains the same.
+- Current config files are versioned with `version: 1`.
+- Authentication records and Science Platform Servers are stored separately.
+- Active routing is stored under `active.authentication` and `active.server`.
+- Legacy or unsupported config files are backed up to
+  `<config-path>.<timestamp>.back` before a default config is written.
+
+After a legacy reset, run:
+
+```bash
+canfar login cadc
+```
 
 ## Documentation and links
 
@@ -68,4 +78,3 @@ This guide helps you migrate from the `skaha` Python package to `canfar`.
 
 - Server base path segments under `/skaha` are server-side contracts and remain unchanged (for example, `https://ws-uv.canfar.net/skaha`).
 - Historical header names remain unchanged (for example, `X-Skaha-Authentication-Type`, `X-Skaha-Registry-Auth`).
-

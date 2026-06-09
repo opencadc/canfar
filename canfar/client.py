@@ -230,7 +230,7 @@ class HTTPClient(BaseSettings):
         """
         if self.url:
             return URL(str(self.url))
-        # Get the active context
+        # Resolve the active legacy auth view from the current Authentication.
         ctx: AuthContext = self.config.context
         if not ctx.server:
             msg = f"Server not found in auth context: {ctx}"

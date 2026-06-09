@@ -136,7 +136,7 @@ def with_active_selection(
 
 
 def active_context(config: Configuration) -> AuthContext:
-    """Return the active authentication context in legacy shape."""
+    """Return the active Authentication as a legacy ``AuthContext`` view."""
     credential = get_credential(config, config.active.authentication)
     try:
         server = get_active_server(config)

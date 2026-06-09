@@ -344,7 +344,7 @@ class Configuration(BaseSettings):
 
     @property
     def context(self) -> AuthContext:
-        """Return the active authentication context in legacy shape.
+        """Return the active Authentication as a legacy ``AuthContext`` view.
 
         Returns:
             Legacy ``OIDC`` or ``X509`` model with embedded active server.
@@ -365,7 +365,7 @@ class Configuration(BaseSettings):
 
         Args:
             idp: Canonical identity provider key.
-            context: Legacy authentication context to persist.
+            context: Legacy ``AuthContext`` view to persist.
         """
         from canfar.config.selection import set_legacy_context  # noqa: PLC0415
 

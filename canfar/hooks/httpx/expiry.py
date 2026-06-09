@@ -24,13 +24,13 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
     """
 
     def hook(request: httpx.Request) -> None:  # noqa: ARG001
-        """Check if the authentication context is expired.
+        """Check if the active Authentication credential is expired.
 
         Args:
             request (httpx.Request): The request.
 
         Raises:
-            AuthExpiredError: If the authentication context is expired.
+            AuthExpiredError: If the active Authentication credential is expired.
 
         """
         try:
@@ -58,13 +58,13 @@ def acheck(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     """
 
     async def hook(request: httpx.Request) -> None:  # noqa: ARG001
-        """Check if the authentication context is expired.
+        """Check if the active Authentication credential is expired.
 
         Args:
             request (httpx.Request): The request.
 
         Raises:
-            AuthExpiredError: If the authentication context is expired.
+            AuthExpiredError: If the active Authentication credential is expired.
         """
         try:
             expired = client.config.context.expired

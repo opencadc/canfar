@@ -80,7 +80,7 @@ class TestSyncHook:
 
     @patch("canfar.auth.oidc.sync_refresh")
     def test_skip_if_not_oidc_context(self, mock_refresh, tmp_path) -> None:
-        """Verify the hook does nothing if the active context is not OIDC."""
+        """Verify the hook does nothing if active Authentication is not OIDC."""
         cert_path = tmp_path / "cert.pem"
         generate_cert(cert_path)
         x509_context = X509(

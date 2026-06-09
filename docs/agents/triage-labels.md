@@ -1,13 +1,14 @@
 # Triage Labels
 
-The skills speak in terms of five canonical triage roles. This file maps those roles to exact GitHub label strings used in this repo.
+The skills speak in terms of five canonical triage roles. This file maps those
+roles to Jira statuses used for canfar work.
 
-| Label in mattpocock/skills | Label in GitHub | Meaning |
+| Skill role | Jira status | Meaning |
 | --- | --- | --- |
-| `needs-triage` | `needs-triage` | Maintainer needs to evaluate this issue |
-| `needs-info` | `needs-info` | Waiting on reporter for more information |
-| `ready-for-agent` | `ready-for-agent` | Fully specified, ready for an AFK agent |
-| `ready-for-human` | `ready-for-human` | Requires human implementation |
-| `wontfix` | `wontfix` | Will not be actioned |
+| `needs-triage` | `To Do` | Maintainer needs to evaluate this issue |
+| `needs-info` | `On Hold` | Waiting on reporter for more information |
+| `ready-for-agent` | `In Progress` | Fully specified, ready for an AFK agent |
+| `ready-for-human` | `Review` | Requires human implementation or review |
+| `wontfix` | `On Hold` | Will not be actioned |
 
-Use these exact labels when triaging. Do not create duplicate labels with alternate spellings.
+Use these statuses when triaging. Keep the `CANFAR` Jira label on canfar work.

@@ -197,7 +197,7 @@ def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
 
 
 def test_auth_use_validates_with_selected_idp_before_save(tmp_path: Path) -> None:
-    """``auth use`` validates using the target Authentication Context."""
+    """``auth use`` validates using the target Authentication IDP."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
     captured: dict[str, object] = {}

@@ -1,131 +1,124 @@
-# Installation & Set-up
+# Install and Set Up
 
-This guide covers everything you need to install and start using CANFAR Science Platform servers worldwide.
+Use the CANFAR Python package when you want to automate Science Platform work:
+launch Sessions, list Container Images, fetch logs, inspect state, and clean up
+resources from Python.
 
-!!! tip "New to CANFAR?"
-    If you want to jump right in with a hands-on tutorial, check out our [5-Minute Quick Start](quick-start.md) guide first!
-
-## Prerequisites
-
-Before you can use CANFAR, you need:
-
-- **Python 3.10+** installed on your system
-- **A Science Platform account** - For CANFAR, [request an account with CADC](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-
-## Installation
-
-Install `canfar` using `pip`:
+## Install
 
 ```bash
 pip install canfar --upgrade
 ```
 
-!!! tip "Virtual Environments"
-    We recommend using a virtual environment to avoid conflicts with other packages:
-    ```bash
-    python -m venv canfar-env
-    source canfar-env/bin/activate  # On Windows: canfar-env\Scripts\activate
-    pip install canfar
-    ```
-
-## Authentication Set-up
-
-CANFAR uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI log in command.
-
-### Quick Authentication
-
-To authenticate with a Science Platform server:
+With `uv`:
 
 ```bash
-canfar auth login
+uv add canfar
 ```
 
-This command will:
+## Log in
 
-1. **Discover available servers** worldwide
-2. **Guide you through server selection**
-3. **Handle the authentication process** (X.509 or OIDC)
-4. **Save your credentials** for future use
+Authenticate once from the CLI. Python then uses the active Authentication and
+Server selection.
 
-!!! example "Example Login Flow"
-    ```bash
-    $ canfar auth login
-    Starting Science Platform Login
-    Discovery completed in 2.1s (5/18 active)
+```bash
+canfar login cadc
+```
 
-    Select a server:
-    » 🟢 CANFAR  CADC
-      🟢 Canada  SRCnet
-      🟢 UK-CAM  SRCnet
+For SRCNet:
 
-    X509 Certificate Authentication
-    Username: your-username
-    Password: ***********
-    ✓ Login completed successfully!
-    ```
+```bash
+canfar login srcnet
+```
 
-### Using CANFAR Programmatically
+Force a fresh login when credentials expire or you want to replace saved state:
 
-Once authenticated via CLI, you can use `canfar` in your Python code:
+```bash
+canfar login cadc --force
+```
+
+Check what Python will use:
+
+```bash
+canfar auth show
+canfar server ls
+```
+
+## Create a Session
 
 ```python
-from canfar.session import Session
-from canfar.images import Images
+from canfar.sessions import Session
 
-# Uses your active authentication context
 session = Session()
-images = Images()
-
-# List available images
-container_images = images.fetch()
-print(f"Found {len(container_images)} container images")
-
-# Create a notebook session
-session_info = session.create(
+ids = session.create(
     kind="notebook",
     image="images.canfar.net/skaha/astroml:latest",
     name="my-analysis",
-    cores=2,
-    ram=4
 )
-print(f"Created session: {session_info.id}")
+print(ids)
+```
+
+Open it in your browser:
+
+```python
+session.connect(ids)
+```
+
+## Use fixed resources
+
+Omit resources for flexible allocation. Pass `cores`, `ram`, and `gpus` when
+you need fixed resources.
+
+```python
+ids = session.create(
+    kind="headless",
+    image="images.canfar.net/skaha/astroml:latest",
+    name="batch-job",
+    cmd="python",
+    args="/arc/projects/demo/run.py",
+    cores=4,
+    ram=16,
+)
+```
+
+## Use async workflows
+
+```python
+from canfar.sessions import AsyncSession
+
+async with AsyncSession() as session:
+    ids = await session.create(
+        kind="notebook",
+        image="images.canfar.net/skaha/astroml:latest",
+        name="async-analysis",
+    )
+    await session.connect(ids)
 ```
 
 ## Private Container Images
 
-To access private container images from registries like CANFAR Harbor, provide registry credentials:
+Configure Container Registry credentials when you need private images.
 
 ```python
-from canfar.models import ContainerRegistry
-from canfar.session import Session
+from canfar.models.config import Configuration
+from canfar.models.registry import ContainerRegistry
+from canfar.sessions import Session
 
-# Configure registry access
-registry = ContainerRegistry(
-    username="your-username",
-    password="**************"
+config = Configuration(
+    registry=ContainerRegistry(username="username", secret="CLI_SECRET")
 )
+session = Session(config=config)
 
-# Use with session
-session = Session(registry=registry)
-
-# Now you can use private images
-session_info = session.create(
+ids = session.create(
     kind="notebook",
-    image="images.canfar.net/private/my-image:latest",
-    cores=1,
-    ram=2
+    image="images.canfar.net/my-project/private-image:latest",
+    name="private-image-test",
 )
 ```
 
-!!! info "Registry Credentials"
-    The registry credentials are base64 encoded and passed to the server via the `X-Skaha-Registry-Auth` header.
+## Read next
 
-## Next Steps
-
-Now that you have `canfar` installed and configured:
-
-- [x] Try our [5-Minute Quick Start](quick-start.md) for a hands-on introduction to creating and managing sessions.
-- [x] Learn about [Authentication Contexts](../cli/authentication-contexts.md) for managing multiple servers and advanced authentication scenarios.
-- [x] Explore [Basic Examples](examples.md) and [Advanced Examples](advanced-examples.md) for common use cases.
-- [x] Check out the [Python API Reference](session.md) for detailed documentation of all available methods.
-- [x] Refer to the [FAQ](../platform/support/faq.md) for answers to common questions.
+- [Python quickstart](quick-start.md)
+- [Examples](examples.md)
+- [Authentication and Servers](../cli/authentication-contexts.md)
+- [Session API](session.md)
