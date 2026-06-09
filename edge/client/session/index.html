@@ -635,7 +635,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -1564,6 +1564,8 @@
       
         
       
+        
+      
     
     
     
@@ -1631,6 +1633,34 @@
     
   
     5-Minute Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
   
 
     
@@ -2158,7 +2188,7 @@ class and inherits its attributes and methods.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span>
 <span class="go">        timeout=120,</span>
 <span class="go">        concurrency=100, # No effect on sync client</span>
@@ -2559,7 +2589,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">    class and inherits its attributes and methods.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session(</span>
 <span class="sd">                timeout=120,</span>
 <span class="sd">                concurrency=100, # No effect on sync client</span>
@@ -2584,7 +2614,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            list[dict[str, str]]: Session[s] information.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.fetch(kind=&quot;notebook&quot;)</span>
 <span class="sd">            [{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
@@ -2613,7 +2643,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            Dict[str, Any]: Cluster statistics.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.stats()</span>
 <span class="sd">            {&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>
@@ -2633,7 +2663,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Dict[str, Any]: Session information.</span>
+<span class="sd">            list[dict[str, Any]]: Session information.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; session.info(ids=&quot;hjko98yghj&quot;)</span>
@@ -2666,8 +2696,8 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            Dict[str, str]: Logs in text/plain format.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; session.logs(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.logs(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; session.logs(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; session.logs(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
@@ -2737,7 +2767,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">                returns an empty list. Does not raise for those errors.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.create(</span>
 <span class="sd">                    name=&quot;test&quot;,</span>
@@ -2796,7 +2826,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            When verbose is True, the events will be printed to stdout only.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.events(ids=&quot;hjko98yghj&quot;)</span>
 <span class="sd">            &gt;&gt;&gt; session.events(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
@@ -2832,10 +2862,10 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            and a bool indicating if the session was destroyed.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
@@ -2876,7 +2906,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            This method is useful for destroying multiple sessions at once.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
 <span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
@@ -2908,7 +2938,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.connect(ids=&quot;hjko98yghj&quot;)</span>
 <span class="sd">            &gt;&gt;&gt; session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
@@ -2987,7 +3017,7 @@ class and inherits its attributes and methods.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
@@ -3027,7 +3057,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.connect(ids=&quot;hjko98yghj&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
@@ -3327,7 +3357,7 @@ returns an empty list. Does not raise for those errors.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
 <span class="go">        name=&quot;test&quot;,</span>
@@ -3475,7 +3505,7 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">            returns an empty list. Does not raise for those errors.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.create(</span>
 <span class="sd">                name=&quot;test&quot;,</span>
@@ -3602,10 +3632,10 @@ returns an empty list. Does not raise for those errors.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
 </code></pre></div>
 
 
@@ -3649,10 +3679,10 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">        and a bool indicating if the session was destroyed.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
@@ -3804,7 +3834,7 @@ This method is useful for destroying multiple sessions at once.</li>
 </details>
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># literal prefix</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;desktop$&quot;</span><span class="p">)</span>  <span class="c1"># regex</span>
@@ -3888,7 +3918,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        This method is useful for destroying multiple sessions at once.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
 <span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
@@ -4012,7 +4042,7 @@ This method is useful for destroying multiple sessions at once.</li>
 </details>
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
@@ -4080,7 +4110,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        When verbose is True, the events will be printed to stdout only.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.events(ids=&quot;hjko98yghj&quot;)</span>
 <span class="sd">        &gt;&gt;&gt; session.events(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
@@ -4223,7 +4253,7 @@ This method is useful for destroying multiple sessions at once.</li>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">)</span>
 <span class="go">[{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
@@ -4298,7 +4328,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        list[dict[str, str]]: Session[s] information.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.fetch(kind=&quot;notebook&quot;)</span>
 <span class="sd">        [{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
@@ -4385,7 +4415,7 @@ This method is useful for destroying multiple sessions at once.</li>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>Dict[str, Any]: Session information.</p>
+                <p>list[dict[str, Any]]: Session information.</p>
               </div>
             </td>
           </tr>
@@ -4431,7 +4461,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Dict[str, Any]: Session information.</span>
+<span class="sd">        list[dict[str, Any]]: Session information.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; session.info(ids=&quot;hjko98yghj&quot;)</span>
@@ -4543,8 +4573,8 @@ This method is useful for destroying multiple sessions at once.</li>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
 </code></pre></div>
 
 
@@ -4604,8 +4634,8 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        Dict[str, str]: Logs in text/plain format.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; session.logs(id=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.logs(id=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; session.logs(ids=&quot;hjko98yghj&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; session.logs(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">ids</span><span class="p">]</span>
@@ -4676,7 +4706,7 @@ This method is useful for destroying multiple sessions at once.</li>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
 <span class="go">{&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>
@@ -4713,7 +4743,7 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">        Dict[str, Any]: Cluster statistics.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; from canfar.session import Session</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.stats()</span>
 <span class="sd">        {&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>

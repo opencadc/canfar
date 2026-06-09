@@ -2587,11 +2587,11 @@ setfacl<span class="w"> </span>-R<span class="w"> </span>-m<span class="w"> </sp
 <p><strong>Best for:</strong> Interactive use, development, short-term automation</p>
 <p><strong>Setup:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="c1"># Login and store authentication token</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login
+canfar<span class="w"> </span>login<span class="w"> </span>cadc
 
 <span class="c1"># Subsequent commands use stored credentials</span>
 canfar<span class="w"> </span>ps
-canfar<span class="w"> </span>launch<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
 canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
 </code></pre></div>
 <p><strong>Benefits:</strong>
@@ -2624,29 +2624,31 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
 <p><strong>Session Management:</strong></p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Start authenticated session client</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Launch computing sessions programmatically</span>
-<span class="n">job</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span><span class="s1">&#39;notebook&#39;</span><span class="p">,</span> <span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">)</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;permission-check&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;skaha/astroml:latest&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Monitor session status</span>
-<span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+<span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
 <span class="c1"># List all active sessions</span>
-<span class="n">active_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">list</span><span class="p">()</span>
+<span class="n">active_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
 </code></pre></div>
 <p><strong>Batch Processing Integration:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Automated pipeline example</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Submit batch job with custom parameters</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">job</span> <span class="o">=</span> <span class="n">canfar</span><span class="o">.</span><span class="n">launch</span><span class="p">(</span>
-    <span class="n">image</span><span class="o">=</span><span class="s1">&#39;skaha/astroml:latest&#39;</span><span class="p">,</span>
-    <span class="n">command</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;python&#39;</span><span class="p">,</span> <span class="s1">&#39;analysis.py&#39;</span><span class="p">],</span>
-    <span class="n">cpu</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">memory</span><span class="o">=</span><span class="mi">8</span>
+<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;automated-analysis&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;skaha/astroml:latest&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;analysis.py&quot;</span><span class="p">,</span>
+    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">ram</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <h2 id="common-issues-troubleshooting">🚨 Common Issues &amp; Troubleshooting<a class="headerlink" href="#common-issues-troubleshooting" title="Permanent link">&para;</a></h2>
@@ -2708,7 +2710,7 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 3, 2026 18:48:17 UTC">March 3, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
   </span>
 
     
@@ -2736,14 +2738,19 @@ cadc-get-cert<span class="w"> </span>-u<span class="w"> </span><span class="o">[
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
+          
+          <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

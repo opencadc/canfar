@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#installation-set-up" class="md-skip">
+        <a href="#install-and-set-up" class="md-skip">
           Skip to content
         </a>
       
@@ -635,7 +635,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -910,10 +910,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prerequisites
+        Install
       
     </span>
   </a>
@@ -921,10 +921,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#log-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Log in
       
     </span>
   </a>
@@ -932,10 +932,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-set-up" class="md-nav__link">
+  <a href="#create-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Set-up
+        Create a Session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-fixed-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use fixed resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-async-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use async workflows
       
     </span>
   </a>
@@ -954,10 +976,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#read-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next Steps
+        Read next
       
     </span>
   </a>
@@ -1292,6 +1314,8 @@
       
         
       
+        
+      
     
     
     
@@ -1359,6 +1383,34 @@
     
   
     5-Minute Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
   
 
     
@@ -1701,10 +1753,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#prerequisites" class="md-nav__link">
+  <a href="#install" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Prerequisites
+        Install
       
     </span>
   </a>
@@ -1712,10 +1764,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
+  <a href="#log-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installation
+        Log in
       
     </span>
   </a>
@@ -1723,10 +1775,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-set-up" class="md-nav__link">
+  <a href="#create-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Set-up
+        Create a Session
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-fixed-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use fixed resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#use-async-workflows" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Use async workflows
       
     </span>
   </a>
@@ -1745,10 +1819,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
+  <a href="#read-next" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Next Steps
+        Read next
       
     </span>
   </a>
@@ -1788,117 +1862,92 @@
   
 
 
-<h1 id="installation-set-up">Installation &amp; Set-up<a class="headerlink" href="#installation-set-up" title="Permanent link">&para;</a></h1>
-<p>This guide covers everything you need to install and start using CANFAR Science Platform servers worldwide.</p>
-<div class="admonition tip">
-<p class="admonition-title">New to CANFAR?</p>
-<p>If you want to jump right in with a hands-on tutorial, check out our <a href="../quick-start/">5-Minute Quick Start</a> guide first!</p>
-</div>
-<h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>Before you can use CANFAR, you need:</p>
-<ul>
-<li><strong>Python 3.10+</strong> installed on your system</li>
-<li><strong>A Science Platform account</strong> - For CANFAR, <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">request an account with CADC</a></li>
-</ul>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Install <code>canfar</code> using <code>pip</code>:</p>
+<h1 id="install-and-set-up">Install and Set Up<a class="headerlink" href="#install-and-set-up" title="Permanent link">&para;</a></h1>
+<p>Use the CANFAR Python package when you want to automate Science Platform work:
+launch Sessions, list Container Images, fetch logs, inspect state, and clean up
+resources from Python.</p>
+<h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--upgrade
 </code></pre></div>
-<div class="admonition tip">
-<p class="admonition-title">Virtual Environments</p>
-<p>We recommend using a virtual environment to avoid conflicts with other packages:
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>canfar-env
-<span class="nb">source</span><span class="w"> </span>canfar-env/bin/activate<span class="w">  </span><span class="c1"># On Windows: canfar-env\Scripts\activate</span>
-pip<span class="w"> </span>install<span class="w"> </span>canfar
-</code></pre></div></p>
-</div>
-<h2 id="authentication-set-up">Authentication Set-up<a class="headerlink" href="#authentication-set-up" title="Permanent link">&para;</a></h2>
-<p>CANFAR uses an authentication context system to manage connections to multiple Science Platform servers. The easiest way to get started is with the CLI log in command.</p>
-<h3 id="quick-authentication">Quick Authentication<a class="headerlink" href="#quick-authentication" title="Permanent link">&para;</a></h3>
-<p>To authenticate with a Science Platform server:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
+<p>With <code>uv</code>:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>add<span class="w"> </span>canfar
 </code></pre></div>
-<p>This command will:</p>
-<ol>
-<li><strong>Discover available servers</strong> worldwide</li>
-<li><strong>Guide you through server selection</strong></li>
-<li><strong>Handle the authentication process</strong> (X.509 or OIDC)</li>
-<li><strong>Save your credentials</strong> for future use</li>
-</ol>
-<div class="admonition example">
-<p class="admonition-title">Example Login Flow</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>canfar<span class="w"> </span>auth<span class="w"> </span>login
-Starting<span class="w"> </span>Science<span class="w"> </span>Platform<span class="w"> </span>Login
-Discovery<span class="w"> </span>completed<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="m">2</span>.1s<span class="w"> </span><span class="o">(</span><span class="m">5</span>/18<span class="w"> </span>active<span class="o">)</span>
-
-Select<span class="w"> </span>a<span class="w"> </span>server:
-»<span class="w"> </span>🟢<span class="w"> </span>CANFAR<span class="w">  </span>CADC
-<span class="w">  </span>🟢<span class="w"> </span>Canada<span class="w">  </span>SRCnet
-<span class="w">  </span>🟢<span class="w"> </span>UK-CAM<span class="w">  </span>SRCnet
-
-X509<span class="w"> </span>Certificate<span class="w"> </span>Authentication
-Username:<span class="w"> </span>your-username
-Password:<span class="w"> </span>***********
-✓<span class="w"> </span>Login<span class="w"> </span>completed<span class="w"> </span>successfully!
+<h2 id="log-in">Log in<a class="headerlink" href="#log-in" title="Permanent link">&para;</a></h2>
+<p>Authenticate once from the CLI. Python then uses the active Authentication and
+Server selection.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
-</div>
-<h3 id="using-canfar-programmatically">Using CANFAR Programmatically<a class="headerlink" href="#using-canfar-programmatically" title="Permanent link">&para;</a></h3>
-<p>Once authenticated via CLI, you can use <code>canfar</code> in your Python code:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
+<p>For SRCNet:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet
+</code></pre></div>
+<p>Force a fresh login when credentials expire or you want to replace saved state:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc<span class="w"> </span>--force
+</code></pre></div>
+<p>Check what Python will use:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show
+canfar<span class="w"> </span>server<span class="w"> </span>ls
+</code></pre></div>
+<h2 id="create-a-session">Create a Session<a class="headerlink" href="#create-a-session" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Uses your active authentication context</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
-
-<span class="c1"># List available images</span>
-<span class="n">container_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">container_images</span><span class="p">)</span><span class="si">}</span><span class="s2"> container images&quot;</span><span class="p">)</span>
-
-<span class="c1"># Create a notebook session</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
     <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span>
 <span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created session: </span><span class="si">{</span><span class="n">session_info</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+</code></pre></div>
+<p>Open it in your browser:</p>
+<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="use-fixed-resources">Use fixed resources<a class="headerlink" href="#use-fixed-resources" title="Permanent link">&para;</a></h2>
+<p>Omit resources for flexible allocation. Pass <code>cores</code>, <code>ram</code>, and <code>gpus</code> when
+you need fixed resources.</p>
+<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;batch-job&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
+    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">ram</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<h2 id="use-async-workflows">Use async workflows<a class="headerlink" href="#use-async-workflows" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+
+<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;async-analysis&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="private-container-images">Private Container Images<a class="headerlink" href="#private-container-images" title="Permanent link">&para;</a></h2>
-<p>To access private container images from registries like CANFAR Harbor, provide registry credentials:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<p>Configure Container Registry credentials when you need private images.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="c1"># Configure registry access</span>
-<span class="n">registry</span> <span class="o">=</span> <span class="n">ContainerRegistry</span><span class="p">(</span>
-    <span class="n">username</span><span class="o">=</span><span class="s2">&quot;your-username&quot;</span><span class="p">,</span>
-    <span class="n">password</span><span class="o">=</span><span class="s2">&quot;**************&quot;</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
+    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">)</span>
 <span class="p">)</span>
+<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
 
-<span class="c1"># Use with session</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">registry</span><span class="o">=</span><span class="n">registry</span><span class="p">)</span>
-
-<span class="c1"># Now you can use private images</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/private/my-image:latest&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">2</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/my-project/private-image:latest&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-image-test&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<div class="admonition info">
-<p class="admonition-title">Registry Credentials</p>
-<p>The registry credentials are base64 encoded and passed to the server via the <code>X-Skaha-Registry-Auth</code> header.</p>
-</div>
-<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
-<p>Now that you have <code>canfar</code> installed and configured:</p>
-<ul class="task-list">
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Try our <a href="../quick-start/">5-Minute Quick Start</a> for a hands-on introduction to creating and managing sessions.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Learn about <a href="../../cli/authentication-contexts/">Authentication Contexts</a> for managing multiple servers and advanced authentication scenarios.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Explore <a href="../examples/">Basic Examples</a> and <a href="../advanced-examples/">Advanced Examples</a> for common use cases.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Check out the <a href="../session/">Python API Reference</a> for detailed documentation of all available methods.</li>
-<li class="task-list-item"><label class="task-list-control"><input type="checkbox" disabled checked/><span class="task-list-indicator"></span></label> Refer to the <a href="../../platform/support/faq/">FAQ</a> for answers to common questions.</li>
+<h2 id="read-next">Read next<a class="headerlink" href="#read-next" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../quick-start/">Python quickstart</a></li>
+<li><a href="../examples/">Examples</a></li>
+<li><a href="../../cli/authentication-contexts/">Authentication and Servers</a></li>
+<li><a href="../session/">Session API</a></li>
 </ul>
 
 
@@ -1922,7 +1971,7 @@ Password:<span class="w"> </span>***********
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
   </span>
 
     
@@ -1950,14 +1999,19 @@ Password:<span class="w"> </span>***********
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
+          
+          <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

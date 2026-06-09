@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/cli/cli-help/">
       
       
-        <link rel="prev" href="../quick-start/">
+        <link rel="prev" href="../authentication-contexts/">
       
       
         <link rel="next" href="../../demos/srcnet-workshop/">
@@ -635,7 +635,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -1192,6 +1192,8 @@
       
         
       
+        
+      
     
     
     
@@ -1274,6 +1276,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1337,10 +1367,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#main-command" class="md-nav__link">
+  <a href="#authentication-and-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Main Command
+        Authentication and Servers
       
     </span>
   </a>
@@ -1348,10 +1378,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#sessions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Sessions
       
     </span>
   </a>
@@ -1359,21 +1389,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
+  <a href="#images-and-platform-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Session Management
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-info" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cluster Info
+        Images and platform state
       
     </span>
   </a>
@@ -1384,7 +1403,18 @@
   <a href="#client-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client Configuration
+        Client configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#machine-output-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Machine output contract
       
     </span>
   </a>
@@ -1701,10 +1731,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#main-command" class="md-nav__link">
+  <a href="#authentication-and-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Main Command
+        Authentication and Servers
       
     </span>
   </a>
@@ -1712,10 +1742,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication" class="md-nav__link">
+  <a href="#sessions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication
+        Sessions
       
     </span>
   </a>
@@ -1723,21 +1753,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
+  <a href="#images-and-platform-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Session Management
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cluster-info" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cluster Info
+        Images and platform state
       
     </span>
   </a>
@@ -1748,7 +1767,18 @@
   <a href="#client-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Client Configuration
+        Client configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#machine-output-contract" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Machine output contract
       
     </span>
   </a>
@@ -1789,655 +1819,285 @@
 
 
 <h1 id="cli-reference">CLI Reference<a class="headerlink" href="#cli-reference" title="Permanent link">&para;</a></h1>
-<p>The CLI provides a comprehensive command-line interface for interacting with the CANFAR Science Platform. This reference covers all available commands and their options.</p>
-<div class="admonition info">
-<p class="admonition-title">Getting Started</p>
-<p>The CLI can be accessed using the <code>canfar</code> command in your environment:
+<p>Use <code>canfar</code> for Authentication, Science Platform Server selection, Session
+management, Container Images, and client configuration.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--help
-</code></pre></div></p>
-</div>
-<h2 id="main-command">Main Command<a class="headerlink" href="#main-command" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>COMMAND<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...
 </code></pre></div>
-<p><strong>Description:</strong> Command Line Interface for Science Platform.</p>
-<h3 id="global-options">Global Options<a class="headerlink" href="#global-options" title="Permanent link">&para;</a></h3>
+<h2 id="authentication-and-servers">Authentication and Servers<a class="headerlink" href="#authentication-and-servers" title="Permanent link">&para;</a></h2>
+<h3 id="canfar-login"><code>canfar login</code><a class="headerlink" href="#canfar-login" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>IDP<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
+</code></pre></div>
 <table>
 <thead>
 <tr>
 <th>Option</th>
-<th>Description</th>
+<th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>--install-completion</code></td>
-<td>Install completion for the current shell</td>
-</tr>
-<tr>
-<td><code>--show-completion</code></td>
-<td>Show completion for the current shell, to copy it or customize the installation</td>
-</tr>
-<tr>
-<td><code>--help</code></td>
-<td>Show help message and exit</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition tip">
-<p class="admonition-title">Shell Completion</p>
-<p>Enable shell completion for a better CLI experience by running:
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--install-completion
-</code></pre></div></p>
-</div>
-<hr />
-<h2 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h2>
-<h3 id="canfar-auth"><code>canfar auth</code><a class="headerlink" href="#canfar-auth" title="Permanent link">&para;</a></h3>
-<p>This command group provides tools for managing authentication contexts for connecting to Science Platform servers.</p>
-<h4 id="canfar-auth-login"><code>canfar auth login</code><a class="headerlink" href="#canfar-auth-login" title="Permanent link">&para;</a></h4>
-<p>Login to Science Platform with automatic server discovery.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<p><strong>Description:</strong> This command guides you through the authentication process, automatically discovering the upstream server and choosing the appropriate authentication method based on the server's configuration.</p>
-<h5 id="options">Options<a class="headerlink" href="#options" title="Permanent link">&para;</a></h5>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Type</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--force</code></td>
-<td>Flag</td>
-<td>-</td>
-<td>Force re-authentication</td>
+<td><code>--force</code>, <code>-f</code></td>
+<td>Force re-authentication.</td>
 </tr>
 <tr>
 <td><code>--debug</code></td>
-<td>Flag</td>
-<td>-</td>
-<td>Enable debug logging</td>
-</tr>
-<tr>
-<td><code>--dead</code></td>
-<td>Flag</td>
-<td>-</td>
-<td>Include dead servers in discovery</td>
+<td>Enable debug logging.</td>
 </tr>
 <tr>
 <td><code>--dev</code></td>
-<td>Flag</td>
-<td>-</td>
-<td>Include dev servers in discovery</td>
-</tr>
-<tr>
-<td><code>--details</code></td>
-<td>Flag</td>
-<td>-</td>
-<td>Include server details in discovery</td>
+<td>Include development Servers during discovery.</td>
 </tr>
 <tr>
 <td><code>--timeout</code>, <code>-t</code></td>
-<td>INTEGER</td>
-<td>2</td>
-<td>Timeout for server response</td>
-</tr>
-<tr>
-<td><code>--discovery-url</code></td>
-<td>TEXT</td>
-<td><code>https://ska-iam.stfc.ac.uk/.well-known/openid-configuration</code></td>
-<td>OIDC Discovery URL</td>
+<td>HTTP timeout in seconds during login. Default: <code>2</code>.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition example">
-<p class="admonition-title">Basic Login</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login
+canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>login<span class="w"> </span>srcnet<span class="w"> </span>--force
 </code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Login with Debug Information</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--debug<span class="w"> </span>--details
+<p><code>canfar auth login</code> is a deprecated compatibility alias.</p>
+<h3 id="canfar-auth"><code>canfar auth</code><a class="headerlink" href="#canfar-auth" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth
+canfar<span class="w"> </span>auth<span class="w"> </span>show
+canfar<span class="w"> </span>auth<span class="w"> </span>ls
+canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>IDP
+canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>IDP<span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--force
 </code></pre></div>
-</div>
-<h4 id="canfar-auth-list-canfar-auth-ls"><code>canfar auth list</code> / <code>canfar auth ls</code><a class="headerlink" href="#canfar-auth-list-canfar-auth-ls" title="Permanent link">&para;</a></h4>
-<p>Shows all available authentication contexts.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>list<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<h4 id="canfar-auth-switch-canfar-auth-use"><code>canfar auth switch</code> / <code>canfar auth use</code><a class="headerlink" href="#canfar-auth-switch-canfar-auth-use" title="Permanent link">&para;</a></h4>
-<p>Switch the active authentication context.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>CONTEXT
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>CONTEXT</code> (required): The name of the context to activate</li>
-</ul>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>SRCnet-Sweden
-</code></pre></div>
-</div>
-<h4 id="canfar-auth-remove-canfar-auth-rm"><code>canfar auth remove</code> / <code>canfar auth rm</code><a class="headerlink" href="#canfar-auth-remove-canfar-auth-rm" title="Permanent link">&para;</a></h4>
-<p>Remove a specific authentication context from the configuration.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>remove<span class="w"> </span>CONTEXT
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>CONTEXT</code> (required): The name of the context to remove</li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Permanent Action</p>
-<p>This action permanently removes the authentication context and cannot be undone.</p>
-</div>
-<h4 id="canfar-auth-purge"><code>canfar auth purge</code><a class="headerlink" href="#canfar-auth-purge" title="Permanent link">&para;</a></h4>
-<p>Remove all authentication contexts and credentials from the configuration.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<h5 id="options_1">Options<a class="headerlink" href="#options_1" title="Permanent link">&para;</a></h5>
 <table>
 <thead>
 <tr>
-<th>Option</th>
-<th>Description</th>
+<th>Command</th>
+<th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>--yes</code>, <code>-y</code></td>
-<td>Skip confirmation prompt</td>
+<td><code>auth</code> / <code>auth show</code></td>
+<td>Show active Authentication state.</td>
+</tr>
+<tr>
+<td><code>auth ls</code></td>
+<td>List saved Authentication records.</td>
+</tr>
+<tr>
+<td><code>auth use IDP</code></td>
+<td>Switch active Authentication by canonical IDP key.</td>
+</tr>
+<tr>
+<td><code>auth rm IDP</code></td>
+<td>Remove one Authentication record and its Servers.</td>
+</tr>
+<tr>
+<td><code>auth purge --force</code></td>
+<td>Reset Authentication and Server state.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition danger">
-<p class="admonition-title">Destructive Action</p>
-<p>This command removes ALL authentication contexts. Use with caution!</p>
-</div>
-<hr />
-<h2 id="session-management">Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
+<p>Machine output is supported for <code>auth</code> / <code>auth show</code> and <code>auth ls</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show<span class="w"> </span>--json
+canfar<span class="w"> </span>auth<span class="w"> </span>ls<span class="w"> </span>--yaml
+</code></pre></div>
+<h3 id="canfar-server"><code>canfar server</code><a class="headerlink" href="#canfar-server" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>ls
+canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>SELECTOR
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>server ls</code></td>
+<td>List Servers for the active IDP, discovering them when needed.</td>
+</tr>
+<tr>
+<td><code>server use SELECTOR</code></td>
+<td>Select a Server by name or URI.</td>
+</tr>
+</tbody>
+</table>
+<p>Use URIs in scripts because names can be ambiguous:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>ivo://cadc.nrc.ca/skaha
+</code></pre></div>
+<h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-create"><code>canfar create</code><a class="headerlink" href="#canfar-create" title="Permanent link">&para;</a></h3>
-<p>Create a new session on the Science Platform.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>KIND<span class="w"> </span>IMAGE<span class="w"> </span><span class="o">[</span>--<span class="w"> </span>CMD<span class="w"> </span><span class="o">[</span>ARGS<span class="o">]</span>...<span class="o">]</span>
 </code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Passing Commands &amp; Arguments</p>
-<p><div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/path/to/script.py<span class="w"> </span>--arg1
-</code></pre></div>
-In this example, <code>python3</code> is the command and <code>/path/to/script.py --arg1</code> are the arguments.</p>
-<div class="admonition warning">
-<ul>
-<li>If you need to pass arguments to the command, you must use the <code>--</code> separator.</li>
-<li>If you don’t supply a <code>CMD</code>, the <code>--</code> is not necessary.</li>
-</ul>
-</div>
-</div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>KIND</code> (required): Session type - one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>contributed</code></li>
-<li><code>IMAGE</code> (required): Container image to use</li>
-<li><code>CMD [ARGS]...</code> (optional): Runtime command and arguments</li>
-</ul>
-<h4 id="options_2">Options<a class="headerlink" href="#options_2" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
 <th>Option</th>
 <th>Short</th>
-<th>Type</th>
-<th>Default</th>
-<th>Description</th>
+<th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>--name</code></td>
 <td><code>-n</code></td>
-<td>TEXT</td>
-<td>Auto-generated</td>
-<td>Name of the session</td>
+<td>Session name. Defaults to a generated name.</td>
 </tr>
 <tr>
 <td><code>--cpu</code></td>
 <td><code>-c</code></td>
-<td>INTEGER</td>
-<td>flexible</td>
-<td>Number of CPU cores (optional - uses flexible allocation if not specified)</td>
+<td>Fixed CPU cores. Omit for flexible allocation.</td>
 </tr>
 <tr>
 <td><code>--memory</code></td>
 <td><code>-m</code></td>
-<td>INTEGER</td>
-<td>flexible</td>
-<td>Amount of RAM in GB (optional - uses flexible allocation if not specified)</td>
+<td>Fixed RAM in GB. Omit for flexible allocation.</td>
 </tr>
 <tr>
 <td><code>--gpu</code></td>
 <td><code>-g</code></td>
-<td>INTEGER</td>
-<td>None</td>
-<td>Number of GPUs</td>
+<td>GPU count.</td>
 </tr>
 <tr>
 <td><code>--env</code></td>
 <td><code>-e</code></td>
-<td>TEXT</td>
-<td>None</td>
-<td>Environment variables (e.g., <code>--env KEY=VALUE</code>)</td>
+<td>Environment variable as <code>KEY=VALUE</code>.</td>
 </tr>
 <tr>
 <td><code>--replicas</code></td>
 <td><code>-r</code></td>
-<td>INTEGER</td>
-<td>1</td>
-<td>Number of replicas to create</td>
+<td>Number of replicas. Default: <code>1</code>.</td>
 </tr>
 <tr>
 <td><code>--debug</code></td>
-<td>-</td>
-<td>Flag</td>
-<td>-</td>
-<td>Enable debug logging</td>
+<td></td>
+<td>Enable debug logging.</td>
 </tr>
 <tr>
 <td><code>--dry-run</code></td>
-<td>-</td>
-<td>Flag</td>
-<td>-</td>
-<td>Dry run. Parse parameters and exit</td>
+<td></td>
+<td>Parse parameters and exit.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition example">
-<p class="admonition-title">Create a Flexible Notebook Session (Default)</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Uses flexible resource allocation - adapts to user load</span>
-canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+<p>Examples:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">16</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/demo/run.py
 </code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Create a Fixed Resource Notebook Session</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Uses fixed resource allocation - guaranteed resources</span>
-canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">8</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
-</code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Create a Headless Session with Command &amp; Arguments</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>python3<span class="w"> </span>/path/to/script.py<span class="w"> </span>--arg1<span class="w"> </span>--arg2
-</code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Create Replicated Headless Sessions</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Create 10 headless replicas running the `env` command</span>
-canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>env
-</code></pre></div>
-</div>
-<h4 id="resource-allocation-modes">Resource Allocation Modes<a class="headerlink" href="#resource-allocation-modes" title="Permanent link">&para;</a></h4>
-<p>CANFAR Science Platform supports two resource allocation modes, see <a href="../../platform/concepts/#resource-allocation-modes">platform concepts</a> for more information.</p>
 <h3 id="canfar-ps"><code>canfar ps</code><a class="headerlink" href="#canfar-ps" title="Permanent link">&para;</a></h3>
-<p>Show running sessions.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
 </code></pre></div>
-<h4 id="options_3">Options<a class="headerlink" href="#options_3" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
 <tr>
 <th>Option</th>
 <th>Short</th>
-<th>Type</th>
-<th>Description</th>
+<th>Use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>--all</code></td>
 <td><code>-a</code></td>
-<td>Flag</td>
-<td>Show all sessions (default shows just running)</td>
+<td>Show all Sessions. Default shows running Sessions.</td>
 </tr>
 <tr>
 <td><code>--quiet</code></td>
 <td><code>-q</code></td>
-<td>Flag</td>
-<td>Only show session IDs</td>
+<td>Print only Session IDs.</td>
 </tr>
 <tr>
 <td><code>--kind</code></td>
 <td><code>-k</code></td>
-<td>Choice</td>
-<td>Filter by session kind: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code></td>
+<td>Filter by Session Kind.</td>
 </tr>
 <tr>
 <td><code>--status</code></td>
 <td><code>-s</code></td>
-<td>Choice</td>
-<td>Filter by status: <code>Pending</code>, <code>Running</code>, <code>Terminating</code>, <code>Succeeded</code>, <code>Error</code>, <code>Failed</code></td>
+<td>Filter by status.</td>
 </tr>
 <tr>
 <td><code>--debug</code></td>
-<td>-</td>
-<td>Flag</td>
-<td>Enable debug logging</td>
+<td></td>
+<td>Enable debug logging.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition example">
-<p class="admonition-title">List All Sessions</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--all
+<p>Machine output:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--json
+canfar<span class="w"> </span>ps<span class="w"> </span>--yaml
 </code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">List Only Notebook Sessions</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--kind<span class="w"> </span>notebook
+<p><code>--quiet</code> is a human-output shortcut and is incompatible with machine output.</p>
+<h3 id="inspect-and-clean-up">Inspect and clean up<a class="headerlink" href="#inspect-and-clean-up" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID...
+canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID...
+canfar<span class="w"> </span>logs<span class="w"> </span>SESSION_ID...
+canfar<span class="w"> </span>open<span class="w"> </span>SESSION_ID...
+canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID...<span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
+canfar<span class="w"> </span>prune<span class="w"> </span>PREFIX<span class="w"> </span><span class="o">[</span>KIND<span class="o">]</span><span class="w"> </span><span class="o">[</span>STATUS<span class="o">]</span>
 </code></pre></div>
-</div>
-<h3 id="canfar-events"><code>canfar events</code><a class="headerlink" href="#canfar-events" title="Permanent link">&para;</a></h3>
-<p>Show session events for debugging and monitoring.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
+<p>Common flow:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
+canfar<span class="w"> </span>info<span class="w"> </span><span class="k">$(</span>canfar<span class="w"> </span>ps<span class="w"> </span>-q<span class="k">)</span>
+canfar<span class="w"> </span>open<span class="w"> </span><span class="k">$(</span>canfar<span class="w"> </span>ps<span class="w"> </span>-q<span class="k">)</span>
+canfar<span class="w"> </span>delete<span class="w"> </span><span class="k">$(</span>canfar<span class="w"> </span>ps<span class="w"> </span>-q<span class="k">)</span>
 </code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
-</ul>
-<h4 id="options_4">Options<a class="headerlink" href="#options_4" title="Permanent link">&para;</a></h4>
+<h2 id="images-and-platform-state">Images and platform state<a class="headerlink" href="#images-and-platform-state" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>image<span class="w"> </span>ls
+canfar<span class="w"> </span>stats
+</code></pre></div>
+<p>Use <code>canfar image --help</code> and <code>canfar stats --help</code> for command-specific
+options.</p>
+<h2 id="client-configuration">Client configuration<a class="headerlink" href="#client-configuration" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>show
+canfar<span class="w"> </span>config<span class="w"> </span>path
+canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>console.width
+canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>console.width<span class="w"> </span><span class="m">132</span>
+canfar<span class="w"> </span>version
+canfar<span class="w"> </span>version<span class="w"> </span>--debug
+</code></pre></div>
+<p><code>config set</code> parses values as YAML.</p>
+<h2 id="machine-output-contract">Machine output contract<a class="headerlink" href="#machine-output-contract" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Option</th>
-<th>Description</th>
+<th>Rule</th>
+<th>Behavior</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging</td>
+<td>Flags</td>
+<td><code>--json</code> or <code>--yaml</code>.</td>
+</tr>
+<tr>
+<td>Placement</td>
+<td>Put the flag after the command, for example <code>canfar ps --json</code>.</td>
+</tr>
+<tr>
+<td>Conflict</td>
+<td><code>--json --yaml</code> exits 2.</td>
+</tr>
+<tr>
+<td>stdout</td>
+<td>Data payload only.</td>
+</tr>
+<tr>
+<td>stderr</td>
+<td>Diagnostics and errors.</td>
+</tr>
+<tr>
+<td>Unsupported command</td>
+<td>Exits 1 with a clear unsupported-machine-output message.</td>
+</tr>
+<tr>
+<td>Ordering</td>
+<td>List ordering is not guaranteed.</td>
 </tr>
 </tbody>
 </table>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span>abc123<span class="w"> </span>def456
-</code></pre></div>
-</div>
-<h3 id="canfar-info"><code>canfar info</code><a class="headerlink" href="#canfar-info" title="Permanent link">&para;</a></h3>
-<p>Show detailed information about sessions.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
-</ul>
-<h4 id="options_5">Options<a class="headerlink" href="#options_5" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>info<span class="w"> </span>abc123
-</code></pre></div>
-</div>
-<h3 id="canfar-open"><code>canfar open</code><a class="headerlink" href="#canfar-open" title="Permanent link">&para;</a></h3>
-<p>Open sessions in a web browser.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>open<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
-</ul>
-<h4 id="options_6">Options<a class="headerlink" href="#options_6" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition tip">
-<p class="admonition-title">Browser Integration</p>
-<p>This command automatically opens the session URLs in your default web browser.</p>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>open<span class="w"> </span>abc123<span class="w"> </span>def456
-</code></pre></div>
-</div>
-<h3 id="canfar-logs"><code>canfar logs</code><a class="headerlink" href="#canfar-logs" title="Permanent link">&para;</a></h3>
-<p>Show session logs for troubleshooting.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>SESSION_IDS...</code> (required): One or more session IDs</li>
-</ul>
-<h4 id="options_7">Options<a class="headerlink" href="#options_7" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span>abc123
-</code></pre></div>
-</div>
-<h3 id="canfar-delete"><code>canfar delete</code><a class="headerlink" href="#canfar-delete" title="Permanent link">&para;</a></h3>
-<p>Delete one or more sessions.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>SESSION_IDS...
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>SESSION_IDS...</code> (required): One or more session IDs to delete</li>
-</ul>
-<h4 id="options_8">Options<a class="headerlink" href="#options_8" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Short</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--force</code></td>
-<td><code>-f</code></td>
-<td>Force deletion without confirmation</td>
-</tr>
-<tr>
-<td><code>--debug</code></td>
-<td>-</td>
-<td>Enable debug logging</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition warning">
-<p class="admonition-title">Permanent Action</p>
-<p>Deleted sessions cannot be recovered. Use <code>--force</code> to skip confirmation prompts.</p>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Delete with Confirmation</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>abc123
-</code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Force Delete Multiple Sessions</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>abc123<span class="w"> </span>def456<span class="w"> </span>--force
-</code></pre></div>
-</div>
-<h3 id="canfar-prune"><code>canfar prune</code><a class="headerlink" href="#canfar-prune" title="Permanent link">&para;</a></h3>
-<p>Prune sessions by criteria for bulk cleanup.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>PREFIX<span class="w"> </span>KIND<span class="w"> </span>STATUS
-</code></pre></div>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>PREFIX</code> (required): Prefix to match session names; regex is used if metacharacters are present</li>
-<li><code>KIND</code> (optional): Session kind - default: <code>headless</code> (one of: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code>)</li>
-<li><code>STATUS</code> (optional): Session status - default: <code>Succeeded</code> (one of: <code>Pending</code>, <code>Running</code>, <code>Terminating</code>, <code>Succeeded</code>, <code>Error</code>, <code>Failed</code>)</li>
-</ul>
-<h4 id="options_9">Options<a class="headerlink" href="#options_9" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Short</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code></td>
-<td>-</td>
-<td>Enable debug logging</td>
-</tr>
-<tr>
-<td><code>--help</code></td>
-<td><code>-h</code></td>
-<td>Show help message and exit</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition example">
-<p class="admonition-title">Prune Completed Headless Sessions</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="s2">&quot;test-&quot;</span><span class="w"> </span>headless<span class="w"> </span>Running
-canfar<span class="w"> </span>prune<span class="w"> </span><span class="s2">&quot;.*-was-&quot;</span><span class="w"> </span>notebook<span class="w"> </span>Running<span class="w">  </span><span class="c1"># regex because of metacharacters</span>
-</code></pre></div>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Bulk Cleanup</p>
-<p>Use prune to clean up multiple sessions that match specific criteria, especially useful for automated workflows.</p>
-</div>
-<hr />
-<h2 id="cluster-info">Cluster Info<a class="headerlink" href="#cluster-info" title="Permanent link">&para;</a></h2>
-<h3 id="canfar-stats"><code>canfar stats</code><a class="headerlink" href="#canfar-stats" title="Permanent link">&para;</a></h3>
-<p>Show cluster statistics and resource usage.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<h4 id="options_10">Options<a class="headerlink" href="#options_10" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats
-</code></pre></div>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Resource Monitoring</p>
-<p>This command provides insights into cluster resource usage, helping you understand available capacity.</p>
-</div>
-<hr />
-<h2 id="client-configuration">Client Configuration<a class="headerlink" href="#client-configuration" title="Permanent link">&para;</a></h2>
-<h3 id="canfar-config"><code>canfar config</code><a class="headerlink" href="#canfar-config" title="Permanent link">&para;</a></h3>
-<p>Manage client configuration settings.</p>
-<h4 id="canfar-config-show-canfar-config-list-canfar-config-ls"><code>canfar config show</code> / <code>canfar config list</code> / <code>canfar config ls</code><a class="headerlink" href="#canfar-config-show-canfar-config-list-canfar-config-ls" title="Permanent link">&para;</a></h4>
-<p>Display the current configuration.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>show<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>ls
-</code></pre></div>
-</div>
-<h4 id="canfar-config-path"><code>canfar config path</code><a class="headerlink" href="#canfar-config-path" title="Permanent link">&para;</a></h4>
-<p>Display the path to the configuration file.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>path<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>path
-</code></pre></div>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Configuration Location</p>
-<p>Use this command to find where your configuration file is stored for manual editing if needed.</p>
-</div>
-<h4 id="canfar-config-get"><code>canfar config get</code><a class="headerlink" href="#canfar-config-get" title="Permanent link">&para;</a></h4>
-<p>Get a single configuration value by dotted path.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>PATH
-</code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>console.width
-</code></pre></div>
-</div>
-<h4 id="canfar-config-set"><code>canfar config set</code><a class="headerlink" href="#canfar-config-set" title="Permanent link">&para;</a></h4>
-<p>Set a single configuration value by dotted path (value is parsed as YAML).</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>PATH<span class="w"> </span>VALUE
-</code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Example</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>console.width<span class="w"> </span><span class="m">130</span>
-</code></pre></div>
-</div>
-<h3 id="canfar-version"><code>canfar version</code><a class="headerlink" href="#canfar-version" title="Permanent link">&para;</a></h3>
-<p>View client version and system information.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>version<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
-</code></pre></div>
-<h4 id="options_11">Options<a class="headerlink" href="#options_11" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Option</th>
-<th>Default</th>
-<th>Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>--debug</code> / <code>--no-debug</code></td>
-<td><code>--no-debug</code></td>
-<td>Show detailed information for bug reports</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition example">
-<p class="admonition-title">Basic Version Info</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>version
-</code></pre></div>
-</div>
-<div class="admonition example">
-<p class="admonition-title">Detailed Debug Information</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>version<span class="w"> </span>--debug
-</code></pre></div>
-</div>
 
 
 
@@ -2460,7 +2120,7 @@ canfar<span class="w"> </span>prune<span class="w"> </span><span class="s2">&quo
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="December 16, 2025 21:08:59 UTC">December 16, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
   </span>
 
     

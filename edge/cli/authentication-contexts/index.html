@@ -15,10 +15,10 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/cli/authentication-contexts/">
       
       
-        <link rel="prev" href="../../client/home/">
+        <link rel="prev" href="../quick-start/">
       
       
-        <link rel="next" href="../../client/updates/">
+        <link rel="next" href="../cli-help/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>Authentication - CANFAR</title>
+        <title>Authentication and Servers - CANFAR</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#authentication-guide" class="md-skip">
+        <a href="#authentication-and-servers" class="md-skip">
           Skip to content
         </a>
       
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Authentication
+              Authentication and Servers
             
           </span>
         </div>
@@ -644,7 +644,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -662,7 +662,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -688,10 +688,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication-overview" class="md-nav__link">
+  <a href="#log-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Overview
+        Log in
       
     </span>
   </a>
@@ -699,10 +699,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli-authentication-management" class="md-nav__link">
+  <a href="#inspect-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI Authentication Management
+        Inspect authentication
       
     </span>
   </a>
@@ -710,10 +710,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#programmatic-authentication" class="md-nav__link">
+  <a href="#switch-idp" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Programmatic Authentication
+        Switch IDP
       
     </span>
   </a>
@@ -721,10 +721,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#manage-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Manage Servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-saved-auth-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove saved auth state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-equivalents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python equivalents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#machine-output-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Machine output rules
       
     </span>
   </a>
@@ -1272,8 +1316,10 @@
                 
   
   
+    
   
   
+  
     
     
       
@@ -1281,27 +1327,27 @@
       
         
       
-    
-    
-    
-      
-      
-        
-          
-          
         
       
     
     
-      
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
-        
+      
         
           
+          
         
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_7" >
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_7" checked>
         
           
           <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="">
@@ -1322,7 +1368,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_3_7">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1356,6 +1402,169 @@
   
 
       </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#log-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Log in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inspect-authentication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inspect authentication
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#switch-idp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Switch IDP
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#manage-servers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Manage Servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-saved-auth-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove saved auth state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-equivalents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python equivalents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#machine-output-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Machine output rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1690,10 +1899,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#authentication-overview" class="md-nav__link">
+  <a href="#log-in" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Overview
+        Log in
       
     </span>
   </a>
@@ -1701,10 +1910,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#cli-authentication-management" class="md-nav__link">
+  <a href="#inspect-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CLI Authentication Management
+        Inspect authentication
       
     </span>
   </a>
@@ -1712,10 +1921,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#programmatic-authentication" class="md-nav__link">
+  <a href="#switch-idp" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Programmatic Authentication
+        Switch IDP
       
     </span>
   </a>
@@ -1723,10 +1932,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#manage-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Manage Servers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remove-saved-auth-state" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remove saved auth state
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#python-equivalents" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Python equivalents
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#machine-output-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Machine output rules
       
     </span>
   </a>
@@ -1766,204 +2019,158 @@
   
 
 
-<h1 id="authentication-guide">Authentication Guide<a class="headerlink" href="#authentication-guide" title="Permanent link">&para;</a></h1>
-<p>CANFAR Python Client and CLI are designed to connect to multiple Science Platform servers around the world. This guide covers everything you need to know about authentication, from basic set-up to advanced scenarios.</p>
-<h2 id="authentication-overview">Authentication Overview<a class="headerlink" href="#authentication-overview" title="Permanent link">&para;</a></h2>
-<p>CANFAR clients use an <strong>Authentication Context</strong> system to manage connections to different Science Platform servers. This system supports multiple authentication methods and makes it easy to switch between servers.</p>
-<h3 id="what-is-an-authentication-context">What is an Authentication Context?<a class="headerlink" href="#what-is-an-authentication-context" title="Permanent link">&para;</a></h3>
-<p>Think of an authentication context (<em>context</em> for short) as a saved profile that contains:</p>
+<h1 id="authentication-and-servers">Authentication and Servers<a class="headerlink" href="#authentication-and-servers" title="Permanent link">&para;</a></h1>
+<p>CANFAR separates identity from routing:</p>
 <ul>
-<li><strong>Server information</strong> (URL, capabilities)</li>
-<li><strong>Authentication credentials</strong> (X.509 certificate, OIDC tokens, etc.)</li>
-<li><strong>User preferences</strong> for that specific server</li>
+<li><strong>Authentication</strong> answers "who am I?"</li>
+<li><strong>Identity Provider (IDP)</strong> names the organization that authenticates you,
+  such as <code>cadc</code> or <code>srcnet</code>.</li>
+<li><strong>Science Platform Server</strong> is the endpoint that runs Sessions.</li>
+<li><strong>Server selection</strong> chooses which compatible Server receives new requests.</li>
 </ul>
-<p>When you use CANFAR, one context is always <strong>active</strong>, and all commands and API calls are directed to that server.</p>
-<h3 id="authentication-methods">Authentication Methods<a class="headerlink" href="#authentication-methods" title="Permanent link">&para;</a></h3>
-<p>CANFAR supports several authentication methods:</p>
-<div class="admonition info">
-<p class="admonition-title">Authentication Methods</p>
-<ul>
-<li><strong>X.509 Certificates</strong> - Most common, uses <code>.pem</code> certificate files</li>
-<li><strong>OIDC Tokens</strong> - OpenID Connect for modern authentication flows</li>
-<li><strong>Bearer Tokens</strong> - Direct token authentication for API access</li>
-</ul>
-</div>
-<div class="admonition tip">
-<p class="admonition-title">Automatic Configuration</p>
-<p>CANFAR automatically configures the appropriate authentication method based on the server's capabilities and your configuration.</p>
-</div>
-<hr />
-<h2 id="cli-authentication-management">CLI Authentication Management<a class="headerlink" href="#cli-authentication-management" title="Permanent link">&para;</a></h2>
-<p>The CANFAR CLI provides comprehensive commands for managing your authentication contexts.</p>
-<h3 id="initial-login-canfar-auth-login">Initial Login (<code>canfar auth login</code>)<a class="headerlink" href="#initial-login-canfar-auth-login" title="Permanent link">&para;</a></h3>
-<p>The <code>login</code> command is your starting point for connecting to any Science Platform server:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>login
+<p><code>canfar login</code> handles the full interactive path: choose an IDP, authenticate,
+discover compatible Servers, select one, and save the active pair.</p>
+<h2 id="log-in">Log in<a class="headerlink" href="#log-in" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login
+canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>login<span class="w"> </span>srcnet
 </code></pre></div>
-<p><strong>What happens during login:</strong></p>
+<p>Useful options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--force</code>, <code>-f</code></td>
+<td>Re-authenticate an IDP that already has saved credentials.</td>
+</tr>
+<tr>
+<td><code>--dev</code></td>
+<td>Include development Servers during discovery.</td>
+</tr>
+<tr>
+<td><code>--timeout</code>, <code>-t</code></td>
+<td>Increase HTTP timeout for login, discovery, and validation.</td>
+</tr>
+<tr>
+<td><code>--debug</code></td>
+<td>Print debug logs while logging in.</td>
+</tr>
+</tbody>
+</table>
+<p><code>canfar auth login</code> still exists as a deprecated compatibility alias. New docs
+and scripts should use <code>canfar login</code>.</p>
+<h2 id="inspect-authentication">Inspect authentication<a class="headerlink" href="#inspect-authentication" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth
+canfar<span class="w"> </span>auth<span class="w"> </span>show
+canfar<span class="w"> </span>auth<span class="w"> </span>ls
+</code></pre></div>
+<p><code>canfar auth</code> defaults to <code>canfar auth show</code>.</p>
+<p>Use machine output when a script needs stable stdout:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show<span class="w"> </span>--json
+canfar<span class="w"> </span>auth<span class="w"> </span>ls<span class="w"> </span>--yaml
+</code></pre></div>
+<h2 id="switch-idp">Switch IDP<a class="headerlink" href="#switch-idp" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>srcnet
+canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>cadc
+</code></pre></div>
+<p>When you switch IDP, CANFAR tries to keep routing usable:</p>
 <ol>
-<li><strong>Server Discovery</strong> - Automatically finds available Science Platform servers worldwide</li>
-<li><strong>Server Selection</strong> - Interactive prompt to choose your target server</li>
-<li><strong>Authentication Flow</strong> - Guides you through the server's authentication method</li>
-<li><strong>Context Creation</strong> - Saves your credentials and server configuration</li>
-<li><strong>Activation</strong> - Sets the new context as active for immediate use</li>
+<li>Reuse the current Server when it belongs to the target IDP.</li>
+<li>Reuse the remembered Server for that IDP when it is still valid.</li>
+<li>Auto-select the only compatible Server.</li>
+<li>Prompt when multiple compatible Servers exist.</li>
 </ol>
-<div class="admonition example">
-<p class="admonition-title">Login Options</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Basic login with server discovery</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login
-
-<span class="c1"># Include development/testing servers</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--dev
-
-<span class="c1"># Include non-responsive servers in discovery</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--dead
-
-<span class="c1"># Show detailed server information during selection</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--details
-
-<span class="c1"># Force re-authentication for existing context</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--force
+<h2 id="manage-servers">Manage Servers<a class="headerlink" href="#manage-servers" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>ls
+canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>canfar
+canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>ivo://cadc.nrc.ca/skaha
 </code></pre></div>
-</div>
-<h3 id="managing-multiple-contexts">Managing Multiple Contexts<a class="headerlink" href="#managing-multiple-contexts" title="Permanent link">&para;</a></h3>
-<p>Once you have one or more authentication contexts, you can easily manage them:</p>
-<h4 id="listing-contexts-canfar-auth-list">Listing Contexts (<code>canfar auth list</code>)<a class="headerlink" href="#listing-contexts-canfar-auth-list" title="Permanent link">&para;</a></h4>
-<p>View all your saved authentication contexts:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>list
+<p>Server names are convenient for humans. Server URIs are stable for scripts.</p>
+<p><code>canfar server ls</code> shows Servers for the active IDP. If no saved Servers exist
+for that IDP, the command runs discovery and stores the results.</p>
+<h2 id="remove-saved-auth-state">Remove saved auth state<a class="headerlink" href="#remove-saved-auth-state" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet
+canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--force
 </code></pre></div>
-<p><strong>Example Output:</strong>
-<div class="highlight"><pre><span></span><code>                  Available Authentication Contexts                  
+<p><code>auth rm &lt;idp&gt;</code> removes the Authentication record and Servers associated with
+that IDP. Removing the active IDP asks for confirmation unless <code>--force</code> is
+passed.</p>
+<p><code>auth purge --force</code> resets Authentication and Server state while preserving
+unrelated configuration such as console and Container Registry settings.</p>
+<h2 id="python-equivalents">Python equivalents<a class="headerlink" href="#python-equivalents" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
 
-  Active   Name          Auth Mode   Server URL                      
- ─────────────────────────────────────────────────────────────────── 
-    ✅     CADC-CANFAR     x509      https://ws-uv.canfar.net/skaha  
-
-           SRCnet-Sweden   oidc      https://services.swesrc.chalmers.se/skaha
-</code></pre></div></p>
-<p>The active context (marked with ✅) determines where your commands are sent.</p>
-<h4 id="switching-contexts-canfar-auth-switch">Switching Contexts (<code>canfar auth switch</code>)<a class="headerlink" href="#switching-contexts-canfar-auth-switch" title="Permanent link">&para;</a></h4>
-<p>Switch between your saved contexts safely:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>&lt;CONTEXT_NAME&gt;
+<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;cadc&quot;</span><span class="p">)</span>
+<span class="n">canfar</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ivo://cadc.nrc.ca/skaha&quot;</span><span class="p">)</span>
+<span class="n">canfar</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
 </code></pre></div>
-<div class="admonition example">
-<p class="admonition-title">Switching Examples</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Switch to a different server</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>switch<span class="w"> </span>SRCnet-Sweden
-
-<span class="c1"># Switch back to CANFAR</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>CADC-CANFAR
+<p>Python helpers are noninteractive. CLI commands own prompts and human rendering.</p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>The current config shape is versioned with <code>version: 1</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="nt">active</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
+<span class="w">  </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
+<span class="nt">authentication</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
+<span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">x509</span>
+<span class="nt">server</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canfar</span>
+<span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
 </code></pre></div>
-</div>
-<p>All subsequent commands will use the newly active context.</p>
-<h4 id="removing-contexts-canfar-auth-remove">Removing Contexts (<code>canfar auth remove</code>)<a class="headerlink" href="#removing-contexts-canfar-auth-remove" title="Permanent link">&para;</a></h4>
-<p>Remove contexts you no longer need:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>remove<span class="w"> </span>&lt;CONTEXT_NAME&gt;
+<p>Environment overrides use nested active fields:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">CANFAR_ACTIVE__AUTHENTICATION</span><span class="o">=</span>srcnet
+<span class="nv">CANFAR_ACTIVE__SERVER</span><span class="o">=</span>ivo://example.org/skaha
 </code></pre></div>
-<div class="admonition warning">
-<p class="admonition-title">Safety Features</p>
-<ul>
-<li>You cannot remove the currently active context</li>
-<li>Switch to a different context first, then remove the unwanted one</li>
-<li>Removed contexts cannot be recovered (you'll need to login again)</li>
-</ul>
-</div>
-<h4 id="purging-all-contexts-canfar-auth-purge">Purging All Contexts (<code>canfar auth purge</code>)<a class="headerlink" href="#purging-all-contexts-canfar-auth-purge" title="Permanent link">&para;</a></h4>
-<p>Remove <strong>all</strong> authentication contexts and credentials:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>purge
-</code></pre></div>
-<div class="admonition danger">
-<p class="admonition-title">Complete Removal</p>
-<p>This command permanently deletes:</p>
-<ul>
-<li>All saved authentication contexts</li>
-<li>Your entire canfar configuration file (<code>~/.config/canfar/config.yaml</code>)</li>
-<li>You'll need to login again to use canfar</li>
-</ul>
-</div>
-<p><strong>Options:</strong>
-<div class="highlight"><pre><span></span><code><span class="c1"># Skip confirmation prompt</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--yes
-
-<span class="c1"># Interactive confirmation (default)</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>purge
-</code></pre></div></p>
-<hr />
-<h2 id="programmatic-authentication">Programmatic Authentication<a class="headerlink" href="#programmatic-authentication" title="Permanent link">&para;</a></h2>
-<p>Once you have authentication contexts set up via the CLI, you can use them programmatically in your Python code.</p>
-<h3 id="using-active-context">Using Active Context<a class="headerlink" href="#using-active-context" title="Permanent link">&para;</a></h3>
-<p>The simplest approach uses your currently active authentication context:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="c1"># Uses the active authentication context automatically</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Check which context is being used</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active context: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">active</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Auth Context: </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">context</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="authentication-priority">Authentication Priority<a class="headerlink" href="#authentication-priority" title="Permanent link">&para;</a></h3>
-<p>When creating a session, canfar follows this priority order:</p>
-<ol>
-<li><strong>User-provided token</strong> (highest priority)</li>
-<li><strong>User-provided certificate</strong></li>
-<li><strong>Active authentication context</strong></li>
-<li><strong>Default certificate location</strong> (<code>~/.ssl/cadcproxy.pem</code>)</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">SecretStr</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.session</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="c1"># Priority 1: Direct token (overrides everything)</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="n">SecretStr</span><span class="p">(</span><span class="s2">&quot;your-bearer-token&quot;</span><span class="p">))</span>
-
-<span class="c1"># Priority 2: Direct certificate (overrides context)</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">certificate</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/path/to/cert.pem&quot;</span><span class="p">))</span>
-
-<span class="c1"># Priority 3: Uses active context (most common)</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-</code></pre></div>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<h3 id="common-authentication-issues">Common Authentication Issues<a class="headerlink" href="#common-authentication-issues" title="Permanent link">&para;</a></h3>
-<div class="admonition question">
-<p class="admonition-title">Login Problems</p>
-<p><strong>No servers found during discovery</strong></p>
-<ul>
-<li>Check your internet connection</li>
-<li>Try <code>canfar auth login --dead</code> to include non-responsive servers</li>
-<li>Verify you're not behind a restrictive firewall</li>
-</ul>
-<p><strong>Authentication failed</strong></p>
-<ul>
-<li>Verify your username and password are correct</li>
-<li>Check if your account is active on the Science Platform</li>
-<li>Try logging into the web interface first</li>
-</ul>
-<p><strong>Certificate expired</strong></p>
-<ul>
-<li>X.509 certificates typically last 10 days</li>
-<li>Run <code>canfar auth login --force</code> to refresh</li>
-<li>Check expiry with your authentication status code above</li>
-</ul>
-</div>
-<div class="admonition question">
-<p class="admonition-title">Context Management Issues</p>
-<p><strong>No active context found</strong></p>
-<ul>
-<li>Run <code>canfar auth list</code> to see available contexts</li>
-<li>Use <code>canfar auth switch &lt;context&gt;</code> to activate one</li>
-<li>If no contexts exist, run <code>canfar auth login</code></li>
-</ul>
-<p><strong>Cannot remove active context</strong></p>
-<ul>
-<li>Switch to a different context first: <code>canfar auth switch &lt;other&gt;</code></li>
-<li>Then remove the unwanted context: <code>canfar auth remove &lt;unwanted&gt;</code></li>
-</ul>
-</div>
-<h3 id="debug-mode">Debug Mode<a class="headerlink" href="#debug-mode" title="Permanent link">&para;</a></h3>
-<p>Enable detailed authentication logging:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># CLI debug mode</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> </span>--debug
-</code></pre></div>
+<p>Legacy or unsupported config files are backed up to
+<code>&lt;config-path&gt;.&lt;timestamp&gt;.back</code> before a default config is written.</p>
+<h2 id="machine-output-rules">Machine output rules<a class="headerlink" href="#machine-output-rules" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Behavior</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Supported flags</td>
+<td><code>--json</code> and <code>--yaml</code></td>
+</tr>
+<tr>
+<td>Placement</td>
+<td>Put the flag after the command that emits data, for example <code>canfar auth ls --json</code>.</td>
+</tr>
+<tr>
+<td>Unsupported placement</td>
+<td><code>canfar auth --json ls</code> exits 2.</td>
+</tr>
+<tr>
+<td>Conflicts</td>
+<td><code>--json --yaml</code> exits 2.</td>
+</tr>
+<tr>
+<td>stdout</td>
+<td>Data only in machine mode.</td>
+</tr>
+<tr>
+<td>stderr</td>
+<td>Diagnostics and errors.</td>
+</tr>
+<tr>
+<td>Unsupported commands</td>
+<td>Exit 1 with <code>machine output not supported for this command yet</code> and <code>use default human output for now</code>.</td>
+</tr>
+</tbody>
+</table>
+<p>Lists have no ordering guarantee. Scripts should select by IDP key, URI,
+Session ID, or another stable field.</p>
 
 
 
@@ -1986,7 +2193,7 @@ canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
   </span>
 
     
@@ -2014,11 +2221,6 @@ canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> 
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
@@ -2027,6 +2229,11 @@ canfar<span class="w"> </span>auth<span class="w"> </span>login<span class="w"> 
         <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
           
           <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

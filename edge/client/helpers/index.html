@@ -635,7 +635,7 @@
   <span class="md-ellipsis">
     
   
-    Authentication
+    Authentication and Servers
   
 
     
@@ -1465,6 +1465,8 @@
       
         
       
+        
+      
     
     
     
@@ -1532,6 +1534,34 @@
     
   
     5-Minute Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
   
 
     
@@ -2022,7 +2052,13 @@
 
     <div class="doc doc-contents ">
 
-        <p>Returns every <code>total</code>-th item from the iterable with a <code>replica</code>-th offset.</p>
+        <p>Return every <code>total</code>-th item from <code>iterable</code> with a <code>replica</code> offset.</p>
+<p>Uses 1-based <code>replica</code> indexing to match <code>REPLICA_ID</code> in CANFAR
+containers. Replica 1 receives indices 0, <code>total</code>, 2 * <code>total</code>, …;
+replica 2 receives indices 1, <code>total</code> + 1, …; and so on.</p>
+<p>Unlike <code>chunk</code>, <code>stripe</code> does not validate <code>replica</code> or <code>total</code>.
+When <code>replica</code> is less than 1, or greater than <code>total</code>, the result is
+empty. When <code>total</code> is zero, <code>ValueError</code> is raised.</p>
 
 
 <table>
@@ -2039,7 +2075,7 @@
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The iterable to partition.</p>
+                <p>The iterable to stripe across replicas.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -2055,8 +2091,7 @@
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The replica number.
-Defaults to int(os.environ.get("REPLICA_ID", 1)).</p>
+                <p>The replica number (1-based). Defaults to <code>REPLICA_ID</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -2076,8 +2111,7 @@ Defaults to int(os.environ.get("REPLICA_ID", 1)).</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The total number of replicas.
-Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
+                <p>The total number of replicas. Defaults to <code>REPLICA_COUNT</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -2093,15 +2127,6 @@ Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
           </tr>
       </tbody>
     </table>
-
-
-<p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">distributed</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">distributed</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">):</span>
-<span class="go">        print(data)</span>
-<span class="go">0, 10, 20, 30, 40, 50, 60, 70, 80, 90</span>
-</code></pre></div>
 
 
 <table>
@@ -2120,12 +2145,23 @@ Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
             </td>
             <td class="doc-yields-details">
               <div class="doc-md-description">
-                <p>Iterator[T]: The <code>replica</code>-th partition of the iterable.</p>
+                <p>Items assigned to this replica.</p>
               </div>
             </td>
           </tr>
       </tbody>
     </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">distributed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">stripe</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">replica</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">[0, 3, 6, 9]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">stripe</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">replica</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">[1, 4, 7]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">stripe</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">),</span> <span class="n">replica</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span>
+<span class="go">[0, 10, 20, 30, 40, 50, 60, 70, 80, 90]</span>
+</code></pre></div>
 
 
     </div>
@@ -2149,16 +2185,15 @@ Defaults to int(os.environ.get("REPLICA_COUNT", 1)).</p>
 
     <div class="doc doc-contents ">
 
-        <p>Returns the <code>replica</code>-th chunk of the iterable split into <code>total</code> chunks.</p>
-<p>This function distributes items from an iterable across multiple replicas canfar
-provided container environment variables.</p>
-<p><strong>Distribution Behavior:</strong></p>
+        <p>Return the <code>replica</code>-th contiguous chunk of <code>iterable</code>.</p>
+<p>Splits <code>iterable</code> into <code>total</code> roughly equal contiguous chunks using
+1-based <code>replica</code> indexing to match <code>REPLICA_ID</code> in CANFAR containers.</p>
+<p><strong>Distribution behavior:</strong></p>
 <ul>
-<li><strong>Standard Distribution</strong> (items &gt;= replicas): Items are divided into roughly
-  equal chunks, with the last replica receiving any remainder items.</li>
-<li><strong>Sparse Distribution</strong> (items &lt; replicas): Each of the first N replicas gets
-  exactly one item (where N = number of items), remaining replicas get empty
-  results.</li>
+<li><strong>Standard</strong> (<code>len(items) &gt;= total</code>): Items are divided into equal-sized
+  chunks; the last replica receives any remainder.</li>
+<li><strong>Sparse</strong> (<code>len(items) &lt; total</code>): Each of the first <code>len(items)</code>
+  replicas receives exactly one item; remaining replicas get nothing.</li>
 </ul>
 
 
@@ -2192,8 +2227,8 @@ provided container environment variables.</p>
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The replica number using 1-based indexing.
-Must be &gt;= 1 and &lt;= total. Defaults to REPLICA_ID environment variable.</p>
+                <p>The replica number (1-based). Must be &gt;= 1 and &lt;= <code>total</code>.
+Defaults to <code>REPLICA_ID</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -2213,8 +2248,8 @@ Must be &gt;= 1 and &lt;= total. Defaults to REPLICA_ID environment variable.</p
             </td>
             <td class="doc-param-details">
               <div class="doc-md-description">
-                <p>The total number of replicas. Must be &gt; 0.
-Defaults to REPLICA_COUNT environment variable.</p>
+                <p>The total number of replicas. Must be &gt; 0. Defaults to
+<code>REPLICA_COUNT</code>.</p>
               </div>
               <p>
                   <span class="doc-param-annotation">
@@ -2235,20 +2270,20 @@ Defaults to REPLICA_COUNT environment variable.</p>
 <table>
       <thead>
         <tr>
-          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span class="doc-section-title">YIELDS</span></th>
           <th><span>DESCRIPTION</span></th>
         </tr>
       </thead>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <span class="doc-returns-annotation">
-                    <code><span title="collections.abc.Iterator">Iterator</span>[<span title="canfar.helpers.distributed.T">T</span>]</code>
+                <span class="doc-yields-annotation">
+                    <code><span title="canfar.helpers.distributed.T">T</span></code>
                 </span>
             </td>
-            <td class="doc-returns-details">
+            <td class="doc-yields-details">
               <div class="doc-md-description">
-                <p>Iterator[T]: An iterator yielding items assigned to this replica.</p>
+                <p>Items assigned to this replica.</p>
               </div>
             </td>
           </tr>
@@ -2272,31 +2307,7 @@ Defaults to REPLICA_COUNT environment variable.</p>
             </td>
             <td class="doc-raises-details">
               <div class="doc-md-description">
-                <p>If replica &lt; 1 (1-based indexing expected).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-              <span class="doc-raises-annotation">
-                  <code><span title="ValueError">ValueError</span></code>
-              </span>
-            </td>
-            <td class="doc-raises-details">
-              <div class="doc-md-description">
-                <p>If replica &gt; total (replica cannot exceed total replicas).</p>
-              </div>
-            </td>
-          </tr>
-          <tr class="doc-section-item">
-            <td>
-              <span class="doc-raises-annotation">
-                  <code><span title="ValueError">ValueError</span></code>
-              </span>
-            </td>
-            <td class="doc-raises-details">
-              <div class="doc-md-description">
-                <p>If total &lt;= 0 (must have at least one replica).</p>
+                <p>If <code>replica</code> &lt; 1, <code>replica</code> &gt; <code>total</code>, or <code>total</code> &lt;= 0.</p>
               </div>
             </td>
           </tr>
@@ -2304,17 +2315,16 @@ Defaults to REPLICA_COUNT environment variable.</p>
     </table>
 
 
-<details class="note" open>
-  <summary>Note</summary>
-  <p>This function is designed for use in canfar containerized environments where
-REPLICA_ID and REPLICA_COUNT environment variables are automatically set.
-The 1-based indexing matches the container environment expectations.</p>
-<p>For optimal performance with large datasets, consider using this function
-with iterators rather than converting large datasets to lists beforehand.</p>
-<p>When items &lt; replicas, the sparse distribution ensures no replica receives
-an unfair share - each item goes to exactly one replica, and excess replicas
-receive empty results rather than duplicating data.</p>
-</details>
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">distributed</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">),</span> <span class="n">replica</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+<span class="go">[0, 1, 2, 3]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">replica</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">4</span><span class="p">))</span>
+<span class="go">[6, 7, 8, 9]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">replica</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="mi">5</span><span class="p">))</span>
+<span class="go">[2]</span>
+</code></pre></div>
+
 
     </div>
 

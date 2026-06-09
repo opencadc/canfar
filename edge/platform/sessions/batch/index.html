@@ -990,10 +990,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#submit-from-the-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📋 Overview
+        Submit From the CLI
       
     </span>
   </a>
@@ -1001,10 +1001,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-your-session-type" class="md-nav__link">
+  <a href="#submit-from-python" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎛️ Choosing Your Session Type
+        Submit From Python
       
     </span>
   </a>
@@ -1012,10 +1012,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-access" class="md-nav__link">
+  <a href="#monitor-and-clean-up" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Reference
+        Monitor and Clean Up
       
     </span>
   </a>
@@ -1023,10 +1023,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring-and-debugging" class="md-nav__link">
+  <a href="#resource-guidance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitoring and Debugging
+        Resource Guidance
       
     </span>
   </a>
@@ -1034,10 +1034,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
+  <a href="#storage-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Best Practices
+        Storage Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#private-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private Images
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
       
     </span>
   </a>
@@ -2055,10 +2077,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
+  <a href="#submit-from-the-cli" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📋 Overview
+        Submit From the CLI
       
     </span>
   </a>
@@ -2066,10 +2088,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-your-session-type" class="md-nav__link">
+  <a href="#submit-from-python" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎛️ Choosing Your Session Type
+        Submit From Python
       
     </span>
   </a>
@@ -2077,10 +2099,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#api-access" class="md-nav__link">
+  <a href="#monitor-and-clean-up" class="md-nav__link">
     <span class="md-ellipsis">
       
-        API Reference
+        Monitor and Clean Up
       
     </span>
   </a>
@@ -2088,10 +2110,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring-and-debugging" class="md-nav__link">
+  <a href="#resource-guidance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitoring and Debugging
+        Resource Guidance
       
     </span>
   </a>
@@ -2099,10 +2121,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
+  <a href="#storage-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Best Practices
+        Storage Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#private-images" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Private Images
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Troubleshooting
       
     </span>
   </a>
@@ -2143,575 +2187,180 @@
 
 
 <h1 id="batch-processing">Batch Processing<a class="headerlink" href="#batch-processing" title="Permanent link">&para;</a></h1>
-<p><strong>Headless container execution for automated workflows and large-scale batch processing</strong></p>
-<div class="admonition abstract">
-<p class="admonition-title">🎯 What You'll Learn</p>
-<ul>
-<li>How to run containers without interactive interfaces ("headless" batch mode)</li>
-<li>Submitting and managing batch jobs through the Science Portal</li>
-<li>Using the REST API for programmatic job control and automation</li>
-<li>Best practices for resource allocation, job scheduling, and monitoring</li>
-<li>Advanced workflows including parameter sweeps and pipeline automation</li>
-</ul>
-</div>
-<p>Batch processing on CANFAR enables you to run computational workflows without interactive interfaces, perfect for automated data processing, parameter sweeps, and production pipelines. The same containers that power interactive sessions can run in headless mode, executing your scripts and analyzes automatically while you focus on other work.</p>
-<h2 id="overview">📋 Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Batch processing provides several key advantages for astronomical research:</p>
-<ul>
-<li><strong>Unattended execution</strong>: Jobs run without requiring user interaction</li>
-<li><strong>Resource efficiency</strong>: Optimal resource allocation for long-running tasks</li>
-<li><strong>Scalability</strong>: Process large datasets or parameter sweeps systematically</li>
-<li><strong>Automation</strong>: Integrate with existing workflows and pipelines</li>
-<li><strong>Cost effectiveness</strong>: Run jobs during off-peak hours when resources are available</li>
-</ul>
-<h2 id="choosing-your-session-type">🎛️ Choosing Your Session Type<a class="headerlink" href="#choosing-your-session-type" title="Permanent link">&para;</a></h2>
-<p>CANFAR offers two types of resource allocation for batch jobs:</p>
-<div class="admonition tip">
-<p class="admonition-title">Flexible Sessions</p>
-<p><strong>Optimal for interactive work and development</strong></p>
-<ul>
-<li><strong>Faster session startup</strong>: Begins immediately with minimal initial resources</li>
-<li><strong>Can burst to higher resource usage</strong>: Auto-scales up to 8 cores and 32GB RAM as needed</li>
-<li><strong>Resource efficient</strong>: Only uses what your workload actually requires</li>
-<li><strong>Best for</strong>: Data exploration, development, testing, educational workshops</li>
-</ul>
-</div>
-<div class="admonition info">
-<p class="admonition-title">Fixed Sessions</p>
-<p><strong>Better for production workloads</strong></p>
-<ul>
-<li><strong>Guaranteed consistent performance</strong>: Gets exactly what you request for the entire session</li>
-<li><strong>Predictable resource availability</strong>: No variation in available CPU/memory during execution</li>
-<li><strong>Better for production workloads</strong>: Suitable for performance-critical analysis and time-sensitive computations</li>
-<li><strong>Best for</strong>: Large-scale processing, production pipelines, longer duration jobs</li>
-</ul>
-</div>
-<hr />
-<div class="admonition info">
-<p class="admonition-title">Quick Links</p>
-<ul>
-<li><a href="../../containers/">Container Development</a></li>
-<li><a href="../../storage/">Storage Guide</a></li>
-<li><a href="../../../client/home/">CANFAR Python Client</a></li>
-<li><a href="https://ws-uv.canfar.net/skaha/v1/capabilities">API Reference</a></li>
-<li><a href="../../support/">Support</a></li>
-</ul>
-</div>
-<h3 id="1-api-based-execution">1. API-Based Execution<a class="headerlink" href="#1-api-based-execution" title="Permanent link">&para;</a></h3>
-<p>Execute containers programmatically using the <code>canfar</code> command-line client:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Ensure you are logged in first</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>login
-
-<span class="c1"># Submit a flexible session job (default - auto-scaling resources)</span>
-canfar<span class="w"> </span>launch<span class="w"> </span>-n<span class="w"> </span>data-reduction<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/scripts/reduce_data.py
-
-<span class="c1"># Submit a fixed session job (guaranteed resources)</span>
-canfar<span class="w"> </span>launch<span class="w"> </span>--name<span class="w"> </span>large-simulation<span class="w"> </span>--cpu<span class="w"> </span><span class="m">16</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">64</span><span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/scripts/simulation.py
+<p>Use a <code>headless</code> Session when a container should run a command and exit without
+an interactive notebook, desktop, CARTA, or Firefly interface.</p>
+<p>Batch work uses the same Container Images and storage mounts as interactive
+Sessions. The main difference is that you pass a command after <code>--</code> in the CLI,
+or <code>cmd</code> and <code>args</code> in Python.</p>
+<h2 id="submit-from-the-cli">Submit From the CLI<a class="headerlink" href="#submit-from-the-cli" title="Permanent link">&para;</a></h2>
+<p>Authenticate once, then create a headless Session:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>data-reduction<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/reduce_data.py
 </code></pre></div>
-<h3 id="2-job-submission-scripts">2. Job Submission Scripts<a class="headerlink" href="#2-job-submission-scripts" title="Permanent link">&para;</a></h3>
-<p>Create shell scripts for common workflows using the <code>canfar</code> client:</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/bin/bash</span>
-<span class="c1"># submit_reduction.sh</span>
-
-<span class="c1"># Set job parameters</span>
-<span class="nv">JOB_NAME</span><span class="o">=</span><span class="s2">&quot;nightly-reduction-</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span><span class="s2">&quot;</span>
-<span class="nv">IMAGE</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/casa:6.5&quot;</span>
-<span class="nv">CMD</span><span class="o">=</span><span class="s2">&quot;python /arc/projects/[project]/pipelines/reduce_night.py /arc/projects/survey/data/</span><span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span><span class="s2">&quot;</span>
-
-<span class="c1"># Submit job</span>
-canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$JOB_NAME</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$IMAGE</span><span class="s2">&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cores<span class="w"> </span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--ram<span class="w"> </span><span class="m">32</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CMD</span><span class="s2">&quot;</span>
+<p>Omit resource options for flexible allocation. Use fixed resources only when the
+workload has measured requirements:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>large-simulation<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cpu<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--memory<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/simulation.py
 </code></pre></div>
-<p>Or using the Python <code>canfar</code> client:</p>
-<div class="highlight"><pre><span></span><code><span class="ch">#!/usr/bin/env python</span>
-<span class="c1"># submit_reduction.py - Python client-based submission</span>
+<p>Pass environment variables with repeated <code>--env</code> flags:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>omp-test<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env<span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/run.py
+</code></pre></div>
+<p>Create replicas when each container can process an independent slice:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>parameter-study<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/analyze.py
+</code></pre></div>
+<p>Each replica receives <code>REPLICA_ID</code> and <code>REPLICA_COUNT</code>. Use those values, or the
+helpers in <a href="../../../client/helpers/">Distributed Computing</a>, to split work
+deterministically.</p>
+<p><code>canfar run</code> and <code>canfar launch</code> are compatibility aliases for <code>canfar create</code>.
+New examples should use <code>canfar create</code>.</p>
+<h2 id="submit-from-python">Submit From Python<a class="headerlink" href="#submit-from-python" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
 
-<span class="c1"># Initialize session manager</span>
 <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Set job parameters</span>
-<span class="n">job_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;nightly-reduction-</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-<span class="n">image</span> <span class="o">=</span> <span class="s2">&quot;images.canfar.net/skaha/casa:6.5&quot;</span>
-<span class="n">project</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[project]&quot;</span>
+<span class="n">project</span> <span class="o">=</span> <span class="s2">&quot;/arc/projects/myproject&quot;</span>
 <span class="n">data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<span class="c1"># Submit flexible job (default - auto-scaling)</span>
 <span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py&quot;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">]</span>
-<span class="p">)</span>
-
-<span class="c1"># Or submit fixed job (guaranteed resources by specifying cores/ram)</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="n">job_name</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="n">image</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>  <span class="c1"># Having cores/ram makes it a fixed session</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py&quot;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">]</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job(s): </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</code></pre></div>
-<h3 id="performance-optimization">Performance Optimization<a class="headerlink" href="#performance-optimization" title="Permanent link">&para;</a></h3>
-<div class="admonition tip">
-<p class="admonition-title">Advanced: Resource Monitoring</p>
-<ul>
-<li>Use <code>canfar stats [session-id]</code> and <code>canfar info [session-id]</code> to monitor job resource usage.</li>
-<li>For parallel workloads, see <a href="../../../client/helpers/">Distributed Computing</a> for strategies.</li>
-</ul>
-</div>
-<h4 id="resource-allocation-strategy">Resource Allocation Strategy<a class="headerlink" href="#resource-allocation-strategy" title="Permanent link">&para;</a></h4>
-<p><strong>Right-sizing your jobs</strong> is crucial for performance and queue times:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Start small and scale up based on monitoring</span>
-<span class="c1"># Test job with minimal resources first</span>
-canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;test-small&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cores<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--ram<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--kind<span class="w"> </span><span class="s2">&quot;headless&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/[project]/test_script.py&quot;</span>
-
-<span class="c1"># Monitor resource usage in the job logs</span>
-<span class="c1"># Scale up for production runs if needed</span>
-</code></pre></div>
-<p><strong>Memory Optimization:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Memory-efficient data processing patterns</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">process_large_cube</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process large data cube efficiently&quot;&quot;&quot;</span>
-
-    <span class="c1"># Memory-map large files instead of loading fully</span>
-    <span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
-
-        <span class="c1"># Process in chunks to control memory usage</span>
-        <span class="n">chunk_size</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Adjust based on available RAM</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">chunk_size</span><span class="p">):</span>
-            <span class="n">chunk</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">chunk_size</span><span class="p">]</span>
-            <span class="c1"># Process chunk and collect lightweight results</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>  <span class="c1"># Example operation</span>
-            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
-            <span class="c1"># Explicit cleanup for large chunks</span>
-            <span class="k">del</span> <span class="n">chunk</span>
-
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
-</code></pre></div>
-<p><strong>Storage Performance:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Use /scratch/ for I/O intensive operations</span>
-<span class="c1">#!/bin/bash</span>
-<span class="nb">set</span><span class="w"> </span>-e
-<span class="nv">PROJECT</span><span class="o">=</span><span class="s2">&quot;/arc/projects/[project]&quot;</span>
-
-<span class="c1"># Copy data to fast scratch storage</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Copying data to scratch...&quot;</span>
-rsync<span class="w"> </span>-av<span class="w"> </span><span class="nv">$PROJECT</span>/large_dataset/<span class="w"> </span>/scratch/working/
-
-<span class="c1"># Process on fast storage</span>
-<span class="nb">cd</span><span class="w"> </span>/scratch/working
-python<span class="w"> </span>intensive_processing.py
-
-<span class="c1"># Save results back to permanent storage</span>
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Saving results...&quot;</span>
-mkdir<span class="w"> </span>-p<span class="w"> </span><span class="nv">$PROJECT</span>/results/<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>
-cp<span class="w"> </span>*.fits<span class="w"> </span><span class="nv">$PROJECT</span>/results/<span class="k">$(</span>date<span class="w"> </span>+%Y%m%d<span class="k">)</span>/
-cp<span class="w"> </span>*.log<span class="w"> </span><span class="nv">$PROJECT</span>/logs/
-
-<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Processing complete&quot;</span>
-</code></pre></div>
-<h4 id="parallel-processing">Parallel Processing<a class="headerlink" href="#parallel-processing" title="Permanent link">&para;</a></h4>
-<p><strong>Multi-core CPU Usage:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">multiprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pool</span><span class="p">,</span> <span class="n">cpu_count</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">partial</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">process_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">parameters</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process a single file&quot;&quot;&quot;</span>
-    <span class="c1"># Your processing logic here</span>
-    <span class="k">return</span> <span class="n">result</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">parallel_processing</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process multiple files in parallel&quot;&quot;&quot;</span>
-
-    <span class="c1"># Get available CPU cores (leave 1 for system)</span>
-    <span class="n">n_cores</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">cpu_count</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-
-    <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;/scratch/input/*.fits&#39;</span><span class="p">)</span>
-    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;param1&#39;</span><span class="p">:</span> <span class="n">value1</span><span class="p">,</span> <span class="s1">&#39;param2&#39;</span><span class="p">:</span> <span class="n">value2</span><span class="p">}</span>
-
-    <span class="c1"># Create partial function with fixed parameters</span>
-    <span class="n">process_func</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">process_file</span><span class="p">,</span> <span class="n">parameters</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
-
-    <span class="c1"># Process files in parallel</span>
-    <span class="k">with</span> <span class="n">Pool</span><span class="p">(</span><span class="n">n_cores</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">pool</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">process_func</span><span class="p">,</span> <span class="n">files</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">results</span>
-</code></pre></div>
-<p><strong>GPU Acceleration (when available):</strong></p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">cupy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>  <span class="c1"># GPU arrays</span>
-    <span class="n">gpu_available</span> <span class="o">=</span> <span class="kc">True</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">cp</span>  <span class="c1"># Fallback to CPU</span>
-    <span class="n">gpu_available</span> <span class="o">=</span> <span class="kc">False</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">gpu_accelerated_processing</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Use GPU acceleration when available&quot;&quot;&quot;</span>
-
-    <span class="k">if</span> <span class="n">gpu_available</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using GPU acceleration&quot;</span><span class="p">)</span>
-        <span class="c1"># Convert to GPU array</span>
-        <span class="n">gpu_data</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-
-        <span class="c1"># GPU-accelerated operations</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">gpu_data</span><span class="p">)</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-
-        <span class="c1"># Convert back to CPU for saving</span>
-        <span class="k">return</span> <span class="n">cp</span><span class="o">.</span><span class="n">asnumpy</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Using CPU fallback&quot;</span><span class="p">)</span>
-        <span class="c1"># CPU-only operations</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">fft</span><span class="o">.</span><span class="n">fft2</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
-</code></pre></div>
-<h4 id="job-monitoring-and-logging">Job Monitoring and Logging<a class="headerlink" href="#job-monitoring-and-logging" title="Permanent link">&para;</a></h4>
-<p><strong>Comprehensive Logging:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">psutil</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-
-<span class="c1"># Setup logging</span>
-<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
-    <span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-    <span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> - </span><span class="si">%(levelname)s</span><span class="s1"> - </span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
-    <span class="n">handlers</span><span class="o">=</span><span class="p">[</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="s1">&#39;/arc/projects/[project]/logs/processing.log&#39;</span><span class="p">),</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">StreamHandler</span><span class="p">()</span>
-    <span class="p">]</span>
-<span class="p">)</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">log_system_status</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Log current system resource usage&quot;&quot;&quot;</span>
-    <span class="n">cpu_percent</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">cpu_percent</span><span class="p">(</span><span class="n">interval</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">memory</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span>
-    <span class="n">disk</span> <span class="o">=</span> <span class="n">psutil</span><span class="o">.</span><span class="n">disk_usage</span><span class="p">(</span><span class="s1">&#39;/scratch&#39;</span><span class="p">)</span>
-
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CPU: </span><span class="si">{</span><span class="n">cpu_percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">%, &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Memory: </span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">memory</span><span class="o">.</span><span class="n">used</span><span class="o">//</span><span class="mi">1024</span><span class="o">**</span><span class="mi">3</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">GB used), &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Scratch: </span><span class="si">{</span><span class="n">disk</span><span class="o">.</span><span class="n">percent</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">% used&quot;</span><span class="p">)</span>
-
-<span class="k">def</span><span class="w"> </span><span class="nf">timed_processing</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper to time and log function execution&quot;&quot;&quot;</span>
-    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">log_system_status</span><span class="p">()</span>
-
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Completed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">elapsed</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">elapsed</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2"> seconds: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">raise</span>
-</code></pre></div>
-<hr />
-<div class="admonition info">
-<p class="admonition-title">See Also</p>
-<ul>
-<li><a href="../../containers/">Container Development</a></li>
-<li><a href="../../storage/">Storage Guide</a></li>
-<li><a href="../../../client/home/">CANFAR Python Client</a></li>
-<li><a href="https://ws-uv.canfar.net/skaha/v1/capabilities">API Reference</a></li>
-<li><a href="../../support/">Support</a></li>
-</ul>
-</div>
-<h3 id="job-sizing-guidelines">Job Sizing Guidelines<a class="headerlink" href="#job-sizing-guidelines" title="Permanent link">&para;</a></h3>
-<p>Choose appropriate resources based on your workload:</p>
-<table>
-<thead>
-<tr>
-<th>Job Type</th>
-<th>Cores</th>
-<th>Memory</th>
-<th>Storage</th>
-<th>Duration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Single image reduction</td>
-<td>1-2</td>
-<td>4-8GB</td>
-<td>10GB</td>
-<td>5-30 min</td>
-</tr>
-<tr>
-<td>Survey night processing</td>
-<td>4-8</td>
-<td>16-32GB</td>
-<td>100GB</td>
-<td>1-4 hours</td>
-</tr>
-<tr>
-<td>Catalog cross-matching</td>
-<td>2-4</td>
-<td>8-16GB</td>
-<td>50GB</td>
-<td>30min-2hr</td>
-</tr>
-<tr>
-<td>ML model training</td>
-<td>8-16</td>
-<td>32-64GB</td>
-<td>200GB</td>
-<td>4-24 hours</td>
-</tr>
-<tr>
-<td>Large simulations</td>
-<td>16-32</td>
-<td>64-128GB</td>
-<td>1TB</td>
-<td>Days-weeks</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition tip">
-<p class="admonition-title">Queue Optimization</p>
-<ul>
-<li><strong>Small jobs</strong> (≤4 cores, ≤16GB) start faster</li>
-<li><strong>Large jobs</strong> (≥16 cores, ≥64GB) may queue longer  </li>
-<li><strong>Off-peak hours</strong> (evenings, weekends) often have shorter wait times</li>
-<li><strong>Resource requests</strong> should match actual usage to avoid waste</li>
-<li>For advanced queue management, see <a href="../../../client/home/">CANFAR Python Client</a></li>
-</ul>
-</div>
-<h3 id="queue-management">Queue Management<a class="headerlink" href="#queue-management" title="Permanent link">&para;</a></h3>
-<p>Understand job priorities and scheduling:</p>
-<ul>
-<li><strong>Small jobs</strong> (&lt;4 cores, &lt;16GB): Higher priority, faster start</li>
-<li><strong>Large jobs</strong> (16+ cores, 64GB+): Lower priority, may queue longer</li>
-<li><strong>Off-peak hours</strong>: Better resource availability (evenings, weekends)</li>
-<li><strong>Resource limits</strong>: Per-user and per-group limits apply</li>
-</ul>
-<h2 id="api-access">API Reference<a class="headerlink" href="#api-access" title="Permanent link">&para;</a></h2>
-<div class="admonition note">
-<p class="admonition-title">Legacy Client</p>
-<p>The <code>skaha</code> Python client is deprecated and has been replaced by the <code>canfar</code> client. The following examples use the modern <code>canfar</code> client.
-For more examples, see <a href="../../../client/examples/">Client Examples</a>.</p>
-</div>
-<h3 id="method-1-canfar-command-line-client">Method 1: <code>canfar</code> Command-Line Client<a class="headerlink" href="#method-1-canfar-command-line-client" title="Permanent link">&para;</a></h3>
-<h4 id="submit-job">Submit Job<a class="headerlink" href="#submit-job" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>launch<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span><span class="s2">&quot;my-analysis-job&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--image<span class="w"> </span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cores<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--ram<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cmd<span class="w"> </span><span class="s2">&quot;python /arc/projects/myproject/analysis.py&quot;</span>
-</code></pre></div>
-<h4 id="list-jobs">List Jobs<a class="headerlink" href="#list-jobs" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
-</code></pre></div>
-<h4 id="get-job-status">Get Job Status<a class="headerlink" href="#get-job-status" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>info<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
-</code></pre></div>
-<h4 id="cancel-job">Cancel Job<a class="headerlink" href="#cancel-job" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
-</code></pre></div>
-<h4 id="get-job-logs">Get Job Logs<a class="headerlink" href="#get-job-logs" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
-</code></pre></div>
-<h4 id="get-resource-usage">Get Resource Usage<a class="headerlink" href="#get-resource-usage" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>stats<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
-</code></pre></div>
-<h3 id="method-2-canfar-python-api">Method 2: <code>canfar</code> Python API<a class="headerlink" href="#method-2-canfar-python-api" title="Permanent link">&para;</a></h3>
-<p>The <code>canfar</code> Python client provides a convenient interface for batch job management and automation.</p>
-<h4 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar
-</code></pre></div>
-<h4 id="basic-python-api-usage">Basic Python API Usage<a class="headerlink" href="#basic-python-api-usage" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="c1"># Initialize session manager</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Simple job submission</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;python-analysis&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;nightly-reduction-</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/casa:6.5&quot;</span><span class="p">,</span>
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
     <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/arc/projects/[project]/analysis.py&quot;</span><span class="p">]</span>
+    <span class="n">args</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py </span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted job(s): </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
 </code></pre></div>
-<h4 id="advanced-job-submission">Advanced Job Submission<a class="headerlink" href="#advanced-job-submission" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Job with custom resources and environment</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<p>Fixed resources use <code>cores</code> and <code>ram</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
     <span class="n">name</span><span class="o">=</span><span class="s2">&quot;heavy-computation&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/[project]/processor:latest&quot;</span><span class="p">,</span> 
+    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/myproject/processor:latest&quot;</span><span class="p">,</span>
     <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
     <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
     <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
     <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;/opt/scripts/heavy_process.sh&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;/arc/projects/[project]/data/large_dataset.h5&quot;</span><span class="p">,</span> <span class="s2">&quot;/arc/projects/results/&quot;</span><span class="p">],</span>
-    <span class="n">env</span><span class="o">=</span><span class="p">{</span>
-        <span class="s2">&quot;PROCESSING_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;OUTPUT_FORMAT&quot;</span><span class="p">:</span> <span class="s2">&quot;hdf5&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;VERBOSE&quot;</span><span class="p">:</span> <span class="s2">&quot;true&quot;</span>
-    <span class="p">}</span>
+    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/data/input.h5 /arc/projects/myproject/results/&quot;</span><span class="p">,</span>
+    <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PROCESSING_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">},</span>
 <span class="p">)</span>
 </code></pre></div>
-<h4 id="private-image-authentication">Private Image Authentication<a class="headerlink" href="#private-image-authentication" title="Permanent link">&para;</a></h4>
-<p>To use private images, you first need to configure the client with your registry credentials. See the <a href="../../containers/registry/">registry guide</a> for details.</p>
-<h4 id="job-monitoring-and-management">Job Monitoring and Management<a class="headerlink" href="#job-monitoring-and-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<p>For async workflows, use <code>AsyncSession</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># List all your sessions</span>
-<span class="n">sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active sessions: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">sessions</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Create a job to monitor</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;monitored-job&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;sleep 60&quot;</span>
-<span class="p">)</span>
-<span class="n">job_id</span> <span class="o">=</span> <span class="n">job_ids</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
-<span class="c1"># Get session details</span>
-<span class="n">session_info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Status: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Start time: </span><span class="si">{</span><span class="n">session_info</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;startTime&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Wait for completion</span>
-<span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-    <span class="n">status</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;status&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">status</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;Succeeded&#39;</span><span class="p">,</span> <span class="s1">&#39;Failed&#39;</span><span class="p">,</span> <span class="s1">&#39;Terminated&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Job completed with status: </span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">break</span>
-    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># Get logs</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Job output:&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">logs</span><span class="p">[</span><span class="n">job_id</span><span class="p">])</span>
-
-<span class="c1"># Clean up</span>
-<span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="n">job_id</span><span class="p">)</span>
+<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">job_ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;async-batch&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/analyze.py&quot;</span><span class="p">,</span>
+        <span class="n">replicas</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div>
-<h4 id="bulk-job-management">Bulk Job Management<a class="headerlink" href="#bulk-job-management" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-
-<span class="c1"># Submit multiple related jobs</span>
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;parameter-study&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python /arc/projects/[project]/scripts/analyze.py&quot;</span><span class="p">,</span>
-    <span class="n">replicas</span><span class="o">=</span><span class="mi">10</span> <span class="c1"># Creates 10 jobs named parameter-study-1, parameter-study-2, etc.</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Submitted jobs: </span><span class="si">{</span><span class="n">job_ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-
-<span class="c1"># Monitor all jobs</span>
-<span class="c1"># ... (see single job monitoring example)</span>
+<h2 id="monitor-and-clean-up">Monitor and Clean Up<a class="headerlink" href="#monitor-and-clean-up" title="Permanent link">&para;</a></h2>
+<p>Use Session IDs returned by <code>create</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
+canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>logs<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
 </code></pre></div>
-<h2 id="monitoring-and-debugging">Monitoring and Debugging<a class="headerlink" href="#monitoring-and-debugging" title="Permanent link">&para;</a></h2>
-<div class="admonition tip">
-<p class="admonition-title">Advanced: Debugging Batch Jobs</p>
-<ul>
-<li>Use <code>canfar logs [session-id]</code> and <code>canfar stats [session-id]</code> for troubleshooting.</li>
-<li>For persistent issues, see <a href="../../support/faq/">FAQ</a> and <a href="../../support/">Support</a>.</li>
-</ul>
-</div>
-<h3 id="log-analysis">Log Analysis<a class="headerlink" href="#log-analysis" title="Permanent link">&para;</a></h3>
-<p>Monitor job progress through logs:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Real-time log monitoring</span>
-canfar<span class="w"> </span>logs<span class="w"> </span>-f<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
-
-<span class="c1"># Search for errors</span>
-canfar<span class="w"> </span>logs<span class="w"> </span>&lt;<span class="o">[</span>session-id<span class="o">]</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-i<span class="w"> </span>error
+<p><code>canfar stats</code> reports cluster-wide load, not per-Session usage.</p>
+<p>Python equivalents:</p>
+<div class="highlight"><pre><span></span><code><span class="n">info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
+<span class="n">events</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
+<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
+<span class="n">deleted</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
 </code></pre></div>
-<h3 id="resource-monitoring">Resource Monitoring<a class="headerlink" href="#resource-monitoring" title="Permanent link">&para;</a></h3>
-<p>Track resource usage:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Get session statistics</span>
-canfar<span class="w"> </span>stats<span class="w"> </span><span class="o">[</span>session-id<span class="o">]</span>
+<h2 id="resource-guidance">Resource Guidance<a class="headerlink" href="#resource-guidance" title="Permanent link">&para;</a></h2>
+<p>Start flexible. Fixed requests can be harder to schedule and should be based on
+measured CPU and memory use.</p>
+<table>
+<thead>
+<tr>
+<th>Workload</th>
+<th>First request</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Script smoke test</td>
+<td>Flexible</td>
+</tr>
+<tr>
+<td>Single-file reduction</td>
+<td>Flexible or <code>cores=1</code>, <code>ram=4</code></td>
+</tr>
+<tr>
+<td>Known memory-heavy job</td>
+<td>Fixed <code>cores</code> and <code>ram</code></td>
+</tr>
+<tr>
+<td>Independent parameter sweep</td>
+<td>Replicas plus modest fixed resources</td>
+</tr>
+</tbody>
+</table>
+<p>Tune threaded libraries to match requested cores:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>threaded-job<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env<span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/threaded.py
 </code></pre></div>
-<h3 id="common-issues">Common Issues<a class="headerlink" href="#common-issues" title="Permanent link">&para;</a></h3>
-<p><strong>Job fails to start</strong>:
-- Check resource availability
-- Verify container image exists
-- Check command syntax</p>
-<p><strong>Job crashes</strong>:
-- Review logs for error messages
-- Check memory usage patterns
-- Verify input file accessibility</p>
-<p><strong>Job hangs</strong>:
-- Monitor CPU usage
-- Check for infinite loops
-- Verify network connectivity</p>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
-<div class="admonition info">
-<p class="admonition-title">See Also</p>
-<ul>
-<li><a href="../../containers/">Container Development</a></li>
-<li><a href="../../storage/">Storage Guide</a></li>
-<li><a href="../../../client/home/">CANFAR Python Client</a></li>
-<li><a href="https://ws-uv.canfar.net/skaha/v1/capabilities">API Reference</a></li>
-<li><a href="../../support/">Support</a></li>
-</ul>
-</div>
-<h3 id="script-design">Script Design<a class="headerlink" href="#script-design" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Error handling</strong>: Use try-catch blocks and meaningful error messages</li>
-<li><strong>Logging</strong>: Include progress indicators and debugging information</li>
-<li><strong>Checkpointing</strong>: Save intermediate results for long-running jobs</li>
-<li><strong>Resource monitoring</strong>: Track memory and CPU usage</li>
-</ul>
-<h3 id="data-management">Data Management<a class="headerlink" href="#data-management" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Input validation</strong>: Check file existence and format before processing</li>
-<li><strong>Output organisation</strong>: Use consistent naming and directory structures</li>
-<li><strong>Cleanup</strong>: Remove temporary files to save storage</li>
-<li><strong>Metadata</strong>: Include processing parameters in output headers</li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Persistence Reminder</p>
-<p>Headless containers do not persist changes to the container filesystem. Always write outputs to <code>/arc/projects/</code> or <code>/arc/home/</code>.
-For data management strategies, see <a href="../../storage/">Storage Guide</a>.</p>
-</div>
+<h2 id="storage-rules">Storage Rules<a class="headerlink" href="#storage-rules" title="Permanent link">&para;</a></h2>
+<p>Write durable outputs to mounted storage such as <code>/arc/home/&lt;user&gt;/</code> or
+<code>/arc/projects/&lt;project&gt;/</code>. Treat container-local paths as temporary, and treat
+<code>/scratch/</code> as ephemeral high-speed working space.</p>
+<h2 id="private-images">Private Images<a class="headerlink" href="#private-images" title="Permanent link">&para;</a></h2>
+<p>Private images require Container Registry credentials. Configure those through
+the Python <code>Configuration</code> model or the CLI config before submitting the Session;
+see the <a href="../../containers/registry/">registry guide</a>.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Job does not start</td>
+<td><code>canfar events SESSION_ID</code></td>
+</tr>
+<tr>
+<td>Command exits unexpectedly</td>
+<td><code>canfar logs SESSION_ID</code></td>
+</tr>
+<tr>
+<td>Resource request waits too long</td>
+<td>Try flexible mode or smaller fixed resources</td>
+</tr>
+<tr>
+<td>Image pull fails</td>
+<td>Verify the image name and registry credentials</td>
+</tr>
+<tr>
+<td>Need structured Session data</td>
+<td><code>canfar ps --json</code></td>
+</tr>
+</tbody>
+</table>
 
 
 
@@ -2734,7 +2383,7 @@ For data management strategies, see <a href="../../storage/">Storage Guide</a>.<
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
   </span>
 
     
