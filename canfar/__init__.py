@@ -3,10 +3,16 @@
 from os import environ as env
 from pathlib import Path
 
-from .utils.logging import configure_logging, get_logger, set_log_level
+# Configuration paths and defaults (defined before logging import to avoid cycles)
+CONFIG_DIR: Path = Path.home() / ".canfar"
+CONFIG_PATH: Path = CONFIG_DIR / "config.yaml"
 
-# Configuration paths and defaults
-CONFIG_PATH: Path = Path.home() / ".canfar" / "config.yaml"
+from .utils.logging import (  # noqa: E402
+    configure_logging,
+    get_logger,
+    set_log_level,
+)
+
 CERT_PATH: Path = Path.home() / ".ssl" / "cadcproxy.pem"
 LOG_LEVEL: str = env.get("CANFAR_LOGLEVEL", "INFO")
 

@@ -14,6 +14,7 @@ import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
 import canfar
+from canfar.authentication import AuthMode
 
 
 def _write_config(path: Path, data: dict) -> None:
@@ -530,3 +531,7 @@ class TestAuthenticationModuleExports:
     def test_canfar_exports_login_helper(self) -> None:
         """canfar.login aliases authentication.login."""
         assert canfar.login is canfar.authentication.login
+
+    def test_authentication_re_exports_auth_mode(self) -> None:
+        """AuthMode remains importable from the public authentication module."""
+        assert AuthMode.__args__ == ("x509", "oidc")

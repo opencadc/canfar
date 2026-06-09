@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal, NoReturn
-
-from pydantic import BaseModel, ConfigDict, Field
+from typing import TYPE_CHECKING, NoReturn
 
 import canfar.server as server_service
 from canfar.errors import ErrorCode, StructuredError
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
+    Authentication,
     AuthenticationCredential,
+    AuthMode,  # noqa: F401  re-export for public imports
     X509Credential,
 )
 from canfar.models.config import Configuration
@@ -18,27 +18,6 @@ from canfar.models.config import Configuration
 if TYPE_CHECKING:
     import builtins
     from collections.abc import Mapping
-
-AuthMode = Literal["x509", "oidc"]
-
-
-class Authentication(BaseModel):
-    """CANFAR Authentication record."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    idp: str = Field(description="Canonical Identity Provider key.")
-    name: str = Field(description="Human-readable IDP name.")
-    mode: AuthMode = Field(description="Authentication mode.")
-    expiry: float | None = Field(
-        default=None,
-        description="Credential expiry as Unix timestamp when applicable.",
-    )
-    active: bool = Field(description="Whether this record is active.")
-    server: str | None = Field(
-        default=None,
-        description="Selected server URI reference when available.",
-    )
 
 
 class AuthenticationError(Exception):

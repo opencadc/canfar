@@ -16,6 +16,7 @@ class TestServer:
         assert server.uri is None
         assert server.url is None
         assert server.version is None
+        assert server.status is None
 
     def test_with_all_values(self) -> None:
         """Test Server with all custom values."""

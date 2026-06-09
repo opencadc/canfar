@@ -11,12 +11,7 @@ from rich.table import Table
 from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
 from canfar.cli import output
-from canfar.cli.dto_maps import server_list_dto
-from canfar.cli.machine import (
-    output_mode_callback,
-    resolve_output_mode_or_exit,
-    unsupported_machine_output,
-)
+from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.server import (
@@ -80,19 +75,12 @@ def _render_server_list_table() -> None:
 
 @server.command("list, ls")
 def server_list_command(
-    ctx: typer.Context,
-    json_output: Annotated[
-        bool,
-        typer.Option("--json", help="Emit machine-readable JSON on stdout."),
-    ] = False,
-    yaml_output: Annotated[
-        bool,
-        typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-    ] = False,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
 ) -> None:
     """List servers for the active Identity Provider."""
-    output_mode_callback(ctx, json_output, yaml_output)
-    mode = resolve_output_mode_or_exit(ctx)
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
 
     try:
         auth_show()
@@ -128,7 +116,7 @@ def server_list_command(
                 mode,
             )
             raise typer.Exit(1)
-        output.to_stdout(server_list_dto(servers), mode)
+        output.to_stdout(servers, mode)
         return
 
     _render_server_list_table()
@@ -136,11 +124,10 @@ def server_list_command(
 
 @server.command("use")
 def server_use_command(
-    ctx: typer.Context,
     selector: Annotated[str, typer.Argument(help="Server name or URI.")],
 ) -> None:
     """Select the active server by name or URI."""
-    unsupported_machine_output(ctx)
+    maybe_emit_banner(output.OutputMode.HUMAN)
     try:
         server_use(selector)
     except ServerSelectorError as exc:

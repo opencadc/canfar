@@ -7,6 +7,7 @@ registry search configuration, and server information.
 from __future__ import annotations
 
 from base64 import b64encode
+from collections import defaultdict
 
 from pydantic import AnyHttpUrl, BaseModel, Field, model_validator
 from typing_extensions import Self
@@ -99,13 +100,15 @@ class ServerResults(BaseModel):
             self.successful += 1
 
     def get_by_registry(self) -> dict[str, list[Server]]:
-        """Group endpoints by registry."""
-        results: dict[str, list[Server]] = {}
+        """Group endpoints by registry name.
+
+        Returns:
+            dict[str, list[Server]]: Endpoints keyed by registry identifier.
+        """
+        results: defaultdict[str, list[Server]] = defaultdict(list)
         for endpoint in self.endpoints:
-            if endpoint.registry not in results:
-                results[endpoint.registry] = []
             results[endpoint.registry].append(endpoint)
-        return results
+        return dict(results)
 
 
 class ContainerRegistry(BaseModel):

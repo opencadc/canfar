@@ -9,6 +9,8 @@ import click
 import typer
 import typer.core
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
@@ -83,6 +85,7 @@ def prune_sessions(
     canfar prune session-name headless Succeeded
     canfar prune session.* notebook Running
     """
+    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _prune() -> None:
         log_level = "DEBUG" if debug else "INFO"

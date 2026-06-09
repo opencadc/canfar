@@ -9,6 +9,8 @@ import yaml
 from pydantic import BaseModel
 
 from canfar import CONFIG_PATH
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.config import Configuration
 from canfar.utils.console import console
@@ -21,6 +23,7 @@ config: typer.Typer = typer.Typer(
 @config.command("show", help="Display client configuration")
 def show() -> None:
     """Display client configuration."""
+    maybe_emit_banner(OutputMode.HUMAN)
     try:
         cfg = Configuration()
         exists: bool = CONFIG_PATH.exists()
@@ -67,6 +70,7 @@ def get(
     canfar config get console.width
     canfar config get contexts.active
     """
+    maybe_emit_banner(OutputMode.HUMAN)
     try:
         cfg = Configuration()
         value = cfg.get_value(key)
@@ -86,6 +90,7 @@ def set_value(
     canfar config set console.width 130
     canfar config set contexts.active default
     """
+    maybe_emit_banner(OutputMode.HUMAN)
     cfg = Configuration()
     try:
         parsed = yaml.safe_load(value)
@@ -99,4 +104,5 @@ def set_value(
 @config.command("path", help="Local path of config")
 def path() -> None:
     """Local path of config."""
+    maybe_emit_banner(OutputMode.HUMAN)
     console.print(f"[green]{CONFIG_PATH}[/green]")

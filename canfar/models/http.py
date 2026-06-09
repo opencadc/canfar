@@ -104,6 +104,14 @@ class Server(BaseSettings):
         description="Maximum GPUs available for session creation.",
         ge=0,
     )
+    status: str | None = Field(
+        default=None,
+        title="Discovery Reachability Status",
+        description=(
+            "Runtime-only discovery reachability status when known; "
+            "not persisted in client configuration."
+        ),
+    )
 
     def capabilities(self, *, timeout: int | None = None) -> list[Capability]:
         """Fetch and parse the server's VOSI capabilities.

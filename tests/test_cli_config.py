@@ -32,7 +32,7 @@ def test_config_get_default_console_width(tmp_path: Path) -> None:
     ):
         result = runner.invoke(config, ["get", "console.width"])
         assert result.exit_code == 0
-        assert result.stdout.strip() == "120"
+        assert result.stdout.strip().splitlines()[-1] == "120"
 
 
 def test_config_set_and_get_console_width(tmp_path: Path) -> None:
@@ -47,7 +47,7 @@ def test_config_set_and_get_console_width(tmp_path: Path) -> None:
 
         result = runner.invoke(config, ["get", "console.width"])
         assert result.exit_code == 0
-        assert result.stdout.strip() == "130"
+        assert result.stdout.strip().splitlines()[-1] == "130"
 
         assert config_path.exists()
         assert "width: 130" in config_path.read_text(encoding="utf-8")

@@ -91,7 +91,7 @@ def test_server_use_selects_by_uri(tmp_path: Path) -> None:
 
 
 def test_server_ls_json_output(tmp_path: Path) -> None:
-    """``server ls --json`` emits DTO payloads on stdout."""
+    """``server ls --json`` emits a JSON array of Server objects on stdout."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
@@ -100,6 +100,21 @@ def test_server_ls_json_output(tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
-    assert "servers" in payload
-    assert payload["servers"][0]["uri"] == _CADC_URI
-    assert payload["servers"][0]["name"] == "CADC-CANFAR"
+    assert isinstance(payload, list)
+    assert len(payload) == 1
+    server = payload[0]
+    assert set(server) == {
+        "name",
+        "uri",
+        "url",
+        "version",
+        "auths",
+        "idp",
+        "cores",
+        "ram",
+        "gpus",
+        "status",
+    }
+    assert server["uri"] == _CADC_URI
+    assert server["name"] == "CADC-CANFAR"
+    assert server["status"] is None

@@ -6,15 +6,18 @@ import json
 from io import StringIO
 
 import pytest
+import typer
 import yaml
+from pydantic import BaseModel
 
-from canfar.cli import output
+from canfar.authentication import Authentication
+from canfar.cli import machine, output
 from canfar.errors import StructuredError
-from canfar.models.dto.base import DtoBase, dto_dump
+from canfar.models.http import Server
 
 
-class SampleDto(DtoBase):
-    """Sample DTO for serialization tests."""
+class SampleModel(BaseModel):
+    """Sample model for serialization tests."""
 
     name: str
     optional: str | None = None
@@ -27,52 +30,46 @@ def test_output_mode_values() -> None:
     assert output.OutputMode.YAML.value == "yaml"
 
 
-def test_parse_leaf_output_flags_after_command_path() -> None:
-    """Leaf flags after the command path select machine output mode."""
-    assert output.parse_suffix(["auth", "ls", "--json"]) == output.OutputMode.JSON
-    assert output.parse_suffix(["ps", "--yaml"]) == output.OutputMode.YAML
-    assert output.parse_suffix(["auth", "ls"]) is None
+def test_resolve_mode_defaults_to_human() -> None:
+    """No machine flags resolve to human output mode."""
+    assert machine.resolve_mode(json_output=False, yaml_output=False) == (
+        output.OutputMode.HUMAN
+    )
 
 
-def test_parse_output_flags_ignores_middle_group_placement() -> None:
-    """Intermediate group placement is not a supported output flag location."""
-    assert output.parse(["auth", "--json", "ls"]) == output.OutputMode.HUMAN
+def test_resolve_mode_json_and_yaml() -> None:
+    """Single machine flags select the matching output mode."""
+    assert machine.resolve_mode(json_output=True, yaml_output=False) == (
+        output.OutputMode.JSON
+    )
+    assert machine.resolve_mode(json_output=False, yaml_output=True) == (
+        output.OutputMode.YAML
+    )
 
 
-def test_parse_output_flags_defaults_to_human() -> None:
-    """No machine flags resolves to human output mode."""
-    assert output.parse(["auth", "ls"]) == output.OutputMode.HUMAN
-
-
-def test_parse_output_flags_ignores_root_prefix_placement() -> None:
-    """Root prefix placement is not a supported output flag location."""
-    assert output.parse(["--json", "auth", "ls"]) == output.OutputMode.HUMAN
-
-
-def test_parse_output_flags_leaf_only() -> None:
-    """Leaf placement alone selects machine output mode."""
-    assert output.parse(["auth", "ls", "--yaml"]) == output.OutputMode.YAML
-
-
-def test_parse_output_flags_duplicate_same_mode_at_leaf_is_idempotent() -> None:
-    """Duplicate same-mode flags at the supported leaf placement are idempotent."""
-    assert output.parse(["ps", "--json", "--json"]) == output.OutputMode.JSON
-    assert output.parse(["auth", "ls", "--yaml", "--yaml"]) == output.OutputMode.YAML
-
-
-def test_parse_output_flags_conflicting_leaf_modes_exit_two() -> None:
-    """Different machine modes at the supported leaf placement raise conflict."""
-    with pytest.raises(output.OutputConflictError) as exc_info:
-        output.parse(["ps", "--json", "--yaml"])
-
-    assert exc_info.value.code == "output.conflict"
+def test_resolve_mode_conflict_exits_two() -> None:
+    """Conflicting machine output flags exit with code 2."""
+    with pytest.raises(typer.Exit) as exc_info:
+        machine.resolve_mode(json_output=True, yaml_output=True)
     assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE
 
 
-def test_dto_dump_includes_null_fields() -> None:
-    """DTO serialization keeps declared null fields for stable machine keys."""
-    payload = dto_dump(SampleDto(name="cadc"))
-    assert payload == {"name": "cadc", "optional": None}
+def test_model_dump_includes_null_fields() -> None:
+    """Serialization keeps declared null fields for stable machine keys."""
+    payload = output.render_stdout(
+        Authentication(
+            idp="cadc",
+            name="CADC",
+            mode="x509",
+            expiry=None,
+            active=True,
+            server=None,
+        ),
+        output.OutputMode.JSON,
+    )
+    parsed = json.loads(payload)
+    assert set(parsed) == {"idp", "name", "mode", "expiry", "active", "server"}
+    assert parsed["server"] is None
 
 
 def test_render_stdout_json_is_data_only() -> None:
@@ -127,7 +124,7 @@ def test_write_stdout_and_stderr_separation(monkeypatch: pytest.MonkeyPatch) -> 
     monkeypatch.setattr("sys.stdout", stdout)
     monkeypatch.setattr("sys.stderr", stderr)
 
-    output.to_stdout({"sessions": []}, output.OutputMode.JSON)
+    output.to_stdout([{"id": "s1"}], output.OutputMode.JSON)
     output.to_stderr(
         StructuredError(
             code="transport.failure",
@@ -136,14 +133,30 @@ def test_write_stdout_and_stderr_separation(monkeypatch: pytest.MonkeyPatch) -> 
         output.OutputMode.JSON,
     )
 
-    assert json.loads(stdout.getvalue()) == {"sessions": []}
+    assert json.loads(stdout.getvalue()) == [{"id": "s1"}]
     assert json.loads(stderr.getvalue())["code"] == "transport.failure"
     assert stdout.getvalue().strip() != stderr.getvalue().strip()
 
 
-def test_render_stdout_accepts_pydantic_dto() -> None:
-    """Stdout rendering accepts DTO models via shared dump helpers."""
+def test_render_stdout_accepts_pydantic_model() -> None:
+    """Stdout rendering accepts Pydantic models via model_dump."""
     rendered = output.render_stdout(
-        SampleDto(name="srcnet", optional=None), output.OutputMode.JSON
+        SampleModel(name="srcnet", optional=None), output.OutputMode.JSON
     )
     assert json.loads(rendered) == {"name": "srcnet", "optional": None}
+
+
+def test_render_stdout_accepts_model_list() -> None:
+    """Stdout rendering serializes lists of Pydantic models."""
+    rendered = output.render_stdout(
+        [
+            Server(name="CADC", status=None),
+            Server(name="SRC", status=None),
+        ],
+        output.OutputMode.JSON,
+    )
+    payload = json.loads(rendered)
+    assert len(payload) == 2
+    assert payload[0]["name"] == "CADC"
+    assert "status" in payload[0]
+    assert payload[0]["status"] is None

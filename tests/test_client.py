@@ -1,6 +1,7 @@
 """Test CANFAR Python Client API."""
 # ruff: noqa: SLF001
 
+import re
 import ssl
 import tempfile
 from datetime import datetime, timedelta, timezone
@@ -422,12 +423,21 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
-        headers = client._get_http_headers()
+        with patch(
+            "canfar.client.formatdate",
+            return_value="Wed, 09 Jun 2026 12:00:00 GMT",
+        ) as mock_formatdate:
+            headers = client._get_http_headers()
 
+        mock_formatdate.assert_called_once_with(usegmt=True)
         assert "Content-Type" in headers
         assert "Accept" in headers
         assert "User-Agent" in headers
-        assert "Date" in headers
+        assert headers["Date"] == "Wed, 09 Jun 2026 12:00:00 GMT"
+        assert re.match(
+            r"^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$",
+            headers["Date"],
+        )
         assert headers["Content-Type"] == "application/x-www-form-urlencoded"
         assert headers["Accept"] == "application/json"
         assert "python-canfar" in headers["User-Agent"]

@@ -7,8 +7,6 @@ from typing import TYPE_CHECKING
 
 from typer.core import TyperGroup
 
-from canfar.cli.machine import set_invoke_argv
-
 if TYPE_CHECKING:
     from typer._click.core import Command, Context
 
@@ -21,11 +19,6 @@ class AliasGroup(TyperGroup):
     """
 
     _CMD_SPLIT_P = re.compile(r" ?[,|] ?")
-
-    def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
-        """Capture raw argv before option parsing for output-mode checks."""
-        set_invoke_argv(args)
-        return super().parse_args(ctx, args)
 
     def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
         """Retrieve a command by name, supporting aliases.

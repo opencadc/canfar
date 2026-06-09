@@ -10,6 +10,8 @@ import typer
 from rich import box
 from rich.table import Table
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
 
@@ -35,6 +37,7 @@ def get_events(
     ] = False,
 ) -> None:
     """Get events from the science platform server."""
+    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_events() -> None:
         log_level = "DEBUG" if debug else "INFO"

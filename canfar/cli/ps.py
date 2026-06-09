@@ -13,6 +13,8 @@ from pydantic import ValidationError
 from rich import box
 from rich.table import Table
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
@@ -67,6 +69,7 @@ def show(
     ] = False,
 ) -> None:
     """Show sessions."""
+    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _list_sessions() -> None:
         """Asynchronous function to list sessions."""

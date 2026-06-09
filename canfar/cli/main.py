@@ -13,10 +13,7 @@ from canfar.cli.image import image
 from canfar.cli.info import info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
-from canfar.cli.machine import (
-    maybe_emit_cli_banner,
-    reset,
-)
+from canfar.cli.machine import reset
 from canfar.cli.open import open_command
 from canfar.cli.prune import prune
 from canfar.cli.ps import ps
@@ -32,7 +29,6 @@ from canfar.utils.console import console
 def callback(ctx: typer.Context) -> None:
     """Main callback that handles no subcommand case."""
     reset()
-    maybe_emit_cli_banner(ctx)
 
     if ctx.invoked_subcommand is None:
         console.print(ctx.get_help())

@@ -139,6 +139,7 @@ The `chunk` function divides your data into contiguous blocks, with each replica
 
 ```python title="Chunking Example"
 from canfar.helpers import distributed
+from glob import glob
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0-9
@@ -157,6 +158,7 @@ The `stripe` function distributes data in a round-robin fashion, which is useful
 
 ```python title="Striping Example"
 from canfar.helpers import distributed
+from glob import glob
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0, 100, 200, 300, ...

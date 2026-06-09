@@ -7,13 +7,35 @@ import time
 from pathlib import Path  # noqa: TC003
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from canfar import get_logger
 from canfar.auth import x509
 from canfar.models.http import Server
 
 log = get_logger(__name__)
+
+AuthMode = Literal["x509", "oidc"]
+"""Supported authentication modes for domain records."""
+
+
+class Authentication(BaseModel):
+    """CANFAR Authentication record."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    idp: str = Field(description="Canonical Identity Provider key.")
+    name: str = Field(description="Human-readable IDP name.")
+    mode: AuthMode = Field(description="Authentication mode.")
+    expiry: float | None = Field(
+        default=None,
+        description="Credential expiry as Unix timestamp when applicable.",
+    )
+    active: bool = Field(description="Whether this record is active.")
+    server: str | None = Field(
+        default=None,
+        description="Selected server URI reference when available.",
+    )
 
 
 class Endpoint(BaseModel):

@@ -27,12 +27,7 @@ from canfar.authentication import (
     show as auth_show,
 )
 from canfar.cli import output
-from canfar.cli.dto_maps import authentication_list_dto, authentication_show_dto
-from canfar.cli.machine import (
-    output_mode_callback,
-    resolve_output_mode_or_exit,
-    unsupported_machine_output,
-)
+from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.idp import get_idp
 from canfar.models.config import Configuration
@@ -155,93 +150,75 @@ def _render_auth_list_table() -> None:
     console.print(table)
 
 
-@auth.callback(invoke_without_command=True)
-def auth_default(
-    ctx: typer.Context,
-    json_output: Annotated[
-        bool,
-        typer.Option("--json", help="Emit machine-readable JSON on stdout."),
-    ] = False,
-    yaml_output: Annotated[
-        bool,
-        typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-    ] = False,
-) -> None:
-    """Active authentication state."""
-    if ctx.invoked_subcommand in {"show", "ls"} and (json_output or yaml_output):
-        typer.echo(
-            "Place --json or --yaml after the command that emits machine output.",
-            err=True,
-        )
-        raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
-    output_mode_callback(ctx, json_output, yaml_output)
-    if ctx.invoked_subcommand is not None:
-        return
+def _auth_show(mode: output.OutputMode) -> None:
+    """Emit the active Authentication record in the resolved output mode.
 
-    mode = resolve_output_mode_or_exit(ctx)
+    Args:
+        mode: Effective CLI output mode.
+
+    Raises:
+        typer.Exit: Exit code 1 when no active authentication is available.
+    """
     if mode is not output.OutputMode.HUMAN:
         try:
             summary = auth_show()
         except AuthenticationError as exc:
             output.to_stderr(exc.error, mode)
             raise typer.Exit(1) from exc
-        output.to_stdout(authentication_show_dto(summary), mode)
+        output.to_stdout(summary, mode)
+        return
+    _render_auth_show_table()
+
+
+@auth.callback(invoke_without_command=True)
+def auth_default(
+    ctx: typer.Context,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
+) -> None:
+    """Active authentication state."""
+    if ctx.invoked_subcommand is not None:
+        if json_output or yaml_output:
+            typer.echo(
+                "Place --json or --yaml after the subcommand.",
+                err=True,
+            )
+            raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
         return
 
-    _render_auth_show_table()
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+    _auth_show(mode)
 
 
 @auth.command("show")
 def auth_show_command(
-    ctx: typer.Context,
-    json_output: Annotated[
-        bool,
-        typer.Option("--json", help="Emit machine-readable JSON on stdout."),
-    ] = False,
-    yaml_output: Annotated[
-        bool,
-        typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-    ] = False,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
 ) -> None:
     """Active authentication state."""
-    output_mode_callback(ctx, json_output, yaml_output)
-    mode = resolve_output_mode_or_exit(ctx)
-    if mode is not output.OutputMode.HUMAN:
-        try:
-            summary = auth_show()
-        except AuthenticationError as exc:
-            output.to_stderr(exc.error, mode)
-            raise typer.Exit(1) from exc
-        output.to_stdout(authentication_show_dto(summary), mode)
-        return
-    _render_auth_show_table()
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+    _auth_show(mode)
 
 
 @auth.command("ls")
 def auth_list_command(
-    ctx: typer.Context,
-    json_output: Annotated[
-        bool,
-        typer.Option("--json", help="Emit machine-readable JSON on stdout."),
-    ] = False,
-    yaml_output: Annotated[
-        bool,
-        typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-    ] = False,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
 ) -> None:
     """Available auth providers."""
-    output_mode_callback(ctx, json_output, yaml_output)
-    mode = resolve_output_mode_or_exit(ctx)
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
     summaries = auth_list()
     if mode is not output.OutputMode.HUMAN:
-        output.to_stdout(authentication_list_dto(summaries), mode)
+        output.to_stdout(summaries, mode)
         return
     _render_auth_list_table()
 
 
 @auth.command("login")
 def auth_login_command(
-    ctx: typer.Context,
     idp: Annotated[
         str | None,
         typer.Argument(help="Canonical Identity Provider key."),
@@ -274,12 +251,12 @@ def auth_login_command(
     from canfar.cli.prompts import select_idp  # noqa: PLC0415
     from canfar.idp import list_idps  # noqa: PLC0415
 
+    maybe_emit_banner(output.OutputMode.HUMAN)
     console.print(
         "\n[red]Deprecation Notice:[/red]"
         "\n[yellow]canfar auth login[/yellow] will be removed soon."
         " Use [green][bold]canfar login[/bold][/green] instead.\n"
     )
-    unsupported_machine_output(ctx)
     if debug:
         set_log_level("DEBUG")
         get_logger(__name__).debug("Debug logging enabled")
@@ -289,11 +266,10 @@ def auth_login_command(
 
 @auth.command("use")
 def auth_use_command(
-    ctx: typer.Context,
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
 ) -> None:
     """Switch auth provider."""
-    unsupported_machine_output(ctx)
+    maybe_emit_banner(output.OutputMode.HUMAN)
     config = Configuration()
 
     try:
@@ -327,7 +303,6 @@ def auth_use_command(
 
 @auth.command("rm")
 def auth_remove_command(
-    ctx: typer.Context,
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
     force: Annotated[
         bool,
@@ -335,7 +310,7 @@ def auth_remove_command(
     ] = False,
 ) -> None:
     """Remove auth and associated servers."""
-    unsupported_machine_output(ctx)
+    maybe_emit_banner(output.OutputMode.HUMAN)
     config = Configuration()
     if config.active.authentication == idp and not force:
         should_remove = Confirm.ask(
@@ -363,14 +338,13 @@ def auth_remove_command(
 
 @auth.command("purge")
 def auth_purge_command(
-    ctx: typer.Context,
     force: Annotated[
         bool,
         typer.Option("--force", help="Required to reset authentication state."),
     ] = False,
 ) -> None:
     """Remove all auths and servers."""
-    unsupported_machine_output(ctx)
+    maybe_emit_banner(output.OutputMode.HUMAN)
     if not force:
         console.print("[bold red]Authentication purge requires --force.[/bold red]")
         raise typer.Exit(1)

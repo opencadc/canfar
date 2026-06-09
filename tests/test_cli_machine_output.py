@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import yaml
 from typer.testing import CliRunner
@@ -16,6 +16,11 @@ if TYPE_CHECKING:
 
 runner = CliRunner()
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
+
+_AUTH_KEYS = frozenset({"idp", "name", "mode", "expiry", "active", "server"})
+_SERVER_KEYS = frozenset(
+    {"name", "uri", "url", "version", "auths", "idp", "cores", "ram", "gpus", "status"}
+)
 
 
 def _patch_config(path: Path):
@@ -56,6 +61,18 @@ def _write_config(path: Path) -> None:
     path.write_text(yaml.dump(data), encoding="utf-8")
 
 
+def test_auth_ls_human_mode_emits_banner(tmp_path: Path) -> None:
+    """``auth ls`` in human mode emits the active-server banner."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(cli, ["auth", "ls"])
+
+    assert result.exit_code == 0
+    assert result.stdout.startswith("@")
+
+
 def test_auth_ls_json_stdout_is_data_only(tmp_path: Path) -> None:
     """``auth ls --json`` emits JSON on stdout without the human-mode banner."""
     config_path = tmp_path / "config.yaml"
@@ -69,17 +86,37 @@ def test_auth_ls_json_stdout_is_data_only(tmp_path: Path) -> None:
     json.loads(result.stdout)
 
 
-def test_auth_group_json_before_subcommand_is_rejected(tmp_path: Path) -> None:
-    """``auth --json ls`` fails before emitting human output."""
+def test_auth_group_flag_before_subcommand_is_rejected(tmp_path: Path) -> None:
+    """Group-level ``--json``/``--yaml`` placement exits 2 with guidance."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "--json", "ls"])
+        json_result = runner.invoke(cli, ["auth", "--json", "ls"])
+        yaml_result = runner.invoke(cli, ["auth", "--yaml", "show"])
 
-    assert result.exit_code == 2
-    assert result.stdout == ""
-    assert "Place --json or --yaml after the command" in result.stderr
+    assert json_result.exit_code == 2
+    assert "Place --json or --yaml after the subcommand." in json_result.stderr
+    assert yaml_result.exit_code == 2
+    assert "Place --json or --yaml after the subcommand." in yaml_result.stderr
+
+
+def test_ps_human_mode_emits_banner(tmp_path: Path) -> None:
+    """Human-only commands like ``ps`` emit the active-server banner."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.ps.AsyncSession") as session_cls,
+    ):
+        session = AsyncMock()
+        session.fetch.return_value = []
+        session_cls.return_value.__aenter__.return_value = session
+        result = runner.invoke(cli, ["ps"])
+
+    assert result.exit_code == 0
+    assert result.stdout.startswith("@")
 
 
 def test_auth_default_json_matches_show(tmp_path: Path) -> None:
@@ -96,8 +133,23 @@ def test_auth_default_json_matches_show(tmp_path: Path) -> None:
     assert json.loads(default_result.stdout) == json.loads(show_result.stdout)
 
 
-def test_auth_ls_json_includes_null_fields(tmp_path: Path) -> None:
-    """``auth ls --json`` keeps declared null DTO fields."""
+def test_auth_show_json_payload_shape(tmp_path: Path) -> None:
+    """``auth show --json`` emits a domain Authentication object without envelopes."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(cli, ["auth", "show", "--json"])
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert set(payload) == _AUTH_KEYS
+    assert payload["idp"] == "cadc"
+    assert payload["active"] is True
+
+
+def test_auth_ls_json_payload_shape(tmp_path: Path) -> None:
+    """``auth ls --json`` emits a JSON array of Authentication objects."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
@@ -106,9 +158,10 @@ def test_auth_ls_json_includes_null_fields(tmp_path: Path) -> None:
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
-    srcnet = next(
-        item for item in payload["authentications"] if item["idp"] == "srcnet"
-    )
+    assert isinstance(payload, list)
+    assert len(payload) == 2
+    assert all(set(item) == _AUTH_KEYS for item in payload)
+    srcnet = next(item for item in payload if item["idp"] == "srcnet")
     assert "server" in srcnet
     assert srcnet["server"] is None
 
@@ -134,9 +187,8 @@ def test_conflicting_output_flags_exit_two() -> None:
     assert "Conflicting machine output flags" in result.stderr
 
 
-def test_unsupported_machine_output_exit_one() -> None:
-    """Unsupported machine output commands exit 1 with exact stderr text."""
-    result = runner.invoke(cli, ["auth", "--json", "purge", "--force"])
-    assert result.exit_code == 1
-    assert "machine output not supported for this command yet" in result.stderr
-    assert "use default human output for now" in result.stderr
+def test_unsupported_command_rejects_leaf_json_flag() -> None:
+    """Commands without machine flags reject ``--json`` at the leaf."""
+    result = runner.invoke(cli, ["auth", "purge", "--json", "--force"])
+    assert result.exit_code == 2
+    assert "--json" in result.stderr

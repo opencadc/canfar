@@ -7,8 +7,9 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 
 from canfar import CONFIG_PATH, get_logger, set_log_level
+from canfar.cli import output
 from canfar.cli.login_auth import authenticate_for_cli
-from canfar.cli.machine import unsupported_machine_output
+from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.prompts import select_idp, select_server
 from canfar.idp import get_idp, list_idps
 from canfar.models.config import Configuration
@@ -144,7 +145,6 @@ def register_login_command(app: typer.Typer) -> None:
         rich_help_panel="Auth Management",
     )
     def login_command(
-        ctx: typer.Context,
         idp: Annotated[
             str | None,
             typer.Argument(help="Canonical Identity Provider key."),
@@ -172,7 +172,7 @@ def register_login_command(app: typer.Typer) -> None:
         ] = 2,
     ) -> None:
         """Login to CANFAR Science Platform."""
-        unsupported_machine_output(ctx)
+        maybe_emit_banner(output.OutputMode.HUMAN)
         if debug:
             set_log_level("DEBUG")
             log.debug("Debug logging enabled")

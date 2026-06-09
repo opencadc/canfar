@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import ssl
 from contextlib import asynccontextmanager, contextmanager
+from datetime import datetime, timezone
+from email.utils import formatdate
 from pathlib import Path
-from time import asctime, gmtime
 from typing import TYPE_CHECKING, Any
 
 from httpx import URL, AsyncClient, Client, Limits, Timeout
@@ -190,7 +191,7 @@ class HTTPClient(BaseSettings):
 
         if self.certificate:
             info = x509.inspect(self.certificate)
-            expiry = {asctime(gmtime(info["expiry"]))}
+            expiry = datetime.fromtimestamp(info["expiry"], tz=timezone.utc).isoformat()
             msg = f"{self.certificate} valid till {expiry}"
             log.debug(msg)
 
@@ -321,7 +322,7 @@ class HTTPClient(BaseSettings):
         headers: dict[str, str] = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
-            "Date": asctime(gmtime()),
+            "Date": formatdate(usegmt=True),
             "User-Agent": f"python-canfar/{__version__}",
         }
 

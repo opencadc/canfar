@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Annotated, Any, get_args
 import click
 import typer
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
@@ -129,6 +131,7 @@ def creation(
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
+    maybe_emit_banner(OutputMode.HUMAN)
     cmd = None
     args = ""
     environment: dict[str, Any] = {}
