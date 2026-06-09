@@ -11,7 +11,6 @@ from canfar.errors import ErrorCode, StructuredError
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
     AuthenticationCredential,
-    OIDCCredential,
     X509Credential,
 )
 from canfar.models.config import Configuration
@@ -341,7 +340,7 @@ def _authenticate_x509(idp: str) -> X509Credential:
     )
 
 
-def _authenticate_oidc(idp: str) -> OIDCCredential:
+def _authenticate_oidc(idp: str) -> NoReturn:
     _fail(
         code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
         message=f"OIDC authentication for IDP '{idp}' requires interactive login.",

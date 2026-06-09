@@ -67,7 +67,7 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
         patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login.server_service.discover",
+            "canfar.cli.login.discover",
             side_effect=lambda idp, *, config, **_kwargs: (
                 _merge_servers(
                     config,
@@ -111,7 +111,7 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
         patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login.server_service.discover",
+            "canfar.cli.login.discover",
             side_effect=lambda idp, *, config, **_kwargs: (
                 _merge_servers(
                     config,
@@ -162,7 +162,7 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
         patch("canfar.server._validate_server", return_value=validated),
         patch(
-            "canfar.cli.login.server_service.discover",
+            "canfar.cli.login.discover",
             side_effect=lambda idp, *, config, **_kwargs: (
                 _merge_servers(
                     config,
@@ -226,7 +226,7 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", authenticate),
         patch("canfar.server._validate_server", validate),
-        patch("canfar.cli.login.server_service.discover", side_effect=discover),
+        patch("canfar.cli.login.discover", side_effect=discover),
     ):
         result = runner.invoke(
             cli,

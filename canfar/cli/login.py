@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Annotated
 
 import typer
 
-import canfar.server as server_service
 from canfar import CONFIG_PATH, get_logger, set_log_level
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.machine import unsupported_machine_output
@@ -17,6 +16,8 @@ from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
     ServerSelectorError,
+    activate,
+    discover,
 )
 from canfar.utils.console import console
 
@@ -103,7 +104,7 @@ def _login_flow(
     _upsert_credential(config, credential)
 
     try:
-        servers = server_service.discover(
+        servers = discover(
             idp,
             config=config,
             dev=dev,
@@ -126,7 +127,7 @@ def _login_flow(
 
     selector = str(selected.uri)
     try:
-        server_service.activate(idp, selector, config=config, dev=dev, timeout=timeout)
+        activate(idp, selector, config=config, dev=dev, timeout=timeout)
     except (ServerFetchError, ServerSelectorError) as exc:
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
