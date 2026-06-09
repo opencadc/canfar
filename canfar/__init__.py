@@ -28,6 +28,8 @@ from .authentication import login  # noqa: E402
 __version__: str = "1.3.5"  # x-release-please-version
 
 __all__ = [
+    "CONFIG_DIR",
+    "CONFIG_PATH",
     "__version__",
     "authentication",
     "configure_logging",

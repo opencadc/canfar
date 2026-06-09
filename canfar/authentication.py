@@ -10,7 +10,7 @@ from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
     Authentication,
     AuthenticationCredential,
-    AuthMode,  # noqa: F401  re-export for public imports
+    AuthMode,
     X509Credential,
 )
 from canfar.models.config import Configuration
@@ -296,8 +296,10 @@ def _upsert_credential(
 
 def _authenticate(idp_info: IdpInfo) -> AuthenticationCredential:
     if idp_info.auth_mode == "x509":
-        return _authenticate_x509(idp_info.key)
-    return _authenticate_oidc(idp_info.key)
+        credential = _authenticate_x509(idp_info.key)
+    else:
+        _authenticate_oidc(idp_info.key)
+    return credential
 
 
 def _authenticate_x509(idp: str) -> X509Credential:
@@ -328,6 +330,7 @@ def _authenticate_oidc(idp: str) -> NoReturn:
 
 
 __all__ = [
+    "AuthMode",
     "Authentication",
     "AuthenticationError",
     "list",

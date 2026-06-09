@@ -534,4 +534,10 @@ class TestAuthenticationModuleExports:
 
     def test_authentication_re_exports_auth_mode(self) -> None:
         """AuthMode remains importable from the public authentication module."""
+        assert "AuthMode" in canfar.authentication.__all__
         assert AuthMode.__args__ == ("x509", "oidc")
+
+    def test_canfar_exports_config_paths(self) -> None:
+        """Configuration paths are explicit package-root exports."""
+        assert "CONFIG_DIR" in canfar.__all__
+        assert "CONFIG_PATH" in canfar.__all__
