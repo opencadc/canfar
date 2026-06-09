@@ -45,6 +45,8 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - Use caveman style only when the user explicitly invokes it; otherwise use normal concise style.
 - During design grilling, ask one question at a time and converge decisions incrementally.
 - During broad refactors, preserve existing tests and avoid API/CLI output regressions unless the user explicitly approves those changes.
+- Do not introduce a separate DTO/request model layer; use the domain Pydantic models under `canfar/models/` directly and serialize the same model for `--json` output.
+- Prefer Python stdlib utilities (for example `pathlib`, `email.utils`, `itertools`) over custom helper or safeguard code.
 
 ## Learned Workspace Facts
 
@@ -54,9 +56,8 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - Domain documentation currently uses root `CONTEXT.md` as the glossary.
 - Specs/decisions are Jira-first; this repo does not keep ADR/RFC directories as the source of truth.
 - `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
-- CLI layout is kubectl-style across domain seams: `canfar auth` (Authentication), `canfar server` (Platform), and `canfar login`.
-- `canfar login` is the supported login entrypoint; `canfar auth login` is a deprecated compatibility alias.
-- `canfar context` was removed; use `canfar auth show`, `canfar auth ls`, and `canfar server ls` for combined auth/server state.
-- Bare `canfar auth` runs `show`; supported subcommand names are canonical only (`ls`/`rm`, not `list`/`remove` aliases).
+- CLI layout is kubectl-style: `canfar auth` (bare runs `show`; canonical subcommand names only, `ls`/`rm`), `canfar server`, and `canfar login` (`canfar auth login` is a deprecated alias; `canfar context` was removed).
 - CLI machine output (`--json`/`--yaml`) must be data-only on stdout; the human-mode active-server banner must not precede JSON/YAML payloads.
 - Built-in default CADC/CANFAR server metadata lists `x509` only; `oidc` and other auth modes are merged from VOSI capabilities enrichment after discovery/login, not static defaults.
+- `canfar ps -q` must print all matching session IDs and apply the same `--all`/running-only status filter as table mode.
+- `canfar.helpers.distributed` is documented public API used in user batch scripts, not internal/dead code.
