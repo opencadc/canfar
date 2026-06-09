@@ -13,8 +13,8 @@ from pydantic import ValidationError
 from rich import box
 from rich.table import Table
 
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
+from canfar.cli import output
+from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
@@ -67,9 +67,20 @@ def show(
             help="Enable debug logging.",
         ),
     ] = False,
+    json_output: JsonOption = False,
+    yaml_output: YamlOption = False,
 ) -> None:
     """Show sessions."""
-    maybe_emit_banner(OutputMode.HUMAN)
+    mode = resolve_mode(json_output, yaml_output)
+    maybe_emit_banner(mode)
+
+    if quiet and mode is not output.OutputMode.HUMAN:
+        typer.echo(
+            "Incompatible flags: --quiet is human-only and cannot be used with "
+            "--json or --yaml.",
+            err=True,
+        )
+        raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
 
     async def _list_sessions() -> None:
         """Asynchronous function to list sessions."""
@@ -86,7 +97,7 @@ def show(
                 sanitized.append(_info)
                 anomalies.extend(_info.anomalies)
             except ValidationError as err:
-                console.print(f"[bold red]Error:[/bold red] {err}")
+                typer.echo(f"Error: {err}", err=True)
                 continue
 
         sessions = sorted(
@@ -95,10 +106,18 @@ def show(
             reverse=False,
         )
 
+        visible = [
+            instance
+            for instance in sessions
+            if everything or instance.status in ["Pending", "Running"]
+        ]
+
+        if mode is not output.OutputMode.HUMAN:
+            output.to_stdout(visible, mode)
+            return
+
         if quiet:
-            for instance in sessions:
-                if not everything and instance.status not in ["Pending", "Running"]:
-                    continue
+            for instance in visible:
                 console.print(instance.id)
             return
 
@@ -111,9 +130,7 @@ def show(
         table.add_column("CREATED", style="yellow")
 
         running = 0
-        for instance in sessions:
-            if not everything and instance.status not in ["Pending", "Running"]:
-                continue
+        for instance in visible:
             created = "unknown"
             if instance.startTime:
                 uptime = datetime.now(timezone.utc) - instance.startTime

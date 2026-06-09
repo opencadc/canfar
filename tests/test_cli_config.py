@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
+import yaml
 from pydantic import BaseModel
 from typer.testing import CliRunner
 
@@ -14,6 +16,10 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 runner = CliRunner()
+
+_CONFIG_KEYS = frozenset(
+    {"version", "active", "authentication", "server", "registry", "console"}
+)
 
 
 def _patch_config_path(path: Path):
@@ -114,6 +120,226 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
 
     assert result.exit_code == 1
     assert "wrong" in result.stdout
+
+
+def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:
+    """``config show --json`` emits the Configuration model with stable keys."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["show", "--json"])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+    payload = json.loads(result.stdout)
+    assert set(payload) == _CONFIG_KEYS
+    assert payload["version"] == 1
+
+
+def test_config_show_yaml_emits_configuration_model(tmp_path: Path) -> None:
+    """``config show --yaml`` emits the Configuration model on stdout."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["show", "--yaml"])
+
+    assert result.exit_code == 0
+    payload = yaml.safe_load(result.stdout)
+    assert set(payload) == _CONFIG_KEYS
+
+
+def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
+    """``config show --json`` must not emit raw OIDC secrets from saved auth."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        yaml.dump(
+            {
+                "version": 1,
+                "active": {
+                    "authentication": "srcnet",
+                    "server": "ivo://cadc.nrc.ca/skaha",
+                },
+                "authentication": [
+                    {
+                        "idp": "srcnet",
+                        "mode": "oidc",
+                        "endpoints": {},
+                        "client": {"identity": "client-id", "secret": "raw-secret"},
+                        "token": {
+                            "access": "raw-access",
+                            "refresh": "raw-refresh",
+                        },
+                        "expiry": {},
+                    }
+                ],
+                "server": [
+                    {
+                        "idp": "srcnet",
+                        "name": "test",
+                        "uri": "ivo://cadc.nrc.ca/skaha",
+                        "url": "https://example.test/skaha",
+                        "version": "v1",
+                        "auths": ["oidc"],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["show", "--json"])
+
+    assert result.exit_code == 0
+    rendered = result.stdout
+    assert "raw-secret" not in rendered
+    assert "raw-access" not in rendered
+    assert "raw-refresh" not in rendered
+    oidc = json.loads(rendered)["authentication"][0]
+    assert oidc["client"]["identity"] == "client-id"
+    assert oidc["client"]["secret"] == "**********"
+    assert oidc["token"]["access"] == "**********"
+    assert oidc["token"]["refresh"] == "**********"
+
+
+def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
+    """Unset OIDC secret fields stay null (stable keys, no fake masking)."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        yaml.dump(
+            {
+                "version": 1,
+                "active": {
+                    "authentication": "srcnet",
+                    "server": "ivo://cadc.nrc.ca/skaha",
+                },
+                "authentication": [
+                    {
+                        "idp": "srcnet",
+                        "mode": "oidc",
+                        "endpoints": {},
+                        "client": {"identity": "client-id"},
+                        "token": {},
+                        "expiry": {},
+                    }
+                ],
+                "server": [
+                    {
+                        "idp": "srcnet",
+                        "name": "test",
+                        "uri": "ivo://cadc.nrc.ca/skaha",
+                        "url": "https://example.test/skaha",
+                        "version": "v1",
+                        "auths": ["oidc"],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["show", "--json"])
+
+    assert result.exit_code == 0
+    oidc = json.loads(result.stdout)["authentication"][0]
+    assert oidc["client"]["secret"] is None
+    assert oidc["token"]["access"] is None
+    assert oidc["token"]["refresh"] is None
+
+
+def test_config_get_json_emits_scalar_value(tmp_path: Path) -> None:
+    """``config get --json`` emits the resolved value without human formatting."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["get", "console.width", "--json"])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+    assert json.loads(result.stdout) == 120
+
+
+def test_config_get_yaml_emits_scalar_value(tmp_path: Path) -> None:
+    """``config get --yaml`` emits the resolved scalar value on stdout."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["get", "console.width", "--yaml"])
+
+    assert result.exit_code == 0
+    assert yaml.safe_load(result.stdout) == 120
+
+
+def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
+    """``config get --json`` masks sensitive OIDC credential values."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        yaml.dump(
+            {
+                "version": 1,
+                "active": {
+                    "authentication": "srcnet",
+                    "server": "ivo://cadc.nrc.ca/skaha",
+                },
+                "authentication": [
+                    {
+                        "idp": "srcnet",
+                        "mode": "oidc",
+                        "endpoints": {},
+                        "client": {"identity": "client-id", "secret": "raw-secret"},
+                        "token": {"access": "raw-access", "refresh": "raw-refresh"},
+                        "expiry": {},
+                    }
+                ],
+                "server": [
+                    {
+                        "idp": "srcnet",
+                        "name": "test",
+                        "uri": "ivo://cadc.nrc.ca/skaha",
+                        "url": "https://example.test/skaha",
+                        "version": "v1",
+                        "auths": ["oidc"],
+                    }
+                ],
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(
+            config,
+            ["get", "authentication.0.client.secret", "--json"],
+        )
+
+    assert result.exit_code == 0
+    assert json.loads(result.stdout) == "**********"
+    assert "raw-secret" not in result.stdout
 
 
 def test_config_help_uses_config_command_descriptions() -> None:

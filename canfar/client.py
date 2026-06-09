@@ -47,8 +47,9 @@ class HTTPClient(BaseSettings):
 
     1.  **Runtime Arguments/Environment Variables**: A `token` or `certificate`
         provided at instantiation (e.g., `CANFAR_TOKEN="..."`).
-    2.  **Active Configuration Context**: The context specified by `active_context`
-        in the loaded configuration file.
+    2.  **Active Configuration Context**: Credentials and server from
+        ``active.authentication`` and ``active.server`` in the loaded configuration
+        file.
 
     Raises:
         ValueError: If configuration is invalid.
