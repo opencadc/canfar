@@ -8,6 +8,7 @@ repos:
           - types-requests
           - types-defusedxml
           - types-PyYAML
+          - click
           - httpx
           - pydantic
           - pydantic_settings
@@ -60,7 +61,7 @@ repos:
         exclude: (^|/)uv\.lock$|^tests/
   # Python code formatting and linting with Ruff
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.14
+    rev: v0.15.15
     hooks:
       # Linter
       - id: ruff

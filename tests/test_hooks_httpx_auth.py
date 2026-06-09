@@ -10,8 +10,8 @@ from pydantic import SecretStr
 from canfar.client import HTTPClient
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
 from canfar.models.auth import OIDC, X509
-from canfar.models.config import Configuration
 from canfar.models.http import Server
+from tests.helpers.config import configuration_from_legacy_context
 from tests.test_auth_x509 import generate_cert
 
 
@@ -36,7 +36,7 @@ def oidc_client() -> HTTPClient:
             "refresh": time.time() + 3600,  # Valid
         },
     )
-    config = Configuration(active="TestOIDC", contexts={"TestOIDC": oidc_context})
+    config = configuration_from_legacy_context("TestOIDC", oidc_context)
     client = HTTPClient(config=config)
     # Mock the internal httpx clients to check header updates
     client._client = Mock(spec=httpx.Client, headers={})  # noqa: SLF001
@@ -80,7 +80,7 @@ class TestSyncHook:
 
     @patch("canfar.auth.oidc.sync_refresh")
     def test_skip_if_not_oidc_context(self, mock_refresh, tmp_path) -> None:
-        """Verify the hook does nothing if the active context is not OIDC."""
+        """Verify the hook does nothing if active Authentication is not OIDC."""
         cert_path = tmp_path / "cert.pem"
         generate_cert(cert_path)
         x509_context = X509(
@@ -89,7 +89,7 @@ class TestSyncHook:
             ),
             path=cert_path,
         )
-        config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
+        config = configuration_from_legacy_context("TestX509", x509_context)
         client = HTTPClient(config=config)
         hook_func = refresh(client)
         request = httpx.Request("GET", "/")
@@ -169,7 +169,7 @@ class TestAsyncHook:
             ),
             path=cert_path,
         )
-        config = Configuration(active="TestX509", contexts={"TestX509": x509_context})
+        config = configuration_from_legacy_context("TestX509", x509_context)
         client = HTTPClient(config=config)
         hook_func = arefresh(client)
         request = httpx.Request("GET", "/")

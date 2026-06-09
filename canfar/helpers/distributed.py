@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import itertools
 import os
 from typing import TYPE_CHECKING, TypeVar
 
@@ -16,29 +17,41 @@ def stripe(
     replica: int = int(os.environ.get("REPLICA_ID", "1")),
     total: int = int(os.environ.get("REPLICA_COUNT", "1")),
 ) -> Iterator[T]:
-    """Returns every `total`-th item from the iterable with a `replica`-th offset.
+    """Return every ``total``-th item from ``iterable`` with a ``replica`` offset.
+
+    Uses 1-based ``replica`` indexing to match ``REPLICA_ID`` in CANFAR
+    containers. Replica 1 receives indices 0, ``total``, 2 * ``total``, …;
+    replica 2 receives indices 1, ``total`` + 1, …; and so on.
+
+    Unlike ``chunk``, ``stripe`` does not validate ``replica`` or ``total``.
+    When ``replica`` is less than 1, or greater than ``total``, the result is
+    empty. When ``total`` is zero, ``ValueError`` is raised.
 
     Args:
-        iterable (Iterable[T]): The iterable to partition.
-        replica (int, optional): The replica number.
-            Defaults to int(os.environ.get("REPLICA_ID", 1)).
-        total (int, optional): The total number of replicas.
-            Defaults to int(os.environ.get("REPLICA_COUNT", 1)).
+        iterable: The iterable to stripe across replicas.
+        replica: The replica number (1-based). Defaults to ``REPLICA_ID``.
+        total: The total number of replicas. Defaults to ``REPLICA_COUNT``.
+
+    Yields:
+        Items assigned to this replica.
 
     Examples:
         >>> from canfar.helpers import distributed
-        >>> dataset = range(100)
-        >>> for data in distributed.partition(dataset, 1, 10):
-                print(data)
-        0, 10, 20, 30, 40, 50, 60, 70, 80, 90
-
-    Yields:
-        Iterator[T]: The `replica`-th partition of the iterable.
+        >>> list(distributed.stripe(range(10), replica=1, total=3))
+        [0, 3, 6, 9]
+        >>> list(distributed.stripe(range(10), replica=2, total=3))
+        [1, 4, 7]
+        >>> list(distributed.stripe(range(100), replica=1, total=10))
+        [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
     """
-    offset = replica - 1
-    for index, item in enumerate(iterable):
-        if index % total == offset:
-            yield item
+    if replica < 1:
+        return
+    if total <= 0:
+        yield from itertools.islice(iterable, replica - 1, None, total)
+    elif replica > total:
+        return
+    else:
+        yield from itertools.islice(iterable, replica - 1, None, total)
 
 
 def chunk(
@@ -46,47 +59,40 @@ def chunk(
     replica: int = int(os.environ.get("REPLICA_ID", "1")),
     total: int = int(os.environ.get("REPLICA_COUNT", "1")),
 ) -> Iterator[T]:
-    """Returns the `replica`-th chunk of the iterable split into `total` chunks.
+    """Return the ``replica``-th contiguous chunk of ``iterable``.
 
-    This function distributes items from an iterable across multiple replicas canfar
-    provided container environment variables.
+    Splits ``iterable`` into ``total`` roughly equal contiguous chunks using
+    1-based ``replica`` indexing to match ``REPLICA_ID`` in CANFAR containers.
 
-    **Distribution Behavior:**
+    **Distribution behavior:**
 
-    - **Standard Distribution** (items >= replicas): Items are divided into roughly
-      equal chunks, with the last replica receiving any remainder items.
-    - **Sparse Distribution** (items < replicas): Each of the first N replicas gets
-      exactly one item (where N = number of items), remaining replicas get empty
-      results.
+    - **Standard** (``len(items) >= total``): Items are divided into equal-sized
+      chunks; the last replica receives any remainder.
+    - **Sparse** (``len(items) < total``): Each of the first ``len(items)``
+      replicas receives exactly one item; remaining replicas get nothing.
 
     Args:
-        iterable (Iterable[T]): The iterable to distribute across replicas.
-        replica (int, optional): The replica number using 1-based indexing.
-            Must be >= 1 and <= total. Defaults to REPLICA_ID environment variable.
-        total (int, optional): The total number of replicas. Must be > 0.
-            Defaults to REPLICA_COUNT environment variable.
+        iterable: The iterable to distribute across replicas.
+        replica: The replica number (1-based). Must be >= 1 and <= ``total``.
+            Defaults to ``REPLICA_ID``.
+        total: The total number of replicas. Must be > 0. Defaults to
+            ``REPLICA_COUNT``.
 
-    Returns:
-        Iterator[T]: An iterator yielding items assigned to this replica.
+    Yields:
+        Items assigned to this replica.
 
     Raises:
-        ValueError: If replica < 1 (1-based indexing expected).
-        ValueError: If replica > total (replica cannot exceed total replicas).
-        ValueError: If total <= 0 (must have at least one replica).
+        ValueError: If ``replica`` < 1, ``replica`` > ``total``, or ``total`` <= 0.
 
-    Note:
-        This function is designed for use in canfar containerized environments where
-        REPLICA_ID and REPLICA_COUNT environment variables are automatically set.
-        The 1-based indexing matches the container environment expectations.
-
-        For optimal performance with large datasets, consider using this function
-        with iterators rather than converting large datasets to lists beforehand.
-
-        When items < replicas, the sparse distribution ensures no replica receives
-        an unfair share - each item goes to exactly one replica, and excess replicas
-        receive empty results rather than duplicating data.
+    Examples:
+        >>> from canfar.helpers import distributed
+        >>> list(distributed.chunk(range(12), replica=1, total=3))
+        [0, 1, 2, 3]
+        >>> list(distributed.chunk(range(10), replica=4, total=4))
+        [6, 7, 8, 9]
+        >>> list(distributed.chunk([1, 2, 3], replica=2, total=5))
+        [2]
     """
-    # Input validation
     if total <= 0:
         msg = "total must be positive"
         raise ValueError(msg)
@@ -99,23 +105,14 @@ def chunk(
 
     items = list(iterable)
     count = len(items)
-
-    # Convert 1-based replica to 0-based for internal calculations
     zero_based_replica = replica - 1
 
-    # Check for sparse distribution case (more replicas than items)
     if count < total:
-        # Sparse distribution: each of first 'count' replicas gets one item
         if zero_based_replica < count:
             yield items[zero_based_replica]
-        # Remaining replicas get nothing (empty iterator)
         return
 
-    # Standard distribution for normal cases (count >= total)
-    # integer chunk size (floor)
     size = count // total
-    # start/end of this chunk using zero-based replica
     start = zero_based_replica * size
-    # last replica picks up any remainder
     end = (zero_based_replica + 1) * size if zero_based_replica < total - 1 else count
     yield from items[start:end]

@@ -436,17 +436,23 @@ async def _authflow_impl(
             raise TimeoutError(msg) from exc
 
 
-async def authenticate(oidc: OIDC) -> OIDC:
+async def authenticate(oidc: OIDC, *, timeout: int | None = None) -> OIDC:
     """Authenticate using OIDC Device Authorization Flow.
 
     Args:
         oidc (OIDC): OIDC configuration.
+        timeout: HTTP timeout in seconds for OIDC HTTP requests.
 
     Returns:
         OIDC: Updated OIDC configuration with tokens.
     """
     console.print("[bold blue]Starting OIDC Device Authentication[/bold blue]")
-    async with httpx.AsyncClient() as client:
+    if timeout is None:
+        client_context = httpx.AsyncClient()
+    else:
+        client_context = httpx.AsyncClient(timeout=httpx.Timeout(timeout))
+
+    async with client_context as client:
         response: dict[str, Any] = await discover(str(oidc.endpoints.discovery), client)
         oidc.endpoints.device = response["device_authorization_endpoint"]
         oidc.endpoints.registration = response["registration_endpoint"]

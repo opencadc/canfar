@@ -2,7 +2,7 @@
 
 
 class AuthContextError(Exception):
-    """Raised when an authentication context is invalid."""
+    """Raised when active Authentication state is invalid."""
 
     def __init__(self, context: str, reason: str) -> None:
         self.message = f"Auth Context '{context}' invalid."
@@ -11,7 +11,7 @@ class AuthContextError(Exception):
 
 
 class AuthExpiredError(Exception):
-    """Raised when an authentication context is expired."""
+    """Raised when active Authentication state is expired."""
 
     def __init__(self, context: str, reason: str) -> None:
         self.message = f"Auth Context '{context}' expired."

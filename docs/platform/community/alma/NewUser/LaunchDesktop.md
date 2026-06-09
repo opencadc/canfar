@@ -20,7 +20,7 @@ Now, hit the launch button and wait for your session to launch
 
 > ![image](../../../sessions/images/desktop/4_launch.png)
 
-Congratulations! You've started your first Desktop session. You are automatically returned to the main Science Portal page, where your desktop session appears as an icon, with your chosen descriptive name.
+Your Desktop session now appears on the main Science Portal page as an icon with your chosen descriptive name.
 
 > ![image](../../../sessions/images/desktop/5_active_desktop.png)
 

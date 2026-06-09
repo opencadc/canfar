@@ -7,13 +7,35 @@ import time
 from pathlib import Path  # noqa: TC003
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from canfar import get_logger
 from canfar.auth import x509
 from canfar.models.http import Server
 
 log = get_logger(__name__)
+
+AuthMode = Literal["x509", "oidc"]
+"""Supported authentication modes for domain records."""
+
+
+class Authentication(BaseModel):
+    """CANFAR Authentication record."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    idp: str = Field(description="Canonical Identity Provider key.")
+    name: str = Field(description="Human-readable IDP name.")
+    mode: AuthMode = Field(description="Authentication mode.")
+    expiry: float | None = Field(
+        default=None,
+        description="Credential expiry as Unix timestamp when applicable.",
+    )
+    active: bool = Field(description="Whether this record is active.")
+    server: str | None = Field(
+        default=None,
+        description="Selected server URI reference when available.",
+    )
 
 
 class Endpoint(BaseModel):
@@ -168,6 +190,57 @@ class X509(BaseModel):
             self.expiry = x509.expiry(self.path)
             log.debug("computed expiry from cert: %s", self.expiry)
         return self.expiry < time.time()
+
+
+class X509Credential(BaseModel):
+    """X.509 authentication credential decoupled from server selection."""
+
+    idp: Annotated[str, Field(description="Canonical identity provider key.")]
+    mode: Literal["x509"] = "x509"
+    path: Annotated[
+        Path | None,
+        Field(
+            title="x509 Certificate",
+            description="Pathlike to PEM certificate",
+        ),
+    ] = None
+    expiry: Annotated[
+        float,
+        Field(
+            default=0.0,
+            title="x509 Expiry Time",
+            description="ctime of cert expiration",
+        ),
+    ]
+
+
+class OIDCCredential(BaseModel):
+    """OIDC authentication credential decoupled from server selection."""
+
+    idp: Annotated[str, Field(description="Canonical identity provider key.")]
+    mode: Literal["oidc"] = "oidc"
+    endpoints: Annotated[
+        Endpoint,
+        Field(default_factory=Endpoint, description="OIDC Endpoints."),
+    ]
+    client: Annotated[
+        Client,
+        Field(default_factory=Client, description="OIDC Client Credentials."),
+    ]
+    token: Annotated[
+        Token,
+        Field(default_factory=Token, description="OIDC Tokens"),
+    ]
+    expiry: Annotated[
+        Expiry,
+        Field(default_factory=Expiry, description="OIDC Token Expiry."),
+    ]
+
+
+AuthenticationCredential = Annotated[
+    OIDCCredential | X509Credential, Field(discriminator="mode")
+]
+"""Discriminated union of v1 authentication credentials without embedded server."""
 
 
 class TokenAuth(BaseModel):

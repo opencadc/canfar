@@ -11,8 +11,8 @@ from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthExpiredError
 from canfar.hooks.httpx.expiry import acheck, check
 from canfar.models.auth import OIDC
-from canfar.models.config import Configuration
 from canfar.models.http import Server
+from tests.helpers.config import configuration_from_legacy_context
 
 
 class TestCheck:
@@ -57,7 +57,7 @@ class TestCheck:
             token={"access": "expired-token", "refresh": "expired-refresh-token"},
             expiry={"access": 0, "refresh": 0},
         )
-        config = Configuration(active="TestOIDC", contexts={"TestOIDC": oidc_context})
+        config = configuration_from_legacy_context("TestOIDC", oidc_context)
         client = HTTPClient(config=config)
 
         hook_func = check(client)
@@ -133,7 +133,7 @@ class TestACheck:
             token={"access": "expired-token", "refresh": "expired-refresh-token"},
             expiry={"access": 0, "refresh": 0},
         )
-        config = Configuration(active="TestOIDC", contexts={"TestOIDC": oidc_context})
+        config = configuration_from_legacy_context("TestOIDC", oidc_context)
         client = HTTPClient(config=config)
 
         hook_func = acheck(client)

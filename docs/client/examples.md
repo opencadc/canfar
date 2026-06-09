@@ -1,10 +1,10 @@
 # Python Client Examples
 
-These examples use the asynchronous API for best performance and scalability.
+These examples show the sync and async Session interfaces.
 
 !!! note "Assumption"
       ```bash title="Authenticated via CLI"
-      canfar auth login
+      canfar login cadc
       ```
 
 ## Create Sessions
@@ -60,7 +60,7 @@ These examples use the asynchronous API for best performance and scalability.
 
 ### Headless
 
-- Headless sessions are are containers that execute a command and exit when complete without user interaction.
+- Headless Sessions are containers that execute a command and exit when complete without user interaction.
 - They are useful for batch processing and distributed computing.
 
 
@@ -75,7 +75,7 @@ These examples use the asynchronous API for best performance and scalability.
         image="images.canfar.net/skaha/astroml:latest",
         kind="headless",
         cmd="echo",
-        args=["Hello, World!"],
+        args="Hello, World!",
     )
     print(ids)  # ["d1tsqexh"]
     ```
@@ -91,7 +91,7 @@ These examples use the asynchronous API for best performance and scalability.
         image="images.canfar.net/skaha/astroml:latest",
         kind="headless",
         cmd="echo",
-        args=["Hello, World!"],
+        args="Hello, World!",
     )
     print(ids)  # ["d1tsqexh"]
     ```
@@ -120,7 +120,7 @@ These examples use the asynchronous API for best performance and scalability.
             image="images.canfar.net/your/private-image:latest",
             kind="headless",
             cmd="python",
-            args=["/app/run.py"],
+            args="/app/run.py",
         )
         print(ids)
 
@@ -178,7 +178,7 @@ CANFAR supports two resource allocation modes for your sessions. See the [resour
     ```python
     from canfar.sessions import AsyncSession
 
-    with AsyncSession() as session:
+    async with AsyncSession() as session:
         all_sessions = await session.fetch()
         print(len(all_sessions))
     ```
@@ -192,7 +192,7 @@ CANFAR supports two resource allocation modes for your sessions. See the [resour
     session = Session()
     running = session.fetch(kind="notebook", status="Running")
     print(running)
-    session.connect(running)
+    session.connect([item["id"] for item in running])
     ```
 
 === "`async`"
@@ -203,7 +203,7 @@ CANFAR supports two resource allocation modes for your sessions. See the [resour
     async with AsyncSession() as session:
         running = await session.fetch(kind="notebook", status="Running")
         print(running)
-        await session.connect(running)
+        await session.connect([item["id"] for item in running])
     ```
 <br>
 

@@ -120,7 +120,11 @@ def _version_sort_key(v: str | None) -> tuple[int, tuple[int, ...]]:
     return (0, tup)
 
 
-def capabilities(url: str | None = None, xml: str | None = None) -> list[Capability]:  # noqa: PLR0912 too many branches (clarity)
+def capabilities(  # noqa: PLR0912 too many branches (clarity)
+    url: str | None = None,
+    xml: str | None = None,
+    timeout: int | None = None,
+) -> list[Capability]:
     """Parse sessions capabilities into a list of endpoint families.
 
     Rules:
@@ -137,6 +141,7 @@ def capabilities(url: str | None = None, xml: str | None = None) -> list[Capabil
     Args:
         url: A VOSI capabilities XML payload as a string.
         xml: A VOSI capabilities XML payload as a string.
+        timeout: HTTP timeout in seconds when ``url`` is provided.
 
     Returns:
         A list of dictionaries of the form:
@@ -152,7 +157,11 @@ def capabilities(url: str | None = None, xml: str | None = None) -> list[Capabil
     if xml:
         root = ElementTree.fromstring(xml)
     elif url:
-        xml = httpx.get(url).text
+        if timeout is None:
+            response = httpx.get(url)
+        else:
+            response = httpx.get(url, timeout=timeout)
+        xml = response.text
     else:
         msg = "Either url or xml must be provided"
         raise ValueError(msg)

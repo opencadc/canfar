@@ -3,15 +3,20 @@
 from __future__ import annotations
 
 import asyncio
-from typing import Annotated, get_args
+from typing import TYPE_CHECKING, Annotated, get_args
 
 import click
 import typer
 import typer.core
 
+from canfar.cli.machine import maybe_emit_banner
+from canfar.cli.output import OutputMode
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import console
+
+if TYPE_CHECKING:
+    from typer._click.core import Context
 
 
 class PruneUsageMessage(typer.core.TyperGroup):
@@ -21,7 +26,7 @@ class PruneUsageMessage(typer.core.TyperGroup):
         typer (TyperGroup): Base class for grouping commands in Typer.
     """
 
-    def get_usage(self, ctx: click.core.Context) -> str:  # noqa: ARG002
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
         """Get the usage message for the prune command.
 
         Args:
@@ -80,6 +85,7 @@ def prune_sessions(
     canfar prune session-name headless Succeeded
     canfar prune session.* notebook Running
     """
+    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _prune() -> None:
         log_level = "DEBUG" if debug else "INFO"

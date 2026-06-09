@@ -27,8 +27,8 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
 
-CONFIG_DIR: Path = Path.home() / ".canfar"
-CONFIG_PATH: Path = CONFIG_DIR / "config.yaml"
+from canfar import CONFIG_DIR, CONFIG_PATH  # noqa: F401
+
 LOGFILE_PATH: Path = CONFIG_DIR / "client.log"
 LOG_LEVEL: int = 10
 # Library logger name - all modules should use this as root

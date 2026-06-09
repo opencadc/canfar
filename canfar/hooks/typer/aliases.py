@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from typer.core import TyperGroup
 
 if TYPE_CHECKING:
-    from click.core import Command, Context
+    from typer._click.core import Command, Context
 
 
 class AliasGroup(TyperGroup):

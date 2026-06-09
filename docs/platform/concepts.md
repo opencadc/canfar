@@ -358,7 +358,7 @@ CANFAR supports two resource definition approaches:
 
     **CLI Usage**:
     ```bash
-    canfar launch notebook skaha/astroml:latest  # Uses flexible mode
+    canfar create notebook skaha/astroml:latest
     ```
 
 === "🎯 Fixed Mode"
@@ -375,7 +375,7 @@ CANFAR supports two resource definition approaches:
 
     **CLI Usage:**
     ```bash
-    canfar launch notebook skaha/astroml:latest --cpu 4 --memory 8
+    canfar create --cpu 4 --memory 8 notebook skaha/astroml:latest
     ```
 
 ### Resource Selection Guidelines
@@ -608,23 +608,24 @@ CANFAR provides REST APIs for programmatic access, enabling automation and integ
 
 ```python
 # Launch and manage sessions programmatically
-from canfar.client import Session
+from canfar.sessions import Session
 
 session = Session()
-job = session.create('notebook', 'skaha/astroml:latest')
-session.monitor(job.id)
+ids = session.create(
+    name="analysis-notebook",
+    image="skaha/astroml:latest",
+    kind="notebook",
+)
+session.info(ids)
 ```
 
 **Data Workflow Automation:**
 
-```python
-# Automated data processing pipeline
-from canfar.storage import VOSpace
-
-vos = VOSpace()
-vos.upload('/local/data', 'vos:project/input/')
-# ... run analysis session ...
-vos.download('vos:project/results/', '/local/results/')
+```bash
+# VOSpace tools handle storage movement; canfar handles Sessions.
+vcp /local/data.fits vos:project/input/data.fits
+canfar create headless skaha/astroml:latest -- python /arc/projects/myproject/run.py
+vcp vos:project/results/output.fits /local/output.fits
 ```
 
 !!! tip "Integration Options"
@@ -636,7 +637,7 @@ vos.download('vos:project/results/', '/local/results/')
     - **Custom Applications**: Build specialised tools using CANFAR APIs
 
 
-## 🔗 Platform Integration & Next Steps
+## Platform Integration
 
 ### Understanding Platform Connections
 

@@ -1,6 +1,7 @@
 """Test CANFAR Python Client API."""
 # ruff: noqa: SLF001
 
+import re
 import ssl
 import tempfile
 from datetime import datetime, timedelta, timezone
@@ -21,6 +22,7 @@ from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
+from tests.helpers.config import configuration_from_legacy_context
 
 
 # Test Fixtures
@@ -316,7 +318,7 @@ class TestBaseURLConstruction:
             ),
         )
 
-        config = Configuration(active="test", contexts={"test": custom_context})
+        config = configuration_from_legacy_context("test", custom_context)
 
         client = canfar_client_fixture(config=config)
         base_url = client._get_base_url()
@@ -329,7 +331,7 @@ class TestBaseURLConstruction:
             path=Path("/test/cert.pem"), expiry=9999999999.0, server=None
         )
 
-        config = Configuration(active="test", contexts={"test": custom_context})
+        config = configuration_from_legacy_context("test", custom_context)
 
         client = canfar_client_fixture(config=config)
         with pytest.raises(ValueError, match="Server not found in auth context"):
@@ -421,12 +423,21 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
-        headers = client._get_http_headers()
+        with patch(
+            "canfar.client.formatdate",
+            return_value="Wed, 09 Jun 2026 12:00:00 GMT",
+        ) as mock_formatdate:
+            headers = client._get_http_headers()
 
+        mock_formatdate.assert_called_once_with(usegmt=True)
         assert "Content-Type" in headers
         assert "Accept" in headers
         assert "User-Agent" in headers
-        assert "Date" in headers
+        assert headers["Date"] == "Wed, 09 Jun 2026 12:00:00 GMT"
+        assert re.match(
+            r"^\w{3}, \d{2} \w{3} \d{4} \d{2}:\d{2}:\d{2} GMT$",
+            headers["Date"],
+        )
         assert headers["Content-Type"] == "application/x-www-form-urlencoded"
         assert headers["Accept"] == "application/json"
         assert "python-canfar" in headers["User-Agent"]
@@ -471,7 +482,7 @@ class TestHTTPClientCreationAndHeaders:
             expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
         )
 
-        config = Configuration(active="oidc", contexts={"oidc": oidc_context})
+        config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
         headers = client._get_http_headers()
@@ -493,7 +504,7 @@ class TestHTTPClientCreationAndHeaders:
             ),
         )
 
-        config = Configuration(active="x509", contexts={"x509": x509_context})
+        config = configuration_from_legacy_context("x509", x509_context)
 
         client = canfar_client_fixture(config=config)
         headers = client._get_http_headers()
@@ -556,7 +567,7 @@ class TestHTTPClientCreationAndHeaders:
             expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
         )
 
-        config = Configuration(active="oidc", contexts={"oidc": oidc_context})
+        config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
 

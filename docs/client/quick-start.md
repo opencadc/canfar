@@ -1,164 +1,81 @@
-# 5-Minute Quick Start (Python Client)
+# Python Quickstart
 
-!!! success "Goal"
-    By the end of this guide, you'll authenticate, launch a compute Session on CANFAR programmatically, inspect it, read logs/events, and clean it up — all from Python.
+This guide creates a notebook Session, inspects it, and deletes it from Python.
 
-!!! tip "Prerequisites"
-    - CADC Account — [Sign up](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-    - You have logged in at least once to the [CANFAR Science Platform](https://canfar.net) and the [Harbor Container Registry](https://images.canfar.net)
-    - Python 3.10+
+## 1. Authenticate
 
-## Installation
-
-<!-- termynal -->
-```
-> pip install canfar --upgrade
----> 100%
-Installed
+```bash
+pip install canfar --upgrade
+canfar login cadc
 ```
 
-## Authentication
+Use `canfar login srcnet` for SRCNet.
 
-The Python client automatically uses your active authentication context created by the CLI.
+## 2. Create a notebook
 
-```bash title="Login to CANFAR Science Platform"
-canfar auth login
+```python
+from canfar.sessions import Session
+
+session = Session()
+ids = session.create(
+    kind="notebook",
+    image="images.canfar.net/skaha/astroml:latest",
+    name="quickstart-notebook",
+    cores=2,
+    ram=4,
+)
+print(ids)
 ```
 
-!!! note "Login Pathways"
-    - If you already have a valid CADC X509 certificate at `~/.ssl/cadcproxy.pem`, the CLI will reuse it automatically.
-    - If you're an SRCnet user, you'll be guided through an OIDC device flow in your browser.
+`create()` returns a list of Session IDs.
 
-```bash title="Force Re-Login (optional)"
-canfar auth login --force
+## 3. Open the notebook
+
+```python
+session.connect(ids)
 ```
 
-!!! success "What just happened?"
-    - The CLI discovered available CANFAR/SRCnet servers
-    - You authenticated and obtained a certificate/token
-    - The active context was saved for the Python client to use
+The notebook can take a minute or two to become reachable. Check status:
 
-## Your First Notebook Session
+```python
+running = session.fetch(kind="notebook", status="Running")
+print(running)
+```
 
-Launch a Jupyter notebook session programmatically.
+## 4. Inspect events and logs
 
-=== "Notebook Session"
+```python
+session.events(ids, verbose=True)
+session.logs(ids, verbose=True)
+```
 
-    ```python
-    from canfar.sessions import Session
+## 5. Clean up
 
-    session = Session()
-    session_ids = session.create(
-        name="my-first-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="notebook",
-        cores=2,
-        ram=4,
-    )
-    print(session_ids)  # e.g., ["d1tsqexh"]
-    ```
+```python
+session.destroy(ids)
+```
 
-=== "`async`"
+## Async version
 
-    ```python
-    from canfar.sessions import AsyncSession
+```python
+from canfar.sessions import AsyncSession
 
-    session = AsyncSession()
+async with AsyncSession() as session:
     ids = await session.create(
-        name="my-first-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
         kind="notebook",
-        cores=2,
-        ram=4,
+        image="images.canfar.net/skaha/astroml:latest",
+        name="quickstart-notebook",
     )
-    print(ids)  # e.g., ["d1tsqexh"]
-    ```
-
-!!! success "What just happened?"
-    - We connected to CANFAR using your active auth context
-    - A notebook container was requested with 2 CPU cores and 4 GB RAM
-    - The API returned the newly created session ID(s)
-
-### Get Connection URL
-
-Fetch details and extract the connect URL to open your notebook.
-
-=== "Connect to Session"
-
-    ```python
-    session.connect(ids)
-    ```
-
-=== "`async`"
-
-    ```python
     await session.connect(ids)
-    ```
-
-## Peek Under the Hood
-
-When a session is created, it goes through a series of steps to be fully deployed. You can inspect the events to understand the progress, or capture them for monitoring.
-
-=== "Deployment Events"
-
-    ```python
-    session.events(ids, verbose=True)
-    ```
-
-=== "`async`"
-
-    ```python
     await session.events(ids, verbose=True)
-    ```
-
-At any point, you can also inspect the logs from the session. This is especially useful when launching long-running batch jobs.
-
-=== "Session Logs"
-
-    ```python
-    session.logs(ids, verbose=True)
-    ```
-
-=== "`async`"
-
-    ```python
-    await session.logs(ids, verbose=True)
-    ```
-
-## Clean Up
-
-When you're done, delete your session(s) to free resources for other users. :simple-happycow:
-
-=== "Destroy Session(s)"
-
-    ```python
-    session.destroy(ids)
-    ```
-
-=== "`async`"
-
-    ```python
     await session.destroy(ids)
-    ```
+```
 
 ## Troubleshooting
 
-- Session won't start?
-
- 
-    ```python title="Check available resources"
-    session.stats()
-    ```
-    ```python title="Check events/logs"
-    session.events(ids, verbose=True)
-    session.logs(ids, verbose=True)
-    ```
-    ```python title="Try smaller resources or different image"
-    session.create(..., cores=1, ram=2, image="images.canfar.net/skaha/astroml:latest")
-    ```
-
-- Authentication issues?
-
-    ```bash title="Force re-authentication"
-    canfar auth login --force --debug
-    ```
+| Symptom | Check |
+| --- | --- |
+| Authentication fails | Run `canfar login cadc --force --debug`. |
+| Session does not start | Run `canfar stats`, then try smaller `cores` or `ram`. |
+| Browser URL fails | Wait 60-120 seconds and confirm the Session is `Running`. |
+| Script needs stable output | Use CLI machine output such as `canfar ps --json`. |

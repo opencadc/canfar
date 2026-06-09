@@ -2,8 +2,6 @@
 
 Complex use cases and power-user examples for CANFAR Science Platform.
 
-# Quick Start
-
 !!! info
     `canfar` automatically sets these environment variables in each container:
 
@@ -33,7 +31,7 @@ for datafile in distributed.chunk(datafiles):
 === ":material-language-python: Flexible Mode (Recommended)"
 
     ```python
-    from canfar.session import AsyncSession
+    from canfar.sessions import AsyncSession
 
     async with AsyncSession() as session:
         # Flexible resource allocation - adapts to cluster availability
@@ -42,7 +40,7 @@ for datafile in distributed.chunk(datafiles):
             image="images.canfar.net/your/analysis-container:latest",
             kind="headless",
             cmd="python",
-            args=["/path/to/batch_processing.py"],
+            args="/path/to/batch_processing.py",
             replicas=100,
         )
         return sessions
@@ -51,7 +49,7 @@ for datafile in distributed.chunk(datafiles):
 === ":material-language-python: Fixed Mode"
 
     ```python
-    from canfar.session import AsyncSession
+    from canfar.sessions import AsyncSession
 
     async with AsyncSession() as session:
         # Fixed resource allocation - guaranteed resources
@@ -62,7 +60,7 @@ for datafile in distributed.chunk(datafiles):
             cores=8,
             ram=32,
             cmd="python",
-            args=["/path/to/batch_processing.py"],
+            args="/path/to/batch_processing.py",
             replicas=100,
         )
         return sessions
@@ -101,7 +99,7 @@ async def mixed_workflow():
             image="images.canfar.net/your/preprocessing:latest",
             kind="headless",
             cmd="python",
-            args=["preprocess.py"],
+            args="preprocess.py",
             replicas=50,
         )
 
@@ -113,7 +111,7 @@ async def mixed_workflow():
             cores=16,
             ram=64,
             cmd="python",
-            args=["analyze.py"],
+            args="analyze.py",
             replicas=10,
         )
 
@@ -141,6 +139,7 @@ The `chunk` function divides your data into contiguous blocks, with each replica
 
 ```python title="Chunking Example"
 from canfar.helpers import distributed
+from glob import glob
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0-9
@@ -159,6 +158,7 @@ The `stripe` function distributes data in a round-robin fashion, which is useful
 
 ```python title="Striping Example"
 from canfar.helpers import distributed
+from glob import glob
 
 # With 1000 files and 100 replicas:
 # - Replica 1 processes files 0, 100, 200, 300, ...
@@ -272,4 +272,3 @@ replica_id = os.environ.get('REPLICA_ID')
 replica_count = os.environ.get('REPLICA_COUNT')
 print(f"Container {replica_id} of {replica_count} processing {len(my_data)} items")
 ```
-
