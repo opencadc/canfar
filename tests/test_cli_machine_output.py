@@ -6,6 +6,7 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
+import click
 import yaml
 from typer.testing import CliRunner
 
@@ -18,16 +19,15 @@ runner = CliRunner()
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 
 _AUTH_KEYS = frozenset({"idp", "name", "mode", "expiry", "active", "server"})
-_SERVER_KEYS = frozenset(
-    {"name", "uri", "url", "version", "auths", "idp", "cores", "ram", "gpus", "status"}
-)
 
 
 def _patch_config(path: Path):
+    """Patch the persisted config path used by CLI commands."""
     return patch("canfar.models.config.CONFIG_PATH", path)
 
 
 def _write_config(path: Path) -> None:
+    """Write a minimal config fixture for machine-output tests."""
     data = {
         "version": 1,
         "active": {"authentication": "cadc", "server": _CADC_URI},
@@ -177,7 +177,7 @@ def test_root_json_flag_before_command_path_is_not_supported(
         result = runner.invoke(cli, ["--json", "auth", "ls"])
 
     assert result.exit_code == 2
-    assert "--json" in result.stderr
+    assert "--json" in click.unstyle(result.stderr)
 
 
 def test_conflicting_output_flags_exit_two() -> None:
@@ -191,4 +191,4 @@ def test_unsupported_command_rejects_leaf_json_flag() -> None:
     """Commands without machine flags reject ``--json`` at the leaf."""
     result = runner.invoke(cli, ["auth", "purge", "--json", "--force"])
     assert result.exit_code == 2
-    assert "--json" in result.stderr
+    assert "--json" in click.unstyle(result.stderr)

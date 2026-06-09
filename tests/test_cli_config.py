@@ -6,6 +6,7 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
+import click
 import yaml
 from pydantic import BaseModel
 from typer.testing import CliRunner
@@ -23,6 +24,7 @@ _CONFIG_KEYS = frozenset(
 
 
 def _patch_config_path(path: Path):
+    """Patch package-level config path for CLI tests."""
     return patch.multiple(
         "canfar",
         CONFIG_PATH=path,
@@ -30,6 +32,7 @@ def _patch_config_path(path: Path):
 
 
 def test_config_get_default_console_width(tmp_path: Path) -> None:
+    """Default config exposes the console width through ``config get``."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
@@ -42,6 +45,7 @@ def test_config_get_default_console_width(tmp_path: Path) -> None:
 
 
 def test_config_set_and_get_console_width(tmp_path: Path) -> None:
+    """Config set persists console width for later reads."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
@@ -60,6 +64,7 @@ def test_config_set_and_get_console_width(tmp_path: Path) -> None:
 
 
 def test_config_set_invalid_value_fails_validation(tmp_path: Path) -> None:
+    """Invalid config values fail validation."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
@@ -345,9 +350,10 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
 def test_config_help_uses_config_command_descriptions() -> None:
     """Config help exposes the canonical command descriptions."""
     result = runner.invoke(config, ["--help"])
+    help_text = click.unstyle(result.stdout)
 
     assert result.exit_code == 0
-    assert "show  Display client configuration" in result.stdout
-    assert "get   Retrieve a config value." in result.stdout
-    assert "set   Set a config value." in result.stdout
-    assert "path  Local path of config" in result.stdout
+    assert "show  Display client configuration" in help_text
+    assert "get   Retrieve a config value." in help_text
+    assert "set   Set a config value." in help_text
+    assert "path  Local path of config" in help_text
