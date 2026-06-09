@@ -44,11 +44,11 @@ Note that the menu options update automatically after your session type selectio
 
 #### Available Versions
 
-- **CARTA 4.0** (recommended): Latest features and bug fixes
-- **CARTA 3.x:** Previous stable releases for compatibility
+- **CARTA 5.1.0** (recommended): Latest features and bug fixes
+- **CARTA 4.x:** Previous stable releases for compatibility
 
 !!! tip "Version Selection"
-    Use the latest version (4.0+) unless you specifically need compatibility with older workflows. New versions include performance improvements and additional features.
+    Use the latest version (5.1.0+) unless you specifically need compatibility with older workflows. New versions include performance improvements and additional features.
 
 ### Step 3: Configure Session
 
