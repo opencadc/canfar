@@ -10,7 +10,7 @@ from pathlib import Path
 
 def test_conftest_isolates_home() -> None:
     """Pytest must not read the developer ``~/.canfar/config.yaml`` at collection."""
-    assert Path(os.environ["HOME"]) == Path("/private/tmp/canfar-empty-home")
+    assert Path(os.environ["HOME"]) == Path(os.environ["CANFAR_TEST_HOME"])
 
 
 def test_stale_list_config_breaks_canfar_import_without_home_isolation(
