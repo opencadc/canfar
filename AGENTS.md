@@ -54,7 +54,8 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - PRDs/spec work for this repo is tracked in Jira (for example `CADC-15643`), not in GitHub Issues.
 - Triage is status-based in Jira: `needs-triage` -> To Do, `needs-info` -> On Hold, `ready-for-agent` -> In Progress, `ready-for-human` -> Review, `wontfix` -> On Hold.
 - Domain documentation currently uses root `CONTEXT.md` as the glossary.
-- Specs/decisions are Jira-first; this repo does not keep ADR/RFC directories as the source of truth.
+- Specs and PRDs are Jira-first; durable agent decision records live under `docs/agents/adrs/`, separate from Jira spec tracking.
+- Client configuration stores `servers` and `authentication` as dicts keyed by Server Name and IDP; Server Selection and `active` references use server names, not IVOA URIs.
 - `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
 - CLI layout is kubectl-style: `canfar auth` (bare runs `show`; canonical subcommand names only, `ls`/`rm`), `canfar server`, and `canfar login` (`canfar auth login` is a deprecated alias; `canfar context` was removed).
 - CLI machine output (`--json`/`--yaml`) must be data-only on stdout; the human-mode active-server banner must not precede JSON/YAML payloads.
