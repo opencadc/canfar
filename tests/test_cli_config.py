@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING
 from unittest.mock import patch
+from urllib.parse import urlparse
 
 import click
 import yaml
@@ -53,7 +54,10 @@ def test_config_get_and_set_servers_canfar_url(tmp_path: Path) -> None:
     ):
         result = runner.invoke(config, ["get", "servers.canfar.url"])
         assert result.exit_code == 0
-        assert "ws-uv.canfar.net" in result.stdout
+        default_url = urlparse(result.stdout.strip().splitlines()[-1])
+        assert default_url.scheme == "https"
+        assert default_url.hostname == "ws-uv.canfar.net"
+        assert default_url.path == "/skaha"
 
         result = runner.invoke(
             config,
@@ -63,7 +67,10 @@ def test_config_get_and_set_servers_canfar_url(tmp_path: Path) -> None:
 
         result = runner.invoke(config, ["get", "servers.canfar.url"])
         assert result.exit_code == 0
-        assert "example.test" in result.stdout
+        updated_url = urlparse(result.stdout.strip().splitlines()[-1])
+        assert updated_url.scheme == "https"
+        assert updated_url.hostname == "example.test"
+        assert updated_url.path == "/skaha"
 
 
 def test_config_get_full_server_record_includes_runtime_name(tmp_path: Path) -> None:
