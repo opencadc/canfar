@@ -479,8 +479,10 @@ class TestAuthenticateFunction:
                 assert mock_client.post.call_count == 1  # registration
 
                 # Verify the result has updated tokens
-                assert result.token.access == "test_access_token"
-                assert result.token.refresh == "test_refresh_token"
+                assert result.token.access is not None
+                assert result.token.access.get_secret_value() == "test_access_token"
+                assert result.token.refresh is not None
+                assert result.token.refresh.get_secret_value() == "test_refresh_token"
                 assert result.expiry.access == 1234567890
                 assert result.expiry.refresh == 1234567890
 

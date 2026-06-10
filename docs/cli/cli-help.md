@@ -162,6 +162,7 @@ options.
 canfar config show
 canfar config path
 canfar config get console.width
+canfar config get servers.canfar.url
 canfar config set console.width 132
 canfar version
 canfar version --debug

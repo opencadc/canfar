@@ -8,7 +8,6 @@ from unittest.mock import patch
 
 import click
 import yaml
-from pydantic import BaseModel
 from typer.testing import CliRunner
 
 from canfar.cli.config import _format_value, config
@@ -19,7 +18,7 @@ if TYPE_CHECKING:
 runner = CliRunner()
 
 _CONFIG_KEYS = frozenset(
-    {"version", "active", "authentication", "server", "registry", "console"}
+    {"version", "active", "authentication", "servers", "registry", "console"}
 )
 
 
@@ -42,6 +41,83 @@ def test_config_get_default_console_width(tmp_path: Path) -> None:
         result = runner.invoke(config, ["get", "console.width"])
         assert result.exit_code == 0
         assert result.stdout.strip().splitlines()[-1] == "120"
+
+
+def test_config_get_and_set_servers_canfar_url(tmp_path: Path) -> None:
+    """Config get/set works on servers.<name>.<field> dotted paths."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["get", "servers.canfar.url"])
+        assert result.exit_code == 0
+        assert "ws-uv.canfar.net" in result.stdout
+
+        result = runner.invoke(
+            config,
+            ["set", "servers.canfar.url", "https://example.test/skaha"],
+        )
+        assert result.exit_code == 0
+
+        result = runner.invoke(config, ["get", "servers.canfar.url"])
+        assert result.exit_code == 0
+        assert "example.test" in result.stdout
+
+
+def test_config_get_full_server_record_includes_runtime_name(tmp_path: Path) -> None:
+    """``config get servers.<name>`` includes the runtime Server Name field."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        json_result = runner.invoke(config, ["get", "servers.canfar", "--json"])
+        human_result = runner.invoke(config, ["get", "servers.canfar"])
+
+    assert json_result.exit_code == 0
+    payload = json.loads(json_result.stdout)
+    assert payload["name"] == "canfar"
+    assert payload["url"] == "https://ws-uv.canfar.net/skaha"
+
+    assert human_result.exit_code == 0
+    assert '"name": "canfar"' in human_result.stdout
+
+
+def test_config_get_authentication_cadc_path(tmp_path: Path) -> None:
+    """Config get works on authentication.<idp>.<field> dotted paths."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, ["get", "authentication.cadc.path"])
+
+    assert result.exit_code == 0
+    assert "cadcproxy.pem" in result.stdout
+
+
+def test_config_get_full_credential_record_includes_runtime_idp(tmp_path: Path) -> None:
+    """``config get authentication.<idp>`` includes the runtime IDP field."""
+    config_path = tmp_path / "config.yaml"
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        json_result = runner.invoke(config, ["get", "authentication.cadc", "--json"])
+        human_result = runner.invoke(config, ["get", "authentication.cadc"])
+
+    assert json_result.exit_code == 0
+    payload = json.loads(json_result.stdout)
+    assert payload["idp"] == "cadc"
+    assert payload["mode"] == "x509"
+
+    assert human_result.exit_code == 0
+    assert '"idp": "cadc"' in human_result.stdout
 
 
 def test_config_set_and_get_console_width(tmp_path: Path) -> None:
@@ -75,12 +151,6 @@ def test_config_set_invalid_value_fails_validation(tmp_path: Path) -> None:
         assert result.exit_code == 1
 
 
-class ExampleModel(BaseModel):
-    """Tiny model for config formatting tests."""
-
-    value: int
-
-
 def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
     """Test config show/path/format helpers and handled error paths."""
     config_path = tmp_path / "config.yaml"
@@ -102,7 +172,7 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert ".canfar" in result.stdout
 
-    assert _format_value(ExampleModel(value=7)) == '{\n  "value": 7\n}'
+    assert _format_value({"value": 7}) == '{\n  "value": 7\n}'
     assert _format_value({"a": [1]}) == '{\n  "a": [\n    1\n  ]\n}'
     assert _format_value(None) == "null"
 
@@ -168,11 +238,10 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
                 "version": 1,
                 "active": {
                     "authentication": "srcnet",
-                    "server": "ivo://cadc.nrc.ca/skaha",
+                    "server": "test",
                 },
-                "authentication": [
-                    {
-                        "idp": "srcnet",
+                "authentication": {
+                    "srcnet": {
                         "mode": "oidc",
                         "endpoints": {},
                         "client": {"identity": "client-id", "secret": "raw-secret"},
@@ -182,17 +251,16 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
                         },
                         "expiry": {},
                     }
-                ],
-                "server": [
-                    {
+                },
+                "servers": {
+                    "test": {
                         "idp": "srcnet",
-                        "name": "test",
                         "uri": "ivo://cadc.nrc.ca/skaha",
                         "url": "https://example.test/skaha",
                         "version": "v1",
                         "auths": ["oidc"],
                     }
-                ],
+                },
             }
         ),
         encoding="utf-8",
@@ -210,7 +278,7 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
     assert "raw-secret" not in rendered
     assert "raw-access" not in rendered
     assert "raw-refresh" not in rendered
-    oidc = json.loads(rendered)["authentication"][0]
+    oidc = json.loads(rendered)["authentication"]["srcnet"]
     assert oidc["client"]["identity"] == "client-id"
     assert oidc["client"]["secret"] == "**********"
     assert oidc["token"]["access"] == "**********"
@@ -226,28 +294,26 @@ def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
                 "version": 1,
                 "active": {
                     "authentication": "srcnet",
-                    "server": "ivo://cadc.nrc.ca/skaha",
+                    "server": "test",
                 },
-                "authentication": [
-                    {
-                        "idp": "srcnet",
+                "authentication": {
+                    "srcnet": {
                         "mode": "oidc",
                         "endpoints": {},
                         "client": {"identity": "client-id"},
                         "token": {},
                         "expiry": {},
                     }
-                ],
-                "server": [
-                    {
+                },
+                "servers": {
+                    "test": {
                         "idp": "srcnet",
-                        "name": "test",
                         "uri": "ivo://cadc.nrc.ca/skaha",
                         "url": "https://example.test/skaha",
                         "version": "v1",
                         "auths": ["oidc"],
                     }
-                ],
+                },
             }
         ),
         encoding="utf-8",
@@ -261,7 +327,7 @@ def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
         result = runner.invoke(config, ["show", "--json"])
 
     assert result.exit_code == 0
-    oidc = json.loads(result.stdout)["authentication"][0]
+    oidc = json.loads(result.stdout)["authentication"]["srcnet"]
     assert oidc["client"]["secret"] is None
     assert oidc["token"]["access"] is None
     assert oidc["token"]["refresh"] is None
@@ -305,28 +371,26 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
                 "version": 1,
                 "active": {
                     "authentication": "srcnet",
-                    "server": "ivo://cadc.nrc.ca/skaha",
+                    "server": "test",
                 },
-                "authentication": [
-                    {
-                        "idp": "srcnet",
+                "authentication": {
+                    "srcnet": {
                         "mode": "oidc",
                         "endpoints": {},
                         "client": {"identity": "client-id", "secret": "raw-secret"},
                         "token": {"access": "raw-access", "refresh": "raw-refresh"},
                         "expiry": {},
                     }
-                ],
-                "server": [
-                    {
+                },
+                "servers": {
+                    "test": {
                         "idp": "srcnet",
-                        "name": "test",
                         "uri": "ivo://cadc.nrc.ca/skaha",
                         "url": "https://example.test/skaha",
                         "version": "v1",
                         "auths": ["oidc"],
                     }
-                ],
+                },
             }
         ),
         encoding="utf-8",
@@ -339,12 +403,74 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
     ):
         result = runner.invoke(
             config,
-            ["get", "authentication.0.client.secret", "--json"],
+            ["get", "authentication.srcnet.client.secret", "--json"],
         )
 
     assert result.exit_code == 0
     assert json.loads(result.stdout) == "**********"
     assert "raw-secret" not in result.stdout
+
+
+def test_config_get_json_redacts_secrets_inside_credential_record(
+    tmp_path: Path,
+) -> None:
+    """``config get authentication.<idp> --json`` masks nested OIDC secrets."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        yaml.dump(
+            {
+                "version": 1,
+                "active": {
+                    "authentication": "srcnet",
+                    "server": "test",
+                },
+                "authentication": {
+                    "srcnet": {
+                        "mode": "oidc",
+                        "endpoints": {},
+                        "client": {"identity": "client-id", "secret": "raw-secret"},
+                        "token": {"access": "raw-access", "refresh": "raw-refresh"},
+                        "expiry": {},
+                    }
+                },
+                "servers": {
+                    "test": {
+                        "idp": "srcnet",
+                        "uri": "ivo://cadc.nrc.ca/skaha",
+                        "url": "https://example.test/skaha",
+                        "version": "v1",
+                        "auths": ["oidc"],
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        record = runner.invoke(config, ["get", "authentication.srcnet", "--json"])
+        token = runner.invoke(
+            config,
+            ["get", "authentication.srcnet.token", "--json"],
+        )
+
+    assert record.exit_code == 0
+    assert "raw-secret" not in record.stdout
+    assert "raw-access" not in record.stdout
+    assert "raw-refresh" not in record.stdout
+    payload = json.loads(record.stdout)
+    assert payload["client"]["identity"] == "client-id"
+    assert payload["client"]["secret"] == "**********"
+    assert payload["token"]["access"] == "**********"
+    assert payload["token"]["refresh"] == "**********"
+
+    assert token.exit_code == 0
+    assert "raw-access" not in token.stdout
+    assert json.loads(token.stdout)["refresh"] == "**********"
 
 
 def test_config_help_uses_config_command_descriptions() -> None:

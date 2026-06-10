@@ -469,7 +469,7 @@ async def authenticate(oidc: OIDC, *, timeout: int | None = None) -> OIDC:
             str(oidc.endpoints.registration), client
         )
         oidc.client.identity = device["client_id"]
-        oidc.client.secret = device["client_secret"]
+        oidc.client.secret = SecretStr(device["client_secret"])
 
         console.print("[green]✓[/green] OIDC device registered successfully")
 
@@ -477,20 +477,24 @@ async def authenticate(oidc: OIDC, *, timeout: int | None = None) -> OIDC:
             str(oidc.endpoints.device),
             str(oidc.endpoints.token),
             str(oidc.client.identity),
-            str(oidc.client.secret),
+            oidc.client.secret.get_secret_value() if oidc.client.secret else "",
             client,
         )
 
-        oidc.token.access = tokens["access_token"]
-        oidc.token.refresh = tokens["refresh_token"]
-        oidc.expiry.refresh = jwt.expiry(str(oidc.token.refresh))
-        oidc.expiry.access = jwt.expiry(str(oidc.token.access))
+        oidc.token.access = SecretStr(tokens["access_token"])
+        oidc.token.refresh = SecretStr(tokens["refresh_token"])
+        oidc.expiry.refresh = jwt.expiry(oidc.token.refresh.get_secret_value())
+        oidc.expiry.access = jwt.expiry(oidc.token.access.get_secret_value())
 
         console.print("[green]✓[/green] OIDC device authenticated successfully")
 
         url: str = response["userinfo_endpoint"]
         headers = {
-            "Authorization": f"Bearer {oidc.token.access}",
+            "Authorization": (
+                f"Bearer {oidc.token.access.get_secret_value()}"
+                if oidc.token.access
+                else ""
+            ),
         }
         user = await client.get(url, headers=headers)
         user.raise_for_status()

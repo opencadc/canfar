@@ -7,7 +7,7 @@ Client configuration stores Science Platform Servers as `servers: Dict[str, Serv
 - The IVOA URI is discovery metadata only. Discovery upserts match by name; the same URI may legitimately appear under two names, and registry renames create a new entry rather than rewriting the user's key.
 - Server Names must match `^[A-Za-z][A-Za-z0-9_-]*$` so they are safe as dotted-path segments (no dots, never digits-only) and env-var segments (`CANFAR_SERVERS__<name>__URL`).
 - Servers discovered without a registry name are keyed by a slug of the URI host (e.g. `ivo://swesrc.chalmers.se/skaha` -> `swesrc-chalmers-se`). Two unnamed servers on one host collide; the registry must name them to disambiguate.
-- `Server.name` and `AuthenticationCredential.idp` remain on the Python models for display and selection but are excluded from serialization; `Configuration` injects the dict key into each value on load.
+- `Server.name` and `AuthenticationCredential.idp` remain on the Python models for display and selection. They are duplicated in saved YAML alongside dict keys; dict keys remain canonical on load (inject overwrites missing or drifted values).
 
 ## Considered options
 

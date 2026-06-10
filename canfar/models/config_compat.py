@@ -82,7 +82,7 @@ class LegacyContextsMapping:
 
     def __contains__(self, key: str) -> bool:
         """Return whether ``key`` is a saved authentication IDP."""
-        return any(cred.idp == key for cred in self._configuration.authentication)
+        return key in self._configuration.authentication
 
     def __getitem__(self, key: str) -> AuthContext:
         """Return the legacy auth context for ``key``."""
@@ -100,7 +100,7 @@ class LegacyContextsMapping:
 
     def keys(self) -> list[str]:
         """Return saved authentication IDP keys."""
-        return [cred.idp for cred in self._configuration.authentication]
+        return list(self._configuration.authentication)
 
     def items(self) -> Iterator[tuple[str, AuthContext]]:
         """Yield ``(idp, legacy_context)`` pairs."""

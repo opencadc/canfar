@@ -30,16 +30,16 @@ class TestConfigDefaults:
 
         assert config.version == 1
         assert config.active.authentication == "cadc"
-        assert str(config.active.server) == "ivo://cadc.nrc.ca/skaha"
+        assert config.active.server == "canfar"
 
-        assert len(config.authentication) == 1
-        cred = config.authentication[0]
+        assert set(config.authentication) == {"cadc"}
+        cred = config.authentication["cadc"]
         assert cred.idp == "cadc"
         assert cred.mode == "x509"
         assert cred.path == Path.home() / ".ssl" / "cadcproxy.pem"
 
-        assert len(config.server) == 1
-        srv = config.server[0]
+        assert set(config.servers) == {"canfar"}
+        srv = config.servers["canfar"]
         assert srv.idp == "cadc"
         assert srv.name == "canfar"
         assert str(srv.uri) == "ivo://cadc.nrc.ca/skaha"
@@ -60,7 +60,7 @@ class TestConfigDefaults:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        cred = config.authentication[0]
+        cred = config.authentication["cadc"]
         assert not hasattr(cred, "server") or "server" not in cred.model_fields
 
 
@@ -75,54 +75,72 @@ class TestConfigEnvOverrides:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "canfar",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/yaml/cert.pem",
                     "expiry": 1234567890.0,
                 },
-                {
-                    "idp": "srcnet",
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "canfar": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-                {
+                "SRCNet": {
                     "idp": "srcnet",
-                    "name": "SRCNet",
                     "uri": "ivo://srcnet.example/skaha",
                     "url": "https://srcnet.example/skaha",
                     "version": "v1",
                     "auths": ["oidc"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.dump(config_data), encoding="utf-8")
 
         monkeypatch.setenv("CANFAR_ACTIVE__AUTHENTICATION", "srcnet")
-        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "ivo://srcnet.example/skaha")
+        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "SRCNet")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
         assert config.active.authentication == "srcnet"
-        assert str(config.active.server) == "ivo://srcnet.example/skaha"
+        assert config.active.server == "SRCNet"
+
+
+class TestConfigServersPaths:
+    """Test dotted-path access to name-keyed servers."""
+
+    def test_get_and_set_servers_canfar_url(self, tmp_path: Path) -> None:
+        """servers.<name>.<field> paths round-trip through get_value/set_value."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        assert str(config.get_value("servers.canfar.url")) == (
+            "https://ws-uv.canfar.net/skaha"
+        )
+
+        updated = config.set_value(
+            "servers.canfar.url",
+            "https://example.test/skaha",
+        )
+        assert str(updated.get_value("servers.canfar.url")) == (
+            "https://example.test/skaha"
+        )
 
 
 class TestConfigServices:
@@ -158,7 +176,7 @@ class TestConfigServices:
 
         select_active_server(config, "cadc", server)
 
-        assert str(config.active.server) == "ivo://cadc.example/skaha"
+        assert config.active.server == "CADC-CANFAR"
         assert config.get_server_by_uri("ivo://cadc.example/skaha").name == (
             "CADC-CANFAR"
         )
@@ -211,26 +229,24 @@ class TestConfigManualReset:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "canfar",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cert.pem",
                     "expiry": 9.0,
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "canfar": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.dump(current), encoding="utf-8")
@@ -238,7 +254,7 @@ class TestConfigManualReset:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.authentication[0].path == Path("/saved/cert.pem")
+        assert config.authentication["cadc"].path == Path("/saved/cert.pem")
         assert list(tmp_path.glob("*.back")) == []
 
     def test_legacy_canfar_active_env_is_not_used(
@@ -249,26 +265,24 @@ class TestConfigManualReset:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "canfar",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cert.pem",
                     "expiry": 9.0,
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "canfar": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.dump(current), encoding="utf-8")

@@ -103,27 +103,37 @@ Python helpers are noninteractive. CLI commands own prompts and human rendering.
 
 ## Configuration
 
-The current config shape is versioned with `version: 1`.
+The current config shape is versioned with `version: 1`. Authentication
+records are keyed by IDP and Servers are keyed by Server Name; `active.server`
+references a Server by name.
 
 ```yaml
 version: 1
 active:
   authentication: cadc
-  server: ivo://cadc.nrc.ca/skaha
+  server: canfar
 authentication:
-  - idp: cadc
+  cadc:
     mode: x509
-server:
-  - idp: cadc
-    name: canfar
+servers:
+  canfar:
+    idp: cadc
     uri: ivo://cadc.nrc.ca/skaha
+    url: https://ws-uv.canfar.net/skaha
+```
+
+Dict keys make every value reachable with dotted paths:
+
+```bash
+canfar config get servers.canfar.url
+canfar config get authentication.cadc.path
 ```
 
 Environment overrides use nested active fields:
 
 ```bash
 CANFAR_ACTIVE__AUTHENTICATION=srcnet
-CANFAR_ACTIVE__SERVER=ivo://example.org/skaha
+CANFAR_ACTIVE__SERVER=canfar
 ```
 
 Legacy or unsupported config files are backed up to
@@ -141,5 +151,5 @@ Legacy or unsupported config files are backed up to
 | stderr | Diagnostics and errors. |
 | Unsupported commands | Exit 1 with `machine output not supported for this command yet` and `use default human output for now`. |
 
-Lists have no ordering guarantee. Scripts should select by IDP key, URI,
-Session ID, or another stable field.
+Lists have no ordering guarantee. Scripts should select by IDP key, Server
+Name, URI, Session ID, or another stable field.

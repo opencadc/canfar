@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import AnyUrl, BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class ActiveConfig(BaseModel):
@@ -10,7 +10,7 @@ class ActiveConfig(BaseModel):
 
     Attributes:
         authentication: Canonical IDP key for the active authentication record.
-        server: IVOA URI of the active science platform server.
+        server: Server Name of the active science platform server.
     """
 
     model_config = ConfigDict(str_strip_whitespace=True)
@@ -18,14 +18,14 @@ class ActiveConfig(BaseModel):
     authentication: str = Field(
         description="Canonical IDP key for the active authentication record.",
     )
-    server: AnyUrl | None = Field(
+    server: str | None = Field(
         default=None,
         description=(
-            "IVOA URI of the active science platform server, or ``None`` "
+            "Server Name of the active science platform server, or ``None`` "
             "when no compatible server is selected."
         ),
     )
-    servers: dict[str, AnyUrl] = Field(
+    servers: dict[str, str] = Field(
         default_factory=dict,
-        description="Last selected science platform server URI by IDP.",
+        description="Last selected science platform server name by IDP.",
     )

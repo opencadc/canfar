@@ -8,7 +8,7 @@ from enum import Enum
 from typing import Any
 
 import yaml
-from pydantic import BaseModel
+from pydantic_core import to_jsonable_python
 
 from canfar.errors import (
     StructuredError,
@@ -37,11 +37,9 @@ def _serialize_payload(data: Any) -> Any:
     Returns:
         JSON-compatible structure ready for rendering.
     """
-    if isinstance(data, BaseModel):
-        return data.model_dump(mode="json", exclude_none=False)
     if isinstance(data, list):
-        return [_serialize_payload(item) for item in data]
-    return data
+        return [to_jsonable_python(item) for item in data]
+    return to_jsonable_python(data)
 
 
 def render_stdout(data: Any, mode: OutputMode) -> str:

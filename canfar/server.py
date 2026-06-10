@@ -234,13 +234,13 @@ def list_servers(
     """
     config = Configuration()
     active_idp = config.active.authentication
-    servers = [server for server in config.server if server.idp == active_idp]
+    servers = [server for server in config.servers.values() if server.idp == active_idp]
     if servers or not discover_if_empty:
         return servers
 
     discover(active_idp, config=config, dev=dev, timeout=timeout, save=False)
     config.save()
-    return [server for server in config.server if server.idp == active_idp]
+    return [server for server in config.servers.values() if server.idp == active_idp]
 
 
 def use(selector: str, *, dev: bool = False, timeout: int = 2) -> None:
@@ -273,7 +273,7 @@ def use(selector: str, *, dev: bool = False, timeout: int = 2) -> None:
 
 def _servers_for_idp(config: Configuration, idp: str) -> list[Server]:
     """Return saved servers belonging to ``idp``."""
-    return [server for server in config.server if server.idp == idp]
+    return [server for server in config.servers.values() if server.idp == idp]
 
 
 def _active_server_for_idp(config: Configuration, idp: str) -> Server | None:
@@ -296,10 +296,9 @@ def _remembered_server_for_idp(
     remembered = get_remembered_server_for_idp(config, idp)
     if remembered is None or remembered.uri is None:
         return None
-    if not any(
-        server.uri is not None and str(server.uri) == str(remembered.uri)
-        for server in servers
-    ):
+    if remembered.name is None:
+        return None
+    if not any(server.name == remembered.name for server in servers):
         return None
     return remembered
 
@@ -311,40 +310,25 @@ def _resolve_selector(
 ) -> Server | None:
     """Resolve a selector to a saved server for ``idp``.
 
+    Server Name is the configuration identity, so name matches win; URI
+    matching remains as a fallback. Names are unique dict keys, so a name
+    selector can match at most one server.
+
     Args:
         config: Loaded configuration.
-        selector: Server name or URI.
+        selector: Server name or IVOA URI.
         idp: Canonical IDP key.
 
     Returns:
         Matching server record, or ``None`` when not found.
-
-    Raises:
-        ServerSelectorError: When ``selector`` matches multiple servers by name.
     """
     servers = _servers_for_idp(config, idp)
-    uri_matches = [
-        server
-        for server in servers
-        if server.uri is not None and str(server.uri) == selector
-    ]
-    if uri_matches:
-        return uri_matches[0]
-
-    name_matches = [
-        server
-        for server in servers
-        if server.name is not None and server.name == selector
-    ]
-    if len(name_matches) == 1:
-        return name_matches[0]
-    if len(name_matches) > 1:
-        uris = ", ".join(str(server.uri) for server in name_matches if server.uri)
-        msg = f"Ambiguous server name '{selector}' for IDP '{idp}'."
-        raise ServerSelectorError(
-            msg,
-            hint=f"Use a server URI. Matches: {uris}",
-        )
+    for server in servers:
+        if server.name == selector:
+            return server
+    for server in servers:
+        if server.uri is not None and str(server.uri) == selector:
+            return server
     return None
 
 
@@ -399,6 +383,13 @@ async def _discover_for_idp(
         ]
 
 
+def _host_slug(uri: AnyUrl) -> str | None:
+    """Return a Server Name slug derived from a URI host (dots -> hyphens)."""
+    if uri.host is None:
+        return None
+    return uri.host.replace(".", "-")
+
+
 def _discovered_to_server(
     endpoint: DiscoveredServer,
     idp: str,
@@ -406,6 +397,9 @@ def _discovered_to_server(
     timeout: int = 2,
 ) -> Server:
     """Convert a registry discovery record to a persisted HTTP server model.
+
+    The registry-provided name wins as the Server Name; endpoints without a
+    registry name are named by a slug of the URI host.
 
     Args:
         endpoint: Discovered registry endpoint.
@@ -415,10 +409,11 @@ def _discovered_to_server(
     Returns:
         Server: Persisted server model with capabilities metadata when available.
     """
+    uri = AnyUrl(endpoint.uri)
     server = Server(
         idp=idp,
-        name=endpoint.name,
-        uri=AnyUrl(endpoint.uri),
+        name=endpoint.name or _host_slug(uri),
+        uri=uri,
         url=AnyHttpUrl(endpoint.url),
     )
     return _enrich_from_capabilities(server, strict=False, timeout=timeout)

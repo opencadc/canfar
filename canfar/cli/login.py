@@ -43,7 +43,7 @@ def _authentication_exists_on_disk(idp: str) -> bool:
     if not CONFIG_PATH.exists():
         return False
     config = Configuration()
-    return any(credential.idp == idp for credential in config.authentication)
+    return idp in config.authentication
 
 
 def _upsert_credential(
@@ -56,17 +56,7 @@ def _upsert_credential(
         config: Configuration being updated in memory.
         credential: Authentication credential to persist on save.
     """
-    updated: list[AuthenticationCredential] = []
-    replaced = False
-    for existing in config.authentication:
-        if existing.idp == credential.idp:
-            updated.append(credential)
-            replaced = True
-        else:
-            updated.append(existing)
-    if not replaced:
-        updated.append(credential)
-    config.authentication = updated
+    config.authentication[credential.idp] = credential
 
 
 def _login_flow(

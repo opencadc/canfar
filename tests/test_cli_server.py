@@ -28,25 +28,23 @@ def _patch_config(path: Path):
 def _write_config(path: Path) -> None:
     data = {
         "version": 1,
-        "active": {"authentication": "cadc", "server": _CADC_URI},
-        "authentication": [
-            {
-                "idp": "cadc",
+        "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/saved/cadc.pem",
                 "expiry": 123.0,
             }
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "CADC-CANFAR": {
                 "idp": "cadc",
-                "name": "CADC-CANFAR",
                 "uri": _CADC_URI,
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             }
-        ],
+        },
     }
     path.write_text(yaml.dump(data), encoding="utf-8")
 
@@ -87,7 +85,34 @@ def test_server_use_selects_by_uri(tmp_path: Path) -> None:
     assert result.exit_code == 0
     with _patch_config(config_path):
         saved = Configuration()
-    assert str(saved.active.server) == _CADC_URI
+    assert saved.active.server == "CADC-CANFAR"
+
+
+def test_server_use_selects_by_name(tmp_path: Path) -> None:
+    """``server use`` resolves a Server Name selector and persists it."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+    target = Server(
+        idp="cadc",
+        name="CADC-CANFAR",
+        uri=AnyUrl(_CADC_URI),
+        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+        version="v1",
+        auths=["x509"],
+    )
+    fetched = target.model_copy(update={"cores": 8, "ram": 64}, deep=True)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.server._validate_server", return_value=fetched),
+    ):
+        result = runner.invoke(cli, ["server", "use", "CADC-CANFAR"])
+
+    assert result.exit_code == 0
+    with _patch_config(config_path):
+        saved = Configuration()
+    assert saved.active.server == "CADC-CANFAR"
+    assert saved.active.servers["cadc"] == "CADC-CANFAR"
 
 
 def test_server_ls_json_output(tmp_path: Path) -> None:
@@ -116,5 +141,19 @@ def test_server_ls_json_output(tmp_path: Path) -> None:
         "status",
     }
     assert server["uri"] == _CADC_URI
-    assert server["name"] == "CADC-CANFAR"
     assert server["status"] is None
+
+
+def test_server_ls_machine_output_includes_server_name(tmp_path: Path) -> None:
+    """``server ls`` machine output exposes the Server Name config identity."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        json_result = runner.invoke(cli, ["server", "ls", "--json"])
+        yaml_result = runner.invoke(cli, ["server", "ls", "--yaml"])
+
+    assert json_result.exit_code == 0
+    assert json.loads(json_result.stdout)[0]["name"] == "CADC-CANFAR"
+    assert yaml_result.exit_code == 0
+    assert yaml.safe_load(yaml_result.stdout)[0]["name"] == "CADC-CANFAR"
