@@ -28,5 +28,7 @@ session.connect(ids)
 
 ---
 <p align="center">
-    <img src="https://img.shields.io/badge/read%20the-documentation-brightgreen?style=for-the-badge&logo=materialformkdocs&logoColor=white">
+    <a href="https://www.opencadc.org/canfar/latest/">
+        <img src="https://img.shields.io/badge/read%20the-documentation-brightgreen?style=for-the-badge&logo=materialformkdocs&logoColor=white">
+    </a>
 </p>
