@@ -22,26 +22,24 @@ def _sample_config(**overrides: Any) -> dict[str, Any]:
         "version": 1,
         "active": {
             "authentication": "cadc",
-            "server": "ivo://cadc.nrc.ca/skaha",
+            "server": "canfar",
         },
-        "authentication": [
-            {
-                "idp": "cadc",
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/test/cert.pem",
                 "expiry": 1234567890.0,
             },
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "canfar": {
                 "idp": "cadc",
-                "name": "CADC-CANFAR",
                 "uri": "ivo://cadc.nrc.ca/skaha",
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             },
-        ],
+        },
     }
     payload.update(overrides)
     return payload
@@ -49,6 +47,29 @@ def _sample_config(**overrides: Any) -> dict[str, Any]:
 
 class TestConfigurationDefaults:
     """Test default state and initialization."""
+
+    def test_default_servers_dict_keyed_by_server_name(self, tmp_path: Path) -> None:
+        """Default Science Platform Servers are keyed by Server Name."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        assert set(config.servers) == {"canfar"}
+        assert config.servers["canfar"].name == "canfar"
+        dumped = config.model_dump(mode="json", exclude_none=True)
+        assert dumped["servers"]["canfar"]["name"] == "canfar"
+
+    def test_default_authentication_dict_keyed_by_idp(self, tmp_path: Path) -> None:
+        """Default Authentication Records are keyed by IDP."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        assert set(config.authentication) == {"cadc"}
+        assert isinstance(config.authentication["cadc"], X509Credential)
+        assert config.authentication["cadc"].idp == "cadc"
+        dumped = config.model_dump(mode="json", exclude_none=True)
+        assert dumped["authentication"]["cadc"]["idp"] == "cadc"
 
     def test_default_initialization(self, tmp_path: Path) -> None:
         """Configuration defaults to the CADC placeholder when no file exists."""
@@ -58,11 +79,11 @@ class TestConfigurationDefaults:
 
         assert config.version == 1
         assert config.active.authentication == "cadc"
-        assert str(config.active.server) == "ivo://cadc.nrc.ca/skaha"
-        assert len(config.authentication) == 1
-        assert isinstance(config.authentication[0], X509Credential)
-        assert len(config.server) == 1
-        assert config.server[0].name == "canfar"
+        assert config.active.server == "canfar"
+        assert set(config.authentication) == {"cadc"}
+        assert isinstance(config.authentication["cadc"], X509Credential)
+        assert set(config.servers) == {"canfar"}
+        assert config.servers["canfar"].name == "canfar"
         assert isinstance(config.registry, ContainerRegistry)
 
     def test_model_config_settings(self) -> None:
@@ -74,27 +95,64 @@ class TestConfigurationDefaults:
 class TestConfigurationValidation:
     """Test data integrity and validation."""
 
+    @pytest.mark.parametrize(
+        "server_name",
+        ["1bad", "bad.name", ""],
+    )
+    def test_invalid_server_name_key_rejected(self, server_name: str) -> None:
+        """Invalid Server Name keys fail validation with a clear message."""
+        with pytest.raises(ValidationError, match="Invalid server name"):
+            Configuration(
+                servers={
+                    server_name: Server(
+                        idp="cadc",
+                        uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
+                        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+                        version="v1",
+                    ),
+                },
+            )
+
+    @pytest.mark.parametrize(
+        "idp_key",
+        ["1bad", "bad.key", ""],
+    )
+    def test_invalid_idp_key_rejected(self, idp_key: str) -> None:
+        """Invalid IDP keys fail validation with a clear message."""
+        with pytest.raises(ValidationError, match="Invalid IDP key"):
+            Configuration(
+                authentication={
+                    idp_key: X509Credential(
+                        idp=idp_key or "cadc",
+                        path=Path("/test/cert.pem"),
+                        expiry=1.0,
+                    ),
+                },
+            )
+
     def test_valid_active_references(self) -> None:
         """Validation passes when active authentication and server exist."""
         config = Configuration(
             active=ActiveConfig(
                 authentication="cadc",
-                server=AnyUrl("ivo://cadc.nrc.ca/skaha"),
+                server="canfar",
             ),
-            authentication=[
-                X509Credential(idp="cadc", path=Path("/test/cert.pem"), expiry=1.0),
-            ],
-            server=[
-                Server(
+            authentication={
+                "cadc": X509Credential(
+                    idp="cadc", path=Path("/test/cert.pem"), expiry=1.0
+                ),
+            },
+            servers={
+                "canfar": Server(
                     idp="cadc",
-                    name="CADC-CANFAR",
                     uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
                     url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
                     version="v1",
                 ),
-            ],
+            },
         )
         assert config.active.authentication == "cadc"
+        assert config.active.server == "canfar"
 
     def test_invalid_active_authentication(self) -> None:
         """Validation fails when active authentication is unknown."""
@@ -105,43 +163,74 @@ class TestConfigurationValidation:
             Configuration(
                 active=ActiveConfig(
                     authentication="missing",
-                    server=AnyUrl("ivo://cadc.nrc.ca/skaha"),
+                    server="canfar",
                 ),
-                authentication=[
-                    X509Credential(idp="cadc", path=Path("/test/cert.pem"), expiry=1.0),
-                ],
-                server=[
-                    Server(
+                authentication={
+                    "cadc": X509Credential(
+                        idp="cadc", path=Path("/test/cert.pem"), expiry=1.0
+                    ),
+                },
+                servers={
+                    "canfar": Server(
                         idp="cadc",
                         uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
                         url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
                         version="v1",
                     ),
-                ],
+                },
             )
 
     def test_invalid_active_server(self) -> None:
-        """Validation fails when active server URI is unknown."""
+        """Validation fails when active Server Name is unknown."""
         with pytest.raises(
             ValidationError,
-            match=r"Active server 'ivo://missing\.example/skaha' not found",
+            match=r"Active server 'missing' not found",
         ):
             Configuration(
                 active=ActiveConfig(
                     authentication="cadc",
-                    server=AnyUrl("ivo://missing.example/skaha"),
+                    server="missing",
                 ),
-                authentication=[
-                    X509Credential(idp="cadc", path=Path("/test/cert.pem"), expiry=1.0),
-                ],
-                server=[
-                    Server(
+                authentication={
+                    "cadc": X509Credential(
+                        idp="cadc", path=Path("/test/cert.pem"), expiry=1.0
+                    ),
+                },
+                servers={
+                    "canfar": Server(
                         idp="cadc",
                         uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
                         url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
                         version="v1",
                     ),
-                ],
+                },
+            )
+
+    def test_invalid_remembered_server_name(self) -> None:
+        """Validation fails when remembered selection names a missing server."""
+        with pytest.raises(
+            ValidationError,
+            match=r"Remembered server 'missing' not found",
+        ):
+            Configuration(
+                active=ActiveConfig(
+                    authentication="cadc",
+                    server="canfar",
+                    servers={"cadc": "missing"},
+                ),
+                authentication={
+                    "cadc": X509Credential(
+                        idp="cadc", path=Path("/test/cert.pem"), expiry=1.0
+                    ),
+                },
+                servers={
+                    "canfar": Server(
+                        idp="cadc",
+                        uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
+                        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+                        version="v1",
+                    ),
+                },
             )
 
 
@@ -164,27 +253,25 @@ class TestConfigurationSerialization:
         original = Configuration(
             active=ActiveConfig(
                 authentication="srcnet",
-                server=AnyUrl("ivo://srcnet.example/skaha"),
+                server="SRCNet",
             ),
-            authentication=[oidc, x509],
-            server=[
-                Server(
+            authentication={"srcnet": oidc, "cadc": x509},
+            servers={
+                "SRCNet": Server(
                     idp="srcnet",
-                    name="SRCNet",
                     uri=AnyUrl("ivo://srcnet.example/skaha"),
                     url=AnyHttpUrl("https://srcnet.example/skaha"),
                     version="v1",
                     auths=["oidc"],
                 ),
-                Server(
+                "canfar": Server(
                     idp="cadc",
-                    name="CADC-CANFAR",
                     uri=AnyUrl("ivo://cadc.nrc.ca/skaha"),
                     url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
                     version="v1",
                     auths=["x509"],
                 ),
-            ],
+            },
             registry=registry,
         )
 
@@ -195,7 +282,7 @@ class TestConfigurationSerialization:
 
         assert loaded.active.authentication == "srcnet"
         assert loaded.registry.username == "test-user"
-        assert any(isinstance(item, OIDCCredential) for item in loaded.authentication)
+        assert isinstance(loaded.authentication["srcnet"], OIDCCredential)
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""
@@ -210,18 +297,20 @@ class TestConfigurationSerialization:
         temp_config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration(
-                authentication=[
-                    X509Credential(
+                authentication={
+                    "cadc": X509Credential(
                         idp="cadc", path=Path("/test.pem"), expiry=1234567890.0
                     ),
-                ],
+                },
             )
             config.save()
 
         yaml_data = yaml.safe_load(temp_config_path.read_text(encoding="utf-8"))
         assert yaml_data["version"] == 1
         assert yaml_data["active"]["authentication"] == "cadc"
-        assert yaml_data["authentication"][0]["mode"] == "x509"
+        assert yaml_data["authentication"]["cadc"]["mode"] == "x509"
+        assert yaml_data["authentication"]["cadc"]["idp"] == "cadc"
+        assert yaml_data["servers"]["canfar"]["name"] == "canfar"
         assert "registry" in yaml_data
 
 
@@ -233,37 +322,31 @@ class TestConfigurationSettingsPrecedence:
     ) -> None:
         """Nested active env vars override YAML active selection."""
         config_data = _sample_config()
-        config_data["server"].append(
-            {
-                "idp": "srcnet",
-                "name": "SRCNet",
-                "uri": "ivo://srcnet.example/skaha",
-                "url": "https://srcnet.example/skaha",
-                "version": "v1",
-                "auths": ["oidc"],
-            },
-        )
-        config_data["authentication"].append(
-            {
-                "idp": "srcnet",
-                "mode": "oidc",
-                "endpoints": {},
-                "client": {},
-                "token": {},
-                "expiry": {},
-            },
-        )
+        config_data["servers"]["SRCNet"] = {
+            "idp": "srcnet",
+            "uri": "ivo://srcnet.example/skaha",
+            "url": "https://srcnet.example/skaha",
+            "version": "v1",
+            "auths": ["oidc"],
+        }
+        config_data["authentication"]["srcnet"] = {
+            "mode": "oidc",
+            "endpoints": {},
+            "client": {},
+            "token": {},
+            "expiry": {},
+        }
         temp_config_path = tmp_path / "config.yaml"
         temp_config_path.write_text(yaml.dump(config_data), encoding="utf-8")
 
         monkeypatch.setenv("CANFAR_ACTIVE__AUTHENTICATION", "srcnet")
-        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "ivo://srcnet.example/skaha")
+        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "SRCNet")
 
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration()
 
         assert config.active.authentication == "srcnet"
-        assert str(config.active.server) == "ivo://srcnet.example/skaha"
+        assert config.active.server == "SRCNet"
 
     def test_init_args_override_all_sources(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -272,11 +355,11 @@ class TestConfigurationSettingsPrecedence:
         temp_config_path = tmp_path / "config.yaml"
         temp_config_path.write_text(yaml.dump(_sample_config()), encoding="utf-8")
         monkeypatch.setenv("CANFAR_ACTIVE__AUTHENTICATION", "srcnet")
-        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "ivo://srcnet.example/skaha")
+        monkeypatch.setenv("CANFAR_ACTIVE__SERVER", "SRCNet")
 
         override = ActiveConfig(
             authentication="cadc",
-            server=AnyUrl("ivo://cadc.nrc.ca/skaha"),
+            server="canfar",
         )
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration(active=override)

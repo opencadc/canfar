@@ -18,7 +18,6 @@ from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
     ServerSelectionRequiredError,
-    ServerSelectorError,
     _discover_for_idp,
     _discovered_to_server,
     _enrich_from_capabilities,
@@ -30,6 +29,7 @@ from canfar.server import (
 from canfar.server import (
     list_servers as server_list,
 )
+from tests.helpers.config import assign_servers
 
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
@@ -69,7 +69,7 @@ class TestServerList:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [cadc, srcnet]
+            assign_servers(config, cadc, srcnet)
             config.active = config.active.model_copy(update={"authentication": "cadc"})
             config.save()
 
@@ -86,13 +86,15 @@ class TestServerList:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.authentication = [
-                X509Credential(idp="cadc", path=Path.home() / ".ssl" / "cadcproxy.pem"),
-                OIDCCredential(idp="srcnet"),
-            ]
-            config.server = [cadc]
+            config.authentication = {
+                "cadc": X509Credential(
+                    idp="cadc", path=Path.home() / ".ssl" / "cadcproxy.pem"
+                ),
+                "srcnet": OIDCCredential(idp="srcnet"),
+            }
+            assign_servers(config, cadc)
             config.active = config.active.model_copy(
-                update={"authentication": "srcnet", "server": cadc.uri}
+                update={"authentication": "srcnet", "server": "CADC-CANFAR"}
             )
             config_path.write_text(
                 yaml.dump(config.model_dump(mode="json", exclude_none=True)),
@@ -118,7 +120,7 @@ class TestServerUse:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [target]
+            assign_servers(config, target)
             config.save()
 
             with (
@@ -131,7 +133,7 @@ class TestServerUse:
                 use(_CADC_URI)
 
             saved = Configuration()
-            assert str(saved.active.server) == _CADC_URI
+            assert saved.active.server == "CADC-CANFAR"
             mock_validate.assert_called_once()
 
     def test_use_by_unique_name_updates_active_server(self, tmp_path: Path) -> None:
@@ -141,7 +143,7 @@ class TestServerUse:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [target]
+            assign_servers(config, target)
             config.save()
 
             with (
@@ -151,31 +153,32 @@ class TestServerUse:
                 use("CADC-CANFAR")
 
             saved = Configuration()
-            assert str(saved.active.server) == _CADC_URI
+            assert saved.active.server == "CADC-CANFAR"
 
-    def test_use_ambiguous_name_fails_with_uri_guidance(self, tmp_path: Path) -> None:
-        """Ambiguous names fail without changing active server."""
-        first = _cadc_server(name="CANFAR", uri=AnyUrl("ivo://cadc.nrc.ca/skaha"))
-        second = _cadc_server(
-            name="CANFAR",
-            uri=AnyUrl("ivo://canfar.net/src/skaha"),
-            url=AnyHttpUrl("https://canfar.net/skaha"),
-        )
+    def test_use_unknown_name_fails_without_changing_active_server(
+        self, tmp_path: Path
+    ) -> None:
+        """Unknown Server Name selectors fail without changing active server."""
+        target = _cadc_server()
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [first, second]
+            assign_servers(config, target)
             config.save()
-            previous = str(Configuration().active.server)
+            previous = Configuration().active.server
 
             with (
+                patch("canfar.server._resolve_selector", return_value=None),
+                patch(
+                    "canfar.server.discover",
+                    side_effect=ServerDiscoveryError("registry down"),
+                ),
                 patch("canfar.server.Configuration", Configuration),
-                pytest.raises(ServerSelectorError, match="Ambiguous") as exc_info,
+                pytest.raises(ServerDiscoveryError),
             ):
-                use("CANFAR")
+                use("missing-server")
 
-            assert "URI" in (exc_info.value.hint or "")
-            assert str(Configuration().active.server) == previous
+            assert Configuration().active.server == previous
 
     def test_use_runs_discovery_on_miss_then_succeeds(self, tmp_path: Path) -> None:
         """Unknown selectors trigger one discovery pass before retry."""
@@ -189,7 +192,7 @@ class TestServerUse:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [known]
+            assign_servers(config, known)
             config.save()
 
             def merge_discovered(
@@ -212,7 +215,7 @@ class TestServerUse:
                 use("ivo://canfar.cam.uksrc.org/skaha")
 
             saved = Configuration()
-            assert str(saved.active.server) == "ivo://canfar.cam.uksrc.org/skaha"
+            assert saved.active.server == "SRCNet-UK"
 
     def test_use_discovery_failure_leaves_active_unchanged(
         self,
@@ -223,9 +226,9 @@ class TestServerUse:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [target]
+            assign_servers(config, target)
             config.save()
-            previous = str(Configuration().active.server)
+            previous = Configuration().active.server
 
             with (
                 patch("canfar.server._resolve_selector", return_value=None),
@@ -238,7 +241,7 @@ class TestServerUse:
             ):
                 use("missing-server")
 
-            assert str(Configuration().active.server) == previous
+            assert Configuration().active.server == previous
 
     def test_use_fetch_failure_leaves_active_unchanged(self, tmp_path: Path) -> None:
         """Fetch or validation failure leaves the previous active server."""
@@ -246,9 +249,9 @@ class TestServerUse:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [target]
+            assign_servers(config, target)
             config.save()
-            previous = str(Configuration().active.server)
+            previous = Configuration().active.server
 
             with (
                 patch(
@@ -260,7 +263,7 @@ class TestServerUse:
             ):
                 use(_CADC_URI)
 
-            assert str(Configuration().active.server) == previous
+            assert Configuration().active.server == previous
 
 
 class TestServerFetch:
@@ -423,7 +426,7 @@ class TestServerDiscovery:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.server = [first, second]
+            assign_servers(config, first, second)
             config.active = config.active.model_copy(update={"server": None})
             config.save()
 
@@ -437,6 +440,124 @@ class TestServerDiscovery:
             "First",
             "Second",
         ]
+
+    def test_discover_keys_named_server_by_registry_name(self, tmp_path: Path) -> None:
+        """Discovery persists a registry-named server under that name key."""
+        discovered = _cadc_server(
+            name="Discovered-CADC",
+            uri=AnyUrl("ivo://cadc.example/skaha"),
+            url=AnyHttpUrl("https://cadc.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch("canfar.server.Configuration", Configuration),
+        ):
+            discover("cadc")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            saved = Configuration()
+        assert "Discovered-CADC" in saved.servers
+        assert str(saved.servers["Discovered-CADC"].uri) == "ivo://cadc.example/skaha"
+
+    def test_rediscovery_updates_existing_name_in_place(self, tmp_path: Path) -> None:
+        """Re-discovering an existing Server Name updates it without duplicates."""
+        first = _cadc_server(
+            name="Discovered-CADC",
+            uri=AnyUrl("ivo://cadc.example/skaha"),
+            url=AnyHttpUrl("https://cadc.example/skaha"),
+        )
+        moved = first.model_copy(
+            update={"url": AnyHttpUrl("https://cadc-moved.example/skaha")},
+            deep=True,
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server.Configuration", Configuration),
+        ):
+            with patch("canfar.server._discover_for_idp", return_value=[first]):
+                discover("cadc")
+            with patch("canfar.server._discover_for_idp", return_value=[moved]):
+                discover("cadc")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            saved = Configuration()
+        names = [name for name, server in saved.servers.items() if server.idp == "cadc"]
+        assert names.count("Discovered-CADC") == 1
+        assert str(saved.servers["Discovered-CADC"].url) == (
+            "https://cadc-moved.example/skaha"
+        )
+
+    def test_registry_rename_inserts_new_key_without_rewriting_old(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """A registry rename adds a new entry; the user's existing key survives."""
+        original = _cadc_server(
+            name="UserName",
+            uri=AnyUrl("ivo://cadc.example/skaha"),
+            url=AnyHttpUrl("https://cadc.example/skaha"),
+        )
+        renamed = original.model_copy(update={"name": "RegistryName"}, deep=True)
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            assign_servers(config, original)
+            config.save()
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server._discover_for_idp", return_value=[renamed]),
+            patch("canfar.server.Configuration", Configuration),
+        ):
+            discover("cadc")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            saved = Configuration()
+        assert "UserName" in saved.servers
+        assert "RegistryName" in saved.servers
+        assert str(saved.servers["UserName"].uri) == "ivo://cadc.example/skaha"
+        assert str(saved.servers["RegistryName"].uri) == "ivo://cadc.example/skaha"
+
+    def test_discover_keys_unnamed_server_by_host_slug(self, tmp_path: Path) -> None:
+        """Discovery persists unnamed registry endpoints under the host slug key."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://swesrc.chalmers.se/skaha",
+            url="https://swesrc.chalmers.se/skaha",
+            status=200,
+            name=None,
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract.return_value = [endpoint]
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.server._enrich_from_capabilities",
+                side_effect=lambda item, **_kwargs: item.model_copy(deep=True),
+            ),
+            patch("canfar.server.Configuration", Configuration),
+        ):
+            discover("srcnet")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            saved = Configuration()
+        assert "swesrc-chalmers-se" in saved.servers
+        assert str(saved.servers["swesrc-chalmers-se"].uri) == (
+            "ivo://swesrc.chalmers.se/skaha"
+        )
 
     @pytest.mark.asyncio
     async def test_discover_for_idp_converts_active_endpoints(self) -> None:
@@ -494,6 +615,24 @@ class TestServerDiscovery:
         assert server.name == "Broken"
         assert str(server.url) == "https://broken.example.org/skaha"
         assert server.version is None
+
+    def test_discovered_to_server_names_unnamed_endpoint_by_host_slug(self) -> None:
+        """Endpoints without a registry name are named by their URI host slug."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://swesrc.chalmers.se/skaha",
+            url="https://swesrc.chalmers.se/skaha",
+            status=200,
+            name=None,
+        )
+
+        with patch(
+            "canfar.models.http.vosi.capabilities",
+            side_effect=ValueError("unreachable"),
+        ):
+            server = _discovered_to_server(endpoint, "srcnet")
+
+        assert server.name == "swesrc-chalmers-se"
 
     def test_enrich_from_capabilities_non_strict_returns_server_on_failure(
         self,
@@ -610,13 +749,15 @@ class TestServerDiscovery:
             auths=["oidc"],
         )
         config = Configuration()
-        config.authentication = [
-            OIDCCredential(idp="srcnet"),
-            X509Credential(idp="cadc", path=Path("/cadc.pem"), expiry=9999999999.0),
-        ]
-        config.server = [srcnet, cadc]
+        config.authentication = {
+            "srcnet": OIDCCredential(idp="srcnet"),
+            "cadc": X509Credential(
+                idp="cadc", path=Path("/cadc.pem"), expiry=9999999999.0
+            ),
+        }
+        assign_servers(config, srcnet, cadc)
         config.active = config.active.model_copy(
-            update={"authentication": "srcnet", "server": srcnet.uri}
+            update={"authentication": "srcnet", "server": "SRCNet"}
         )
         captured: dict[str, Configuration] = {}
 
@@ -649,7 +790,7 @@ class TestServerDiscovery:
 
         validation_config = captured["config"]
         assert validation_config.active.authentication == "cadc"
-        assert str(validation_config.active.server) == _CADC_URI
+        assert validation_config.active.server == "CADC-CANFAR"
         assert config.active.authentication == "srcnet"
 
 

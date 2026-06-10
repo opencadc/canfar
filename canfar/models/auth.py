@@ -7,13 +7,23 @@ import time
 from pathlib import Path  # noqa: TC003
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from canfar import get_logger
 from canfar.auth import x509
 from canfar.models.http import Server
 
 log = get_logger(__name__)
+
+
+def _secret_present(value: SecretStr | str | None) -> bool:
+    """Return whether a secret field holds a non-empty value."""
+    if value is None:
+        return False
+    if isinstance(value, SecretStr):
+        return bool(value.get_secret_value())
+    return bool(value)
+
 
 AuthMode = Literal["x509", "oidc"]
 """Supported authentication modes for domain records."""
@@ -55,14 +65,23 @@ class Client(BaseModel):
     """OIDC client configuration."""
 
     identity: Annotated[str | None, Field(description="OIDC client ID")] = None
-    secret: Annotated[str | None, Field(description="OIDC client secret")] = None
+    secret: Annotated[
+        SecretStr | None,
+        Field(description="OIDC client secret"),
+    ] = None
 
 
 class Token(BaseModel):
     """OIDC token configuration."""
 
-    access: Annotated[str | None, Field(description="Access token")] = None
-    refresh: Annotated[str | None, Field(description="Refresh token")] = None
+    access: Annotated[
+        SecretStr | None,
+        Field(description="Access token"),
+    ] = None
+    refresh: Annotated[
+        SecretStr | None,
+        Field(description="Refresh token"),
+    ] = None
 
 
 class Expiry(BaseModel):
@@ -108,16 +127,13 @@ class OIDC(BaseModel):
         Returns:
             bool: True if all required OIDC information is present, False otherwise.
         """
-        required: list[str | float | None] = [
-            self.endpoints.discovery,
-            self.endpoints.token,
-            self.client.identity,
-            self.client.secret,
-            self.token.refresh,
-        ]
-
-        # Check if all required fields are defined
-        if not all(required):
+        if not (
+            self.endpoints.discovery
+            and self.endpoints.token
+            and self.client.identity
+            and _secret_present(self.client.secret)
+            and _secret_present(self.token.refresh)
+        ):
             log.warning("Missing required OIDC configuration.")
             return False
 

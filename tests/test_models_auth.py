@@ -80,7 +80,8 @@ class TestOIDCClientConfig:
             secret="test_client_secret",  # nosec B106
         )
         assert config.identity == "test_client_id"
-        assert config.secret == "test_client_secret"  # nosec B105
+        assert config.secret is not None
+        assert config.secret.get_secret_value() == "test_client_secret"  # nosec B105
 
 
 class TestOIDCTokenConfig:
@@ -98,8 +99,10 @@ class TestOIDCTokenConfig:
             access="test_access_token",
             refresh="test_refresh_token",
         )
-        assert config.access == "test_access_token"
-        assert config.refresh == "test_refresh_token"
+        assert config.access is not None
+        assert config.access.get_secret_value() == "test_access_token"
+        assert config.refresh is not None
+        assert config.refresh.get_secret_value() == "test_refresh_token"
 
 
 class TestOIDCExpiryConfig:

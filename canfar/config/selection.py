@@ -21,17 +21,26 @@ if TYPE_CHECKING:
 
 def get_credential(config: Configuration, idp: str) -> AuthenticationCredential:
     """Return the saved authentication credential for an IDP key."""
-    for credential in config.authentication:
-        if credential.idp == idp:
-            return credential
-    msg = f"Authentication record for IDP '{idp}' not found."
-    raise KeyError(msg)
+    try:
+        return config.authentication[idp]
+    except KeyError as exc:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        raise KeyError(msg) from exc
+
+
+def get_server_by_name(config: Configuration, name: str) -> Server:
+    """Return a known server by Server Name."""
+    try:
+        return config.servers[name]
+    except KeyError as exc:
+        msg = f"Server '{name}' not found."
+        raise KeyError(msg) from exc
 
 
 def get_server_by_uri(config: Configuration, uri: str | AnyUrl) -> Server:
     """Return a known server by IVOA URI."""
     target = str(uri)
-    for server in config.server:
+    for server in config.servers.values():
         if server.uri is not None and str(server.uri) == target:
             return server
     msg = f"Server '{target}' not found."
@@ -43,7 +52,7 @@ def get_active_server(config: Configuration) -> Server:
     if config.active.server is None:
         msg = "No active server selected."
         raise KeyError(msg)
-    return get_server_by_uri(config, config.active.server)
+    return get_server_by_name(config, config.active.server)
 
 
 def get_server_for_idp(config: Configuration, idp: str) -> Server:
@@ -51,14 +60,14 @@ def get_server_for_idp(config: Configuration, idp: str) -> Server:
     if config.active.authentication == idp and config.active.server is not None:
         return get_active_server(config)
 
-    for server in config.server:
+    for server in config.servers.values():
         if server.idp == idp:
             return server
     msg = f"No server found for IDP '{idp}'."
     raise KeyError(msg)
 
 
-def server_selection_history(config: Configuration) -> dict[str, AnyUrl]:
+def server_selection_history(config: Configuration) -> dict[str, str]:
     """Return remembered server selections seeded with the current active pair."""
     selections = dict(config.active.servers)
     if config.active.server is None:
@@ -67,18 +76,18 @@ def server_selection_history(config: Configuration) -> dict[str, AnyUrl]:
         server = get_active_server(config)
     except KeyError:
         return selections
-    if server.idp == config.active.authentication and server.uri is not None:
-        selections[config.active.authentication] = server.uri
+    if server.idp == config.active.authentication and server.name is not None:
+        selections[config.active.authentication] = server.name
     return selections
 
 
 def get_remembered_server_for_idp(config: Configuration, idp: str) -> Server | None:
     """Return the last selected server for ``idp`` when still valid."""
-    uri = server_selection_history(config).get(idp)
-    if uri is None:
+    name = server_selection_history(config).get(idp)
+    if name is None:
         return None
     try:
-        server = get_server_by_uri(config, uri)
+        server = get_server_by_name(config, name)
     except KeyError:
         return None
     if server.idp != idp:
@@ -87,38 +96,26 @@ def get_remembered_server_for_idp(config: Configuration, idp: str) -> Server | N
 
 
 def upsert_server(config: Configuration, server: Server) -> None:
-    """Insert or replace a server record keyed by URI."""
-    if server.uri is None:
+    """Insert or replace a server record keyed by Server Name."""
+    if server.name is None:
         return
-    target = str(server.uri)
-    updated: list[Server] = []
-    replaced = False
-    for existing in config.server:
-        if existing.uri is not None and str(existing.uri) == target:
-            updated.append(server)
-            replaced = True
-        else:
-            updated.append(existing)
-    if not replaced:
-        updated.append(server)
-    config.server = updated
+    config.servers[server.name] = server
 
 
 def set_active_selection(config: Configuration, idp: str, server: Server) -> None:
     """Persist ``idp`` and ``server`` as the active Authentication/Server pair."""
-    if server.uri is None:
-        msg = "Server URI is required for active selection."
+    if server.name is None:
+        msg = "Server name is required for active selection."
         raise ValueError(msg)
 
-    uri = server.uri
     selected = server.model_copy(update={"idp": idp}, deep=True)
     upsert_server(config, selected)
     selections = server_selection_history(config)
-    selections[idp] = uri
+    selections[idp] = server.name
     config.active = config.active.model_copy(
         update={
             "authentication": idp,
-            "server": uri,
+            "server": server.name,
             "servers": selections,
         },
     )
@@ -152,18 +149,7 @@ def legacy_contexts(config: Configuration) -> LegacyContextsMapping:
 
 def set_legacy_context(config: Configuration, idp: str, context: AuthContext) -> None:
     """Update saved authentication and optional server from a legacy context."""
-    credential = legacy_context_to_credential(context, idp)
-    updated: list[AuthenticationCredential] = []
-    replaced = False
-    for existing in config.authentication:
-        if existing.idp == idp:
-            updated.append(credential)
-            replaced = True
-        else:
-            updated.append(existing)
-    if not replaced:
-        updated.append(credential)
-    config.authentication = updated
+    config.authentication[idp] = legacy_context_to_credential(context, idp)
 
     if context.server is not None:
         upsert_server(config, context.server.model_copy(update={"idp": idp}))

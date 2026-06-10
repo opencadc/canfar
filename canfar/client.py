@@ -334,7 +334,8 @@ class HTTPClient(BaseSettings):
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-X509"
         elif ctx.mode == "oidc":
             assert ctx.valid, "Invalid OIDC context provided."
-            headers["Authorization"] = f"Bearer {ctx.token.access}"
+            assert ctx.token.access is not None
+            headers["Authorization"] = f"Bearer {ctx.token.access.get_secret_value()}"
             headers["X-Skaha-Authentication-Type"] = "OIDC"
         elif ctx.mode == "x509":
             headers["X-Skaha-Authentication-Type"] = "X509"

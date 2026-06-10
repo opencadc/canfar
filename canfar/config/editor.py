@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel
-
 if TYPE_CHECKING:
     from canfar.models.config import Configuration
 
@@ -27,14 +25,11 @@ def _get_from_container(container: Any, key: str | int) -> Any:
             raise TypeError(msg)
         return container[key]
 
-    if isinstance(container, BaseModel):
-        return getattr(container, key)
-
     if isinstance(container, dict):
         return container[key]
 
-    msg = f"Expected mapping or model for key {key!r}"
-    raise TypeError(msg)
+    msg = f"Expected mapping for key {key!r}"
+    raise KeyError(msg)
 
 
 def _set_in_container(container: Any, key: str | int, value: Any) -> None:
@@ -69,7 +64,7 @@ def _ensure_child_container(parent: Any, key: str | int) -> Any:
 
 def get_value(config: Configuration, path: str) -> Any:
     """Get a nested configuration value via dotted path."""
-    value: Any = config
+    value: Any = config.model_dump(mode="json", exclude_none=False)
     for segment in _parse_dotted_path(path):
         value = _get_from_container(value, segment)
     return value

@@ -128,7 +128,8 @@ def list() -> builtins.list[Authentication]:  # noqa: A001
     """
     config = Configuration()
     return [
-        _authentication_for_credential(config, cred) for cred in config.authentication
+        _authentication_for_credential(config, cred)
+        for cred in config.authentication.values()
     ]
 
 
@@ -160,15 +161,15 @@ def remove(idp: str, *, force: bool = False) -> None:
             hint="Use --force or switch authentication before removing.",
         )
 
-    config.authentication = [
-        credential for credential in config.authentication if credential.idp != idp
-    ]
-    config.server = [server for server in config.server if server.idp != idp]
+    config.authentication.pop(idp, None)
+    config.servers = {
+        name: server for name, server in config.servers.items() if server.idp != idp
+    }
     config.active.servers.pop(idp, None)
 
     if config.active.authentication == idp:
         if config.authentication:
-            config.active.authentication = config.authentication[0].idp
+            config.active.authentication = next(iter(config.authentication))
             config.active.server = None
         else:
             config.active = config.active.model_copy(
@@ -229,7 +230,7 @@ def show() -> Authentication:
 
 
 def _has_authentication(config: Configuration, idp: str) -> bool:
-    return any(credential.idp == idp for credential in config.authentication)
+    return idp in config.authentication
 
 
 def _active_server_compatible(config: Configuration, idp: str) -> bool:
@@ -254,10 +255,10 @@ def _authentication_for_credential(
         try:
             server = config.get_active_server()
         except KeyError:
-            server_ref = str(config.active.server)
+            server_ref = config.active.server
         else:
             if server.idp == credential.idp:
-                server_ref = str(config.active.server)
+                server_ref = config.active.server
 
     expiry = _credential_expiry(credential)
     return Authentication(
@@ -281,17 +282,7 @@ def _upsert_credential(
     config: Configuration,
     credential: AuthenticationCredential,
 ) -> None:
-    updated: builtins.list[AuthenticationCredential] = []
-    replaced = False
-    for existing in config.authentication:
-        if existing.idp == credential.idp:
-            updated.append(credential)
-            replaced = True
-        else:
-            updated.append(existing)
-    if not replaced:
-        updated.append(credential)
-    config.authentication = updated
+    config.authentication[credential.idp] = credential
 
 
 def _authenticate(idp_info: IdpInfo) -> AuthenticationCredential:

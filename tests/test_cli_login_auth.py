@@ -34,7 +34,8 @@ def test_authenticate_for_cli_srcnet_uses_oidc_device_flow() -> None:
     mock_run.assert_called_once()
     assert credential.idp == "srcnet"
     assert credential.mode == "oidc"
-    assert credential.token.access == "access-token"
+    assert credential.token.access is not None
+    assert credential.token.access.get_secret_value() == "access-token"
 
 
 def test_authenticate_for_cli_passes_timeout_to_oidc_device_flow() -> None:

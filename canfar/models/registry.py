@@ -41,7 +41,7 @@ class IVOARegistrySearch(BaseModel):
             "ivo://canfar.itsrc.ext.cineca.it/skaha": "itCINECA",
             "ivo://canfar.srcnet.skao.int/skaha": "skaSRC",
             "ivo://aussrc.org/skaha": "ausSRC",
-            "ivo://cadc.nrc.ca/skaha": "cadc",
+            "ivo://cadc.nrc.ca/skaha": "canfar",
         }
     )
 

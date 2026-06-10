@@ -32,6 +32,8 @@ from __future__ import annotations
 import time
 from typing import TYPE_CHECKING, Callable
 
+from pydantic import SecretStr
+
 from canfar import get_logger
 from canfar.auth import oidc
 from canfar.models.auth import OIDC
@@ -41,7 +43,6 @@ if TYPE_CHECKING:
     from collections.abc import Awaitable
 
     import httpx
-    from pydantic import SecretStr
 
     from canfar.client import HTTPClient
 
@@ -82,10 +83,18 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.warning("OIDC context is not valid.")
             return
 
-        if not ctx.token.refresh or (
-            ctx.expiry.refresh and ctx.expiry.refresh < time.time()
+        refresh = ctx.token.refresh
+        if (
+            refresh is None
+            or not refresh.get_secret_value()
+            or (ctx.expiry.refresh and ctx.expiry.refresh < time.time())
         ):
             log.warning("OIDC refresh token is missing or expired.")
+            return
+
+        client_secret = ctx.client.secret
+        if client_secret is None:
+            log.warning("OIDC client secret is missing.")
             return
 
         try:
@@ -93,8 +102,8 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             token: SecretStr = oidc.sync_refresh(
                 url=str(ctx.endpoints.token),
                 identity=str(ctx.client.identity),
-                secret=str(ctx.client.secret),
-                token=str(ctx.token.refresh),
+                secret=client_secret.get_secret_value(),
+                token=refresh.get_secret_value(),
             )
             log.debug("Synchronous OIDC token refresh successful.")
 
@@ -102,7 +111,9 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             access_value = token.get_secret_value()
             context = ctx.model_copy(
                 update={
-                    "token": ctx.token.model_copy(update={"access": access_value}),
+                    "token": ctx.token.model_copy(
+                        update={"access": SecretStr(access_value)}
+                    ),
                     "expiry": ctx.expiry.model_copy(
                         update={"access": jwt.expiry(access_value)}
                     ),
@@ -153,10 +164,18 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         if not ctx.expired:
             return
 
-        if not ctx.token.refresh or (
-            ctx.expiry.refresh and ctx.expiry.refresh < time.time()
+        refresh = ctx.token.refresh
+        if (
+            refresh is None
+            or not refresh.get_secret_value()
+            or (ctx.expiry.refresh and ctx.expiry.refresh < time.time())
         ):
             log.warning("OIDC refresh token is missing or expired.")
+            return
+
+        client_secret = ctx.client.secret
+        if client_secret is None:
+            log.warning("OIDC client secret is missing.")
             return
 
         try:
@@ -164,8 +183,8 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
             token: SecretStr = await oidc.refresh(
                 url=str(ctx.endpoints.token),
                 identity=str(ctx.client.identity),
-                secret=str(ctx.client.secret),
-                token=str(ctx.token.refresh),
+                secret=client_secret.get_secret_value(),
+                token=refresh.get_secret_value(),
             )
             log.debug("Asynchronous OIDC token refresh successful.")
 
@@ -173,7 +192,9 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
             access_value = token.get_secret_value()
             context = ctx.model_copy(
                 update={
-                    "token": ctx.token.model_copy(update={"access": access_value}),
+                    "token": ctx.token.model_copy(
+                        update={"access": SecretStr(access_value)}
+                    ),
                     "expiry": ctx.expiry.model_copy(
                         update={"access": jwt.expiry(access_value)}
                     ),

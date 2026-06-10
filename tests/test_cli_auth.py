@@ -31,41 +31,37 @@ def _patch_config(path: Path):
 def _write_config(path: Path) -> None:
     data = {
         "version": 1,
-        "active": {"authentication": "cadc", "server": _CADC_URI},
-        "authentication": [
-            {
-                "idp": "cadc",
+        "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/saved/cadc.pem",
                 "expiry": 123.0,
             },
-            {
-                "idp": "srcnet",
+            "srcnet": {
                 "mode": "oidc",
                 "endpoints": {},
                 "client": {},
                 "token": {},
                 "expiry": {},
             },
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "CADC-CANFAR": {
                 "idp": "cadc",
-                "name": "CADC-CANFAR",
                 "uri": _CADC_URI,
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             },
-            {
+            "SRCNet": {
                 "idp": "srcnet",
-                "name": "SRCNet",
                 "uri": "ivo://srcnet.example/skaha",
                 "url": "https://srcnet.example/skaha",
                 "version": "v1",
                 "auths": ["oidc"],
             },
-        ],
+        },
     }
     path.write_text(yaml.dump(data), encoding="utf-8")
 
@@ -73,49 +69,44 @@ def _write_config(path: Path) -> None:
 def _write_config_with_multiple_srcnet_servers(path: Path) -> None:
     data = {
         "version": 1,
-        "active": {"authentication": "srcnet", "server": _SRCNET_URI},
-        "authentication": [
-            {
-                "idp": "cadc",
+        "active": {"authentication": "srcnet", "server": "canSRC"},
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/saved/cadc.pem",
                 "expiry": 123.0,
             },
-            {
-                "idp": "srcnet",
+            "srcnet": {
                 "mode": "oidc",
                 "endpoints": {},
                 "client": {},
                 "token": {},
                 "expiry": {},
             },
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "cadc": {
                 "idp": "cadc",
-                "name": "cadc",
                 "uri": _CADC_URI,
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             },
-            {
+            "canSRC": {
                 "idp": "srcnet",
-                "name": "canSRC",
                 "uri": _SRCNET_URI,
                 "url": "https://src.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["oidc"],
             },
-            {
+            "sweSRC": {
                 "idp": "srcnet",
-                "name": "sweSRC",
                 "uri": "ivo://swesrc.chalmers.se/skaha",
                 "url": "https://services.swesrc.chalmers.se/skaha",
                 "version": "v1",
                 "auths": ["oidc"],
             },
-        ],
+        },
     }
     path.write_text(yaml.dump(data), encoding="utf-8")
 
@@ -141,7 +132,7 @@ def test_auth_show_humanizes_expiry() -> None:
         mode="x509",
         expiry=future,
         active=True,
-        server="ivo://cadc.nrc.ca/skaha",
+        server="CADC-CANFAR",
     )
     expected = humanize.naturaltime(datetime.fromtimestamp(future, tz=timezone.utc))
 
@@ -240,7 +231,7 @@ def test_auth_use_reuses_previous_server_for_idp(tmp_path: Path) -> None:
     with _patch_config(config_path):
         saved = Configuration()
     assert saved.active.authentication == "srcnet"
-    assert str(saved.active.server) == _SRCNET_URI
+    assert saved.active.server == "canSRC"
 
 
 def test_auth_remove_requires_force_for_active_idp(tmp_path: Path) -> None:
@@ -266,8 +257,8 @@ def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:
     assert result.exit_code == 0
     with _patch_config(config_path):
         saved = Configuration()
-    assert all(item.idp != "cadc" for item in saved.authentication)
-    assert all(item.idp != "cadc" for item in saved.server)
+    assert "cadc" not in saved.authentication
+    assert all(server.idp != "cadc" for server in saved.servers.values())
 
 
 def test_auth_purge_requires_force(tmp_path: Path) -> None:

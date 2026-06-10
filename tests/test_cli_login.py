@@ -30,7 +30,9 @@ def _write_config(path: Path, data: dict) -> None:
 
 
 def _merge_servers(config: Configuration, discovered: list[Server], idp: str) -> None:  # noqa: ARG001
-    config.server = discovered
+    for server in discovered:
+        if server.name is not None:
+            config.servers[server.name] = server
 
 
 def test_login_help_is_available() -> None:
@@ -132,7 +134,7 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
     ):
         saved = Configuration()
     assert saved.active.authentication == "cadc"
-    assert str(saved.active.server) == _CADC_URI
+    assert saved.active.server == "CADC-CANFAR"
 
 
 def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
@@ -179,7 +181,7 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
     with patch("canfar.models.config.CONFIG_PATH", config_path):
         saved = Configuration()
     assert saved.active.authentication == "cadc"
-    assert str(saved.active.server) == _CADC_URI
+    assert saved.active.server == "CADC-CANFAR"
     assert saved.get_credential("cadc").path == Path("/new/cert.pem")
 
 
@@ -237,7 +239,8 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     authenticate.assert_called_once()
     assert authenticate.call_args.kwargs["timeout"] == 9
     validate.assert_called_once()
-    assert validate.call_args.args == (discovered[0],)
+    validated = validate.call_args.args[0]
+    assert str(validated.uri) == _CADC_URI
     assert validate.call_args.kwargs["idp"] == "cadc"
     assert validate.call_args.kwargs["timeout"] == 9
     assert isinstance(validate.call_args.kwargs["config"], Configuration)
@@ -262,25 +265,23 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
         config_path,
         {
             "version": 1,
-            "active": {"authentication": "cadc", "server": _CADC_URI},
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/existing/cert.pem",
                     "expiry": 1.0,
                 }
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": _CADC_URI,
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 }
-            ],
+            },
         },
     )
 

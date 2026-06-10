@@ -30,33 +30,30 @@ def _write_config(path: Path) -> None:
     """Write a minimal config fixture for machine-output tests."""
     data = {
         "version": 1,
-        "active": {"authentication": "cadc", "server": _CADC_URI},
-        "authentication": [
-            {
-                "idp": "cadc",
+        "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/saved/cadc.pem",
                 "expiry": 123.0,
             },
-            {
-                "idp": "srcnet",
+            "srcnet": {
                 "mode": "oidc",
                 "endpoints": {},
                 "client": {},
                 "token": {},
                 "expiry": {},
             },
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "CADC-CANFAR": {
                 "idp": "cadc",
-                "name": "CADC-CANFAR",
                 "uri": _CADC_URI,
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             }
-        ],
+        },
     }
     path.write_text(yaml.dump(data), encoding="utf-8")
 

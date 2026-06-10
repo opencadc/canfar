@@ -20,24 +20,22 @@ def _write_null_active_server_config(path: Path) -> None:
     data = {
         "version": 1,
         "active": {"authentication": "cadc", "server": None},
-        "authentication": [
-            {
-                "idp": "cadc",
+        "authentication": {
+            "cadc": {
                 "mode": "x509",
                 "path": "/saved/cadc.pem",
                 "expiry": 123.0,
             }
-        ],
-        "server": [
-            {
+        },
+        "servers": {
+            "CADC-CANFAR": {
                 "idp": "cadc",
-                "name": "CADC-CANFAR",
                 "uri": "ivo://cadc.nrc.ca/skaha",
                 "url": "https://ws-uv.canfar.net/skaha",
                 "version": "v1",
                 "auths": ["x509"],
             }
-        ],
+        },
     }
     path.write_text(yaml.dump(data), encoding="utf-8")
 

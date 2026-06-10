@@ -29,7 +29,9 @@ def _merge_servers(
     config: canfar.models.config.Configuration,
     discovered: list,
 ) -> None:
-    config.server = discovered
+    for server in discovered:
+        if server.name is not None:
+            config.servers[server.name] = server
 
 
 class TestAuthenticationList:
@@ -41,34 +43,31 @@ class TestAuthenticationList:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cadc.pem",
                     "expiry": 1234567890.0,
                 },
-                {
-                    "idp": "srcnet",
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 }
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -86,7 +85,7 @@ class TestAuthenticationList:
         assert by_idp["cadc"].mode == "x509"
         assert by_idp["cadc"].expiry == 1234567890.0
         assert by_idp["cadc"].active is True
-        assert by_idp["cadc"].server == "ivo://cadc.nrc.ca/skaha"
+        assert by_idp["cadc"].server == "CADC-CANFAR"
         assert by_idp["srcnet"].active is False
         assert by_idp["srcnet"].server is None
 
@@ -100,26 +99,24 @@ class TestAuthenticationShow:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cadc.pem",
                     "expiry": 999.0,
                 }
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 }
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -132,7 +129,7 @@ class TestAuthenticationShow:
         assert summary.mode == "x509"
         assert summary.expiry == 999.0
         assert summary.active is True
-        assert summary.server == "ivo://cadc.nrc.ca/skaha"
+        assert summary.server == "CADC-CANFAR"
 
 
 class TestAuthenticationUse:
@@ -144,42 +141,38 @@ class TestAuthenticationUse:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cadc.pem",
                     "expiry": 1.0,
                 },
-                {
-                    "idp": "srcnet",
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-                {
+                "SRCNet": {
                     "idp": "srcnet",
-                    "name": "SRCNet",
                     "uri": "ivo://srcnet.example/skaha",
                     "url": "https://srcnet.example/skaha",
                     "version": "v1",
                     "auths": ["oidc"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -196,42 +189,38 @@ class TestAuthenticationUse:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cadc.pem",
                     "expiry": 1.0,
                 },
-                {
-                    "idp": "srcnet",
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-                {
+                "SRCNet": {
                     "idp": "srcnet",
-                    "name": "SRCNet",
                     "uri": "ivo://srcnet.example/skaha",
                     "url": "https://srcnet.example/skaha",
                     "version": "v1",
                     "auths": ["oidc"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -251,26 +240,24 @@ class TestAuthenticationUse:
         config_data = {
             "version": 1,
             "active": {"authentication": "srcnet", "server": None},
-            "authentication": [
-                {
-                    "idp": "srcnet",
+            "authentication": {
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 }
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "SRCNet": {
                     "idp": "srcnet",
-                    "name": "SRCNet",
                     "uri": "ivo://srcnet.example/skaha",
                     "url": "https://srcnet.example/skaha",
                     "version": "v1",
                     "auths": ["oidc"],
                 }
-            ],
+            },
         }
         (config_dir / "config.yaml").write_text(
             yaml.dump(config_data), encoding="utf-8"
@@ -293,42 +280,38 @@ class TestAuthenticationUse:
             "version": 1,
             "active": {
                 "authentication": "srcnet",
-                "server": "ivo://srcnet.example/skaha",
+                "server": "SRCNet",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/saved/cadc.pem",
                     "expiry": 1.0,
                 },
-                {
-                    "idp": "srcnet",
+                "srcnet": {
                     "mode": "oidc",
                     "endpoints": {},
                     "client": {},
                     "token": {},
                     "expiry": {},
                 },
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 },
-                {
+                "SRCNet": {
                     "idp": "srcnet",
-                    "name": "SRCNet",
                     "uri": "ivo://srcnet.example/skaha",
                     "url": "https://srcnet.example/skaha",
                     "version": "v1",
                     "auths": ["oidc"],
                 },
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -338,7 +321,7 @@ class TestAuthenticationUse:
             config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "srcnet"
-        assert str(config.active.server) == "ivo://srcnet.example/skaha"
+        assert config.active.server == "SRCNet"
 
     def test_use_unknown_idp_raises_key_error(self) -> None:
         """Unknown IDP keys are rejected by the built-in catalog."""
@@ -375,26 +358,24 @@ class TestAuthenticationLogin:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/existing/cert.pem",
                     "expiry": 42.0,
                 }
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 }
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
@@ -410,7 +391,7 @@ class TestAuthenticationLogin:
         mock_discover.assert_not_called()
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
-        assert config.authentication[0].path == Path("/existing/cert.pem")
+        assert config.authentication["cadc"].path == Path("/existing/cert.pem")
 
     def test_login_saves_auth_and_servers_without_changing_active(
         self, tmp_path: Path
@@ -454,7 +435,7 @@ class TestAuthenticationLogin:
             config = canfar.models.config.Configuration()
 
         assert config.active.authentication == "cadc"
-        assert str(config.active.server) == "ivo://cadc.nrc.ca/skaha"
+        assert config.active.server == "canfar"
         assert config.get_credential("cadc").path == Path("/new/cert.pem")
         assert str(config.get_server_by_uri("ivo://cadc.nrc.ca/skaha").url) == (
             "https://ws-uv.canfar.net/skaha"
@@ -468,26 +449,24 @@ class TestAuthenticationLogin:
             "version": 1,
             "active": {
                 "authentication": "cadc",
-                "server": "ivo://cadc.nrc.ca/skaha",
+                "server": "CADC-CANFAR",
             },
-            "authentication": [
-                {
-                    "idp": "cadc",
+            "authentication": {
+                "cadc": {
                     "mode": "x509",
                     "path": "/old/cert.pem",
                     "expiry": 1.0,
                 }
-            ],
-            "server": [
-                {
+            },
+            "servers": {
+                "CADC-CANFAR": {
                     "idp": "cadc",
-                    "name": "CADC-CANFAR",
                     "uri": "ivo://cadc.nrc.ca/skaha",
                     "url": "https://ws-uv.canfar.net/skaha",
                     "version": "v1",
                     "auths": ["x509"],
                 }
-            ],
+            },
         }
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)

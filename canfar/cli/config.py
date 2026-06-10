@@ -3,11 +3,9 @@
 from __future__ import annotations
 
 import json
-from typing import Any
 
 import typer
 import yaml
-from pydantic import BaseModel
 
 from canfar import CONFIG_PATH
 from canfar.cli import output
@@ -19,51 +17,6 @@ from canfar.utils.console import console
 config: typer.Typer = typer.Typer(
     cls=AliasGroup,
 )
-
-_SENSITIVE_GET_SUFFIXES = (
-    "client.secret",
-    "token.access",
-    "token.refresh",
-)
-_REDACTED_VALUE = "**********"
-
-
-def _mask(mapping: dict[str, Any], key: str) -> None:
-    """Mask a secret value in place, preserving the key and null values."""
-    if mapping.get(key) is not None:
-        mapping[key] = _REDACTED_VALUE
-
-
-def _redact_config_for_machine(cfg: Configuration) -> dict[str, Any]:
-    """Return Configuration data safe for machine output with stable keys."""
-    data = cfg.model_dump(mode="json", exclude_none=False)
-    for auth in data.get("authentication", []):
-        if auth.get("mode") != "oidc":
-            continue
-        client = auth.get("client")
-        if isinstance(client, dict):
-            _mask(client, "secret")
-        token = auth.get("token")
-        if isinstance(token, dict):
-            _mask(token, "access")
-            _mask(token, "refresh")
-    return data
-
-
-def _is_sensitive_config_path(key: str) -> bool:
-    """Return whether a dotted config path resolves to a secret value."""
-    lowered = key.lower()
-    return any(
-        lowered == suffix or lowered.endswith(f".{suffix}")
-        for suffix in _SENSITIVE_GET_SUFFIXES
-    )
-
-
-def _machine_safe_value(key: str, value: object) -> object:
-    """Mask sensitive values before machine output."""
-    if value is None or not _is_sensitive_config_path(key):
-        return value
-    return _REDACTED_VALUE
 
 
 @config.command("show", help="Display client configuration")
@@ -77,7 +30,7 @@ def show(
     try:
         cfg = Configuration()
         if mode is not output.OutputMode.HUMAN:
-            output.to_stdout(_redact_config_for_machine(cfg), mode)
+            output.to_stdout(cfg.model_dump(mode="json", exclude_none=False), mode)
             return
 
         exists: bool = CONFIG_PATH.exists()
@@ -95,18 +48,9 @@ def show(
 
 
 def _format_value(value: object) -> str:
-    """Format a value for display.
-
-    Args:
-        value (object): Value to format.
-
-    Returns:
-        str: Formatted value.
-    """
-    if isinstance(value, BaseModel):
-        return json.dumps(value.model_dump(mode="json", exclude_none=True), indent=2)
+    """Format a JSON-safe config value for human display."""
     if isinstance(value, (dict, list)):
-        return json.dumps(value, indent=2, default=str)
+        return json.dumps(value, indent=2)
     if value is None:
         return "null"
     return str(value)
@@ -125,6 +69,7 @@ def get(
 
     canfar config get console.width
     canfar config get active.server
+    canfar config get servers.canfar.url
     """
     mode = resolve_mode(json_output, yaml_output)
     maybe_emit_banner(mode)
@@ -132,7 +77,7 @@ def get(
         cfg = Configuration()
         value = cfg.get_value(key)
         if mode is not output.OutputMode.HUMAN:
-            output.to_stdout(_machine_safe_value(key, value), mode)
+            output.to_stdout(value, mode)
             return
         typer.echo(_format_value(value))
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
@@ -149,6 +94,7 @@ def set_value(
 
     canfar config set console.width 130
     canfar config set active.authentication cadc
+    canfar config set servers.canfar.url https://ws-uv.canfar.net/skaha
     """
     maybe_emit_banner(output.OutputMode.HUMAN)
     cfg = Configuration()

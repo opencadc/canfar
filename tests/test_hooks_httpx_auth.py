@@ -75,7 +75,8 @@ class TestSyncHook:
         # Verify the context in the config was updated
         new_context = oidc_client.config.context
         assert isinstance(new_context, OIDC)
-        assert new_context.token.access == "new-access-token"
+        assert new_context.token.access is not None
+        assert new_context.token.access.get_secret_value() == "new-access-token"
         assert new_context.expiry.access > time.time()
 
     @patch("canfar.auth.oidc.sync_refresh")
@@ -156,7 +157,8 @@ class TestAsyncHook:
 
         new_context = oidc_client.config.context
         assert isinstance(new_context, OIDC)
-        assert new_context.token.access == "new-async-token"
+        assert new_context.token.access is not None
+        assert new_context.token.access.get_secret_value() == "new-async-token"
 
     @patch("canfar.auth.oidc.refresh")
     async def test_skip_if_not_oidc_context_async(self, mock_refresh, tmp_path) -> None:
