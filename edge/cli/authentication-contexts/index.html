@@ -2111,22 +2111,29 @@ unrelated configuration such as console and Container Registry settings.</p>
 </code></pre></div>
 <p>Python helpers are noninteractive. CLI commands own prompts and human rendering.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The current config shape is versioned with <code>version: 1</code>.</p>
+<p>The current config shape is versioned with <code>version: 1</code>. Authentication
+records are keyed by IDP and Servers are keyed by Server Name; <code>active.server</code>
+references a Server by name.</p>
 <div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="nt">active</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
-<span class="w">  </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
+<span class="w">  </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canfar</span>
 <span class="nt">authentication</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
+<span class="w">  </span><span class="nt">cadc</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">x509</span>
-<span class="nt">server</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
-<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canfar</span>
+<span class="nt">servers</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">canfar</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
 <span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
+<span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://ws-uv.canfar.net/skaha</span>
+</code></pre></div>
+<p>Dict keys make every value reachable with dotted paths:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>servers.canfar.url
+canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>authentication.cadc.path
 </code></pre></div>
 <p>Environment overrides use nested active fields:</p>
 <div class="highlight"><pre><span></span><code><span class="nv">CANFAR_ACTIVE__AUTHENTICATION</span><span class="o">=</span>srcnet
-<span class="nv">CANFAR_ACTIVE__SERVER</span><span class="o">=</span>ivo://example.org/skaha
+<span class="nv">CANFAR_ACTIVE__SERVER</span><span class="o">=</span>canfar
 </code></pre></div>
 <p>Legacy or unsupported config files are backed up to
 <code>&lt;config-path&gt;.&lt;timestamp&gt;.back</code> before a default config is written.</p>
@@ -2169,8 +2176,8 @@ unrelated configuration such as console and Container Registry settings.</p>
 </tr>
 </tbody>
 </table>
-<p>Lists have no ordering guarantee. Scripts should select by IDP key, URI,
-Session ID, or another stable field.</p>
+<p>Lists have no ordering guarantee. Scripts should select by IDP key, Server
+Name, URI, Session ID, or another stable field.</p>
 
 
 
@@ -2193,7 +2200,7 @@ Session ID, or another stable field.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 10, 2026 05:18:06 UTC">June 10, 2026</span>
   </span>
 
     
