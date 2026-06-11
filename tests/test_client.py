@@ -23,6 +23,7 @@ from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
 from tests.helpers.config import configuration_from_legacy_context
+from tests.test_auth_x509 import generate_cert
 
 
 # Test Fixtures
@@ -698,6 +699,60 @@ class TestContextManagerBehavior:
 
 class TestSSLContextAndClientKwargs:
     """Test SSL context creation and client kwargs generation."""
+
+    def test_expiry_hook_omitted_for_runtime_token(
+        self, canfar_client_fixture, tmp_path
+    ) -> None:
+        """Runtime token must not install saved-config expiry request hook."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509",
+                uri=AnyUrl("ivo://test.org/skaha"),
+                url=AnyHttpUrl("https://x509.example.com"),
+                version="v1",
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("x509", x509_context)
+        client = canfar_client_fixture(
+            config=config,
+            token=SecretStr("runtime-token"),
+            url="https://runtime.com",
+        )
+
+        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        async_kwargs = client._get_client_kwargs(asynchronous=True)
+
+        assert sync_kwargs["event_hooks"]["request"] == []
+        assert async_kwargs["event_hooks"]["request"] == []
+
+    def test_expiry_hook_present_for_saved_expired_x509(
+        self, canfar_client_fixture, tmp_path
+    ) -> None:
+        """Saved expired x509 config must still install expiry request hook."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509",
+                uri=AnyUrl("ivo://test.org/skaha"),
+                url=AnyHttpUrl("https://x509.example.com"),
+                version="v1",
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("x509", x509_context)
+        client = canfar_client_fixture(config=config)
+
+        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        async_kwargs = client._get_client_kwargs(asynchronous=True)
+
+        assert len(sync_kwargs["event_hooks"]["request"]) == 1
+        assert len(async_kwargs["event_hooks"]["request"]) == 1
+        assert sync_kwargs["event_hooks"]["request"][0].__name__ == "hook"
+        assert async_kwargs["event_hooks"]["request"][0].__name__ == "hook"
 
     def test_get_client_kwargs_with_certificate(
         self, canfar_client_fixture, tmp_path

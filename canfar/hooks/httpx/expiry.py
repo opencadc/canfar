@@ -4,8 +4,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Callable
 
+from canfar import get_logger
 from canfar.auth import x509
 from canfar.exceptions.context import AuthExpiredError
+
+log = get_logger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable
@@ -33,6 +36,13 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
             AuthExpiredError: If the active Authentication credential is expired.
 
         """
+        if client.uses_runtime_credentials:
+            log.debug(
+                "Skipping saved Authentication Record expiry check; "
+                "runtime credentials are active."
+            )
+            return
+
         try:
             expired = client.config.context.expired
         except x509.CertificateError as err:
@@ -66,6 +76,13 @@ def acheck(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Raises:
             AuthExpiredError: If the active Authentication credential is expired.
         """
+        if client.uses_runtime_credentials:
+            log.debug(
+                "Skipping saved Authentication Record expiry check; "
+                "runtime credentials are active."
+            )
+            return
+
         try:
             expired = client.config.context.expired
         except x509.CertificateError as err:
