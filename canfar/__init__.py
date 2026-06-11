@@ -25,7 +25,7 @@ from .authentication import login  # noqa: E402
 
 # Kept in sync with pyproject.toml by release-please
 # DO NOT EDIT MANUALLY
-__version__: str = "1.3.5"  # x-release-please-version
+__version__: str = "1.4.0"  # x-release-please-version
 
 __all__ = [
     "CONFIG_DIR",
