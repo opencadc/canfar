@@ -2161,11 +2161,13 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 <li><code>canfar.helpers.distributed</code> (<code>chunk</code>, <code>stripe</code>) batch helpers documented with corrected, runnable examples.</li>
 </ul>
 </li>
-<li>The <strong>Skaha</strong> service is enjoying some optimizations that should help speed up Session creation</li>
+<li>The <strong>skaha</strong> service is enjoying some optimizations that should help speed up session creation<ul>
 <li>Now relies on the Cavern self-allocation for new users.</li>
 <li>Small internal optimizations where effort was previously wasted.</li>
+</ul>
+</li>
 <li><strong>Cavern</strong> - Now enables the ability for new users to "self-allocate".  Permissions are controlled either by Group setting, or using the SRCNet Permissions API.</li>
-<li>See the new Helm Chart configuration for allocation authorization: <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L89">https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L89</a></li>
+<li>See the new <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L89">Helm Chart configuration</a> for allocation authorization.</li>
 </ul>
 <h3 id="technical-changes">⚙️ Technical Changes<a class="headerlink" href="#technical-changes" title="Permanent link">&para;</a></h3>
 <ul>
@@ -2174,8 +2176,8 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 <li>CARTA 5.1.0 with <a href="https://github.com/astrofrog/psrecord">psrecord</a> available (Requires CanfarSP 2026.2)</li>
 <li>
 <p>CANFAR CLI and Python Library</p>
-<div class="admonition failure">
-<p class="admonition-title">Backwards Compatibility Notes</p>
+<div class="admonition warning">
+<p class="admonition-title">Compatibility Notes</p>
 <ul>
 <li><code>canfar context</code> has been removed. Use <code>canfar auth</code>and <code>canfar server</code> commands instead.</li>
 <li><code>canfar auth login</code> is deprecated and will be removed in a future release. Switch to <code>canfar login</code>.</li>
@@ -2200,34 +2202,39 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 </li>
 <li>The CANFAR Portal Branding Logo is now configurable</li>
 <li>Deployers have the option to configure skaha and cavern to use the SRCNet Permissions API for authorization decisions.</li>
+<li>For updated deployment instructions, refer to the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments repository</a>.</li>
+<li>Looking for a reference deployment to get past a deployment issue?  You can now see what <a href="https://src.canfar.net/science-portal">canSRC</a> deploys as our <a href="https://github.com/cadc-ccda-infra/keel-deploy/tree/main/helm/values/src.canfar.net">ArgoCD Application</a>.</li>
 </ul>
-<p>For full deployment instructions, please refer to the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments Code Repository</a>.</p>
-<p>Looking for a reference deployment to get past a deployment issue?  You can now see what <a href="https://src.canfar.net/science-portal">canSRC</a> deploys at our <a href="https://github.com/cadc-ccda-infra/keel-deploy/tree/main/helm/values/src.canfar.net">ArgoCD deployment</a>.</p>
-<h4 id="potential-breaking-changes">⚠️ Potential Breaking Changes<a class="headerlink" href="#potential-breaking-changes" title="Permanent link">&para;</a></h4>
-<p>The <strong>skaha</strong> service is the only one that requires a Service Account as it will interact with the Kubernetes Cluster.
-- <strong>[Skaha]</strong> - <code>serviceAccountName</code> will need to be converted to the new <code>serviceAccount</code> object:
-<div class="highlight"><pre><span></span><code><span class="c1"># Old</span>
-<span class="c1">#</span>
+<div class="admonition warning">
+<p class="admonition-title">Potential Breaking Changes</p>
+<ul>
+<li>
+<p>The <strong>skaha</strong> service is the only one that requires a Service Account as it will interact with the Kubernetes Cluster. The skaha helm chart<code>serviceAccountName</code> value will be required to be converted to the new <code>serviceAccount</code> object:
+<div class="highlight"><pre><span></span><code><span class="c1"># Old Helm Configuration</span>
 <span class="nt">deployment</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">skaha</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">skaha</span>
-
-<span class="c1"># New</span>
-<span class="c1"># </span>
+<span class="c1"># New Helm Configuration</span>
 <span class="nt">serviceAccount</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">skaha</span>
 <span class="w">  </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
 </code></pre></div></p>
-<p>Also beware of maintaining RBAC rules.  This is to make the Charts a little more friendly to ArgoCD.
-<div class="highlight"><pre><span></span><code>rbac:
-  create: true
-  clusterRole:
-    create: true
+</li>
+<li>
+<p>Beware of maintaining RBAC rules through Helm Charts. Changes have been made to make the charts a little more ArgoCD friendly.
+  <div class="highlight"><pre><span></span><code><span class="nt">rbac</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">clusterRole</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
-The <code>deployment.skaha.sessions.limitRange</code> and <code>deployment.skaha.sessions.kueue</code> also maintain their own RBAC settings.  See <a href="https://github.com/opencadc/science-platform/blob/main/helm">https://github.com/opencadc/science-platform/blob/main/helm</a> for full chart options.</p>
-<p>If <strong>Cavern</strong> was previously installed with a local PostgreSQL in the cluster, it may now require authentication provided.  This can be done with a secret, or just setup username and password.  The UWS database is volatile.
-See <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L144">https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L144</a>.</p>
-<h3 id="releases">Releases<a class="headerlink" href="#releases" title="Permanent link">&para;</a></h3>
+  The <code>deployment.skaha.sessions.limitRange</code> and <code>deployment.skaha.sessions.kueue</code> also maintain their own RBAC settings.  See <a href="https://github.com/opencadc/science-platform/blob/main/helm">science platform helm chart</a> for full options.</p>
+</li>
+<li>
+<p>If <strong>Cavern</strong> was previously installed with a local PostgreSQL in the cluster, it may now require authentication provided.  This can be done with a secret, or just setup username and password.  The UWS database is volatile. See <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L144">cavern helm chart</a> for more information.</p>
+</li>
+</ul>
+</div>
+<h3 id="releases">🔖 Releases<a class="headerlink" href="#releases" title="Permanent link">&para;</a></h3>
 <h4 id="python-client-cli">Python Client &amp; CLI<a class="headerlink" href="#python-client-cli" title="Permanent link">&para;</a></h4>
 <table>
 <thead>
@@ -2315,7 +2322,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 11, 2026 18:41:38 UTC">June 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 11, 2026 19:14:43 UTC">June 11, 2026</span>
   </span>
 
     
