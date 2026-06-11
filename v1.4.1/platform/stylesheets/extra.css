@@ -1,0 +1,46 @@
+/* Mobile navigation improvements */
+
+/* Show hamburger menu on tablets and smaller screens */
+@media screen and (max-width: 1440px) {
+  .md-header__button.md-icon[for="__drawer"] {
+    display: block !important;
+    color: var(--md-primary-bg-color);
+  }
+}
+
+/* Ensure mobile navigation works properly */
+@media screen and (max-width: 76.1875em) {
+  .md-header__button.md-icon {
+    display: block !important;
+  }
+  
+  .md-nav__toggle {
+    display: block !important;
+  }
+  
+  .md-nav--primary .md-nav__list {
+    display: block;
+  }
+}
+
+/* Force hamburger menu on medium screens (tablets) */
+@media screen and (max-width: 1200px) {
+  .md-header__button {
+    display: block !important;
+  }
+  
+  .md-nav__toggle ~ .md-nav {
+    display: block;
+  }
+}
+
+/* Make sure tabs still work on larger screens */
+@media screen and (min-width: 1441px) {
+  .md-tabs {
+    display: block;
+  }
+  
+  .md-header__button.md-icon[for="__drawer"] {
+    display: none;
+  }
+}
