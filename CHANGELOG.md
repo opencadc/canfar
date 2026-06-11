@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.4.1](https://github.com/opencadc/canfar/compare/v1.4.0...v1.4.1) (2026-06-11)
+
+
+### Bug Fixes
+
+* **docs:** updated compatibility notes ([3eb0ee2](https://github.com/opencadc/canfar/commit/3eb0ee2876e5e314fee1c6da51ad38985e8aab79))
+* typo and link fix ([2fe2ec9](https://github.com/opencadc/canfar/commit/2fe2ec9fb200d319a4ccc27d26c3c1ac02b4cd5c))
+
+
+### Documentation
+
+* add latest to list of releases and add platform notes ([440de9f](https://github.com/opencadc/canfar/commit/440de9f9091693e48e2b021a9ba73f09746e5c24))
+* add reference link ([36f8afe](https://github.com/opencadc/canfar/commit/36f8afe4406abd3f9fa4f04c1c6709f6a1007a02))
+
 ## [1.4.0](https://github.com/opencadc/canfar/compare/v1.3.5...v1.4.0) (2026-06-11)
 
 
