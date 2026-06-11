@@ -143,6 +143,11 @@ class HTTPClient(BaseSettings):
             log.debug("Asynchronous HTTPx client created")
         return self._asynclient
 
+    @property
+    def uses_runtime_credentials(self) -> bool:
+        """Return whether runtime token or certificate credentials are active."""
+        return bool(self.token or self.certificate)
+
     @field_validator("loglevel", mode="before")
     @classmethod
     def _validate_loglevel(cls, value: int | str) -> str:
@@ -248,12 +253,15 @@ class HTTPClient(BaseSettings):
         Returns:
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
-        checker = expiry.acheck(self) if asynchronous else expiry.check(self)
         catcher = errors.acatch if asynchronous else errors.catch
         response_hooks = [catcher] if self.raise_http_errors else []
+        request_hooks: list[Any] = []
+        if not self.uses_runtime_credentials:
+            checker = expiry.acheck(self) if asynchronous else expiry.check(self)
+            request_hooks.append(checker)
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
-            "event_hooks": {"request": [checker], "response": response_hooks},
+            "event_hooks": {"request": request_hooks, "response": response_hooks},
             "base_url": self._get_base_url(),
         }
         # Configure connection pooling for async clients

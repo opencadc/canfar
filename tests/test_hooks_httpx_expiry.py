@@ -5,14 +5,16 @@ from unittest.mock import Mock
 
 import httpx
 import pytest
+from pydantic import SecretStr
 
 from canfar.auth import x509
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthExpiredError
 from canfar.hooks.httpx.expiry import acheck, check
-from canfar.models.auth import OIDC
+from canfar.models.auth import OIDC, X509
 from canfar.models.http import Server
 from tests.helpers.config import configuration_from_legacy_context
+from tests.test_auth_x509 import generate_cert
 
 
 class TestCheck:
@@ -21,6 +23,7 @@ class TestCheck:
     def test_check_with_valid_context(self) -> None:
         """Test check hook with valid (non-expired) context."""
         mock_client = Mock()
+        mock_client.uses_runtime_credentials = False
         mock_client.config.context.expired = False
 
         hook_func = check(mock_client)
@@ -31,6 +34,7 @@ class TestCheck:
     def test_check_with_expired_context(self) -> None:
         """Test check hook with expired context (covers line 36)."""
         mock_client = Mock()
+        mock_client.uses_runtime_credentials = False
         mock_client.config.context.expired = True
         mock_client.config.context.mode = "OIDC"
 
@@ -81,11 +85,55 @@ class TestCheck:
                 msg = "detailed certificate issue"
                 raise x509.CertificateError(msg)
 
-        hook = check(SimpleNamespace(config=SimpleNamespace(context=Context())))
+        hook = check(
+            SimpleNamespace(
+                config=SimpleNamespace(context=Context()),
+                uses_runtime_credentials=False,
+            )
+        )
         request = httpx.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match="detailed certificate issue"):
             hook(request)
+
+    def test_skip_if_runtime_credentials_used(self, tmp_path) -> None:
+        """Expiry hook must not check saved config when runtime token is active."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509", url="https://x509.example.com", version="v0"
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("TestX509", x509_context)
+        client = HTTPClient(
+            config=config,
+            token=SecretStr("runtime-token"),
+            url="https://runtime.com",
+        )
+        hook_func = check(client)
+        request = httpx.Request("GET", "/")
+
+        hook_func(request)
+
+    def test_raises_without_runtime_credentials(self, tmp_path) -> None:
+        """Expiry hook still checks saved config when no runtime credentials."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509", url="https://x509.example.com", version="v0"
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("TestX509", x509_context)
+        client = HTTPClient(config=config)
+        hook_func = check(client)
+        request = httpx.Request("GET", "/")
+
+        with pytest.raises(AuthExpiredError):
+            hook_func(request)
 
 
 class TestACheck:
@@ -95,6 +143,7 @@ class TestACheck:
     async def test_acheck_with_valid_context(self) -> None:
         """Test acheck hook with valid (non-expired) context."""
         mock_client = Mock()
+        mock_client.uses_runtime_credentials = False
         mock_client.config.context.expired = False
 
         hook_func = acheck(mock_client)
@@ -106,6 +155,7 @@ class TestACheck:
     async def test_acheck_with_expired_context(self) -> None:
         """Test acheck hook with expired context (covers line 62)."""
         mock_client = Mock()
+        mock_client.uses_runtime_credentials = False
         mock_client.config.context.expired = True
         mock_client.config.context.mode = "X509"
 
@@ -158,7 +208,12 @@ class TestACheck:
                 msg = "detailed certificate issue"
                 raise x509.CertificateError(msg)
 
-        hook = acheck(SimpleNamespace(config=SimpleNamespace(context=Context())))
+        hook = acheck(
+            SimpleNamespace(
+                config=SimpleNamespace(context=Context()),
+                uses_runtime_credentials=False,
+            )
+        )
         request = httpx.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match="detailed certificate issue"):
@@ -175,8 +230,54 @@ class TestACheck:
             def expired(self) -> bool:
                 return True
 
-        hook = acheck(SimpleNamespace(config=SimpleNamespace(context=Context())))
+        hook = acheck(
+            SimpleNamespace(
+                config=SimpleNamespace(context=Context()),
+                uses_runtime_credentials=False,
+            )
+        )
         request = httpx.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match="auth expired"):
             await hook(request)
+
+    @pytest.mark.anyio
+    async def test_skip_if_runtime_credentials_used(self, tmp_path) -> None:
+        """Async expiry hook must not check saved config with runtime token."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509", url="https://x509.example.com", version="v0"
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("TestX509", x509_context)
+        client = HTTPClient(
+            config=config,
+            token=SecretStr("runtime-token"),
+            url="https://runtime.com",
+        )
+        hook_func = acheck(client)
+        request = httpx.Request("GET", "/")
+
+        await hook_func(request)
+
+    @pytest.mark.anyio
+    async def test_raises_without_runtime_credentials(self, tmp_path) -> None:
+        """Async expiry hook still checks saved config without runtime credentials."""
+        cert_path = tmp_path / "expired.pem"
+        generate_cert(cert_path, expired=True)
+        x509_context = X509(
+            server=Server(
+                name="TestX509", url="https://x509.example.com", version="v0"
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("TestX509", x509_context)
+        client = HTTPClient(config=config)
+        hook_func = acheck(client)
+        request = httpx.Request("GET", "/")
+
+        with pytest.raises(AuthExpiredError):
+            await hook_func(request)
