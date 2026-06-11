@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.4.0](https://github.com/opencadc/canfar/compare/v1.3.5...v1.4.0) (2026-06-11)
+
+
+### Features
+
+* **2026.2:** new login flow, manage identities & servers, script-friendly machine output, support for new ui ([70441f2](https://github.com/opencadc/canfar/commit/70441f25f538198afaac5bdcbf6770d61a82e9f8))
+* **config:** key servers by name and simplify config get/set ([eb98a23](https://github.com/opencadc/canfar/commit/eb98a2335452773b34b568d3602cffb6cbca83ea))
+
+
+### Bug Fixes
+
+* **ci:** configure codecov coverage statuses ([9539995](https://github.com/opencadc/canfar/commit/9539995285579b4fb9e24a97c0a8f726e7512110))
+* **ci:** relaxed int tests ([7fccadd](https://github.com/opencadc/canfar/commit/7fccadde5d388dba59be7d4371db4c45ea797d4b))
+* **ci:** relaxing test coverage due to network instability ([79366b9](https://github.com/opencadc/canfar/commit/79366b93953f58fb9ae62e6aa046034344b83b68))
+* **client:** skip expiry hook when runtime credentials active ([#115](https://github.com/opencadc/canfar/issues/115)) ([7250f9e](https://github.com/opencadc/canfar/commit/7250f9ee04354335af9d58d21927e4bb3410afbd))
+* **deps:** update ([4a55ecc](https://github.com/opencadc/canfar/commit/4a55eccca309563f6b352a96ac6abe08db165fe1))
+* **deps:** updated dependabot and pre-commit ([679d22f](https://github.com/opencadc/canfar/commit/679d22f5c0cdf1dd034ccc6a89ddf8c51de58c34))
+* **dockerfile:** entrypoint ([fa264d1](https://github.com/opencadc/canfar/commit/fa264d128c9ba6a1cf7718fa67548f75e825e4f9))
+* parameter name from 'server' to 'url' ([cda9af1](https://github.com/opencadc/canfar/commit/cda9af1c6e0e6fddcc0fc5d6bf8bc8ca529c0621))
+* **security:** token permissions ([ba94fee](https://github.com/opencadc/canfar/commit/ba94fee0fd891c4673969270c0e82a19a6a439a1))
+* **style:** lint ([8853536](https://github.com/opencadc/canfar/commit/8853536ec319a8e2d1acb1caad93247e6ab4eb93))
+* **syntax:** improvement for if/else ([48265d5](https://github.com/opencadc/canfar/commit/48265d517cedc1ca9972460d86f972dea74e6d01))
+* **test:** use cross-platform isolated HOME for pytest ([1132f82](https://github.com/opencadc/canfar/commit/1132f82dddf93e9b343505452a24f83c658081e2))
+
+
+### Documentation
+
+* add Server Name glossary and agent memory for dict-keyed config ([bfaf6f8](https://github.com/opencadc/canfar/commit/bfaf6f874a04b337ff8208aa5af85e11e407257e))
+* **adr:** record server name as configuration identity ([a91ca7e](https://github.com/opencadc/canfar/commit/a91ca7ef3bf015a54586eae3ace26e49e7be718b))
+* **agents:** record runtime credential hook precedence ([b7d3c61](https://github.com/opencadc/canfar/commit/b7d3c6131def54c0f8671c3fff8cdd277d028ee0))
+* **readme:** href-fix ([cd5946d](https://github.com/opencadc/canfar/commit/cd5946d46440442a8d87d58efd4cb2739e7c13e2))
+* **release-notes:** fix for deployment link ([83aab54](https://github.com/opencadc/canfar/commit/83aab5466876859c86cafc74c621fb6305c7609b))
+* **release-notes:** note GH [#115](https://github.com/opencadc/canfar/issues/115) runtime credential expiry fix ([2bb6293](https://github.com/opencadc/canfar/commit/2bb6293188dfefb958a4dfbceb767bea6e2983c4))
+* **release-notes:** typos ([11e5b3e](https://github.com/opencadc/canfar/commit/11e5b3e405efdd9183dc52d7857e8c99d83ecb29))
+* **release:** 2026.2 feedback ([ee2aa39](https://github.com/opencadc/canfar/commit/ee2aa39de5c74c9eef73ffcd1109619759457a68))
+* **release:** Draft version of the 2026.2 release notes ([ef59d1c](https://github.com/opencadc/canfar/commit/ef59d1c493efbc3d628c041c2aa633f6073aed89))
+
 ## [1.3.5](https://github.com/opencadc/canfar/compare/v1.3.4...v1.3.5) (2026-04-28)
 
 
