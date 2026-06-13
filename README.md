@@ -11,7 +11,7 @@
 ```bash
 pip install canfar --upgrade
 canfar login cadc
-canfar create notebook skaha/astroml:latest
+canfar create notebook skaha/astroml:26.04
 canfar ps --json 
 # assumes jq is installed
 canfar open $(canfar ps --json | jq -r ".[0].id")
@@ -23,7 +23,7 @@ from canfar.sessions import Session
 session = Session()
 ids = session.create(
     kind="notebook",
-    image="images.canfar.net/skaha/astroml:latest",
+    image="skaha/astroml:26.04",
 )
 session.connect(ids)
 ```
