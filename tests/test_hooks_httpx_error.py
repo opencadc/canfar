@@ -80,6 +80,25 @@ class TestCatch:
         mock_response.read.assert_called_once()
         mock_response.raise_for_status.assert_called_once()
 
+    def test_catch_read_raises_propagates_without_warning_log(self) -> None:
+        """Pin behavior: ReadTimeout from response.read() propagates unlogged.
+
+        The refactored ``catch`` calls ``response.read()`` before the shared
+        try/except ladder, so a body-download ``ReadTimeout`` is not
+        warning-logged by the hook — it propagates directly to the caller.
+        """
+        mock_response = Mock(spec=httpx.Response)
+        mock_response.read.side_effect = httpx.ReadTimeout("body download timed out")
+
+        with (
+            patch("canfar.hooks.httpx.errors.log") as mock_log,
+            pytest.raises(httpx.ReadTimeout),
+        ):
+            catch(mock_response)
+
+        mock_log.warning.assert_not_called()
+        mock_response.raise_for_status.assert_not_called()
+
 
 class TestACatch:
     """Test the acatch function."""
@@ -175,3 +194,25 @@ class TestACatch:
         assert "abc.def.ghi" not in error_text
         assert "Authorization Bearer <redacted>" in error_text
         assert log.warning.call_args.kwargs["exc_info"] is False
+
+    @pytest.mark.asyncio
+    async def test_acatch_aread_raises_propagates_without_warning_log(self) -> None:
+        """Pin behavior: ReadTimeout from aread() propagates unlogged.
+
+        The refactored ``acatch`` calls ``await response.aread()`` before the shared
+        try/except ladder, so a body-download ``ReadTimeout`` is not
+        warning-logged by the hook — it propagates directly to the caller.
+        """
+        mock_response = Mock(spec=httpx.Response)
+        mock_response.aread = AsyncMock(
+            side_effect=httpx.ReadTimeout("body download timed out")
+        )
+
+        with (
+            patch("canfar.hooks.httpx.errors.log") as mock_log,
+            pytest.raises(httpx.ReadTimeout),
+        ):
+            await acatch(mock_response)
+
+        mock_log.warning.assert_not_called()
+        mock_response.raise_for_status.assert_not_called()

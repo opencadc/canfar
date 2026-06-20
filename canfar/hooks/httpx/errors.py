@@ -69,6 +69,12 @@ def _handle_error(response: httpx.Response) -> None:
     read the body (``response.read()`` vs ``await response.aread()``); every
     except branch here is identical for sync and async paths.
 
+    Note: errors that arise during body download (``response.read()`` /
+    ``await response.aread()``) propagate without being warning-logged here,
+    because the read call happens outside this function.  This is a known
+    minor behavior difference vs the pre-refactor code where both the read
+    and ``raise_for_status()`` shared a single try block.
+
     Raises:
         httpx.ConnectTimeout: on connect timeout.
         httpx.ReadTimeout: on read timeout.
