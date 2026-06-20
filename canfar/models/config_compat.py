@@ -80,13 +80,27 @@ class LegacyContextsMapping(Mapping[str, "AuthContext"]):
 
     Subclasses :class:`collections.abc.Mapping`, so only ``__getitem__``,
     ``__iter__``, and ``__len__`` are implemented here; the mixin derives
-    ``__contains__``, ``keys``, ``items``, ``values``, and ``__eq__``.
-    ``__setitem__`` is kept as an extra mutation hook used by the httpx
-    auth refresh hooks, which the read-only base does not provide.
+    ``keys``, ``items``, ``values``, and ``__eq__``.
+
+    ``__contains__`` is overridden to report direct membership in the saved
+    authentication records, preserving the pre-refactor semantics: an IDP is
+    a member when it has a saved credential, even if its legacy context is not
+    currently resolvable (e.g. no matching server). The ``Mapping`` mixin's
+    default ``__contains__`` would instead probe ``__getitem__`` and report
+    ``False`` for such an IDP.
+
+    ``__setitem__`` is kept as an extra mutation hook used by the httpx auth
+    refresh hooks, which the read-only base does not provide. ``.get()`` is
+    inherited from the mixin and resolves through ``__getitem__``, so it
+    returns its default for an IDP whose context cannot be reconstructed.
     """
 
     def __init__(self, configuration: Configuration) -> None:
         self._configuration = configuration
+
+    def __contains__(self, key: object) -> bool:
+        """Return whether ``key`` is a saved authentication IDP."""
+        return key in self._configuration.authentication
 
     def __getitem__(self, key: str) -> AuthContext:
         """Return the legacy auth context for ``key``."""
