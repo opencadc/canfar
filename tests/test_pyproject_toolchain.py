@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import tomllib
+import toml
 
 _PYPROJECT = Path(__file__).parent.parent / "pyproject.toml"
 
 
 def _load() -> dict[str, object]:
-    with _PYPROJECT.open("rb") as f:
-        return tomllib.load(f)
+    with _PYPROJECT.open() as f:
+        return toml.load(f)
 
 
 def test_mypy_config_absent() -> None:
