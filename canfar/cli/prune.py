@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING, Annotated, get_args
 
 import click
 import typer
 import typer.core
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.models.types import Pruneable, Status
@@ -61,7 +61,7 @@ def prune_sessions(
     kind: Annotated[
         Pruneable,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Pruneable)),
             help="Filter by session kind.",
         ),
@@ -69,7 +69,7 @@ def prune_sessions(
     status: Annotated[
         Status,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),
@@ -88,6 +88,7 @@ def prune_sessions(
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _prune() -> None:
+        """Delete matching sessions from the science platform server."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             response = await session.destroy_with(
@@ -97,4 +98,4 @@ def prune_sessions(
                 f"[bold green] Deleted {len(response)} sessions.[/bold green]"
             )
 
-    asyncio.run(_prune())
+    run(_prune())

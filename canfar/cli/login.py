@@ -42,7 +42,7 @@ def _authentication_exists_on_disk(idp: str) -> bool:
     """
     if not CONFIG_PATH.exists():
         return False
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     return idp in config.authentication
 
 
@@ -91,7 +91,7 @@ def _login_flow(
         console.print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     _upsert_credential(config, credential)
 
     try:

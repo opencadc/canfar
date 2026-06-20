@@ -75,7 +75,7 @@ def ls(
         typer.Option(
             "--kind",
             "-k",
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Kind)),
             help="Filter by image kind.",
         ),

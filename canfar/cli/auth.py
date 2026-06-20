@@ -270,7 +270,7 @@ def auth_use_command(
 ) -> None:
     """Switch auth provider."""
     maybe_emit_banner(output.OutputMode.HUMAN)
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
 
     try:
         get_idp(idp)
@@ -311,7 +311,7 @@ def auth_remove_command(
 ) -> None:
     """Remove auth and associated servers."""
     maybe_emit_banner(output.OutputMode.HUMAN)
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     if config.active.authentication == idp and not force:
         should_remove = Confirm.ask(
             f"Remove active authentication '{idp}'?",

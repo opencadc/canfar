@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import Annotated
 
 import typer
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
@@ -37,6 +37,7 @@ def get_logs(
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_logs() -> None:
+        """Fetch logs for the requested sessions and render them."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             try:
@@ -57,4 +58,4 @@ def get_logs(
             )
             console.print(log_text)
 
-    asyncio.run(_get_logs())
+    run(_get_logs())

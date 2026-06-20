@@ -27,6 +27,24 @@ from pydantic_settings import (
 from pydantic_settings.sources import EnvSettingsSource
 
 from canfar import CONFIG_PATH, get_logger
+from canfar.config.editor import get_value as _get_value
+from canfar.config.editor import set_value as _set_value
+from canfar.config.selection import active_context as _active_context
+from canfar.config.selection import get_active_server as _get_active_server
+from canfar.config.selection import get_credential as _get_credential
+from canfar.config.selection import (
+    get_remembered_server_for_idp as _get_remembered_server_for_idp,
+)
+from canfar.config.selection import get_server_by_uri as _get_server_by_uri
+from canfar.config.selection import get_server_for_idp as _get_server_for_idp
+from canfar.config.selection import legacy_contexts as _legacy_contexts
+from canfar.config.selection import (
+    server_selection_history as _server_selection_history,
+)
+from canfar.config.selection import set_active_selection as _set_active_selection
+from canfar.config.selection import set_legacy_context as _set_legacy_context
+from canfar.config.selection import upsert_server as _upsert_server
+from canfar.config.selection import with_active_selection as _with_active_selection
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import AuthenticationCredential, X509Credential
 from canfar.models.config_compat import AuthContext, LegacyContextsMapping
@@ -257,15 +275,11 @@ class Configuration(BaseSettings):
 
     def get_value(self, path: str) -> Any:
         """Get a nested configuration value via dotted path (e.g. 'console.width')."""
-        from canfar.config.editor import get_value  # noqa: PLC0415
-
-        return get_value(self, path)
+        return _get_value(self, path)
 
     def set_value(self, path: str, value: Any) -> Configuration:
         """Return a new validated Configuration with a dotted-path value updated."""
-        from canfar.config.editor import set_value  # noqa: PLC0415
-
-        return set_value(self, path, value)
+        return _set_value(self, path, value)
 
     def get_credential(self, idp: str) -> AuthenticationCredential:
         """Return the saved authentication credential for an IDP key.
@@ -279,9 +293,7 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no credential exists for ``idp``.
         """
-        from canfar.config.selection import get_credential  # noqa: PLC0415
-
-        return get_credential(self, idp)
+        return _get_credential(self, idp)
 
     def get_server_by_uri(self, uri: str | AnyUrl) -> Server:
         """Return a known server by IVOA URI.
@@ -295,9 +307,7 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``uri``.
         """
-        from canfar.config.selection import get_server_by_uri  # noqa: PLC0415
-
-        return get_server_by_uri(self, uri)
+        return _get_server_by_uri(self, uri)
 
     def get_active_server(self) -> Server:
         """Return the active science platform server record.
@@ -305,9 +315,7 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no active server is selected.
         """
-        from canfar.config.selection import get_active_server  # noqa: PLC0415
-
-        return get_active_server(self)
+        return _get_active_server(self)
 
     def get_server_for_idp(self, idp: str) -> Server:
         """Return the best-known server for an IDP.
@@ -324,9 +332,7 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``idp``.
         """
-        from canfar.config.selection import get_server_for_idp  # noqa: PLC0415
-
-        return get_server_for_idp(self, idp)
+        return _get_server_for_idp(self, idp)
 
     def get_remembered_server_for_idp(self, idp: str) -> Server | None:
         """Return the last selected server for ``idp`` when still valid.
@@ -338,17 +344,11 @@ class Configuration(BaseSettings):
             Matching server record, or ``None`` when no remembered selection is
             available for ``idp``.
         """
-        from canfar.config.selection import (  # noqa: PLC0415
-            get_remembered_server_for_idp,
-        )
-
-        return get_remembered_server_for_idp(self, idp)
+        return _get_remembered_server_for_idp(self, idp)
 
     def _server_selection_history(self) -> dict[str, str]:
         """Return remembered selections seeded with the current active pair."""
-        from canfar.config.selection import server_selection_history  # noqa: PLC0415
-
-        return server_selection_history(self)
+        return _server_selection_history(self)
 
     def set_active_selection(self, idp: str, server: Server) -> None:
         """Persist ``idp`` and ``server`` as the active pair.
@@ -360,9 +360,7 @@ class Configuration(BaseSettings):
         Raises:
             ValueError: If the server has no Server Name.
         """
-        from canfar.config.selection import set_active_selection  # noqa: PLC0415
-
-        set_active_selection(self, idp, server)
+        _set_active_selection(self, idp, server)
 
     def with_active_selection(self, idp: str, server: Server) -> Configuration:
         """Return a copy using ``idp`` and ``server`` as the active pair.
@@ -378,9 +376,7 @@ class Configuration(BaseSettings):
         Raises:
             ValueError: If the server has no Server Name.
         """
-        from canfar.config.selection import with_active_selection  # noqa: PLC0415
-
-        return with_active_selection(self, idp, server)
+        return _with_active_selection(self, idp, server)
 
     @property
     def context(self) -> AuthContext:
@@ -389,16 +385,12 @@ class Configuration(BaseSettings):
         Returns:
             Legacy ``OIDC`` or ``X509`` model with embedded active server.
         """
-        from canfar.config.selection import active_context  # noqa: PLC0415
-
-        return active_context(self)
+        return _active_context(self)
 
     @property
     def contexts(self) -> LegacyContextsMapping:
         """Return a legacy dict-like view keyed by IDP."""
-        from canfar.config.selection import legacy_contexts  # noqa: PLC0415
-
-        return legacy_contexts(self)
+        return _legacy_contexts(self)
 
     def set_legacy_context(self, idp: str, context: AuthContext) -> None:
         """Update saved authentication (and optional server) from legacy context.
@@ -407,15 +399,11 @@ class Configuration(BaseSettings):
             idp: Canonical identity provider key.
             context: Legacy ``AuthContext`` view to persist.
         """
-        from canfar.config.selection import set_legacy_context  # noqa: PLC0415
-
-        set_legacy_context(self, idp, context)
+        _set_legacy_context(self, idp, context)
 
     def _upsert_server(self, server: Server) -> None:
         """Insert or replace a server record keyed by Server Name."""
-        from canfar.config.selection import upsert_server  # noqa: PLC0415
-
-        upsert_server(self, server)
+        _upsert_server(self, server)
 
 
 __all__ = ["CONFIG_PATH", "AuthContext", "Configuration", "ConsoleConfig"]

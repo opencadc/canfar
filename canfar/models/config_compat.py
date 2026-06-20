@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, TypeAlias
 
 from canfar.models.auth import (
@@ -46,7 +47,7 @@ def credential_to_legacy_context(
         client=credential.client,
         token=credential.token,
         expiry=credential.expiry,
-        server=server,
+        server=server,  # ty: ignore[invalid-argument-type]
     )
 
 
@@ -74,13 +75,30 @@ def legacy_context_to_credential(
     )
 
 
-class LegacyContextsMapping:
-    """Dict-like view over authentication records keyed by IDP."""
+class LegacyContextsMapping(Mapping[str, "AuthContext"]):
+    """Dict-like view over authentication records keyed by IDP.
+
+    Subclasses :class:`collections.abc.Mapping`, so only ``__getitem__``,
+    ``__iter__``, and ``__len__`` are implemented here; the mixin derives
+    ``keys``, ``items``, ``values``, and ``__eq__``.
+
+    ``__contains__`` is overridden to report direct membership in the saved
+    authentication records, preserving the pre-refactor semantics: an IDP is
+    a member when it has a saved credential, even if its legacy context is not
+    currently resolvable (e.g. no matching server). The ``Mapping`` mixin's
+    default ``__contains__`` would instead probe ``__getitem__`` and report
+    ``False`` for such an IDP.
+
+    ``__setitem__`` is kept as an extra mutation hook used by the httpx auth
+    refresh hooks, which the read-only base does not provide. ``.get()`` is
+    inherited from the mixin and resolves through ``__getitem__``, so it
+    returns its default for an IDP whose context cannot be reconstructed.
+    """
 
     def __init__(self, configuration: Configuration) -> None:
         self._configuration = configuration
 
-    def __contains__(self, key: str) -> bool:
+    def __contains__(self, key: object) -> bool:
         """Return whether ``key`` is a saved authentication IDP."""
         return key in self._configuration.authentication
 
@@ -96,21 +114,7 @@ class LegacyContextsMapping:
 
     def __iter__(self) -> Iterator[str]:
         """Iterate saved authentication IDP keys."""
-        return iter(self.keys())
-
-    def keys(self) -> list[str]:
-        """Return saved authentication IDP keys."""
-        return list(self._configuration.authentication)
-
-    def items(self) -> Iterator[tuple[str, AuthContext]]:
-        """Yield ``(idp, legacy_context)`` pairs."""
-        for key in self.keys():
-            yield key, self[key]
-
-    def values(self) -> Iterator[AuthContext]:
-        """Yield legacy auth contexts in IDP key order."""
-        for key in self.keys():
-            yield self[key]
+        return iter(self._configuration.authentication)
 
     def __len__(self) -> int:
         """Return the number of saved authentication records."""

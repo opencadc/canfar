@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime, timezone
 from typing import Annotated, get_args
 
@@ -14,6 +13,7 @@ from rich import box
 from rich.table import Table
 
 from canfar.cli import output
+from canfar.cli._run import run
 from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
@@ -45,7 +45,7 @@ def show(
         typer.Option(
             "--kind",
             "-k",
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Kind)),
             help="Filter by session kind.",
         ),
@@ -55,7 +55,7 @@ def show(
         typer.Option(
             "--status",
             "-s",
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),
@@ -156,4 +156,4 @@ def show(
             for message in dict.fromkeys(anomalies):
                 console.print(f"[dim]- {message}[/dim]")
 
-    asyncio.run(_list_sessions())
+    run(_list_sessions())

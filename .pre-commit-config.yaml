@@ -1,24 +1,8 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v2.1.0
+  - repo: https://github.com/astral-sh/ty-pre-commit
+    rev: v0.0.51
     hooks:
-      - id: mypy
-        additional_dependencies:
-          - types-toml
-          - types-requests
-          - types-defusedxml
-          - types-PyYAML
-          - click
-          - httpx
-          - pydantic
-          - pydantic_settings
-          - rich
-          - segno
-          - typer
-          - cadcutils
-          - questionary
-          - humanize
-        args: [--config-file=pyproject.toml]
+      - id: ty
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
@@ -80,10 +64,3 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
-
-  # Check for Python version compatibility
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
-    hooks:
-      - id: pyupgrade
-        args: [--py39-plus]

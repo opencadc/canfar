@@ -505,7 +505,7 @@ async def authenticate(oidc: OIDC, *, timeout: int | None = None) -> OIDC:
 
 
 if __name__ == "__main__":
-    oidc_config = OIDC()  # type: ignore [call-arg]
+    oidc_config = OIDC()  # ty: ignore[missing-argument]
     oidc_config.endpoints.discovery = (
         "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
     )

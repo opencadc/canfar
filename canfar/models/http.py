@@ -180,7 +180,7 @@ class Server(BaseSettings):
         from canfar.models.config import Configuration  # noqa: PLC0415
 
         base_url = self._require_fetch_base_url()
-        runtime_config = config or Configuration()
+        runtime_config = config or Configuration()  # ty: ignore[missing-argument]
         if timeout is None:
             client = HTTPClient(
                 config=runtime_config,
@@ -211,7 +211,7 @@ class Server(BaseSettings):
         from canfar.models.config import Configuration  # noqa: PLC0415
 
         base_url = self._require_fetch_base_url()
-        runtime_config = config or Configuration()
+        runtime_config = config or Configuration()  # ty: ignore[missing-argument]
         if timeout is None:
             client = HTTPClient(
                 config=runtime_config,

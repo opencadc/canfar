@@ -24,7 +24,7 @@ def get_console() -> Console:
     Returns:
         Rich console instance sized from user configuration.
     """
-    cfg = Configuration()
+    cfg = Configuration()  # ty: ignore[missing-argument]
     return Console(width=cfg.console.width)
 
 
@@ -33,7 +33,7 @@ def emit_active_server_banner() -> None:
     if _banner_emitted.get():
         return
     _banner_emitted.set(True)
-    cfg = Configuration()
+    cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         name = cfg.get_active_server().name
     except KeyError:
