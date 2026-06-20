@@ -61,25 +61,23 @@ def _response_text(response: httpx.Response) -> str:
     return _BEARER_TOKEN.sub(r"\g<prefix><redacted>", text)
 
 
-def catch(response: httpx.Response) -> None:
-    """Reads the response body and raises HTTPStatusError for error responses.
+def _handle_error(response: httpx.Response) -> None:
+    """Log and re-raise any error from response.raise_for_status().
 
-    Handles various httpx exceptions with informative error messages:
-    - Timeout exceptions (ConnectTimeout, ReadTimeout, WriteTimeout, PoolTimeout)
-      are caught and logged with specific timeout information
-    - HTTP status errors (4xx, 5xx) are logged with response details
-    - Other request errors are caught and logged generally
-
-    Args:
-        response: An httpx.Response object.
+    Shared error-handling core called by both ``catch`` and ``acatch`` after
+    the body has already been read.  The two callers differ only in how they
+    read the body (``response.read()`` vs ``await response.aread()``); every
+    except branch here is identical for sync and async paths.
 
     Raises:
-        httpx.TimeoutException: When a timeout occurs during the request
-        httpx.HTTPStatusError: When the response has an error status code
-        httpx.RequestError: For other request-related errors
+        httpx.ConnectTimeout: on connect timeout.
+        httpx.ReadTimeout: on read timeout.
+        httpx.WriteTimeout: on write timeout.
+        httpx.PoolTimeout: on pool timeout.
+        httpx.HTTPStatusError: on 4xx/5xx status.
+        httpx.RequestError: for other request errors.
     """
     try:
-        response.read()
         response.raise_for_status()
     except httpx.ConnectTimeout as err:
         log.warning(
@@ -137,6 +135,27 @@ def catch(response: httpx.Response) -> None:
         )
         log.debug("Request error details", exc_info=True)
         raise
+
+
+def catch(response: httpx.Response) -> None:
+    """Reads the response body and raises HTTPStatusError for error responses.
+
+    Handles various httpx exceptions with informative error messages:
+    - Timeout exceptions (ConnectTimeout, ReadTimeout, WriteTimeout, PoolTimeout)
+      are caught and logged with specific timeout information
+    - HTTP status errors (4xx, 5xx) are logged with response details
+    - Other request errors are caught and logged generally
+
+    Args:
+        response: An httpx.Response object.
+
+    Raises:
+        httpx.TimeoutException: When a timeout occurs during the request
+        httpx.HTTPStatusError: When the response has an error status code
+        httpx.RequestError: For other request-related errors
+    """
+    response.read()
+    _handle_error(response)
 
 
 async def acatch(response: httpx.Response) -> None:
@@ -156,62 +175,5 @@ async def acatch(response: httpx.Response) -> None:
         httpx.HTTPStatusError: When the response has an error status code
         httpx.RequestError: For other request-related errors
     """
-    try:
-        await response.aread()
-        response.raise_for_status()
-    except httpx.ConnectTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            CONN_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        log.debug("Connect timeout details", exc_info=True)
-        raise
-    except httpx.ReadTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            READ_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        log.debug("Read timeout details", exc_info=True)
-        raise
-    except httpx.WriteTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            WRITE_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        log.debug("Write timeout details", exc_info=True)
-        raise
-    except httpx.PoolTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            POOL_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        log.debug("Pool timeout details", exc_info=True)
-        raise
-    except httpx.HTTPStatusError as err:
-        log.warning(
-            "HTTP %d error for %s %s: %s",
-            err.response.status_code,
-            err.request.method,
-            err.request.url,
-            _response_text(err.response),
-            exc_info=False,
-        )
-        log.debug("HTTP status error details", exc_info=True)
-        raise
-    except httpx.RequestError as err:
-        log.warning(
-            "Request error for %s: %s",
-            _request_url(err),
-            err,
-            exc_info=False,
-        )
-        log.debug("Request error details", exc_info=True)
-        raise
+    await response.aread()
+    _handle_error(response)

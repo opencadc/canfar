@@ -1,11 +1,11 @@
+"""Tests for httpx error hooks."""
+
 from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest
 
 from canfar.hooks.httpx.errors import acatch, catch
-
-"""Tests for httpx error hooks."""
 
 
 class TestCatch:
@@ -154,3 +154,24 @@ class TestACatch:
         # Verify response.aread() was called
         mock_response.aread.assert_called_once()
         mock_response.raise_for_status.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_acatch_redacts_bearer_token_in_error_body(self) -> None:
+        """Async HTTP status logs redact bearer tokens from response bodies."""
+        request = httpx.Request("GET", "https://example.com/skaha/v1/context")
+        response = httpx.Response(
+            401,
+            request=request,
+            text="unhandled auth: Authorization Bearer abc.def.ghi",
+        )
+
+        with (
+            patch("canfar.hooks.httpx.errors.log") as log,
+            pytest.raises(httpx.HTTPStatusError),
+        ):
+            await acatch(response)
+
+        error_text = " ".join(str(arg) for arg in log.warning.call_args.args)
+        assert "abc.def.ghi" not in error_text
+        assert "Authorization Bearer <redacted>" in error_text
+        assert log.warning.call_args.kwargs["exc_info"] is False

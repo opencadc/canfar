@@ -191,3 +191,47 @@ class TestAsyncHook:
 
         with pytest.raises(AuthenticationError, match="Failed to refresh OIDC token"):
             await hook_func(request)
+
+
+class TestSyncAsyncParity:
+    """Characterization tests: sync and async auth hooks share guard behavior."""
+
+    @patch("canfar.auth.oidc.sync_refresh")
+    @patch("canfar.auth.oidc.refresh")
+    def test_refresh_and_arefresh_both_skip_non_oidc(
+        self,
+        mock_async_refresh,
+        mock_sync_refresh,
+        tmp_path,
+    ) -> None:
+        """Both refresh and arefresh skip when the Authentication Record is not OIDC."""
+        cert_path = tmp_path / "cert.pem"
+        generate_cert(cert_path)
+        x509_context = X509(
+            server=Server(
+                name="TestX509", url="https://x509.example.com", version="v0"
+            ),
+            path=cert_path,
+        )
+        config = configuration_from_legacy_context("TestX509", x509_context)
+        client = HTTPClient(config=config)
+        request = httpx.Request("GET", "/")
+
+        refresh(client)(request)
+        mock_sync_refresh.assert_not_called()
+        mock_async_refresh.assert_not_called()
+
+    @patch("canfar.auth.oidc.sync_refresh")
+    @patch("canfar.auth.oidc.refresh")
+    def test_refresh_and_arefresh_both_skip_runtime_credentials(
+        self,
+        mock_async_refresh,
+        mock_sync_refresh,
+    ) -> None:
+        """Both refresh and arefresh skip when runtime credentials are active."""
+        client = HTTPClient(token=SecretStr("runtime-token"), url="https://runtime.com")
+        request = httpx.Request("GET", "/")
+
+        refresh(client)(request)
+        mock_sync_refresh.assert_not_called()
+        mock_async_refresh.assert_not_called()
