@@ -38,6 +38,16 @@ repos:
       - id: check-symlinks
       - id: detect-private-key
 
+  - repo: local
+    hooks:
+    - id: radon
+      name: radon
+      entry: radon
+      verbose: true
+      language: python
+      additional_dependencies: [radon]
+      args: ["cc", "--min=C","--total-average","--exclude=tests/*.py"]
+
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
     hooks:
@@ -58,3 +68,15 @@ repos:
         args: [--fix, --exit-non-zero-on-fix]
       # Formatter
       - id: ruff-format
+  # Documentation checks
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        args: [--config=pyproject.toml]
+
+  # GitHub Actions workflow linting
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
