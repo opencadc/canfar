@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
 import webbrowser
 from typing import Annotated
 
 import typer
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
@@ -37,6 +37,7 @@ def open_sessions(
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _open_sessions() -> None:
+        """Look up the requested sessions and open their connect URLs."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             sessions_info = await session.info(ids=session_ids)
@@ -52,4 +53,4 @@ def open_sessions(
             else:
                 typer.echo(f"No connectURL found for session {session_info.get('id')}.")
 
-    asyncio.run(_open_sessions())
+    run(_open_sessions())

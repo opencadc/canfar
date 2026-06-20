@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import Annotated
 
 import typer
 from rich.prompt import Confirm
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
@@ -60,6 +60,7 @@ def delete_sessions(
         )
 
     async def _delete() -> None:
+        """Delete the requested sessions from the science platform server."""
         async with AsyncSession(loglevel="DEBUG" if debug else "INFO") as session:
             try:
                 deleted = await session.destroy(ids=session_ids)
@@ -71,4 +72,4 @@ def delete_sessions(
                 console.print(f"[bold red]Error during deletion: {err}[/bold red]")
 
     if proceed:
-        asyncio.run(_delete())
+        run(_delete())

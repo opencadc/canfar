@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import click
 import typer
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
@@ -151,6 +151,7 @@ def creation(
             environment[key] = value
 
     async def _create() -> None:
+        """Create the requested session(s) on the science platform server."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             try:
@@ -215,4 +216,4 @@ def creation(
         console.print("[yellow]Dry run complete.[/yellow]")
         return
 
-    asyncio.run(_create())
+    run(_create())
