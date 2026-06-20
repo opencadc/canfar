@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import TYPE_CHECKING, TypeAlias
 
 from canfar.models.auth import (
@@ -74,15 +75,18 @@ def legacy_context_to_credential(
     )
 
 
-class LegacyContextsMapping:
-    """Dict-like view over authentication records keyed by IDP."""
+class LegacyContextsMapping(Mapping[str, "AuthContext"]):
+    """Dict-like view over authentication records keyed by IDP.
+
+    Subclasses :class:`collections.abc.Mapping`, so only ``__getitem__``,
+    ``__iter__``, and ``__len__`` are implemented here; the mixin derives
+    ``__contains__``, ``keys``, ``items``, ``values``, and ``__eq__``.
+    ``__setitem__`` is kept as an extra mutation hook used by the httpx
+    auth refresh hooks, which the read-only base does not provide.
+    """
 
     def __init__(self, configuration: Configuration) -> None:
         self._configuration = configuration
-
-    def __contains__(self, key: str) -> bool:
-        """Return whether ``key`` is a saved authentication IDP."""
-        return key in self._configuration.authentication
 
     def __getitem__(self, key: str) -> AuthContext:
         """Return the legacy auth context for ``key``."""
@@ -96,21 +100,7 @@ class LegacyContextsMapping:
 
     def __iter__(self) -> Iterator[str]:
         """Iterate saved authentication IDP keys."""
-        return iter(self.keys())
-
-    def keys(self) -> list[str]:
-        """Return saved authentication IDP keys."""
-        return list(self._configuration.authentication)
-
-    def items(self) -> Iterator[tuple[str, AuthContext]]:
-        """Yield ``(idp, legacy_context)`` pairs."""
-        for key in self.keys():
-            yield key, self[key]
-
-    def values(self) -> Iterator[AuthContext]:
-        """Yield legacy auth contexts in IDP key order."""
-        for key in self.keys():
-            yield self[key]
+        return iter(self._configuration.authentication)
 
     def __len__(self) -> int:
         """Return the number of saved authentication records."""
