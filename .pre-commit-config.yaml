@@ -80,10 +80,3 @@ repos:
     rev: v1.7.12
     hooks:
       - id: actionlint
-
-  # Check for Python version compatibility
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.2
-    hooks:
-      - id: pyupgrade
-        args: [--py39-plus]
