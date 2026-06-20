@@ -314,6 +314,35 @@ def test_stats_outputs_cluster_tables() -> None:
     session_cls.assert_called_once_with(loglevel="DEBUG")
 
 
+def test_stats_renders_only_cpu_and_ram_columns() -> None:
+    """Pin that ``canfar stats`` shows CPU/RAM but never the Instances column.
+
+    The Instances column is intentionally not rendered; this characterization
+    test guards that removing the disabled inline code leaves the human output
+    unchanged, i.e. no per-instance labels or counts leak into stdout.
+    """
+    with patch("canfar.cli.stats.AsyncSession") as session_cls:
+        session = _mock_async_session(session_cls)
+        session.stats.return_value = {
+            "instances": {"desktopApp": 2, "notebook": 3, "total": 5},
+            "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
+            "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
+        }
+        result = runner.invoke(stats, ["--debug"])
+
+    assert result.exit_code == 0
+    # The CPU/RAM table and its values are rendered.
+    assert "CPU" in result.stdout
+    assert "RAM" in result.stdout
+    assert "64" in result.stdout
+    assert "128Gi" in result.stdout
+    # The Instances column/data is not rendered (dead UI code).
+    assert "Instances" not in result.stdout
+    assert "Notebook" not in result.stdout
+    assert "Desktop" not in result.stdout
+    assert "desktopApp" not in result.stdout
+
+
 @pytest.mark.slow
 def test_stats_command_integration() -> None:
     """Test stats command integration (may fail without proper auth/config)."""
