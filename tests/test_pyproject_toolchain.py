@@ -9,7 +9,7 @@ import tomllib
 _PYPROJECT = Path(__file__).parent.parent / "pyproject.toml"
 
 
-def _load() -> dict:  # type: ignore[type-arg]
+def _load() -> dict[str, object]:
     with _PYPROJECT.open("rb") as f:
         return tomllib.load(f)
 
