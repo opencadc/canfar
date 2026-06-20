@@ -11,13 +11,13 @@ from canfar.models.auth import (
     OIDCCredential,
     X509Credential,
 )
+from canfar.models.http import Server
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
 
     from canfar.models.auth import AuthenticationCredential
     from canfar.models.config import Configuration
-    from canfar.models.http import Server
 
 AuthContext: TypeAlias = OIDC | X509
 """Legacy authentication context shape with embedded server."""
@@ -47,7 +47,7 @@ def credential_to_legacy_context(
         client=credential.client,
         token=credential.token,
         expiry=credential.expiry,
-        server=server,
+        server=server or Server(),
     )
 
 

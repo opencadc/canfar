@@ -28,7 +28,7 @@ def show(
     mode = resolve_mode(json_output, yaml_output)
     maybe_emit_banner(mode)
     try:
-        cfg = Configuration()
+        cfg = Configuration()  # ty: ignore[missing-argument]
         if mode is not output.OutputMode.HUMAN:
             output.to_stdout(cfg.model_dump(mode="json", exclude_none=False), mode)
             return
@@ -74,7 +74,7 @@ def get(
     mode = resolve_mode(json_output, yaml_output)
     maybe_emit_banner(mode)
     try:
-        cfg = Configuration()
+        cfg = Configuration()  # ty: ignore[missing-argument]
         value = cfg.get_value(key)
         if mode is not output.OutputMode.HUMAN:
             output.to_stdout(value, mode)
@@ -97,7 +97,7 @@ def set_value(
     canfar config set servers.canfar.url https://ws-uv.canfar.net/skaha
     """
     maybe_emit_banner(output.OutputMode.HUMAN)
-    cfg = Configuration()
+    cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         parsed = yaml.safe_load(value)
         updated = cfg.set_value(key, parsed)

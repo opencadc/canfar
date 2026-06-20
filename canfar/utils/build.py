@@ -29,7 +29,7 @@ def fetch_parameters(
     # Kind is an alias for type in the API.
     # It is renamed as kind to avoid conflicts with the built-in type function.
     # by_alias=true, returns, {"type": "headless"} instead of {"kind": "headless"}
-    return FetchRequest(kind=kind, status=status, view=view).model_dump(
+    return FetchRequest(kind=kind, status=status, view=view).model_dump(  # ty: ignore[unknown-argument]
         exclude_none=True, by_alias=True
     )
 

@@ -105,7 +105,7 @@ def discover(
     Raises:
         ServerDiscoveryError: If discovery fails or finds no usable servers.
     """
-    target_config = config or Configuration()
+    target_config = config or Configuration()  # ty: ignore[missing-argument]
     discovered = asyncio.run(_discover_for_idp(idp, dev=dev, timeout=timeout))
     if not discovered:
         msg = f"No servers discovered for IDP '{idp}'."
@@ -151,7 +151,7 @@ def activate(
         ServerDiscoveryError: If discovery fails before usable data is produced.
         ServerFetchError: If fetch or validation fails before save.
     """
-    target_config = config or Configuration()
+    target_config = config or Configuration()  # ty: ignore[missing-argument]
     reason: Literal["active", "remembered", "single", "selected"]
     if selector is None:
         active_server = _active_server_for_idp(target_config, idp)
@@ -232,7 +232,7 @@ def list_servers(
     Raises:
         ServerDiscoveryError: If discovery fails before usable data is produced.
     """
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     active_idp = config.active.authentication
     servers = [server for server in config.servers.values() if server.idp == active_idp]
     if servers or not discover_if_empty:
@@ -261,7 +261,7 @@ def use(selector: str, *, dev: bool = False, timeout: int = 2) -> None:
         ServerDiscoveryError: If discovery fails before usable data is produced.
         ServerFetchError: If fetch or validation fails before save.
     """
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     activate(
         config.active.authentication,
         selector,
@@ -508,7 +508,7 @@ def _validate_server(
         msg = "Server URL and version are required before activation."
         raise ServerFetchError(msg)
 
-    base_config = config or Configuration()
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = idp or enriched.idp or base_config.active.authentication
     validation_config = with_active_selection(base_config, active_idp, enriched)
     return enriched.fetch(timeout=timeout, config=validation_config)

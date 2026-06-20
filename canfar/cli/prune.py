@@ -61,7 +61,7 @@ def prune_sessions(
     kind: Annotated[
         Pruneable,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Pruneable)),
             help="Filter by session kind.",
         ),
@@ -69,7 +69,7 @@ def prune_sessions(
     status: Annotated[
         Status,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),

@@ -63,7 +63,7 @@ def creation(
         Kind,
         typer.Argument(
             ...,
-            click_type=click.Choice(kinds, case_sensitive=True),
+            click_type=click.Choice(kinds, case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(kinds),
             help="Session Kind.",
         ),
