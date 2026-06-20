@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import asyncio
 from typing import Annotated
 
 import typer
 from rich import box
 from rich.table import Table
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
@@ -35,6 +35,7 @@ def get_stats(
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_stats() -> None:
+        """Fetch cluster-wide statistics and render them."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             data = await session.stats()
@@ -75,4 +76,4 @@ def get_stats(
             "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
         )
 
-    asyncio.run(_get_stats())
+    run(_get_stats())

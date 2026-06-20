@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 import re
 from typing import Annotated
 
@@ -10,6 +9,7 @@ import typer
 from rich import box
 from rich.table import Table
 
+from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
@@ -40,6 +40,7 @@ def get_events(
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_events() -> None:
+        """Fetch events for the requested sessions and render them."""
         log_level = "DEBUG" if debug else "INFO"
         async with AsyncSession(loglevel=log_level) as session:
             all_events = await session.events(ids=session_ids)
@@ -74,4 +75,4 @@ def get_events(
 
                 console.print(table)
 
-    asyncio.run(_get_events())
+    run(_get_events())

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import asyncio
 from datetime import datetime, timezone
 from typing import Annotated, get_args
 
@@ -14,6 +13,7 @@ from rich import box
 from rich.table import Table
 
 from canfar.cli import output
+from canfar.cli._run import run
 from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
@@ -156,4 +156,4 @@ def show(
             for message in dict.fromkeys(anomalies):
                 console.print(f"[dim]- {message}[/dim]")
 
-    asyncio.run(_list_sessions())
+    run(_list_sessions())
