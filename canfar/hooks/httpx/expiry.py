@@ -18,6 +18,33 @@ if TYPE_CHECKING:
     from canfar.client import HTTPClient
 
 
+def _check_expiry(client: HTTPClient) -> None:
+    """Shared expiry-check core for both sync and async hooks.
+
+    Raises:
+        AuthExpiredError: if the saved Authentication Record is expired or its
+            X.509 certificate cannot be loaded.
+    """
+    if client.uses_runtime_credentials:
+        log.debug(
+            "Skipping saved Authentication Record expiry check; "
+            "runtime credentials are active."
+        )
+        return
+
+    try:
+        expired = client.config.context.expired
+    except x509.CertificateError as err:
+        raise AuthExpiredError(
+            context=client.config.context.mode, reason=str(err)
+        ) from err
+
+    if expired:
+        raise AuthExpiredError(
+            context=client.config.context.mode, reason="auth expired"
+        )
+
+
 def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
     """Create a hook to check for authentication expiry.
 
@@ -36,24 +63,7 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
             AuthExpiredError: If the active Authentication credential is expired.
 
         """
-        if client.uses_runtime_credentials:
-            log.debug(
-                "Skipping saved Authentication Record expiry check; "
-                "runtime credentials are active."
-            )
-            return
-
-        try:
-            expired = client.config.context.expired
-        except x509.CertificateError as err:
-            raise AuthExpiredError(
-                context=client.config.context.mode, reason=str(err)
-            ) from err
-
-        if expired:
-            raise AuthExpiredError(
-                context=client.config.context.mode, reason="auth expired"
-            )
+        _check_expiry(client)
 
     return hook
 
@@ -76,23 +86,8 @@ def acheck(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Raises:
             AuthExpiredError: If the active Authentication credential is expired.
         """
-        if client.uses_runtime_credentials:
-            log.debug(
-                "Skipping saved Authentication Record expiry check; "
-                "runtime credentials are active."
-            )
-            return
-
-        try:
-            expired = client.config.context.expired
-        except x509.CertificateError as err:
-            raise AuthExpiredError(
-                context=client.config.context.mode, reason=str(err)
-            ) from err
-
-        if expired:
-            raise AuthExpiredError(
-                context=client.config.context.mode, reason="auth expired"
-            )
+        # No await needed: _check_expiry is synchronous; async is only required
+        # by the httpx async event-hook signature.
+        _check_expiry(client)
 
     return hook

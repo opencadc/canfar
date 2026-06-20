@@ -1,6 +1,7 @@
 """Tests for the HTTPx expiry hooks."""
 
 from types import SimpleNamespace
+from typing import Any
 from unittest.mock import Mock
 
 import httpx
@@ -281,3 +282,44 @@ class TestACheck:
 
         with pytest.raises(AuthExpiredError):
             await hook_func(request)
+
+
+class TestSyncAsyncParity:
+    """Characterization tests: sync and async hooks must behave identically."""
+
+    def test_check_and_acheck_share_no_state(self) -> None:
+        """The check and acheck factories return independent callables."""
+        mock_client = Mock()
+        mock_client.uses_runtime_credentials = False
+        mock_client.config.context.expired = False
+
+        hook_sync = check(mock_client)
+        hook_async = acheck(mock_client)
+        assert hook_sync is not hook_async
+
+    @pytest.mark.anyio
+    async def test_acheck_and_check_raise_same_error_for_expired(self) -> None:
+        """Async and sync hooks raise AuthExpiredError with identical message."""
+
+        class Context:
+            mode = "x509"
+
+            @property
+            def expired(self) -> bool:
+                return True
+
+        def _ns() -> Any:
+            return SimpleNamespace(
+                config=SimpleNamespace(context=Context()),
+                uses_runtime_credentials=False,
+            )
+
+        request = httpx.Request("GET", "https://example.com")
+
+        with pytest.raises(AuthExpiredError, match="auth expired") as sync_exc:
+            check(_ns())(request)
+
+        with pytest.raises(AuthExpiredError, match="auth expired") as async_exc:
+            await acheck(_ns())(request)
+
+        assert str(sync_exc.value) == str(async_exc.value)

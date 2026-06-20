@@ -40,7 +40,7 @@ from canfar.models.auth import OIDC
 from canfar.utils import jwt
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable
+    from collections.abc import Awaitable, MutableMapping
 
     import httpx
 
@@ -51,6 +51,48 @@ log = get_logger(__name__)
 
 class AuthenticationError(Exception):
     """Exception raised when authentication refresh fails."""
+
+
+def _apply_refreshed_token(
+    client: HTTPClient,
+    ctx: OIDC,
+    token: SecretStr,
+    httpx_client_headers: MutableMapping[str, str],
+    request: httpx.Request,
+) -> None:
+    """Persist a refreshed access token to config, headers, and the outgoing request.
+
+    Shared by both ``refresh`` (sync) and ``arefresh`` (async); only the
+    source of ``token`` (sync vs. async network call) and the target of
+    ``httpx_client_headers`` (``client.client.headers`` for sync vs.
+    ``client.asynclient.headers`` for async) differ between the two callers.
+
+    Args:
+        client: The CANFAR HTTPClient whose config is updated.
+        ctx: The current OIDC Authentication Record.
+        token: The new access token returned by the OIDC provider.
+        httpx_client_headers: The header mapping of the underlying httpx client.
+        request: The outgoing httpx request whose Authorization header is updated.
+    """
+    access_value = token.get_secret_value()
+    new_context = ctx.model_copy(
+        update={
+            "token": ctx.token.model_copy(update={"access": SecretStr(access_value)}),
+            "expiry": ctx.expiry.model_copy(
+                update={"access": jwt.expiry(access_value)}
+            ),
+        }
+    )
+
+    client.config.contexts[client.config.active.authentication] = new_context
+    client.config.save()
+    log.debug("Authentication refreshed and configuration saved.")
+
+    header = f"Bearer {access_value}"
+    httpx_client_headers["Authorization"] = header
+    request.headers["Authorization"] = header
+    log.debug("HTTP request headers updated with new token.")
+    log.info("OIDC Access Token Refreshed.")
 
 
 def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
@@ -106,31 +148,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 token=refresh.get_secret_value(),
             )
             log.debug("Synchronous OIDC token refresh successful.")
-
-            # Create a new context with the updated token
-            access_value = token.get_secret_value()
-            context = ctx.model_copy(
-                update={
-                    "token": ctx.token.model_copy(
-                        update={"access": SecretStr(access_value)}
-                    ),
-                    "expiry": ctx.expiry.model_copy(
-                        update={"access": jwt.expiry(access_value)}
-                    ),
-                }
-            )
-
-            # Update the configuration and save it
-            client.config.contexts[client.config.active.authentication] = context
-            client.config.save()
-            log.debug("Authentication refreshed and configuration saved.")
-
-            # Update headers
-            header = f"Bearer {token.get_secret_value()}"
-            client.client.headers["Authorization"] = header
-            request.headers["Authorization"] = header
-            log.debug("HTTP request headers updated with new token.")
-            log.info("OIDC Access Token Refreshed.")
+            _apply_refreshed_token(client, ctx, token, client.client.headers, request)
 
         except Exception as err:
             msg = f"Failed to refresh OIDC token: {err}"
@@ -142,6 +160,10 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
 
 def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     """Create an asynchronous authentication refresh hook for httpx clients.
+
+    Note: the ``ctx.valid`` guard present in the synchronous ``refresh`` hook
+    is intentionally absent here to preserve the existing async behavior.
+    Aligning them would be a behavior change outside this task's scope.
 
     Args:
         client (HTTPClient): The HTTPClient instance.
@@ -187,31 +209,9 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
                 token=refresh.get_secret_value(),
             )
             log.debug("Asynchronous OIDC token refresh successful.")
-
-            # Create a new context with the updated token
-            access_value = token.get_secret_value()
-            context = ctx.model_copy(
-                update={
-                    "token": ctx.token.model_copy(
-                        update={"access": SecretStr(access_value)}
-                    ),
-                    "expiry": ctx.expiry.model_copy(
-                        update={"access": jwt.expiry(access_value)}
-                    ),
-                }
+            _apply_refreshed_token(
+                client, ctx, token, client.asynclient.headers, request
             )
-
-            # Update the configuration and save it
-            client.config.contexts[client.config.active.authentication] = context
-            client.config.save()
-            log.debug("Authentication refreshed and configuration saved.")
-
-            # Update headers
-            header = f"Bearer {token.get_secret_value()}"
-            client.asynclient.headers["Authorization"] = header
-            request.headers["Authorization"] = header
-            log.debug("HTTP request headers updated with new token.")
-            log.info("OIDC Access Token Refreshed.")
 
         except Exception as err:
             msg = f"Failed to refresh OIDC token: {err}"
