@@ -47,7 +47,7 @@ def credential_to_legacy_context(
         client=credential.client,
         token=credential.token,
         expiry=credential.expiry,
-        server=server,
+        server=server,  # ty: ignore[invalid-argument-type]
     )
 
 

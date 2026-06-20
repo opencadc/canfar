@@ -19,7 +19,7 @@
 ## Validation
 
 - Fast lint: `uv run --no-sync ruff check . --no-cache`
-- Type check: `uv run --no-sync mypy canfar --config-file pyproject.toml`
+- Type check: `uv run ty check canfar`
 - Deterministic non-slow tests: `uv run --no-sync pytest tests -m "not slow" --no-cov -q -o cache_dir=/tmp/canfar-pytest-cache`
 - Docs build: `uv run --group docs mkdocs build`
 - Full test suite: `uv run --no-sync pytest`

@@ -72,7 +72,7 @@ def login(idp: str, force: bool = False) -> None:
         AuthenticationError: Credential or discovery failure.
     """
     idp_info = get_idp(idp)
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
 
     if _has_authentication(config, idp) and not force:
         return
@@ -96,7 +96,7 @@ def use(idp: str) -> None:
         AuthenticationError: Saved authentication missing for ``idp``.
     """
     get_idp(idp)
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
 
     try:
         config.get_credential(idp)
@@ -126,7 +126,7 @@ def list() -> builtins.list[Authentication]:  # noqa: A001
     Returns:
         Authentication records for configured IDPs. Order not guaranteed.
     """
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     return [
         _authentication_for_credential(config, cred)
         for cred in config.authentication.values()
@@ -145,7 +145,7 @@ def remove(idp: str, *, force: bool = False) -> None:
         AuthenticationError: Missing auth or active auth removed without force.
     """
     get_idp(idp)
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
 
     if not _has_authentication(config, idp):
         _fail(
@@ -197,10 +197,10 @@ def purge(*, force: bool = False) -> None:
             hint="Re-run with --force to reset authentication and server state.",
         )
 
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     registry = config.registry.model_copy(deep=True)
     console = config.console.model_copy(deep=True)
-    fresh = Configuration(registry=registry, console=console)
+    fresh = Configuration(registry=registry, console=console)  # ty: ignore[missing-argument]
     fresh.save()
 
 
@@ -213,7 +213,7 @@ def show() -> Authentication:
     Raises:
         AuthenticationError: Active authentication is not configured.
     """
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     try:
         credential = config.get_credential(config.active.authentication)
     except KeyError as exc:

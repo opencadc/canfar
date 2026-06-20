@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from cadcutils.net.auth import Subject, get_cert  # type: ignore[import-untyped]
+from cadcutils.net.auth import Subject, get_cert
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 

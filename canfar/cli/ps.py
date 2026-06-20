@@ -45,7 +45,7 @@ def show(
         typer.Option(
             "--kind",
             "-k",
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Kind)),
             help="Filter by session kind.",
         ),
@@ -55,7 +55,7 @@ def show(
         typer.Option(
             "--status",
             "-s",
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),
+            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),
