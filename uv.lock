@@ -114,7 +114,6 @@ dependencies = [
     { name = "questionary" },
     { name = "rich" },
     { name = "segno" },
-    { name = "toml" },
     { name = "typer" },
 ]
 
@@ -126,11 +125,10 @@ dev = [
     { name = "pytest" },
     { name = "pytest-asyncio" },
     { name = "pytest-cov" },
-    { name = "pytest-mock" },
     { name = "pytest-order" },
-    { name = "pytest-timeout" },
     { name = "pytest-xdist" },
     { name = "ruff" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "ty" },
 ]
 docs = [
@@ -155,7 +153,6 @@ requires-dist = [
     { name = "questionary", specifier = ">=2.1.0" },
     { name = "rich", specifier = ">=13.9.4" },
     { name = "segno", specifier = ">=1.6.6" },
-    { name = "toml", specifier = ">=0.10.2" },
     { name = "typer", specifier = ">=0.16.0" },
 ]
 
@@ -166,11 +163,10 @@ dev = [
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-asyncio", specifier = ">=1.0.0" },
     { name = "pytest-cov", specifier = ">=6.1.1" },
-    { name = "pytest-mock", specifier = ">=3.14.1" },
     { name = "pytest-order", specifier = ">=1.3.0" },
-    { name = "pytest-timeout", specifier = ">=2.4.0" },
     { name = "pytest-xdist", specifier = ">=3.7.0" },
     { name = "ruff", specifier = ">=0.11.11" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.1" },
     { name = "ty", specifier = ">=0.0.51" },
 ]
 docs = [
@@ -1727,18 +1723,6 @@ wheels = [
 ]
 
 [[package]]
-name = "pytest-mock"
-version = "3.15.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/68/14/eb014d26be205d38ad5ad20d9a80f7d201472e08167f0bb4361e251084a9/pytest_mock-3.15.1.tar.gz", hash = "sha256:1849a238f6f396da19762269de72cb1814ab44416fa73a8686deac10b0d87a0f", size = 34036, upload-time = "2025-09-16T16:37:27.081Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/5a/cc/06253936f4a7fa2e0f48dfe6d851d9c56df896a9ab09ac019d70b760619c/pytest_mock-3.15.1-py3-none-any.whl", hash = "sha256:0a25e2eb88fe5168d535041d09a4529a188176ae608a6d249ee65abc0949630d", size = 10095, upload-time = "2025-09-16T16:37:25.734Z" },
-]
-
-[[package]]
 name = "pytest-order"
 version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1748,18 +1732,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fe/76/c7b4a2ad3758a3c2757f532c6e931aa5e387781512a71b67b6ddc19d9ef8/pytest_order-1.4.0.tar.gz", hash = "sha256:327fb6eee1ae771051da13d2a0d9306d947e87f9ab8f4d6302e5d122c7472691", size = 49891, upload-time = "2026-04-26T12:37:43.056Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1e/d0/c62c07141151f259faddff6bd591f28235c37dd0c486160d0d2a0d4e6e5a/pytest_order-1.4.0-py3-none-any.whl", hash = "sha256:05b1710cf16bb2123294eec5bdfaee513322ff1926c0dfa86eb8be632eb264a1", size = 14918, upload-time = "2026-04-26T12:37:41.123Z" },
-]
-
-[[package]]
-name = "pytest-timeout"
-version = "2.4.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "pytest" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ac/82/4c9ecabab13363e72d880f2fb504c5f750433b2b6f16e99f4ec21ada284c/pytest_timeout-2.4.0.tar.gz", hash = "sha256:7e68e90b01f9eff71332b25001f85c75495fc4e3a836701876183c4bcfd0540a", size = 17973, upload-time = "2025-05-05T19:44:34.99Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fa/b6/3127540ecdf1464a00e5a01ee60a1b09175f6913f0644ac748494d9c4b21/pytest_timeout-2.4.0-py3-none-any.whl", hash = "sha256:c42667e5cdadb151aeb5b26d114aff6bdf5a907f176a007a30b940d3d865b5c2", size = 14382, upload-time = "2025-05-05T19:44:33.502Z" },
 ]
 
 [[package]]
@@ -2019,15 +1991,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/26/8c/ea13868e6008ed964837db011648e3e7766e0ecfa1b42d7b9a4cf0c228e2/termynal-0.14.0.tar.gz", hash = "sha256:2918a1a6cf468497fbb3a72dc3726743988829eef1136d0c78a81df70ec869f6", size = 178022, upload-time = "2026-03-16T16:56:21.539Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c3/8f/c089f7c9f9fc1da25e6271386e5df84e1f6e0b04d2f0b408939b51b2876f/termynal-0.14.0-py3-none-any.whl", hash = "sha256:b5147545e29256d35148251f5c2d3d23dec1d2fb0b4ba464ff330a7de8b56fc6", size = 11754, upload-time = "2026-03-16T16:56:22.76Z" },
-]
-
-[[package]]
-name = "toml"
-version = "0.10.2"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253, upload-time = "2020-11-01T01:40:22.204Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588, upload-time = "2020-11-01T01:40:20.672Z" },
 ]
 
 [[package]]
