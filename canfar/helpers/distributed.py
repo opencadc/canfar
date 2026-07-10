@@ -14,8 +14,8 @@ T = TypeVar("T")
 
 def stripe(
     iterable: Iterable[T],
-    replica: int = int(os.environ.get("REPLICA_ID", "1")),
-    total: int = int(os.environ.get("REPLICA_COUNT", "1")),
+    replica: int | None = None,
+    total: int | None = None,
 ) -> Iterator[T]:
     """Return every ``total``-th item from ``iterable`` with a ``replica`` offset.
 
@@ -44,6 +44,9 @@ def stripe(
         >>> list(distributed.stripe(range(100), replica=1, total=10))
         [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
     """
+    replica = int(os.environ.get("REPLICA_ID", "1")) if replica is None else replica
+    total = int(os.environ.get("REPLICA_COUNT", "1")) if total is None else total
+
     if replica < 1:
         return
     if total <= 0:
@@ -56,8 +59,8 @@ def stripe(
 
 def chunk(
     iterable: Iterable[T],
-    replica: int = int(os.environ.get("REPLICA_ID", "1")),
-    total: int = int(os.environ.get("REPLICA_COUNT", "1")),
+    replica: int | None = None,
+    total: int | None = None,
 ) -> Iterator[T]:
     """Return the ``replica``-th contiguous chunk of ``iterable``.
 
@@ -93,6 +96,9 @@ def chunk(
         >>> list(distributed.chunk([1, 2, 3], replica=2, total=5))
         [2]
     """
+    replica = int(os.environ.get("REPLICA_ID", "1")) if replica is None else replica
+    total = int(os.environ.get("REPLICA_COUNT", "1")) if total is None else total
+
     if total <= 0:
         msg = "total must be positive"
         raise ValueError(msg)
