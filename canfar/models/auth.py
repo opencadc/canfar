@@ -257,21 +257,3 @@ AuthenticationCredential = Annotated[
     OIDCCredential | X509Credential, Field(discriminator="mode")
 ]
 """Discriminated union of v1 authentication credentials without embedded server."""
-
-
-class TokenAuth(BaseModel):
-    """Token authentication configuration."""
-
-    mode: Literal["token"] = "token"
-    token: Annotated[
-        str | None,
-        Field(
-            default=None,
-            title="Authentication Token",
-            description="Authentication token for the server.",
-        ),
-    ] = None
-    server: Annotated[
-        Server | None,
-        Field(description="Token server information"),
-    ] = None

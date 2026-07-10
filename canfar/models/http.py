@@ -299,35 +299,3 @@ class Server(BaseSettings):
             update=self._resource_settings_from_context(data),
             deep=True,
         )
-
-
-class Connection(BaseSettings):
-    """CANFAR Client HTTP Connection Details."""
-
-    model_config = SettingsConfigDict(
-        title="Science Platform Client Server Configuration",
-        env_prefix="CANFAR_CONNECTION_",
-        env_nested_delimiter="__",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
-        extra="forbid",
-        json_schema_mode_override="serialization",
-        str_strip_whitespace=True,
-        str_max_length=256,
-        str_min_length=1,
-    )
-
-    concurrency: int = Field(
-        default=32,
-        title="HTTP Concurrency",
-        description="Maximum concurrent http requests.",
-        le=256,
-        ge=1,
-    )
-    timeout: int = Field(
-        default=30,
-        title="HTTP Timeout",
-        description="HTTP timeout in seconds.",
-        gt=0,
-        le=300,
-    )
