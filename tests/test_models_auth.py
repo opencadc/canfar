@@ -1,10 +1,14 @@
 """Comprehensive tests for the authentication configuration module."""
 
+from __future__ import annotations
+
 import math
 import time
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from unittest.mock import patch
 
+import pytest
 from pydantic import AnyHttpUrl, AnyUrl
 
 from canfar.models.auth import (
@@ -14,7 +18,9 @@ from canfar.models.auth import (
     Client,
     Endpoint,
     Expiry,
+    OIDCCredential,
     Token,
+    X509Credential,
 )
 from canfar.models.http import Server
 
@@ -123,6 +129,70 @@ class TestOIDCExpiryConfig:
         )
         assert config.access == future_time
         assert config.refresh == future_time + 3600
+
+
+class TestCanonicalCredentialEligibility:
+    """Boundary contracts for canonical Authentication Record eligibility."""
+
+    @staticmethod
+    def oidc(refresh_expiry: float | None = None) -> OIDCCredential:
+        """Build a complete canonical OIDC Authentication Record."""
+        return OIDCCredential(
+            idp="test",
+            endpoints=Endpoint(
+                discovery="https://identity.example/.well-known/openid-configuration",
+                token="https://identity.example/token",
+            ),
+            client=Client(identity="client", secret="secret"),
+            token=Token(access="access", refresh="refresh"),
+            expiry=Expiry(access=2_000.0, refresh=refresh_expiry),
+        )
+
+    @pytest.mark.parametrize(
+        ("expiry", "expired"),
+        [(None, True), (0.0, True), (1_000.0, True), (1_001.0, False)],
+    )
+    def test_oidc_access_expiry_boundaries(
+        self,
+        expiry: float | None,
+        expired: bool,
+    ) -> None:
+        """Missing, zero, and exact access expiry are expired."""
+        credential = self.oidc()
+        credential.expiry.access = expiry
+
+        with patch("canfar.models.auth.time.time", return_value=1_000.0):
+            assert credential.expired is expired
+
+    @pytest.mark.parametrize(
+        ("expiry", "refreshable"),
+        [(None, True), (0.0, False), (1_000.0, False), (1_001.0, True)],
+    )
+    def test_oidc_refresh_expiry_boundaries(
+        self,
+        expiry: float | None,
+        refreshable: bool,
+    ) -> None:
+        """Only missing or future refresh expiry remains eligible."""
+        credential = self.oidc(expiry)
+
+        with patch("canfar.models.auth.time.time", return_value=1_000.0):
+            assert credential.refreshable is refreshable
+
+    @pytest.mark.parametrize(
+        ("expiry", "expired"),
+        [(1_000.0, True), (1_001.0, False)],
+    )
+    def test_x509_expiry_boundaries(self, expiry: float, expired: bool) -> None:
+        """An X.509 Authentication Record expires exactly at its boundary."""
+        credential = X509Credential(
+            idp="test",
+            path=Path("/unused/cert.pem"),
+            expiry=expiry,
+        )
+
+        with patch("canfar.models.auth.time.time", return_value=1_000.0):
+            assert credential.expired is expired
 
 
 class TestOIDC:

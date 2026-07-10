@@ -2,66 +2,98 @@
 
 from __future__ import annotations
 
-from unittest.mock import patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 from pydantic import AnyHttpUrl
 
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.idp import IdpInfo, get_idp
-from canfar.models.auth import OIDC, Client, Endpoint, Expiry, Token
+
+_JWT = "eyJleHAiOjk5OTk5OTk5OTl9"
 
 
-def test_authenticate_for_cli_srcnet_uses_oidc_device_flow() -> None:
-    """SRCNet login runs the interactive OIDC device authorization flow."""
-    idp_info = get_idp("srcnet")
-    updated = OIDC(
-        endpoints=Endpoint(
-            discovery="https://ska-iam.stfc.ac.uk/.well-known/openid-configuration",
-            token="https://example.com/token",
+@pytest.mark.parametrize(
+    ("complete_uri", "expected_uri"),
+    [
+        (
+            "https://example.com/device?code=ABC123",
+            "https://example.com/device?code=ABC123",
         ),
-        client=Client(identity="client-id", secret="client-secret"),
-        token=Token(access="access-token", refresh="refresh-token"),
-        expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
-    )
-
-    with patch(
-        "canfar.cli.login_auth.asyncio.run",
-        return_value=updated,
-    ) as mock_run:
-        credential = authenticate_for_cli(idp_info)
-
-    mock_run.assert_called_once()
-    assert credential.idp == "srcnet"
-    assert credential.mode == "oidc"
-    assert credential.token.access is not None
-    assert credential.token.access.get_secret_value() == "access-token"
-
-
-def test_authenticate_for_cli_passes_timeout_to_oidc_device_flow() -> None:
-    """CLI OIDC login uses the caller-provided HTTP timeout."""
+        (None, "https://example.com/device"),
+    ],
+)
+def test_authenticate_for_cli_presents_oidc_device_challenge(
+    complete_uri: str | None,
+    expected_uri: str,
+) -> None:
+    """CLI login owns browser, QR, Rich, and human OIDC presentation."""
     idp_info = get_idp("srcnet")
-    updated = OIDC(
-        endpoints=Endpoint(
-            discovery="https://ska-iam.stfc.ac.uk/.well-known/openid-configuration",
-            token="https://example.com/token",
-        ),
-        client=Client(identity="client-id", secret="client-secret"),
-        token=Token(access="access-token", refresh="refresh-token"),
-        expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
-    )
-    seen: dict[str, int | None] = {}
+    client = AsyncMock(spec=httpx.AsyncClient)
+    discovery = MagicMock()
+    discovery.json.return_value = {
+        "issuer": "https://ska-iam.stfc.ac.uk/",
+        "device_authorization_endpoint": "https://example.com/device",
+        "registration_endpoint": "https://example.com/register",
+        "token_endpoint": "https://example.com/token",
+        "userinfo_endpoint": "https://example.com/userinfo",
+    }
+    registration = MagicMock()
+    registration.json.return_value = {
+        "client_id": "client-id",
+        "client_secret": "client-secret",
+    }
+    device_authorization = MagicMock()
+    device_authorization.json.return_value = {
+        "verification_uri": "https://example.com/device",
+        "verification_uri_complete": complete_uri,
+        "user_code": "ABC123",
+        "expires_in": 600,
+        "interval": 5,
+        "device_code": "device-code",
+    }
+    token = MagicMock(status_code=200)
+    token.json.return_value = {
+        "access_token": _JWT,
+        "refresh_token": _JWT,
+    }
+    userinfo = MagicMock()
+    userinfo.json.return_value = {"preferred_username": "test-user"}
+    client.get.side_effect = [discovery, userinfo]
+    client.post.side_effect = [registration, device_authorization, token]
+    console = MagicMock()
 
-    async def authenticate(oidc_config: OIDC, *, timeout: int | None = None) -> OIDC:
-        assert oidc_config.endpoints.discovery is not None
-        seen["timeout"] = timeout
-        return updated
-
-    with patch("canfar.cli.login_auth.oidc.authenticate", new=authenticate):
+    with (
+        patch("canfar.auth.oidc.httpx.AsyncClient") as client_class,
+        patch("canfar.utils.console.get_console", return_value=console),
+        patch("webbrowser.get") as browser,
+        patch("segno.make") as make_qr,
+        patch("rich.progress.Progress") as progress,
+    ):
+        client_class.return_value.__aenter__.return_value = client
         credential = authenticate_for_cli(idp_info, timeout=17)
 
-    assert seen["timeout"] == 17
+    configured_timeout = client_class.call_args.kwargs["timeout"]
+    assert configured_timeout.connect == 17
+    assert configured_timeout.read == 17
+    browser.return_value.open.assert_called_once_with(
+        expected_uri,
+        new=2,
+    )
+    make_qr.assert_called_once_with(
+        expected_uri,
+        error="H",
+    )
+    make_qr.return_value.terminal.assert_called_once_with(compact=True)
+    assert progress.called
+    console.print.assert_any_call(
+        "[green]✓[/green] Successfully authenticated as test-user"
+    )
+    console.print.assert_any_call("[bold]Code:[/bold] ABC123")
     assert credential.idp == "srcnet"
+    assert credential.token.access is not None
+    assert credential.token.access.get_secret_value() == _JWT
 
 
 def test_authenticate_for_cli_oidc_requires_discovery_url() -> None:
@@ -75,4 +107,21 @@ def test_authenticate_for_cli_oidc_requires_discovery_url() -> None:
     )
 
     with pytest.raises(RuntimeError, match="discovery URL"):
+        authenticate_for_cli(idp_info)
+
+
+def test_authenticate_for_cli_oidc_requires_expected_issuer() -> None:
+    """OIDC IDPs without an expected issuer fail before network access."""
+    idp_info = IdpInfo(
+        key="srcnet",
+        name="SKA Regional Centre Network",
+        auth_mode="oidc",
+        registry_url=AnyHttpUrl("https://spsrc27.iaa.csic.es/reg/resource-caps"),
+        oidc_discovery_url=AnyHttpUrl(
+            "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
+        ),
+        oidc_issuer=None,
+    )
+
+    with pytest.raises(RuntimeError, match="issuer"):
         authenticate_for_cli(idp_info)

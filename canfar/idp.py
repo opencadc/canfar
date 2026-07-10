@@ -21,6 +21,7 @@ class IdpInfo(BaseModel):
         registry_name: Registry display name used for server discovery.
         dev_registries: Development registry resource-caps URLs keyed by URL.
         oidc_discovery_url: OIDC discovery URL when ``auth_mode`` is ``oidc``.
+        oidc_issuer: Exact issuer expected from OIDC discovery metadata.
     """
 
     model_config = ConfigDict(extra="forbid", frozen=True)
@@ -42,6 +43,10 @@ class IdpInfo(BaseModel):
     oidc_discovery_url: AnyHttpUrl | None = Field(
         default=None,
         description="OIDC discovery URL for interactive CLI login.",
+    )
+    oidc_issuer: AnyHttpUrl | None = Field(
+        default=None,
+        description="Exact issuer expected from OIDC discovery metadata.",
     )
 
 
@@ -69,6 +74,7 @@ _BUILTIN_IDPS: dict[str, IdpInfo] = {
         oidc_discovery_url=AnyHttpUrl(
             "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
         ),
+        oidc_issuer=AnyHttpUrl("https://ska-iam.stfc.ac.uk/"),
     ),
 }
 
