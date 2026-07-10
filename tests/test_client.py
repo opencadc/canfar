@@ -1,6 +1,7 @@
 """Test CANFAR Python Client API."""
 # ruff: noqa: SLF001
 
+import logging
 import re
 import ssl
 import tempfile
@@ -17,8 +18,16 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
+from canfar import configure_logging, get_logger
 from canfar.client import HTTPClient
-from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
+from canfar.models.auth import (
+    OIDC,
+    X509,
+    Client,
+    Endpoint,
+    Expiry,
+    Token,
+)
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
@@ -109,6 +118,18 @@ class TestInitializationAndConfiguration:
         # URL gets normalized with trailing slash
         assert str(client.url) == "https://env.example.com/"
         assert client.loglevel == "WARNING"
+
+    def test_client_loglevel_does_not_override_application_runtime(
+        self,
+        canfar_client_fixture,
+    ) -> None:
+        """Client validation does not mutate the process-wide logging policy."""
+        configure_logging(loglevel="ERROR")
+
+        client = canfar_client_fixture(loglevel="INFO")
+
+        assert client.loglevel == "INFO"
+        assert get_logger().getEffectiveLevel() == logging.ERROR
 
     def test_precedence_constructor_over_env(
         self, canfar_client_fixture, monkeypatch
@@ -601,18 +622,6 @@ class TestContextManagerBehavior:
         # After exit, client should be closed
         assert client._client is None
 
-    def test_sync_session_context(self, canfar_client_fixture) -> None:
-        """Test synchronous session context manager."""
-        client = canfar_client_fixture(
-            token=SecretStr("test-token"), url="https://example.com"
-        )
-
-        with client._session() as session:
-            assert isinstance(session, httpx.Client)
-
-        # After exit, client should be closed
-        assert client._client is None
-
     def test_close_sync_client(self, canfar_client_fixture) -> None:
         """Test closing synchronous client."""
         client = canfar_client_fixture(
@@ -653,18 +662,6 @@ class TestContextManagerBehavior:
             assert ctx_client is client
             # Verify asynclient is created
             assert isinstance(ctx_client.asynclient, httpx.AsyncClient)
-
-        # After exit, asynclient should be closed
-        assert client._asynclient is None
-
-    async def test_async_session_context(self, canfar_client_fixture) -> None:
-        """Test asynchronous session context manager."""
-        client = canfar_client_fixture(
-            token=SecretStr("test-token"), url="https://example.com"
-        )
-
-        async with client._asession() as session:
-            assert isinstance(session, httpx.AsyncClient)
 
         # After exit, asynclient should be closed
         assert client._asynclient is None

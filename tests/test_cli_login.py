@@ -127,8 +127,8 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
 
     assert result.exit_code == 0
-    assert "canfar auth login will be removed soon" in result.stdout
-    assert "canfar login" in result.stdout
+    assert "canfar auth login will be removed soon" in result.stderr
+    assert "canfar login" in result.stderr
     with (
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
@@ -293,4 +293,4 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
         result = runner.invoke(cli, ["login", "cadc"])
 
     assert result.exit_code == 1
-    assert "already exists" in result.stdout
+    assert "already exists" in result.stderr

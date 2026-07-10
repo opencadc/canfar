@@ -9,7 +9,7 @@ from pydantic import SecretStr
 
 from canfar.client import HTTPClient
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
-from canfar.models.auth import OIDC, X509
+from canfar.models.auth import OIDC, X509, OIDCCredential
 from canfar.models.http import Server
 from tests.helpers.config import configuration_from_legacy_context
 from tests.test_auth_x509 import generate_cert
@@ -111,7 +111,19 @@ class TestSyncHook:
     @patch("canfar.auth.oidc.sync_refresh")
     def test_skip_if_token_not_expired(self, mock_refresh, oidc_client) -> None:
         """Verify the hook does nothing if the access token is not expired."""
-        oidc_client.config.context.expiry.access = time.time() + 3600  # Make it valid
+        credential = oidc_client.config.get_credential(
+            oidc_client.config.active.authentication
+        )
+        assert isinstance(credential, OIDCCredential)
+        oidc_client.config.update_credential(
+            credential.model_copy(
+                update={
+                    "expiry": credential.expiry.model_copy(
+                        update={"access": time.time() + 3600}
+                    )
+                }
+            )
+        )
         hook_func = refresh(oidc_client)
         request = httpx.Request("GET", "/")
 
@@ -225,25 +237,12 @@ class TestSyncAsyncParity:
 
     @patch("canfar.auth.oidc.sync_refresh")
     @patch("canfar.auth.oidc.refresh")
-    async def test_ctx_valid_guard_divergence(
+    async def test_invalid_record_skips_sync_and_async_refresh(
         self,
         mock_async_refresh,
         mock_sync_refresh,
     ) -> None:
-        """Pin the documented ctx.valid sync/async divergence.
-
-        The sync ``refresh`` hook short-circuits via ``if not ctx.valid`` when the OIDC
-        context is missing required fields (e.g., no discovery endpoint), so it never
-        calls the underlying network refresh.  The async ``arefresh`` hook has no such
-        guard and proceeds to attempt the token refresh even when ctx.valid is False.
-
-        This is the invariant referenced in AC#2: the two hooks deliberately differ here
-        and that asymmetry must be preserved.
-        """
-        # Build an OIDC context that is:
-        #  - expired (so both hooks reach the ctx.valid / refresh-token guard)
-        #  - ctx.valid == False because the discovery endpoint is absent
-        #  - refresh token and client secret ARE present (so arefresh proceeds to call)
+        """An invalid canonical record is unrefreshable in both request paths."""
         oidc_context = OIDC(
             server=Server(
                 name="TestOIDC", url="https://oidc.example.com", version="v1"
@@ -261,20 +260,10 @@ class TestSyncAsyncParity:
         )
         config = configuration_from_legacy_context("TestOIDC", oidc_context)
         client = HTTPClient(config=config)
-        # Mock httpx clients so header updates don't error
-        client._client = Mock(spec=httpx.Client, headers={})  # noqa: SLF001
-        client._asynclient = Mock(spec=httpx.AsyncClient, headers={})  # noqa: SLF001
         request = httpx.Request("GET", "/")
 
-        # Sync hook: exits early at the ctx.valid guard — sync_refresh never called
         refresh(client)(request)
         mock_sync_refresh.assert_not_called()
 
-        # Async hook: no ctx.valid guard — proceeds and calls oidc.refresh
-        mock_async_refresh.return_value = SecretStr("new-token")
-        with (
-            patch("canfar.models.config.Configuration.save"),
-            patch("canfar.utils.jwt.expiry", return_value=time.time() + 3600),
-        ):
-            await arefresh(client)(request)
-        mock_async_refresh.assert_called_once()
+        await arefresh(client)(request)
+        mock_async_refresh.assert_not_called()

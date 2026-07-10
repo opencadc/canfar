@@ -32,17 +32,17 @@ def _check_expiry(client: HTTPClient) -> None:
         )
         return
 
+    credential = client.authentication_record
+    if credential is None:
+        return
+
     try:
-        expired = client.config.context.expired
+        expired = credential.expired
     except x509.CertificateError as err:
-        raise AuthExpiredError(
-            context=client.config.context.mode, reason=str(err)
-        ) from err
+        raise AuthExpiredError(context=credential.mode, reason=str(err)) from err
 
     if expired:
-        raise AuthExpiredError(
-            context=client.config.context.mode, reason="auth expired"
-        )
+        raise AuthExpiredError(context=credential.mode, reason="auth expired")
 
 
 def check(client: HTTPClient) -> Callable[[httpx.Request], None]:

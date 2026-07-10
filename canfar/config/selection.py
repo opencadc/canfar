@@ -8,7 +8,6 @@ from canfar.models.config_compat import (
     AuthContext,
     LegacyContextsMapping,
     credential_to_legacy_context,
-    legacy_context_to_credential,
 )
 
 if TYPE_CHECKING:
@@ -96,29 +95,13 @@ def get_remembered_server_for_idp(config: Configuration, idp: str) -> Server | N
 
 
 def upsert_server(config: Configuration, server: Server) -> None:
-    """Insert or replace a server record keyed by Server Name."""
-    if server.name is None:
-        return
-    config.servers[server.name] = server
+    """Compatibility wrapper for Configuration-owned Server mutation."""
+    config.upsert_server(server)
 
 
 def set_active_selection(config: Configuration, idp: str, server: Server) -> None:
-    """Persist ``idp`` and ``server`` as the active Authentication/Server pair."""
-    if server.name is None:
-        msg = "Server name is required for active selection."
-        raise ValueError(msg)
-
-    selected = server.model_copy(update={"idp": idp}, deep=True)
-    upsert_server(config, selected)
-    selections = server_selection_history(config)
-    selections[idp] = server.name
-    config.active = config.active.model_copy(
-        update={
-            "authentication": idp,
-            "server": server.name,
-            "servers": selections,
-        },
-    )
+    """Compatibility wrapper for Configuration-owned Server Selection."""
+    config.set_active_selection(idp, server)
 
 
 def with_active_selection(
@@ -127,9 +110,7 @@ def with_active_selection(
     server: Server,
 ) -> Configuration:
     """Return a copy using ``idp`` and ``server`` as the active pair."""
-    selected_config = config.model_copy(deep=True)
-    set_active_selection(selected_config, idp, server)
-    return selected_config
+    return config.with_active_selection(idp, server)
 
 
 def active_context(config: Configuration) -> AuthContext:
@@ -148,8 +129,5 @@ def legacy_contexts(config: Configuration) -> LegacyContextsMapping:
 
 
 def set_legacy_context(config: Configuration, idp: str, context: AuthContext) -> None:
-    """Update saved authentication and optional server from a legacy context."""
-    config.authentication[idp] = legacy_context_to_credential(context, idp)
-
-    if context.server is not None:
-        upsert_server(config, context.server.model_copy(update={"idp": idp}))
+    """Compatibility wrapper for Configuration-owned legacy context mutation."""
+    config.set_legacy_context(idp, context)

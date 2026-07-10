@@ -29,14 +29,14 @@ Note:
 
 from __future__ import annotations
 
-import time
-from typing import TYPE_CHECKING, Callable
+import asyncio
+from typing import TYPE_CHECKING, Callable, cast
 
 from pydantic import SecretStr
 
 from canfar import get_logger
 from canfar.auth import oidc
-from canfar.models.auth import OIDC
+from canfar.models.auth import OIDCCredential
 from canfar.utils import jwt
 
 if TYPE_CHECKING:
@@ -53,9 +53,46 @@ class AuthenticationError(Exception):
     """Exception raised when authentication refresh fails."""
 
 
+def _get_oidc_credential(client: HTTPClient) -> OIDCCredential | None:
+    """Return the selected canonical OIDC record unless runtime auth wins."""
+    if client.uses_runtime_credentials:
+        return None
+    credential = client.authentication_record
+    return credential if isinstance(credential, OIDCCredential) else None
+
+
+def _apply_access_header(
+    token: SecretStr,
+    httpx_client_headers: MutableMapping[str, str],
+    request: httpx.Request,
+) -> None:
+    """Apply one access token to the active client and outgoing request."""
+    header = f"Bearer {token.get_secret_value()}"
+    httpx_client_headers["Authorization"] = header
+    request.headers["Authorization"] = header
+
+
+def _refresh_parameters(
+    credential: OIDCCredential,
+) -> tuple[str, str, str, str] | None:
+    """Return complete refresh inputs when the record is eligible."""
+    if not credential.refreshable:
+        return None
+    token_url = cast("str", credential.endpoints.token)
+    identity = cast("str", credential.client.identity)
+    client_secret = cast("SecretStr", credential.client.secret)
+    refresh_token = cast("SecretStr", credential.token.refresh)
+    return (
+        token_url,
+        identity,
+        client_secret.get_secret_value(),
+        refresh_token.get_secret_value(),
+    )
+
+
 def _apply_refreshed_token(
     client: HTTPClient,
-    ctx: OIDC,
+    credential: OIDCCredential,
     token: SecretStr,
     httpx_client_headers: MutableMapping[str, str],
     request: httpx.Request,
@@ -69,28 +106,28 @@ def _apply_refreshed_token(
 
     Args:
         client: The CANFAR HTTPClient whose config is updated.
-        ctx: The current OIDC Authentication Record.
+        credential: The current OIDC Authentication Record.
         token: The new access token returned by the OIDC provider.
         httpx_client_headers: The header mapping of the underlying httpx client.
         request: The outgoing httpx request whose Authorization header is updated.
     """
     access_value = token.get_secret_value()
-    new_context = ctx.model_copy(
+    updated = credential.model_copy(
         update={
-            "token": ctx.token.model_copy(update={"access": SecretStr(access_value)}),
-            "expiry": ctx.expiry.model_copy(
+            "token": credential.token.model_copy(
+                update={"access": SecretStr(access_value)}
+            ),
+            "expiry": credential.expiry.model_copy(
                 update={"access": jwt.expiry(access_value)}
             ),
         }
     )
 
-    client.config.contexts[client.config.active.authentication] = new_context
+    client.config.update_credential(updated)
     client.config.save()
     log.debug("Authentication refreshed and configuration saved.")
 
-    header = f"Bearer {access_value}"
-    httpx_client_headers["Authorization"] = header
-    request.headers["Authorization"] = header
+    _apply_access_header(token, httpx_client_headers, request)
     log.debug("HTTP request headers updated with new token.")
     log.info("OIDC Access Token Refreshed.")
 
@@ -111,44 +148,44 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        ctx = client.config.context
-        if not isinstance(ctx, OIDC):
-            log.debug("Skipping auth refresh for non-OIDC context.")
+        credential = _get_oidc_credential(client)
+        if credential is None:
+            log.debug("Skipping auth refresh without a saved OIDC record.")
             return
 
         # Skip if the access token is not expired
-        if not ctx.expired:
+        if not credential.expired:
+            if credential.token.access is not None:
+                _apply_access_header(
+                    credential.token.access,
+                    client.client.headers,
+                    request,
+                )
             log.debug("Skipping auth refresh, access token is not expired.")
             return
 
-        if not ctx.valid:
-            log.warning("OIDC context is not valid.")
+        parameters = _refresh_parameters(credential)
+        if parameters is None:
+            log.warning("OIDC Authentication Record cannot be refreshed.")
             return
-
-        refresh = ctx.token.refresh
-        if (
-            refresh is None
-            or not refresh.get_secret_value()
-            or (ctx.expiry.refresh and ctx.expiry.refresh < time.time())
-        ):
-            log.warning("OIDC refresh token is missing or expired.")
-            return
-
-        client_secret = ctx.client.secret
-        if client_secret is None:
-            log.warning("OIDC client secret is missing.")
-            return
+        token_url, identity, client_secret, refresh_token = parameters
 
         try:
             log.debug("Starting synchronous OIDC token refresh.")
             token: SecretStr = oidc.sync_refresh(
-                url=str(ctx.endpoints.token),
-                identity=str(ctx.client.identity),
-                secret=client_secret.get_secret_value(),
-                token=refresh.get_secret_value(),
+                url=token_url,
+                identity=identity,
+                secret=client_secret,
+                token=refresh_token,
             )
             log.debug("Synchronous OIDC token refresh successful.")
-            _apply_refreshed_token(client, ctx, token, client.client.headers, request)
+            _apply_refreshed_token(
+                client,
+                credential,
+                token,
+                client.client.headers,
+                request,
+            )
 
         except Exception as err:
             msg = f"Failed to refresh OIDC token: {err}"
@@ -161,16 +198,13 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
 def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     """Create an asynchronous authentication refresh hook for httpx clients.
 
-    Note: the ``ctx.valid`` guard present in the synchronous ``refresh`` hook
-    is intentionally absent here to preserve the existing async behavior.
-    Aligning them would be a behavior change outside this task's scope.
-
     Args:
         client (HTTPClient): The HTTPClient instance.
 
     Returns:
         Callable[[httpx.Request], Awaitable[None]]: The async auth hook.
     """
+    lock = asyncio.Lock()
 
     async def ahook(request: httpx.Request) -> None:
         """Asynchronous refresh hook for httpx clients.
@@ -178,44 +212,47 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        ctx = client.config.context
-        if not isinstance(ctx, OIDC):
-            log.debug("Skipping auth refresh for non-OIDC context.")
-            return
+        async with lock:
+            credential = _get_oidc_credential(client)
+            if credential is None:
+                log.debug("Skipping auth refresh without a saved OIDC record.")
+                return
 
-        if not ctx.expired:
-            return
+            if not credential.expired:
+                if credential.token.access is not None:
+                    _apply_access_header(
+                        credential.token.access,
+                        client.asynclient.headers,
+                        request,
+                    )
+                return
 
-        refresh = ctx.token.refresh
-        if (
-            refresh is None
-            or not refresh.get_secret_value()
-            or (ctx.expiry.refresh and ctx.expiry.refresh < time.time())
-        ):
-            log.warning("OIDC refresh token is missing or expired.")
-            return
+            parameters = _refresh_parameters(credential)
+            if parameters is None:
+                log.warning("OIDC Authentication Record cannot be refreshed.")
+                return
+            token_url, identity, client_secret, refresh_token = parameters
 
-        client_secret = ctx.client.secret
-        if client_secret is None:
-            log.warning("OIDC client secret is missing.")
-            return
+            try:
+                log.debug("Starting asynchronous OIDC token refresh.")
+                token: SecretStr = await oidc.refresh(
+                    url=token_url,
+                    identity=identity,
+                    secret=client_secret,
+                    token=refresh_token,
+                )
+                log.debug("Asynchronous OIDC token refresh successful.")
+                _apply_refreshed_token(
+                    client,
+                    credential,
+                    token,
+                    client.asynclient.headers,
+                    request,
+                )
 
-        try:
-            log.debug("Starting asynchronous OIDC token refresh.")
-            token: SecretStr = await oidc.refresh(
-                url=str(ctx.endpoints.token),
-                identity=str(ctx.client.identity),
-                secret=client_secret.get_secret_value(),
-                token=refresh.get_secret_value(),
-            )
-            log.debug("Asynchronous OIDC token refresh successful.")
-            _apply_refreshed_token(
-                client, ctx, token, client.asynclient.headers, request
-            )
-
-        except Exception as err:
-            msg = f"Failed to refresh OIDC token: {err}"
-            log.exception(msg)
-            raise AuthenticationError(msg) from err
+            except Exception as err:
+                msg = f"Failed to refresh OIDC token: {err}"
+                log.exception(msg)
+                raise AuthenticationError(msg) from err
 
     return ahook

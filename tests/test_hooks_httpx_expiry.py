@@ -25,7 +25,7 @@ class TestCheck:
         """Test check hook with valid (non-expired) context."""
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
-        mock_client.config.context.expired = False
+        mock_client.authentication_record.expired = False
 
         hook_func = check(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -36,8 +36,8 @@ class TestCheck:
         """Test check hook with expired context (covers line 36)."""
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
-        mock_client.config.context.expired = True
-        mock_client.config.context.mode = "OIDC"
+        mock_client.authentication_record.expired = True
+        mock_client.authentication_record.mode = "OIDC"
 
         hook_func = check(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -88,7 +88,7 @@ class TestCheck:
 
         hook = check(
             SimpleNamespace(
-                config=SimpleNamespace(context=Context()),
+                authentication_record=Context(),
                 uses_runtime_credentials=False,
             )
         )
@@ -145,7 +145,7 @@ class TestACheck:
         """Test acheck hook with valid (non-expired) context."""
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
-        mock_client.config.context.expired = False
+        mock_client.authentication_record.expired = False
 
         hook_func = acheck(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -157,8 +157,8 @@ class TestACheck:
         """Test acheck hook with expired context (covers line 62)."""
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
-        mock_client.config.context.expired = True
-        mock_client.config.context.mode = "X509"
+        mock_client.authentication_record.expired = True
+        mock_client.authentication_record.mode = "X509"
 
         hook_func = acheck(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -211,7 +211,7 @@ class TestACheck:
 
         hook = acheck(
             SimpleNamespace(
-                config=SimpleNamespace(context=Context()),
+                authentication_record=Context(),
                 uses_runtime_credentials=False,
             )
         )
@@ -233,7 +233,7 @@ class TestACheck:
 
         hook = acheck(
             SimpleNamespace(
-                config=SimpleNamespace(context=Context()),
+                authentication_record=Context(),
                 uses_runtime_credentials=False,
             )
         )
@@ -291,7 +291,7 @@ class TestSyncAsyncParity:
         """The check and acheck factories return independent callables."""
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
-        mock_client.config.context.expired = False
+        mock_client.authentication_record.expired = False
 
         hook_sync = check(mock_client)
         hook_async = acheck(mock_client)
@@ -310,7 +310,7 @@ class TestSyncAsyncParity:
 
         def _ns() -> Any:
             return SimpleNamespace(
-                config=SimpleNamespace(context=Context()),
+                authentication_record=Context(),
                 uses_runtime_credentials=False,
             )
 

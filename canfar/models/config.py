@@ -16,6 +16,8 @@ from pydantic import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Iterable
+
     from pydantic.fields import FieldInfo
 
 from pydantic_settings import (
@@ -41,13 +43,13 @@ from canfar.config.selection import legacy_contexts as _legacy_contexts
 from canfar.config.selection import (
     server_selection_history as _server_selection_history,
 )
-from canfar.config.selection import set_active_selection as _set_active_selection
-from canfar.config.selection import set_legacy_context as _set_legacy_context
-from canfar.config.selection import upsert_server as _upsert_server
-from canfar.config.selection import with_active_selection as _with_active_selection
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import AuthenticationCredential, X509Credential
-from canfar.models.config_compat import AuthContext, LegacyContextsMapping
+from canfar.models.config_compat import (
+    AuthContext,
+    LegacyContextsMapping,
+    legacy_context_to_credential,
+)
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
 
@@ -273,6 +275,33 @@ class Configuration(BaseSettings):
 
         save_config(self)
 
+    def _replace_state(
+        self,
+        *,
+        active: ActiveConfig | None = None,
+        authentication: dict[str, AuthenticationCredential] | None = None,
+        servers: dict[str, Server] | None = None,
+    ) -> None:
+        """Validate and install a complete Authentication and Server state."""
+        data = {
+            **self.model_dump(mode="python"),
+            "active": self.active if active is None else active,
+            "authentication": (
+                self.authentication if authentication is None else authentication
+            ),
+            "servers": self.servers if servers is None else servers,
+        }
+        # Validate only this candidate; BaseSettings construction would reload and
+        # merge persisted/environment sources, resurrecting keys being removed.
+        candidate = self.__class__.model_construct()
+        self.__class__.__pydantic_validator__.validate_python(
+            data,
+            self_instance=candidate,
+        )
+        self.active = candidate.active
+        self.authentication = candidate.authentication
+        self.servers = candidate.servers
+
     def get_value(self, path: str) -> Any:
         """Get a nested configuration value via dotted path (e.g. 'console.width')."""
         return _get_value(self, path)
@@ -294,6 +323,98 @@ class Configuration(BaseSettings):
             KeyError: If no credential exists for ``idp``.
         """
         return _get_credential(self, idp)
+
+    def upsert_credential(self, credential: AuthenticationCredential) -> None:
+        """Insert or replace a validated Authentication Record.
+
+        Args:
+            credential: Authentication Record to store by its IDP key.
+        """
+        self._replace_state(
+            authentication={**self.authentication, credential.idp: credential},
+        )
+
+    def update_credential(self, credential: AuthenticationCredential) -> None:
+        """Replace an existing validated Authentication Record.
+
+        Raises:
+            KeyError: If no Authentication Record exists for the credential IDP.
+        """
+        self.get_credential(credential.idp)
+        self.upsert_credential(credential)
+
+    def set_active_authentication(self, idp: str) -> None:
+        """Select an Authentication Record and its remembered Server, if any."""
+        self.get_credential(idp)
+        remembered = self.get_remembered_server_for_idp(idp)
+        if remembered is not None:
+            self.set_active_selection(idp, remembered)
+            return
+
+        selections = self._server_selection_history()
+        server_name = self.active.server
+        if server_name is not None:
+            try:
+                active_server = self.get_active_server()
+            except KeyError:
+                server_name = None
+            else:
+                if active_server.idp != idp:
+                    server_name = None
+        self._replace_state(
+            active=self.active.model_copy(
+                update={
+                    "authentication": idp,
+                    "server": server_name,
+                    "servers": selections,
+                },
+            ),
+        )
+
+    def remove_authentication(self, idp: str) -> None:
+        """Remove an Authentication Record and its Science Platform Servers."""
+        authentication = dict(self.authentication)
+        authentication.pop(idp, None)
+        servers = {
+            name: server for name, server in self.servers.items() if server.idp != idp
+        }
+        selections = {
+            selected_idp: name
+            for selected_idp, name in self.active.servers.items()
+            if selected_idp != idp
+        }
+
+        if not authentication:
+            self.purge_authentication()
+            return
+
+        active = self.active.model_copy(update={"servers": selections})
+        if active.authentication == idp:
+            active = active.model_copy(
+                update={
+                    "authentication": next(iter(authentication)),
+                    "server": None,
+                },
+            )
+        self._replace_state(
+            active=active,
+            authentication=authentication,
+            servers=servers,
+        )
+
+    def purge_authentication(self) -> None:
+        """Reset Authentication and Server state while preserving other settings."""
+        self._replace_state(
+            active=default_active.model_copy(deep=True),
+            authentication={
+                key: credential.model_copy(deep=True)
+                for key, credential in default_authentication.items()
+            },
+            servers={
+                name: server.model_copy(deep=True)
+                for name, server in default_servers.items()
+            },
+        )
 
     def get_server_by_uri(self, uri: str | AnyUrl) -> Server:
         """Return a known server by IVOA URI.
@@ -360,23 +481,28 @@ class Configuration(BaseSettings):
         Raises:
             ValueError: If the server has no Server Name.
         """
-        _set_active_selection(self, idp, server)
+        if server.name is None:
+            msg = "Server name is required for active selection."
+            raise ValueError(msg)
+
+        selected = server.model_copy(update={"idp": idp}, deep=True)
+        servers = {**self.servers, server.name: selected}
+        selections = self._server_selection_history()
+        selections[idp] = server.name
+        active = self.active.model_copy(
+            update={
+                "authentication": idp,
+                "server": server.name,
+                "servers": selections,
+            },
+        )
+        self._replace_state(active=active, servers=servers)
 
     def with_active_selection(self, idp: str, server: Server) -> Configuration:
-        """Return a copy using ``idp`` and ``server`` as the active pair.
-
-        Args:
-            idp: Canonical identity provider key.
-            server: Server record to use for active server resolution.
-
-        Returns:
-            Configuration: Deep copy with the candidate Authentication and
-            Server Selection installed.
-
-        Raises:
-            ValueError: If the server has no Server Name.
-        """
-        return _with_active_selection(self, idp, server)
+        """Return a copy using ``idp`` and ``server`` as the active pair."""
+        selected = self.model_copy(deep=True)
+        selected.set_active_selection(idp, server)
+        return selected
 
     @property
     def context(self) -> AuthContext:
@@ -393,17 +519,35 @@ class Configuration(BaseSettings):
         return _legacy_contexts(self)
 
     def set_legacy_context(self, idp: str, context: AuthContext) -> None:
-        """Update saved authentication (and optional server) from legacy context.
+        """Insert or replace authentication from a legacy context assignment.
 
         Args:
             idp: Canonical identity provider key.
             context: Legacy ``AuthContext`` view to persist.
         """
-        _set_legacy_context(self, idp, context)
+        authentication = {
+            **self.authentication,
+            idp: legacy_context_to_credential(context, idp),
+        }
+        servers = dict(self.servers)
+        if context.server is not None and context.server.name is not None:
+            servers[context.server.name] = context.server.model_copy(
+                update={"idp": idp},
+                deep=True,
+            )
+        self._replace_state(authentication=authentication, servers=servers)
 
-    def _upsert_server(self, server: Server) -> None:
-        """Insert or replace a server record keyed by Server Name."""
-        _upsert_server(self, server)
+    def upsert_server(self, server: Server) -> None:
+        """Insert or replace a validated server record keyed by Server Name."""
+        self.upsert_servers((server,))
+
+    def upsert_servers(self, servers: Iterable[Server]) -> None:
+        """Insert or replace validated server records in one state change."""
+        updated = dict(self.servers)
+        for server in servers:
+            if server.name is not None:
+                updated[server.name] = server
+        self._replace_state(servers=updated)
 
 
 __all__ = ["CONFIG_PATH", "AuthContext", "Configuration", "ConsoleConfig"]

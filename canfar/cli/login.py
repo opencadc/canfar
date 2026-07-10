@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated
+from typing import Annotated
 
 import typer
 
@@ -20,10 +20,7 @@ from canfar.server import (
     activate,
     discover,
 )
-from canfar.utils.console import console
-
-if TYPE_CHECKING:
-    from canfar.models.auth import AuthenticationCredential
+from canfar.utils.console import get_console
 
 log = get_logger(__name__)
 
@@ -46,19 +43,6 @@ def _authentication_exists_on_disk(idp: str) -> bool:
     return idp in config.authentication
 
 
-def _upsert_credential(
-    config: Configuration,
-    credential: AuthenticationCredential,
-) -> None:
-    """Insert or replace an authentication credential on ``config``.
-
-    Args:
-        config: Configuration being updated in memory.
-        credential: Authentication credential to persist on save.
-    """
-    config.authentication[credential.idp] = credential
-
-
 def _login_flow(
     idp: str,
     *,
@@ -78,7 +62,7 @@ def _login_flow(
         timeout: HTTP timeout in seconds for login HTTP requests.
     """
     if _authentication_exists_on_disk(idp) and not force:
-        console.print(
+        get_console(stderr=True).print(
             f"[yellow]Authentication for '{idp}' already exists. "
             "Use --force to re-authenticate.[/yellow]"
         )
@@ -88,11 +72,11 @@ def _login_flow(
     try:
         credential = authenticate_for_cli(idp_info, timeout=timeout)
     except (ValueError, RuntimeError) as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
+        get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
     config = Configuration()  # ty: ignore[missing-argument]
-    _upsert_credential(config, credential)
+    config.upsert_credential(credential)
 
     try:
         servers = discover(
@@ -103,27 +87,31 @@ def _login_flow(
             save=False,
         )
     except ServerDiscoveryError as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
+        get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
     if not servers:
-        console.print(f"[bold red]No servers discovered for IDP '{idp}'.[/bold red]")
+        get_console(stderr=True).print(
+            f"[bold red]No servers discovered for IDP '{idp}'.[/bold red]"
+        )
         raise typer.Exit(1)
 
     selected = servers[0] if len(servers) == 1 else select_server(servers)
 
     if selected.uri is None:
-        console.print("[bold red]Selected server has no URI.[/bold red]")
+        get_console(stderr=True).print(
+            "[bold red]Selected server has no URI.[/bold red]"
+        )
         raise typer.Exit(1)
 
     selector = str(selected.uri)
     try:
         activate(idp, selector, config=config, dev=dev, timeout=timeout)
     except (ServerFetchError, ServerSelectorError) as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
+        get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    console.print("[green]✓[/green] Login completed successfully")
+    get_console().print("[green]✓[/green] Login completed successfully")
 
 
 def register_login_command(app: typer.Typer) -> None:
@@ -171,7 +159,7 @@ def register_login_command(app: typer.Typer) -> None:
         try:
             get_idp(selected_idp)
         except KeyError as exc:
-            console.print(f"[bold red]{exc}[/bold red]")
+            get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
             raise typer.Exit(1) from exc
 
         _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)
