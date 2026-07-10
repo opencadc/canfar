@@ -292,6 +292,64 @@ class TestConfigurationSerialization:
             config.save()
         assert nested_path.exists()
 
+    def test_failed_serialization_preserves_existing_configuration(
+        self, tmp_path: Path
+    ) -> None:
+        """A failed save cannot truncate the last valid configuration."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+        original = b"version: 1\nmarker: keep-me\n"
+        config_path.write_bytes(original)
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar.config.store.yaml.dump",
+                side_effect=TypeError("cannot serialize"),
+            ),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert config_path.read_bytes() == original
+
+    def test_failed_replacement_preserves_existing_configuration(
+        self, tmp_path: Path
+    ) -> None:
+        """A failed atomic replacement leaves no partial configuration behind."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+        original = b"version: 1\nmarker: keep-me\n"
+        config_path.write_bytes(original)
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar.config.store.Path.replace",
+                side_effect=OSError("cannot replace"),
+            ),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert config_path.read_bytes() == original
+        assert set(tmp_path.iterdir()) == {config_path}
+
+    def test_failed_first_write_leaves_no_configuration(self, tmp_path: Path) -> None:
+        """A failed first save leaves neither a target nor temporary file."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.config.store.os.fsync", side_effect=OSError("disk full")),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert not config_path.exists()
+        assert list(tmp_path.iterdir()) == []
+
     def test_yaml_file_content_structure(self, tmp_path: Path) -> None:
         """Saved YAML uses current top-level keys."""
         temp_config_path = tmp_path / "config.yaml"
