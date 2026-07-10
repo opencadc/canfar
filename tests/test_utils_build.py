@@ -160,3 +160,23 @@ class TestCreateParameters:
             assert env_vars["FOO"] == "BAR"
             assert env_vars["REPLICA_ID"] == str(i + 1)
             assert env_vars["REPLICA_COUNT"] == "2"
+
+    def test_create_parameters_preserves_field_and_environment_order(self) -> None:
+        """Keep the form tuple order stable for repeated environment fields."""
+        assert create_parameters(
+            name="session",
+            image="custom/image:latest",
+            cores=2,
+            env={"A": "1", "B": "2"},
+        ) == [
+            [
+                ("name", "session"),
+                ("image", "images.canfar.net/custom/image:latest"),
+                ("cores", 2),
+                ("type", "headless"),
+                ("env", "A=1"),
+                ("env", "B=2"),
+                ("env", "REPLICA_ID=1"),
+                ("env", "REPLICA_COUNT=1"),
+            ]
+        ]

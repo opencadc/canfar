@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from canfar.models.session import CreateRequest, FetchRequest
-from canfar.utils import convert
 
 if TYPE_CHECKING:
     from canfar.models.types import Kind, Status, View
@@ -87,6 +86,11 @@ def create_parameters(
             data["name"] = name + "-" + str(replica + 1)
         data["env"]["REPLICA_ID"] = str(replica + 1)
         data["env"]["REPLICA_COUNT"] = str(replicas)
-        payload = convert.dict_to_tuples(data)
+        payload = []
+        for key, value in data.items():
+            if isinstance(value, dict):
+                payload.extend((key, f"{k}={v}") for k, v in value.items())
+            else:
+                payload.append((key, value))
         payloads.append(payload)
     return payloads

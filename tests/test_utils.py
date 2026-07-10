@@ -8,38 +8,7 @@ import pytest
 import questionary
 
 from canfar.models.registry import Server, ServerResults
-from canfar.utils.convert import dict_to_tuples
 from canfar.utils.display import configure_server_choices, servers
-
-
-# Tests for convert module
-def test_dict_to_tuples_empty() -> None:
-    assert dict_to_tuples({}) == []
-
-
-def test_dict_to_tuples_simple() -> None:
-    assert dict_to_tuples({"a": 1, "b": 2}) == [("a", 1), ("b", 2)]
-
-
-def test_dict_to_tuples_nested() -> None:
-    assert dict_to_tuples({"a": {"x": 1, "y": 2}, "b": 3}) == [
-        ("a", "x=1"),
-        ("a", "y=2"),
-        ("b", 3),
-    ]
-
-
-def test_dict_to_tuples_mixed() -> None:
-    assert dict_to_tuples({"a": 1, "b": {"x": 2}, "c": {"y": 3, "z": 4}}) == [
-        ("a", 1),
-        ("b", "x=2"),
-        ("c", "y=3"),
-        ("c", "z=4"),
-    ]
-
-
-def test_dict_to_tuples_non_string_keys() -> None:
-    assert dict_to_tuples({1: "a", 2: {"x": "b"}}) == [(1, "a"), (2, "x=b")]
 
 
 # Tests for display module
