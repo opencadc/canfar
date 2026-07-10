@@ -104,15 +104,6 @@ def set_active_selection(config: Configuration, idp: str, server: Server) -> Non
     config.set_active_selection(idp, server)
 
 
-def with_active_selection(
-    config: Configuration,
-    idp: str,
-    server: Server,
-) -> Configuration:
-    """Return a copy using ``idp`` and ``server`` as the active pair."""
-    return config.with_active_selection(idp, server)
-
-
 def active_context(config: Configuration) -> AuthContext:
     """Return the active Authentication as a legacy ``AuthContext`` view."""
     credential = get_credential(config, config.active.authentication)

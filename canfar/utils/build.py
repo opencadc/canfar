@@ -34,8 +34,8 @@ def fetch_parameters(
 
 
 def create_parameters(
-    name: str,
-    image: str,
+    name: str | CreateRequest,
+    image: str | None = None,
     cores: int | None = None,
     ram: int | None = None,
     kind: Kind = "headless",
@@ -48,8 +48,8 @@ def create_parameters(
     """Build form-encoded payloads for creating one or more sessions.
 
     Args:
-        name: Base session name (suffixed per replica when ``replicas`` > 1).
-        image: Container image reference.
+        name: Domain request or base session name. Names are suffixed per replica.
+        image: Container image reference when ``name`` is a string.
         cores: CPU core count.
         ram: RAM in gigabytes.
         kind: Session kind.
@@ -62,35 +62,41 @@ def create_parameters(
     Returns:
         list[list[tuple[str, Any]]]: One tuple payload per replica.
     """
-    specification: CreateRequest = CreateRequest(
-        name=name,
-        image=image,
-        cores=cores,
-        ram=ram,
-        kind=kind,
-        gpus=gpu,
-        cmd=cmd,
-        args=args,
-        env=env,
-        replicas=replicas,
-    )
+    if isinstance(name, CreateRequest):
+        specification = name
+    else:
+        if image is None:
+            msg = "image is required when creating a Session from scalar arguments"
+            raise TypeError(msg)
+        specification = CreateRequest(
+            name=name,
+            image=image,
+            cores=cores,
+            ram=ram,
+            kind=kind,
+            gpus=gpu,
+            cmd=cmd,
+            args=args,
+            env=env,
+            replicas=replicas,
+        )
     data: dict[str, Any] = specification.model_dump(exclude_none=True, by_alias=True)
-    payload: list[tuple[str, Any]] = []
+    environment = data.pop("env", {})
     payloads: list[list[tuple[str, Any]]] = []
-    if "env" not in data:
-        data["env"] = {}
-    for replica in range(replicas):
-        if replicas == 1:
-            data["name"] = name
-        else:
-            data["name"] = name + "-" + str(replica + 1)
-        data["env"]["REPLICA_ID"] = str(replica + 1)
-        data["env"]["REPLICA_COUNT"] = str(replicas)
-        payload = []
-        for key, value in data.items():
-            if isinstance(value, dict):
-                payload.extend((key, f"{k}={v}") for k, v in value.items())
-            else:
-                payload.append((key, value))
+    replica_count = specification.replicas
+    for replica in range(replica_count):
+        data["name"] = (
+            specification.name
+            if replica_count == 1
+            else f"{specification.name}-{replica + 1}"
+        )
+        replica_environment = environment | {
+            "REPLICA_ID": str(replica + 1),
+            "REPLICA_COUNT": str(replica_count),
+        }
+        payload = list(data.items())
+        payload.extend(
+            ("env", f"{key}={value}") for key, value in replica_environment.items()
+        )
         payloads.append(payload)
     return payloads

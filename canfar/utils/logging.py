@@ -19,15 +19,22 @@ from __future__ import annotations
 
 import logging
 import logging.handlers
+import os
 import tempfile
 import threading
+from enum import Enum
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
 
 from canfar import CONFIG_DIR, CONFIG_PATH  # noqa: F401
+from canfar.errors import ErrorCode, LoggingEnvironmentError
+
+if TYPE_CHECKING:
+    from logfire import LevelName
 
 LOGFILE_PATH: Path = CONFIG_DIR / "client.log"
 LOG_LEVEL: int = 10
@@ -44,8 +51,83 @@ RICH_FORMAT = "%(message)s"
 MAX_LOGFILE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_LOGFILE_COUNT = 10
 
-# Install rich traceback handling globally for better error display
-install_rich_traceback(show_locals=False, suppress=[])
+LOG_LEVEL_ENV_VAR = "CANFAR_LOGLEVEL"
+
+
+class LoggingLevel(str, Enum):
+    """Logging levels accepted by the CLI and CANFAR environment policy."""
+
+    CRITICAL = "critical"
+    ERROR = "error"
+    WARNING = "warning"
+    INFO = "info"
+    DEBUG = "debug"
+
+
+DEFAULT_LOG_LEVEL = LoggingLevel.CRITICAL
+VERBOSITY_LEVELS = (
+    LoggingLevel.CRITICAL,
+    LoggingLevel.ERROR,
+    LoggingLevel.WARNING,
+    LoggingLevel.INFO,
+    LoggingLevel.DEBUG,
+)
+_LOGFIRE_LEVELS: dict[LoggingLevel, LevelName] = {
+    LoggingLevel.CRITICAL: "fatal",
+    LoggingLevel.ERROR: "error",
+    LoggingLevel.WARNING: "warning",
+    LoggingLevel.INFO: "info",
+    LoggingLevel.DEBUG: "debug",
+}
+
+
+class InvalidLoggingEnvironmentError(ValueError):
+    """A known CANFAR logging environment variable has an invalid value."""
+
+    def __init__(self, provided_value: str) -> None:
+        expected = [level.value for level in LoggingLevel]
+        self.error = LoggingEnvironmentError(
+            code=ErrorCode.LOGGING_INVALID_ENV_VALUE,
+            message=f"Invalid value for {LOG_LEVEL_ENV_VAR}.",
+            hint=f"Use one of: {', '.join(expected)}.",
+            env_var=LOG_LEVEL_ENV_VAR,
+            provided_value=provided_value,
+            expected=expected,
+        )
+        details = (
+            f"{self.error.code} env_var={self.error.env_var} "
+            f"provided_value={self.error.provided_value} "
+            f"expected={','.join(self.error.expected)}"
+        )
+        super().__init__(details)
+
+
+def _resolve_log_level(
+    loglevel: int | str | LoggingLevel | None,
+    verbosity: int,
+) -> LoggingLevel:
+    """Resolve CLI, environment, and packaged logging-level precedence."""
+    if loglevel is not None:
+        if isinstance(loglevel, LoggingLevel):
+            return loglevel
+        if isinstance(loglevel, int):
+            loglevel = logging.getLevelName(loglevel)
+        try:
+            return LoggingLevel(str(loglevel).lower())
+        except ValueError as err:
+            msg = f"Invalid log level: {loglevel}"
+            raise ValueError(msg) from err
+
+    if verbosity:
+        return VERBOSITY_LEVELS[min(verbosity, len(VERBOSITY_LEVELS) - 1)]
+
+    env_level = os.environ.get(LOG_LEVEL_ENV_VAR)
+    if env_level is None:
+        return DEFAULT_LOG_LEVEL
+    try:
+        return LoggingLevel(env_level.lower())
+    except ValueError as err:
+        raise InvalidLoggingEnvironmentError(env_level) from err
 
 
 class CanfarLogger:
@@ -62,7 +144,6 @@ class CanfarLogger:
     def __init__(self) -> None:
         """Constructor."""
         self._logger: logging.Logger | None = None
-        self._console = Console()
         self._file_handler: logging.handlers.RotatingFileHandler | None = None
 
     @property
@@ -88,6 +169,7 @@ class CanfarLogger:
             filelog (bool, optional): Whether to enable file logging. Defaults to False.
         """
         with _LOCK:
+            install_rich_traceback(show_locals=False, suppress=[])
             if self._configured:
                 # Allow reconfiguration but clean up existing handlers
                 self._cleanup_handlers()
@@ -97,11 +179,9 @@ class CanfarLogger:
             # Configure the main logger
             logger = self.logger
             logger.setLevel(loglevel)
-            # Use provided console or create new one
-            console = self._console
             # Setup Rich console handler
             self._rich_handler = RichHandler(
-                console=console,
+                console=Console(stderr=True),
                 show_path=True,
                 show_time=True,
                 enable_link_path=True,
@@ -220,9 +300,28 @@ _canfar_logger = CanfarLogger()
 
 
 # Convenience functions for easy access
-def configure_logging(loglevel: int | str, filelog: bool = False) -> None:
-    """Configure CANFAR logging. See CanfarLogger.configure for parameters."""
-    _canfar_logger.configure(loglevel=loglevel, filelog=filelog)
+def configure_logging(
+    loglevel: int | str | LoggingLevel | None = None,
+    filelog: bool = False,
+    *,
+    verbosity: int = 0,
+) -> LoggingLevel:
+    """Configure logging explicitly using CLI, environment, and packaged policy."""
+    level = _resolve_log_level(loglevel, verbosity)
+
+    # Logfire is intentionally imported and configured only at this runtime seam.
+    import logfire  # noqa: PLC0415
+
+    logfire.configure(
+        send_to_logfire=False,
+        console=False,
+        metrics=False,
+        inspect_arguments=False,
+        distributed_tracing=False,
+        min_level=_LOGFIRE_LEVELS[level],
+    )
+    _canfar_logger.configure(loglevel=level.value, filelog=filelog)
+    return level
 
 
 def get_logger(name: str | None = None) -> logging.Logger:

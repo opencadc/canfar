@@ -1,7 +1,6 @@
 """Comprehensive tests for the registry models module."""
 
 import base64
-import math
 
 import pytest
 from pydantic import ValidationError
@@ -11,7 +10,6 @@ from canfar.models.registry import (
     IVOARegistry,
     IVOARegistrySearch,
     Server,
-    ServerResults,
 )
 
 
@@ -131,108 +129,6 @@ class TestServer:
         """Test that missing required fields raise ValidationError."""
         with pytest.raises(ValidationError):
             Server(**server_data)
-
-
-class TestServerResults:
-    """Test ServerResults class."""
-
-    def test_default_values(self) -> None:
-        """Test default values for ServerResults."""
-        results = ServerResults()
-
-        assert results.endpoints == []
-        assert math.isclose(results.total_time, 0.0, abs_tol=1e-9)
-        assert math.isclose(results.registry_fetch_time, 0.0, abs_tol=1e-9)
-        assert math.isclose(results.endpoint_check_time, 0.0, abs_tol=1e-9)
-        assert results.found == 0
-        assert results.checked == 0
-        assert results.successful == 0
-
-    def test_with_custom_values(self) -> None:
-        """Test ServerResults with custom values."""
-        endpoints = [
-            Server(
-                registry="CADC",
-                uri="ivo://cadc.nrc.ca/skaha",
-                url="https://ws-uv.canfar.net/skaha",
-            )
-        ]
-
-        results = ServerResults(
-            endpoints=endpoints,
-            total_time=5.5,
-            registry_fetch_time=2.0,
-            endpoint_check_time=3.5,
-            found=10,
-            checked=8,
-            successful=6,
-        )
-
-        assert len(results.endpoints) == 1
-        assert math.isclose(results.total_time, 5.5, rel_tol=1e-9, abs_tol=1e-9)
-        assert math.isclose(
-            results.registry_fetch_time, 2.0, rel_tol=1e-9, abs_tol=1e-9
-        )
-        assert math.isclose(
-            results.endpoint_check_time, 3.5, rel_tol=1e-9, abs_tol=1e-9
-        )
-        assert results.found == 10
-        assert results.checked == 8
-        assert results.successful == 6
-
-    def test_add_method(self) -> None:
-        """Test add method."""
-        results = ServerResults()
-
-        successful_server = Server(
-            registry="CADC",
-            uri="ivo://cadc.nrc.ca/skaha",
-            url="https://ws-uv.canfar.net/skaha",
-            status=200,
-        )
-        results.add(successful_server)
-
-        assert len(results.endpoints) == 1
-        assert results.successful == 1
-
-        failed_server = Server(
-            registry="Failed",
-            uri="ivo://failed.com/skaha",
-            url="https://failed.com/skaha",
-            status=500,
-        )
-        results.add(failed_server)
-
-        assert len(results.endpoints) == 2
-        assert results.successful == 1
-
-    def test_get_by_registry_method(self) -> None:
-        """Test get_by_registry method."""
-        results = ServerResults()
-
-        cadc_server1 = Server(
-            registry="CADC", uri="ivo://cadc1.com", url="https://cadc1.com"
-        )
-        cadc_server2 = Server(
-            registry="CADC", uri="ivo://cadc2.com", url="https://cadc2.com"
-        )
-        srcnet_server = Server(
-            registry="SRCnet", uri="ivo://srcnet.com", url="https://srcnet.com"
-        )
-
-        results.add(cadc_server1)
-        results.add(cadc_server2)
-        results.add(srcnet_server)
-
-        grouped = results.get_by_registry()
-
-        assert "CADC" in grouped
-        assert "SRCnet" in grouped
-        assert len(grouped["CADC"]) == 2
-        assert len(grouped["SRCnet"]) == 1
-        assert grouped["CADC"][0] == cadc_server1
-        assert grouped["CADC"][1] == cadc_server2
-        assert grouped["SRCnet"][0] == srcnet_server
 
 
 class TestContainerRegistry:

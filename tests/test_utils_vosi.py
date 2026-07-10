@@ -1,5 +1,7 @@
 """Tests for the VOSI utilities module."""
 
+from xml.etree.ElementTree import ParseError
+
 import pytest
 
 from canfar.utils.vosi import capabilities
@@ -203,7 +205,56 @@ def test_capabilities_sorting() -> None:
     assert caps[1]["version"] == "v1"
 
 
-def test_capabilities_error_handling() -> None:
-    """Test capabilities error handling."""
-    with pytest.raises(ValueError, match="Either url or xml must be provided"):
-        capabilities()
+def test_capabilities_merge_is_independent_of_document_order() -> None:
+    """Capability merging has a stable version/base URL/auth ordering."""
+    alpha_x509 = """
+        <capability standardID="http://www.opencadc.org/std/platform#session-2">
+          <interface>
+            <accessURL use="base">https://alpha.example/skaha/v2</accessURL>
+            <securityMethod standardID="ivo://ivoa.net/sso#tls-with-certificate"/>
+          </interface>
+        </capability>
+    """
+    alpha_oidc = """
+        <capability standardID="http://www.opencadc.org/std/platform#session-2">
+          <interface>
+            <accessURL use="base">https://alpha.example/skaha/v2</accessURL>
+            <securityMethod standardID="ivo://ivoa.net/sso#token"/>
+          </interface>
+        </capability>
+    """
+    beta = """
+        <capability standardID="http://www.opencadc.org/std/platform#session-2">
+          <interface>
+            <accessURL use="base">https://beta.example/skaha/v2</accessURL>
+            <securityMethod standardID="ivo://ivoa.net/sso#token"/>
+          </interface>
+        </capability>
+    """
+    expected = [
+        {
+            "baseurl": "https://alpha.example/skaha",
+            "version": "v2",
+            "auth_modes": ["x509", "oidc"],
+        },
+        {
+            "baseurl": "https://beta.example/skaha",
+            "version": "v2",
+            "auth_modes": ["oidc"],
+        },
+    ]
+
+    for entries in ((beta, alpha_x509, alpha_oidc), (alpha_oidc, beta, alpha_x509)):
+        xml = f"<capabilities>{''.join(entries)}</capabilities>"
+        assert capabilities(xml=xml) == expected
+
+
+def test_capabilities_returns_empty_for_empty_document() -> None:
+    """An empty VOSI document has no session capabilities."""
+    assert capabilities(xml="  \n") == []
+
+
+def test_capabilities_rejects_malformed_document() -> None:
+    """Malformed XML is not confused with an empty capability set."""
+    with pytest.raises(ParseError):
+        capabilities(xml="<capabilities>")

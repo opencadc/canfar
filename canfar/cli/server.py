@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 import typer
 from rich import box
@@ -12,6 +12,7 @@ from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
 from canfar.cli import output
 from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.server import (
@@ -25,7 +26,10 @@ from canfar.server import (
 from canfar.server import (
     use as server_use,
 )
-from canfar.utils.console import console
+from canfar.utils.console import get_console
+
+if TYPE_CHECKING:
+    from canfar.models.http import Server
 
 server = typer.Typer(
     name="server",
@@ -35,24 +39,10 @@ server = typer.Typer(
 )
 
 
-def _render_server_list_table() -> None:
+def _render_server_list_table(servers: list[Server]) -> None:
     """Render known servers for the active IDP in human mode."""
-    try:
-        auth_show()
-    except AuthenticationError as exc:
-        console.print(f"[bold red]{exc.error.message}[/bold red]")
-        if exc.error.hint:
-            console.print(exc.error.hint)
-        raise typer.Exit(1) from exc
-
-    try:
-        servers = server_list()
-    except ServerDiscoveryError as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
-        raise typer.Exit(1) from exc
-
     if not servers:
-        console.print(
+        get_console(stderr=True).print(
             "[yellow]No compatible servers available for active IDP.[/yellow]"
         )
         return
@@ -70,7 +60,7 @@ def _render_server_list_table() -> None:
             str(item.url) if item.url is not None else "N/A",
             item.version or "N/A",
         )
-    console.print(table)
+    get_console().print(table)
 
 
 @server.command("list, ls")
@@ -85,13 +75,24 @@ def server_list_command(
     try:
         auth_show()
         servers = server_list()
+    except ConfigResetRequiredError as exc:
+        error = StructuredError(
+            code=exc.code,
+            message=exc.message,
+            hint="Reset the configuration and log in again.",
+        )
+        if mode is output.OutputMode.HUMAN:
+            get_console(stderr=True).print(f"[bold red]{error.message}[/bold red]")
+        else:
+            output.to_stderr(error, mode)
+        raise typer.Exit(1) from exc
     except AuthenticationError as exc:
         if mode is not output.OutputMode.HUMAN:
             output.to_stderr(exc.error, mode)
         else:
-            console.print(f"[bold red]{exc.error.message}[/bold red]")
+            get_console(stderr=True).print(f"[bold red]{exc.error.message}[/bold red]")
             if exc.error.hint:
-                console.print(exc.error.hint)
+                get_console(stderr=True).print(exc.error.hint)
         raise typer.Exit(1) from exc
     except ServerDiscoveryError as exc:
         error = StructuredError(
@@ -102,7 +103,7 @@ def server_list_command(
         if mode is not output.OutputMode.HUMAN:
             output.to_stderr(error, mode)
         else:
-            console.print(f"[bold red]{exc}[/bold red]")
+            get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
     if mode is not output.OutputMode.HUMAN:
@@ -119,7 +120,7 @@ def server_list_command(
         output.to_stdout(servers, mode)
         return
 
-    _render_server_list_table()
+    _render_server_list_table(servers)
 
 
 @server.command("use")
@@ -131,12 +132,14 @@ def server_use_command(
     try:
         server_use(selector)
     except ServerSelectorError as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
+        get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         if exc.hint:
-            console.print(exc.hint)
+            get_console(stderr=True).print(exc.hint)
         raise typer.Exit(1) from exc
     except (ServerDiscoveryError, ServerFetchError) as exc:
-        console.print(f"[bold red]{exc}[/bold red]")
+        get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
-    console.print(f"[green]✓[/green] Active server set to [bold]{selector}[/bold]")
+    get_console().print(
+        f"[green]✓[/green] Active server set to [bold]{selector}[/bold]"
+    )

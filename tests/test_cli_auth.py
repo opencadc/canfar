@@ -243,7 +243,7 @@ def test_auth_remove_requires_force_for_active_idp(tmp_path: Path) -> None:
         result = runner.invoke(auth, ["rm", "cadc"], input="n\n")
 
     assert result.exit_code == 0
-    assert "cancelled" in result.stdout.lower()
+    assert "cancelled" in result.stderr.lower()
 
 
 def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:

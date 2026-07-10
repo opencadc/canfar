@@ -23,6 +23,7 @@ from canfar.utils.logging import (
     MAX_LOGFILE_SIZE,
     RICH_FORMAT,
     CanfarLogger,
+    LoggingLevel,
     configure_logging,
     enable_debug,
     get_logger,
@@ -270,10 +271,23 @@ class TestConvenienceFunctions:
     """Test the convenience functions."""
 
     def test_configure_logging_calls_global_logger(self) -> None:
-        """Test that configure_logging calls the global logger."""
-        with patch("canfar.utils.logging._canfar_logger.configure") as mock_configure:
-            configure_logging(loglevel=logging.DEBUG, filelog=True)
-            mock_configure.assert_called_once_with(loglevel=logging.DEBUG, filelog=True)
+        """Runtime setup keeps telemetry local and configures the global logger."""
+        with (
+            patch("canfar.utils.logging._canfar_logger.configure") as mock_configure,
+            patch("logfire.configure") as mock_logfire_configure,
+        ):
+            result = configure_logging(loglevel=logging.DEBUG, filelog=True)
+
+            assert result is LoggingLevel.DEBUG
+            mock_configure.assert_called_once_with(loglevel="debug", filelog=True)
+            mock_logfire_configure.assert_called_once_with(
+                send_to_logfire=False,
+                console=False,
+                metrics=False,
+                inspect_arguments=False,
+                distributed_tracing=False,
+                min_level="debug",
+            )
 
     def test_get_logger_without_name(self) -> None:
         """Test get_logger without name returns main logger."""

@@ -91,4 +91,17 @@ class TestInfoCLI:
         result = runner.invoke(info, ["non-existent"])
 
         assert result.exit_code == 0
-        assert "No information found" in result.stdout
+        assert "No information found" in result.stderr
+
+    @patch("canfar.cli.info.AsyncSession")
+    def test_info_debug_retains_response_anomaly_details(self, mock_session_cls):
+        """The info debug flag continues to reveal response anomalies."""
+        mock_session = AsyncMock()
+        mock_session_cls.return_value.__aenter__.return_value = mock_session
+        mock_session.info.return_value = [{"id": "test-id", "name": "test-name"}]
+
+        result = runner.invoke(info, ["test-id", "--debug"])
+
+        assert result.exit_code == 0
+        assert "Session Response Warnings" in result.stderr
+        assert "missing or invalid startTime" in result.stderr

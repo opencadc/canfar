@@ -13,7 +13,7 @@ from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Context
@@ -94,7 +94,7 @@ def prune_sessions(
             response = await session.destroy_with(
                 prefix=prefix, kind=kind, status=status
             )
-            console.print(
+            get_console().print(
                 f"[bold green] Deleted {len(response)} sessions.[/bold green]"
             )
 

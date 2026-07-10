@@ -9,6 +9,22 @@ from canfar.models.http import Server
 class TestServer:
     """Test Server class."""
 
+    def test_model_ignores_environment_and_has_no_network_methods(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Persisted Server data comes only from validated input."""
+        monkeypatch.setenv("CANFAR_SERVER_NAME", "Environment Server")
+        monkeypatch.setenv("CANFAR_SERVER_CORES", "64")
+
+        server = Server()
+
+        assert server.name is None
+        assert server.cores == 2
+        assert not hasattr(server, "capabilities")
+        assert not hasattr(server, "fetch")
+        assert not hasattr(server, "afetch")
+
     def test_default_values(self) -> None:
         """Test default values for Server."""
         server = Server()
@@ -97,6 +113,9 @@ class TestServer:
 
         server = Server(version="v123")
         assert server.version == "v123"
+
+        server = Server(version="v2.1")
+        assert server.version == "v2.1"
 
         server = Server(version="v9999999")  # Max length test
         assert server.version == "v9999999"

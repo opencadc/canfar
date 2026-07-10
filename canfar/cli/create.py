@@ -14,7 +14,7 @@ from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Context
@@ -49,6 +49,20 @@ create = typer.Typer(
     no_args_is_help=True,
     cls=CreateUsageMessage,
 )
+
+
+def _parse_environment(env: list[str] | None) -> dict[str, Any]:
+    """Parse repeated ``KEY=VALUE`` options for the session request."""
+    environment: dict[str, Any] = {}
+    for item in env or []:
+        if "=" not in item:
+            get_console(stderr=True).print(
+                f"[bold red]Error:[/bold red] Invalid env variable: {item}"
+            )
+            raise typer.Exit(1)
+        key, value = item.split("=", 1)
+        environment[key] = value
+    return environment
 
 
 @create.callback(
@@ -134,21 +148,11 @@ def creation(
     maybe_emit_banner(OutputMode.HUMAN)
     cmd = None
     args = ""
-    environment: dict[str, Any] = {}
+    environment = _parse_environment(env)
 
     if command and len(command) > 0:
         cmd = command[0]
         args = " ".join(command[1:])
-
-    if env:
-        for item in env:
-            if "=" not in item:
-                console.print(
-                    f"[bold red]Error:[/bold red] Invalid env variable: {item}"
-                )
-                raise typer.Exit(1)
-            key, value = item.split("=", 1)
-            environment[key] = value
 
     async def _create() -> None:
         """Create the requested session(s) on the science platform server."""
@@ -169,21 +173,23 @@ def creation(
                 )
                 if session_ids:
                     if len(session_ids) > 1:
-                        console.print(
+                        get_console().print(
                             f"[bold green]Successfully created {len(session_ids)} "
                             f"sessions named '{name}':[/bold green]"
                         )
                         for session_id in session_ids:
-                            console.print(f"  - {session_id}")
+                            get_console().print(f"  - {session_id}")
                         return
 
-                    console.print(
+                    get_console().print(
                         f"[bold green]Successfully created session "
                         f"'{name}' (ID: {session_ids[0]})[/bold green]"
                     )
                     return
-                console.print("[bold red]Failed to create session(s).[/bold red]")
-                console.print(
+                get_console(stderr=True).print(
+                    "[bold red]Failed to create session(s).[/bold red]"
+                )
+                get_console(stderr=True).print(
                     "[dim]No session IDs were returned. Run with --debug for request "
                     "details, or set a longer client timeout (environment variable "
                     "CANFAR_TIMEOUT, in seconds) if the image pull or platform is "
@@ -191,29 +197,30 @@ def creation(
                     "[/dim]"
                 )
             except KeyboardInterrupt:
-                console.print(
+                get_console(stderr=True).print(
                     "\n[bold yellow]Operation cancelled by user.[/bold yellow]"
                 )
                 raise typer.Exit(130) from KeyboardInterrupt
             except Exception as err:  # noqa: BLE001
-                console.print(f"[bold red]Error: {err}[/bold red]")
-                console.print_exception()
+                get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
+                get_console(stderr=True).print_exception()
             raise typer.Exit(1)
 
     if dry or debug:
-        console.print("[dim]Debug: Parsed parameters:[/dim]")
-        console.print(f"[dim]  Kind: {kind}[/dim]")
-        console.print(f"[dim]  Image: {image}[/dim]")
-        console.print(f"[dim]  Name: {name}[/dim]")
-        console.print(f"[dim]  CPUs: {cpu}[/dim]")
-        console.print(f"[dim]  Memory: {memory}GB[/dim]")
-        console.print(f"[dim]  GPU: {gpu}[/dim]")
-        console.print(f"[dim]  Env: {environment}[/dim]")
-        console.print(f"[dim]  Replicas: {replicas}[/dim]")
-        console.print(f"[dim]  Command: {cmd}[/dim]")
-        console.print(f"[dim]  Arguments: {args}[/dim]")
+        details_console = get_console() if dry else get_console(stderr=True)
+        details_console.print("[dim]Debug: Parsed parameters:[/dim]")
+        details_console.print(f"[dim]  Kind: {kind}[/dim]")
+        details_console.print(f"[dim]  Image: {image}[/dim]")
+        details_console.print(f"[dim]  Name: {name}[/dim]")
+        details_console.print(f"[dim]  CPUs: {cpu}[/dim]")
+        details_console.print(f"[dim]  Memory: {memory}GB[/dim]")
+        details_console.print(f"[dim]  GPU: {gpu}[/dim]")
+        details_console.print(f"[dim]  Env: {environment}[/dim]")
+        details_console.print(f"[dim]  Replicas: {replicas}[/dim]")
+        details_console.print(f"[dim]  Command: {cmd}[/dim]")
+        details_console.print(f"[dim]  Arguments: {args}[/dim]")
     if dry:
-        console.print("[yellow]Dry run complete.[/yellow]")
+        get_console().print("[yellow]Dry run complete.[/yellow]")
         return
 
     run(_create())

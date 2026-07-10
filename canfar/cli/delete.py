@@ -12,7 +12,7 @@ from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 delete = typer.Typer(
     name="delete",
@@ -55,7 +55,7 @@ def delete_sessions(
     else:
         proceed = Confirm.ask(
             f"Confirm deletion of {len(session_ids)} session(s)?",
-            console=console,
+            console=get_console(),
             default=False,
         )
 
@@ -64,12 +64,14 @@ def delete_sessions(
         async with AsyncSession(loglevel="DEBUG" if debug else "INFO") as session:
             try:
                 deleted = await session.destroy(ids=session_ids)
-                console.print(
+                get_console().print(
                     f"[bold green]Successfully deleted {deleted} "
                     f"session(s).[/bold green]"
                 )
             except Exception as err:  # noqa: BLE001
-                console.print(f"[bold red]Error during deletion: {err}[/bold red]")
+                get_console(stderr=True).print(
+                    f"[bold red]Error during deletion: {err}[/bold red]"
+                )
 
     if proceed:
         run(_delete())

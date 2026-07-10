@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+from typing import Annotated
+
 import typer
 
+from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
 from canfar.cli.create import create
@@ -22,16 +25,58 @@ from canfar.cli.stats import stats
 from canfar.cli.version import version
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import AliasGroup
-from canfar.utils.console import console
+from canfar.hooks.typer.aliases import ROOT_CHILD_ARGS_META_KEY, AliasGroup
+from canfar.utils.console import get_console
+from canfar.utils.logging import (
+    InvalidLoggingEnvironmentError,
+    LoggingLevel,
+    configure_logging,
+)
 
 
-def callback(ctx: typer.Context) -> None:
+def _leaf_output_mode(args: list[str]) -> output.OutputMode:
+    """Infer an already-parsed leaf machine flag for root setup failures."""
+    if "--json" in args:
+        return output.OutputMode.JSON
+    if "--yaml" in args:
+        return output.OutputMode.YAML
+    return output.OutputMode.HUMAN
+
+
+def callback(
+    ctx: typer.Context,
+    log_level: Annotated[
+        LoggingLevel | None,
+        typer.Option(
+            "--log-level",
+            case_sensitive=False,
+            help="Set the logging level.",
+        ),
+    ] = None,
+    verbose: Annotated[
+        int,
+        typer.Option(
+            "-v",
+            count=True,
+            help="Increase logging verbosity; repeat up to four times.",
+        ),
+    ] = 0,
+) -> None:
     """Main callback that handles no subcommand case."""
     reset()
+    try:
+        configure_logging(loglevel=log_level, verbosity=verbose)
+    except InvalidLoggingEnvironmentError as err:
+        child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
+        mode = _leaf_output_mode(child_args)
+        if mode is output.OutputMode.HUMAN:
+            typer.echo(str(err), err=True)
+        else:
+            output.to_stderr(err.error, mode)
+        raise typer.Exit(2) from err
 
     if ctx.invoked_subcommand is None:
-        console.print(ctx.get_help())
+        get_console().print(ctx.get_help())
         raise typer.Exit(0)
 
 
@@ -182,12 +227,14 @@ def main() -> None:
     try:
         cli()
     except AuthExpiredError as err:
-        console.print(err)
-        console.print("Authenticate with [italic cyan]canfar login[/italic cyan]")
+        get_console(stderr=True).print(err)
+        get_console(stderr=True).print(
+            "Authenticate with [italic cyan]canfar login[/italic cyan]"
+        )
     except AuthContextError as err:
-        console.print(err)
+        get_console(stderr=True).print(err)
     except ConfigResetRequiredError as err:
-        console.print(err)
+        get_console(stderr=True).print(err)
         raise typer.Exit(1) from err
     finally:
         reset()

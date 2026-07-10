@@ -14,10 +14,10 @@ def test_conftest_isolates_home() -> None:
     assert Path(os.environ["HOME"]) == Path(os.environ["CANFAR_TEST_HOME"])
 
 
-def test_stale_list_config_breaks_canfar_import_without_home_isolation(
+def test_stale_list_config_does_not_break_canfar_or_cli_imports(
     tmp_path: Path,
 ) -> None:
-    """Legacy list-shaped config under ``HOME`` prevents importing canfar."""
+    """Importing the library never reads a stale user configuration."""
     home = tmp_path / "stale-home"
     config_dir = home / ".canfar"
     config_dir.mkdir(parents=True)
@@ -44,12 +44,46 @@ server:
     )
 
     script = """
+import logging
 import os
 import sys
 from pathlib import Path
 
 os.environ["HOME"] = sys.argv[1]
+original_excepthook = sys.excepthook
 import canfar  # noqa: F401
+
+import importlib
+
+for module in (
+    "canfar.auth.oidc",
+    "canfar.cli.auth",
+    "canfar.cli.config",
+    "canfar.cli.create",
+    "canfar.cli.delete",
+    "canfar.cli.events",
+    "canfar.cli.image",
+    "canfar.cli.info",
+    "canfar.cli.login",
+    "canfar.cli.logs",
+    "canfar.cli.main",
+    "canfar.cli.prune",
+    "canfar.cli.ps",
+    "canfar.cli.server",
+    "canfar.cli.stats",
+    "canfar.cli.version",
+):
+    importlib.import_module(module)
+
+from canfar.utils.logging import _canfar_logger
+
+canfar_logger = logging.getLogger("canfar")
+assert not _canfar_logger._configured
+assert canfar_logger.handlers == []
+assert canfar_logger.level == logging.NOTSET
+assert canfar_logger.propagate
+assert logging.getLogger().handlers == []
+assert sys.excepthook is original_excepthook
 """
     result = subprocess.run(  # noqa: S603
         [sys.executable, "-c", script, str(home)],
@@ -58,8 +92,43 @@ import canfar  # noqa: F401
         check=False,
     )
 
-    assert result.returncode != 0
-    assert "ValidationError" in result.stderr
+    assert result.returncode == 0, result.stderr
+    assert result.stdout == ""
+    assert result.stderr == ""
+
+
+def test_logfire_runtime_import_is_scoped_to_configure_logging() -> None:
+    """Only explicit runtime configuration may import the Logfire package."""
+    source = Path("canfar/utils/logging.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    runtime_body = [
+        node
+        for node in tree.body
+        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+        and not (
+            isinstance(node, ast.If)
+            and isinstance(node.test, ast.Name)
+            and node.test.id == "TYPE_CHECKING"
+        )
+    ]
+    runtime_tree = ast.Module(body=runtime_body, type_ignores=[])
+    runtime_imports = [
+        alias.name
+        for node in ast.walk(runtime_tree)
+        if isinstance(node, ast.Import)
+        for alias in node.names
+    ] + [
+        node.module or ""
+        for node in ast.walk(runtime_tree)
+        if isinstance(node, ast.ImportFrom)
+    ]
+
+    assert not any(module.startswith("logfire") for module in runtime_imports)
+    assert [
+        (function, module)
+        for function, module in _function_local_imports(source)
+        if module.startswith("logfire")
+    ] == [("configure_logging", "logfire")]
 
 
 def _function_local_imports(source: str) -> list[tuple[str, str]]:

@@ -57,9 +57,10 @@ class TestCreateCLI:
         result = runner.invoke(create, ["headless", "image:tag"])
 
         assert result.exit_code == 1
-        assert "Failed to create session(s)" in result.stdout
-        assert "CANFAR_TIMEOUT" in result.stdout
-        assert "--debug" in result.stdout
+        assert result.stdout == ""
+        assert "Failed to create session(s)" in result.stderr
+        assert "CANFAR_TIMEOUT" in result.stderr
+        assert "--debug" in result.stderr
 
     def test_create_command_dry_run(self):
         """Test create command dry run."""
@@ -80,4 +81,4 @@ class TestCreateCLI:
         result = runner.invoke(create, ["headless", "image:tag"])
 
         assert result.exit_code == 1
-        assert "Error: API Error" in result.stdout
+        assert "Error: API Error" in result.stderr

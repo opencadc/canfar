@@ -17,15 +17,21 @@ def reset_banner_state() -> None:
     _banner_emitted.set(False)
 
 
-@lru_cache(maxsize=1)
-def get_console() -> Console:
+@lru_cache(maxsize=2)
+def get_console(*, stderr: bool = False) -> Console:
     """Get a Rich console configured from the user configuration.
+
+    Args:
+        stderr: Write diagnostics to stderr instead of command data to stdout.
 
     Returns:
         Rich console instance sized from user configuration.
     """
-    cfg = Configuration()  # ty: ignore[missing-argument]
-    return Console(width=cfg.console.width)
+    try:
+        width = Configuration().console.width  # ty: ignore[missing-argument]
+    except Exception:  # noqa: BLE001
+        width = 120
+    return Console(width=width, stderr=stderr)
 
 
 def emit_active_server_banner() -> None:
@@ -38,8 +44,4 @@ def emit_active_server_banner() -> None:
         name = cfg.get_active_server().name
     except KeyError:
         name = "unknown"
-    console.print(f"@{name}", style="dim underline")
-
-
-# Convenience instance for modules that just need a console
-console: Console = get_console()
+    get_console().print(f"@{name}", style="dim underline")

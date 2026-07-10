@@ -37,7 +37,7 @@ def test_image_ls_no_images_message() -> None:
         result = runner.invoke(cli, ["image", "ls"])
 
     assert result.exit_code == 0
-    assert "No images found" in result.stdout
+    assert "No images found" in result.stderr
 
 
 def test_image_ls_rejects_invalid_kind() -> None:

@@ -1,6 +1,5 @@
 """CANFAR Science Platform Python Client."""
 
-from os import environ as env
 from pathlib import Path
 
 # Configuration paths and defaults (defined before logging import to avoid cycles)
@@ -14,11 +13,6 @@ from .utils.logging import (  # noqa: E402
 )
 
 CERT_PATH: Path = Path.home() / ".ssl" / "cadcproxy.pem"
-LOG_LEVEL: str = env.get("CANFAR_LOGLEVEL", "INFO")
-
-configure_logging(loglevel=LOG_LEVEL, filelog=False)
-log = get_logger(__name__)
-set_log_level(LOG_LEVEL)
 
 from . import authentication, server  # noqa: E402
 from .authentication import login  # noqa: E402

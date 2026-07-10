@@ -180,3 +180,16 @@ class TestCreateParameters:
                 ("env", "REPLICA_COUNT=1"),
             ]
         ]
+
+    def test_create_parameters_overrides_reserved_replica_environment(self) -> None:
+        """System replica metadata wins without duplicate form fields."""
+        [payload] = create_parameters(
+            name="session",
+            image="custom/image:latest",
+            env={"REPLICA_ID": "caller", "REPLICA_COUNT": "caller"},
+        )
+
+        assert [value for key, value in payload if key == "env"] == [
+            "REPLICA_ID=1",
+            "REPLICA_COUNT=1",
+        ]

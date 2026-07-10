@@ -10,7 +10,7 @@ import typer
 from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
-from canfar.sessions import AsyncSession
+from canfar.sessions import AsyncSession, connection_url
 
 open_command = typer.Typer(
     name="open",
@@ -42,15 +42,24 @@ def open_sessions(
         async with AsyncSession(loglevel=log_level) as session:
             sessions_info = await session.info(ids=session_ids)
         if not sessions_info:
-            typer.echo("No information found for the specified session(s).")
+            typer.echo("No information found for the specified session(s).", err=True)
             return
 
         for session_info in sessions_info:
-            connect_url = session_info.get("connectURL")
+            connect_url = connection_url(session_info)
             if connect_url:
                 webbrowser.open_new_tab(connect_url)
                 typer.echo(f"Opening session {session_info.get('id')} in a new tab.")
+            elif session_info.get("connectURL"):
+                typer.echo(
+                    f"Session {session_info.get('id')} is not ready to connect "
+                    f"(status: {session_info.get('status', 'unknown')}).",
+                    err=True,
+                )
             else:
-                typer.echo(f"No connectURL found for session {session_info.get('id')}.")
+                typer.echo(
+                    f"No connectURL found for session {session_info.get('id')}.",
+                    err=True,
+                )
 
     run(_open_sessions())

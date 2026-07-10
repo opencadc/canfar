@@ -498,12 +498,6 @@ class Configuration(BaseSettings):
         )
         self._replace_state(active=active, servers=servers)
 
-    def with_active_selection(self, idp: str, server: Server) -> Configuration:
-        """Return a copy using ``idp`` and ``server`` as the active pair."""
-        selected = self.model_copy(deep=True)
-        selected.set_active_selection(idp, server)
-        return selected
-
     @property
     def context(self) -> AuthContext:
         """Return the active Authentication as a legacy ``AuthContext`` view.

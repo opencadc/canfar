@@ -118,7 +118,7 @@ def test_ps_outputs_running_table_and_debug_anomalies() -> None:
     assert result.exit_code == 0
     assert "running-1" in result.stdout
     assert "done-1" not in result.stdout
-    assert "Session Response Warnings" in result.stdout
+    assert "Session Response Warnings" in result.stderr
     session.fetch.assert_awaited_once_with(kind=None, status=None)
 
 
@@ -294,7 +294,7 @@ def test_ps_allows_empty_running_view() -> None:
         result = runner.invoke(ps, [])
 
     assert result.exit_code == 0
-    assert "No pending or running sessions found" in result.stdout
+    assert "No pending or running sessions found" in result.stderr
 
 
 def test_stats_outputs_cluster_tables() -> None:

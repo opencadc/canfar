@@ -187,21 +187,21 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
         result = runner.invoke(config, ["show"])
 
     assert result.exit_code == 1
-    assert "bad" in result.stdout
+    assert isinstance(result.exception, RuntimeError)
 
     with patch("canfar.cli.config.Configuration") as cfg:
         cfg.return_value.get_value.side_effect = KeyError("missing")
         result = runner.invoke(config, ["get", "missing"])
 
     assert result.exit_code == 1
-    assert "missing" in result.stdout
+    assert "missing" in result.stderr
 
     with patch("canfar.cli.config.Configuration") as cfg:
         cfg.return_value.set_value.side_effect = TypeError("wrong")
         result = runner.invoke(config, ["set", "console.width", "120"])
 
     assert result.exit_code == 1
-    assert "wrong" in result.stdout
+    assert "wrong" in result.stderr
 
 
 def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:

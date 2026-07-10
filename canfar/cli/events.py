@@ -13,7 +13,7 @@ from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 events = typer.Typer(
     name="events",
@@ -46,7 +46,7 @@ def get_events(
             all_events = await session.events(ids=session_ids)
 
         if not all_events:
-            console.print(
+            get_console(stderr=True).print(
                 "[yellow]No events found for the specified session(s).[/yellow]"
             )
             return
@@ -73,6 +73,6 @@ def get_events(
                     if len(parts) == 5:
                         table.add_row(*parts)
 
-                console.print(table)
+                get_console().print(table)
 
     run(_get_events())

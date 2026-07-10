@@ -12,7 +12,7 @@ from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 stats = typer.Typer(
     name="stats",
@@ -70,9 +70,11 @@ def get_stats(
         # Add the first row with nested tables
         table.add_row(cores_table, ram_table)
 
-        console.print(table)
-        console.print("[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM")
-        console.print(
+        get_console().print(table)
+        get_console().print(
+            "[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM"
+        )
+        get_console(stderr=True).print(
             "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
         )
 
