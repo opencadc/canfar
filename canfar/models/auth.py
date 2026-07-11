@@ -82,6 +82,14 @@ class Token(BaseModel):
         SecretStr | None,
         Field(description="Refresh token"),
     ] = None
+    token_type: Annotated[
+        str | None,
+        Field(description="OAuth token type"),
+    ] = None
+    scope: Annotated[
+        str | None,
+        Field(description="OAuth scope string"),
+    ] = None
 
 
 def _oidc_valid(endpoints: Endpoint, client: Client, token: Token) -> bool:

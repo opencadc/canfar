@@ -25,7 +25,7 @@ from canfar.models.http import Server
 from canfar.utils import console as console_utils
 
 if TYPE_CHECKING:
-    import httpx
+    from authlib.integrations.httpx_client import AsyncOAuth2Client
 
     from canfar.idp import IdpInfo
 
@@ -35,7 +35,7 @@ async def _interactive_device_flow(
     token_url: str,
     identity: str,
     secret: str,
-    client: httpx.AsyncClient,
+    client: AsyncOAuth2Client,
 ) -> dict[str, Any]:
     """Present and complete one interactive OIDC device authorization."""
     challenge = await oidc.start_device_authorization(

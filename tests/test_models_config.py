@@ -11,7 +11,14 @@ import yaml
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar.models.active import ActiveConfig
-from canfar.models.auth import OIDCCredential, X509Credential
+from canfar.models.auth import (
+    Client,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
+    X509Credential,
+)
 from canfar.models.config import Configuration, _CanfarEnvSettingsSource
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
@@ -239,7 +246,21 @@ class TestConfigurationSerialization:
 
     def test_complex_round_trip_serialization(self, tmp_path: Path) -> None:
         """Complex configuration can be saved and loaded back."""
-        oidc = OIDCCredential(idp="srcnet")
+        oidc = OIDCCredential(
+            idp="srcnet",
+            endpoints=Endpoint(
+                discovery="https://example.com/.well-known/openid-configuration",
+                token="https://example.com/token",
+            ),
+            client=Client(identity="client-id", secret="client-secret"),
+            token=Token(
+                access="access-token",
+                refresh="refresh-token",
+                token_type="Bearer",
+                scope="openid profile email",
+            ),
+            expiry=Expiry(access=1893456000),
+        )
         x509 = X509Credential(
             idp="cadc",
             path=Path("/custom/path/cert.pem"),
@@ -282,7 +303,18 @@ class TestConfigurationSerialization:
 
         assert loaded.active.authentication == "srcnet"
         assert loaded.registry.username == "test-user"
-        assert isinstance(loaded.authentication["srcnet"], OIDCCredential)
+        loaded_oidc = loaded.authentication["srcnet"]
+        assert isinstance(loaded_oidc, OIDCCredential)
+        assert loaded_oidc.client.secret is not None
+        assert loaded_oidc.client.secret.get_secret_value() == "client-secret"
+        assert loaded_oidc.token.access is not None
+        assert loaded_oidc.token.access.get_secret_value() == "access-token"
+        assert loaded_oidc.token.refresh is not None
+        assert loaded_oidc.token.refresh.get_secret_value() == "refresh-token"
+        assert loaded_oidc.token.token_type == "Bearer"
+        assert loaded_oidc.token.scope == "openid profile email"
+        assert loaded_oidc.expiry.access == 1893456000
+        assert loaded_oidc.expiry.refresh is None
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""
