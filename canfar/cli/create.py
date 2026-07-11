@@ -71,6 +71,53 @@ def _parse_environment(env: list[str] | None) -> dict[str, Any]:
     return environment
 
 
+async def _create_sessions(request: CreateRequest) -> list[str]:
+    """Create the requested Sessions on the selected Science Platform Server."""
+    async with AsyncSession() as session:
+        return await session.create(request)
+
+
+def _render_create_result(
+    session_ids: list[str],
+    name: str,
+    mode: output.OutputMode,
+) -> None:
+    """Render the result of a Session creation request."""
+    if session_ids:
+        if mode is not output.OutputMode.HUMAN:
+            output.to_stdout(session_ids, mode)
+        elif len(session_ids) > 1:
+            get_console().print(
+                f"[bold green]Successfully created {len(session_ids)} "
+                f"sessions named '{name}':[/bold green]\n"
+                + "\n".join(f"  - {session_id}" for session_id in session_ids)
+            )
+        else:
+            get_console().print(
+                f"[bold green]Successfully created session "
+                f"'{name}' (ID: {session_ids[0]})[/bold green]"
+            )
+        return
+
+    failure = StructuredError(
+        code=ErrorCode.TRANSPORT_FAILURE,
+        message="Failed to create session(s).",
+        hint=(
+            "No session IDs were returned. Run `canfar --log-level debug create` "
+            "for library logs, or set a longer client timeout (environment "
+            "variable CANFAR_TIMEOUT, in seconds) if the image pull or platform "
+            "is slow."
+        ),
+    )
+    if mode is not output.OutputMode.HUMAN:
+        output.to_stderr(failure, mode)
+    else:
+        get_console(stderr=True).print(
+            f"[bold red]{failure.message}[/bold red]\n[dim]{failure.hint}[/dim]"
+        )
+    raise typer.Exit(1)
+
+
 @create.callback(
     invoke_without_command=True,
     context_settings={
@@ -183,87 +230,16 @@ def creation(
             get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
             if isinstance(err, ValidationError):
                 get_console(stderr=True).print_exception()
-        else:
-            output.to_stderr(
-                StructuredError(
-                    code=ErrorCode.COMMAND_VALIDATION_FAILED,
-                    message="Session request validation failed.",
-                    hint="Check the create arguments and retry.",
-                ),
-                mode,
-            )
-        raise typer.Exit(1) from err
-
-    async def _create() -> None:
-        """Create the requested session(s) on the science platform server."""
-        try:
-            async with AsyncSession() as session:
-                session_ids = await session.create(request)
-        except KeyboardInterrupt:
-            if mode is output.OutputMode.HUMAN:
-                get_console(stderr=True).print(
-                    "\n[bold yellow]Operation cancelled by user.[/bold yellow]"
-                )
-            else:
-                output.to_stderr(
-                    StructuredError(
-                        code=ErrorCode.COMMAND_CANCELLED,
-                        message="Operation cancelled by user.",
-                        hint="Retry the command when ready.",
-                    ),
-                    mode,
-                )
-            raise typer.Exit(130) from KeyboardInterrupt
-        except Exception as err:
-            if mode is output.OutputMode.HUMAN:
-                get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
-                get_console(stderr=True).print_exception()
-            else:
-                output.to_stderr(
-                    StructuredError(
-                        code=ErrorCode.TRANSPORT_FAILURE,
-                        message="Unable to create session(s).",
-                        hint=(
-                            "Check authentication and Science Platform "
-                            "connectivity, then retry."
-                        ),
-                    ),
-                    mode,
-                )
             raise typer.Exit(1) from err
-
-        if session_ids:
-            if mode is not output.OutputMode.HUMAN:
-                return output.to_stdout(session_ids, mode)
-            if len(session_ids) > 1:
-                return get_console().print(
-                    f"[bold green]Successfully created {len(session_ids)} "
-                    f"sessions named '{name}':[/bold green]\n"
-                    + "\n".join(f"  - {session_id}" for session_id in session_ids)
-                )
-
-            return get_console().print(
-                f"[bold green]Successfully created session "
-                f"'{name}' (ID: {session_ids[0]})[/bold green]"
-            )
-
-        failure = StructuredError(
-            code=ErrorCode.TRANSPORT_FAILURE,
-            message="Failed to create session(s).",
-            hint=(
-                "No session IDs were returned. Run `canfar --log-level debug create` "
-                "for library logs, or set a longer client timeout (environment "
-                "variable CANFAR_TIMEOUT, in seconds) if the image pull or platform "
-                "is slow."
+        output.to_stderr(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message="Session request validation failed.",
+                hint="Check the create arguments and retry.",
             ),
+            mode,
         )
-        if mode is not output.OutputMode.HUMAN:
-            output.to_stderr(failure, mode)
-        else:
-            get_console(stderr=True).print(
-                f"[bold red]{failure.message}[/bold red]\n[dim]{failure.hint}[/dim]"
-            )
-        raise typer.Exit(1)
+        raise typer.Exit(1) from err
 
     if dry or debug:
         (get_console() if dry else get_console(stderr=True)).print(
@@ -280,5 +256,42 @@ def creation(
             f"[dim]  Arguments: {args}[/dim]"
             + ("\n[yellow]Dry run complete.[/yellow]" if dry else "")
         )
-    if not dry:
-        run(_create())
+    if dry:
+        return
+
+    try:
+        session_ids = run(_create_sessions(request))
+    except KeyboardInterrupt:
+        if mode is output.OutputMode.HUMAN:
+            get_console(stderr=True).print(
+                "\n[bold yellow]Operation cancelled by user.[/bold yellow]"
+            )
+            raise typer.Exit(130) from KeyboardInterrupt
+        output.to_stderr(
+            StructuredError(
+                code=ErrorCode.COMMAND_CANCELLED,
+                message="Operation cancelled by user.",
+                hint="Retry the command when ready.",
+            ),
+            mode,
+        )
+        raise typer.Exit(130) from KeyboardInterrupt
+    except Exception as err:
+        if mode is output.OutputMode.HUMAN:
+            get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
+            get_console(stderr=True).print_exception()
+            raise typer.Exit(1) from err
+        output.to_stderr(
+            StructuredError(
+                code=ErrorCode.TRANSPORT_FAILURE,
+                message="Unable to create session(s).",
+                hint=(
+                    "Check authentication and Science Platform connectivity, "
+                    "then retry."
+                ),
+            ),
+            mode,
+        )
+        raise typer.Exit(1) from err
+
+    _render_create_result(session_ids, name, mode)
