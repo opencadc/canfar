@@ -20,7 +20,7 @@ canfar login [IDP] [OPTIONS]
 | `--force`, `-f` | Force re-authentication. |
 | `--debug` | Enable debug logging. |
 | `--dev` | Include development Servers during discovery. |
-| `--timeout`, `-t` | HTTP timeout in seconds during login. Default: `2`. |
+| `--timeout`, `-t` | HTTP timeout in seconds during login. Default: `10`. |
 
 Examples:
 

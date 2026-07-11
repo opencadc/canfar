@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 from typer.testing import CliRunner
@@ -40,6 +41,20 @@ def test_login_help_is_available() -> None:
     result = runner.invoke(cli, ["login", "--help"])
     assert result.exit_code == 0
     assert "Login to CANFAR Science Platform" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [["login", "cadc"], ["auth", "login", "cadc"]],
+    ids=["canonical", "compatibility-alias"],
+)
+def test_login_defaults_to_ten_second_timeout(arguments: list[str]) -> None:
+    """Canonical and compatibility login commands default to ten seconds."""
+    with patch("canfar.cli.login._login_flow") as login_flow:
+        result = runner.invoke(cli, arguments)
+
+    assert result.exit_code == 0
+    login_flow.assert_called_once_with("cadc", force=False, dev=False, timeout=10)
 
 
 def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> None:

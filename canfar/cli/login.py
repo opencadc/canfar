@@ -48,7 +48,7 @@ def _login_flow(
     *,
     force: bool = False,
     dev: bool = False,
-    timeout: int = 2,
+    timeout: int = 10,
 ) -> None:
     """Run the guided login flow for ``idp``.
 
@@ -147,7 +147,7 @@ def register_login_command(app: typer.Typer) -> None:
                 help="Timeout for HTTP requests during login.",
                 min=1,
             ),
-        ] = 2,
+        ] = 10,
     ) -> None:
         """Login to CANFAR Science Platform."""
         maybe_emit_banner(output.OutputMode.HUMAN)

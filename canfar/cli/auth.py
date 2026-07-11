@@ -275,7 +275,7 @@ def auth_login_command(
             help="Timeout for HTTP requests during login.",
             min=1,
         ),
-    ] = 2,
+    ] = 10,
 ) -> None:
     """Alias for canfar login."""
     from canfar import get_logger, set_log_level  # noqa: PLC0415
