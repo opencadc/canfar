@@ -75,7 +75,10 @@ async with AsyncSession() as session:
 
 | Symptom | Check |
 | --- | --- |
-| Authentication fails | Run `canfar login cadc --force --debug`. |
+| Authentication fails | Run `canfar --log-level debug login cadc --force`. |
 | Session does not start | Run `canfar stats`, then try smaller `cores` or `ram`. |
 | Browser URL fails | Wait 60-120 seconds and confirm the Session is `Running`. |
 | Script needs stable output | Use CLI machine output such as `canfar ps --json`. |
+
+See [Logging and observability](../cli/logging.md) for the CLI and Python
+logging controls.

@@ -26,7 +26,15 @@ Useful options:
 | `--force`, `-f` | Re-authenticate an IDP that already has saved credentials. |
 | `--dev` | Include development Servers during discovery. |
 | `--timeout`, `-t` | Increase HTTP timeout for login, discovery, and validation. |
-| `--debug` | Print debug logs while logging in. |
+
+Logging controls are root options. Put them before `login` when troubleshooting:
+
+```bash
+canfar --log-level debug login cadc --force
+```
+
+See [Logging and observability](logging.md) for level precedence, streams, and
+redaction guarantees.
 
 `canfar auth login` still exists as a deprecated compatibility alias. New docs
 and scripts should use `canfar login`.

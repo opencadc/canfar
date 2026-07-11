@@ -7,6 +7,26 @@ management, Container Images, and client configuration.
 canfar --help
 ```
 
+## Root logging controls
+
+Put logging options before the command:
+
+```bash
+canfar --log-level debug ps
+canfar -vvv ps
+canfar --log-file ./logs/canfar.jsonl ps
+```
+
+| Option | Use |
+| --- | --- |
+| `--log-level LEVEL` | Select `critical`, `error`, `warning`, `info`, or `debug`. |
+| `-v` | Increase verbosity; repeat through `-vvvv` for `debug`. |
+| `--log-file PATH` | Add the rotating JSON Lines file sink. |
+
+See [Logging and observability](logging.md) for the exact mapping,
+precedence, streams, telemetry, file schema, redaction policy, and stable error
+codes.
+
 ## Authentication and Servers
 
 ### `canfar login`
@@ -18,7 +38,6 @@ canfar login [IDP] [OPTIONS]
 | Option | Use |
 | --- | --- |
 | `--force`, `-f` | Force re-authentication. |
-| `--debug` | Enable debug logging. |
 | `--dev` | Include development Servers during discovery. |
 | `--timeout`, `-t` | HTTP timeout in seconds during login. Default: `10`. |
 
@@ -92,7 +111,7 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 | `--gpu` | `-g` | GPU count. |
 | `--env` | `-e` | Environment variable as `KEY=VALUE`. |
 | `--replicas` | `-r` | Number of replicas. Default: `1`. |
-| `--debug` | | Enable debug logging. |
+| `--debug` | | Print parsed Session request details. |
 | `--dry-run` | | Parse parameters and exit. |
 
 Examples:
@@ -115,7 +134,7 @@ canfar ps [OPTIONS]
 | `--quiet` | `-q` | Print only Session IDs. |
 | `--kind` | `-k` | Filter by Session Kind. |
 | `--status` | `-s` | Filter by status. |
-| `--debug` | | Enable debug logging. |
+| `--debug` | | Show Session response warnings. |
 
 Machine output:
 
@@ -136,6 +155,9 @@ canfar open SESSION_ID...
 canfar delete SESSION_ID... [--force]
 canfar prune PREFIX [KIND] [STATUS]
 ```
+
+`canfar info SESSION_ID --debug` shows Session response warnings. This is
+a command diagnostic, not a logging-level control.
 
 Common flow:
 
@@ -169,6 +191,8 @@ canfar version --debug
 ```
 
 `config set` parses values as YAML.
+`version --debug` shows environment and dependency details for bug reports; it
+does not change the logging level.
 
 ## Machine output contract
 

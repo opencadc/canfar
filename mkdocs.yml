@@ -260,6 +260,7 @@ nav:
       - CLI:
           - 5-Minute Tutorial: cli/quick-start.md
           - Authentication and Servers: cli/authentication-contexts.md
+          - Logging and Observability: cli/logging.md
           - Reference: cli/cli-help.md
       - Demos:
           - SRCnet Workshop: demos/srcnet-workshop.md

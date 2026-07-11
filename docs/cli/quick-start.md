@@ -101,8 +101,11 @@ canfar create headless skaha/terminal:1.1.2 -- python /arc/projects/demo/run.py
 
 | Symptom | Command |
 | --- | --- |
-| Need fresh credentials | `canfar login cadc --force --debug` |
+| Need fresh credentials | `canfar --log-level debug login cadc --force` |
 | Need another Server | `canfar server ls` then `canfar server use <name-or-uri>` |
 | Session is pending | `canfar events $(canfar ps -q)` |
 | Need cluster capacity | `canfar stats` |
 | Need structured output | `canfar ps --json` |
+
+Logging controls belong before the command. See
+[Logging and observability](logging.md) for the complete policy.
