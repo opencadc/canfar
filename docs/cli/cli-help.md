@@ -113,6 +113,10 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 | `--replicas` | `-r` | Number of replicas. Default: `1`. |
 | `--debug` | | Print parsed Session request details. |
 | `--dry-run` | | Parse parameters and exit. |
+| `--json` | | Emit created Session IDs as a JSON list. |
+| `--yaml` | | Emit created Session IDs as a YAML list. |
+
+`--json` and `--yaml` are mutually exclusive. `--dry-run` is human-output only.
 
 Examples:
 
