@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from contextlib import ExitStack
+from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -246,12 +247,14 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
     def capability_response(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, text=capabilities, request=request)
 
+    discovery_httpx = SimpleNamespace(
+        AsyncClient=_async_client_factory(httpx.MockTransport(registry_response)),
+        HTTPError=httpx.HTTPError,
+        Timeout=httpx.Timeout,
+    )
     with (
         _config_path(config_path),
-        patch(
-            "canfar.utils.discover.httpx.AsyncClient",
-            side_effect=_async_client_factory(httpx.MockTransport(registry_response)),
-        ),
+        patch("canfar.utils.discover.httpx", discovery_httpx),
         patch(
             "canfar.client.Client",
             side_effect=_client_factory(httpx.MockTransport(capability_response)),

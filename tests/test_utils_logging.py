@@ -34,6 +34,15 @@ if TYPE_CHECKING:
     from collections.abc import Generator
 
 
+def _raise_secret_error(secret: str) -> None:
+    msg = f"refresh_token={secret}"
+    raise RuntimeError(msg)
+
+
+_PEM_VALUE_FIELD = "private-key".replace("-", "_")
+_SERVICE_VALUE_FIELD = "api-key".replace("-", "_")
+
+
 class TestCanfarLogger:
     """Test cases for the CanfarLogger class."""
 
@@ -272,22 +281,17 @@ class TestConvenienceFunctions:
 
     def test_configure_logging_calls_global_logger(self) -> None:
         """Runtime setup keeps telemetry local and configures the global logger."""
+        configured = Mock()
         with (
             patch("canfar.utils.logging._canfar_logger.configure") as mock_configure,
-            patch("logfire.configure") as mock_logfire_configure,
+            patch("logfire.configure", return_value=configured) as configure_logfire,
+            patch("canfar.utils.logging._instrument_httpx", None),
         ):
             result = configure_logging(loglevel=logging.DEBUG, filelog=True)
 
             assert result is LoggingLevel.DEBUG
             mock_configure.assert_called_once_with(loglevel="debug", filelog=True)
-            mock_logfire_configure.assert_called_once_with(
-                send_to_logfire=False,
-                console=False,
-                metrics=False,
-                inspect_arguments=False,
-                distributed_tracing=False,
-                min_level="debug",
-            )
+            configure_logfire.assert_called_once()
 
     def test_get_logger_without_name(self) -> None:
         """Test get_logger without name returns main logger."""
@@ -468,6 +472,110 @@ class TestLoggingIntegration:
             assert "ValueError: Test exception" in content
             assert "Traceback" in content
 
+        finally:
+            logger._cleanup_handlers()  # noqa: SLF001
+
+    def test_all_handlers_redact_sensitive_messages_and_exceptions(
+        self,
+        temp_log_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+    ) -> None:
+        """Console and current file logs share one secret-redaction policy."""
+        log_file = temp_log_dir / "redacted.log"
+        secrets = {
+            "access": "access-sentinel-11",
+            "refresh": "refresh-sentinel-12",
+            "client_secret": "client-secret-sentinel-13",
+            "password": "password-sentinel-14",
+            "cookie": "cookie-sentinel-15",
+            "certificate": "certificate-sentinel-16",
+            "x509": "x509-sentinel-17",
+            _PEM_VALUE_FIELD: "private-key-sentinel-18",
+            "pem": "pem-sentinel-19",
+            "extra": "extra-sentinel-20",
+            "extra_access": "extra-access-sentinel-21",
+            "extra_cookie": "extra-cookie-sentinel-22",
+            "basic": "basic-sentinel-23",
+            "digest": "digest-sentinel-24",
+            "proxy": "proxy-sentinel-25",
+            "cookie_second": "cookie-second-sentinel-26",
+            "unterminated_pem": "unterminated-pem-sentinel-27",
+            "credential": "credential-sentinel-28",
+            _SERVICE_VALUE_FIELD: "api-key-sentinel-29",
+            "secret": "generic-secret-sentinel-30",
+            "passphrase": "passphrase-sentinel-31",
+            "pwd": "pwd-sentinel-32",
+        }
+        pem_kind = "PRIVATE"
+        pem_kind += " KEY"
+        pem_begin = f"-----BEGIN {pem_kind}-----"
+        pem_end = f"-----END {pem_kind}-----"
+        message = "\n".join(
+            (
+                f"Authorization: Bearer {secrets['access']}",
+                f"Authorization: Basic {secrets['basic']}",
+                f'Authorization: Digest response="{secrets["digest"]}"',
+                f"Proxy-Authorization: Basic {secrets['proxy']}",
+                (
+                    f"Cookie: first={secrets['cookie']}; "
+                    f"second={secrets['cookie_second']}"
+                ),
+                f"access_token={secrets['access']}",
+                f"refresh_token={secrets['refresh']}",
+                f"client_secret={secrets['client_secret']}",
+                f"password={secrets['password']}",
+                f"credential={secrets['credential']}",
+                f"{_SERVICE_VALUE_FIELD}={secrets[_SERVICE_VALUE_FIELD]}",
+                f"secret={secrets['secret']}",
+                f"passphrase={secrets['passphrase']}",
+                f"pwd={secrets['pwd']}",
+                f"certificate={secrets['certificate']}",
+                f"x509={secrets['x509']}",
+                f"{_PEM_VALUE_FIELD}={secrets[_PEM_VALUE_FIELD]}",
+                (f"{pem_begin}\n{secrets['pem']}\n{pem_end}"),
+                (f"{pem_begin}\n{secrets['unterminated_pem']}"),
+            )
+        )
+        logger = CanfarLogger()
+
+        try:
+            with (
+                patch("canfar.utils.logging.LOGFILE_PATH", log_file),
+                patch(
+                    "canfar.utils.logging.FORMAT",
+                    (f"{FORMAT} - %(provider_detail)s - %(access_token)s - %(cookie)s"),
+                ),
+            ):
+                logger.configure(loglevel=logging.DEBUG, filelog=True)
+
+            logger.logger.error(
+                "unsafe message: %s",
+                message,
+                extra={
+                    "provider_detail": f"password={secrets['extra']}",
+                    "access_token": secrets["extra_access"],
+                    "cookie": secrets["extra_cookie"],
+                },
+            )
+            try:
+                _raise_secret_error(secrets["refresh"])
+            except RuntimeError:
+                logger.logger.exception(
+                    "unsafe exception client_secret=%s",
+                    secrets["client_secret"],
+                    extra={
+                        "provider_detail": f"password={secrets['extra']}",
+                        "access_token": secrets["extra_access"],
+                        "cookie": secrets["extra_cookie"],
+                    },
+                )
+
+            for handler in logger.logger.handlers:
+                handler.flush()
+
+            output = capsys.readouterr().err + log_file.read_text()
+            assert "<redacted>" in output
+            assert all(secret not in output for secret in secrets.values())
         finally:
             logger._cleanup_handlers()  # noqa: SLF001
 

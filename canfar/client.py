@@ -30,6 +30,7 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.config import Configuration
+from canfar.utils.logging import instrument_httpx
 
 if TYPE_CHECKING:
     from types import TracebackType
@@ -234,10 +235,10 @@ class HTTPClient(BaseSettings):
             AsyncClient: The asynchronous HTTPx client.
         """
         kwargs = self._get_client_kwargs(asynchronous=True)
-        log.debug("HTTPx async client kwargs: %s", kwargs)
         headers = self._get_http_headers()
         client = AsyncClient(**kwargs)
         client.headers.update(headers)
+        instrument_httpx(client)
         return client
 
     def _create_sync_client(self) -> Client:
@@ -247,10 +248,10 @@ class HTTPClient(BaseSettings):
             Client: The synchronous HTTPx client.
         """
         kwargs = self._get_client_kwargs(asynchronous=False)
-        log.debug("HTTPx sync client kwargs: %s", kwargs)
         headers = self._get_http_headers()
         client = Client(**kwargs)
         client.headers.update(headers)
+        instrument_httpx(client)
         return client
 
     def _get_base_url(self) -> URL:

@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import logging
+from contextlib import contextmanager
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -10,6 +13,23 @@ from pydantic import SecretStr
 
 from canfar.models.session import CreateRequest
 from canfar.sessions import AsyncSession, Session
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
+
+
+@contextmanager
+def _session_log_sink(caplog: pytest.LogCaptureFixture) -> Iterator[None]:
+    """Attach pytest's real capture handler to the Session logger."""
+    logger = logging.getLogger("canfar.sessions")
+    previous_level = logger.level
+    logger.addHandler(caplog.handler)
+    logger.setLevel(logging.DEBUG)
+    try:
+        yield
+    finally:
+        logger.removeHandler(caplog.handler)
+        logger.setLevel(previous_level)
 
 
 def _http_status_error() -> httpx.HTTPStatusError:
@@ -160,44 +180,62 @@ async def test_sync_and_async_create_share_http_failure_policy(
             assert await asession.create(request) == expected
 
 
-@patch("canfar.sessions._log_http_task_failure")
-def test_sync_create_returns_empty_on_http_error(mock_log_fail: MagicMock) -> None:
-    """Sync create returns [] and logs payload context when post fails."""
+def test_sync_create_failure_logs_only_safe_replica_context(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Sync create omits the request payload and raw exception from logs."""
     session = Session()
     mock_client = MagicMock()
     mock_client.post.side_effect = _http_status_error()
     session._client = mock_client  # noqa: SLF001
+    environment_secret = "sync-environment-secret-sentinel"
 
-    result = session.create(
-        name="test-name",
-        image="images.example/net/img:latest",
-        kind="headless",
-        replicas=1,
-    )
+    with _session_log_sink(caplog):
+        result = session.create(
+            name="test-name",
+            image="images.example/net/img:latest",
+            kind="headless",
+            env={"ACCESS_TOKEN": environment_secret},
+            replicas=1,
+        )
 
     assert result == []
-    mock_log_fail.assert_called_once()
-    assert mock_log_fail.call_args[0][0] == "Failed to create session with payload"
+    logged = caplog.text
+    assert environment_secret not in logged
+    assert "no capacity" not in logged
+    assert "server error" not in logged
+    assert "Failed to create session" in logged
+    assert "replica 1/1" in logged
+    assert "HTTPStatusError" in logged
     mock_client.post.assert_called_once()
 
 
 @pytest.mark.asyncio
-@patch("canfar.sessions._log_http_task_failure")
-async def test_async_create_empty_on_http_error(mock_log_fail: MagicMock) -> None:
-    """Async create returns [] and logs payload context when post fails."""
+async def test_async_create_failure_logs_only_safe_replica_context(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Async create omits the request payload and raw exception from logs."""
     asession = AsyncSession()
     mock_client = MagicMock()
     mock_client.post = AsyncMock(side_effect=_http_status_error())
     asession._asynclient = mock_client  # noqa: SLF001
+    environment_secret = "async-environment-secret-sentinel"
 
-    result = await asession.create(
-        name="test-name",
-        image="images.example/net/img:latest",
-        kind="headless",
-        replicas=1,
-    )
+    with _session_log_sink(caplog):
+        result = await asession.create(
+            name="test-name",
+            image="images.example/net/img:latest",
+            kind="headless",
+            env={"REFRESH_TOKEN": environment_secret},
+            replicas=1,
+        )
 
     assert result == []
-    mock_log_fail.assert_called_once()
-    assert mock_log_fail.call_args[0][0] == "Failed to create session with payload"
+    logged = caplog.text
+    assert environment_secret not in logged
+    assert "no capacity" not in logged
+    assert "server error" not in logged
+    assert "Failed to create session" in logged
+    assert "replica 1/1" in logged
+    assert "HTTPStatusError" in logged
     mock_client.post.assert_awaited_once()

@@ -75,7 +75,9 @@ for module in (
 ):
     importlib.import_module(module)
 
-from canfar.utils.logging import _canfar_logger
+from canfar.utils.logging import _canfar_logger, instrument_httpx
+
+instrument_httpx(object())
 
 canfar_logger = logging.getLogger("canfar")
 assert not _canfar_logger._configured
@@ -84,6 +86,9 @@ assert canfar_logger.level == logging.NOTSET
 assert canfar_logger.propagate
 assert logging.getLogger().handlers == []
 assert sys.excepthook is original_excepthook
+assert "opentelemetry.instrumentation.httpx" not in sys.modules, [
+    m for m in sys.modules if m.startswith("opentelemetry.instrumentation.httpx")
+]
 """
     result = subprocess.run(  # noqa: S603
         [sys.executable, "-c", script, str(home)],

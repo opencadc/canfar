@@ -22,13 +22,12 @@ log = get_logger(__name__)
 
 
 def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
-    """Log a failed HTTP task with caller context.
+    """Log a failed HTTP task with safe caller context.
 
-    Status codes, bodies, and timeouts are already logged by httpx response hooks
-    (``catch`` / ``acatch``); this adds identifying context (payload or session id)
-    without duplicating tracebacks.
+    Status codes and safe request context are already logged by HTTPX response hooks;
+    this adds a Session identifier or replica position and exception class only.
     """
-    log.error("%s: %s: %s", operation, context, exc)
+    log.error("%s: %s (%s)", operation, context, type(exc).__name__)
 
 
 def _ids(value: str | list[str]) -> list[str]:
@@ -270,14 +269,14 @@ class Session(HTTPClient):
         results: list[str] = []
         session_kind = name.kind if isinstance(name, CreateRequest) else kind
         log.debug("Creating %d %s session[s].", len(payloads), session_kind)
-        for payload in payloads:
+        for replica, payload in enumerate(payloads, start=1):
             try:
                 response: Response = self.client.post(url="session", params=payload)
                 results.append(response.text.rstrip("\r\n"))
             except HTTPError as err:
                 _log_http_task_failure(
-                    "Failed to create session with payload",
-                    payload,
+                    "Failed to create session",
+                    f"replica {replica}/{len(payloads)}",
                     err,
                 )
         return results
@@ -496,7 +495,6 @@ class AsyncSession(HTTPClient):
         parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
         response: Response = await self.asynclient.get(url="session", params=parameters)
         data: list[dict[str, str]] = response.json()
-        log.debug(data)
         return data
 
     async def stats(self) -> dict[str, Any]:
@@ -517,7 +515,6 @@ class AsyncSession(HTTPClient):
         parameters = {"view": "stats"}
         response: Response = await self.asynclient.get("session", params=parameters)
         data: dict[str, Any] = response.json()
-        log.debug(data)
         return data
 
     async def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
@@ -685,7 +682,6 @@ class AsyncSession(HTTPClient):
 
         async def bounded(parameters: list[tuple[str, Any]]) -> Any:
             async with semaphore:
-                log.debug("HTTP Request Parameters: %s", parameters)
                 response = await self.asynclient.post(url="session", params=parameters)
                 return response.text.rstrip("\r\n")
 
@@ -694,11 +690,11 @@ class AsyncSession(HTTPClient):
         msg = f"Creating {len(payloads)} {session_kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for payload, reply in zip(payloads, responses, strict=True):
+        for replica, reply in enumerate(responses, start=1):
             if isinstance(reply, Exception):
                 _log_http_task_failure(
-                    "Failed to create session with payload",
-                    payload,
+                    "Failed to create session",
+                    f"replica {replica}/{len(payloads)}",
                     reply,
                 )
             elif isinstance(reply, str):
