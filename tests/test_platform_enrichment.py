@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 import httpx
 import pytest
+from authlib.integrations.httpx_client import OAuth2Client
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
 import canfar.server as platform
@@ -614,15 +615,28 @@ class TestPlatformEnrichment:
             token_requests.append(request)
             return httpx.Response(
                 200,
-                json={"access_token": refreshed_token},
+                json={
+                    "access_token": refreshed_token,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
                 request=request,
             )
 
         client_type = httpx.Client
+        oauth_client = OAuth2Client(
+            "client-id",
+            "client-secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=httpx.MockTransport(token_response),
+        )
         config_path = tmp_path / "config.yaml"
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
                 side_effect=lambda **kwargs: client_type(
@@ -631,11 +645,8 @@ class TestPlatformEnrichment:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=httpx.MockTransport(token_response),
-                    **kwargs,
-                ),
+                "authlib.integrations.httpx_client.OAuth2Client",
+                return_value=oauth_client,
             ),
         ):
             config = _active_with_target(_oidc_credential(access_expiry=now - 1))
@@ -721,6 +732,12 @@ class TestPlatformEnrichment:
         token_transport = httpx.MockTransport(
             lambda request: httpx.Response(503, request=request)
         )
+        oauth_client = OAuth2Client(
+            "client-id",
+            "client-secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=token_transport,
+        )
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
@@ -733,11 +750,8 @@ class TestPlatformEnrichment:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=token_transport,
-                    **kwargs,
-                ),
+                "authlib.integrations.httpx_client.OAuth2Client",
+                return_value=oauth_client,
             ),
         ):
             config = _active_with_target(_oidc_credential(access_expiry=now - 1))

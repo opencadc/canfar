@@ -172,7 +172,7 @@ async def refresh(
     identity: str,
     secret: str,
     token: str,
-) -> SecretStr:
+) -> dict[str, Any]:
     """Refresh OIDC access token using refresh token.
 
     Args:
@@ -182,41 +182,36 @@ async def refresh(
         token (str): Refresh token.
 
     Returns:
-        pydantic.SecretStr: New access token.
+        Complete Authlib token mapping.
 
     Raises:
-        httpx.HTTPStatusError: For HTTP errors.
-        KeyError: If refresh token is invalid or expired.
-        Exception: For other errors.
+        ValueError: If the token response does not contain an access token.
     """
-    payload: dict[str, Any] = {
-        "grant_type": "refresh_token",
-        "refresh_token": token,
-        "client_id": identity,
-        "client_secret": secret,
-    }
+    from authlib.integrations.httpx_client import (  # noqa: PLC0415
+        AsyncOAuth2Client,
+    )
 
     try:
-        async with httpx.AsyncClient() as client:
-            log.debug("Refreshing OIDC access token")
-            response = await client.post(url, data=payload, auth=(identity, secret))
-            response.raise_for_status()
-            data: dict[str, Any] = response.json()
-            log.debug("refresh http request successful")
-            access: SecretStr = SecretStr(data["access_token"])
-            return access
-    except httpx.HTTPStatusError as error:
-        msg = "HTTP error while refreshing OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except KeyError as error:
-        msg = "server response does not contain access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except Exception as error:
-        msg = "Failed to refresh OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
+        async with AsyncOAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as client:
+            refreshed = await client.refresh_token(url, refresh_token=token)
+    except (OAuthError, httpx.HTTPError):
+        msg = "OIDC token refresh failed"
+        raise ValueError(msg) from None
+    except (TypeError, ValueError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
+    if (
+        not isinstance(refreshed, dict)
+        or not isinstance(refreshed.get("access_token"), str)
+        or not refreshed["access_token"]
+    ):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    return dict(refreshed)
 
 
 def sync_refresh(
@@ -224,7 +219,7 @@ def sync_refresh(
     identity: str,
     secret: str,
     token: str,
-) -> SecretStr:
+) -> dict[str, Any]:
     """Refresh OIDC access token using refresh token.
 
     Args:
@@ -234,41 +229,34 @@ def sync_refresh(
         token (str): Refresh token.
 
     Returns:
-        pydantic.SecretStr: New access token.
+        Complete Authlib token mapping.
 
     Raises:
-        httpx.HTTPStatusError: For HTTP errors.
-        KeyError: If refresh token is invalid or expired.
-        Exception: For other errors.
+        ValueError: If the token response does not contain an access token.
     """
-    payload: dict[str, Any] = {
-        "grant_type": "refresh_token",
-        "refresh_token": token,
-        "client_id": identity,
-        "client_secret": secret,
-    }
+    from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
 
     try:
-        with httpx.Client() as client:
-            log.debug("Refreshing OIDC access token")
-            response = client.post(url, data=payload, auth=(identity, secret))
-            response.raise_for_status()
-            data: dict[str, Any] = response.json()
-            log.debug("refresh http request successful")
-            access: SecretStr = SecretStr(data["access_token"])
-            return access
-    except httpx.HTTPStatusError as error:
-        msg = "HTTP error while refreshing OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except KeyError as error:
-        msg = "server response does not contain access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except Exception as error:
-        msg = "Failed to refresh OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
+        with OAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as client:
+            refreshed = client.refresh_token(url, refresh_token=token)
+    except (OAuthError, httpx.HTTPError):
+        msg = "OIDC token refresh failed"
+        raise ValueError(msg) from None
+    except (TypeError, ValueError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
+    if (
+        not isinstance(refreshed, dict)
+        or not isinstance(refreshed.get("access_token"), str)
+        or not refreshed["access_token"]
+    ):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    return dict(refreshed)
 
 
 async def authflow(

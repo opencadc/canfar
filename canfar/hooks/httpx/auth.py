@@ -30,14 +30,13 @@ Note:
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable, cast
 
-from pydantic import SecretStr
+from pydantic import SecretStr, ValidationError
 
 from canfar import get_logger
 from canfar.auth import oidc
-from canfar.models.auth import OIDCCredential
-from canfar.utils import jwt
+from canfar.models.auth import Expiry, OIDCCredential, Token
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, MutableMapping
@@ -93,41 +92,56 @@ def _refresh_parameters(
 def _apply_refreshed_token(
     client: HTTPClient,
     credential: OIDCCredential,
-    token: SecretStr,
+    refreshed: dict[str, Any],
     httpx_client_headers: MutableMapping[str, str],
     request: httpx.Request,
 ) -> None:
-    """Persist a refreshed access token to config, headers, and the outgoing request.
-
-    Shared by both ``refresh`` (sync) and ``arefresh`` (async); only the
-    source of ``token`` (sync vs. async network call) and the target of
-    ``httpx_client_headers`` (``client.client.headers`` for sync vs.
-    ``client.asynclient.headers`` for async) differ between the two callers.
-
-    Args:
-        client: The CANFAR HTTPClient whose config is updated.
-        credential: The current OIDC Authentication Record.
-        token: The new access token returned by the OIDC provider.
-        httpx_client_headers: The header mapping of the underlying httpx client.
-        request: The outgoing httpx request whose Authorization header is updated.
-    """
-    access_value = token.get_secret_value()
-    updated = credential.model_copy(
-        update={
-            "token": credential.token.model_copy(
-                update={"access": SecretStr(access_value)}
-            ),
-            "expiry": credential.expiry.model_copy(
-                update={"access": jwt.expiry(access_value)}
-            ),
-        }
+    """Atomically persist refreshed OIDC state, then update active headers."""
+    previous_refresh = credential.token.refresh
+    previous_refresh_value = (
+        previous_refresh.get_secret_value() if previous_refresh is not None else None
     )
+    returned_refresh = refreshed.get("refresh_token")
+    refresh_value = (
+        returned_refresh
+        if isinstance(returned_refresh, str) and returned_refresh
+        else previous_refresh_value
+    )
+    rotated = refresh_value != previous_refresh_value
+    access_value = refreshed.get("access_token")
+    if not isinstance(access_value, str) or not access_value:
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    access_token = SecretStr(access_value)
+    token_type = refreshed.get("token_type")
+    if token_type is None or token_type == "":
+        token_type = credential.token.token_type
+    scope = refreshed.get("scope")
+    if scope is None or scope == "":
+        scope = credential.token.scope
+    try:
+        token = Token(
+            access=access_token,
+            refresh=SecretStr(refresh_value) if refresh_value is not None else None,
+            token_type=token_type,
+            scope=scope,
+        )
+        expiry = Expiry(
+            access=refreshed.get("expires_at"),
+            refresh=None if rotated else credential.expiry.refresh,
+        )
+    except (KeyError, TypeError, ValidationError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
 
+    updated = credential.model_copy(update={"token": token, "expiry": expiry})
+    candidate = client.config.model_copy(deep=True)
+    candidate.update_credential(updated)
+    candidate.save()
     client.config.update_credential(updated)
-    client.config.save()
     log.debug("Authentication refreshed and configuration saved.")
 
-    _apply_access_header(token, httpx_client_headers, request)
+    _apply_access_header(access_token, httpx_client_headers, request)
     log.debug("HTTP request headers updated with new token.")
     log.info("OIDC Access Token Refreshed.")
 
@@ -172,7 +186,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
 
         try:
             log.debug("Starting synchronous OIDC token refresh.")
-            token: SecretStr = oidc.sync_refresh(
+            token = oidc.sync_refresh(
                 url=token_url,
                 identity=identity,
                 secret=client_secret,
@@ -187,10 +201,9 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 request,
             )
 
-        except Exception as err:
-            msg = f"Failed to refresh OIDC token: {err}"
-            log.exception(msg)
-            raise AuthenticationError(msg) from err
+        except Exception:  # noqa: BLE001 - sanitize every boundary failure
+            msg = "Failed to refresh OIDC token"
+            raise AuthenticationError(msg) from None
 
     return hook
 
@@ -235,7 +248,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
 
             try:
                 log.debug("Starting asynchronous OIDC token refresh.")
-                token: SecretStr = await oidc.refresh(
+                token = await oidc.refresh(
                     url=token_url,
                     identity=identity,
                     secret=client_secret,
@@ -250,9 +263,8 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
                     request,
                 )
 
-            except Exception as err:
-                msg = f"Failed to refresh OIDC token: {err}"
-                log.exception(msg)
-                raise AuthenticationError(msg) from err
+            except Exception:  # noqa: BLE001 - sanitize every boundary failure
+                msg = "Failed to refresh OIDC token"
+                raise AuthenticationError(msg) from None
 
     return ahook

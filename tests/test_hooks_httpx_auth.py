@@ -48,12 +48,19 @@ class TestSyncHook:
     """Tests for the synchronous `hook` function."""
 
     @patch("canfar.models.config.Configuration.save")
-    @patch("canfar.utils.jwt.expiry", return_value=time.time() + 3600)
-    @patch("canfar.auth.oidc.sync_refresh", return_value=SecretStr("new-access-token"))
+    @patch(
+        "canfar.auth.oidc.sync_refresh",
+        return_value={
+            "access_token": "new-access-token",
+            "refresh_token": "rotated-refresh-token",
+            "token_type": "Bearer",
+            "scope": "openid profile",
+            "expires_at": 4_000.0,
+        },
+    )
     def test_successful_refresh(
         self,
         mock_refresh,
-        mock_expiry,  # noqa: ARG002
         mock_save,
         oidc_client,
     ) -> None:
@@ -77,7 +84,12 @@ class TestSyncHook:
         assert isinstance(new_context, OIDC)
         assert new_context.token.access is not None
         assert new_context.token.access.get_secret_value() == "new-access-token"
-        assert new_context.expiry.access > time.time()
+        assert new_context.token.refresh is not None
+        assert new_context.token.refresh.get_secret_value() == "rotated-refresh-token"
+        assert new_context.token.token_type == "Bearer"
+        assert new_context.token.scope == "openid profile"
+        assert new_context.expiry.access == 4_000.0
+        assert new_context.expiry.refresh is None
 
     @patch("canfar.auth.oidc.sync_refresh")
     def test_skip_if_not_oidc_context(self, mock_refresh, tmp_path) -> None:
@@ -144,12 +156,19 @@ class TestAsyncHook:
     """Tests for the asynchronous `ahook` function."""
 
     @patch("canfar.models.config.Configuration.save")
-    @patch("canfar.utils.jwt.expiry", return_value=time.time() + 3600)
-    @patch("canfar.auth.oidc.refresh", return_value=SecretStr("new-async-token"))
+    @patch(
+        "canfar.auth.oidc.refresh",
+        return_value={
+            "access_token": "new-async-token",
+            "refresh_token": "rotated-async-refresh",
+            "token_type": "Bearer",
+            "scope": "openid email",
+            "expires_at": 5_000.0,
+        },
+    )
     async def test_successful_async_refresh(
         self,
         mock_refresh,
-        mock_expiry,  # noqa: ARG002
         mock_save,
         oidc_client,
     ) -> None:
@@ -171,6 +190,12 @@ class TestAsyncHook:
         assert isinstance(new_context, OIDC)
         assert new_context.token.access is not None
         assert new_context.token.access.get_secret_value() == "new-async-token"
+        assert new_context.token.refresh is not None
+        assert new_context.token.refresh.get_secret_value() == "rotated-async-refresh"
+        assert new_context.token.token_type == "Bearer"
+        assert new_context.token.scope == "openid email"
+        assert new_context.expiry.access == 5_000.0
+        assert new_context.expiry.refresh is None
 
     @patch("canfar.auth.oidc.refresh")
     async def test_skip_if_not_oidc_context_async(self, mock_refresh, tmp_path) -> None:

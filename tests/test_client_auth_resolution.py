@@ -8,10 +8,12 @@ from unittest.mock import patch
 
 import httpx
 import pytest
+from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
     Client,
@@ -52,13 +54,66 @@ def _configuration(credential: OIDCCredential | X509Credential) -> Configuration
 class TestRequestAuthenticationResolution:
     """Request contracts for canonical Authentication and Server resolution."""
 
+    @pytest.mark.parametrize(
+        (
+            "token_response",
+            "expected_token",
+            "expected_expiry",
+        ),
+        [
+            (
+                {
+                    "access_token": _REFRESHED_TOKEN,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
+                Token(
+                    access=_REFRESHED_TOKEN,
+                    refresh="rotated-refresh",
+                    token_type="Bearer",
+                    scope="openid profile",
+                ),
+                Expiry(access=1_300.0, refresh=None),
+            ),
+            (
+                {"access_token": _REFRESHED_TOKEN, "expires_in": 300},
+                Token(
+                    access=_REFRESHED_TOKEN,
+                    refresh="refresh-secret",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
+                Expiry(access=1_300.0, refresh=2_000.0),
+            ),
+            (
+                {
+                    "access_token": _REFRESHED_TOKEN,
+                    "token_type": None,
+                    "scope": "",
+                    "expires_in": 300,
+                },
+                Token(
+                    access=_REFRESHED_TOKEN,
+                    refresh="refresh-secret",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
+                Expiry(access=1_300.0, refresh=2_000.0),
+            ),
+        ],
+        ids=["rotated", "optional-fields-omitted", "optional-fields-empty"],
+    )
     def test_refreshable_record_without_access_refreshes_first_request(
         self,
+        token_response: dict[str, object],
+        expected_token: Token,
+        expected_expiry: Expiry,
         tmp_path: Path,
     ) -> None:
-        """A refresh token can bootstrap the first Platform request."""
+        """Refresh metadata is atomically persisted or preserved when omitted."""
         now = 1_000.0
-        refreshed_token = _REFRESHED_TOKEN
         config = _configuration(
             OIDCCredential(
                 idp="test",
@@ -69,7 +124,11 @@ class TestRequestAuthenticationResolution:
                     token="https://identity.example/token",
                 ),
                 client=Client(identity="client", secret="client-secret"),
-                token=Token(refresh="refresh-secret"),
+                token=Token(
+                    refresh="refresh-secret",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
                 expiry=Expiry(access=None, refresh=2_000.0),
             )
         )
@@ -86,16 +145,23 @@ class TestRequestAuthenticationResolution:
                 token_requests.append(request)
                 or httpx.Response(
                     200,
-                    json={"access_token": refreshed_token},
+                    json=token_response,
                     request=request,
                 )
             )
         )
         client_type = httpx.Client
+        oauth_client = OAuth2Client(
+            "client",
+            "client-secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=token_transport,
+        )
 
         with (
             patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
             patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
                 side_effect=lambda **kwargs: client_type(
@@ -104,21 +170,24 @@ class TestRequestAuthenticationResolution:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=token_transport,
-                    **kwargs,
-                ),
+                "authlib.integrations.httpx_client.OAuth2Client",
+                return_value=oauth_client,
             ),
             HTTPClient(config=config) as client,
         ):
             response = client.client.get("probe")
+            persisted = Configuration().get_credential("test")
 
         assert response.status_code == 200
         assert len(token_requests) == 1
         assert [request.headers["Authorization"] for request in platform_requests] == [
-            f"Bearer {refreshed_token}"
+            f"Bearer {_REFRESHED_TOKEN}"
         ]
+        canonical = config.get_credential("test")
+        assert isinstance(canonical, OIDCCredential)
+        assert canonical == persisted
+        assert canonical.token == expected_token
+        assert canonical.expiry == expected_expiry
 
     def test_unusable_oidc_record_raises_typed_safe_error(self) -> None:
         """Incomplete saved OIDC state is typed and never reveals secrets."""
@@ -297,7 +366,12 @@ class TestRequestAuthenticationResolution:
                     token="https://identity.example/token",
                 ),
                 client=Client(identity="client", secret="secret"),
-                token=Token(access="expired", refresh="refresh"),
+                token=Token(
+                    access="expired",
+                    refresh="refresh",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
                 expiry=Expiry(access=now - 1, refresh=now + 1_000),
             )
         )
@@ -309,7 +383,13 @@ class TestRequestAuthenticationResolution:
             await asyncio.sleep(0.01)
             return httpx.Response(
                 200,
-                json={"access_token": refreshed_token},
+                json={
+                    "access_token": refreshed_token,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
                 request=request,
             )
 
@@ -321,10 +401,17 @@ class TestRequestAuthenticationResolution:
             )
         )
         async_client = httpx.AsyncClient
+        oauth_client = AsyncOAuth2Client(
+            "client",
+            "secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=token_transport,
+        )
 
         with (
             patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
             patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.AsyncClient",
                 side_effect=lambda **kwargs: async_client(
@@ -333,11 +420,8 @@ class TestRequestAuthenticationResolution:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=token_transport,
-                    **kwargs,
-                ),
+                "authlib.integrations.httpx_client.AsyncOAuth2Client",
+                return_value=oauth_client,
             ),
         ):
             async with HTTPClient(config=config) as client:
@@ -345,6 +429,7 @@ class TestRequestAuthenticationResolution:
                     client.asynclient.get("one"),
                     client.asynclient.get("two"),
                 )
+                persisted = Configuration().get_credential("test")
 
         assert [response.status_code for response in responses] == [200, 200]
         assert len(token_requests) == 1
@@ -352,6 +437,16 @@ class TestRequestAuthenticationResolution:
             f"Bearer {refreshed_token}",
             f"Bearer {refreshed_token}",
         ]
+        canonical = config.get_credential("test")
+        assert isinstance(canonical, OIDCCredential)
+        assert canonical == persisted
+        assert canonical.token == Token(
+            access=refreshed_token,
+            refresh="rotated-refresh",
+            token_type="Bearer",
+            scope="openid profile",
+        )
+        assert canonical.expiry == Expiry(access=1_300.0, refresh=None)
 
     async def test_async_refresh_repairs_existing_sync_client(
         self,
@@ -370,7 +465,12 @@ class TestRequestAuthenticationResolution:
                     token="https://identity.example/token",
                 ),
                 client=Client(identity="client", secret="secret"),
-                token=Token(access="expired", refresh="refresh"),
+                token=Token(
+                    access="expired",
+                    refresh="refresh",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
                 expiry=Expiry(access=now - 1, refresh=now + 1_000),
             )
         )
@@ -384,16 +484,29 @@ class TestRequestAuthenticationResolution:
         token_transport = httpx.MockTransport(
             lambda request: httpx.Response(
                 200,
-                json={"access_token": refreshed_token},
+                json={
+                    "access_token": refreshed_token,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
                 request=request,
             )
         )
         sync_client = httpx.Client
         async_client = httpx.AsyncClient
+        oauth_client = AsyncOAuth2Client(
+            "client",
+            "secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=token_transport,
+        )
 
         with (
             patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
             patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
                 side_effect=lambda **kwargs: sync_client(
@@ -409,24 +522,152 @@ class TestRequestAuthenticationResolution:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=token_transport,
-                    **kwargs,
-                ),
+                "authlib.integrations.httpx_client.AsyncOAuth2Client",
+                return_value=oauth_client,
             ),
             HTTPClient(config=config) as client,
         ):
             async with client:
                 sync = client.client
+                assert sync.headers["Authorization"] == "Bearer expired"
                 async_response = await client.asynclient.get("refresh")
+                assert sync.headers["Authorization"] == "Bearer expired"
                 sync_response = sync.get("after-refresh")
+                assert sync.headers["Authorization"] == f"Bearer {refreshed_token}"
+                persisted = Configuration().get_credential("test")
 
         assert [async_response.status_code, sync_response.status_code] == [200, 200]
         assert [request.headers["Authorization"] for request in platform_requests] == [
             f"Bearer {refreshed_token}",
             f"Bearer {refreshed_token}",
         ]
+        canonical = config.get_credential("test")
+        assert isinstance(canonical, OIDCCredential)
+        assert canonical == persisted
+        assert canonical.token == Token(
+            access=refreshed_token,
+            refresh="rotated-refresh",
+            token_type="Bearer",
+            scope="openid profile",
+        )
+        assert canonical.expiry == Expiry(access=1_300.0, refresh=None)
+
+    @pytest.mark.parametrize(
+        "failure",
+        ["save", "oauth", "network", "malformed"],
+    )
+    def test_refresh_failure_preserves_last_valid_record(
+        self,
+        failure: str,
+        tmp_path: Path,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Refresh and persistence failures leave record and request state intact."""
+        now = 1_000.0
+        sentinel = "secret-refresh-diagnostic"
+        config = _configuration(
+            OIDCCredential(
+                idp="test",
+                endpoints=Endpoint(
+                    discovery=(
+                        "https://identity.example/.well-known/openid-configuration"
+                    ),
+                    token="https://identity.example/token",
+                ),
+                client=Client(identity="client", secret="client-secret"),
+                token=Token(
+                    access="old-access",
+                    refresh="old-refresh",
+                    token_type="Legacy",
+                    scope="openid",
+                ),
+                expiry=Expiry(access=now - 1, refresh=now + 1_000),
+            )
+        )
+        original = config.get_credential("test").model_copy(deep=True)
+        platform_requests: list[httpx.Request] = []
+        token_requests: list[httpx.Request] = []
+
+        def token_endpoint(request: httpx.Request) -> httpx.Response:
+            token_requests.append(request)
+            if failure == "oauth":
+                return httpx.Response(
+                    400,
+                    json={
+                        "error": "invalid_grant",
+                        "error_description": sentinel,
+                    },
+                    request=request,
+                )
+            if failure == "network":
+                raise httpx.ConnectError(sentinel, request=request)
+            if failure == "malformed":
+                return httpx.Response(
+                    200,
+                    content=sentinel,
+                    headers={"Content-Type": "application/json"},
+                    request=request,
+                )
+            return httpx.Response(
+                200,
+                json={
+                    "access_token": _REFRESHED_TOKEN,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
+                request=request,
+            )
+
+        platform_transport = httpx.MockTransport(
+            lambda request: (
+                platform_requests.append(request)
+                or httpx.Response(200, request=request)
+            )
+        )
+        oauth_client = OAuth2Client(
+            "client",
+            "client-secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=httpx.MockTransport(token_endpoint),
+        )
+        client_type = httpx.Client
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
+            patch(
+                "canfar.client.Client",
+                side_effect=lambda **kwargs: client_type(
+                    transport=platform_transport,
+                    **kwargs,
+                ),
+            ),
+            patch(
+                "authlib.integrations.httpx_client.OAuth2Client",
+                return_value=oauth_client,
+            ),
+            patch(
+                "canfar.models.config.Configuration.save",
+                side_effect=(OSError(sentinel) if failure == "save" else None),
+            ) as save,
+            HTTPClient(config=config) as client,
+        ):
+            request_client = client.client
+            with pytest.raises(AuthenticationError) as exc_info:
+                request_client.get("probe")
+            assert request_client.headers["Authorization"] == "Bearer old-access"
+
+        assert str(exc_info.value) == "Failed to refresh OIDC token"
+        assert exc_info.value.__cause__ is None
+        assert sentinel not in str(exc_info.value)
+        assert sentinel not in caplog.text
+        assert config.get_credential("test") == original
+        assert len(token_requests) == 1
+        assert platform_requests == []
+        assert save.call_count == int(failure == "save")
 
     @pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
     @pytest.mark.parametrize(
@@ -472,7 +713,13 @@ class TestRequestAuthenticationResolution:
             token_requests.append(request)
             return httpx.Response(
                 200,
-                json={"access_token": refreshed_token},
+                json={
+                    "access_token": refreshed_token,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
                 request=request,
             )
 
@@ -502,6 +749,7 @@ class TestRequestAuthenticationResolution:
         with (
             patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
             patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
                 side_effect=lambda **kwargs: sync_client(
@@ -517,15 +765,17 @@ class TestRequestAuthenticationResolution:
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.Client",
-                side_effect=lambda **kwargs: sync_client(
+                "authlib.integrations.httpx_client.OAuth2Client",
+                side_effect=lambda *args, **kwargs: OAuth2Client(
+                    *args,
                     transport=token_transport,
                     **kwargs,
                 ),
             ),
             patch(
-                "canfar.auth.oidc.httpx.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
+                "authlib.integrations.httpx_client.AsyncOAuth2Client",
+                side_effect=lambda *args, **kwargs: AsyncOAuth2Client(
+                    *args,
                     transport=token_transport,
                     **kwargs,
                 ),
