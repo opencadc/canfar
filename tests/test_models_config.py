@@ -345,6 +345,28 @@ class TestConfigurationSerialization:
 
         assert config_path.read_bytes() == original
 
+    def test_invalid_assignment_cannot_replace_last_valid_configuration(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Saving validates assignment-mutated state before atomic replacement."""
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.save()
+            original = config_path.read_bytes()
+            config.active.authentication = "missing"
+
+            with pytest.raises(OSError, match="Failed to save configuration"):
+                config.save()
+
+            loaded = Configuration()
+
+        assert config_path.read_bytes() == original
+        assert loaded.active.authentication == "cadc"
+        assert set(tmp_path.iterdir()) == {config_path}
+
     def test_failed_replacement_preserves_existing_configuration(
         self, tmp_path: Path
     ) -> None:

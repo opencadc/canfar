@@ -55,8 +55,9 @@ def save_config(config: Configuration, path: Path | None = None) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:
-        data = config.model_dump(mode="json", exclude_none=True)
-        _restore_oidc_secrets(config, data)
+        candidate = config._validated_copy()  # noqa: SLF001
+        data = candidate.model_dump(mode="json", exclude_none=True)
+        _restore_oidc_secrets(candidate, data)
         serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)
         with tempfile.NamedTemporaryFile(
             mode="w",

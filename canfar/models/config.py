@@ -275,6 +275,16 @@ class Configuration(BaseSettings):
 
         save_config(self)
 
+    def _validated_copy(self, **updates: Any) -> Configuration:
+        """Validate a source-isolated copy of this complete Configuration."""
+        data = {**self.model_dump(mode="python"), **updates}
+        candidate = self.__class__.model_construct()
+        self.__class__.__pydantic_validator__.validate_python(
+            data,
+            self_instance=candidate,
+        )
+        return candidate
+
     def _replace_state(
         self,
         *,
@@ -283,20 +293,14 @@ class Configuration(BaseSettings):
         servers: dict[str, Server] | None = None,
     ) -> None:
         """Validate and install a complete Authentication and Server state."""
-        data = {
-            **self.model_dump(mode="python"),
-            "active": self.active if active is None else active,
-            "authentication": (
-                self.authentication if authentication is None else authentication
-            ),
-            "servers": self.servers if servers is None else servers,
-        }
         # Validate only this candidate; BaseSettings construction would reload and
         # merge persisted/environment sources, resurrecting keys being removed.
-        candidate = self.__class__.model_construct()
-        self.__class__.__pydantic_validator__.validate_python(
-            data,
-            self_instance=candidate,
+        candidate = self._validated_copy(
+            active=self.active if active is None else active,
+            authentication=(
+                self.authentication if authentication is None else authentication
+            ),
+            servers=self.servers if servers is None else servers,
         )
         self.active = candidate.active
         self.authentication = candidate.authentication
