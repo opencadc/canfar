@@ -4,17 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from canfar.models.config_compat import (
-    AuthContext,
-    LegacyContextsMapping,
-    credential_to_legacy_context,
-)
-
 if TYPE_CHECKING:
     from pydantic import AnyUrl
 
-    from canfar.models.auth import AuthenticationCredential
+    from canfar.models.auth import AuthContext, AuthenticationCredential
     from canfar.models.config import Configuration
+    from canfar.models.config_compat import LegacyContextsMapping
     from canfar.models.http import Server
 
 
@@ -106,6 +101,10 @@ def set_active_selection(config: Configuration, idp: str, server: Server) -> Non
 
 def active_context(config: Configuration) -> AuthContext:
     """Return the active Authentication as a legacy ``AuthContext`` view."""
+    from canfar.models.config_compat import (  # noqa: PLC0415
+        credential_to_legacy_context,
+    )
+
     credential = get_credential(config, config.active.authentication)
     try:
         server = get_active_server(config)
@@ -116,6 +115,8 @@ def active_context(config: Configuration) -> AuthContext:
 
 def legacy_contexts(config: Configuration) -> LegacyContextsMapping:
     """Return a legacy dict-like view keyed by IDP."""
+    from canfar.models.config_compat import LegacyContextsMapping  # noqa: PLC0415
+
     return LegacyContextsMapping(config)
 
 

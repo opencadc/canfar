@@ -11,6 +11,7 @@ from pydantic import AnyHttpUrl
 
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.idp import IdpInfo, get_idp
+from canfar.models.auth import OIDCCredential, X509Credential
 
 _OPAQUE_ACCESS_TOKEN = "opaque-access-token"
 _OPAQUE_REFRESH_TOKEN = "opaque-refresh-token"
@@ -76,6 +77,10 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
         patch(
             "authlib.integrations.httpx_client.AsyncOAuth2Client"
         ) as oauth_client_class,
+        patch(
+            "canfar.auth.oidc.authenticate",
+            side_effect=AssertionError("legacy OIDC authentication was used"),
+        ) as legacy_authenticate,
         patch("canfar.utils.console.get_console", return_value=console),
         patch("webbrowser.get") as browser,
         patch("segno.make") as make_qr,
@@ -108,6 +113,7 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
         "[green]✓[/green] Successfully authenticated as test-user"
     )
     console.print.assert_any_call("[bold]Code:[/bold] ABC123")
+    assert isinstance(credential, OIDCCredential)
     assert credential.idp == "srcnet"
     assert credential.token.access is not None
     assert credential.token.access.get_secret_value() == _OPAQUE_ACCESS_TOKEN
@@ -117,6 +123,56 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     assert credential.token.scope == "openid profile email"
     assert credential.expiry.access == 1893456000
     assert credential.expiry.refresh is None
+    legacy_authenticate.assert_not_called()
+
+
+def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
+    """CLI X.509 acquisition maps gathered certificate data without legacy state."""
+    certificate = tmp_path / "cadcproxy.pem"
+    gathered = {"path": str(certificate), "expiry": 1893456000.0}
+
+    with (
+        patch("canfar.auth.x509.gather", return_value=gathered) as gather,
+        patch(
+            "canfar.auth.x509.authenticate",
+            side_effect=AssertionError("legacy X.509 authentication was used"),
+        ) as legacy_authenticate,
+    ):
+        result = authenticate_for_cli(get_idp("cadc"))
+
+    assert isinstance(result, X509Credential)
+    assert result.idp == "cadc"
+    assert result.path == certificate
+    assert result.expiry == 1893456000.0
+    gather.assert_called_once_with()
+    legacy_authenticate.assert_not_called()
+
+
+def test_authenticate_for_cli_normalizes_x509_gather_failure() -> None:
+    """CLI X.509 acquisition keeps the established failure prefix."""
+    with (
+        patch(
+            "canfar.auth.x509.gather",
+            side_effect=RuntimeError("certificate service unavailable"),
+        ),
+        pytest.raises(
+            ValueError,
+            match=r"^Failed to authenticate with X509 certificate:",
+        ),
+    ):
+        authenticate_for_cli(get_idp("cadc"))
+
+
+def test_authenticate_for_cli_normalizes_malformed_x509_gather_result() -> None:
+    """CLI X.509 acquisition maps malformed certificate data to ValueError."""
+    with (
+        patch("canfar.auth.x509.gather", return_value={"expiry": 1893456000.0}),
+        pytest.raises(
+            ValueError,
+            match=r"^Failed to authenticate with X509 certificate:",
+        ),
+    ):
+        authenticate_for_cli(get_idp("cadc"))
 
 
 def test_authenticate_for_cli_oidc_requires_discovery_url() -> None:

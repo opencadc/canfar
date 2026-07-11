@@ -14,7 +14,7 @@ from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
 from pydantic import SecretStr, ValidationError
 
 from canfar import get_logger
-from canfar.models.auth import OIDC, DeviceAuthorization, Expiry, Token
+from canfar.models.auth import OIDC, DeviceAuthorization, Expiry, OIDCCredential, Token
 
 if TYPE_CHECKING:
     from authlib.integrations.httpx_client import AsyncOAuth2Client
@@ -446,18 +446,18 @@ async def _authflow_impl(
     )
 
 
-async def authenticate(
-    oidc: OIDC,
+async def authenticate_credential(
+    credential: OIDCCredential,
     *,
     expected_issuer: str,
     timeout: int | None = None,
     device_flow: DeviceFlow | None = None,
     on_authenticated: Callable[[str | None], None] | None = None,
-) -> OIDC:
+) -> OIDCCredential:
     """Authenticate using OIDC Device Authorization Flow.
 
     Args:
-        oidc (OIDC): OIDC configuration.
+        credential: Canonical OIDC Authentication Record.
         expected_issuer: Exact issuer configured for the Identity Provider.
         timeout: HTTP timeout in seconds for OIDC HTTP requests.
         device_flow: Device authorization coordinator. Defaults to the
@@ -465,7 +465,7 @@ async def authenticate(
         on_authenticated: Optional observer for the authenticated username.
 
     Returns:
-        OIDC: Updated OIDC configuration with tokens.
+        Updated OIDC Authentication Record with tokens.
     """
     request_timeout = None if timeout is None else httpx.Timeout(timeout)
     if request_timeout is None:
@@ -475,24 +475,25 @@ async def authenticate(
 
     async with client_context as client:
         response: dict[str, Any] = await discover(
-            str(oidc.endpoints.discovery),
+            str(credential.endpoints.discovery),
             client,
             expected_issuer=expected_issuer,
         )
-        oidc.endpoints.device = response["device_authorization_endpoint"]
-        oidc.endpoints.registration = response["registration_endpoint"]
-        oidc.endpoints.token = response["token_endpoint"]
+        credential.endpoints.device = response["device_authorization_endpoint"]
+        credential.endpoints.registration = response["registration_endpoint"]
+        credential.endpoints.token = response["token_endpoint"]
 
         log.debug("Discovered OIDC configuration:")
-        log.debug("Device Registration Endpoint: %s", oidc.endpoints.registration)
-        log.debug("Device Authorization Endpoint: %s", oidc.endpoints.device)
-        log.debug("Token Endpoint: %s", oidc.endpoints.token)
+        log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
+        log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
+        log.debug("Token Endpoint: %s", credential.endpoints.token)
 
         device: dict[str, Any] = await register(
-            str(oidc.endpoints.registration), client
+            str(credential.endpoints.registration), client
         )
-        oidc.client.identity = device["client_id"]
-        oidc.client.secret = SecretStr(device["client_secret"])
+        credential.client.identity = device["client_id"]
+        client_secret = device["client_secret"]
+        credential.client.secret = SecretStr(client_secret)
 
         from authlib.integrations.httpx_client import (  # noqa: PLC0415
             AsyncOAuth2Client,
@@ -500,14 +501,14 @@ async def authenticate(
 
         if request_timeout is None:
             oauth_context = AsyncOAuth2Client(
-                oidc.client.identity,
-                oidc.client.secret.get_secret_value() if oidc.client.secret else "",
+                credential.client.identity,
+                client_secret,
                 token_endpoint_auth_method=_BASIC_AUTH_METHOD,
             )
         else:
             oauth_context = AsyncOAuth2Client(
-                oidc.client.identity,
-                oidc.client.secret.get_secret_value() if oidc.client.secret else "",
+                credential.client.identity,
+                client_secret,
                 token_endpoint_auth_method=_BASIC_AUTH_METHOD,
                 timeout=request_timeout,
             )
@@ -515,10 +516,10 @@ async def authenticate(
         async with oauth_context as oauth_client:
             authorize = device_flow or authflow
             tokens = await authorize(
-                str(oidc.endpoints.device),
-                str(oidc.endpoints.token),
-                str(oidc.client.identity),
-                oidc.client.secret.get_secret_value() if oidc.client.secret else "",
+                str(credential.endpoints.device),
+                str(credential.endpoints.token),
+                str(credential.client.identity),
+                client_secret,
                 oauth_client,
             )
 
@@ -533,13 +534,13 @@ async def authenticate(
         except (KeyError, TypeError, ValidationError):
             msg = "OIDC device authorization failed: malformed token response"
             raise ValueError(msg) from None
-        oidc.token, oidc.expiry = token, expiry
+        credential.token, credential.expiry = token, expiry
 
         url: str = response["userinfo_endpoint"]
         headers = {
             "Authorization": (
-                f"Bearer {oidc.token.access.get_secret_value()}"
-                if oidc.token.access
+                f"Bearer {credential.token.access.get_secret_value()}"
+                if credential.token.access
                 else ""
             ),
         }
@@ -548,17 +549,34 @@ async def authenticate(
         username = user.json().get("preferred_username")
         if on_authenticated is not None:
             on_authenticated(username)
-        return oidc
+        return credential
 
 
-if __name__ == "__main__":
-    oidc_config = OIDC()  # ty: ignore[missing-argument]
-    oidc_config.endpoints.discovery = (
-        "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
+async def authenticate(
+    oidc: OIDC,
+    *,
+    expected_issuer: str,
+    timeout: int | None = None,
+    device_flow: DeviceFlow | None = None,
+    on_authenticated: Callable[[str | None], None] | None = None,
+) -> OIDC:
+    """Authenticate a legacy OIDC context through the canonical credential flow."""
+    credential = OIDCCredential(
+        idp=oidc.server.idp or "legacy",
+        endpoints=oidc.endpoints,
+        client=oidc.client,
+        token=oidc.token,
+        expiry=oidc.expiry,
     )
-    asyncio.run(
-        authenticate(
-            oidc_config,
-            expected_issuer="https://ska-iam.stfc.ac.uk/",
+    try:
+        await authenticate_credential(
+            credential,
+            expected_issuer=expected_issuer,
+            timeout=timeout,
+            device_flow=device_flow,
+            on_authenticated=on_authenticated,
         )
-    )
+    finally:
+        oidc.token = credential.token
+        oidc.expiry = credential.expiry
+    return oidc

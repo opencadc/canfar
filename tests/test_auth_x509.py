@@ -215,6 +215,7 @@ def test_authenticate_happy_path(mock_gather) -> None:
         config = X509()
         updated_config = x509_auth.authenticate(config)
 
+        assert updated_config is config
         assert updated_config.path == str(cert_path.resolve())
         assert updated_config.expiry == mock_gather.return_value["expiry"]
         mock_gather.assert_called_once()

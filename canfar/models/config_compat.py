@@ -3,11 +3,12 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, TypeAlias
+from typing import TYPE_CHECKING
 
 from canfar.models.auth import (
     OIDC,
     X509,
+    AuthContext,
     OIDCCredential,
     X509Credential,
 )
@@ -18,9 +19,6 @@ if TYPE_CHECKING:
     from canfar.models.auth import AuthenticationCredential
     from canfar.models.config import Configuration
     from canfar.models.http import Server
-
-AuthContext: TypeAlias = OIDC | X509
-"""Legacy authentication context shape with embedded server."""
 
 
 def credential_to_legacy_context(
@@ -89,10 +87,10 @@ class LegacyContextsMapping(Mapping[str, "AuthContext"]):
     default ``__contains__`` would instead probe ``__getitem__`` and report
     ``False`` for such an IDP.
 
-    ``__setitem__`` is kept as an extra mutation hook used by the httpx auth
-    refresh hooks, which the read-only base does not provide. ``.get()`` is
-    inherited from the mixin and resolves through ``__getitem__``, so it
-    returns its default for an IDP whose context cannot be reconstructed.
+    ``__setitem__`` is retained for public compatibility assignments, which the
+    read-only base does not provide. ``.get()`` is inherited from the mixin and
+    resolves through ``__getitem__``, so it returns its default for an IDP whose
+    context cannot be reconstructed.
     """
 
     def __init__(self, configuration: Configuration) -> None:

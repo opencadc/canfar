@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping  # noqa: TC003 - needed by get_type_hints
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
 
@@ -44,11 +45,10 @@ from canfar.config.selection import (
     server_selection_history as _server_selection_history,
 )
 from canfar.models.active import ActiveConfig
-from canfar.models.auth import AuthenticationCredential, X509Credential
-from canfar.models.config_compat import (
+from canfar.models.auth import (
     AuthContext,
-    LegacyContextsMapping,
-    legacy_context_to_credential,
+    AuthenticationCredential,
+    X509Credential,
 )
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
@@ -109,7 +109,7 @@ class Configuration(BaseSettings):
     """Unified configuration settings for CANFAR client and authentication.
 
     Current configuration separates authentication credentials from science
-    platform servers. Active selection references an IDP key and server URI.
+    platform servers. Active selection references an IDP key and Server Name.
     """
 
     model_config = SettingsConfigDict(
@@ -508,7 +508,7 @@ class Configuration(BaseSettings):
         return _active_context(self)
 
     @property
-    def contexts(self) -> LegacyContextsMapping:
+    def contexts(self) -> Mapping[str, AuthContext]:
         """Return a legacy dict-like view keyed by IDP."""
         return _legacy_contexts(self)
 
@@ -519,6 +519,10 @@ class Configuration(BaseSettings):
             idp: Canonical identity provider key.
             context: Legacy ``AuthContext`` view to persist.
         """
+        from canfar.models.config_compat import (  # noqa: PLC0415
+            legacy_context_to_credential,
+        )
+
         authentication = {
             **self.authentication,
             idp: legacy_context_to_credential(context, idp),

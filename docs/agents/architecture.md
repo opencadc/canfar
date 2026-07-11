@@ -19,6 +19,18 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.
 - Request builders in `canfar/utils/build.py` are useful test surfaces for payload shape and validation.
 
+## Authentication Configuration
+
+Canonical code stores `OIDCCredential` and `X509Credential` Authentication
+Records in `Configuration.authentication` and accesses them through
+`Configuration.get_credential`, `upsert_credential`, and `update_credential`.
+`ActiveConfig` owns the active Authentication and Server Selection references;
+`HTTPClient` composes `Configuration` and resolves those records for transport.
+
+The legacy `OIDC` and `X509` models, `Configuration.context` and `.contexts`,
+and the selection compatibility shims remain working compatibility views. New
+code should use the canonical records and `Configuration` methods directly.
+
 ## Test Caveats
 
 - Some tests touch live CANFAR endpoints even if they are not long-running. They must be marked `slow` and `integration`.

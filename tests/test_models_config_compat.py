@@ -146,9 +146,8 @@ class TestLegacyContextsMapping:
     def test_setitem_persists_context(self) -> None:
         """Assigning a context updates the underlying configuration.
 
-        This is the mutation path used by the httpx auth refresh hooks
-        (``client.config.contexts[idp] = context``) and must survive the
-        switch to a read-only ``Mapping`` base.
+        This public compatibility mutation must survive the switch to a
+        read-only ``Mapping`` base.
         """
         config = _config_with_oidc()
         idp = config.active.authentication

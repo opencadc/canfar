@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 import time
 from pathlib import Path  # noqa: TC003
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
@@ -340,3 +340,6 @@ AuthenticationCredential = Annotated[
     OIDCCredential | X509Credential, Field(discriminator="mode")
 ]
 """Discriminated union of v1 authentication credentials without embedded server."""
+
+AuthContext: TypeAlias = OIDC | X509
+"""Legacy authentication context shape with embedded server."""

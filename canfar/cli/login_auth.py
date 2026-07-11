@@ -11,8 +11,6 @@ from rich import progress as rich_progress
 
 from canfar.auth import oidc, x509
 from canfar.models.auth import (
-    OIDC,
-    X509,
     AuthenticationCredential,
     Client,
     Endpoint,
@@ -21,7 +19,6 @@ from canfar.models.auth import (
     Token,
     X509Credential,
 )
-from canfar.models.http import Server
 from canfar.utils import console as console_utils
 
 if TYPE_CHECKING:
@@ -130,12 +127,7 @@ def _authenticate_x509(idp: str) -> X509Credential:
     Returns:
         X509 credential record for persisted configuration.
     """
-    context = x509.authenticate(X509(expiry=0.0))
-    return X509Credential(
-        idp=idp,
-        path=context.path,
-        expiry=context.expiry,
-    )
+    return x509.authenticate_credential(X509Credential(idp=idp, expiry=0.0))
 
 
 def _authenticate_oidc(
@@ -162,18 +154,18 @@ def _authenticate_oidc(
         msg = f"OIDC issuer is not configured for IDP '{idp_info.key}'."
         raise RuntimeError(msg)
 
-    legacy = OIDC(
+    credential = OIDCCredential(
+        idp=idp_info.key,
         endpoints=Endpoint(discovery=str(idp_info.oidc_discovery_url)),
         client=Client(),
         token=Token(),
         expiry=Expiry(),
-        server=Server(),
     )
     console = console_utils.get_console()
     console.print("[bold blue]Starting OIDC Device Authentication[/bold blue]")
-    updated = asyncio.run(
-        oidc.authenticate(
-            legacy,
+    return asyncio.run(
+        oidc.authenticate_credential(
+            credential,
             expected_issuer=str(idp_info.oidc_issuer),
             timeout=timeout,
             device_flow=_interactive_device_flow,
@@ -181,11 +173,4 @@ def _authenticate_oidc(
                 f"[green]✓[/green] Successfully authenticated as {username}"
             ),
         )
-    )
-    return OIDCCredential(
-        idp=idp_info.key,
-        endpoints=updated.endpoints,
-        client=updated.client,
-        token=updated.token,
-        expiry=updated.expiry,
     )

@@ -38,36 +38,25 @@ client = HTTPClient(loglevel=logging.DEBUG)
 
 ## Configuration
 
-The client inherits from the `Configuration` class and supports all configuration options:
+The client composes a `Configuration` object through its `config` field:
 
 ```python
 from canfar.client import HTTPClient
+from canfar.models.config import Configuration
 
 client = HTTPClient(
+    config=Configuration(),
     timeout=60,           # Request timeout in seconds
     concurrency=64,       # Max concurrent connections
-    loglevel=20,         # Logging level (INFO)
+    loglevel=20,          # Logging level (INFO)
 )
 ```
 
-## Authentication Expiry
-
-The client provides an `expiry` property that returns the expiry time for the current authentication method:
-
-```python
-import time
-
-client = HTTPClient()
-
-if client.expiry:
-    time_left = client.expiry - time.time()
-    print(f"Authentication expires in {time_left:.0f} seconds")
-else:
-    print("No expiry tracking (user-provided credentials)")
-```
-
-!!! note "Expiry Tracking"
-    The `expiry` property returns `None` for user-provided certificates or tokens since the client cannot track their expiry automatically.
+Runtime `token` or `certificate` arguments take precedence over saved
+Authentication Records, including authentication hook selection. Without
+runtime credentials, `authentication_idp` selects an Authentication Record for
+that client; otherwise the active Authentication Record and Server Selection
+from `Configuration` are used.
 
 ## Error Handling
 
