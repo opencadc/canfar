@@ -537,7 +537,7 @@ async def authenticate(
         try:
             token = Token(
                 access=tokens["access_token"],
-                refresh=tokens["refresh_token"],
+                refresh=tokens.get("refresh_token"),
                 token_type=tokens.get("token_type"),
                 scope=tokens.get("scope"),
             )

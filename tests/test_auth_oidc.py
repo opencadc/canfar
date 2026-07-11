@@ -698,6 +698,51 @@ class TestAuthflowFunction:
 class TestAuthenticateFunction:
     """Test the authenticate function."""
 
+    async def _authenticate_with_tokens(self, tokens: dict[str, object]) -> OIDC:
+        oidc_config = OIDC(
+            endpoints=Endpoint(
+                discovery="https://example.com/.well-known/openid-configuration"
+            ),
+            client=Client(),
+            token=Token(),
+        )
+
+        with (
+            patch("httpx.AsyncClient") as mock_client_class,
+            patch(
+                "authlib.integrations.httpx_client.AsyncOAuth2Client"
+            ) as oauth_client_class,
+        ):
+            mock_client = AsyncMock()
+            mock_client_class.return_value.__aenter__.return_value = mock_client
+            oauth_client_class.return_value.__aenter__.return_value = AsyncMock(
+                spec=AsyncOAuth2Client
+            )
+
+            discovery_response = MagicMock()
+            discovery_response.json.return_value = {
+                "issuer": "https://example.com",
+                "device_authorization_endpoint": "https://example.com/device",
+                "registration_endpoint": "https://example.com/register",
+                "token_endpoint": "https://example.com/token",
+                "userinfo_endpoint": "https://example.com/userinfo",
+            }
+            registration_response = MagicMock()
+            registration_response.json.return_value = {
+                "client_id": "test_client_id",
+                "client_secret": "test_client_secret",
+            }
+            userinfo_response = MagicMock()
+            userinfo_response.json.return_value = {"preferred_username": "testuser"}
+            mock_client.get.side_effect = [discovery_response, userinfo_response]
+            mock_client.post.return_value = registration_response
+
+            return await authenticate(
+                oidc_config,
+                expected_issuer="https://example.com",
+                device_flow=AsyncMock(return_value=tokens),
+            )
+
     @pytest.mark.asyncio
     async def test_authenticate_function(self) -> None:
         """Test the authenticate function integration."""
@@ -782,6 +827,26 @@ class TestAuthenticateFunction:
                 assert result.expiry.refresh is None
 
     @pytest.mark.asyncio
+    async def test_authenticate_accepts_token_without_refresh_token(self) -> None:
+        """Authentication succeeds when the token response omits a refresh token."""
+        result = await self._authenticate_with_tokens(
+            {
+                "access_token": "test_access_token",
+                "token_type": "Bearer",
+                "scope": "openid profile",
+                "expires_at": 1234567890,
+            }
+        )
+
+        assert result.token.access is not None
+        assert result.token.access.get_secret_value() == "test_access_token"
+        assert result.token.refresh is None
+        assert result.token.token_type == "Bearer"
+        assert result.token.scope == "openid profile"
+        assert result.expiry.access == 1234567890
+        assert result.expiry.refresh is None
+
+    @pytest.mark.asyncio
     @pytest.mark.parametrize(
         "malformed_metadata",
         [
@@ -797,13 +862,6 @@ class TestAuthenticateFunction:
     ) -> None:
         """Malformed token metadata becomes one safe Authentication failure."""
         sentinel = "secret-malformed-token-metadata"
-        oidc_config = OIDC(
-            endpoints=Endpoint(
-                discovery="https://example.com/.well-known/openid-configuration"
-            ),
-            client=Client(),
-            token=Token(),
-        )
         tokens: dict[str, object] = {
             "access_token": "test_access_token",
             "refresh_token": "test_refresh_token",
@@ -813,45 +871,11 @@ class TestAuthenticateFunction:
             **malformed_metadata,
         }
 
-        with (
-            patch("httpx.AsyncClient") as mock_client_class,
-            patch(
-                "authlib.integrations.httpx_client.AsyncOAuth2Client"
-            ) as oauth_client_class,
-        ):
-            mock_client = AsyncMock()
-            oauth_client = AsyncMock(spec=AsyncOAuth2Client)
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-            oauth_client_class.return_value.__aenter__.return_value = oauth_client
-
-            discovery_response = MagicMock()
-            discovery_response.json.return_value = {
-                "issuer": "https://example.com",
-                "device_authorization_endpoint": "https://example.com/device",
-                "registration_endpoint": "https://example.com/register",
-                "token_endpoint": "https://example.com/token",
-                "userinfo_endpoint": "https://example.com/userinfo",
-            }
-            register_response = MagicMock()
-            register_response.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
-            userinfo_response = MagicMock()
-            userinfo_response.json.return_value = {"preferred_username": "testuser"}
-            mock_client.get.side_effect = [discovery_response, userinfo_response]
-            mock_client.post.return_value = register_response
-            device_flow = AsyncMock(return_value=tokens)
-
-            with pytest.raises(
-                ValueError,
-                match=r"OIDC device authorization failed: malformed token response$",
-            ) as exc:
-                await authenticate(
-                    oidc_config,
-                    expected_issuer="https://example.com",
-                    device_flow=device_flow,
-                )
+        with pytest.raises(
+            ValueError,
+            match=r"OIDC device authorization failed: malformed token response$",
+        ) as exc:
+            await self._authenticate_with_tokens(tokens)
 
         assert sentinel not in str(exc.value)
         assert sentinel not in caplog.text
