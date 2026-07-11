@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
@@ -67,6 +70,7 @@ def span_exporter(
         )
         return configured
 
+    monkeypatch.delenv("CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
     monkeypatch.setattr(logfire, "configure", configure_with_exporter)
     configure_logging(loglevel="DEBUG")
     try:
@@ -80,9 +84,24 @@ def span_exporter(
 @pytest.mark.asyncio
 async def test_explicit_logging_emits_safe_completed_http_spans(
     capsys: pytest.CaptureFixture[str],
+    monkeypatch: pytest.MonkeyPatch,
     span_exporter: InMemorySpanExporter,
 ) -> None:
     """Configured sync and async clients emit the same safe completed span."""
+    hostile_environment = {
+        "LOGFIRE_HTTPX_CAPTURE_ALL": "true",
+        "LOGFIRE_TOKEN": "ambient-logfire-token",
+        "OTEL_EXPORTER_OTLP_ENDPOINT": "https://ambient.invalid",
+        "OTEL_TRACES_EXPORTER": "console",
+        "OTEL_METRICS_EXPORTER": "console",
+        "OTEL_LOGS_EXPORTER": "console",
+        "OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_CLIENT_REQUEST": ".*",
+        "OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_CLIENT_RESPONSE": ".*",
+        "OTEL_PYTHON_HTTPX_EXCLUDED_URLS": ".*",
+        "OTEL_SEMCONV_STABILITY_OPT_IN": "http",
+    }
+    for key, value in hostile_environment.items():
+        monkeypatch.setenv(key, value)
     traceparents: list[str] = []
 
     def respond(request: httpx.Request) -> httpx.Response:
@@ -203,6 +222,36 @@ async def test_explicit_logging_emits_safe_completed_http_spans(
 
     stderr = capsys.readouterr().err
     assert all(secret not in stderr for secret in _SECRETS.values())
+    assert {key: os.environ[key] for key in hostile_environment} == (
+        hostile_environment
+    )
+
+
+def test_preimport_propagator_env_cannot_disable_safe_http_spans() -> None:
+    """Explicit logging overrides a hostile propagator cached during import."""
+    environment = os.environ.copy()
+    environment.pop("CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT", None)
+    environment["OTEL_PROPAGATORS"] = "none"
+    result = subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            (f"{__file__}::test_explicit_logging_emits_safe_completed_http_spans"),
+            "-n",
+            "0",
+            "-q",
+            "--no-cov",
+            "-p",
+            "no:cacheprovider",
+        ],
+        capture_output=True,
+        text=True,
+        check=False,
+        env=environment,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
 
 
 @pytest.mark.asyncio

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import os
 import tempfile
 import threading
 from pathlib import Path
@@ -23,6 +24,7 @@ from canfar.utils.logging import (
     MAX_LOGFILE_SIZE,
     RICH_FORMAT,
     CanfarLogger,
+    InvalidLoggingEnvironmentError,
     LoggingLevel,
     configure_logging,
     enable_debug,
@@ -41,6 +43,10 @@ def _raise_secret_error(secret: str) -> None:
 
 _PEM_VALUE_FIELD = "private-key".replace("-", "_")
 _SERVICE_VALUE_FIELD = "api-key".replace("-", "_")
+_OTLP_ENDPOINT_ENV_VAR = "CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT"
+_OTLP_ENDPOINT_EXPECTED = (
+    "absolute http(s) base URL without credentials, query, or fragment"
+)
 
 
 class TestCanfarLogger:
@@ -292,6 +298,176 @@ class TestConvenienceFunctions:
             assert result is LoggingLevel.DEBUG
             mock_configure.assert_called_once_with(loglevel="debug", filelog=True)
             configure_logfire.assert_called_once()
+
+    @pytest.mark.parametrize(
+        ("endpoint", "expected"),
+        [
+            (None, {}),
+            (
+                "https://collector.example:4318/otel/v1",
+                {
+                    "OTEL_EXPORTER_OTLP_ENDPOINT": (
+                        "https://collector.example:4318/otel/v1"
+                    ),
+                    "OTEL_TRACES_EXPORTER": "otlp",
+                    "OTEL_METRICS_EXPORTER": "none",
+                    "OTEL_LOGS_EXPORTER": "none",
+                },
+            ),
+        ],
+    )
+    def test_configure_logging_uses_only_canfar_telemetry_environment(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        endpoint: str | None,
+        expected: dict[str, str],
+    ) -> None:
+        """Only a valid CANFAR endpoint reaches upstream configuration."""
+        ambient = {
+            "LOGFIRE_TOKEN": "ambient-logfire-token",
+            "LOGFIRE_SEND_TO_LOGFIRE": "true",
+            "OTEL_EXPORTER_OTLP_ENDPOINT": "https://ambient.invalid",
+            "OTEL_TRACES_EXPORTER": "console",
+            "OTEL_METRICS_EXPORTER": "console",
+            "OTEL_LOGS_EXPORTER": "console",
+            "OTEL_PYTHON_HTTPX_EXCLUDED_URLS": ".*",
+        }
+        for key, value in ambient.items():
+            monkeypatch.setenv(key, value)
+        if endpoint is None:
+            monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
+        else:
+            monkeypatch.setenv(_OTLP_ENDPOINT_ENV_VAR, endpoint)
+        before = {
+            key: value
+            for key, value in os.environ.items()
+            if key.startswith(("LOGFIRE_", "OTEL_"))
+        }
+        observed: dict[str, str] = {}
+
+        def configure_upstream(**kwargs: object) -> Mock:
+            del kwargs
+            observed.update(
+                {
+                    key: value
+                    for key, value in os.environ.items()
+                    if key.startswith(("LOGFIRE_", "OTEL_"))
+                }
+            )
+            return Mock()
+
+        with (
+            patch("logfire.configure", side_effect=configure_upstream),
+            patch("canfar.utils.logging._canfar_logger.configure"),
+            patch("canfar.utils.logging._instrument_httpx", None),
+        ):
+            configure_logging(loglevel="ERROR")
+
+        assert observed == expected
+        assert {
+            key: value
+            for key, value in os.environ.items()
+            if key.startswith(("LOGFIRE_", "OTEL_"))
+        } == before
+
+    def test_configure_logging_preserves_telemetry_changes_made_during_setup(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Upstream setup does not erase telemetry changes made during its call."""
+        monkeypatch.setenv(
+            _OTLP_ENDPOINT_ENV_VAR,
+            "https://collector.example:4318/otel",
+        )
+        monkeypatch.setenv("OTEL_TRACES_EXPORTER", "console")
+
+        def configure_upstream(**kwargs: object) -> Mock:
+            del kwargs
+            assert os.environ["OTEL_TRACES_EXPORTER"] == "otlp"
+            os.environ["OTEL_TRACES_EXPORTER"] = "zipkin"
+            os.environ["OTEL_RESOURCE_ATTRIBUTES"] = "service.name=host"
+            return Mock()
+
+        with (
+            patch("logfire.configure", side_effect=configure_upstream),
+            patch("canfar.utils.logging._canfar_logger.configure"),
+            patch("canfar.utils.logging._instrument_httpx", None),
+        ):
+            configure_logging(loglevel="ERROR")
+
+        assert os.environ["OTEL_TRACES_EXPORTER"] == "zipkin"
+        assert os.environ["OTEL_RESOURCE_ATTRIBUTES"] == "service.name=host"
+
+    def test_configure_logging_restores_ambient_telemetry_after_failure(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Upstream failure restores every hidden ambient setting exactly."""
+        ambient = {
+            "LOGFIRE_TOKEN": "ambient-logfire-token",
+            "OTEL_EXPORTER_OTLP_ENDPOINT": "https://ambient.invalid/path",
+            "OTEL_INSTRUMENTATION_HTTP_CAPTURE_HEADERS_CLIENT_REQUEST": ".*",
+        }
+        for key, value in ambient.items():
+            monkeypatch.setenv(key, value)
+        before = {
+            key: value
+            for key, value in os.environ.items()
+            if key.startswith(("LOGFIRE_", "OTEL_"))
+        }
+
+        def fail_upstream(**kwargs: object) -> None:
+            del kwargs
+            assert not any(key.startswith(("LOGFIRE_", "OTEL_")) for key in os.environ)
+            msg = "upstream configuration failed"
+            raise RuntimeError(msg)
+
+        with (
+            patch("logfire.configure", side_effect=fail_upstream),
+            pytest.raises(RuntimeError, match="upstream configuration failed"),
+        ):
+            configure_logging(loglevel="ERROR")
+
+        assert {
+            key: value
+            for key, value in os.environ.items()
+            if key.startswith(("LOGFIRE_", "OTEL_"))
+        } == before
+
+    @pytest.mark.parametrize(
+        "value",
+        [
+            "collector.example:4318",
+            "ftp://collector.example/otel",
+            "ftp://collector.example/client_secret=opaque",
+            "https:///otel",
+            "https://user:password@collector.example/otel",
+            "https://collector.example/otel?token=value",
+            "https://collector.example/otel#fragment",
+            " https://collector.example/otel",
+            "https://collector.example:99999/otel",
+            "https://collector.example:/otel",
+        ],
+    )
+    def test_invalid_otlp_endpoint_fails_before_upstream_configuration(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        value: str,
+    ) -> None:
+        """Known-invalid endpoint shapes fail before Logfire configuration."""
+        monkeypatch.setenv(_OTLP_ENDPOINT_ENV_VAR, value)
+
+        with (
+            patch("logfire.configure") as configure_upstream,
+            pytest.raises(InvalidLoggingEnvironmentError) as caught,
+        ):
+            configure_logging(loglevel="ERROR")
+
+        configure_upstream.assert_not_called()
+        assert caught.value.error.env_var == _OTLP_ENDPOINT_ENV_VAR
+        assert caught.value.error.provided_value == "<redacted>"
+        assert caught.value.error.expected == [_OTLP_ENDPOINT_EXPECTED]
+        assert "opaque" not in str(caught.value)
 
     def test_get_logger_without_name(self) -> None:
         """Test get_logger without name returns main logger."""

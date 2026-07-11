@@ -6,7 +6,7 @@ import json
 from contextlib import ExitStack
 from types import SimpleNamespace
 from typing import TYPE_CHECKING
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import httpx
 import pytest
@@ -28,6 +28,10 @@ if TYPE_CHECKING:
 runner = CliRunner()
 _CADC_REGISTRY = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
+_OTLP_ENDPOINT_ENV_VAR = "CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT"
+_OTLP_ENDPOINT_EXPECTED = (
+    "absolute http(s) base URL without credentials, query, or fragment"
+)
 
 
 def _config_path(path: Path) -> ExitStack:
@@ -381,3 +385,48 @@ def test_invalid_logging_environment_is_one_structured_machine_error(
     assert error.env_var == "CANFAR_LOGLEVEL"
     assert error.provided_value == "chatty"
     assert error.expected == ["critical", "error", "warning", "info", "debug"]
+
+
+def test_invalid_otlp_endpoint_is_a_secret_safe_setup_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Endpoint setup failure keeps data streams clean without echoing secrets."""
+    credential = "credential-sentinel-41"
+    query = "query-sentinel-42"
+    endpoint = (
+        f"https://user:{credential}@collector.example/otel?token={query}#fragment"
+    )
+    monkeypatch.setenv(_OTLP_ENDPOINT_ENV_VAR, endpoint)
+
+    result = runner.invoke(cli, ["config", "get", "console.width", "--json"])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert credential not in result.stderr
+    assert query not in result.stderr
+    error = LoggingEnvironmentError.model_validate(json.loads(result.stderr))
+    assert error.code == ErrorCode.LOGGING_INVALID_ENV_VALUE.value
+    assert error.env_var == _OTLP_ENDPOINT_ENV_VAR
+    assert error.provided_value == "<redacted>"
+    assert error.expected == [_OTLP_ENDPOINT_EXPECTED]
+
+
+def test_valid_otlp_endpoint_preserves_command_streams_without_network(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Explicit export opt-in does not change command stdout or stderr."""
+    monkeypatch.setenv(
+        _OTLP_ENDPOINT_ENV_VAR,
+        "https://collector.example:4318/otel/v1",
+    )
+
+    with (
+        patch("logfire.configure", return_value=Mock()) as configure_upstream,
+        patch("canfar.utils.logging._instrument_httpx", None),
+    ):
+        result = runner.invoke(cli, ["config", "get", "console.width", "--json"])
+
+    assert result.exit_code == 0
+    assert result.stderr == ""
+    assert json.loads(result.stdout) == 120
+    configure_upstream.assert_called_once()

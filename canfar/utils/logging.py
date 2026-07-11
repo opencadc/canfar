@@ -24,6 +24,7 @@ import re
 import tempfile
 import threading
 import traceback
+from contextlib import contextmanager
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -37,7 +38,7 @@ from canfar import CONFIG_DIR, CONFIG_PATH  # noqa: F401
 from canfar.errors import ErrorCode, LoggingEnvironmentError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
 
     from httpx import AsyncClient, Client
     from logfire import LevelName
@@ -50,6 +51,7 @@ LOG_LEVEL: int = 10
 LOGGER_NAME = "canfar"
 # Thread lock for configuration safety
 _LOCK = threading.Lock()
+_TELEMETRY_ENV_LOCK = threading.RLock()
 _instrument_httpx: Callable[..., None] | None = None
 
 # Default configuration
@@ -61,6 +63,11 @@ MAX_LOGFILE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_LOGFILE_COUNT = 10
 
 LOG_LEVEL_ENV_VAR = "CANFAR_LOGLEVEL"
+OTLP_ENDPOINT_ENV_VAR = "CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT"
+_OTLP_ENDPOINT_EXPECTED = (
+    "absolute http(s) base URL without credentials, query, or fragment"
+)
+_TELEMETRY_ENV_PREFIXES = ("LOGFIRE_", "OTEL_")
 
 
 class LoggingLevel(str, Enum):
@@ -118,13 +125,19 @@ _SENSITIVE_FIELD = re.compile(_SENSITIVE_NAME_FRAGMENT, re.IGNORECASE)
 class InvalidLoggingEnvironmentError(ValueError):
     """A known CANFAR logging environment variable has an invalid value."""
 
-    def __init__(self, provided_value: str) -> None:
-        expected = [level.value for level in LoggingLevel]
+    def __init__(
+        self,
+        provided_value: str,
+        *,
+        env_var: str = LOG_LEVEL_ENV_VAR,
+        expected: list[str] | None = None,
+    ) -> None:
+        expected = expected or [level.value for level in LoggingLevel]
         self.error = LoggingEnvironmentError(
             code=ErrorCode.LOGGING_INVALID_ENV_VALUE,
-            message=f"Invalid value for {LOG_LEVEL_ENV_VAR}.",
+            message=f"Invalid value for {env_var}.",
             hint=f"Use one of: {', '.join(expected)}.",
-            env_var=LOG_LEVEL_ENV_VAR,
+            env_var=env_var,
             provided_value=provided_value,
             expected=expected,
         )
@@ -134,6 +147,76 @@ class InvalidLoggingEnvironmentError(ValueError):
             f"expected={','.join(self.error.expected)}"
         )
         super().__init__(details)
+
+
+def _resolve_otlp_endpoint() -> str | None:
+    """Validate and return the explicit CANFAR OTLP endpoint, if present."""
+    value = os.environ.get(OTLP_ENDPOINT_ENV_VAR)
+    if value is None:
+        return None
+
+    try:
+        parts = urlsplit(value)
+        port = parts.port
+        valid = (
+            not any(character.isspace() for character in value)
+            and parts.scheme.lower() in {"http", "https"}
+            and parts.hostname is not None
+            and parts.username is None
+            and parts.password is None
+            and "?" not in value
+            and "#" not in value
+            and not parts.netloc.endswith(":")
+            and (port is None or port > 0)
+        )
+    except ValueError:
+        valid = False
+
+    if not valid:
+        provided_value = "<redacted>"
+        raise InvalidLoggingEnvironmentError(
+            provided_value,
+            env_var=OTLP_ENDPOINT_ENV_VAR,
+            expected=[_OTLP_ENDPOINT_EXPECTED],
+        )
+    return value
+
+
+@contextmanager
+def _telemetry_environment(endpoint: str | None = None) -> Iterator[None]:
+    """Briefly quarantine telemetry env during explicit setup/client creation.
+
+    The upstream env-only API requires a short process-global mutation, so
+    unrelated readers can briefly observe the quarantined state.
+    """
+    mapped = (
+        {
+            "OTEL_EXPORTER_OTLP_ENDPOINT": endpoint,
+            "OTEL_TRACES_EXPORTER": "otlp",
+            "OTEL_METRICS_EXPORTER": "none",
+            "OTEL_LOGS_EXPORTER": "none",
+        }
+        if endpoint is not None
+        else {}
+    )
+    with _TELEMETRY_ENV_LOCK:
+        previous = {
+            key: value
+            for key, value in os.environ.items()
+            if key.startswith(_TELEMETRY_ENV_PREFIXES)
+        }
+        for key in tuple(os.environ):
+            if key.startswith(_TELEMETRY_ENV_PREFIXES):
+                os.environ.pop(key)
+        os.environ.update(mapped)
+        try:
+            yield
+        finally:
+            for key, value in mapped.items():
+                if os.environ.get(key) == value:
+                    os.environ.pop(key)
+            for key, value in previous.items():
+                os.environ.setdefault(key, value)
 
 
 def safe_url(value: object) -> str:
@@ -202,20 +285,21 @@ def instrument_httpx(client: Client | AsyncClient) -> None:
     """Instrument one cached client after explicit logging configuration."""
     if _instrument_httpx is None:
         return
-    from canfar.utils.telemetry import (  # noqa: PLC0415
-        safe_httpx_tracer_provider,
-    )
+    with _telemetry_environment():
+        from canfar.utils.telemetry import (  # noqa: PLC0415
+            safe_httpx_tracer_provider,
+        )
 
-    _instrument_httpx(
-        client,
-        capture_all=False,
-        capture_headers=False,
-        capture_request_body=False,
-        capture_response_body=False,
-        request_hook=_httpx_request_hook,
-        response_hook=_httpx_response_hook,
-        tracer_provider=safe_httpx_tracer_provider(),
-    )
+        _instrument_httpx(
+            client,
+            capture_all=False,
+            capture_headers=False,
+            capture_request_body=False,
+            capture_response_body=False,
+            request_hook=_httpx_request_hook,
+            response_hook=_httpx_response_hook,
+            tracer_provider=safe_httpx_tracer_provider(),
+        )
 
 
 def _resolve_log_level(
@@ -428,19 +512,24 @@ def configure_logging(
     global _instrument_httpx  # noqa: PLW0603
 
     level = _resolve_log_level(loglevel, verbosity)
+    endpoint = _resolve_otlp_endpoint()
 
-    # Logfire is intentionally imported and configured only at this runtime seam.
-    import logfire  # noqa: PLC0415
+    with _telemetry_environment(endpoint):
+        # Logfire is intentionally imported and configured only at this runtime seam.
+        import logfire  # noqa: PLC0415
 
-    configured = logfire.configure(
-        send_to_logfire=False,
-        console=False,
-        metrics=False,
-        scrubbing=logfire.ScrubbingOptions(extra_patterns=_SCRUBBING_PATTERNS),
-        inspect_arguments=False,
-        distributed_tracing=False,
-        min_level=_LOGFIRE_LEVELS[level],
-    )
+        from canfar.utils.telemetry import install_w3c_propagator  # noqa: PLC0415
+
+        configured = logfire.configure(
+            send_to_logfire=False,
+            console=False,
+            metrics=False,
+            scrubbing=logfire.ScrubbingOptions(extra_patterns=_SCRUBBING_PATTERNS),
+            inspect_arguments=False,
+            distributed_tracing=False,
+            min_level=_LOGFIRE_LEVELS[level],
+        )
+        install_w3c_propagator()
     _instrument_httpx = configured.instrument_httpx
     _canfar_logger.configure(loglevel=level.value, filelog=filelog)
     return level

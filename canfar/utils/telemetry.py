@@ -6,7 +6,13 @@ from contextlib import contextmanager
 from typing import TYPE_CHECKING
 
 from opentelemetry import trace
+from opentelemetry.baggage.propagation import W3CBaggagePropagator
+from opentelemetry.propagate import set_global_textmap
+from opentelemetry.propagators.composite import CompositePropagator
 from opentelemetry.trace import SpanKind, Status, StatusCode, Tracer, TracerProvider
+from opentelemetry.trace.propagation.tracecontext import (
+    TraceContextTextMapPropagator,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Iterator, Sequence
@@ -14,6 +20,13 @@ if TYPE_CHECKING:
     from opentelemetry.context import Context
     from opentelemetry.trace import Link, Span
     from opentelemetry.util.types import Attributes
+
+
+def install_w3c_propagator() -> None:
+    """Install the canonical W3C trace-context and baggage propagators."""
+    set_global_textmap(
+        CompositePropagator([TraceContextTextMapPropagator(), W3CBaggagePropagator()])
+    )
 
 
 def _exception_type(exception: Exception) -> str:
