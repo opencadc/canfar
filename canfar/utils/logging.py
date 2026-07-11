@@ -422,8 +422,7 @@ class CanfarLogger:
     _rich_handler: RichHandler | None = None
 
     def __init__(self) -> None:
-        """Constructor."""
-        self._logger: logging.Logger | None = None
+        """Initialize per-instance file-handler state."""
         self._file_handler: logging.handlers.RotatingFileHandler | None = None
 
     @property
@@ -433,9 +432,7 @@ class CanfarLogger:
         Returns:
             logging.Logger: logging object.
         """
-        if self._logger is None:
-            self._logger = logging.getLogger(LOGGER_NAME)
-        return self._logger
+        return logging.getLogger(LOGGER_NAME)
 
     def configure(
         self,
@@ -533,19 +530,6 @@ class CanfarLogger:
         self._rich_handler = None
         self._file_handler = None
 
-    def get_child_logger(self, name: str) -> logging.Logger:
-        """Get a child logger for a specific module.
-
-        Args:
-            name: Module name (will be prefixed with 'canfar')
-
-        Returns:
-            Child logger that inherits configuration from parent
-        """
-        if not name.startswith(LOGGER_NAME):
-            name = f"{LOGGER_NAME}.{name}"
-        return logging.getLogger(name)
-
 
 # Global logger instance
 _canfar_logger = CanfarLogger()
@@ -600,5 +584,7 @@ def get_logger(name: str | None = None) -> logging.Logger:
         Logger instance
     """
     if name is None:
-        return _canfar_logger.logger
-    return _canfar_logger.get_child_logger(name)
+        name = LOGGER_NAME
+    elif not name.startswith(LOGGER_NAME):
+        name = f"{LOGGER_NAME}.{name}"
+    return logging.getLogger(name)

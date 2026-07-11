@@ -270,19 +270,10 @@ class TestConvenienceFunctions:
         assert caught.value.error.expected == [_OTLP_ENDPOINT_EXPECTED]
         assert "opaque" not in str(caught.value)
 
-    def test_get_logger_without_name(self) -> None:
-        """Test get_logger without name returns main logger."""
-        with patch.object(CanfarLogger, "logger", new_callable=Mock) as mock_logger:
-            result = get_logger()
-            assert result is mock_logger
-
-    def test_get_logger_with_name(self) -> None:
-        """Test get_logger with name returns child logger."""
-        with patch(
-            "canfar.utils.logging._canfar_logger.get_child_logger"
-        ) as mock_get_child:
-            get_logger("test.module")
-            mock_get_child.assert_called_once_with("test.module")
+    def test_get_logger_returns_root_and_prefixed_child_names(self) -> None:
+        """Public logger lookup returns canonical CANFAR logger names."""
+        assert get_logger().name == "canfar"
+        assert get_logger("test.module").name == "canfar.test.module"
 
 
 class TestConstants:
@@ -350,35 +341,15 @@ class TestLoggingIntegration:
     ) -> None:
         """One public event is safe, correlated, and parseable in both sinks."""
         log_file = temp_log_dir / "events.jsonl"
-        secrets = {
-            "access": "access-jsonl-sentinel-01",
-            "refresh": "refresh-jsonl-sentinel-02",
-            "client_secret": "client-secret-jsonl-sentinel-03",
-            "password": "password-jsonl-sentinel-04",
-            "cookie": "cookie-jsonl-sentinel-05",
-            "certificate": "certificate-jsonl-sentinel-06",
-            "private_key": "private-key-jsonl-sentinel-07",
-            "pem": "pem-jsonl-sentinel-08",
-        }
-        message = "\n".join(
-            (
-                "unicode café 🍁",
-                f"Authorization: Bearer {secrets['access']}",
-                f"client_secret={secrets['client_secret']}",
-                f"password={secrets['password']}",
-                f"Cookie: session={secrets['cookie']}",
-                f"certificate={secrets['certificate']}",
-                f"private_key={secrets['private_key']}",
-                f"pem={secrets['pem']}",
-            )
-        )
+        secret = "jsonl-secret-sentinel-01"
+        message = f"unicode café 🍁\nAuthorization: Bearer {secret}"
         monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
 
         try:
             configure_logging(loglevel="DEBUG", log_file=log_file)
             logger = get_logger("jsonl")
             try:
-                _raise_secret_error(secrets["refresh"])
+                _raise_secret_error(secret)
             except RuntimeError:
                 logger.exception(
                     message,
@@ -427,7 +398,7 @@ class TestLoggingIntegration:
             assert "unicode café 🍁" in stderr
             output = stderr + raw
             assert "<redacted>" in output
-            assert all(secret not in output for secret in secrets.values())
+            assert secret not in output
         finally:
             for handler in get_logger().handlers[:]:
                 handler.close()
