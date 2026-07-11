@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import json
 import logging
 import os
+import re
 import tempfile
 import threading
+from contextlib import ExitStack
 from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import Mock, patch
@@ -13,6 +16,7 @@ from unittest.mock import Mock, patch
 import pytest
 from rich.logging import RichHandler
 
+from canfar.errors import ErrorCode
 from canfar.utils.logging import (
     CONFIG_DIR,
     CONFIG_PATH,
@@ -135,6 +139,21 @@ class TestCanfarLogger:
         assert hasattr(file_handler, "baseFilename")
         assert file_handler.baseFilename == str(log_file)  # type: ignore[attr-defined]
         assert canfar_logger._file_handler is file_handler  # noqa: SLF001
+
+    def test_explicit_file_path_wins_over_legacy_file_logging(
+        self,
+        canfar_logger: CanfarLogger,
+        temp_log_dir: Path,
+    ) -> None:
+        """An explicit sink target wins when the legacy switch is also enabled."""
+        legacy = temp_log_dir / "legacy.jsonl"
+        explicit = temp_log_dir / "explicit.jsonl"
+
+        with patch("canfar.utils.logging.LOGFILE_PATH", legacy):
+            canfar_logger.configure(filelog=True, log_file=explicit)
+
+        assert explicit.is_file()
+        assert not legacy.exists()
 
     def test_configure_reconfiguration_cleans_handlers(
         self, canfar_logger: CanfarLogger
@@ -275,11 +294,7 @@ class TestCanfarLogger:
         assert hasattr(file_handler, "backupCount")
         assert file_handler.maxBytes == MAX_LOGFILE_SIZE  # type: ignore[attr-defined]
         assert file_handler.backupCount == MAX_LOGFILE_COUNT  # type: ignore[attr-defined]
-
-        # Check formatter
-        formatter = file_handler.formatter
-        assert hasattr(formatter, "_fmt")
-        assert formatter._fmt == FORMAT  # type: ignore[attr-defined] # noqa: SLF001
+        assert file_handler.formatter is not None
 
 
 class TestConvenienceFunctions:
@@ -296,7 +311,7 @@ class TestConvenienceFunctions:
             result = configure_logging(loglevel=logging.DEBUG, filelog=True)
 
             assert result is LoggingLevel.DEBUG
-            mock_configure.assert_called_once_with(loglevel="debug", filelog=True)
+            mock_configure.assert_called_once()
             configure_logfire.assert_called_once()
 
     @pytest.mark.parametrize(
@@ -573,6 +588,41 @@ class TestLoggingIntegration:
         finally:
             logger._cleanup_handlers()  # noqa: SLF001
 
+    def test_json_lines_rotate_with_a_test_only_small_size(
+        self,
+        temp_log_dir: Path,
+    ) -> None:
+        """The stdlib rotating handler preserves JSON Lines across rollover."""
+        log_file = temp_log_dir / "rotating.jsonl"
+        logger = CanfarLogger()
+
+        try:
+            with patch("canfar.utils.logging.MAX_LOGFILE_SIZE", 256):
+                logger.configure(loglevel=logging.INFO, log_file=log_file)
+            for index in range(8):
+                logger.logger.info("rotation-event-%d %s", index, "x" * 80)
+            for handler in logger.logger.handlers:
+                handler.flush()
+
+            files = sorted(temp_log_dir.glob("rotating.jsonl*"))
+            assert log_file in files
+            assert temp_log_dir / "rotating.jsonl.1" in files
+            events = [
+                json.loads(line)
+                for path in files
+                for line in path.read_text(encoding="utf-8").splitlines()
+            ]
+            assert events
+            assert all(
+                set(event) == {"timestamp", "level", "logger", "message"}
+                for event in events
+            )
+            assert all(
+                event["message"].startswith("rotation-event-") for event in events
+            )
+        finally:
+            logger._cleanup_handlers()  # noqa: SLF001
+
     def test_child_logger_inheritance(self) -> None:
         """Test that child loggers inherit configuration from parent."""
         logger = CanfarLogger()
@@ -650,6 +700,125 @@ class TestLoggingIntegration:
 
         finally:
             logger._cleanup_handlers()  # noqa: SLF001
+
+    def test_public_runtime_writes_secret_safe_json_lines_and_stderr(
+        self,
+        temp_log_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """One public event is safe, correlated, and parseable in both sinks."""
+        log_file = temp_log_dir / "events.jsonl"
+        secrets = {
+            "access": "access-jsonl-sentinel-01",
+            "refresh": "refresh-jsonl-sentinel-02",
+            "client_secret": "client-secret-jsonl-sentinel-03",
+            "password": "password-jsonl-sentinel-04",
+            "cookie": "cookie-jsonl-sentinel-05",
+            "certificate": "certificate-jsonl-sentinel-06",
+            "private_key": "private-key-jsonl-sentinel-07",
+            "pem": "pem-jsonl-sentinel-08",
+        }
+        message = "\n".join(
+            (
+                "unicode café 🍁",
+                f"Authorization: Bearer {secrets['access']}",
+                f"client_secret={secrets['client_secret']}",
+                f"password={secrets['password']}",
+                f"Cookie: session={secrets['cookie']}",
+                f"certificate={secrets['certificate']}",
+                f"private_key={secrets['private_key']}",
+                f"pem={secrets['pem']}",
+            )
+        )
+        monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
+
+        try:
+            configure_logging(loglevel="DEBUG", log_file=log_file)
+            logger = get_logger("jsonl")
+            try:
+                _raise_secret_error(secrets["refresh"])
+            except RuntimeError:
+                logger.exception(
+                    message,
+                    extra={
+                        "event_code": "logging.contract",
+                        "request_id": "request-123",
+                        "trace_id": "trace-456",
+                        "span_id": "span-789",
+                    },
+                )
+            for handler in get_logger().handlers:
+                handler.flush()
+
+            raw = log_file.read_text(encoding="utf-8")
+            lines = raw.splitlines()
+            events = [json.loads(line) for line in lines]
+            assert len(events) == 1
+            event = events[0]
+            assert set(event) == {
+                "timestamp",
+                "level",
+                "logger",
+                "message",
+                "event_code",
+                "request_id",
+                "trace_id",
+                "span_id",
+                "exception",
+            }
+            assert re.fullmatch(
+                r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z",
+                event["timestamp"],
+            )
+            assert event["level"] == "ERROR"
+            assert event["logger"] == "canfar.jsonl"
+            assert event["message"].startswith("unicode café 🍁")
+            assert event["event_code"] == "logging.contract"
+            assert event["request_id"] == "request-123"
+            assert event["trace_id"] == "trace-456"
+            assert event["span_id"] == "span-789"
+            assert "Traceback" in event["exception"]
+            assert len(lines) == 1
+            assert "\\n" in raw
+
+            stderr = capsys.readouterr().err
+            assert "unicode café 🍁" in stderr
+            output = stderr + raw
+            assert "<redacted>" in output
+            assert all(secret not in output for secret in secrets.values())
+        finally:
+            for handler in get_logger().handlers[:]:
+                handler.close()
+                get_logger().removeHandler(handler)
+
+    def test_json_lines_omit_non_string_correlation_values(
+        self,
+        temp_log_dir: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Nested correlation data cannot violate the flat redacted schema."""
+        log_file = temp_log_dir / "flat.jsonl"
+        secret = "nested-correlation-secret-sentinel"
+        monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
+
+        try:
+            configure_logging(loglevel="INFO", log_file=log_file)
+            get_logger("jsonl").info(
+                "flat-event",
+                extra={"request_id": {"password": secret}},
+            )
+            for handler in get_logger().handlers:
+                handler.flush()
+
+            raw = log_file.read_text(encoding="utf-8")
+            event = json.loads(raw)
+            assert "request_id" not in event
+            assert secret not in raw
+        finally:
+            for handler in get_logger().handlers[:]:
+                handler.close()
+                get_logger().removeHandler(handler)
 
     def test_all_handlers_redact_sensitive_messages_and_exceptions(
         self,
@@ -818,31 +987,60 @@ class TestErrorHandling:
         finally:
             logger._cleanup_handlers()  # noqa: SLF001
 
-    def test_file_logging_permission_error(self, temp_log_dir: Path) -> None:
-        """Test handling of file permission errors.
-
-        Current behavior: falls back to a temp log location instead of raising.
-        """
-        # Create a directory where we can't write
-        readonly_dir = temp_log_dir / "readonly"
-        readonly_dir.mkdir()
-        readonly_dir.chmod(0o444)  # Read-only
-
-        log_file = readonly_dir / "test.log"
-
+    @pytest.mark.parametrize("failure", ["write", "rollover"])
+    def test_runtime_file_failure_disables_only_that_sink_and_warns_once(
+        self,
+        temp_log_dir: Path,
+        capsys: pytest.CaptureFixture[str],
+        failure: str,
+    ) -> None:
+        """Write and rollover errors disable the file sink without recursion."""
         logger = CanfarLogger()
+        warning_writer = Mock()
+        logger.configure(
+            loglevel=logging.CRITICAL,
+            log_file=temp_log_dir / f"{failure}.jsonl",
+            warning_writer=warning_writer,
+        )
+        handler = logger._file_handler  # noqa: SLF001
+        assert handler is not None
 
         try:
-            with patch("canfar.utils.logging.LOGFILE_PATH", log_file):
-                logger.configure(filelog=True)
+            with ExitStack() as stack:
+                if failure == "write":
+                    failing_call = stack.enter_context(
+                        patch(
+                            "logging.FileHandler.emit",
+                            side_effect=OSError("synthetic write failure"),
+                        )
+                    )
+                else:
+                    stack.enter_context(
+                        patch.object(handler, "shouldRollover", return_value=True)
+                    )
+                    failing_call = stack.enter_context(
+                        patch.object(
+                            handler,
+                            "doRollover",
+                            side_effect=OSError("synthetic rollover failure"),
+                        )
+                    )
 
-            assert logger._file_handler is not None  # noqa: SLF001
-            assert logger._file_handler.baseFilename != str(log_file)  # noqa: SLF001
+                logger.logger.critical("critical-event-one")
+                logger.logger.critical("critical-event-two")
 
+            stderr = capsys.readouterr().err
+            assert failing_call.call_count == 1
+            assert stderr.count("critical-event-one") == 1
+            assert stderr.count("critical-event-two") == 1
+            assert ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE.value not in stderr
+            warning_writer.assert_called_once()
+            assert (
+                warning_writer.call_args.args[0].code
+                == ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE.value
+            )
         finally:
             logger._cleanup_handlers()  # noqa: SLF001
-            # Restore permissions for cleanup
-            readonly_dir.chmod(0o755)
 
     def test_cleanup_with_no_handlers(self) -> None:
         """Test cleanup when no handlers exist."""

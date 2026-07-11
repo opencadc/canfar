@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from typing import Annotated
+from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
+from typing import TYPE_CHECKING, Annotated
 
 import typer
 
@@ -28,10 +29,14 @@ from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import ROOT_CHILD_ARGS_META_KEY, AliasGroup
 from canfar.utils.console import get_console
 from canfar.utils.logging import (
+    InvalidLogFilePathError,
     InvalidLoggingEnvironmentError,
     LoggingLevel,
     configure_logging,
 )
+
+if TYPE_CHECKING:
+    from canfar.errors import StructuredError
 
 
 def _leaf_output_mode(args: list[str]) -> output.OutputMode:
@@ -61,14 +66,33 @@ def callback(
             help="Increase logging verbosity; repeat up to four times.",
         ),
     ] = 0,
+    log_file: Annotated[
+        Path | None,
+        typer.Option(
+            "--log-file",
+            help="Write JSON Lines logs to this file.",
+        ),
+    ] = None,
 ) -> None:
     """Main callback that handles no subcommand case."""
     reset()
+    child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
+    mode = _leaf_output_mode(child_args)
+
+    def warning_writer(error: StructuredError) -> None:
+        if mode is output.OutputMode.HUMAN:
+            typer.echo(f"{error.code}: {error.message}", err=True)
+        else:
+            output.to_stderr(error, mode)
+
     try:
-        configure_logging(loglevel=log_level, verbosity=verbose)
-    except InvalidLoggingEnvironmentError as err:
-        child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
-        mode = _leaf_output_mode(child_args)
+        configure_logging(
+            loglevel=log_level,
+            verbosity=verbose,
+            log_file=log_file,
+            warning_writer=warning_writer,
+        )
+    except (InvalidLoggingEnvironmentError, InvalidLogFilePathError) as err:
         if mode is output.OutputMode.HUMAN:
             typer.echo(str(err), err=True)
         else:

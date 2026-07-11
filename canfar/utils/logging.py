@@ -17,14 +17,16 @@ Best Practices Implemented:
 
 from __future__ import annotations
 
+import json
 import logging
 import logging.handlers
 import os
 import re
-import tempfile
+import sys
 import threading
 import traceback
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING
@@ -35,7 +37,7 @@ from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
 
 from canfar import CONFIG_DIR, CONFIG_PATH  # noqa: F401
-from canfar.errors import ErrorCode, LoggingEnvironmentError
+from canfar.errors import ErrorCode, LoggingEnvironmentError, StructuredError
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -149,6 +151,49 @@ class InvalidLoggingEnvironmentError(ValueError):
         super().__init__(details)
 
 
+class InvalidLogFilePathError(ValueError):
+    """The requested file sink target is not a file path."""
+
+    def __init__(self) -> None:
+        self.error = StructuredError(
+            code=ErrorCode.LOGGING_INVALID_FILE_PATH,
+            message="Invalid log file path.",
+            hint="Choose a file path other than '-' or an existing directory.",
+        )
+        message = f"{self.error.code}: {self.error.message} {self.error.hint}"
+        super().__init__(message)
+
+
+def _resolve_log_file_path(log_file: Path) -> Path:
+    """Resolve and validate one explicitly requested file sink path."""
+    if str(log_file) == "-":
+        raise InvalidLogFilePathError
+    resolved = log_file if log_file.is_absolute() else Path.cwd() / log_file
+    try:
+        is_directory = resolved.is_dir()
+    except OSError:
+        is_directory = False
+    if is_directory:
+        raise InvalidLogFilePathError
+    return resolved
+
+
+def _warn_file_sink_unavailable(
+    warning_writer: Callable[[StructuredError], None] | None = None,
+) -> None:
+    """Emit the stable sink warning without routing back through logging."""
+    error = StructuredError(
+        code=ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE,
+        message="File logging is unavailable.",
+        hint="Logging continues on stderr.",
+    )
+    if warning_writer is not None:
+        warning_writer(error)
+        return
+    with suppress(OSError):
+        sys.stderr.write(f"{error.code}: {error.message}\n")
+
+
 def _resolve_otlp_endpoint() -> str | None:
     """Validate and return the explicit CANFAR OTLP endpoint, if present."""
     value = os.environ.get(OTLP_ENDPOINT_ENV_VAR)
@@ -260,6 +305,49 @@ class _RedactingFilter(logging.Filter):
 _REDACTION_FILTER = _RedactingFilter()
 
 
+class _JSONLinesFormatter(logging.Formatter):
+    """Format one redacted logging event as one UTF-8 JSON object."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        timestamp = datetime.fromtimestamp(record.created, timezone.utc)
+        payload: dict[str, object] = {
+            "timestamp": timestamp.isoformat(timespec="milliseconds").replace(
+                "+00:00", "Z"
+            ),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+        }
+        for name in ("event_code", "request_id", "trace_id", "span_id"):
+            value = getattr(record, name, None)
+            if isinstance(value, str):
+                payload[name] = value
+        diagnostics = [value for value in (record.exc_text, record.stack_info) if value]
+        if diagnostics:
+            payload["exception"] = "\n".join(diagnostics)
+        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+
+
+class _ResilientRotatingFileHandler(logging.handlers.RotatingFileHandler):
+    """Disable this sink after its first runtime failure."""
+
+    _disabled = False
+    warning_writer: Callable[[StructuredError], None] | None = None
+
+    def emit(self, record: logging.LogRecord) -> None:
+        if not self._disabled:
+            super().emit(record)
+
+    def handleError(  # noqa: N802
+        self,
+        record: logging.LogRecord,  # noqa: ARG002
+    ) -> None:
+        self._disabled = True
+        with suppress(OSError):
+            self.close()
+        _warn_file_sink_unavailable(self.warning_writer)
+
+
 def _httpx_request_hook(span: Span, request: RequestInfo) -> None:
     """Overwrite native URL attributes with a safe request URL."""
     url = safe_url(request.url)
@@ -361,13 +449,21 @@ class CanfarLogger:
         self,
         loglevel: int | str = logging.INFO,
         filelog: bool = False,
+        *,
+        log_file: Path | None = None,
+        warning_writer: Callable[[StructuredError], None] | None = None,
     ) -> None:
         """Configure the CANFAR logger with Rich support and optional file logging.
 
         Args:
             loglevel (int | str, optional): Logging level. Defaults to logging.INFO.
             filelog (bool, optional): Whether to enable file logging. Defaults to False.
+            log_file: Explicit file sink path. Overrides the legacy ``filelog`` path.
+            warning_writer: Optional sink for structured file-logging warnings.
         """
+        target = log_file if log_file is not None else LOGFILE_PATH if filelog else None
+        if target is not None:
+            target = _resolve_log_file_path(target)
         with _LOCK:
             install_rich_traceback(show_locals=False, suppress=[])
             if self._configured:
@@ -397,12 +493,13 @@ class CanfarLogger:
             logger.addHandler(self._rich_handler)
 
             # Setup file logging if requested
-            if filelog:
+            if target is not None:
                 self._setup_file_logging(
-                    LOGFILE_PATH,
+                    target,
                     MAX_LOGFILE_SIZE,
                     MAX_LOGFILE_COUNT,
                     int(loglevel),
+                    warning_writer,
                 )
 
             # Prevent propagation to root logger to avoid duplicate messages
@@ -415,33 +512,25 @@ class CanfarLogger:
         size: int,
         count: int,
         level: int,
+        warning_writer: Callable[[StructuredError], None] | None = None,
     ) -> None:
         """Setup rotating file handler for logging."""
-        # Ensure log directory exists
         try:
             logfile.parent.mkdir(parents=True, exist_ok=True)
-
-            # Use RotatingFileHandler for automatic log rotation
-            self._file_handler = logging.handlers.RotatingFileHandler(
+            self._file_handler = _ResilientRotatingFileHandler(
                 filename=logfile,
                 maxBytes=size,
                 backupCount=count,
                 encoding="utf-8",
             )
-        except PermissionError:
-            fallback = Path(tempfile.gettempdir()) / "canfar" / logfile.name
-            fallback.parent.mkdir(parents=True, exist_ok=True)
-            self._file_handler = logging.handlers.RotatingFileHandler(
-                filename=fallback,
-                maxBytes=size,
-                backupCount=count,
-                encoding="utf-8",
-            )
+        except OSError:
+            self._file_handler = None
+            _warn_file_sink_unavailable(warning_writer)
+            return
+        self._file_handler.warning_writer = warning_writer
         self._file_handler.setLevel(level)
         self._file_handler.addFilter(_REDACTION_FILTER)
-        # File handler uses detailed format
-        file_formatter = logging.Formatter(FORMAT)
-        self._file_handler.setFormatter(file_formatter)
+        self._file_handler.setFormatter(_JSONLinesFormatter())
         self.logger.addHandler(self._file_handler)
 
     def _cleanup_handlers(self) -> None:
@@ -507,6 +596,8 @@ def configure_logging(
     filelog: bool = False,
     *,
     verbosity: int = 0,
+    log_file: Path | None = None,
+    warning_writer: Callable[[StructuredError], None] | None = None,
 ) -> LoggingLevel:
     """Configure logging explicitly using CLI, environment, and packaged policy."""
     global _instrument_httpx  # noqa: PLW0603
@@ -531,7 +622,12 @@ def configure_logging(
         )
         install_w3c_propagator()
     _instrument_httpx = configured.instrument_httpx
-    _canfar_logger.configure(loglevel=level.value, filelog=filelog)
+    _canfar_logger.configure(
+        loglevel=level.value,
+        filelog=filelog,
+        log_file=log_file,
+        warning_writer=warning_writer,
+    )
     return level
 
 

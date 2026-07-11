@@ -430,3 +430,92 @@ def test_valid_otlp_endpoint_preserves_command_streams_without_network(
     assert result.stderr == ""
     assert json.loads(result.stdout) == 120
     configure_upstream.assert_called_once()
+
+
+def test_relative_log_file_creates_parents_without_contaminating_stdout(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The root file sink resolves from CWD and keeps machine output data-only."""
+    monkeypatch.chdir(tmp_path)
+
+    result = runner.invoke(
+        cli,
+        [
+            "--log-file",
+            "nested/logs/canfar.jsonl",
+            "config",
+            "get",
+            "console.width",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.stderr
+    assert json.loads(result.stdout) == 120
+    assert result.stderr == ""
+    assert (tmp_path / "nested/logs/canfar.jsonl").is_file()
+
+
+@pytest.mark.parametrize(("target", "directory"), [("-", False), ("logs", True)])
+@pytest.mark.parametrize(
+    ("flag", "load"),
+    [(None, None), ("--json", json.loads), ("--yaml", yaml.safe_load)],
+)
+def test_invalid_log_file_target_is_a_structured_setup_error(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    target: str,
+    directory: bool,
+    flag: str | None,
+    load: Callable[[str], Any] | None,
+) -> None:
+    """Directory and pseudo-file targets fail at the existing setup boundary."""
+    monkeypatch.chdir(tmp_path)
+    if directory:
+        (tmp_path / target).mkdir()
+    args = ["--log-file", target, "config", "get", "console.width"]
+    if flag:
+        args.append(flag)
+
+    result = runner.invoke(cli, args)
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    if load is None:
+        assert ErrorCode.LOGGING_INVALID_FILE_PATH.value in result.stderr
+    else:
+        error = StructuredError.model_validate(load(result.stderr))
+        assert error.code == ErrorCode.LOGGING_INVALID_FILE_PATH.value
+
+
+@pytest.mark.parametrize(
+    ("flag", "load"),
+    [(None, None), ("--json", json.loads), ("--yaml", yaml.safe_load)],
+)
+def test_log_file_initialization_failure_keeps_command_running(
+    tmp_path: Path,
+    flag: str | None,
+    load: Callable[[str], Any] | None,
+) -> None:
+    """An unavailable sink emits one mode-aware structured warning."""
+    log_file = tmp_path / "unavailable.jsonl"
+    args = ["--log-file", str(log_file), "config", "get", "console.width"]
+    if flag:
+        args.append(flag)
+
+    with patch(
+        "logging.handlers.RotatingFileHandler.__init__",
+        side_effect=OSError("synthetic sink failure"),
+    ):
+        result = runner.invoke(cli, args)
+
+    assert result.exit_code == 0, result.stderr
+    if load is None:
+        assert result.stdout.rstrip().endswith("120")
+        assert result.stderr.count(ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE.value) == 1
+    else:
+        assert load(result.stdout) == 120
+        error = StructuredError.model_validate(load(result.stderr))
+        assert error.code == ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE.value
+    assert not log_file.exists()
