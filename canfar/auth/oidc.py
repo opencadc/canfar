@@ -116,7 +116,7 @@ async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[st
         response.raise_for_status()
         data = response.json()
 
-    log.debug("OIDC Client Registration Data: %s", data)
+    log.debug("OIDC dynamic client registration succeeded.")
     return data
 
 

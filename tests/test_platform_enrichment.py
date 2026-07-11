@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
-_REFRESHED_TOKEN = "e30.eyJleHAiOjIwMDB9.e30"  # gitleaks:allow
+_REFRESHED_TOKEN = "opaque-refreshed-access-token"
 _CONTEXT_PAYLOAD = {
     "cores": {"defaultLimit": None},
     "memoryGB": {"defaultLimit": 192},

@@ -12,7 +12,8 @@ from pydantic import AnyHttpUrl
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.idp import IdpInfo, get_idp
 
-_JWT = "eyJleHAiOjk5OTk5OTk5OTl9"
+_OPAQUE_ACCESS_TOKEN = "opaque-access-token"
+_OPAQUE_REFRESH_TOKEN = "opaque-refresh-token"
 
 
 @pytest.mark.parametrize(
@@ -56,8 +57,8 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
         "device_code": "device-code",
     }
     tokens = {
-        "access_token": _JWT,
-        "refresh_token": _JWT,
+        "access_token": _OPAQUE_ACCESS_TOKEN,
+        "refresh_token": _OPAQUE_REFRESH_TOKEN,
         "token_type": "Bearer",
         "scope": "openid profile email",
         "expires_at": 1893456000,
@@ -109,9 +110,9 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     console.print.assert_any_call("[bold]Code:[/bold] ABC123")
     assert credential.idp == "srcnet"
     assert credential.token.access is not None
-    assert credential.token.access.get_secret_value() == _JWT
+    assert credential.token.access.get_secret_value() == _OPAQUE_ACCESS_TOKEN
     assert credential.token.refresh is not None
-    assert credential.token.refresh.get_secret_value() == _JWT
+    assert credential.token.refresh.get_secret_value() == _OPAQUE_REFRESH_TOKEN
     assert credential.token.token_type == "Bearer"
     assert credential.token.scope == "openid profile email"
     assert credential.expiry.access == 1893456000

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import logging
 import time
 from unittest.mock import AsyncMock, MagicMock, call, patch
 from urllib.parse import parse_qs
@@ -48,6 +49,7 @@ def _oauth_client(
     requests: list[httpx.Request] = []
 
     async def token_endpoint(request: httpx.Request) -> httpx.Response:
+        """Return the next deterministic token response."""
         requests.append(request)
         response = next(remaining)
         if isinstance(response, Exception):
@@ -236,27 +238,35 @@ class TestRegisterFunction:
     """Test the register function."""
 
     @pytest.mark.asyncio
-    async def test_register_with_client(self) -> None:
-        """Test register function with provided client."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "client_id": "test_client_id",
-            "client_secret": "test_client_secret",
+    async def test_register_with_client(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Registration returns complete data without logging its secret."""
+        sentinel = "registration-client-secret-sentinel"
+        registered = {
+            "client_id": "test-client-id",
+            "client_secret": sentinel,
         }
-        mock_client.post.return_value = mock_response
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = registered
+        client.post.return_value = response
 
-        result = await register("https://example.com/register", mock_client)
+        logger = logging.getLogger("canfar.auth.oidc")
+        logger.addHandler(caplog.handler)
+        try:
+            caplog.set_level(logging.DEBUG, logger="canfar.auth.oidc")
+            result = await register("https://identity.example/register", client)
+        finally:
+            logger.removeHandler(caplog.handler)
 
-        assert result["client_id"] == "test_client_id"
-        assert result["client_secret"] == "test_client_secret"
-        mock_client.post.assert_called_once()
-        call_args = mock_client.post.call_args
-        assert call_args[0][0] == "https://example.com/register"
-        assert "client_name" in call_args[1]["json"]
-        # Check that client_name starts with "Science Platform CLI @"
-        client_name = call_args[1]["json"]["client_name"]
-        assert client_name.startswith("Science Platform CLI @")
+        assert result == registered
+        call = client.post.await_args
+        assert call.args == ("https://identity.example/register",)
+        assert call.kwargs["json"]["client_name"].startswith("Science Platform CLI @")
+        assert sentinel not in caplog.text
+        assert "OIDC dynamic client registration succeeded." in caplog.messages
 
     @pytest.mark.asyncio
     async def test_register_without_client(self) -> None:

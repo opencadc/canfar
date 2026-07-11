@@ -30,7 +30,10 @@ from tests.test_auth_x509 import generate_cert
 if TYPE_CHECKING:
     from pathlib import Path
 
-_REFRESHED_TOKEN = "e30.eyJleHAiOjIwMDB9.e30"  # gitleaks:allow
+_REFRESHED_TOKEN = "opaque-refreshed-access-token"
+_MISLEADING_FUTURE_JWT_ACCESS_TOKEN = (  # gitleaks:allow
+    "e30.eyJleHAiOjk5OTk5OTk5OTl9.e30"
+)
 
 
 def _server() -> Server:
@@ -671,7 +674,13 @@ class TestRequestAuthenticationResolution:
 
     @pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
     @pytest.mark.parametrize(
-        ("state", "access_expiry", "refresh_expiry", "refreshes", "succeeds"),
+        (
+            "state",
+            "persisted_access_expiry",
+            "refresh_expiry",
+            "refreshes",
+            "succeeds",
+        ),
         [
             ("valid", 1_100.0, 2_000.0, 0, True),
             ("expired", 900.0, 900.0, 0, False),
@@ -682,14 +691,14 @@ class TestRequestAuthenticationResolution:
     async def test_refresh_and_expiry_outcome_matrix(
         self,
         state: str,
-        access_expiry: float,
+        persisted_access_expiry: float,
         refresh_expiry: float,
         refreshes: int,
         succeeds: bool,
         asynchronous: bool,
         tmp_path: Path,
     ) -> None:
-        """The same Authentication Record has the same sync and async outcome."""
+        """Persisted expiry, not misleading JWT claims, controls refresh."""
         now = 1_000.0
         refreshed_token = _REFRESHED_TOKEN
         config = _configuration(
@@ -702,8 +711,14 @@ class TestRequestAuthenticationResolution:
                     token="https://identity.example/token",
                 ),
                 client=Client(identity="client", secret="secret"),
-                token=Token(access="current-access", refresh="refresh"),
-                expiry=Expiry(access=access_expiry, refresh=refresh_expiry),
+                token=Token(
+                    access=_MISLEADING_FUTURE_JWT_ACCESS_TOKEN,
+                    refresh="refresh",
+                ),
+                expiry=Expiry(
+                    access=persisted_access_expiry,
+                    refresh=refresh_expiry,
+                ),
             )
         )
         token_requests: list[httpx.Request] = []
@@ -806,3 +821,7 @@ class TestRequestAuthenticationResolution:
         assert len(platform_requests) == int(succeeds)
         if succeeds:
             assert response.status_code == 200
+        if state == "refresh-eligible":
+            assert platform_requests[0].headers["Authorization"] == (
+                f"Bearer {_REFRESHED_TOKEN}"
+            )
