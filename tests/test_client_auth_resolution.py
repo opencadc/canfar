@@ -31,12 +31,17 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 _REFRESHED_TOKEN = "opaque-refreshed-access-token"
+_UNUSABLE_OIDC_SECRETS = (
+    "selected-client-secret",
+    "selected-refresh-secret",
+)
 _MISLEADING_FUTURE_JWT_ACCESS_TOKEN = (  # gitleaks:allow
     "e30.eyJleHAiOjk5OTk5OTk5OTl9.e30"
 )
 
 
 def _server() -> Server:
+    """Build the platform server shared by authentication tests."""
     return Server(
         idp="test",
         name="platform",
@@ -47,6 +52,7 @@ def _server() -> Server:
 
 
 def _configuration(credential: OIDCCredential | X509Credential) -> Configuration:
+    """Build an active configuration around the supplied credential."""
     return Configuration(
         active=ActiveConfig(authentication="test", server="platform"),
         authentication={"test": credential},
@@ -221,41 +227,6 @@ class TestRequestAuthenticationResolution:
         with pytest.raises(AuthContextError, match=r"X\.509 certificate"):
             _ = HTTPClient(config=config).client
 
-    def test_runtime_token_request_ignores_unusable_saved_authentication(self) -> None:
-        """A runtime token request does not resolve the saved Authentication."""
-        config = Configuration(
-            active=ActiveConfig(authentication="srcnet", server=None),
-            authentication={"srcnet": OIDCCredential(idp="srcnet")},
-            servers={},
-        )
-        requests: list[httpx.Request] = []
-        transport = httpx.MockTransport(
-            lambda request: (
-                requests.append(request) or httpx.Response(200, request=request)
-            )
-        )
-        sync_client = httpx.Client
-
-        with (
-            patch(
-                "canfar.client.Client",
-                side_effect=lambda **kwargs: sync_client(
-                    transport=transport,
-                    **kwargs,
-                ),
-            ),
-            HTTPClient(
-                config=config,
-                token=SecretStr("runtime-token"),
-                url="https://runtime.example/api",
-            ) as client,
-        ):
-            response = client.client.get("probe")
-
-        assert response.status_code == 200
-        assert str(requests[0].url) == "https://runtime.example/api/probe"
-        assert requests[0].headers["Authorization"] == "Bearer runtime-token"
-
     @pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
     @pytest.mark.parametrize(
         "authentication",
@@ -274,6 +245,7 @@ class TestRequestAuthenticationResolution:
         client_kwargs: dict[str, object] = {}
         expected_authorization: str | None = None
         expected_type: str | None = None
+        expected_url: str | None = None
 
         if authentication == "saved-oidc":
             credential = OIDCCredential(
@@ -302,18 +274,41 @@ class TestRequestAuthenticationResolution:
 
         config = _configuration(credential)
         if authentication == "runtime-token":
+            config = Configuration(
+                active=ActiveConfig(authentication="active", server="platform"),
+                authentication={
+                    "active": X509Credential(idp="active", path=None),
+                    "selected": OIDCCredential(
+                        idp="selected",
+                        client=Client(
+                            identity="selected-client",
+                            secret=_UNUSABLE_OIDC_SECRETS[0],
+                        ),
+                        token=Token(refresh=_UNUSABLE_OIDC_SECRETS[1]),
+                    ),
+                },
+                servers={
+                    "platform": _server().model_copy(
+                        update={"idp": "active"},
+                        deep=True,
+                    )
+                },
+            )
             client_kwargs = {
+                "authentication_idp": "selected",
                 "token": SecretStr("runtime-access"),
-                "url": "https://runtime.example",
+                "url": "https://runtime.example/api",
             }
             expected_authorization = "Bearer runtime-access"
             expected_type = "RUNTIME-TOKEN"
+            expected_url = "https://runtime.example/api/probe"
         elif authentication == "runtime-x509":
             client_kwargs = {
                 "certificate": cert_path,
                 "url": "https://runtime.example",
             }
             expected_type = "RUNTIME-X509"
+        before_config = config.model_dump(mode="json")
 
         requests: list[httpx.Request] = []
         transport = httpx.MockTransport(
@@ -349,8 +344,17 @@ class TestRequestAuthenticationResolution:
 
         assert response.status_code == 200
         assert len(requests) == 1
-        assert requests[0].headers.get("Authorization") == expected_authorization
-        assert requests[0].headers.get("X-Skaha-Authentication-Type") == expected_type
+        request = requests[0]
+        assert request.headers.get("Authorization") == expected_authorization
+        assert request.headers.get("X-Skaha-Authentication-Type") == expected_type
+        if expected_url is not None:
+            assert str(request.url) == expected_url
+        assert config.model_dump(mode="json") == before_config
+        if authentication == "runtime-token":
+            request_material = "\n".join((str(request.url), *request.headers.values()))
+            assert all(
+                secret not in request_material for secret in _UNUSABLE_OIDC_SECRETS
+            )
 
     async def test_concurrent_requests_share_one_oidc_refresh(
         self,
@@ -382,6 +386,7 @@ class TestRequestAuthenticationResolution:
         platform_requests: list[httpx.Request] = []
 
         async def refresh_token(request: httpx.Request) -> httpx.Response:
+            """Return one delayed refresh response for concurrent callers."""
             token_requests.append(request)
             await asyncio.sleep(0.01)
             return httpx.Response(
@@ -592,6 +597,7 @@ class TestRequestAuthenticationResolution:
         token_requests: list[httpx.Request] = []
 
         def token_endpoint(request: httpx.Request) -> httpx.Response:
+            """Return the selected deterministic refresh failure."""
             token_requests.append(request)
             if failure == "oauth":
                 return httpx.Response(
@@ -725,6 +731,7 @@ class TestRequestAuthenticationResolution:
         platform_requests: list[httpx.Request] = []
 
         def token(request: httpx.Request) -> httpx.Response:
+            """Return the refresh outcome selected by the test matrix."""
             token_requests.append(request)
             return httpx.Response(
                 200,
@@ -749,6 +756,7 @@ class TestRequestAuthenticationResolution:
         async_client = httpx.AsyncClient
 
         def make_unrefreshable() -> None:
+            """Remove the saved refresh material before the second request."""
             credential = config.get_credential("test")
             assert isinstance(credential, OIDCCredential)
             config.update_credential(

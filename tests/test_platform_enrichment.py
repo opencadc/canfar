@@ -8,7 +8,7 @@ from unittest.mock import patch
 import httpx
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
-from pydantic import AnyHttpUrl, AnyUrl, SecretStr
+from pydantic import AnyHttpUrl, AnyUrl
 
 import canfar.server as platform
 from canfar.client import HTTPClient
@@ -336,42 +336,6 @@ class TestPlatformEnrichment:
         assert isinstance(client.authentication_record, OIDCCredential)
         assert "authentication_idp" not in client.model_dump(mode="json")
         assert config.active.model_dump(mode="json") == before_active
-
-    def test_runtime_token_precedes_transient_saved_authentication(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Runtime precedence still bypasses an unusable selected record."""
-        requests: list[httpx.Request] = []
-        transport = httpx.MockTransport(
-            lambda request: (
-                requests.append(request) or httpx.Response(200, request=request)
-            )
-        )
-
-        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
-            config = _active_with_target(OIDCCredential(idp="srcnet"))
-            before = config.model_dump(mode="json")
-            with (
-                patch(
-                    "canfar.client.Client",
-                    side_effect=_http_client_factory(transport),
-                ),
-                HTTPClient(
-                    config=config,
-                    authentication_idp="srcnet",
-                    token=SecretStr("runtime-token"),
-                    url="https://srcnet.example/skaha",
-                ) as client,
-            ):
-                response = client.client.get("probe")
-
-        assert (
-            response.status_code,
-            requests[0].headers.get("Authorization"),
-            requests[0].headers.get("X-Skaha-Authentication-Type"),
-            config.model_dump(mode="json"),
-        ) == (200, "Bearer runtime-token", "RUNTIME-TOKEN", before)
 
     def test_enrich_returns_validated_capability_metadata(
         self,

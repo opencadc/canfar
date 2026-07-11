@@ -6,9 +6,7 @@ import json
 import logging
 import os
 import re
-import tempfile
 from contextlib import ExitStack
-from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import Mock, patch
 
@@ -29,9 +27,11 @@ from canfar.utils.logging import (
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
 
 
 def _raise_secret_error(secret: str) -> None:
+    """Raise a deterministic exception containing the supplied secret."""
     msg = f"refresh_token={secret}"
     raise RuntimeError(msg)
 
@@ -292,18 +292,12 @@ class TestConstants:
 class TestLoggingIntegration:
     """Integration tests for logging functionality."""
 
-    @pytest.fixture
-    def temp_log_dir(self) -> Generator[Path]:
-        """Create a temporary directory for log files."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yield Path(temp_dir)
-
     def test_json_lines_rotate_with_a_test_only_small_size(
         self,
-        temp_log_dir: Path,
+        tmp_path: Path,
     ) -> None:
         """The stdlib rotating handler preserves JSON Lines across rollover."""
-        log_file = temp_log_dir / "rotating.jsonl"
+        log_file = tmp_path / "rotating.jsonl"
         logger = CanfarLogger()
 
         try:
@@ -314,9 +308,9 @@ class TestLoggingIntegration:
             for handler in logger.logger.handlers:
                 handler.flush()
 
-            files = sorted(temp_log_dir.glob("rotating.jsonl*"))
+            files = sorted(tmp_path.glob("rotating.jsonl*"))
             assert log_file in files
-            assert temp_log_dir / "rotating.jsonl.1" in files
+            assert tmp_path / "rotating.jsonl.1" in files
             events = [
                 json.loads(line)
                 for path in files
@@ -335,12 +329,12 @@ class TestLoggingIntegration:
 
     def test_public_runtime_writes_secret_safe_json_lines_and_stderr(
         self,
-        temp_log_dir: Path,
+        tmp_path: Path,
         capsys: pytest.CaptureFixture[str],
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """One public event is safe, correlated, and parseable in both sinks."""
-        log_file = temp_log_dir / "events.jsonl"
+        log_file = tmp_path / "events.jsonl"
         secret = "jsonl-secret-sentinel-01"
         message = f"unicode café 🍁\nAuthorization: Bearer {secret}"
         monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
@@ -406,11 +400,11 @@ class TestLoggingIntegration:
 
     def test_json_lines_omit_non_string_correlation_values(
         self,
-        temp_log_dir: Path,
+        tmp_path: Path,
         monkeypatch: pytest.MonkeyPatch,
     ) -> None:
         """Nested correlation data cannot violate the flat redacted schema."""
-        log_file = temp_log_dir / "flat.jsonl"
+        log_file = tmp_path / "flat.jsonl"
         secret = "nested-correlation-secret-sentinel"
         monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
 
@@ -434,11 +428,11 @@ class TestLoggingIntegration:
 
     def test_all_handlers_redact_sensitive_messages_and_exceptions(
         self,
-        temp_log_dir: Path,
+        tmp_path: Path,
         capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Console and current file logs share one secret-redaction policy."""
-        log_file = temp_log_dir / "redacted.log"
+        log_file = tmp_path / "redacted.log"
         secrets = {
             "access": "access-sentinel-11",
             "refresh": "refresh-sentinel-12",
@@ -536,16 +530,10 @@ class TestLoggingIntegration:
 class TestErrorHandling:
     """Test error handling in logging configuration."""
 
-    @pytest.fixture
-    def temp_log_dir(self) -> Generator[Path]:
-        """Create a temporary directory for log files."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            yield Path(temp_dir)
-
     @pytest.mark.parametrize("failure", ["write", "rollover"])
     def test_runtime_file_failure_disables_only_that_sink_and_warns_once(
         self,
-        temp_log_dir: Path,
+        tmp_path: Path,
         capsys: pytest.CaptureFixture[str],
         failure: str,
     ) -> None:
@@ -554,7 +542,7 @@ class TestErrorHandling:
         warning_writer = Mock()
         logger.configure(
             loglevel=logging.CRITICAL,
-            log_file=temp_log_dir / f"{failure}.jsonl",
+            log_file=tmp_path / f"{failure}.jsonl",
             warning_writer=warning_writer,
         )
         handler = logger._file_handler  # noqa: SLF001
