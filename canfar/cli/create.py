@@ -77,6 +77,23 @@ async def _create_sessions(request: CreateRequest) -> list[str]:
         return await session.create(request)
 
 
+def _render_create_failure(
+    failure: StructuredError,
+    mode: output.OutputMode,
+    human_message: str,
+    *,
+    show_traceback: bool = False,
+) -> None:
+    """Render one create failure without mixing human and machine streams."""
+    if mode is not output.OutputMode.HUMAN:
+        output.to_stderr(failure, mode)
+        return
+
+    get_console(stderr=True).print(human_message)
+    if show_traceback:
+        get_console(stderr=True).print_exception()
+
+
 def _render_create_result(
     session_ids: list[str],
     name: str,
@@ -109,12 +126,11 @@ def _render_create_result(
             "is slow."
         ),
     )
-    if mode is not output.OutputMode.HUMAN:
-        output.to_stderr(failure, mode)
-    else:
-        get_console(stderr=True).print(
-            f"[bold red]{failure.message}[/bold red]\n[dim]{failure.hint}[/dim]"
-        )
+    _render_create_failure(
+        failure,
+        mode,
+        f"[bold red]{failure.message}[/bold red]\n[dim]{failure.hint}[/dim]",
+    )
     raise typer.Exit(1)
 
 
@@ -226,18 +242,15 @@ def creation(
             replicas=replicas,
         )
     except ValueError as err:
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
-            if isinstance(err, ValidationError):
-                get_console(stderr=True).print_exception()
-            raise typer.Exit(1) from err
-        output.to_stderr(
+        _render_create_failure(
             StructuredError(
                 code=ErrorCode.COMMAND_VALIDATION_FAILED,
                 message="Session request validation failed.",
                 hint="Check the create arguments and retry.",
             ),
             mode,
+            f"[bold red]Error: {err}[/bold red]",
+            show_traceback=isinstance(err, ValidationError),
         )
         raise typer.Exit(1) from err
 
@@ -262,26 +275,18 @@ def creation(
     try:
         session_ids = run(_create_sessions(request))
     except KeyboardInterrupt:
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(
-                "\n[bold yellow]Operation cancelled by user.[/bold yellow]"
-            )
-            raise typer.Exit(130) from KeyboardInterrupt
-        output.to_stderr(
+        _render_create_failure(
             StructuredError(
                 code=ErrorCode.COMMAND_CANCELLED,
                 message="Operation cancelled by user.",
                 hint="Retry the command when ready.",
             ),
             mode,
+            "\n[bold yellow]Operation cancelled by user.[/bold yellow]",
         )
         raise typer.Exit(130) from KeyboardInterrupt
     except Exception as err:
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(f"[bold red]Error: {err}[/bold red]")
-            get_console(stderr=True).print_exception()
-            raise typer.Exit(1) from err
-        output.to_stderr(
+        _render_create_failure(
             StructuredError(
                 code=ErrorCode.TRANSPORT_FAILURE,
                 message="Unable to create session(s).",
@@ -291,6 +296,8 @@ def creation(
                 ),
             ),
             mode,
+            f"[bold red]Error: {err}[/bold red]",
+            show_traceback=True,
         )
         raise typer.Exit(1) from err
 
