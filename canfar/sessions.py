@@ -532,7 +532,6 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, Any]] = []
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(value: str) -> dict[str, Any]:
@@ -576,7 +575,6 @@ class AsyncSession(HTTPClient):
         results: dict[str, str] = {}
 
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
-        tasks: list[Any] = []
 
         async def bounded(value: str) -> tuple[str, str]:
             async with semaphore:
@@ -675,7 +673,6 @@ class AsyncSession(HTTPClient):
             replicas,
         )
         results: list[str] = []
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(parameters: list[tuple[str, Any]]) -> Any:
@@ -726,7 +723,6 @@ class AsyncSession(HTTPClient):
         ids = _ids(ids)
         results: list[dict[str, str]] = []
         parameters: dict[str, str] = {"view": "events"}
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(value: str) -> dict[str, str]:
@@ -747,7 +743,7 @@ class AsyncSession(HTTPClient):
                     reply,
                 )
             elif isinstance(reply, dict):
-                results.append(dict(reply))
+                results.append(reply)
 
         if verbose and results:
             for result in results:
@@ -776,7 +772,6 @@ class AsyncSession(HTTPClient):
         ids = _ids(ids)
         results: dict[str, bool] = {}
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
-        tasks: list[Any] = []
 
         async def bounded(value: str) -> tuple[str, bool]:
             async with semaphore:

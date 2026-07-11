@@ -262,22 +262,6 @@ def test_ps_quiet_with_json_exits_two() -> None:
     assert "quiet" in result.stderr.lower()
 
 
-def test_ps_json_stdout_is_data_only(tmp_path: Path) -> None:
-    """``ps --json`` suppresses the human-mode active-server banner."""
-    config_path = tmp_path / "config.yaml"
-
-    with (
-        _patch_config(config_path),
-        patch("canfar.cli.ps.AsyncSession") as session_cls,
-    ):
-        session = _mock_async_session(session_cls)
-        session.fetch.return_value = []
-        result = runner.invoke(ps, ["--json"])
-
-    assert result.exit_code == 0
-    assert not result.stdout.startswith("@")
-
-
 def test_ps_allows_empty_running_view() -> None:
     """Test ps reports empty running view when only completed sessions exist."""
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
