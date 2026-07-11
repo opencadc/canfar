@@ -36,6 +36,7 @@ class TestErrorCode:
             "LOGGING_FILE_SINK_UNAVAILABLE": "logging.file_sink_unavailable",
             "TRANSPORT_FAILURE": "transport.failure",
             "COMMAND_VALIDATION_FAILED": "command.validation_failed",
+            "COMMAND_CANCELLED": "command.cancelled",
         }
         for name, value in expected.items():
             assert getattr(ErrorCode, name).value == value
