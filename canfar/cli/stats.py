@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Annotated
-
 import typer
 from rich import box
 from rich.table import Table
@@ -22,22 +20,13 @@ stats = typer.Typer(
 
 
 @stats.callback(invoke_without_command=True)
-def get_stats(
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
-) -> None:
+def get_stats() -> None:
     """Display cluster-wide usage and status statistics."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_stats() -> None:
         """Fetch cluster-wide statistics and render them."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             data = await session.stats()
 
         # Main table

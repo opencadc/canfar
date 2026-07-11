@@ -38,11 +38,9 @@ ps = typer.Typer(
 async def _fetch_sessions(
     kind: Kind | None,
     status: Status | None,
-    debug: bool,
 ) -> list[dict[str, str]]:
     """Fetch sessions at the external Science Platform boundary."""
-    log_level = "DEBUG" if debug else "INFO"
-    async with AsyncSession(loglevel=log_level) as session:
+    async with AsyncSession() as session:
         return await session.fetch(kind=kind, status=status)
 
 
@@ -62,12 +60,11 @@ def _raise_fetch_failure(
 def _fetch_session_payloads(
     kind: Kind | None,
     status: Status | None,
-    debug: bool,
     mode: output.OutputMode,
 ) -> list[dict[str, str]]:
     """Fetch session payloads and map expected boundary failures."""
     try:
-        return run(_fetch_sessions(kind, status, debug))
+        return run(_fetch_sessions(kind, status))
     except ConfigResetRequiredError as err:
         _raise_fetch_failure(
             err,
@@ -226,7 +223,7 @@ def show(
         bool,
         typer.Option(
             "--debug",
-            help="Enable debug logging.",
+            help="Show Session response warnings.",
         ),
     ] = False,
     json_output: JsonOption = False,
@@ -245,7 +242,7 @@ def show(
         raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
 
     sessions, anomalies = _sanitize_sessions(
-        _fetch_session_payloads(kind, status, debug, mode)
+        _fetch_session_payloads(kind, status, mode)
     )
 
     visible = [

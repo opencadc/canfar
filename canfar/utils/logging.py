@@ -36,7 +36,6 @@ from rich.console import Console
 from rich.logging import RichHandler
 from rich.traceback import install as install_rich_traceback
 
-from canfar import CONFIG_DIR, CONFIG_PATH  # noqa: F401
 from canfar.errors import ErrorCode, LoggingEnvironmentError, StructuredError
 
 if TYPE_CHECKING:
@@ -47,8 +46,6 @@ if TYPE_CHECKING:
     from logfire.integrations.httpx import RequestInfo, ResponseInfo
     from opentelemetry.trace import Span
 
-LOGFILE_PATH: Path = CONFIG_DIR / "client.log"
-LOG_LEVEL: int = 10
 # Library logger name - all modules should use this as root
 LOGGER_NAME = "canfar"
 # Thread lock for configuration safety
@@ -56,11 +53,6 @@ _LOCK = threading.Lock()
 _TELEMETRY_ENV_LOCK = threading.RLock()
 _instrument_httpx: Callable[..., None] | None = None
 
-# Default configuration
-FORMAT = (
-    "%(asctime)s - %(name)s - %(levelname)s - %(funcName)s:%(lineno)d - %(message)s"
-)
-RICH_FORMAT = "%(message)s"
 MAX_LOGFILE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_LOGFILE_COUNT = 10
 
@@ -448,7 +440,6 @@ class CanfarLogger:
     def configure(
         self,
         loglevel: int | str = logging.INFO,
-        filelog: bool = False,
         *,
         log_file: Path | None = None,
         warning_writer: Callable[[StructuredError], None] | None = None,
@@ -457,13 +448,10 @@ class CanfarLogger:
 
         Args:
             loglevel (int | str, optional): Logging level. Defaults to logging.INFO.
-            filelog (bool, optional): Whether to enable file logging. Defaults to False.
-            log_file: Explicit file sink path. Overrides the legacy ``filelog`` path.
+            log_file: Explicit file sink path.
             warning_writer: Optional sink for structured file-logging warnings.
         """
-        target = log_file if log_file is not None else LOGFILE_PATH if filelog else None
-        if target is not None:
-            target = _resolve_log_file_path(target)
+        target = _resolve_log_file_path(log_file) if log_file is not None else None
         with _LOCK:
             install_rich_traceback(show_locals=False, suppress=[])
             if self._configured:
@@ -488,7 +476,7 @@ class CanfarLogger:
             self._rich_handler.addFilter(_REDACTION_FILTER)
 
             # Rich handler uses a simpler format since Rich adds the styling
-            formatter = logging.Formatter(RICH_FORMAT)
+            formatter = logging.Formatter("%(message)s")
             self._rich_handler.setFormatter(formatter)
             logger.addHandler(self._rich_handler)
 
@@ -545,22 +533,6 @@ class CanfarLogger:
         self._rich_handler = None
         self._file_handler = None
 
-    def set_level(self, level: int | str) -> None:
-        """Change the logging level for all handlers.
-
-        Args:
-            level: New logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL or int)
-        """
-        if isinstance(level, str):
-            level = getattr(logging, level.upper())
-
-        logger = self.logger
-        logger.setLevel(level)
-
-        # Update all handler levels
-        for handler in logger.handlers:
-            handler.setLevel(level)
-
     def get_child_logger(self, name: str) -> logging.Logger:
         """Get a child logger for a specific module.
 
@@ -574,17 +546,6 @@ class CanfarLogger:
             name = f"{LOGGER_NAME}.{name}"
         return logging.getLogger(name)
 
-    def enable_debug_mode(self) -> None:
-        """Enable debug mode with detailed logging."""
-        self.set_level(logging.DEBUG)
-
-        # Add more detailed formatting for debug mode
-        if self._rich_handler:
-            debug_formatter = logging.Formatter(
-                "%(name)s:%(funcName)s:%(lineno)d - %(message)s"
-            )
-            self._rich_handler.setFormatter(debug_formatter)
-
 
 # Global logger instance
 _canfar_logger = CanfarLogger()
@@ -593,7 +554,6 @@ _canfar_logger = CanfarLogger()
 # Convenience functions for easy access
 def configure_logging(
     loglevel: int | str | LoggingLevel | None = None,
-    filelog: bool = False,
     *,
     verbosity: int = 0,
     log_file: Path | None = None,
@@ -624,7 +584,6 @@ def configure_logging(
     _instrument_httpx = configured.instrument_httpx
     _canfar_logger.configure(
         loglevel=level.value,
-        filelog=filelog,
         log_file=log_file,
         warning_writer=warning_writer,
     )
@@ -643,13 +602,3 @@ def get_logger(name: str | None = None) -> logging.Logger:
     if name is None:
         return _canfar_logger.logger
     return _canfar_logger.get_child_logger(name)
-
-
-def set_log_level(level: int | str) -> None:
-    """Set logging level for all Canfar loggers."""
-    _canfar_logger.set_level(level)
-
-
-def enable_debug() -> None:
-    """Enable debug mode with detailed logging."""
-    _canfar_logger.enable_debug_mode()

@@ -74,10 +74,6 @@ def prune_sessions(
             help="Filter by session status.",
         ),
     ] = "Succeeded",
-    debug: Annotated[
-        bool,
-        typer.Option("--debug", help="Enable debug logging."),
-    ] = False,
 ) -> None:
     """Delete sessions by criteria.
 
@@ -89,8 +85,7 @@ def prune_sessions(
 
     async def _prune() -> None:
         """Delete matching sessions from the science platform server."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             response = await session.destroy_with(
                 prefix=prefix, kind=kind, status=status
             )

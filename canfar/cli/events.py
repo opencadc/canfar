@@ -28,21 +28,13 @@ def get_events(
         list[str],
         typer.Argument(help="One or more session IDs."),
     ],
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
 ) -> None:
     """Get events from the science platform server."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_events() -> None:
         """Fetch events for the requested sessions and render them."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             all_events = await session.events(ids=session_ids)
 
         if not all_events:

@@ -60,7 +60,7 @@ class TestCreateCLI:
         assert result.stdout == ""
         assert "Failed to create session(s)" in result.stderr
         assert "CANFAR_TIMEOUT" in result.stderr
-        assert "--debug" in result.stderr
+        assert "canfar --log-level debug create" in result.stderr
 
     def test_create_command_dry_run(self):
         """Test create command dry run."""

@@ -68,7 +68,6 @@ class Session(HTTPClient):
         >>> session = Session(
                 timeout=120,
                 concurrency=100, # No effect on sync client
-                loglevel=40,
             )
     """
 
@@ -437,7 +436,6 @@ class AsyncSession(HTTPClient):
                 token="token",
                 timeout=30,
                 concurrency=100,
-                loglevel=40,
             )
     """
 

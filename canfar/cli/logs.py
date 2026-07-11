@@ -25,21 +25,13 @@ def get_logs(
         list[str],
         typer.Argument(help="One or more session IDs."),
     ],
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
 ) -> None:
     """Get logs from the science platform server."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_logs() -> None:
         """Fetch logs for the requested sessions and render them."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             try:
                 all_logs = await session.logs(ids=session_ids)
             except Exception as e:

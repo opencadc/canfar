@@ -25,21 +25,13 @@ def open_sessions(
         list[str],
         typer.Argument(help="One or more session IDs."),
     ],
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
 ) -> None:
     """Open one or more sessions in a web browser."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _open_sessions() -> None:
         """Look up the requested sessions and open their connect URLs."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             sessions_info = await session.info(ids=session_ids)
         if not sessions_info:
             typer.echo("No information found for the specified session(s).", err=True)

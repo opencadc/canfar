@@ -127,7 +127,7 @@ def creation(
         bool,
         typer.Option(
             "--debug",
-            help="Enable debug logging.",
+            help="Print parsed Session request details.",
         ),
     ] = False,
     dry: Annotated[
@@ -156,8 +156,7 @@ def creation(
 
     async def _create() -> None:
         """Create the requested session(s) on the science platform server."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             try:
                 session_ids = await session.create(
                     name=name,
@@ -190,10 +189,10 @@ def creation(
                     "[bold red]Failed to create session(s).[/bold red]"
                 )
                 get_console(stderr=True).print(
-                    "[dim]No session IDs were returned. Run with --debug for request "
-                    "details, or set a longer client timeout (environment variable "
-                    "CANFAR_TIMEOUT, in seconds) if the image pull or platform is "
-                    "slow. You can also set CANFAR_LOGLEVEL=DEBUG for library logs."
+                    "[dim]No session IDs were returned. Run "
+                    "`canfar --log-level debug create` for library logs, or set a "
+                    "longer client timeout (environment variable CANFAR_TIMEOUT, in "
+                    "seconds) if the image pull or platform is slow."
                     "[/dim]"
                 )
             except KeyboardInterrupt:

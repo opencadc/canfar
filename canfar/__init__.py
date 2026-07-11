@@ -9,7 +9,6 @@ CONFIG_PATH: Path = CONFIG_DIR / "config.yaml"
 from .utils.logging import (  # noqa: E402
     configure_logging,
     get_logger,
-    set_log_level,
 )
 
 CERT_PATH: Path = Path.home() / ".ssl" / "cadcproxy.pem"
@@ -30,5 +29,4 @@ __all__ = [
     "get_logger",
     "login",
     "server",
-    "set_log_level",
 ]

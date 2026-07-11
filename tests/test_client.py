@@ -1,7 +1,6 @@
 """Test CANFAR Python Client API."""
 # ruff: noqa: SLF001
 
-import logging
 import re
 import ssl
 import tempfile
@@ -18,7 +17,6 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
-from canfar import configure_logging, get_logger
 from canfar.client import HTTPClient
 from canfar.models.auth import (
     OIDC,
@@ -76,7 +74,6 @@ class TestInitializationAndConfiguration:
         client = canfar_client_fixture()
         assert client.timeout == 30
         assert client.concurrency == 32
-        assert client.loglevel == "INFO"
         assert client.token is None
         assert client.certificate is None
         assert client.url is None
@@ -92,7 +89,6 @@ class TestInitializationAndConfiguration:
             certificate=Path("/test/cert.pem"),
             url="https://example.com/api",
             config=config,
-            loglevel="DEBUG",
         )
         assert client.timeout == 60
         assert client.concurrency == 64
@@ -101,7 +97,6 @@ class TestInitializationAndConfiguration:
         assert client.certificate is None
         assert str(client.url) == "https://example.com/api"
         assert client.config is config
-        assert client.loglevel == "DEBUG"
 
     def test_environment_variables(self, canfar_client_fixture, monkeypatch) -> None:
         """Test that environment variables are picked up correctly."""
@@ -109,7 +104,6 @@ class TestInitializationAndConfiguration:
         monkeypatch.setenv("CANFAR_CONCURRENCY", "16")
         monkeypatch.setenv("CANFAR_TOKEN", "env-token")
         monkeypatch.setenv("CANFAR_URL", "https://env.example.com")
-        monkeypatch.setenv("CANFAR_LOGLEVEL", "WARNING")
 
         client = canfar_client_fixture()
         assert client.timeout == 45
@@ -117,19 +111,6 @@ class TestInitializationAndConfiguration:
         assert client.token.get_secret_value() == "env-token"
         # URL gets normalized with trailing slash
         assert str(client.url) == "https://env.example.com/"
-        assert client.loglevel == "WARNING"
-
-    def test_client_loglevel_does_not_override_application_runtime(
-        self,
-        canfar_client_fixture,
-    ) -> None:
-        """Client validation does not mutate the process-wide logging policy."""
-        configure_logging(loglevel="ERROR")
-
-        client = canfar_client_fixture(loglevel="INFO")
-
-        assert client.loglevel == "INFO"
-        assert get_logger().getEffectiveLevel() == logging.ERROR
 
     def test_precedence_constructor_over_env(
         self, canfar_client_fixture, monkeypatch

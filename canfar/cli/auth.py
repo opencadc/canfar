@@ -259,10 +259,6 @@ def auth_login_command(
         bool,
         typer.Option("-f", "--force", help="Force re-authentication."),
     ] = False,
-    debug: Annotated[
-        bool,
-        typer.Option("--debug", help="Enable debug logging."),
-    ] = False,
     dev: Annotated[
         bool,
         typer.Option("--dev", help="Include dev servers in discovery."),
@@ -278,7 +274,6 @@ def auth_login_command(
     ] = 10,
 ) -> None:
     """Alias for canfar login."""
-    from canfar import get_logger, set_log_level  # noqa: PLC0415
     from canfar.cli.login import _login_flow  # noqa: PLC0415
     from canfar.cli.prompts import select_idp  # noqa: PLC0415
     from canfar.idp import list_idps  # noqa: PLC0415
@@ -289,9 +284,6 @@ def auth_login_command(
         "\n[yellow]canfar auth login[/yellow] will be removed soon."
         " Use [green][bold]canfar login[/bold][/green] instead.\n"
     )
-    if debug:
-        set_log_level("DEBUG")
-        get_logger(__name__).debug("Debug logging enabled")
     selected_idp = idp or select_idp(list_idps())
     _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)
 

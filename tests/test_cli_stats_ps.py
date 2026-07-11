@@ -306,12 +306,12 @@ def test_stats_outputs_cluster_tables() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, ["--debug"])
+        result = runner.invoke(stats, [])
 
     assert result.exit_code == 0
     assert "CANFAR Platform Load" in result.stdout
     assert "Maximum Requests Size" in result.stdout
-    session_cls.assert_called_once_with(loglevel="DEBUG")
+    session_cls.assert_called_once_with()
 
 
 def test_stats_renders_only_cpu_and_ram_columns() -> None:
@@ -328,7 +328,7 @@ def test_stats_renders_only_cpu_and_ram_columns() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, ["--debug"])
+        result = runner.invoke(stats, [])
 
     assert result.exit_code == 0
     # The CPU/RAM table and its values are rendered.

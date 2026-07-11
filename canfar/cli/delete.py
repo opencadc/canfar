@@ -35,13 +35,6 @@ def delete_sessions(
             help="Force deletion without confirmation.",
         ),
     ] = False,
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
 ) -> None:
     """Delete sessions by ID.
 
@@ -61,7 +54,7 @@ def delete_sessions(
 
     async def _delete() -> None:
         """Delete the requested sessions from the science platform server."""
-        async with AsyncSession(loglevel="DEBUG" if debug else "INFO") as session:
+        async with AsyncSession() as session:
             try:
                 deleted = await session.destroy(ids=session_ids)
                 get_console().print(

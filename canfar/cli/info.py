@@ -159,8 +159,7 @@ async def _get_info(
     debug: bool,
 ) -> None:
     """Get detailed information about one or more sessions."""
-    log_level = "DEBUG" if debug else "INFO"
-    async with AsyncSession(loglevel=log_level) as session:
+    async with AsyncSession() as session:
         sessions_info = await session.info(ids=session_ids)
     if not sessions_info:
         get_console(stderr=True).print(
@@ -181,7 +180,7 @@ def get_info(
         bool,
         typer.Option(
             "--debug",
-            help="Enable debug logging.",
+            help="Show Session response warnings.",
         ),
     ] = False,
 ) -> None:

@@ -14,7 +14,6 @@ from pydantic import (
     Field,
     PrivateAttr,
     SecretStr,
-    field_validator,
     model_validator,
 )
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -114,14 +113,6 @@ class HTTPClient(BaseSettings):
         description="Install response hooks that raise HTTP status errors.",
         exclude=True,
     )
-    loglevel: int | str = Field(
-        default="INFO",
-        title="Logging level for the client.",
-        description="10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL",
-        examples=["info", "10"],
-        validate_default=False,
-    )
-
     # Composed configuration object
     config: Configuration = Field(
         default_factory=Configuration,
@@ -174,31 +165,6 @@ class HTTPClient(BaseSettings):
         if isinstance(credential, X509Credential) and credential.path is None:
             return None
         return credential
-
-    @field_validator("loglevel", mode="before")
-    @classmethod
-    def _validate_loglevel(cls, value: int | str) -> str:
-        """Validate and set the log level.
-
-        Args:
-            value (int | str): Log level as an integer or string.
-
-        Returns:
-            str: Log level as a string.
-        """
-        valid: dict[int, str] = {
-            0: "NOTSET",
-            10: "DEBUG",
-            20: "INFO",
-            30: "WARNING",
-            40: "ERROR",
-            50: "CRITICAL",
-        }
-        if isinstance(value, int):
-            value = valid[value]
-        value = value.upper()
-        assert value in valid.values(), f"Invalid log level: {value}"
-        return value
 
     @model_validator(mode="after")
     def _validate(self) -> Self:

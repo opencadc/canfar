@@ -6,7 +6,7 @@ from typing import Annotated
 
 import typer
 
-from canfar import CONFIG_PATH, get_logger, set_log_level
+from canfar import CONFIG_PATH
 from canfar.cli import output
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.machine import maybe_emit_banner
@@ -21,8 +21,6 @@ from canfar.server import (
     discover,
 )
 from canfar.utils.console import get_console
-
-log = get_logger(__name__)
 
 
 def _authentication_exists_on_disk(idp: str) -> bool:
@@ -131,10 +129,6 @@ def register_login_command(app: typer.Typer) -> None:
             bool,
             typer.Option("-f", "--force", help="Force re-authentication."),
         ] = False,
-        debug: Annotated[
-            bool,
-            typer.Option("--debug", help="Enable debug logging."),
-        ] = False,
         dev: Annotated[
             bool,
             typer.Option("--dev", help="Include dev servers in discovery."),
@@ -151,10 +145,6 @@ def register_login_command(app: typer.Typer) -> None:
     ) -> None:
         """Login to CANFAR Science Platform."""
         maybe_emit_banner(output.OutputMode.HUMAN)
-        if debug:
-            set_log_level("DEBUG")
-            log.debug("Debug logging enabled")
-
         selected_idp = idp or select_idp(list_idps())
         try:
             get_idp(selected_idp)
