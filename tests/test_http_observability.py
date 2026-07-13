@@ -338,16 +338,14 @@ def test_safe_tracer_honors_disabled_exception_recording() -> None:
     error = ValueError("opaque-caller-message")
 
     try:
-        with (
-            pytest.raises(ValueError, match="opaque-caller-message") as caught,
-            tracer.start_as_current_span(
-                "disabled-exception-recording",
-                record_exception=False,
-                set_status_on_exception=False,
-            ),
+        with tracer.start_as_current_span(  # noqa: SIM117
+            "disabled-exception-recording",
+            record_exception=False,
+            set_status_on_exception=False,
         ):
-            raise error
-
+            # Nested so CodeQL sees pytest.raises as a reachable catch boundary.
+            with pytest.raises(ValueError, match="opaque-caller-message") as caught:
+                raise error
         assert caught.value is error
         span = exporter.get_finished_spans()[0]
         assert span.events == ()

@@ -25,12 +25,6 @@ from canfar.models.auth import (
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
-from canfar.server import (
-    ServerDiscoveryError,
-    ServerFetchError,
-    _validate_server,
-    discover,
-)
 from tests.test_auth_x509 import generate_cert
 
 if TYPE_CHECKING:
@@ -306,7 +300,7 @@ class TestPlatformEnrichment:
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
             if strict:
-                with pytest.raises(ServerFetchError) as exc_info:
+                with pytest.raises(platform.ServerFetchError) as exc_info:
                     platform.enrich(server, config=config, strict=True)
                 assert isinstance(exc_info.value.__cause__, AuthContextError)
                 message = str(exc_info.value)
@@ -621,7 +615,7 @@ class TestPlatformEnrichment:
                 for name, server in config.servers.items()
             }
 
-            validated = _validate_server(
+            validated = platform._validate_server(  # noqa: SLF001
                 target,
                 config=config,
                 idp="srcnet",
@@ -723,7 +717,9 @@ class TestPlatformEnrichment:
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
 
-            with pytest.raises(ServerFetchError, match="Failed to fetch capabilities"):
+            with pytest.raises(
+                platform.ServerFetchError, match="Failed to fetch capabilities"
+            ):
                 platform.enrich(target, config=config)
 
         assert (
@@ -778,8 +774,10 @@ class TestPlatformEnrichment:
             config.save()
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
-            with pytest.raises(ServerDiscoveryError, match="No servers discovered"):
-                discover("cadc", config=config)
+            with pytest.raises(
+                platform.ServerDiscoveryError, match="No servers discovered"
+            ):
+                platform.discover("cadc", config=config)
 
         assert (config.model_dump(mode="json"), config_path.read_bytes()) == (
             before_model,
@@ -811,7 +809,7 @@ class TestPlatformEnrichment:
         ):
             if strict:
                 with pytest.raises(
-                    ServerFetchError,
+                    platform.ServerFetchError,
                     match="Failed to fetch capabilities",
                 ):
                     platform.enrich(

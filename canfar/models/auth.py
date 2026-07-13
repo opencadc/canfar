@@ -343,3 +343,18 @@ AuthenticationCredential = Annotated[
 
 AuthContext: TypeAlias = OIDC | X509
 """Legacy authentication context shape with embedded server."""
+
+__all__ = [
+    "OIDC",
+    "X509",
+    "AuthContext",
+    "AuthMode",
+    "Authentication",
+    "AuthenticationCredential",
+    "Client",
+    "Endpoint",
+    "Expiry",
+    "OIDCCredential",
+    "Token",
+    "X509Credential",
+]

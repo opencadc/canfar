@@ -8,7 +8,6 @@ import pytest
 from typer.testing import CliRunner
 
 import canfar
-from canfar import configure_logging
 from canfar.cli.main import cli
 from canfar.client import HTTPClient
 
@@ -71,4 +70,4 @@ def test_top_level_package_has_no_log_level_mutator() -> None:
 
 def test_configure_logging_has_no_legacy_file_switch() -> None:
     """The canonical runtime accepts only the explicit file path policy."""
-    assert "filelog" not in signature(configure_logging).parameters
+    assert "filelog" not in signature(canfar.configure_logging).parameters

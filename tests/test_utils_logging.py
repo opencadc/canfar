@@ -335,17 +335,18 @@ class TestLoggingIntegration:
     ) -> None:
         """One public event is safe, correlated, and parseable in both sinks."""
         log_file = tmp_path / "events.jsonl"
-        secret = "jsonl-secret-sentinel-01"
-        message = f"unicode café 🍁\nAuthorization: Bearer {secret}"
+        sentinel = "jsonl-secret-sentinel-01"
+        message = f"unicode café 🍁\nAuthorization: Bearer {sentinel}"
         monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
 
         try:
             configure_logging(loglevel="DEBUG", log_file=log_file)
             logger = get_logger("jsonl")
             try:
-                _raise_secret_error(secret)
+                _raise_secret_error(sentinel)
             except RuntimeError:
-                logger.exception(
+                # Intentional clear-text input for the redaction contract below.
+                logger.exception(  # codeql[py/clear-text-logging-sensitive-data]
                     message,
                     extra={
                         "event_code": "logging.contract",
@@ -392,7 +393,7 @@ class TestLoggingIntegration:
             assert "unicode café 🍁" in stderr
             output = stderr + raw
             assert "<redacted>" in output
-            assert secret not in output
+            assert sentinel not in output
         finally:
             for handler in get_logger().handlers[:]:
                 handler.close()
@@ -405,14 +406,15 @@ class TestLoggingIntegration:
     ) -> None:
         """Nested correlation data cannot violate the flat redacted schema."""
         log_file = tmp_path / "flat.jsonl"
-        secret = "nested-correlation-secret-sentinel"
+        sentinel = "nested-correlation-secret-sentinel"
         monkeypatch.delenv(_OTLP_ENDPOINT_ENV_VAR, raising=False)
 
         try:
             configure_logging(loglevel="INFO", log_file=log_file)
-            get_logger("jsonl").info(
+            # Nested non-string correlation values must be omitted, not serialized.
+            get_logger("jsonl").info(  # codeql[py/clear-text-logging-sensitive-data]
                 "flat-event",
-                extra={"request_id": {"password": secret}},
+                extra={"request_id": {"nested": sentinel}},
             )
             for handler in get_logger().handlers:
                 handler.flush()
@@ -420,7 +422,7 @@ class TestLoggingIntegration:
             raw = log_file.read_text(encoding="utf-8")
             event = json.loads(raw)
             assert "request_id" not in event
-            assert secret not in raw
+            assert sentinel not in raw
         finally:
             for handler in get_logger().handlers[:]:
                 handler.close()
