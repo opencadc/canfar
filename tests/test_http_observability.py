@@ -63,6 +63,7 @@ def span_exporter(
     configured: logfire.Logfire | None = None
 
     def configure_with_exporter(**kwargs: Any) -> logfire.Logfire:
+        """Configure logfire while attaching this test's in-memory exporter."""
         nonlocal configured
         configured = original_configure(
             **kwargs,
@@ -82,7 +83,7 @@ def span_exporter(
 
 
 @pytest.mark.asyncio
-async def test_explicit_logging_emits_safe_completed_http_spans(
+async def test_explicit_logging_emits_safe_completed_http_spans(  # noqa: PLR0915
     capsys: pytest.CaptureFixture[str],
     monkeypatch: pytest.MonkeyPatch,
     span_exporter: InMemorySpanExporter,
@@ -105,6 +106,7 @@ async def test_explicit_logging_emits_safe_completed_http_spans(
     traceparents: list[str] = []
 
     def respond(request: httpx.Request) -> httpx.Response:
+        """Assert secret-bearing request fields and return an empty payload."""
         assert request.headers["authorization"] == f"Bearer {_SECRETS['access']}"
         assert request.url.params["refresh_token"] == _SECRETS["refresh"]
         assert request.headers["cookie"] == f"session={_SECRETS['cookie']}"
@@ -262,7 +264,10 @@ async def test_transport_failures_preserve_callers_without_exporting_secrets(
     """Transport exceptions stay intact while completed spans are secret-free."""
 
     def failing_transport() -> httpx.MockTransport:
+        """Build a transport that always raises a ConnectError carrying secrets."""
+
         def fail(request: httpx.Request) -> httpx.Response:
+            """Raise a ConnectError that embeds URL and header secrets."""
             message = f"transport failed: {request.url} {request.headers['x-secret']}"
             raise httpx.ConnectError(message, request=request)
 
@@ -338,15 +343,17 @@ def test_safe_tracer_honors_disabled_exception_recording() -> None:
     error = ValueError("opaque-caller-message")
 
     try:
-        with tracer.start_as_current_span(  # noqa: SIM117
+        caught: BaseException | None = None
+        with tracer.start_as_current_span(
             "disabled-exception-recording",
             record_exception=False,
             set_status_on_exception=False,
         ):
-            # Nested so CodeQL sees pytest.raises as a reachable catch boundary.
-            with pytest.raises(ValueError, match="opaque-caller-message") as caught:
+            try:
                 raise error
-        assert caught.value is error
+            except ValueError as exc:
+                caught = exc
+        assert caught is error
         span = exporter.get_finished_spans()[0]
         assert span.events == ()
         assert span.status.status_code.name == "UNSET"

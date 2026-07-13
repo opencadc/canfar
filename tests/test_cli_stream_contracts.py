@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from typing import Any
 
 runner = CliRunner()
+_CLI_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"}
 _CADC_REGISTRY = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _OTLP_ENDPOINT_ENV_VAR = "CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT"
@@ -108,7 +109,12 @@ def test_config_success_warning_and_failure_keep_stream_contracts(
     config_path = tmp_path / "missing" / "config.yaml"
 
     with _config_path(config_path):
-        success = runner.invoke(cli, ["config", "get", "console.width", *flags])
+        success = runner.invoke(
+            cli,
+            ["config", "get", "console.width", *flags],
+            env=_CLI_ENV,
+            color=False,
+        )
     assert success.exit_code == 0
     assert success.stderr == ""
     if load is None:
@@ -118,10 +124,16 @@ def test_config_success_warning_and_failure_keep_stream_contracts(
         assert "@" not in success.stdout
 
     with _config_path(config_path):
-        warning = runner.invoke(cli, ["config", "show", *flags])
+        warning = runner.invoke(
+            cli,
+            ["config", "show", *flags],
+            env=_CLI_ENV,
+            color=False,
+        )
     assert warning.exit_code == 0
-    assert "does not exist, showing defaults" in warning.stderr
-    assert "does not exist, showing defaults" not in warning.stdout
+    warning_stderr = " ".join(warning.stderr.split())
+    assert "does not exist, showing defaults" in warning_stderr
+    assert "does not exist, showing defaults" not in " ".join(warning.stdout.split())
     if load is None:
         assert "'version': 1" in warning.stdout
     else:
@@ -130,7 +142,12 @@ def test_config_success_warning_and_failure_keep_stream_contracts(
         assert "@" not in warning.stdout
 
     with _config_path(config_path):
-        failure = runner.invoke(cli, ["config", "get", "missing.key", *flags])
+        failure = runner.invoke(
+            cli,
+            ["config", "get", "missing.key", *flags],
+            env=_CLI_ENV,
+            color=False,
+        )
     assert failure.exit_code == 1
     if load is None:
         assert "missing.key" in failure.stderr
@@ -158,6 +175,7 @@ def test_real_ps_log_and_payload_stay_on_separate_streams(
     _write_config(config_path, with_server=True)
 
     def response(request: httpx.Request) -> httpx.Response:
+        """Return an empty Session list payload."""
         return httpx.Response(200, json=[], request=request)
 
     with (
@@ -192,6 +210,7 @@ def test_ps_transport_failure_is_one_structured_machine_error(
     _write_config(config_path, with_server=True)
 
     def unavailable(request: httpx.Request) -> httpx.Response:
+        """Simulate a refused Session list request."""
         message = "connection refused"
         raise httpx.ConnectError(message, request=request)
 

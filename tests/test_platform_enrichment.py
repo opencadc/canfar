@@ -739,6 +739,7 @@ class TestPlatformEnrichment:
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
         def registry_response(request: httpx.Request) -> httpx.Response:
+            """Serve CADC registry contents for discovery before enrich fails."""
             if request.method == "GET" and str(request.url) == registry_url:
                 return httpx.Response(200, text=registry_body, request=request)
             if request.method == "HEAD" and str(request.url) == _CADC_URL:
@@ -747,6 +748,7 @@ class TestPlatformEnrichment:
             raise AssertionError(message)
 
         def unavailable(request: httpx.Request) -> httpx.Response:
+            """Simulate auth or transport failure during capability fetch."""
             if failure == "network":
                 message = "connection refused"
                 raise httpx.ConnectError(message, request=request)
@@ -754,16 +756,18 @@ class TestPlatformEnrichment:
 
         async_transport = httpx.MockTransport(registry_response)
         capabilities_transport = httpx.MockTransport(unavailable)
-        async_client_type = httpx.AsyncClient
+
+        class _RegistryAsyncClient(httpx.AsyncClient):
+            def __init__(self, **kwargs: object) -> None:
+                kwargs["transport"] = async_transport
+                super().__init__(**kwargs)
+
         config_path = tmp_path / "config.yaml"
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch(
                 "canfar.utils.discover.httpx.AsyncClient",
-                side_effect=lambda **kwargs: async_client_type(
-                    transport=async_transport,
-                    **kwargs,
-                ),
+                _RegistryAsyncClient,
             ),
             patch(
                 "canfar.client.Client",

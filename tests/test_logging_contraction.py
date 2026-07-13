@@ -12,6 +12,7 @@ from canfar.cli.main import cli
 from canfar.client import HTTPClient
 
 runner = CliRunner()
+_HELP_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"}
 
 
 @pytest.mark.parametrize(
@@ -29,7 +30,7 @@ runner = CliRunner()
 )
 def test_logging_only_leaf_debug_options_are_absent(command: list[str]) -> None:
     """Logging verbosity is controlled only by root options."""
-    result = runner.invoke(cli, [*command, "--help"])
+    result = runner.invoke(cli, [*command, "--help"], env=_HELP_ENV, color=False)
 
     assert result.exit_code == 0, result.output
     assert "--debug" not in result.output
@@ -49,7 +50,7 @@ def test_domain_debug_options_keep_their_public_meanings(
     meaning: str,
 ) -> None:
     """Domain-specific debug flags remain visible and unambiguous."""
-    result = runner.invoke(cli, [*command, "--help"])
+    result = runner.invoke(cli, [*command, "--help"], env=_HELP_ENV, color=False)
 
     assert result.exit_code == 0, result.output
     help_text = " ".join(result.output.replace("│", " ").split())
