@@ -200,7 +200,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 request,
             )
 
-        except ValueError:
+        except (ValueError, OSError):
             msg = "Failed to refresh OIDC token"
             raise AuthenticationError(msg) from None
 
@@ -262,7 +262,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
                     request,
                 )
 
-            except ValueError:
+            except (ValueError, OSError):
                 msg = "Failed to refresh OIDC token"
                 raise AuthenticationError(msg) from None
 
