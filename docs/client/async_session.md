@@ -12,7 +12,7 @@ are logged when the application configures logging. Call
 `canfar.configure_logging()` at the Python application entry point; it honors
 `CANFAR_LOGLEVEL`. In the CLI, use a root control such as
 `canfar --log-level debug create ...`. See
-[Logging and observability](../cli/logging.md).
+[Logging](../cli/logging.md).
 
 ::: canfar.sessions.AsyncSession
     handler: python

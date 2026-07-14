@@ -23,9 +23,8 @@ canfar --log-file ./logs/canfar.jsonl ps
 | `-v` | Increase verbosity; repeat through `-vvvv` for `debug`. |
 | `--log-file PATH` | Add the rotating JSON Lines file sink. |
 
-See [Logging and observability](logging.md) for the exact mapping,
-precedence, streams, telemetry, file schema, redaction policy, and stable error
-codes.
+See [Logging](logging.md) for the exact mapping, precedence, streams, file
+schema, and stable error codes.
 
 ## Authentication and Servers
 

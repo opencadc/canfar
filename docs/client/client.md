@@ -32,8 +32,8 @@ client = HTTPClient()
 ```
 
 Logging is an application concern rather than an `HTTPClient` constructor
-setting. See [Logging and observability](../cli/logging.md) for environment
-precedence, telemetry, file output, and redaction guarantees.
+setting. See [Logging](../cli/logging.md) for environment precedence, stream
+separation, and the optional `--log-file` JSON Lines sink.
 
 ## Configuration
 

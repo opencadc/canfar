@@ -11,7 +11,7 @@ empty list. The method does not raise for those errors, so callers can check `if
 after the call. For details in Python, call `canfar.configure_logging()` at the
 application entry point; it honors `CANFAR_LOGLEVEL`. In the CLI, use a root
 control such as `canfar --log-level debug create ...`. See
-[Logging and observability](../cli/logging.md).
+[Logging](../cli/logging.md).
 
 ::: canfar.sessions.Session
     handler: python

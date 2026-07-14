@@ -1,9 +1,12 @@
-# Logging and observability
+# Logging
 
 CANFAR configures logging only at an explicit application entry point. The CLI
 does this once before dispatching a command. Python applications can call
 `canfar.configure_logging(...)` themselves; importing `canfar` does not configure
-handlers, consoles, or telemetry.
+handlers or consoles.
+
+Logging uses Python's standard `logging` library with Rich for human stderr
+output, plus an optional rotating JSON Lines file sink.
 
 ## CLI controls and precedence
 
@@ -50,8 +53,7 @@ CANFAR_LOGLEVEL=info canfar ps
 ```
 
 Only the documented CANFAR logging variables affect this policy. Unknown
-CANFAR logging variables are ignored. Ambient `LOGFIRE_*` and `OTEL_*`
-variables do not directly configure CANFAR logging or telemetry.
+CANFAR logging variables are ignored.
 
 ## Python applications
 
@@ -104,42 +106,6 @@ In `--json` or `--yaml` mode, logging setup failures and file-sink warnings are
 serialized in the selected format on stderr. They never add a banner or log
 line to the command payload on stdout.
 
-## HTTP tracing and OTLP
-
-External telemetry export is off by default. Set
-`CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT` to opt in:
-
-```bash
-CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT=https://collector.example:4318/otel \
-  canfar ps
-```
-
-The endpoint must be an absolute HTTP or HTTPS base URL without credentials,
-a query, or a fragment. When it is set, CANFAR enables OTLP trace export only;
-OTLP logs and metrics remain disabled. Export batching, connection recovery,
-and retries use the upstream OpenTelemetry defaults. CANFAR adds no exporter
-retry manager or health subsystem.
-
-The same Logfire HTTPX instrumentation is used for synchronous and asynchronous
-clients. Traces can include:
-
-- request method;
-- URL without user information, query parameters, or fragments;
-- response status and duration;
-- a validated response request ID when present; and
-- trace and span correlation identifiers.
-
-Request and response headers and bodies are not captured. Transport exceptions
-are recorded without copying raw exception messages or stack traces into HTTP
-spans.
-
-During explicit setup and client instrumentation, CANFAR briefly quarantines
-ambient `LOGFIRE_*` and `OTEL_*` variables, maps the CANFAR endpoint when one was
-provided, and then restores the previous environment. This upstream env-based
-configuration creates a short process-wide observation window; unrelated
-threads can momentarily observe the quarantined values. Values changed by
-another participant during setup are not overwritten during restoration.
-
 ## Rotating JSON Lines file sink
 
 File logging is opt-in. Use the root option or the Python `Path` argument shown
@@ -171,12 +137,12 @@ Every file event contains:
 | `timestamp` | Yes | UTC RFC3339 timestamp with `Z` suffix and millisecond precision. |
 | `level` | Yes | Logging level name, such as `INFO` or `ERROR`. |
 | `logger` | Yes | Logger name, such as `canfar.sessions`. |
-| `message` | Yes | Rendered, redacted message. |
+| `message` | Yes | Rendered message. |
 | `event_code` | No | Stable event code when the record supplies one. |
-| `request_id` | No | Request correlation identifier when supplied. |
-| `trace_id` | No | Trace correlation identifier when supplied. |
-| `span_id` | No | Span correlation identifier when supplied. |
-| `exception` | No | Escaped, redacted exception or stack text. |
+| `request_id` | No | Request correlation identifier when supplied as a string. |
+| `trace_id` | No | Trace correlation identifier when supplied as a string. |
+| `span_id` | No | Span correlation identifier when supplied as a string. |
+| `exception` | No | Escaped exception or stack text. |
 
 Example shape:
 
@@ -184,18 +150,8 @@ Example shape:
 {"timestamp":"2026-07-11T12:34:56.789Z","level":"INFO","logger":"canfar.sessions","message":"Session request accepted","request_id":"request-123"}
 ```
 
-## Redaction guarantees
-
-Recognized secrets are redacted before stderr, JSON Lines, or OTLP output. The
-policy covers:
-
-- bearer, access, and refresh tokens;
-- client secrets, API keys, credentials, and password-like values;
-- cookies and sensitive authorization headers; and
-- X.509 certificate, private-key, and PEM material.
-
-HTTP URLs also lose user information, query parameters, and fragments before
-they are logged or traced. Headers and bodies remain uncaptured by default.
+Authentication Record secrets use Pydantic `SecretStr` and render as masked
+values in Configuration dumps. Do not log raw token or certificate material.
 
 ## Stable logging diagnostics
 
@@ -203,7 +159,7 @@ Logging diagnostics use stable dotted-domain codes:
 
 | Code | Behavior and details |
 | --- | --- |
-| `logging.invalid_env_value` | Fatal setup error. Includes `env_var`, `provided_value`, and `expected`. Invalid OTLP endpoint values are reported as `<redacted>`. |
+| `logging.invalid_env_value` | Fatal setup error. Includes `env_var`, `provided_value`, and `expected`. |
 | `logging.invalid_file_path` | Fatal setup error for `-` or an existing directory. Includes the standard `code`, `message`, and `hint` fields. |
 | `logging.file_sink_unavailable` | Non-fatal warning for initialization, write, or rollover failure. The command continues with stderr logging; machine mode emits a structured warning on stderr. |
 

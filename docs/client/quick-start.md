@@ -80,5 +80,5 @@ async with AsyncSession() as session:
 | Browser URL fails | Wait 60-120 seconds and confirm the Session is `Running`. |
 | Script needs stable output | Use CLI machine output such as `canfar ps --json`. |
 
-See [Logging and observability](../cli/logging.md) for the CLI and Python
+See [Logging](../cli/logging.md) for the CLI and Python
 logging controls.

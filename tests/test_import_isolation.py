@@ -75,9 +75,7 @@ for module in (
 ):
     importlib.import_module(module)
 
-from canfar.utils.logging import _canfar_logger, instrument_httpx
-
-instrument_httpx(object())
+from canfar.utils.logging import _canfar_logger
 
 canfar_logger = logging.getLogger("canfar")
 assert not _canfar_logger._configured
@@ -86,9 +84,6 @@ assert canfar_logger.level == logging.NOTSET
 assert canfar_logger.propagate
 assert logging.getLogger().handlers == []
 assert sys.excepthook is original_excepthook
-assert "opentelemetry.instrumentation.httpx" not in sys.modules, [
-    m for m in sys.modules if m.startswith("opentelemetry.instrumentation.httpx")
-]
 """
     result = subprocess.run(  # noqa: S603
         [sys.executable, "-c", script, str(home)],
@@ -147,38 +142,21 @@ assert PublicAuthContext is DirectAuthContext
     assert result.returncode == 0, result.stderr
 
 
-def test_logfire_runtime_import_is_scoped_to_configure_logging() -> None:
-    """Only explicit runtime configuration may import the Logfire package."""
+def test_logging_module_has_no_logfire_or_opentelemetry_imports() -> None:
+    """Stdlib logging path must not depend on Logfire or OpenTelemetry."""
     source = Path("canfar/utils/logging.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
-    runtime_body = [
-        node
-        for node in tree.body
-        if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-        and not (
-            isinstance(node, ast.If)
-            and isinstance(node.test, ast.Name)
-            and node.test.id == "TYPE_CHECKING"
-        )
-    ]
-    runtime_tree = ast.Module(body=runtime_body, type_ignores=[])
-    runtime_imports = [
+    modules = [
         alias.name
-        for node in ast.walk(runtime_tree)
+        for node in ast.walk(tree)
         if isinstance(node, ast.Import)
         for alias in node.names
     ] + [
-        node.module or ""
-        for node in ast.walk(runtime_tree)
-        if isinstance(node, ast.ImportFrom)
+        node.module or "" for node in ast.walk(tree) if isinstance(node, ast.ImportFrom)
     ]
-
-    assert not any(module.startswith("logfire") for module in runtime_imports)
-    assert [
-        (function, module)
-        for function, module in _function_local_imports(source)
-        if module.startswith("logfire")
-    ] == [("configure_logging", "logfire")]
+    assert not any(
+        module.startswith(("logfire", "opentelemetry")) for module in modules
+    )
 
 
 def _function_local_imports(source: str) -> list[tuple[str, str]]:

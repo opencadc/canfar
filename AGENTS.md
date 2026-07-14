@@ -46,15 +46,13 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - During design grilling, ask one question at a time and converge decisions incrementally.
 - During broad refactors, preserve existing tests and avoid API/CLI output regressions unless the user explicitly approves those changes.
 - Do not introduce a separate DTO/request model layer; use the domain Pydantic models under `canfar/models/` directly and serialize the same model for `--json` output.
-- Prefer Python stdlib utilities and Pydantic built-ins (`model_dump`, `model_dump_json`) over custom serialization or config glue; keep the smallest footprint that preserves behavior.
+- Prefer Python stdlib utilities and Pydantic built-ins (`logging`, `model_dump`, `model_dump_json`, `SecretStr`) over custom serialization, config glue, Logfire, or telemetry stacks; keep the smallest footprint that preserves behavior (including CLI `--log-file`).
 
 ## Learned Workspace Facts
 
-- Issue tracking for this repo uses Jira on `herzberg.atlassian.net`, CADC project, with `CANFAR` label required for canfar work.
-- PRDs/spec work for this repo is tracked in Jira (for example `CADC-15643`), not in GitHub Issues.
+- Issue tracking and PRDs/specs use Jira on `herzberg.atlassian.net` (CADC project, `CANFAR` label required; e.g. `CADC-15643`), not GitHub Issues; durable agent decisions live under `docs/agents/adrs/`.
 - Triage is status-based in Jira: `needs-triage` -> To Do, `needs-info` -> On Hold, `ready-for-agent` -> In Progress, `ready-for-human` -> Review, `wontfix` -> On Hold.
 - Domain documentation currently uses root `CONTEXT.md` as the glossary.
-- Specs and PRDs are Jira-first; durable agent decision records live under `docs/agents/adrs/`, separate from Jira spec tracking.
 - Client configuration stores `servers` and `authentication` as dicts keyed by Server Name and IDP; `Server.name` and credential `idp` may duplicate those keys in nested values; Server Selection and `active` references use server names, not IVOA URIs.
 - `Session.create` and `AsyncSession.create` should preserve parity and return `list[str]`, using `[]` on total HTTP/network failure without raising.
 - CLI layout is kubectl-style: `canfar auth` (bare runs `show`; canonical subcommand names only, `ls`/`rm`), `canfar server`, and `canfar login` (`canfar auth login` is a deprecated alias; `canfar context` was removed).
@@ -63,3 +61,4 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - `canfar ps -q` must print all matching session IDs and apply the same `--all`/running-only status filter as table mode.
 - `canfar.helpers.distributed` is documented public API used in user batch scripts, not internal/dead code.
 - When `HTTPClient` has runtime `token` or `certificate`, skip saved Authentication Record expiry and OIDC refresh httpx hooks (`uses_runtime_credentials`); saved-config hooks apply only without runtime credentials.
+- Observability is stdlib `logging` only (no Logfire or `canfar/utils/telemetry.py`); token masking relies on Pydantic `SecretStr`, not custom log redaction; CLI `--log-file` remains the local file sink.

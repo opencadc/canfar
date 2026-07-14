@@ -1,19 +1,4 @@
-# canfar/logging.py
-"""Unified logging configuration for the CANFAR client library.
-
-This module provides a centralized logging configuration using Python's
-logging library with Rich for enhanced console output. It follows best
-practices for library logging.
-
-Best Practices Implemented:
-1. Use a single named logger for the entire library
-2. Lazy logger initialization to avoid import-time side effects
-3. Rich integration for beautiful console output
-4. Optional file logging with rotation
-5. Performance optimizations (lazy formatting, level checks)
-6. Proper exception handling and context
-7. Thread-safe configuration
-"""
+"""CANFAR logging: stdlib logging with Rich stderr and optional JSONL file sink."""
 
 from __future__ import annotations
 
@@ -21,11 +6,9 @@ import json
 import logging
 import logging.handlers
 import os
-import re
 import sys
 import threading
-import traceback
-from contextlib import contextmanager, suppress
+from contextlib import suppress
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -39,29 +22,15 @@ from rich.traceback import install as install_rich_traceback
 from canfar.errors import ErrorCode, LoggingEnvironmentError, StructuredError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Iterator
+    from collections.abc import Callable
 
-    from httpx import AsyncClient, Client
-    from logfire import LevelName
-    from logfire.integrations.httpx import RequestInfo, ResponseInfo
-    from opentelemetry.trace import Span
-
-# Library logger name - all modules should use this as root
 LOGGER_NAME = "canfar"
-# Thread lock for configuration safety
 _LOCK = threading.Lock()
-_TELEMETRY_ENV_LOCK = threading.RLock()
-_instrument_httpx: Callable[..., None] | None = None
 
 MAX_LOGFILE_SIZE = 10 * 1024 * 1024  # 10MB
 MAX_LOGFILE_COUNT = 10
 
 LOG_LEVEL_ENV_VAR = "CANFAR_LOGLEVEL"
-OTLP_ENDPOINT_ENV_VAR = "CANFAR_OTEL_EXPORTER_OTLP_ENDPOINT"
-_OTLP_ENDPOINT_EXPECTED = (
-    "absolute http(s) base URL without credentials, query, or fragment"
-)
-_TELEMETRY_ENV_PREFIXES = ("LOGFIRE_", "OTEL_")
 
 
 class LoggingLevel(str, Enum):
@@ -82,38 +51,6 @@ VERBOSITY_LEVELS = (
     LoggingLevel.INFO,
     LoggingLevel.DEBUG,
 )
-_LOGFIRE_LEVELS: dict[LoggingLevel, LevelName] = {
-    LoggingLevel.CRITICAL: "fatal",
-    LoggingLevel.ERROR: "error",
-    LoggingLevel.WARNING: "warning",
-    LoggingLevel.INFO: "info",
-    LoggingLevel.DEBUG: "debug",
-}
-
-_SENSITIVE_NAME_FRAGMENT = (
-    r"(?:access[._ -]?token|refresh[._ -]?token|client[._ -]?secret|password|"
-    r"passwd|passphrase|pwd|credential|api[._ -]?key|secret|cookie|set-cookie|"
-    r"authorization|proxy-authorization|x509|certificate|private[._ -]?key|pem)"
-)
-_SCRUBBING_PATTERNS = (_SENSITIVE_NAME_FRAGMENT,)
-_REQUEST_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/-]{0,127}$")
-_PEM_BLOCK = re.compile(
-    r"-----BEGIN [^-]*(?:PRIVATE KEY|CERTIFICATE)-----.*?"
-    r"(?:-----END [^-]*(?:PRIVATE KEY|CERTIFICATE)-----|$)",
-    re.IGNORECASE | re.DOTALL,
-)
-_BEARER_VALUE = re.compile(r"(?P<prefix>\bBearer\s+)[^\s,;]+", re.IGNORECASE)
-_SENSITIVE_HEADER_VALUE = re.compile(
-    r"(?P<prefix>['\"]?(?:authorization|proxy-authorization|cookie|set-cookie)"
-    r"['\"]?\s*(?::|=)\s*)(?:\"[^\r\n]*\"|'[^\r\n]*'|[^\r\n]*)",
-    re.IGNORECASE,
-)
-_SENSITIVE_VALUE = re.compile(
-    rf"(?P<prefix>['\"]?{_SENSITIVE_NAME_FRAGMENT}['\"]?\s*(?::|=)\s*)"
-    r"(?:\"[^\"]*\"|'[^']*'|[^\s,;]+)",
-    re.IGNORECASE,
-)
-_SENSITIVE_FIELD = re.compile(_SENSITIVE_NAME_FRAGMENT, re.IGNORECASE)
 
 
 class InvalidLoggingEnvironmentError(ValueError):
@@ -186,76 +123,6 @@ def _warn_file_sink_unavailable(
         sys.stderr.write(f"{error.code}: {error.message}\n")
 
 
-def _resolve_otlp_endpoint() -> str | None:
-    """Validate and return the explicit CANFAR OTLP endpoint, if present."""
-    value = os.environ.get(OTLP_ENDPOINT_ENV_VAR)
-    if value is None:
-        return None
-
-    try:
-        parts = urlsplit(value)
-        port = parts.port
-        valid = (
-            not any(character.isspace() for character in value)
-            and parts.scheme.lower() in {"http", "https"}
-            and parts.hostname is not None
-            and parts.username is None
-            and parts.password is None
-            and "?" not in value
-            and "#" not in value
-            and not parts.netloc.endswith(":")
-            and (port is None or port > 0)
-        )
-    except ValueError:
-        valid = False
-
-    if not valid:
-        provided_value = "<redacted>"
-        raise InvalidLoggingEnvironmentError(
-            provided_value,
-            env_var=OTLP_ENDPOINT_ENV_VAR,
-            expected=[_OTLP_ENDPOINT_EXPECTED],
-        )
-    return value
-
-
-@contextmanager
-def _telemetry_environment(endpoint: str | None = None) -> Iterator[None]:
-    """Briefly quarantine telemetry env during explicit setup/client creation.
-
-    The upstream env-only API requires a short process-global mutation, so
-    unrelated readers can briefly observe the quarantined state.
-    """
-    mapped = (
-        {
-            "OTEL_EXPORTER_OTLP_ENDPOINT": endpoint,
-            "OTEL_TRACES_EXPORTER": "otlp",
-            "OTEL_METRICS_EXPORTER": "none",
-            "OTEL_LOGS_EXPORTER": "none",
-        }
-        if endpoint is not None
-        else {}
-    )
-    with _TELEMETRY_ENV_LOCK:
-        previous = {
-            key: value
-            for key, value in os.environ.items()
-            if key.startswith(_TELEMETRY_ENV_PREFIXES)
-        }
-        for key in tuple(os.environ):
-            if key.startswith(_TELEMETRY_ENV_PREFIXES):
-                os.environ.pop(key)
-        os.environ.update(mapped)
-        try:
-            yield
-        finally:
-            for key, value in mapped.items():
-                if os.environ.get(key) == value:
-                    os.environ.pop(key)
-            for key, value in previous.items():
-                os.environ.setdefault(key, value)
-
-
 def safe_url(value: object) -> str:
     """Return a URL without user information, query parameters, or fragments."""
     parts = urlsplit(str(value))
@@ -263,42 +130,8 @@ def safe_url(value: object) -> str:
     return urlunsplit((parts.scheme, netloc, parts.path, "", ""))
 
 
-def redact_text(value: str) -> str:
-    """Redact common Authentication and certificate secrets from text."""
-    value = _PEM_BLOCK.sub("<redacted>", value)
-    value = _SENSITIVE_HEADER_VALUE.sub(r"\g<prefix><redacted>", value)
-    value = _BEARER_VALUE.sub(r"\g<prefix><redacted>", value)
-    return _SENSITIVE_VALUE.sub(r"\g<prefix><redacted>", value)
-
-
-class _RedactingFilter(logging.Filter):
-    """Sanitize a record only when a configured handler emits it."""
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        record.msg = redact_text(record.getMessage())
-        record.args = ()
-        if record.exc_info:
-            record.exc_text = redact_text(
-                "".join(traceback.format_exception(*record.exc_info))
-            )
-            record.exc_info = None
-        if record.stack_info:
-            record.stack_info = redact_text(record.stack_info)
-        for key, value in tuple(record.__dict__.items()):
-            if isinstance(value, str):
-                record.__dict__[key] = (
-                    "<redacted>"
-                    if _SENSITIVE_FIELD.fullmatch(key)
-                    else redact_text(value)
-                )
-        return True
-
-
-_REDACTION_FILTER = _RedactingFilter()
-
-
 class _JSONLinesFormatter(logging.Formatter):
-    """Format one redacted logging event as one UTF-8 JSON object."""
+    """Format one logging event as one UTF-8 JSON object."""
 
     def format(self, record: logging.LogRecord) -> str:
         timestamp = datetime.fromtimestamp(record.created, timezone.utc)
@@ -340,48 +173,6 @@ class _ResilientRotatingFileHandler(logging.handlers.RotatingFileHandler):
         _warn_file_sink_unavailable(self.warning_writer)
 
 
-def _httpx_request_hook(span: Span, request: RequestInfo) -> None:
-    """Overwrite native URL attributes with a safe request URL."""
-    url = safe_url(request.url)
-    span.set_attribute("url.full", url)
-    span.set_attribute("http.url", url)
-
-
-def _httpx_response_hook(
-    span: Span,
-    request: RequestInfo,
-    response: ResponseInfo,
-) -> None:
-    """Capture one validated response request identifier."""
-    del request
-    if response.headers is None:
-        return
-    value = response.headers.get("x-request-id")
-    if value and _REQUEST_ID.fullmatch(value):
-        span.set_attribute("request_id", value)
-
-
-def instrument_httpx(client: Client | AsyncClient) -> None:
-    """Instrument one cached client after explicit logging configuration."""
-    if _instrument_httpx is None:
-        return
-    with _telemetry_environment():
-        from canfar.utils.telemetry import (  # noqa: PLC0415
-            safe_httpx_tracer_provider,
-        )
-
-        _instrument_httpx(
-            client,
-            capture_all=False,
-            capture_headers=False,
-            capture_request_body=False,
-            capture_response_body=False,
-            request_hook=_httpx_request_hook,
-            response_hook=_httpx_response_hook,
-            tracer_provider=safe_httpx_tracer_provider(),
-        )
-
-
 def _resolve_log_level(
     loglevel: int | str | LoggingLevel | None,
     verbosity: int,
@@ -411,12 +202,7 @@ def _resolve_log_level(
 
 
 class CanfarLogger:
-    """Centralized logger configuration for the CANFAR client.
-
-    This class manages the configuration of logging for the entire library,
-    providing a unified interface for setting up console and file logging
-    with Rich integration.
-    """
+    """Configure stdlib logging for the CANFAR logger name."""
 
     _configured = False
     _rich_handler: RichHandler | None = None
@@ -427,11 +213,7 @@ class CanfarLogger:
 
     @property
     def logger(self) -> logging.Logger:
-        """CANFAR Logger.
-
-        Returns:
-            logging.Logger: logging object.
-        """
+        """Return the CANFAR root logger."""
         return logging.getLogger(LOGGER_NAME)
 
     def configure(
@@ -441,26 +223,16 @@ class CanfarLogger:
         log_file: Path | None = None,
         warning_writer: Callable[[StructuredError], None] | None = None,
     ) -> None:
-        """Configure the CANFAR logger with Rich support and optional file logging.
-
-        Args:
-            loglevel (int | str, optional): Logging level. Defaults to logging.INFO.
-            log_file: Explicit file sink path.
-            warning_writer: Optional sink for structured file-logging warnings.
-        """
+        """Configure Rich stderr logging and an optional rotating JSONL file sink."""
         target = _resolve_log_file_path(log_file) if log_file is not None else None
         with _LOCK:
             install_rich_traceback(show_locals=False, suppress=[])
             if self._configured:
-                # Allow reconfiguration but clean up existing handlers
                 self._cleanup_handlers()
-            # Convert string level to int if needed
             if isinstance(loglevel, str):
                 loglevel = getattr(logging, loglevel.upper())
-            # Configure the main logger
             logger = self.logger
             logger.setLevel(loglevel)
-            # Setup Rich console handler
             self._rich_handler = RichHandler(
                 console=Console(stderr=True),
                 show_path=True,
@@ -470,14 +242,9 @@ class CanfarLogger:
                 tracebacks_show_locals=False,
             )
             self._rich_handler.setLevel(loglevel)
-            self._rich_handler.addFilter(_REDACTION_FILTER)
-
-            # Rich handler uses a simpler format since Rich adds the styling
-            formatter = logging.Formatter("%(message)s")
-            self._rich_handler.setFormatter(formatter)
+            self._rich_handler.setFormatter(logging.Formatter("%(message)s"))
             logger.addHandler(self._rich_handler)
 
-            # Setup file logging if requested
             if target is not None:
                 self._setup_file_logging(
                     target,
@@ -487,7 +254,6 @@ class CanfarLogger:
                     warning_writer,
                 )
 
-            # Prevent propagation to root logger to avoid duplicate messages
             logger.propagate = False
             self._configured = True
 
@@ -499,7 +265,7 @@ class CanfarLogger:
         level: int,
         warning_writer: Callable[[StructuredError], None] | None = None,
     ) -> None:
-        """Setup rotating file handler for logging."""
+        """Attach a rotating JSON Lines file handler when the path is usable."""
         try:
             logfile.parent.mkdir(parents=True, exist_ok=True)
             self._file_handler = _ResilientRotatingFileHandler(
@@ -514,28 +280,22 @@ class CanfarLogger:
             return
         self._file_handler.warning_writer = warning_writer
         self._file_handler.setLevel(level)
-        self._file_handler.addFilter(_REDACTION_FILTER)
         self._file_handler.setFormatter(_JSONLinesFormatter())
         self.logger.addHandler(self._file_handler)
 
     def _cleanup_handlers(self) -> None:
         """Remove existing handlers to allow reconfiguration."""
         logger = self.logger
-
-        # Remove all existing handlers
         for handler in logger.handlers[:]:
             handler.close()
             logger.removeHandler(handler)
-
         self._rich_handler = None
         self._file_handler = None
 
 
-# Global logger instance
 _canfar_logger = CanfarLogger()
 
 
-# Convenience functions for easy access
 def configure_logging(
     loglevel: int | str | LoggingLevel | None = None,
     *,
@@ -544,28 +304,7 @@ def configure_logging(
     warning_writer: Callable[[StructuredError], None] | None = None,
 ) -> LoggingLevel:
     """Configure logging explicitly using CLI, environment, and packaged policy."""
-    global _instrument_httpx  # noqa: PLW0603
-
     level = _resolve_log_level(loglevel, verbosity)
-    endpoint = _resolve_otlp_endpoint()
-
-    with _telemetry_environment(endpoint):
-        # Logfire is intentionally imported and configured only at this runtime seam.
-        import logfire  # noqa: PLC0415
-
-        from canfar.utils.telemetry import install_w3c_propagator  # noqa: PLC0415
-
-        configured = logfire.configure(
-            send_to_logfire=False,
-            console=False,
-            metrics=False,
-            scrubbing=logfire.ScrubbingOptions(extra_patterns=_SCRUBBING_PATTERNS),
-            inspect_arguments=False,
-            distributed_tracing=False,
-            min_level=_LOGFIRE_LEVELS[level],
-        )
-        install_w3c_propagator()
-    _instrument_httpx = configured.instrument_httpx
     _canfar_logger.configure(
         loglevel=level.value,
         log_file=log_file,
@@ -575,14 +314,7 @@ def configure_logging(
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    """Get a CANFAR logger instance.
-
-    Args:
-        name: Optional module name for child logger
-
-    Returns:
-        Logger instance
-    """
+    """Return a CANFAR logger, optionally nested under ``canfar``."""
     if name is None:
         name = LOGGER_NAME
     elif not name.startswith(LOGGER_NAME):

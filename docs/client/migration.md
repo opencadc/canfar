@@ -15,7 +15,7 @@ This guide helps you migrate from the `skaha` Python package to `canfar`.
 - Logger name: `canfar`. Current releases write no default log file; file output
   is explicit through root `--log-file` or a `pathlib.Path` passed to
   `canfar.configure_logging()`. See
-  [Logging and observability](../cli/logging.md).
+  [Logging](../cli/logging.md).
 - Environment variables: prefix change `SKAHA_…` → `CANFAR_…`.
 - CLI entry point: `canfar` (single entry point).
 - User-Agent header: `python-canfar/{version}`.
