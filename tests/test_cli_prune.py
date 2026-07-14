@@ -32,3 +32,7 @@ def test_prune_success_and_usage_message() -> None:
 
     usage = PruneUsageMessage(name="prune").get_usage(MagicMock())
     assert "canfar prune" in usage
+
+    help_result = runner.invoke(prune, ["--help"])
+    assert help_result.exit_code == 0
+    assert "canfar prune 'session.*' notebook Running" in help_result.output

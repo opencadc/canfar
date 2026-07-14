@@ -54,7 +54,10 @@ def prune_sessions(
         str,
         typer.Argument(
             ...,
-            help="Prefix or regex pattern to match session names.",
+            help=(
+                "Prefix or regex pattern to match session names. "
+                "Quote patterns with shell metacharacters (e.g. '*', '?')."
+            ),
             metavar="PREFIX",
         ),
     ],
@@ -79,7 +82,7 @@ def prune_sessions(
 
     Examples:
     canfar prune session-name headless Succeeded
-    canfar prune session.* notebook Running
+    canfar prune 'session.*' notebook Running
     """
     maybe_emit_banner(OutputMode.HUMAN)
 

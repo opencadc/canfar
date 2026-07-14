@@ -159,6 +159,9 @@ canfar delete SESSION_ID... [--force]
 canfar prune PREFIX [KIND] [STATUS]
 ```
 
+Quote `PREFIX` when it contains shell metacharacters
+(for example `canfar prune 'rabi.*' headless Completed`).
+
 `canfar info SESSION_ID --debug` shows Session response warnings. This is
 a command diagnostic, not a logging-level control.
 
