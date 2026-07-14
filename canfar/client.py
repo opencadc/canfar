@@ -35,8 +35,6 @@ if TYPE_CHECKING:
 
 log = get_logger(__name__)
 
-_UNSET = object()
-
 
 class HTTPClient(BaseSettings):
     """HTTP Client for interacting with CANFAR Science Platform services (V2).
@@ -257,19 +255,17 @@ class HTTPClient(BaseSettings):
         self,
         asynchronous: bool,
         *,
-        credential: AuthenticationCredential | None | object = _UNSET,
+        credential: AuthenticationCredential | None,
     ) -> dict[str, Any]:
         """Get the keyword arguments for creating an HTTPx client.
 
         Args:
             asynchronous (bool): Whether the client is asynchronous.
-            credential: Pre-resolved Authentication Record, or unset to resolve.
+            credential: Pre-resolved Authentication Record for this client build.
 
         Returns:
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
-        if credential is _UNSET:
-            credential = self._resolved_authentication_record()
         catcher = errors.acatch if asynchronous else errors.catch
         response_hooks = [catcher] if self.raise_http_errors else []
         request_hooks: list[Any] = []
@@ -341,18 +337,16 @@ class HTTPClient(BaseSettings):
     def _get_http_headers(
         self,
         *,
-        credential: AuthenticationCredential | None | object = _UNSET,
+        credential: AuthenticationCredential | None,
     ) -> dict[str, str]:
         """Generate HTTP headers for the client based on authentication mode.
 
         Args:
-            credential: Pre-resolved Authentication Record, or unset to resolve.
+            credential: Pre-resolved Authentication Record for this client build.
 
         Returns:
             dict[str, str]: HTTP headers.
         """
-        if credential is _UNSET:
-            credential = self._resolved_authentication_record()
         headers: dict[str, str] = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",

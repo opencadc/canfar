@@ -44,7 +44,12 @@ def _session_name_pattern(selector: str) -> re.Pattern[str]:
     else:
         log.info("destroy_with using literal prefix: %s", selector)
         pattern = rf"^{re.escape(selector)}"
-    return re.compile(pattern)
+    try:
+        return re.compile(pattern)
+    except re.error as exc:
+        msg = f"Invalid regex pattern '{selector}': {exc}"
+        log.exception(msg)
+        raise ValueError(msg) from exc
 
 
 def _matching_session_ids(sessions: list[Any], regex: re.Pattern[str]) -> list[str]:
@@ -386,13 +391,7 @@ class Session(HTTPClient):
             >>> session.destroy_with(prefix="test")  # literal prefix
             >>> session.destroy_with(prefix="desktop$")  # regex
         """
-        try:
-            regex = _session_name_pattern(prefix)
-        except re.error as exc:
-            msg = f"Invalid regex pattern '{prefix}': {exc}"
-            log.exception(msg)
-            raise ValueError(msg) from exc
-
+        regex = _session_name_pattern(prefix)
         sessions = self.fetch(kind=kind, status=status)
         return self.destroy(_matching_session_ids(sessions, regex))
 
@@ -826,13 +825,7 @@ class AsyncSession(HTTPClient):
             >>> await session.destroy_with(prefix="test")  # literal prefix
             >>> await session.destroy_with(prefix="desktop$")  # regex
         """
-        try:
-            regex = _session_name_pattern(prefix)
-        except re.error as err:
-            msg = f"Invalid regex pattern '{prefix}': {err}"
-            log.exception(msg)
-            raise ValueError(msg) from err
-
+        regex = _session_name_pattern(prefix)
         sessions = await self.fetch(kind=kind, status=status)
         return await self.destroy(_matching_session_ids(sessions, regex))
 

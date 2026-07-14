@@ -314,19 +314,17 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no credential exists for ``idp``.
         """
-        try:
-            return self.authentication[idp]
-        except KeyError as exc:
+        if idp not in self.authentication:
             msg = f"Authentication record for IDP '{idp}' not found."
-            raise KeyError(msg) from exc
+            raise KeyError(msg)
+        return self.authentication[idp]
 
     def _get_server_by_name(self, name: str) -> Server:
         """Return a known server by Server Name."""
-        try:
-            return self.servers[name]
-        except KeyError as exc:
+        if name not in self.servers:
             msg = f"Server '{name}' not found."
-            raise KeyError(msg) from exc
+            raise KeyError(msg)
+        return self.servers[name]
 
     def upsert_credential(self, credential: AuthenticationCredential) -> None:
         """Insert or replace a validated Authentication Record.
@@ -485,12 +483,9 @@ class Configuration(BaseSettings):
             available for ``idp``.
         """
         name = self._server_selection_history().get(idp)
-        if name is None:
+        if name is None or name not in self.servers:
             return None
-        try:
-            server = self._get_server_by_name(name)
-        except KeyError:
-            return None
+        server = self.servers[name]
         if server.idp != idp:
             return None
         return server
@@ -498,12 +493,10 @@ class Configuration(BaseSettings):
     def _server_selection_history(self) -> dict[str, str]:
         """Return remembered selections seeded with the current active pair."""
         selections = dict(self.active.servers)
-        if self.active.server is None:
+        active_name = self.active.server
+        if active_name is None or active_name not in self.servers:
             return selections
-        try:
-            server = self.get_active_server()
-        except KeyError:
-            return selections
+        server = self.servers[active_name]
         if server.idp == self.active.authentication and server.name is not None:
             selections[self.active.authentication] = server.name
         return selections

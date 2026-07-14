@@ -360,7 +360,9 @@ class TestCertificateValidation:
         assert client.certificate is None  # Certificate should be nullified
 
         # Verify that the client uses token authentication
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
         assert "Authorization" in headers
         assert headers["Authorization"] == "Bearer test-token"
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-TOKEN"
@@ -430,7 +432,9 @@ class TestHTTPClientCreationAndHeaders:
             "canfar.client.formatdate",
             return_value="Wed, 09 Jun 2026 12:00:00 GMT",
         ) as mock_formatdate:
-            headers = client._get_http_headers()
+            headers = client._get_http_headers(
+                credential=client._resolved_authentication_record()
+            )
 
         mock_formatdate.assert_called_once_with(usegmt=True)
         assert "Content-Type" in headers
@@ -450,7 +454,9 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["Authorization"] == "Bearer test-token"
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-TOKEN"
@@ -461,7 +467,9 @@ class TestHTTPClientCreationAndHeaders:
         _create_test_certificate(cert_path)
 
         client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-X509"
         assert "Authorization" not in headers
@@ -488,7 +496,9 @@ class TestHTTPClientCreationAndHeaders:
         config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["Authorization"] == "Bearer oidc-access-token"
         assert headers["X-Skaha-Authentication-Type"] == "OIDC"
@@ -510,7 +520,9 @@ class TestHTTPClientCreationAndHeaders:
         config = configuration_from_legacy_context("x509", x509_context)
 
         client = canfar_client_fixture(config=config)
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["X-Skaha-Authentication-Type"] == "X509"
         assert "Authorization" not in headers
@@ -524,7 +536,9 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com", config=config
         )
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert "X-Skaha-Registry-Auth" in headers
 
@@ -538,14 +552,18 @@ class TestHTTPClientCreationAndHeaders:
         )
 
         # Test sync client kwargs
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
         assert "timeout" in sync_kwargs
         # httpx.Timeout doesn't have a .timeout attribute, it's the object itself
         assert isinstance(sync_kwargs["timeout"], httpx.Timeout)
         assert "limits" not in sync_kwargs  # Only for async
 
         # Test async client kwargs
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
         assert "timeout" in async_kwargs
         assert isinstance(async_kwargs["timeout"], httpx.Timeout)
         assert "limits" in async_kwargs
@@ -575,12 +593,16 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(config=config)
 
         # Test sync client kwargs
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
         assert "event_hooks" in sync_kwargs
         assert "request" in sync_kwargs["event_hooks"]
 
         # Test async client kwargs
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
         assert "event_hooks" in async_kwargs
         assert "request" in async_kwargs["event_hooks"]
 
@@ -700,8 +722,12 @@ class TestSSLContextAndClientKwargs:
             url="https://runtime.com",
         )
 
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
 
         assert sync_kwargs["event_hooks"]["request"] == []
         assert async_kwargs["event_hooks"]["request"] == []
@@ -724,8 +750,12 @@ class TestSSLContextAndClientKwargs:
         config = configuration_from_legacy_context("x509", x509_context)
         client = canfar_client_fixture(config=config)
 
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
 
         assert len(sync_kwargs["event_hooks"]["request"]) == 1
         assert len(async_kwargs["event_hooks"]["request"]) == 1
@@ -740,7 +770,9 @@ class TestSSLContextAndClientKwargs:
         _create_test_certificate(cert_path)
 
         client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
-        kwargs = client._get_client_kwargs(asynchronous=False)
+        kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
 
         assert "verify" in kwargs
         assert isinstance(kwargs["verify"], ssl.SSLContext)
