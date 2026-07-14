@@ -47,6 +47,11 @@ def _session_name_pattern(selector: str) -> re.Pattern[str]:
     return re.compile(pattern)
 
 
+def _matching_session_ids(sessions: list[Any], regex: re.Pattern[str]) -> list[str]:
+    """Return session IDs whose names match the compiled selector."""
+    return [session["id"] for session in sessions if regex.search(session["name"])]
+
+
 def connection_url(session: Mapping[str, Any]) -> str | None:
     """Return the URL only when a Session is ready for a connection."""
     value = session.get("connectURL")
@@ -389,10 +394,7 @@ class Session(HTTPClient):
             raise ValueError(msg) from exc
 
         sessions = self.fetch(kind=kind, status=status)
-        ids: list[str] = [
-            session["id"] for session in sessions if regex.search(session["name"])
-        ]
-        return self.destroy(ids)
+        return self.destroy(_matching_session_ids(sessions, regex))
 
     def connect(self, ids: list[str] | str) -> None:
         """Open session[s] in a web browser.
@@ -795,6 +797,7 @@ class AsyncSession(HTTPClient):
     async def destroy_with(
         self,
         prefix: str,
+        *,
         kind: Kind = "headless",
         status: Status = "Completed",
     ) -> dict[str, bool]:
@@ -830,12 +833,8 @@ class AsyncSession(HTTPClient):
             log.exception(msg)
             raise ValueError(msg) from err
 
-        ids: list[str] = [
-            session["id"]
-            for session in await self.fetch(kind=kind, status=status)
-            if regex.search(session["name"])
-        ]
-        return await self.destroy(ids)
+        sessions = await self.fetch(kind=kind, status=status)
+        return await self.destroy(_matching_session_ids(sessions, regex))
 
     async def connect(self, ids: list[str] | str) -> None:
         """Connect to a session[s] in a web browser.

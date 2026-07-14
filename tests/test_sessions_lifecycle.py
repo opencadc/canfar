@@ -132,3 +132,17 @@ async def test_sync_and_async_lifecycle_share_public_policy() -> None:
         "https://example.test/running",
         "https://example.test/running",
     ]
+
+
+@pytest.mark.asyncio
+async def test_destroy_with_kind_and_status_are_keyword_only() -> None:
+    """Kind and status must be keyword-only on Session and AsyncSession."""
+    base_url = "https://example.test/skaha/v1/"
+    token = SecretStr("token")
+
+    with Session(token=token, url=base_url) as session, pytest.raises(TypeError):
+        session.destroy_with("prefix", "headless", "Completed")
+
+    async with AsyncSession(token=token, url=base_url) as asession:
+        with pytest.raises(TypeError):
+            await asession.destroy_with("prefix", "headless", "Completed")
