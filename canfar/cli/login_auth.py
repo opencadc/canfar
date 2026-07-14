@@ -71,7 +71,7 @@ async def _interactive_device_flow(
             progress.update(task_id, advance=1)
 
     poll_task = asyncio.create_task(
-        oidc.poll_device_token(token_url, identity, secret, challenge, client)
+        oidc.poll_device_token(token_url, challenge, client)
     )
     progress_task = asyncio.create_task(update_progress())
     try:

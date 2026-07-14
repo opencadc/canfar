@@ -5,7 +5,8 @@ from __future__ import annotations
 import asyncio
 import socket
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Generator
+from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
 import httpx
@@ -167,6 +168,31 @@ async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[st
     return token
 
 
+@contextmanager
+def _map_refresh_errors() -> Generator[None, None, None]:
+    """Map Authlib/httpx refresh failures to the fixed, secret-safe messages."""
+    try:
+        yield
+    except (OAuthError, httpx.HTTPError):
+        msg = "OIDC token refresh failed"
+        raise ValueError(msg) from None
+    except (TypeError, ValueError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
+
+
+def _validated_refresh(refreshed: Any) -> dict[str, Any]:
+    """Return the refreshed token mapping, or raise on a malformed response."""
+    if (
+        not isinstance(refreshed, dict)
+        or not isinstance(refreshed.get("access_token"), str)
+        or not refreshed["access_token"]
+    ):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    return dict(refreshed)
+
+
 async def refresh(
     url: str,
     identity: str,
@@ -191,27 +217,14 @@ async def refresh(
         AsyncOAuth2Client,
     )
 
-    try:
+    with _map_refresh_errors():
         async with AsyncOAuth2Client(
             identity,
             secret,
             token_endpoint_auth_method=_BASIC_AUTH_METHOD,
         ) as client:
             refreshed = await client.refresh_token(url, refresh_token=token)
-    except (OAuthError, httpx.HTTPError):
-        msg = "OIDC token refresh failed"
-        raise ValueError(msg) from None
-    except (TypeError, ValueError):
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg) from None
-    if (
-        not isinstance(refreshed, dict)
-        or not isinstance(refreshed.get("access_token"), str)
-        or not refreshed["access_token"]
-    ):
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg)
-    return dict(refreshed)
+    return _validated_refresh(refreshed)
 
 
 def sync_refresh(
@@ -236,27 +249,16 @@ def sync_refresh(
     """
     from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
 
-    try:
-        with OAuth2Client(
+    with (
+        _map_refresh_errors(),
+        OAuth2Client(
             identity,
             secret,
             token_endpoint_auth_method=_BASIC_AUTH_METHOD,
-        ) as client:
-            refreshed = client.refresh_token(url, refresh_token=token)
-    except (OAuthError, httpx.HTTPError):
-        msg = "OIDC token refresh failed"
-        raise ValueError(msg) from None
-    except (TypeError, ValueError):
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg) from None
-    if (
-        not isinstance(refreshed, dict)
-        or not isinstance(refreshed.get("access_token"), str)
-        or not refreshed["access_token"]
+        ) as client,
     ):
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg)
-    return dict(refreshed)
+        refreshed = client.refresh_token(url, refresh_token=token)
+    return _validated_refresh(refreshed)
 
 
 async def authflow(
@@ -339,8 +341,6 @@ async def start_device_authorization(
 
 async def poll_device_token(
     token_url: str,
-    identity: str,
-    secret: str,
     challenge: DeviceAuthorization,
     client: AsyncOAuth2Client,
 ) -> dict[str, Any]:
@@ -348,15 +348,12 @@ async def poll_device_token(
 
     Args:
         token_url: Token endpoint.
-        identity: Registered client ID.
-        secret: Registered client secret.
         challenge: Challenge returned by :func:`start_device_authorization`.
         client: Authlib async OAuth client configured for the registered client.
 
     Returns:
         OIDC token response data.
     """
-    del identity, secret  # Authlib owns credentials; retain the public call shape.
     return await _poll_with_backoff(
         token_url,
         challenge.device_code.get_secret_value(),
@@ -437,13 +434,7 @@ async def _authflow_impl(
         client,
     )
 
-    return await poll_device_token(
-        token_url,
-        identity,
-        secret,
-        challenge,
-        client,
-    )
+    return await poll_device_token(token_url, challenge, client)
 
 
 async def authenticate_credential(
