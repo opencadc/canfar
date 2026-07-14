@@ -1467,6 +1467,8 @@
       
         
       
+        
+      
     
     
     
@@ -1562,6 +1564,34 @@
     
   
     Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -2044,9 +2074,7 @@
 
 <a href="#canfar.helpers.distributed.stripe" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">stripe</span><span class="p">(</span>
-    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
-    <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
-    <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_COUNT&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </code></pre></div>
 
@@ -2096,11 +2124,11 @@ empty. When <code>total</code> is zero, <code>ValueError</code> is raised.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="int">int</span></code>
+                      <code><span title="int">int</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>
@@ -2116,11 +2144,11 @@ empty. When <code>total</code> is zero, <code>ValueError</code> is raised.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="int">int</span></code>
+                      <code><span title="int">int</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>
@@ -2177,9 +2205,7 @@ empty. When <code>total</code> is zero, <code>ValueError</code> is raised.</p>
 
 <a href="#canfar.helpers.distributed.chunk" class="headerlink" title="Permanent link">&para;</a></h4>
 <div class="doc-signature highlight"><pre><span></span><code><span class="nf">chunk</span><span class="p">(</span>
-    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
-    <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_ID&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
-    <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;REPLICA_COUNT&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">)),</span>
+    <span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">T</span><span class="p">],</span> <span class="n">replica</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">total</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">T</span><span class="p">]</span>
 </code></pre></div>
 
@@ -2233,11 +2259,11 @@ Defaults to <code>REPLICA_ID</code>.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="int">int</span></code>
+                      <code><span title="int">int</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_ID&#39;, &#39;1&#39;))</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>
@@ -2254,11 +2280,11 @@ Defaults to <code>REPLICA_ID</code>.</p>
               <p>
                   <span class="doc-param-annotation">
                     <b>TYPE:</b>
-                      <code><span title="int">int</span></code>
+                      <code><span title="int">int</span> | None</code>
                   </span>
                   <span class="doc-param-default">
                     <b>DEFAULT:</b>
-                      <code><span title="int">int</span>(<span title="os.environ.get">get</span>(&#39;REPLICA_COUNT&#39;, &#39;1&#39;))</code>
+                      <code>None</code>
                   </span>
               </p>
             </td>

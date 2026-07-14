@@ -1400,10 +1400,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Logging
       
     </span>
   </a>
@@ -1411,10 +1411,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-expiry" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Expiry
+        Configuration
       
     </span>
   </a>
@@ -1504,6 +1504,8 @@
   
     
     
+      
+        
       
         
       
@@ -1606,6 +1608,34 @@
     
   
     Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -1970,10 +2000,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#logging" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
+        Logging
       
     </span>
   </a>
@@ -1981,10 +2011,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-expiry" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Expiry
+        Configuration
       
     </span>
   </a>
@@ -2056,52 +2086,40 @@
 <li><strong>Automatic SSL Configuration</strong>: Seamless certificate-based authentication</li>
 <li><strong>Async/Sync Support</strong>: Both synchronous and asynchronous HTTP clients</li>
 <li><strong>Connection Pooling</strong>: Optimized for concurrent requests</li>
-<li><strong>Debug Logging</strong>: Comprehensive logging for troubleshooting</li>
+<li><strong>Application Logging</strong>: Explicit, secret-safe runtime configuration</li>
 <li><strong>Context Managers</strong>: Proper resource management</li>
 </ul>
 </div>
 <p><em>This is a low-level client that is used by all other API clients in CANFAR. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.</em></p>
 <h2 id="authentication-modes">Authentication Modes<a class="headerlink" href="#authentication-modes" title="Permanent link">&para;</a></h2>
 <p>The client supports multiple authentication modes that can be configured through the authentication system:</p>
-<h3 id="debug-logging">Debug Logging<a class="headerlink" href="#debug-logging" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<h2 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_logging</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
 
-<span class="c1"># Enable debug logging to see client creation details</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
-
-<span class="c1"># This will log:</span>
-<span class="c1"># - Authentication mode selection</span>
-<span class="c1"># - SSL context creation</span>
-<span class="c1"># - Header generation</span>
-<span class="c1"># - Client configuration</span>
+<span class="c1"># Configure the application once, then construct clients normally.</span>
+<span class="n">configure_logging</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">)</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">()</span>
 </code></pre></div>
+<p>Logging is an application concern rather than an <code>HTTPClient</code> constructor
+setting. See <a href="../../cli/logging/">Logging</a> for environment precedence, stream
+separation, and the optional <code>--log-file</code> JSON Lines sink.</p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The client inherits from the <code>Configuration</code> class and supports all configuration options:</p>
+<p>The client composes a <code>Configuration</code> object through its <code>config</code> field:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">(</span>
+    <span class="n">config</span><span class="o">=</span><span class="n">Configuration</span><span class="p">(),</span>
     <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>           <span class="c1"># Request timeout in seconds</span>
     <span class="n">concurrency</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>       <span class="c1"># Max concurrent connections</span>
-    <span class="n">loglevel</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>         <span class="c1"># Logging level (INFO)</span>
 <span class="p">)</span>
 </code></pre></div>
-<h2 id="authentication-expiry">Authentication Expiry<a class="headerlink" href="#authentication-expiry" title="Permanent link">&para;</a></h2>
-<p>The client provides an <code>expiry</code> property that returns the expiry time for the current authentication method:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-
-<span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">()</span>
-
-<span class="k">if</span> <span class="n">client</span><span class="o">.</span><span class="n">expiry</span><span class="p">:</span>
-    <span class="n">time_left</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">expiry</span> <span class="o">-</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Authentication expires in </span><span class="si">{</span><span class="n">time_left</span><span class="si">:</span><span class="s2">.0f</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span>
-<span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;No expiry tracking (user-provided credentials)&quot;</span><span class="p">)</span>
-</code></pre></div>
-<div class="admonition note">
-<p class="admonition-title">Expiry Tracking</p>
-<p>The <code>expiry</code> property returns <code>None</code> for user-provided certificates or tokens since the client cannot track their expiry automatically.</p>
-</div>
+<p>Runtime <code>token</code> or <code>certificate</code> arguments take precedence over saved
+Authentication Records, including authentication hook selection. Without
+runtime credentials, <code>authentication_idp</code> selects an Authentication Record for
+that client; otherwise the active Authentication Record and Server Selection
+from <code>Configuration</code> are used.</p>
 <h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
 <p>The client includes built-in error handling for HTTP responses:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">httpx</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPStatusError</span>
@@ -2140,9 +2158,9 @@ variables, or a configuration file.</p>
 <ol>
 <li><strong>Runtime Arguments/Environment Variables</strong>: A <code>token</code> or <code>certificate</code>
     provided at instantiation (e.g., <code>CANFAR_TOKEN="..."</code>).</li>
-<li><strong>Active Configuration Context</strong>: Credentials and server from
-    <code>active.authentication</code> and <code>active.server</code> in the loaded configuration
-    file.</li>
+<li><strong>Saved Authentication</strong>: The Authentication Record named by transient
+    <code>authentication_idp</code> or <code>active.authentication</code>, plus the active Server
+    Selection when no explicit <code>url</code> is supplied.</li>
 </ol>
 
 
@@ -2295,7 +2313,7 @@ variables, or a configuration file.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
   </span>
 
     
@@ -2323,14 +2341,14 @@ variables, or a configuration file.</p>
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
         <a href="https://github.com/web-flow" class="md-author" title="@web-flow">

@@ -1,0 +1,1511 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CANFAR Science Platform">
+      
+      
+        <meta name="author" content="Shiny Brar">
+      
+      
+        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/agents/reviews/2026-07-09-code-quality-audit/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../static/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>CANFAR Overall Code Quality Audit - CANFAR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../termynal.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#canfar-overall-code-quality-audit" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CANFAR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              CANFAR Overall Code Quality Audit
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="canfar" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../platform/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../client/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Client
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../conduct/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contribute
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    CANFAR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../platform/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../client/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../conduct/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../about/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#executive-verdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Executive verdict
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#evidence-snapshot" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Evidence snapshot
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#issue-100-is-planned-work-not-a-new-audit-backlog" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Issue #100 is planned work, not a new audit backlog
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#combined-structural-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Combined structural findings
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ponytail-audit-ranked-cuts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Ponytail audit — ranked cuts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#published-improvement-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Published improvement program
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#review-guardrails" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Review guardrails
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/agents/reviews/2026-07-09-code-quality-audit.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/agents/reviews/2026-07-09-code-quality-audit.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+    </a>
+  
+
+
+<h1 id="canfar-overall-code-quality-audit">CANFAR Overall Code Quality Audit<a class="headerlink" href="#canfar-overall-code-quality-audit" title="Permanent link">&para;</a></h1>
+<ul>
+<li><strong>Audit date:</strong> 2026-07-09</li>
+<li><strong>Snapshot:</strong> <code>main</code> at <code>f6609e23</code></li>
+<li><strong>Scope:</strong> whole repository, read-only code-quality and over-engineering review</li>
+<li><strong>Review tracks:</strong> thermo-nuclear maintainability review and ponytail whole-repo audit</li>
+</ul>
+<h2 id="executive-verdict">Executive verdict<a class="headerlink" href="#executive-verdict" title="Permanent link">&para;</a></h2>
+<p>The repository has a healthy executable baseline: lint, type checking, and all
+deterministic non-slow tests pass. It is not a spaghetti codebase, and no shipped
+Python file has crossed the thermo-nuclear 1,000-line threshold.</p>
+<p>The architecture is nevertheless carrying several expensive seams:</p>
+<ul>
+<li><code>Session</code> and <code>AsyncSession</code> maintain the same nine operations by copying policy.</li>
+<li>The canonical Authentication Record and Server Selection schema is converted back
+  into a legacy context shape inside the HTTP client and auth hooks.</li>
+<li>The persisted Science Platform Server model owns HTTP I/O and fallback policy.</li>
+<li>OIDC protocol code, browser/QR presentation, Rich progress, and model mutation are
+  fused into one 512-line module.</li>
+<li>Importing <code>canfar</code> can read and reject the user's configuration before the user
+  invokes an operation.</li>
+<li>A superseded discovery/display path and heavily duplicated tests contribute a
+  large amount of code without supporting the live product path.</li>
+</ul>
+<p>The highest-leverage move is not a broad rewrite. It is to delete the dormant path,
+make the existing domain seams canonical internally, and share only pure policy
+between sync and async adapters.</p>
+<h2 id="evidence-snapshot">Evidence snapshot<a class="headerlink" href="#evidence-snapshot" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Measure</th>
+<th style="text-align: right;">Current result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Shipped Python</td>
+<td style="text-align: right;">73 files / 10,055 physical lines</td>
+</tr>
+<tr>
+<td>Test Python</td>
+<td style="text-align: right;">62 files / 14,759 physical lines</td>
+</tr>
+<tr>
+<td>Test-to-production ratio</td>
+<td style="text-align: right;">1.468</td>
+</tr>
+<tr>
+<td>Production files at least 1,000 lines</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>Production files at least 500 lines</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td>Test files at least 1,000 lines</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td>Largest production file</td>
+<td style="text-align: right;"><code>canfar/sessions.py</code>, 870 lines</td>
+</tr>
+<tr>
+<td>Largest test file</td>
+<td style="text-align: right;"><code>tests/test_helpers_distributed.py</code>, 1,651 lines</td>
+</tr>
+</tbody>
+</table>
+<p>Largest production files:</p>
+<ol>
+<li><code>canfar/sessions.py</code> — 870 lines</li>
+<li><code>canfar/server.py</code> — 514 lines</li>
+<li><code>canfar/auth/oidc.py</code> — 512 lines</li>
+<li><code>canfar/models/config.py</code> — 442 lines</li>
+<li><code>canfar/client.py</code> — 433 lines</li>
+</ol>
+<p>Largest function spans:</p>
+<ol>
+<li><code>canfar/cli/create.py:61</code> <code>creation</code> — 159 lines</li>
+<li><code>canfar/cli/ps.py:32</code> <code>show</code> — 128 lines</li>
+<li><code>canfar/utils/vosi.py:123</code> <code>capabilities</code> — 103 lines</li>
+<li><code>canfar/sessions.py:598</code> async <code>create</code> — 97 lines</li>
+<li><code>canfar/auth/oidc.py:344</code> <code>_authflow_impl</code> — 93 lines</li>
+</ol>
+<p>The current branch is one docs-only commit ahead of <code>origin/main</code>; that commit adds a
+Typst demo and does not affect the production-code findings.</p>
+<h2 id="issue-100-is-planned-work-not-a-new-audit-backlog">Issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> is planned work, not a new audit backlog<a class="headerlink" href="#issue-100-is-planned-work-not-a-new-audit-backlog" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/opencadc/canfar/issues/100">#100 — PRD: Logging Architecture and Observability Vertical Slice</a>
+is open and labeled <code>enhancement</code>, <code>PRD</code>, and <code>ready-for-agent</code>. It has no assignee,
+milestone, project item, or comments. It was last updated on 2026-05-23.</p>
+<p>The following visible debt is already owned by <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> and is deliberately excluded
+from the independent findings and deletion estimates below:</p>
+<ul>
+<li>the 249-line <code>canfar/utils/logging.py</code> implementation;</li>
+<li>logging configuration and Rich traceback installation at import time;</li>
+<li>the process-wide log-level side effect in <code>HTTPClient</code> validation;</li>
+<li>scattered CLI verbosity handling and the future <code>--log-level</code> / repeated <code>-v</code>
+  contract;</li>
+<li>stdout/stderr discipline and structured machine diagnostics;</li>
+<li>redaction, request correlation, and HTTPX instrumentation;</li>
+<li>Logfire/OpenTelemetry configuration and optional OTLP export;</li>
+<li>file sinks, rotation, JSON Lines, fallback behavior, and logging documentation;</li>
+<li>logging-test replacement with externally observable behavior tests.</li>
+</ul>
+<p>Do not start a competing stdlib-only logging rewrite. Issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> explicitly chooses
+Logfire, a big-bang internal migration, and no compatibility shim.</p>
+<p>Two implementation cautions should be preserved when <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> is executed:</p>
+<ul>
+<li><code>canfar version --debug</code> means "show bug-report details", not "enable logging".</li>
+<li><code>canfar info --debug</code> both raises verbosity and displays response anomalies; a
+  mechanical flag replacement would remove non-logging behavior.</li>
+</ul>
+<p>The non-logging console/config import problem described below is adjacent to <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a>,
+but is outside its logging-only scope.</p>
+<h2 id="combined-structural-findings">Combined structural findings<a class="headerlink" href="#combined-structural-findings" title="Permanent link">&para;</a></h2>
+<h3 id="p1-make-import-canfar-inert-with-respect-to-user-configuration">P1 — Make <code>import canfar</code> inert with respect to user configuration<a class="headerlink" href="#p1-make-import-canfar-inert-with-respect-to-user-configuration" title="Permanent link">&para;</a></h3>
+<p><code>canfar/utils/console.py:45</code> constructs a configured Rich console at module import:</p>
+<div class="highlight"><pre><span></span><code><span class="n">console</span><span class="p">:</span> <span class="n">Console</span> <span class="o">=</span> <span class="n">get_console</span><span class="p">()</span>
+</code></pre></div>
+<p><code>get_console()</code> constructs <code>Configuration()</code>. The eager import path is
+<code>canfar.__init__ -&gt; server -&gt; Discover -&gt; console</code>, so a stale
+<code>~/.canfar/config.yaml</code> can make <code>import canfar</code> fail. This is not hypothetical:
+<code>tests/test_import_isolation.py:17</code> currently asserts that failure.</p>
+<p>Concrete improvement:</p>
+<ul>
+<li>delete the module-level configured console;</li>
+<li>call <code>get_console()</code> from CLI command execution, after configuration migration and
+  validation are intentionally in scope;</li>
+<li>remove console output from discovery and OIDC protocol modules;</li>
+<li>reverse the isolation test so importing the library must succeed with stale user
+  state.</li>
+</ul>
+<p>This makes import behavior predictable without inventing a proxy object or another
+configuration layer.</p>
+<h3 id="p1-stop-converting-canonical-authentication-state-back-into-legacy-contexts">P1 — Stop converting canonical Authentication state back into legacy contexts<a class="headerlink" href="#p1-stop-converting-canonical-authentication-state-back-into-legacy-contexts" title="Permanent link">&para;</a></h3>
+<p>The persisted schema already separates Authentication Records from Science Platform
+Servers. Internally, however, <code>canfar/client.py:239</code>, <code>canfar/client.py:274</code>, and
+<code>canfar/client.py:330</code> obtain <code>config.context</code>, rebuilding legacy <code>OIDC</code> or <code>X509</code>
+objects with an embedded server. <code>canfar/hooks/httpx/auth.py:87</code> then writes refreshed
+tokens back through <code>config.contexts</code>.</p>
+<p>That makes the compatibility adapter part of the core runtime and forces maintainers
+to reason about two representations of the same Authentication state.</p>
+<p>The code-judo move is to keep compatibility at the boundary and make canonical
+records the only internal representation:</p>
+<div class="highlight"><pre><span></span><code><span class="n">idp</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">active</span><span class="o">.</span><span class="n">authentication</span>
+<span class="n">credential</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="n">idp</span><span class="p">)</span>
+<span class="n">server</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_active_server</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">credential</span><span class="p">,</span> <span class="n">OIDCCredential</span><span class="p">):</span>
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">credential</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+        <span class="n">update</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">credential</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="n">token</span><span class="p">}),</span>
+            <span class="s2">&quot;expiry&quot;</span><span class="p">:</span> <span class="n">credential</span><span class="o">.</span><span class="n">expiry</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="n">expiry</span><span class="p">}),</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">authentication</span><span class="p">[</span><span class="n">idp</span><span class="p">]</span> <span class="o">=</span> <span class="n">updated</span>
+</code></pre></div>
+<p>Move <code>valid</code>/<code>expired</code> behavior onto <code>OIDCCredential</code> and <code>X509Credential</code>, or into
+small pure functions over those models. Keep <code>Configuration.context</code> and <code>.contexts</code>
+only as an explicitly deprecated compatibility boundary until a breaking release can
+remove them.</p>
+<p>Server Selection rules also have two peer APIs today: free functions in
+<code>canfar/config/selection.py</code> and forwarding methods in
+<code>canfar/models/config.py:270-406</code>. Pick one internal owner. The low-risk choice is to
+use <code>config.selection</code> internally and retain model methods only for public
+compatibility; if <code>Configuration</code> is intended to be the public canonical seam, fold
+the implementations into it in one change. Do not keep both forms as peer call paths.</p>
+<p>Finally, <code>canfar/config/store.py:50</code> writes directly to the target YAML file. Preserve
+the existing one-save orchestration, but write a temporary file in the target
+directory and finish with <code>os.replace()</code> so an interruption cannot leave partial
+configuration.</p>
+<h3 id="p1-share-session-policy-not-a-magical-syncasync-transport-abstraction">P1 — Share Session policy, not a magical sync/async transport abstraction<a class="headerlink" href="#p1-share-session-policy-not-a-magical-syncasync-transport-abstraction" title="Permanent link">&para;</a></h3>
+<p><code>Session</code> occupies lines 31-406 of <code>canfar/sessions.py</code>; <code>AsyncSession</code> repeats the
+same nine public operations at lines 409-870. Together the classes occupy 838 of 870
+lines (96.3%). Their paired operations span 784 lines.</p>
+<p>The async side also repeats the same semaphore / gather / exception-filter loop in
+<code>info</code>, <code>logs</code>, <code>create</code>, <code>events</code>, and <code>destroy</code>. Similar copied policy has already
+drifted elsewhere: <code>canfar/hooks/httpx/auth.py:161</code> documents that the async refresh
+hook intentionally lacks the sync hook's <code>ctx.valid</code> guard.</p>
+<p>Keep both public adapters. Extract only the behavior that should be identical:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">_ids</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_session_name_pattern</span><span class="p">(</span><span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">re</span><span class="o">.</span><span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="s2">&quot;.^$*+?</span><span class="si">{}</span><span class="s2">[]()|&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">prefix</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">meta</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">prefix</span><span class="p">)</span> <span class="k">else</span> <span class="sa">rf</span><span class="s2">&quot;^</span><span class="si">{</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Likewise, build <code>CreateRequest</code> once and pass that model into a shared payload builder.
+If the scalar <code>create(...)</code> API must remain compatible, keep it as one thin adapter
+that constructs <code>CreateRequest</code>; do not maintain scalar and model-first
+implementations as peers.</p>
+<p>Avoid solving this with a generic sync/async transport protocol, decorators, or code
+generation. Python's I/O mechanics are genuinely different; ID normalization,
+selector compilation, payload generation, refresh eligibility, and result parsing
+are the parts that should be shared.</p>
+<h3 id="p1-make-the-science-platform-server-model-pure-data">P1 — Make the Science Platform Server model pure data<a class="headerlink" href="#p1-make-the-science-platform-server-model-pure-data" title="Permanent link">&para;</a></h3>
+<p><code>canfar/models/http.py:27</code> begins as a persisted Pydantic Science Platform Server
+model, then owns VOSI retrieval, sync and async HTTP-client construction,
+Authentication configuration loading, fallback policy, and context-response parsing
+through line 301. Local imports of <code>HTTPClient</code> and <code>Configuration</code> at lines 179 and
+210 are evidence that the ownership direction is backwards.</p>
+<p><code>Server.afetch()</code> has no production or documentation caller. <code>Server.fetch()</code> has one
+production caller in the Platform service.</p>
+<p>Move the I/O to <code>canfar/server.py</code> (or reuse the existing <code>canfar.context.Context</code>
+client) and leave model methods for parsing/copying only:</p>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch_server_resources</span><span class="p">(</span>
+    <span class="n">server</span><span class="p">:</span> <span class="n">Server</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Server</span><span class="p">:</span>
+    <span class="n">base_url</span> <span class="o">=</span> <span class="n">AnyHttpUrl</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">server</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">server</span><span class="o">.</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">resources</span> <span class="o">=</span> <span class="n">Context</span><span class="p">(</span>
+        <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="n">base_url</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="n">raise_http_errors</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">resources</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">server</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">update</span><span class="o">=</span><span class="n">resource_settings</span><span class="p">(</span><span class="n">resources</span><span class="p">),</span> <span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+<p>This deletes the unused async path, removes hidden client construction from a model,
+and puts Authentication-aware Platform I/O in the module that already owns Science
+Platform Server discovery and validation.</p>
+<h3 id="p2-split-oidc-protocol-from-interactive-cli-presentation">P2 — Split OIDC protocol from interactive CLI presentation<a class="headerlink" href="#p2-split-oidc-protocol-from-interactive-cli-presentation" title="Permanent link">&para;</a></h3>
+<p><code>canfar/auth/oidc.py</code> is 512 lines and combines four responsibilities:</p>
+<ul>
+<li>discovery, dynamic registration, polling, and refresh HTTP protocol;</li>
+<li>browser launching and QR rendering;</li>
+<li>Rich console output and progress animation;</li>
+<li>mutation of the legacy <code>OIDC</code> context model.</li>
+</ul>
+<p>The mixed flow is concentrated in <code>_authflow_impl</code> at line 344 and <code>authenticate</code> at
+line 439. <code>canfar/cli/login_auth.py</code> is already the natural presentation adapter, but
+delegates into a function that prints and opens the browser.</p>
+<p>Expose protocol steps and keep presentation in the CLI:</p>
+<div class="highlight"><pre><span></span><code><span class="n">challenge</span> <span class="o">=</span> <span class="k">await</span> <span class="n">start_device_authorization</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">present_device_challenge</span><span class="p">(</span><span class="n">challenge</span><span class="p">)</span>  <span class="c1"># canfar/cli/login_auth.py</span>
+<span class="n">tokens</span> <span class="o">=</span> <span class="k">await</span> <span class="n">poll_device_token</span><span class="p">(</span><span class="n">challenge</span><span class="p">,</span> <span class="o">...</span><span class="p">)</span>
+</code></pre></div>
+<p>If typed provider payloads are introduced, place the Pydantic domain shapes under
+<code>canfar/models/auth.py</code>; do not add a parallel DTO layer. Removing QR support is a
+product/UX decision, not an automatic code-quality win.</p>
+<p>The follow-on
+<a href="../../research/2026-07-10-authlib-oidc-replacement/">Authlib feasibility study</a>
+finds that Authlib can replace token request, parsing, expiry, and refresh mechanics,
+but not CANFAR's dynamic registration, RFC 8628 coordinator, CLI presentation, or
+credential persistence. Adopt it only after a live SKA IAM pilot and only if the
+result deletes substantial custom protocol code.</p>
+<h3 id="p2-decompose-the-three-branch-density-hotspots-around-existing-seams">P2 — Decompose the three branch-density hotspots around existing seams<a class="headerlink" href="#p2-decompose-the-three-branch-density-hotspots-around-existing-seams" title="Permanent link">&para;</a></h3>
+<p>The largest functions each mix input, policy, I/O, and rendering:</p>
+<ul>
+<li><code>canfar/cli/create.py:61</code> — 159 lines and 11 parameters;</li>
+<li><code>canfar/cli/ps.py:32</code> — 128 lines with a 73-line nested coroutine;</li>
+<li><code>canfar/utils/vosi.py:123</code> — 103 lines with about 17 branch nodes.</li>
+</ul>
+<p>Use existing domain objects rather than new request wrappers:</p>
+<ul>
+<li><code>create</code>: parse <code>KEY=VALUE</code>, construct <code>CreateRequest</code>, run the Session call, and
+  render the result in separate functions;</li>
+<li><code>ps</code>: validate raw responses once, filter visible <code>FetchResponse</code> models once, then
+  choose human or machine rendering;</li>
+<li>VOSI: separate HTTP retrieval from XML parsing and parse the XML exactly once.</li>
+</ul>
+<p>This keeps Typer modules as adapters and lets machine output serialize the same
+Pydantic models used by library code.</p>
+<h3 id="p2-contract-the-test-suite-where-cases-repeat-python-or-the-implementation">P2 — Contract the test suite where cases repeat Python or the implementation<a class="headerlink" href="#p2-contract-the-test-suite-where-cases-repeat-python-or-the-implementation" title="Permanent link">&para;</a></h3>
+<p><code>tests/test_helpers_distributed.py</code> is 1,651 lines for a documented 118-line public
+helper module: 65 tests, 182 assertions, 110 <code>chunk()</code> calls, 48 <code>stripe()</code> calls, and
+35 <code>patch.dict</code> uses. Most cases manually repeat the same partitions.</p>
+<p>A compact table plus invariants preserves more signal:</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">parametrize</span><span class="p">(</span>
+    <span class="p">(</span><span class="s2">&quot;fn&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span> <span class="s2">&quot;replica&quot;</span><span class="p">,</span> <span class="s2">&quot;total&quot;</span><span class="p">,</span> <span class="s2">&quot;expected&quot;</span><span class="p">),</span>
+    <span class="p">[</span>
+        <span class="p">(</span><span class="n">stripe</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]),</span>
+        <span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="p">[]),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">test_partition_case</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">replica</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">expected</span><span class="p">):</span>
+    <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">fn</span><span class="p">(</span><span class="n">items</span><span class="p">,</span> <span class="n">replica</span><span class="o">=</span><span class="n">replica</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">))</span> <span class="o">==</span> <span class="n">expected</span>
+</code></pre></div>
+<p>Add one invariant that every replica's result is disjoint and the union equals the
+input. Resolve <code>REPLICA_ID</code> and <code>REPLICA_COUNT</code> at call time rather than as default
+arguments if environment behavior must be tested without module reloads.</p>
+<p><code>tests/test_models_types.py</code> is also 280 lines for static <code>Literal</code> aliases. A few
+exact <code>get_args(...)</code> assertions cover the project contract; annotations,
+importability, capitalization, and pairwise-disjointness checks mostly retest Python.</p>
+<h2 id="ponytail-audit-ranked-cuts">Ponytail audit — ranked cuts<a class="headerlink" href="#ponytail-audit-ranked-cuts" title="Permanent link">&para;</a></h2>
+<p>These lines preserve the requested ponytail-audit format. The maximum estimate
+includes optional UX changes; the synthesis following it distinguishes automatic
+cuts from product decisions.</p>
+<p>shrink: Replace the 1,651-line distributed-helper suite with a parameterized behavior table, one partition-coverage invariant, and focused validation/default tests; about 1,400 lines are removable. [<code>tests/test_helpers_distributed.py:1</code>].</p>
+<p>delete: Remove the superseded interactive discovery/display path—<code>display.servers</code>, <code>display.capabilities</code>, <code>Discover.servers</code>, module-level <code>discover.servers</code>, and <code>ServerResults</code>—plus tests that only call that path; keep <code>server._discover_for_idp</code> and move the one live style helper into <code>cli/prompts.py</code>. About 950 lines are removable. [<code>canfar/utils/display.py:15</code>, <code>canfar/utils/discover.py:137</code>, <code>canfar/models/registry.py:85</code>].</p>
+<p>shrink: Collapse the 280-line test suite for static <code>Literal</code> aliases to exact tuple assertions and delete the production-unused <code>Mode</code> alias; about 240 lines are removable. [<code>tests/test_models_types.py:1</code>, <code>canfar/models/types.py:29</code>].</p>
+<p>yagni: Retire the undocumented legacy <code>OIDC</code>/<code>X509</code> context mirror and <code>LegacyContextsMapping</code> after migrating internal callers to credential models and direct <code>config.authentication[idp]</code> updates; about 180 net production lines are removable. [<code>canfar/models/auth.py:98</code>, <code>canfar/models/config_compat.py:1</code>, <code>canfar/config/selection.py:135</code>, <code>canfar/models/config.py:381</code>].</p>
+<p>delete: Remove test-only or unread state: <code>Connection</code>, <code>TokenAuth</code>, <code>ConsoleConfig.file</code>, and persisted <code>Server.status</code>; about 165 lines are removable with their self-tests. [<code>canfar/models/http.py:304</code>, <code>canfar/models/auth.py:262</code>, <code>canfar/models/config.py:99</code>, <code>canfar/models/http.py:107</code>].</p>
+<p>yagni: Choose one configuration-operation API instead of maintaining service functions and 14 model forwarders as peer surfaces; about 80 lines are removable after call-site migration. [<code>canfar/models/config.py:270</code>].</p>
+<p>yagni: Inline the one-caller <code>dict_to_tuples</code> flattening loop into <code>create_parameters</code> and delete its module-only tests; about 50 lines are removable. [<code>canfar/utils/convert.py:1</code>, <code>canfar/utils/build.py:90</code>].</p>
+<p>stdlib: Delete <code>canfar.cli._run.run</code> and call <code>asyncio.run</code> directly from CLI adapters; the wrapper delegates one standard-library call and has tests of <code>asyncio.run</code> semantics. About 45 net lines are removable. [<code>canfar/cli/_run.py:1</code>, <code>tests/test_cli_runner.py:1</code>].</p>
+<p>delete: Remove private <code>_session</code>/<code>_asession</code> context managers and the no-op <code>__del__</code>; public <code>with client</code>/<code>async with client</code> already provide lifetime behavior. About 40 lines are removable with duplicate tests. [<code>canfar/client.py:358</code>, <code>canfar/client.py:393</code>, <code>canfar/client.py:427</code>].</p>
+<p>native: Replace the remaining <code>questionary</code> menus with the existing Rich <code>Prompt</code> pattern, consolidate the two Science Platform Server selectors, and remove <code>questionary</code>; about 35 lines and one dependency are removable. [<code>canfar/cli/prompts.py:8</code>, <code>canfar/cli/auth.py:80</code>, <code>pyproject.toml:54</code>].</p>
+<p>delete: Remove or reduce the one-time "mypy is gone" migration-invariant test and remove its runtime <code>toml</code> dependency; direct text assertions can retain the invariant without a TOML parser. About 35 lines and one dependency are removable. [<code>tests/test_pyproject_toolchain.py:1</code>, <code>pyproject.toml:57</code>].</p>
+<p>delete: Drop unused <code>pytest-mock</code> and <code>pytest-timeout</code>; tests use <code>unittest.mock</code>, and no timeout marker or pytest timeout setting exists. Two dependencies are removable. [<code>pyproject.toml:69</code>].</p>
+<p>delete: Drop terminal QR rendering and <code>segno</code>; the flow already prints the authorization URL and opens it in the browser. One dependency and a few lines are removable if that UX is intentionally retired. [<code>canfar/auth/oidc.py:381</code>, <code>pyproject.toml:56</code>].</p>
+<p>net: -3,100 lines, -5 deps possible.</p>
+<h3 id="triage-of-the-ponytail-maximum">Triage of the ponytail maximum<a class="headerlink" href="#triage-of-the-ponytail-maximum" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Classification</th>
+<th>Findings</th>
+<th>Decision</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>High confidence</td>
+<td>duplicated distributed tests; superseded discovery/display; dead types/state; <code>dict_to_tuples</code>; private client context helpers; unused pytest plugins</td>
+<td>Safe candidates for focused deletion with existing behavior tests.</td>
+</tr>
+<tr>
+<td>Staged compatibility work</td>
+<td>legacy context mirror; dual Configuration/service API</td>
+<td>Migrate internals first, deprecate public compatibility, remove only with an explicit compatibility decision.</td>
+</tr>
+<tr>
+<td>Deliberate small seam</td>
+<td><code>canfar.cli._run.run</code></td>
+<td>The cut is real but small. Keeping one event-loop entry point is defensible; do not churn it before higher-value cuts.</td>
+</tr>
+<tr>
+<td>Product/UX decision</td>
+<td>replacing <code>questionary</code>; removing QR/<code>segno</code></td>
+<td>Do not count as automatic cleanup. Both alter interactive experience.</td>
+</tr>
+<tr>
+<td>Already planned</td>
+<td>all logging and observability work</td>
+<td>Execute through issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> only.</td>
+</tr>
+</tbody>
+</table>
+<p>The high-confidence, no-UX-change floor is roughly 3,000 lines and three dependencies
+(<code>toml</code>, <code>pytest-mock</code>, and <code>pytest-timeout</code>). The two additional dependency cuts in
+the maximum estimate require explicit product approval.</p>
+<h2 id="published-improvement-program">Published improvement program<a class="headerlink" href="#published-improvement-program" title="Permanent link">&para;</a></h2>
+<p>The review and Authlib research were converted into a native GitHub issue hierarchy
+on 2026-07-10. The master roadmap is
+<a href="https://github.com/opencadc/canfar/issues/156">#156 — PRD: Systematic CANFAR client maintainability program</a>.
+It owns these six PRD sub-issues:</p>
+<ol>
+<li><a href="https://github.com/opencadc/canfar/issues/157">#157 — Contract-focused test and code contraction</a> — 5 implementation sub-issues.</li>
+<li><a href="https://github.com/opencadc/canfar/issues/158">#158 — Configuration and Authentication runtime boundaries</a> — 7 implementation sub-issues.</li>
+<li><a href="https://github.com/opencadc/canfar/issues/159">#159 — Platform and Science Platform Server model purity</a> — 4 implementation sub-issues.</li>
+<li><a href="https://github.com/opencadc/canfar/issues/160">#160 — SRCNet OIDC Authentication with Authlib</a> — 7 implementation sub-issues.</li>
+<li><a href="https://github.com/opencadc/canfar/issues/161">#161 — Session policy and thin CLI adapters</a> — 5 implementation sub-issues.</li>
+<li><a href="https://github.com/opencadc/canfar/issues/100">#100 — Logging Architecture and Observability</a> — clarified in place with 6 implementation sub-issues.</li>
+</ol>
+<p>The hierarchy contains 34 tracer-bullet implementation issues and 40 native
+blocking links. The two live OIDC gates are deliberately human-owned:
+<a href="https://github.com/opencadc/canfar/issues/177">#177</a> verifies SKA IAM/Authlib
+compatibility before token exchange changes, and
+<a href="https://github.com/opencadc/canfar/issues/187">#187</a> verifies login, UserInfo,
+refresh, and one read-only Science Platform request after the replacement.</p>
+<p>The preferred delivery sequence is:</p>
+<ol>
+<li>Independent contract tests and mechanical contraction.</li>
+<li>Atomic Configuration writes and centralized mutation ownership.</li>
+<li>Deterministic VOSI discovery and OIDC presentation separation.</li>
+<li>Canonical Authentication Record and HTTP-client resolution.</li>
+<li>Platform contraction and incremental Authlib adoption.</li>
+<li>Sync/async Session policy parity.</li>
+<li>Issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> logging on stable HTTP and Authentication seams.</li>
+<li>Thin <code>create</code> and <code>ps</code> CLI adapters.</li>
+<li>Legacy/dead-code contraction and a final whole-program review.</li>
+</ol>
+<p>Every implementation issue declares its observable seam, concrete acceptance
+criteria, blockers, and the same TDD loop: focused red contract test, smallest green
+change, deterministic validation, then a simplification and regression review.</p>
+<h2 id="review-guardrails">Review guardrails<a class="headerlink" href="#review-guardrails" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Preserve the public <code>Session</code> and <code>AsyncSession</code> surfaces and their <code>list[str]</code>
+  create result contract.</li>
+<li>Do not introduce a separate DTO/request layer; use the domain Pydantic models under
+  <code>canfar/models/</code>.</li>
+<li>Keep <code>canfar.helpers.distributed</code> as documented public API. The audit targets its
+  tests, not the helper itself.</li>
+<li>Preserve Authentication and Platform as separate domain seams, and use the glossary
+  terms in <code>CONTEXT.md</code>.</li>
+<li>Do not combine structural refactors with issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a>'s logging behavior migration.</li>
+<li>Run Authentication-dependent integration tests only with a valid CANFAR account and
+  X.509 configuration.</li>
+</ul>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<p>The audit baseline was verified with:</p>
+<div class="highlight"><pre><span></span><code>uv run --no-sync ruff check . --no-cache
+All checks passed!
+
+uv run --no-sync ty check canfar
+All checks passed!
+
+uv run --no-sync pytest tests -m &quot;not slow&quot; --no-cov -q \
+  -o cache_dir=/tmp/canfar-pytest-cache
+737 passed in 12.05s
+
+uv run --group docs --no-sync mkdocs build
+Documentation built successfully (informational navigation/plugin warnings only).
+</code></pre></div>
+<p>The full auth-dependent test suite was intentionally not run.</p>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 10, 2026 23:34:36 UTC">July 10, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 10, 2026 23:34:36 UTC">July 10, 2026</span>
+  </span>
+
+    
+    
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Let us know how we can improve this page.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/opencadc/canfar" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/canfar" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://images.canfar.net" target="_blank" rel="noopener" title="images.canfar.net" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/vcCQ8QBvBa" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:support@canfar.net" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M536.4-26.3c9.8-3.5 20.6-1 28 6.3s9.8 18.2 6.3 28l-178 496.9c-5 13.9-18.1 23.1-32.8 23.1-14.2 0-27-8.6-32.3-21.7l-64.2-158c-4.5-11-2.5-23.6 5.2-32.6l94.5-112.4c5.1-6.1 4.7-15-.9-20.6s-14.6-6-20.6-.9l-112.4 94.3c-9.1 7.6-21.6 9.6-32.6 5.2L38.1 216.8c-13.1-5.3-21.7-18.1-21.7-32.3 0-14.7 9.2-27.8 23.1-32.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.instant.progress", "navigation.prune", "navigation.sections", "navigation.tracking", "navigation.indexes", "navigation.expand", "navigation.instant.prefetch", "toc.follow", "navigation.top", "announce.dismiss", "content.code.annotate", "content.action.edit", "content.action.view", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../termynal.js"></script>
+      
+    
+  </body>
+</html>

@@ -1024,6 +1024,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#authentication-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#test-caveats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1039,6 +1050,17 @@
     <span class="md-ellipsis">
       
         Change Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historical-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historical notes
       
     </span>
   </a>
@@ -1428,6 +1450,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#authentication-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Authentication Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#test-caveats" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1443,6 +1476,17 @@
     <span class="md-ellipsis">
       
         Change Rules
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#historical-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Historical notes
       
     </span>
   </a>
@@ -1491,7 +1535,7 @@
 <li>User-facing library operations live in <code>canfar/sessions.py</code>, <code>canfar/images.py</code>, <code>canfar/context.py</code>, and <code>canfar/overview.py</code>.</li>
 <li>Typer command adapters live in <code>canfar/cli/</code> and should stay thin over library modules.</li>
 <li>Auth flows live in <code>canfar/auth/</code>; request/response hooks live in <code>canfar/hooks/</code>.</li>
-<li>Discovery, display, logging, request builders, and other helper modules live in <code>canfar/utils/</code>.</li>
+<li>Discovery, logging, request builders, and other helper modules live in <code>canfar/utils/</code>.</li>
 </ul>
 <h2 id="current-seams">Current Seams<a class="headerlink" href="#current-seams" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1500,7 +1544,16 @@
 <li><code>Session</code> and <code>AsyncSession</code> duplicate many operations in sync/async form. Keep behavior aligned when changing either adapter.</li>
 <li>CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.</li>
 <li>Request builders in <code>canfar/utils/build.py</code> are useful test surfaces for payload shape and validation.</li>
+<li>Logging is stdlib <code>logging</code> plus Rich stderr and optional <code>--log-file</code> JSONL (<code>canfar/utils/logging.py</code>). There is no Logfire, OTLP, or <code>telemetry.py</code> layer.</li>
 </ul>
+<h2 id="authentication-configuration">Authentication Configuration<a class="headerlink" href="#authentication-configuration" title="Permanent link">&para;</a></h2>
+<p><code>OIDCCredential</code> and <code>X509Credential</code> Authentication Records live in
+<code>Configuration.authentication</code>, accessed through <code>Configuration.get_credential</code>,
+<code>upsert_credential</code>, and <code>update_credential</code>. <code>ActiveConfig</code> owns the active
+Authentication and Server Selection references; <code>HTTPClient</code> composes
+<code>Configuration</code> and resolves those records for transport. Server Selection
+history lives on <code>Configuration</code> / <code>ActiveConfig</code> directly (there is no
+separate <code>selection.py</code> shim).</p>
 <h2 id="test-caveats">Test Caveats<a class="headerlink" href="#test-caveats" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Some tests touch live CANFAR endpoints even if they are not long-running. They must be marked <code>slow</code> and <code>integration</code>.</li>
@@ -1514,6 +1567,10 @@
 <li>Prefer Pydantic models for structured request/config data instead of ad hoc dict handling at call sites.</li>
 <li>Keep secret-bearing config output redacted or explicitly justified.</li>
 </ul>
+<h2 id="historical-notes">Historical notes<a class="headerlink" href="#historical-notes" title="Permanent link">&para;</a></h2>
+<p>Files under <code>docs/agents/research/</code> and <code>docs/agents/reviews/</code> are dated
+snapshots from audits and research. Prefer this file and <code>docs/cli/</code> for
+current design; treat older notes as historical unless they match the code.</p>
 
 
 
@@ -1536,7 +1593,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="May 21, 2026 21:42:20 UTC">May 21, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 07:57:53 UTC">July 14, 2026</span>
   </span>
 
     

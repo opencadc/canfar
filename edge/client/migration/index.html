@@ -1305,6 +1305,8 @@
       
         
       
+        
+      
     
     
     
@@ -1400,6 +1402,34 @@
     
   
     Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
   
 
     
@@ -1851,7 +1881,10 @@
 <li><code>headless</code> session <code>kind</code> parameter is no longer required.</li>
 <li><code>session.info()</code> query now returns <code>Completed</code> instead of <code>Succeeded</code>.</li>
 <li>Configuration path: <code>~/.skaha/config.yaml</code> → <code>~/.canfar/config.yaml</code>.</li>
-<li>Logger name and location: logger <code>canfar</code>; logs under <code>~/.canfar/client.log</code>.</li>
+<li>Logger name: <code>canfar</code>. Current releases write no default log file; file output
+  is explicit through root <code>--log-file</code> or a <code>pathlib.Path</code> passed to
+  <code>canfar.configure_logging()</code>. See
+  <a href="../../cli/logging/">Logging</a>.</li>
 <li>Environment variables: prefix change <code>SKAHA_…</code> → <code>CANFAR_…</code>.</li>
 <li>CLI entry point: <code>canfar</code> (single entry point).</li>
 <li>User-Agent header: <code>python-canfar/{version}</code>.</li>
@@ -1879,9 +1912,9 @@
 </li>
 </ul>
 <h2 id="environment-variables">Environment variables<a class="headerlink" href="#environment-variables" title="Permanent link">&para;</a></h2>
-<p><div class="highlight"><span class="filename">Before</span><pre><span></span><code><span class="sb">`</span>SKAHA_TIMEOUT<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>SKAHA_CONCURRENCY<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>SKAHA_TOKEN<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>SKAHA_URL<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>SKAHA_LOGLEVEL
+<p><div class="highlight"><span class="filename">Before</span><pre><span></span><code>SKAHA_TIMEOUT,<span class="w"> </span>SKAHA_CONCURRENCY,<span class="w"> </span>SKAHA_TOKEN,<span class="w"> </span>SKAHA_URL,<span class="w"> </span>SKAHA_LOGLEVEL
 </code></pre></div>
-<div class="highlight"><span class="filename">After</span><pre><span></span><code><span class="sb">`</span>CANFAR_TIMEOUT<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>CANFAR_CONCURRENCY<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>CANFAR_TOKEN<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>CANFAR_URL<span class="sb">`</span>,<span class="w"> </span><span class="sb">`</span>CANFAR_LOGLEVEL<span class="sb">`</span>
+<div class="highlight"><span class="filename">After</span><pre><span></span><code>CANFAR_TIMEOUT,<span class="w"> </span>CANFAR_CONCURRENCY,<span class="w"> </span>CANFAR_TOKEN,<span class="w"> </span>CANFAR_URL,<span class="w"> </span>CANFAR_LOGLEVEL
 </code></pre></div></p>
 <h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1928,7 +1961,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
   </span>
 
     

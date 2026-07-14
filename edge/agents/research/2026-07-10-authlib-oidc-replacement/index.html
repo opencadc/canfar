@@ -1,0 +1,1582 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="CANFAR Science Platform">
+      
+      
+        <meta name="author" content="Shiny Brar">
+      
+      
+        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/agents/research/2026-07-10-authlib-oidc-replacement/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../../static/logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>Authlib feasibility for CANFAR OIDC - CANFAR</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/_mkdocstrings.css">
+    
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
+    
+      <link rel="stylesheet" href="../../../termynal.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#authlib-feasibility-for-canfar-oidc" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="CANFAR" class="md-header__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            CANFAR
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Authlib feasibility for CANFAR OIDC
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1M8 13h8v-2H8zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4a5 5 0 0 0 5-5 5 5 0 0 0-5-5"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="canfar" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5M7 15a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../platform/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Platform
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../client/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Client
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../conduct/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  Contribute
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../about/home/" class="md-tabs__link">
+          
+  
+  
+    
+  
+  About
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="CANFAR" class="md-nav__button md-logo" aria-label="CANFAR" data-md-component="logo">
+      
+  <img src="../../../static/logo.png" alt="logo">
+
+    </a>
+    CANFAR
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/opencadc/canfar/" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M202.1 328.7c0 20.9-10.9 55.1-36.7 55.1s-36.7-34.2-36.7-55.1 10.9-55.1 36.7-55.1 36.7 34.2 36.7 55.1M496 278.2c0 31.9-3.2 65.7-17.5 95-37.9 76.6-142.1 74.8-216.7 74.8-75.8 0-186.2 2.7-225.6-74.8-14.6-29-20.2-63.1-20.2-95 0-41.9 13.9-81.5 41.5-113.6-5.2-15.8-7.7-32.4-7.7-48.8 0-21.5 4.9-32.3 14.6-51.8 45.3 0 74.3 9 108.8 36 29-6.9 58.8-10 88.7-10 27 0 54.2 2.9 80.4 9.2 34-26.7 63-35.2 107.8-35.2 9.8 19.5 14.6 30.3 14.6 51.8 0 16.4-2.6 32.7-7.7 48.2 27.5 32.4 39 72.3 39 114.2m-64.3 50.5c0-43.9-26.7-82.6-73.5-82.6-18.9 0-37 3.4-56 6-14.9 2.3-29.8 3.2-45.1 3.2-15.2 0-30.1-.9-45.1-3.2-18.7-2.6-37-6-56-6-46.8 0-73.5 38.7-73.5 82.6 0 87.8 80.4 101.3 150.4 101.3h48.2c70.3 0 150.6-13.4 150.6-101.3m-82.6-55.1c-25.8 0-36.7 34.2-36.7 55.1s10.9 55.1 36.7 55.1 36.7-34.2 36.7-55.1-10.9-55.1-36.7-55.1"/></svg>
+  </div>
+  <div class="md-source__repository">
+    opencadc/canfar
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../platform/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Platform
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../client/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../conduct/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Contribute
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../../about/home/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    About
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#verdict" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verdict
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#capability-boundary" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Capability boundary
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-improves-in-the-current-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this improves in the current code
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#recommended-integration-shape" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Recommended integration shape
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concrete-persistence-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concrete persistence example
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#empirical-checks-performed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Empirical checks performed
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dependency-assessment" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Dependency assessment
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-planned-issue-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to planned issue #100
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#adoption-gates" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Adoption gates
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primary-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primary sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/agents/research/2026-07-10-authlib-oidc-replacement.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
+    </a>
+  
+  
+    
+      
+    
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/agents/research/2026-07-10-authlib-oidc-replacement.md" title="View source of this page" class="md-content__button md-icon">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
+    </a>
+  
+
+
+<h1 id="authlib-feasibility-for-canfar-oidc">Authlib feasibility for CANFAR OIDC<a class="headerlink" href="#authlib-feasibility-for-canfar-oidc" title="Permanent link">&para;</a></h1>
+<ul>
+<li><strong>Date:</strong> 2026-07-10</li>
+<li><strong>Repository snapshot:</strong> <code>08454ca8</code> on <code>feat/vospace</code></li>
+<li><strong>Authlib evaluated:</strong> <code>v1.7.2</code></li>
+<li><strong>Question:</strong> Can Authlib replace CANFAR's custom OIDC authentication logic?</li>
+</ul>
+<h2 id="verdict">Verdict<a class="headerlink" href="#verdict" title="Permanent link">&para;</a></h2>
+<p><strong>Partly, and the partial replacement is worthwhile. A full replacement is not
+available.</strong></p>
+<p>Authlib can take over the OAuth token mechanics that CANFAR should not maintain:
+token-endpoint client authentication, device-grant token requests, OAuth error
+parsing, <code>expires_in</code> normalization, refresh-token rotation, sync/async refresh,
+bearer injection, and async refresh serialization.</p>
+<p>Authlib does <strong>not</strong> provide a complete RFC 8628 client flow or a dynamic-registration
+client. CANFAR must still own a small coordinator for discovery, dynamic client
+registration, device authorization, RFC 8628 polling timing, CLI presentation, error
+translation, and Pydantic/YAML persistence.</p>
+<p>The recommended decision is:</p>
+<ol>
+<li>Run one authenticated SKA IAM compatibility pilot.</li>
+<li>If it passes, adopt Authlib for token lifecycle behind the existing OIDC boundary.</li>
+<li>Keep the Authentication domain and CLI experience CANFAR-owned.</li>
+<li>Do not add an adapter hierarchy or a second model layer.</li>
+<li>Only switch platform traffic to Authlib's HTTPX subclasses if that second step
+   deletes the custom refresh hooks without introducing cross-client state machinery.</li>
+</ol>
+<p>This is a dependency worth adding only if it removes substantial custom protocol
+code. Adding Authlib merely to wrap the existing <code>refresh()</code> functions would not pay
+for itself.</p>
+<h2 id="capability-boundary">Capability boundary<a class="headerlink" href="#capability-boundary" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Responsibility</th>
+<th>Authlib 1.7.2</th>
+<th>CANFAR recommendation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fetch the configured discovery URL</td>
+<td>Generic HTTPX client does not auto-discover</td>
+<td>Keep the HTTP GET</td>
+</tr>
+<tr>
+<td>Validate OIDC provider metadata</td>
+<td><code>OpenIDProviderMetadata.validate()</code></td>
+<td>Adopt, plus verify the returned issuer against the configured issuer</td>
+</tr>
+<tr>
+<td>Dynamic client registration request</td>
+<td>RFC 7591 implementation is authorization-server-side</td>
+<td>Keep CANFAR's small POST and registration policy</td>
+</tr>
+<tr>
+<td>Device authorization request</td>
+<td>RFC 8628 implementation is authorization-server-side</td>
+<td>Keep a small request function</td>
+</tr>
+<tr>
+<td>Device token request</td>
+<td>Generic <code>fetch_token()</code> accepts an arbitrary grant type and parameters</td>
+<td>Replace CANFAR's <code>_poll_token()</code> request/parsing logic</td>
+</tr>
+<tr>
+<td>RFC 8628 polling schedule</td>
+<td>No device-client poller</td>
+<td>Keep a small standards-compliant loop</td>
+</tr>
+<tr>
+<td><code>authorization_pending</code> / <code>slow_down</code> parsing</td>
+<td>Returned as <code>OAuthError.error</code> values</td>
+<td>Use Authlib parsing; translate at the CANFAR boundary</td>
+</tr>
+<tr>
+<td>Token endpoint client authentication</td>
+<td>Built-in <code>client_secret_basic</code>, <code>client_secret_post</code>, and <code>none</code></td>
+<td>Replace hand-built body/Basic combinations</td>
+</tr>
+<tr>
+<td>Token response and expiry normalization</td>
+<td>Full token mapping; <code>expires_in</code> becomes <code>expires_at</code></td>
+<td>Adopt</td>
+</tr>
+<tr>
+<td>Refresh and refresh-token rotation</td>
+<td>Full refresh response; preserves the old refresh token if the provider omits a new one</td>
+<td>Replace custom sync/async refresh HTTP</td>
+</tr>
+<tr>
+<td>Automatic bearer injection</td>
+<td><code>OAuth2Client</code> and <code>AsyncOAuth2Client</code> are HTTPX clients</td>
+<td>Candidate for the saved-OIDC branch only</td>
+</tr>
+<tr>
+<td>Concurrent async refresh</td>
+<td><code>AsyncOAuth2Client</code> uses an AnyIO lock</td>
+<td>Adopt if Authlib owns request-time refresh</td>
+</tr>
+<tr>
+<td>CANFAR Authentication Records</td>
+<td>No knowledge of CANFAR's domain</td>
+<td>Keep canonical <code>OIDCCredential</code> models</td>
+</tr>
+<tr>
+<td>Configuration persistence</td>
+<td><code>update_token</code> callback only</td>
+<td>Keep one CANFAR callback that atomically updates YAML</td>
+</tr>
+<tr>
+<td>Browser, QR, Rich progress, UserInfo output</td>
+<td>Not a device-flow presenter</td>
+<td>Keep in the CLI adapter</td>
+</tr>
+<tr>
+<td>X.509 and runtime credential precedence</td>
+<td>Not CANFAR policy</td>
+<td>Keep in <code>HTTPClient</code></td>
+</tr>
+<tr>
+<td>Logging, redaction, and telemetry</td>
+<td>Not solved by adopting Authlib</td>
+<td>Leave centralized policy to issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a></td>
+</tr>
+</tbody>
+</table>
+<p>The important naming trap is Authlib's advertised "RFC 8628 support." Its
+<a href="https://docs.authlib.org/en/v1.4.1/specs/rfc8628.html">RFC 8628 documentation</a>
+teaches <code>DeviceAuthorizationEndpoint</code> and <code>DeviceCodeGrant</code> for Flask/Django
+<strong>authorization servers</strong>. The tagged source likewise contains server endpoint and
+grant classes under
+<a href="https://github.com/authlib/authlib/tree/v1.7.2/authlib/oauth2/rfc8628"><code>authlib/oauth2/rfc8628</code></a>,
+not a device-client coordinator. The same distinction applies to Authlib's
+<a href="https://docs.authlib.org/en/latest/oauth2/specs/rfc7591.html">RFC 7591 implementation</a>:
+it builds a registration endpoint for an authorization server; it does not call a
+provider's registration endpoint on behalf of a client.</p>
+<p>Authlib's generic HTTP client is still enough for the token exchange. Its
+<a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/oauth2/client.py"><code>fetch_token</code> implementation</a>
+accepts an explicit <code>grant_type</code> and arbitrary form parameters, so RFC 8628's device
+grant and <code>device_code</code> work without a dedicated high-level flow.</p>
+<h2 id="what-this-improves-in-the-current-code">What this improves in the current code<a class="headerlink" href="#what-this-improves-in-the-current-code" title="Permanent link">&para;</a></h2>
+<h3 id="1-correct-token-endpoint-authentication">1. Correct token-endpoint authentication<a class="headerlink" href="#1-correct-token-endpoint-authentication" title="Permanent link">&para;</a></h3>
+<p><code>canfar/auth/oidc.py:117-126</code> currently sends <code>client_id</code> and <code>client_secret</code> in the
+form body <strong>and</strong> sends the same credentials through HTTP Basic authentication.
+Registration declares <code>client_secret_basic</code>, so the secret should not also be placed
+in the request body.</p>
+<p>Authlib selects the configured token authentication method once:</p>
+<div class="highlight"><pre><span></span><code><span class="n">oauth</span> <span class="o">=</span> <span class="n">AsyncOAuth2Client</span><span class="p">(</span>
+    <span class="n">client_id</span><span class="o">=</span><span class="n">client_id</span><span class="p">,</span>
+    <span class="n">client_secret</span><span class="o">=</span><span class="n">client_secret</span><span class="p">,</span>
+    <span class="n">token_endpoint</span><span class="o">=</span><span class="n">token_endpoint</span><span class="p">,</span>
+    <span class="n">token_endpoint_auth_method</span><span class="o">=</span><span class="s2">&quot;client_secret_basic&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">token</span> <span class="o">=</span> <span class="k">await</span> <span class="n">oauth</span><span class="o">.</span><span class="n">fetch_token</span><span class="p">(</span>
+    <span class="n">grant_type</span><span class="o">=</span><span class="s2">&quot;urn:ietf:params:oauth:grant-type:device_code&quot;</span><span class="p">,</span>
+    <span class="n">device_code</span><span class="o">=</span><span class="n">device_code</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>The local probe confirmed that this puts the credentials in the Basic header and
+omits <code>client_secret</code> from the form body.</p>
+<h3 id="2-preserve-the-complete-refresh-result">2. Preserve the complete refresh result<a class="headerlink" href="#2-preserve-the-complete-refresh-result" title="Permanent link">&para;</a></h3>
+<p><code>canfar/auth/oidc.py:140-241</code> duplicates sync and async refresh functions and returns
+only a new access token. It discards <code>expires_in</code>, a rotated <code>refresh_token</code>, scope,
+and other returned fields. A provider that invalidates an old refresh token after
+rotation can therefore break the next refresh.</p>
+<p>Authlib parses the complete token mapping, normalizes expiry, retains the old refresh
+token when a response omits it, and passes the complete result to <code>update_token</code>.
+These behaviors are implemented in the tagged
+<a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/integrations/httpx_client/oauth2_client.py">HTTPX OAuth client source</a>
+and documented in Authlib's
+<a href="https://docs.authlib.org/en/1.7.1/oauth2/client/http/#refresh-auto-update-token">refresh and auto-update guide</a>.</p>
+<p>One exact-version caution: use an <code>async def</code> update callback with
+<code>AsyncOAuth2Client</code>. The v1.7.2 source awaits the callback, and the local probe
+verified that shape.</p>
+<h3 id="3-stop-treating-every-oauth-token-as-an-unverified-jwt">3. Stop treating every OAuth token as an unverified JWT<a class="headerlink" href="#3-stop-treating-every-oauth-token-as-an-unverified-jwt" title="Permanent link">&para;</a></h3>
+<p>Initial login and refresh derive expiry with <code>canfar.utils.jwt.expiry</code>
+(<code>canfar/auth/oidc.py:484-487</code>, <code>canfar/hooks/httpx/auth.py:77-84</code>). That helper scans
+every dot-separated segment and accepts the first JSON object containing <code>exp</code>
+(<code>canfar/utils/jwt.py:7-42</code>); it does not verify a signature and cannot handle opaque
+tokens.</p>
+<p>Authlib's
+<a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/oauth2/rfc6749/wrappers.py"><code>OAuth2Token</code></a>
+turns the token response's <code>expires_in</code> into <code>expires_at</code>. Prefer that protocol field.
+If SKA IAM ever omits both fields, do not restore unverified JWT decoding: either
+validate claims against the issuer's keys or treat expiry as unknown and rely on a
+well-defined token-endpoint error path. The authenticated pilot must confirm the real
+SKA IAM token response before <code>canfar/utils/jwt.py</code> is deleted.</p>
+<p>Refresh-token expiry is not a standard Authlib token-lifecycle field. If the provider
+uses opaque refresh tokens, CANFAR should let the token endpoint reject an expired
+token and translate <code>invalid_grant</code>, rather than guessing locally.</p>
+<h3 id="4-fix-rfc-8628-edge-cases-while-retaining-a-small-poller">4. Fix RFC 8628 edge cases while retaining a small poller<a class="headerlink" href="#4-fix-rfc-8628-edge-cases-while-retaining-a-small-poller" title="Permanent link">&para;</a></h3>
+<p>Authlib removes the request encoding and error parsing, but CANFAR still needs the
+timer. That remaining loop should follow
+<a href="https://datatracker.ietf.org/doc/html/rfc8628#section-3">RFC 8628 section 3</a>:</p>
+<ul>
+<li><code>verification_uri_complete</code> is optional; fall back to the required
+  <code>verification_uri</code> and display the required <code>user_code</code>.</li>
+<li>Display <code>user_code</code> even when a QR/complete URI is available.</li>
+<li>Default <code>interval</code> to five seconds.</li>
+<li>On <code>authorization_pending</code>, wait at least the current interval before another
+  request.</li>
+<li>On <code>slow_down</code>, increase the interval by five seconds for all later requests.</li>
+<li>Back off on connection timeouts and stop at <code>expires_in</code>.</li>
+<li>Stop immediately for <code>access_denied</code>, <code>expired_token</code>, and other terminal errors.</li>
+</ul>
+<p>The current implementation requires <code>verification_uri_complete</code>
+(<code>canfar/auth/oidc.py:373-377</code>) and uses a logarithmic/multiplicative <code>slow_down</code>
+formula (<code>canfar/auth/oidc.py:321-341</code>) instead of RFC 8628's fixed five-second
+increase.</p>
+<p>A sufficient coordinator remains small:</p>
+<div class="highlight"><pre><span></span><code><span class="n">interval</span> <span class="o">=</span> <span class="n">challenge</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;interval&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">deadline</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">+</span> <span class="n">challenge</span><span class="p">[</span><span class="s2">&quot;expires_in&quot;</span><span class="p">]</span>
+
+<span class="k">while</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">deadline</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="k">await</span> <span class="n">oauth</span><span class="o">.</span><span class="n">fetch_token</span><span class="p">(</span>
+            <span class="n">grant_type</span><span class="o">=</span><span class="n">DEVICE_GRANT</span><span class="p">,</span>
+            <span class="n">device_code</span><span class="o">=</span><span class="n">challenge</span><span class="p">[</span><span class="s2">&quot;device_code&quot;</span><span class="p">],</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="n">OAuthError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">error</span> <span class="o">==</span> <span class="s2">&quot;authorization_pending&quot;</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">error</span><span class="o">.</span><span class="n">error</span> <span class="o">==</span> <span class="s2">&quot;slow_down&quot;</span><span class="p">:</span>
+            <span class="n">interval</span> <span class="o">+=</span> <span class="mi">5</span>
+            <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">translate_oauth_error</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">error</span>
+
+<span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="s2">&quot;Device flow timed out&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>This is intentionally not a framework, protocol class, or separate DTO layer.</p>
+<h3 id="5-validate-discovery-instead-of-trusting-raw-json">5. Validate discovery instead of trusting raw JSON<a class="headerlink" href="#5-validate-discovery-instead-of-trusting-raw-json" title="Permanent link">&para;</a></h3>
+<p><code>canfar/auth/oidc.py:34-56</code> fetches discovery JSON but does not validate it. Authlib's
+<a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/oidc/discovery/models.py"><code>OpenIDProviderMetadata</code></a>
+validates required OIDC metadata and secure endpoint URLs. CANFAR must still fetch
+the configured URL and perform the OpenID Discovery issuer-equality check described
+by the
+<a href="https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfigurationValidation">OpenID Connect Discovery specification</a>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">http</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">discovery_url</span><span class="p">)</span>
+<span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">OpenIDProviderMetadata</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+<span class="n">metadata</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+<span class="k">if</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;issuer&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">expected_issuer</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;OIDC discovery issuer mismatch&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>The issuer comparison should be exact, as required by OpenID Connect Discovery. Keep
+the expected issuer as explicit IDP metadata; do not derive it differently at each
+call site.</p>
+<h2 id="recommended-integration-shape">Recommended integration shape<a class="headerlink" href="#recommended-integration-shape" title="Permanent link">&para;</a></h2>
+<h3 id="first-slice-lowest-risk-protocol-replacement">First slice: lowest-risk protocol replacement<a class="headerlink" href="#first-slice-lowest-risk-protocol-replacement" title="Permanent link">&para;</a></h3>
+<p>Keep ordinary <code>httpx.Client</code> / <code>httpx.AsyncClient</code> for CANFAR platform requests.
+Inside the OIDC boundary:</p>
+<ol>
+<li>Keep the discovery GET, dynamic registration POST, and device-authorization POST.</li>
+<li>Validate discovery with <code>OpenIDProviderMetadata</code> and verify issuer equality.</li>
+<li>Reuse one <code>AsyncOAuth2Client</code> for device token polling.</li>
+<li>Replace both custom refresh HTTP functions with Authlib and return a complete token
+   mapping.</li>
+<li>Keep the existing CANFAR hook ordering, runtime-credential bypass, headers, and
+   canonical <code>OIDCCredential</code> persistence while the provider behavior is proven.</li>
+<li>Move link, <code>user_code</code>, browser, QR, and Rich progress rendering into
+   <code>canfar/cli/login_auth.py</code>.</li>
+</ol>
+<p>This slice changes the security-sensitive wire protocol without simultaneously
+rewriting X.509/runtime credential selection.</p>
+<h3 id="optional-second-slice-delete-the-oidc-refresh-hooks">Optional second slice: delete the OIDC refresh hooks<a class="headerlink" href="#optional-second-slice-delete-the-oidc-refresh-hooks" title="Permanent link">&para;</a></h3>
+<p>Authlib's <code>OAuth2Client</code> and <code>AsyncOAuth2Client</code> subclass HTTPX clients and accept the
+timeout, limits, base URL, headers, transport, and event-hook arguments CANFAR already
+uses. If the first slice succeeds, use those classes only when the saved credential
+mode is OIDC. Then Authlib can own bearer injection and automatic refresh, allowing
+the OIDC-specific code in <code>canfar/hooks/httpx/auth.py</code> to be deleted.</p>
+<p>Do not apply this to runtime tokens, X.509, or default mode. Keep
+<code>X-Skaha-Authentication-Type</code>, registry headers, error hooks, and CANFAR timeout/pool
+policy in <code>HTTPClient</code>.</p>
+<p>The deletion is conditional on solving one existing state hazard without adding a
+new subsystem: <code>HTTPClient</code> can cache both a sync and async client, while today a
+refresh updates only the client that made the request. A single token-persistence
+callback must update the canonical <code>OIDCCredential</code> and ensure both cached token
+views cannot retain a rotated refresh token. If that requires a shared token manager,
+stop after the first slice; the extra abstraction would erase the simplification.</p>
+<p>Authlib refreshes 60 seconds before expiry by default. Use <code>leeway=0</code> initially if
+exact current timing must be preserved, or adopt the default as an explicit behavior
+change with tests.</p>
+<h2 id="concrete-persistence-example">Concrete persistence example<a class="headerlink" href="#concrete-persistence-example" title="Permanent link">&para;</a></h2>
+<p>Operate directly on the domain model; do not round-trip through the legacy <code>OIDC</code>
+context and do not introduce an Authlib DTO:</p>
+<div class="highlight"><pre><span></span><code><span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">apply_token</span><span class="p">(</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span> <span class="n">idp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">current</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="n">idp</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">OIDCCredential</span><span class="p">)</span>
+    <span class="n">rotated_refresh</span> <span class="o">=</span> <span class="n">token</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;refresh_token&quot;</span><span class="p">)</span>
+    <span class="n">refresh</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">SecretStr</span><span class="p">(</span><span class="n">rotated_refresh</span><span class="p">)</span> <span class="k">if</span> <span class="n">rotated_refresh</span> <span class="k">else</span> <span class="n">current</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">refresh</span>
+    <span class="p">)</span>
+
+    <span class="n">updated</span> <span class="o">=</span> <span class="n">current</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+        <span class="n">update</span><span class="o">=</span><span class="p">{</span>
+            <span class="s2">&quot;token&quot;</span><span class="p">:</span> <span class="n">current</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+                <span class="n">update</span><span class="o">=</span><span class="p">{</span>
+                    <span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="n">SecretStr</span><span class="p">(</span><span class="n">token</span><span class="p">[</span><span class="s2">&quot;access_token&quot;</span><span class="p">]),</span>
+                    <span class="s2">&quot;refresh&quot;</span><span class="p">:</span> <span class="n">refresh</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;expiry&quot;</span><span class="p">:</span> <span class="n">current</span><span class="o">.</span><span class="n">expiry</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span>
+                <span class="n">update</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;access&quot;</span><span class="p">:</span> <span class="n">token</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;expires_at&quot;</span><span class="p">)}</span>
+            <span class="p">),</span>
+        <span class="p">}</span>
+    <span class="p">)</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">authentication</span><span class="p">[</span><span class="n">idp</span><span class="p">]</span> <span class="o">=</span> <span class="n">updated</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+<p>The real callback must preserve an existing refresh token when the response omits a
+new one and translate missing/invalid fields into the established Authentication
+error surface.</p>
+<h2 id="empirical-checks-performed">Empirical checks performed<a class="headerlink" href="#empirical-checks-performed" title="Permanent link">&para;</a></h2>
+<h3 id="isolated-authlib-172-httpx-probe">Isolated Authlib 1.7.2 HTTPX probe<a class="headerlink" href="#isolated-authlib-172-httpx-probe" title="Permanent link">&para;</a></h3>
+<p>An in-memory <code>httpx.MockTransport</code> probe verified all of these behaviors against the
+released package:</p>
+<table>
+<thead>
+<tr>
+<th>Check</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Arbitrary RFC 8628 device grant encoded</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>device_code</code> encoded</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>authorization_pending</code> exposed as <code>OAuthError.error</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>client_secret_basic</code> used</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Client secret omitted from form body</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td><code>expires_in</code> normalized to <code>expires_at</code></td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Expired token automatically refreshed</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Rotated refresh token delivered to async update callback</td>
+<td>Pass</td>
+</tr>
+<tr>
+<td>Refreshed bearer injected into resource request</td>
+<td>Pass</td>
+</tr>
+</tbody>
+</table>
+<h3 id="live-read-only-ska-iam-discovery-check">Live, read-only SKA IAM discovery check<a class="headerlink" href="#live-read-only-ska-iam-discovery-check" title="Permanent link">&para;</a></h3>
+<p>Authlib 1.7.2 <code>OpenIDProviderMetadata.validate()</code> passed against the repository's
+configured discovery URL on 2026-07-10. The returned metadata advertised:</p>
+<ul>
+<li>issuer <code>https://ska-iam.stfc.ac.uk/</code>;</li>
+<li>device authorization, registration, token, and UserInfo endpoints;</li>
+<li><code>urn:ietf:params:oauth:grant-type:device_code</code>; and</li>
+<li><code>client_secret_basic</code>.</li>
+</ul>
+<p>Dynamic registration was intentionally not invoked because it creates server-side
+state. Device login, UserInfo, refresh rotation, and a CANFAR API request remain the
+authenticated integration gate.</p>
+<h3 id="current-repository-baseline">Current-repository baseline<a class="headerlink" href="#current-repository-baseline" title="Permanent link">&para;</a></h3>
+<p>The delegated local audit ran the current Authentication baseline:</p>
+<div class="highlight"><pre><span></span><code>rtk<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_auth_oidc.py<span class="w"> </span>tests/test_hooks_httpx_auth.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_cli_login_auth.py<span class="w"> </span>tests/test_utils_jwt.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="nv">cache_dir</span><span class="o">=</span>/tmp/canfar-oidc-pytest-cache
+<span class="c1"># 42 passed</span>
+
+rtk<span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_client.py<span class="w"> </span>tests/test_models_auth.py<span class="w"> </span>tests/test_models_config.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_models_config_compat.py<span class="w"> </span>tests/test_config.py<span class="w"> </span>tests/test_cli_login.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_cli_config.py<span class="w"> </span>tests/test_hooks_httpx_expiry.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="nv">cache_dir</span><span class="o">=</span>/tmp/canfar-oidc-contract-pytest-cache
+<span class="c1"># 165 passed</span>
+</code></pre></div>
+<p>No production code or dependency files were changed by this research.</p>
+<h2 id="dependency-assessment">Dependency assessment<a class="headerlink" href="#dependency-assessment" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/authlib/authlib/releases/tag/v1.7.2">Authlib v1.7.2</a> was the
+latest release evaluated. Its tagged
+<a href="https://github.com/authlib/authlib/blob/v1.7.2/pyproject.toml"><code>pyproject.toml</code></a>
+requires Python 3.10 or newer and uses the BSD-3-Clause license. That matches CANFAR's
+Python floor and presents no apparent license conflict with this AGPL project.</p>
+<p>CANFAR already depends on HTTPX and already locks <code>cryptography</code>. Adding Authlib adds
+Authlib itself and <code>joserfc&gt;=1.6.0</code> to the lock. This is not a zero-cost dependency,
+but it is justified if the migration deletes the duplicate refresh functions, token
+request/parser logic, unsafe expiry helper, and eventually the OIDC refresh hooks.</p>
+<p>Use the repository's normal lower-bound style if adopted:</p>
+<div class="highlight"><pre><span></span><code><span class="s2">&quot;authlib&gt;=1.7.2&quot;</span><span class="err">,</span>
+</code></pre></div>
+<p>Do not add another OAuth wrapper around Authlib.</p>
+<h2 id="relationship-to-planned-issue-100">Relationship to planned issue <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a><a class="headerlink" href="#relationship-to-planned-issue-100" title="Permanent link">&para;</a></h2>
+<p><a href="https://github.com/opencadc/canfar/issues/100">#100: Logging Architecture and Observability Vertical Slice</a>
+is already planned future work. It explicitly owns centralized logging, redaction,
+Logfire/OpenTelemetry configuration, and HTTPX instrumentation. This research does
+not create a competing logging backlog.</p>
+<p>The Authlib work should observe four boundaries:</p>
+<ol>
+<li>Remove or do not reproduce the raw registration, token, and device-response debug
+   logs currently at <code>canfar/auth/oidc.py:93</code>, <code>:128</code>, and <code>:371</code>.</li>
+<li>Do not build an Authlib-specific redaction or telemetry subsystem; <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> owns the
+   centralized policy.</li>
+<li>Construct Authlib HTTPX clients through the same CANFAR client seam so <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> can
+   instrument them without capturing authentication headers or bodies by default.</li>
+<li>Add one cross-work regression test proving client secrets, device codes, access
+   tokens, and refresh tokens do not appear in emitted logs.</li>
+</ol>
+<p>Keep the Authlib migration and <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/mkdocs-material/issues/100" title="GitHub Issue: squidfunk/mkdocs-material #100">#100</a> in separate reviewable changes. They overlap at
+HTTPX client construction and should coordinate there, but Authentication behavior
+must not be hidden inside the logging work package.</p>
+<h2 id="adoption-gates">Adoption gates<a class="headerlink" href="#adoption-gates" title="Permanent link">&para;</a></h2>
+<p>Before deleting the current implementation, require:</p>
+<ul>
+<li>a real SKA IAM device login with and without <code>verification_uri_complete</code>;</li>
+<li>exact dynamic-registration metadata and authentication-method compatibility;</li>
+<li><code>authorization_pending</code>, <code>slow_down</code>, <code>access_denied</code>, and <code>expired_token</code> tests;</li>
+<li>opaque access and refresh token coverage;</li>
+<li><code>expires_in</code> / <code>expires_at</code> and missing-expiry behavior;</li>
+<li>refresh-token rotation and omitted-new-refresh-token behavior;</li>
+<li>sync/async parity or an explicit compatibility decision;</li>
+<li>both cached CANFAR clients observing the same refreshed token state;</li>
+<li>atomic persistence of the complete token result;</li>
+<li>no secret-bearing logs;</li>
+<li>UserInfo and one authenticated CANFAR request; and</li>
+<li>the repository's standard lint, type, non-slow test, and docs gates.</li>
+</ul>
+<h2 id="primary-sources">Primary sources<a class="headerlink" href="#primary-sources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://docs.authlib.org/en/1.7.1/oauth2/client/http/">Authlib HTTP clients</a></li>
+<li><a href="https://docs.authlib.org/en/v1.7.0/oauth2/client/http/httpx.html">Authlib HTTPX client guide</a></li>
+<li><a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/integrations/httpx_client/oauth2_client.py">Authlib v1.7.2 HTTPX OAuth client source</a></li>
+<li><a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/oauth2/client.py">Authlib v1.7.2 generic OAuth client source</a></li>
+<li><a href="https://github.com/authlib/authlib/blob/v1.7.2/authlib/oidc/discovery/models.py">Authlib v1.7.2 OIDC metadata validator</a></li>
+<li><a href="https://github.com/authlib/authlib/tree/v1.7.2/authlib/oauth2/rfc8628">Authlib RFC 8628 server implementation</a></li>
+<li><a href="https://docs.authlib.org/en/latest/oauth2/specs/rfc7591.html">Authlib RFC 7591 server documentation</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc8628">RFC 8628: OAuth 2.0 Device Authorization Grant</a></li>
+<li><a href="https://datatracker.ietf.org/doc/html/rfc7591">RFC 7591: OAuth 2.0 Dynamic Client Registration</a></li>
+<li><a href="https://openid.net/specs/openid-connect-discovery-1_0.html">OpenID Connect Discovery 1.0</a></li>
+<li><a href="https://github.com/opencadc/canfar/issues/100">CANFAR issue #100</a></li>
+</ul>
+
+
+
+
+
+
+
+  
+    
+  
+  
+    
+  
+
+
+  <aside class="md-source-file">
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Last update">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 10, 2026 23:34:36 UTC">July 10, 2026</span>
+  </span>
+
+    
+    
+      
+  <span class="md-source-file__fact">
+    <span class="md-icon" title="Created">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
+    </span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 10, 2026 23:34:36 UTC">July 10, 2026</span>
+  </span>
+
+    
+    
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
+    
+  </aside>
+
+
+  
+
+
+
+  <form class="md-feedback" name="feedback" hidden>
+    <fieldset>
+      <legend class="md-feedback__title">
+        Was this page helpful?
+      </legend>
+      <div class="md-feedback__inner">
+        <div class="md-feedback__list">
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
+            </button>
+          
+            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
+            </button>
+          
+        </div>
+        <div class="md-feedback__note">
+          
+            <div data-md-value="1" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Thanks for your feedback!
+            </div>
+          
+            <div data-md-value="0" hidden>
+              
+              
+                
+              
+              
+              
+                
+                
+              
+              Let us know how we can improve this page.
+            </div>
+          
+        </div>
+      </div>
+    </fieldset>
+  </form>
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
+    </div>
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/opencadc/canfar" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://pypi.org/project/canfar" target="_blank" rel="noopener" title="pypi.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.8 200.5c-7.7-30.9-22.3-54.2-53.4-54.2h-40.1v47.4c0 36.8-31.2 67.8-66.8 67.8H172.7c-29.2 0-53.4 25-53.4 54.3v101.8c0 29 25.2 46 53.4 54.3 33.8 9.9 66.3 11.7 106.8 0 26.9-7.8 53.4-23.5 53.4-54.3v-40.7H226.2v-13.6h160.2c31.1 0 42.6-21.7 53.4-54.2 11.2-33.5 10.7-65.7 0-108.6M286.2 444.7a20.4 20.4 0 1 1 0-40.7 20.4 20.4 0 1 1 0 40.7M167.8 248.1h106.8c29.7 0 53.4-24.5 53.4-54.3V91.9c0-29-24.4-50.7-53.4-55.6-35.8-5.9-74.7-5.6-106.8.1-45.2 8-53.4 24.7-53.4 55.6v40.7h106.9v13.6h-147c-31.1 0-58.3 18.7-66.8 54.2-9.8 40.7-10.2 66.1 0 108.6 7.6 31.6 25.7 54.2 56.8 54.2H101v-48.8c0-35.3 30.5-66.4 66.8-66.4m-6.6-183.4a20.4 20.4 0 1 1 0 40.8 20.4 20.4 0 1 1 0-40.8"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://images.canfar.net" target="_blank" rel="noopener" title="images.canfar.net" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M349.9 236.3h-66.1v-59.4h66.1zm0-204.3h-66.1v60.7h66.1zm78.2 144.8H362v59.4h66.1zm-156.3-72.1h-66.1v60.1h66.1zm78.1 0h-66.1v60.1h66.1zm276.8 100c-14.4-9.7-47.6-13.2-73.1-8.4-3.3-24-16.7-44.9-41.1-63.7l-14-9.3-9.3 14c-18.4 27.8-23.4 73.6-3.7 103.8-8.7 4.7-25.8 11.1-48.4 10.7H2.4c-8.7 50.8 5.8 116.8 44 162.1 37.1 43.9 92.7 66.2 165.4 66.2 157.4 0 273.9-72.5 328.4-204.2 21.4.4 67.6.1 91.3-45.2 1.5-2.5 6.6-13.2 8.5-17.1zm-511.1-27.9h-66v59.4h66.1v-59.4zm78.1 0h-66.1v59.4h66.1zm78.1 0h-66.1v59.4h66.1zm-78.1-72.1h-66.1v60.1h66.1z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://discord.gg/vcCQ8QBvBa" target="_blank" rel="noopener" title="discord.gg" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M492.5 69.8c-.2-.3-.4-.6-.8-.7-38.1-17.5-78.4-30-119.7-37.1-.4-.1-.8 0-1.1.1s-.6.4-.8.8c-5.5 9.9-10.5 20.2-14.9 30.6-44.6-6.8-89.9-6.8-134.4 0-4.5-10.5-9.5-20.7-15.1-30.6-.2-.3-.5-.6-.8-.8s-.7-.2-1.1-.2C162.5 39 122.2 51.5 84.1 69c-.3.1-.6.4-.8.7C7.1 183.5-13.8 294.6-3.6 404.2c0 .3.1.5.2.8s.3.4.5.6c44.4 32.9 94 58 146.8 74.2.4.1.8.1 1.1 0s.7-.4.9-.7c11.3-15.4 21.4-31.8 30-48.8.1-.2.2-.5.2-.8s0-.5-.1-.8-.2-.5-.4-.6-.4-.3-.7-.4c-15.8-6.1-31.2-13.4-45.9-21.9-.3-.2-.5-.4-.7-.6s-.3-.6-.3-.9 0-.6.2-.9.3-.5.6-.7c3.1-2.3 6.2-4.7 9.1-7.1.3-.2.6-.4.9-.4s.7 0 1 .1c96.2 43.9 200.4 43.9 295.5 0 .3-.1.7-.2 1-.2s.7.2.9.4c2.9 2.4 6 4.9 9.1 7.2.2.2.4.4.6.7s.2.6.2.9-.1.6-.3.9-.4.5-.6.6c-14.7 8.6-30 15.9-45.9 21.8-.2.1-.5.2-.7.4s-.3.4-.4.7-.1.5-.1.8.1.5.2.8c8.8 17 18.8 33.3 30 48.8.2.3.6.6.9.7s.8.1 1.1 0c52.9-16.2 102.6-41.3 147.1-74.2.2-.2.4-.4.5-.6s.2-.5.2-.8c12.3-126.8-20.5-236.9-86.9-334.5zm-302 267.7c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.4 59.2-52.8 59.2m195.4 0c-29 0-52.8-26.6-52.8-59.2s23.4-59.2 52.8-59.2c29.7 0 53.3 26.8 52.8 59.2 0 32.7-23.2 59.2-52.8 59.2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+    <a href="mailto:support@canfar.net" target="_blank" rel="noopener" title="" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M536.4-26.3c9.8-3.5 20.6-1 28 6.3s9.8 18.2 6.3 28l-178 496.9c-5 13.9-18.1 23.1-32.8 23.1-14.2 0-27-8.6-32.3-21.7l-64.2-158c-4.5-11-2.5-23.6 5.2-32.6l94.5-112.4c5.1-6.1 4.7-15-.9-20.6s-14.6-6-20.6-.9l-112.4 94.3c-9.1 7.6-21.6 9.6-32.6 5.2L38.1 216.8c-13.1-5.3-21.7-18.1-21.7-32.3 0-14.7 9.2-27.8 23.1-32.8z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+      <div class="md-progress" data-md-component="progress" role="progressbar"></div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["navigation.tabs", "navigation.tabs.sticky", "navigation.instant", "navigation.instant.progress", "navigation.prune", "navigation.sections", "navigation.tracking", "navigation.indexes", "navigation.expand", "navigation.instant.prefetch", "toc.follow", "navigation.top", "announce.dismiss", "content.code.annotate", "content.action.edit", "content.action.view", "content.code.copy", "content.code.select", "content.footnote.tooltips", "content.tabs.link", "content.tooltips", "search.highlight", "search.share", "search.suggest"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="../../../termynal.js"></script>
+      
+    
+  </body>
+</html>

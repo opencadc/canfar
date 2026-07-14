@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/cli/cli-help/">
       
       
-        <link rel="prev" href="../authentication-contexts/">
+        <link rel="prev" href="../logging/">
       
       
         <link rel="next" href="../../demos/srcnet-workshop/">
@@ -1194,6 +1194,8 @@
       
         
       
+        
+      
     
     
     
@@ -1304,6 +1306,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1365,6 +1395,17 @@
       Table of contents
     </label>
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#root-logging-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root logging controls
+      
+    </span>
+  </a>
+  
+</li>
       
         <li class="md-nav__item">
   <a href="#authentication-and-servers" class="md-nav__link">
@@ -1731,6 +1772,17 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#root-logging-controls" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root logging controls
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#authentication-and-servers" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1823,6 +1875,36 @@
 management, Container Images, and client configuration.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--help
 </code></pre></div>
+<h2 id="root-logging-controls">Root logging controls<a class="headerlink" href="#root-logging-controls" title="Permanent link">&para;</a></h2>
+<p>Put logging options before the command:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>ps
+canfar<span class="w"> </span>-vvv<span class="w"> </span>ps
+canfar<span class="w"> </span>--log-file<span class="w"> </span>./logs/canfar.jsonl<span class="w"> </span>ps
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--log-level LEVEL</code></td>
+<td>Select <code>critical</code>, <code>error</code>, <code>warning</code>, <code>info</code>, or <code>debug</code>.</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>Increase verbosity; repeat through <code>-vvvv</code> for <code>debug</code>.</td>
+</tr>
+<tr>
+<td><code>--log-file PATH</code></td>
+<td>Add the rotating JSON Lines file sink.</td>
+</tr>
+</tbody>
+</table>
+<p>See <a href="../logging/">Logging</a> for the exact mapping, precedence, streams, file
+schema, and stable error codes.</p>
 <h2 id="authentication-and-servers">Authentication and Servers<a class="headerlink" href="#authentication-and-servers" title="Permanent link">&para;</a></h2>
 <h3 id="canfar-login"><code>canfar login</code><a class="headerlink" href="#canfar-login" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>IDP<span class="o">]</span><span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span>
@@ -1840,16 +1922,12 @@ management, Container Images, and client configuration.</p>
 <td>Force re-authentication.</td>
 </tr>
 <tr>
-<td><code>--debug</code></td>
-<td>Enable debug logging.</td>
-</tr>
-<tr>
 <td><code>--dev</code></td>
 <td>Include development Servers during discovery.</td>
 </tr>
 <tr>
 <td><code>--timeout</code>, <code>-t</code></td>
-<td>HTTP timeout in seconds during login. Default: <code>2</code>.</td>
+<td>HTTP timeout in seconds during login. Default: <code>10</code>.</td>
 </tr>
 </tbody>
 </table>
@@ -1972,15 +2050,26 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 <tr>
 <td><code>--debug</code></td>
 <td></td>
-<td>Enable debug logging.</td>
+<td>Print parsed Session request details.</td>
 </tr>
 <tr>
 <td><code>--dry-run</code></td>
 <td></td>
 <td>Parse parameters and exit.</td>
 </tr>
+<tr>
+<td><code>--json</code></td>
+<td></td>
+<td>Emit created Session IDs as a JSON list.</td>
+</tr>
+<tr>
+<td><code>--yaml</code></td>
+<td></td>
+<td>Emit created Session IDs as a YAML list.</td>
+</tr>
 </tbody>
 </table>
+<p><code>--json</code> and <code>--yaml</code> are mutually exclusive. <code>--dry-run</code> is human-output only.</p>
 <p>Examples:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
 canfar<span class="w"> </span>create<span class="w"> </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">16</span><span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
@@ -2021,7 +2110,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>headless<span class=
 <tr>
 <td><code>--debug</code></td>
 <td></td>
-<td>Enable debug logging.</td>
+<td>Show Session response warnings.</td>
 </tr>
 </tbody>
 </table>
@@ -2038,6 +2127,10 @@ canfar<span class="w"> </span>open<span class="w"> </span>SESSION_ID...
 canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID...<span class="w"> </span><span class="o">[</span>--force<span class="o">]</span>
 canfar<span class="w"> </span>prune<span class="w"> </span>PREFIX<span class="w"> </span><span class="o">[</span>KIND<span class="o">]</span><span class="w"> </span><span class="o">[</span>STATUS<span class="o">]</span>
 </code></pre></div>
+<p>Quote <code>PREFIX</code> when it contains shell metacharacters
+(for example <code>canfar prune 'rabi.*' headless Completed</code>).</p>
+<p><code>canfar info SESSION_ID --debug</code> shows Session response warnings. This is
+a command diagnostic, not a logging-level control.</p>
 <p>Common flow:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
 canfar<span class="w"> </span>info<span class="w"> </span><span class="k">$(</span>canfar<span class="w"> </span>ps<span class="w"> </span>-q<span class="k">)</span>
@@ -2059,7 +2152,9 @@ canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set
 canfar<span class="w"> </span>version
 canfar<span class="w"> </span>version<span class="w"> </span>--debug
 </code></pre></div>
-<p><code>config set</code> parses values as YAML.</p>
+<p><code>config set</code> parses values as YAML.
+<code>version --debug</code> shows environment and dependency details for bug reports; it
+does not change the logging level.</p>
 <h2 id="machine-output-contract">Machine output contract<a class="headerlink" href="#machine-output-contract" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -2121,7 +2216,7 @@ canfar<span class="w"> </span>version<span class="w"> </span>--debug
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 10, 2026 05:18:06 UTC">June 10, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 09:04:41 UTC">July 14, 2026</span>
   </span>
 
     
