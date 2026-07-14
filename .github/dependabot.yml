@@ -4,13 +4,25 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      actions:
+        patterns:
+          - "*"
 
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: weekly
+    groups:
+      docker:
+        patterns:
+          - "*"
 
   - package-ecosystem: uv
     directory: /
     schedule:
       interval: weekly
+    groups:
+      python:
+        patterns:
+          - "*"
