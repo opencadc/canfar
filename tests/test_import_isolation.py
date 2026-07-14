@@ -102,13 +102,10 @@ def test_canonical_imports_do_not_load_legacy_config_adapter(tmp_path: Path) -> 
     script = """
 import os
 import sys
-from collections.abc import Mapping
-from typing import get_type_hints
 
 os.environ["HOME"] = sys.argv[1]
 
 from canfar.client import HTTPClient
-from canfar.models.auth import AuthContext
 from canfar.models.config import Configuration
 
 with HTTPClient(
@@ -118,14 +115,7 @@ with HTTPClient(
 ) as client:
     client.client
 
-hints = get_type_hints(Configuration.contexts.fget)
-assert hints["return"] == Mapping[str, AuthContext]
 assert "canfar.models.config_compat" not in sys.modules
-
-from canfar.models.config import AuthContext as PublicAuthContext
-from canfar.models.config_compat import AuthContext as DirectAuthContext
-
-assert PublicAuthContext is DirectAuthContext
 """
     result = subprocess.run(  # noqa: S603
         [sys.executable, "-c", script, str(tmp_path)],

@@ -17,7 +17,7 @@ from cryptography.hazmat.backends import default_backend
 from canfar import CERT_PATH, get_logger
 
 if TYPE_CHECKING:
-    from canfar.models.auth import X509, X509Credential
+    from canfar.models.auth import X509Credential
 
 log = get_logger(__name__)
 
@@ -262,30 +262,3 @@ def authenticate_credential(credential: X509Credential) -> X509Credential:
         raise ValueError(msg) from err
 
     return credential
-
-
-def authenticate(config: X509) -> X509:
-    """Authenticate using X509 certificate.
-
-    Args:
-        config (auth.X509): X509 configuration.
-
-    Returns:
-        auth.X509: X509 configuration.
-
-    Raises:
-        ValueError: If certificate cannot be read or parsed.
-    """
-    from canfar.models.auth import X509Credential  # noqa: PLC0415
-
-    credential = authenticate_credential(
-        X509Credential(
-            idp=config.server.idp if config.server and config.server.idp else "legacy",
-            path=config.path,
-            expiry=config.expiry,
-        )
-    )
-    config.path = credential.model_dump(mode="json")["path"]
-    config.expiry = credential.expiry
-
-    return config

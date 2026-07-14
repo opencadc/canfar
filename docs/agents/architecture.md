@@ -22,17 +22,13 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 
 ## Authentication Configuration
 
-Canonical code stores `OIDCCredential` and `X509Credential` Authentication
-Records in `Configuration.authentication` and accesses them through
-`Configuration.get_credential`, `upsert_credential`, and `update_credential`.
-`ActiveConfig` owns the active Authentication and Server Selection references;
-`HTTPClient` composes `Configuration` and resolves those records for transport.
-Server Selection history lives on `Configuration` / `ActiveConfig` directly
-(there is no separate `selection.py` shim).
-
-The legacy `OIDC` and `X509` models plus `Configuration.context` and
-`.contexts` remain working compatibility views. New code should use the
-canonical records and `Configuration` methods directly.
+`OIDCCredential` and `X509Credential` Authentication Records live in
+`Configuration.authentication`, accessed through `Configuration.get_credential`,
+`upsert_credential`, and `update_credential`. `ActiveConfig` owns the active
+Authentication and Server Selection references; `HTTPClient` composes
+`Configuration` and resolves those records for transport. Server Selection
+history lives on `Configuration` / `ActiveConfig` directly (there is no
+separate `selection.py` shim).
 
 ## Test Caveats
 

@@ -15,7 +15,7 @@ from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
 from pydantic import SecretStr, ValidationError
 
 from canfar import get_logger
-from canfar.models.auth import OIDC, DeviceAuthorization, Expiry, OIDCCredential, Token
+from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Token
 
 if TYPE_CHECKING:
     from authlib.integrations.httpx_client import AsyncOAuth2Client
@@ -541,33 +541,3 @@ async def authenticate_credential(
         if on_authenticated is not None:
             on_authenticated(username)
         return credential
-
-
-async def authenticate(
-    oidc: OIDC,
-    *,
-    expected_issuer: str,
-    timeout: int | None = None,
-    device_flow: DeviceFlow | None = None,
-    on_authenticated: Callable[[str | None], None] | None = None,
-) -> OIDC:
-    """Authenticate a legacy OIDC context through the canonical credential flow."""
-    credential = OIDCCredential(
-        idp=oidc.server.idp or "legacy",
-        endpoints=oidc.endpoints,
-        client=oidc.client,
-        token=oidc.token,
-        expiry=oidc.expiry,
-    )
-    try:
-        await authenticate_credential(
-            credential,
-            expected_issuer=expected_issuer,
-            timeout=timeout,
-            device_flow=device_flow,
-            on_authenticated=on_authenticated,
-        )
-    finally:
-        oidc.token = credential.token
-        oidc.expiry = credential.expiry
-    return oidc

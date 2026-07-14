@@ -12,9 +12,7 @@ from canfar.auth import x509
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthExpiredError
 from canfar.hooks.httpx.expiry import acheck, check
-from canfar.models.auth import OIDC, X509
-from canfar.models.http import Server
-from tests.helpers.config import configuration_from_legacy_context
+from tests.helpers.config import oidc_config, x509_config
 from tests.test_auth_x509 import generate_cert
 
 
@@ -50,19 +48,13 @@ class TestCheck:
 
     def test_check_with_real_client_expired(self) -> None:
         """Test check hook with real HTTPClient that has expired context."""
-        oidc_context = OIDC(
-            server=Server(
-                name="TestOIDC", url="https://oidc.example.com", version="v1"
-            ),
-            endpoints={
-                "discovery": "https://oidc.example.com/.well-known/openid-configuration",
-                "token": "https://oidc.example.com/token",
-            },
-            client={"identity": "test-client", "secret": "test-secret"},
-            token={"access": "expired-token", "refresh": "expired-refresh-token"},
-            expiry={"access": 0, "refresh": 0},
+        config = oidc_config(
+            idp="testoidc",
+            access="expired-token",
+            refresh="expired-refresh-token",
+            access_expiry=0,
+            refresh_expiry=0,
         )
-        config = configuration_from_legacy_context("TestOIDC", oidc_context)
         client = HTTPClient(config=config)
 
         hook_func = check(client)
@@ -101,13 +93,7 @@ class TestCheck:
         """Expiry hook must not check saved config when runtime token is active."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509", url="https://x509.example.com", version="v0"
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("TestX509", x509_context)
+        config = x509_config(idp="testx509", path=cert_path, version="v0")
         client = HTTPClient(
             config=config,
             token=SecretStr("runtime-token"),
@@ -122,13 +108,7 @@ class TestCheck:
         """Expiry hook still checks saved config when no runtime credentials."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509", url="https://x509.example.com", version="v0"
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("TestX509", x509_context)
+        config = x509_config(idp="testx509", path=cert_path, version="v0", expiry=0.0)
         client = HTTPClient(config=config)
         hook_func = check(client)
         request = httpx.Request("GET", "/")
@@ -172,19 +152,13 @@ class TestACheck:
     @pytest.mark.asyncio
     async def test_acheck_with_real_client_expired(self) -> None:
         """Test acheck hook with real HTTPClient that has expired context."""
-        oidc_context = OIDC(
-            server=Server(
-                name="TestOIDC", url="https://oidc.example.com", version="v1"
-            ),
-            endpoints={
-                "discovery": "https://oidc.example.com/.well-known/openid-configuration",
-                "token": "https://oidc.example.com/token",
-            },
-            client={"identity": "test-client", "secret": "test-secret"},
-            token={"access": "expired-token", "refresh": "expired-refresh-token"},
-            expiry={"access": 0, "refresh": 0},
+        config = oidc_config(
+            idp="testoidc",
+            access="expired-token",
+            refresh="expired-refresh-token",
+            access_expiry=0,
+            refresh_expiry=0,
         )
-        config = configuration_from_legacy_context("TestOIDC", oidc_context)
         client = HTTPClient(config=config)
 
         hook_func = acheck(client)
@@ -247,13 +221,7 @@ class TestACheck:
         """Async expiry hook must not check saved config with runtime token."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509", url="https://x509.example.com", version="v0"
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("TestX509", x509_context)
+        config = x509_config(idp="testx509", path=cert_path, version="v0")
         client = HTTPClient(
             config=config,
             token=SecretStr("runtime-token"),
@@ -269,13 +237,7 @@ class TestACheck:
         """Async expiry hook still checks saved config without runtime credentials."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509", url="https://x509.example.com", version="v0"
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("TestX509", x509_context)
+        config = x509_config(idp="testx509", path=cert_path, version="v0", expiry=0.0)
         client = HTTPClient(config=config)
         hook_func = acheck(client)
         request = httpx.Request("GET", "/")

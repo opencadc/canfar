@@ -8,21 +8,22 @@ import httpx
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 
-from canfar.auth.oidc import authenticate
-from canfar.models.auth import OIDC, Client, Endpoint, Token
+from canfar.auth.oidc import authenticate_credential
+from canfar.models.auth import Client, Endpoint, OIDCCredential, Token
 
 
-class TestAuthenticateFunction:
-    """Test the authenticate function."""
+class TestAuthenticateCredentialFunction:
+    """Test the authenticate_credential function."""
 
     async def _authenticate_with_tokens(
         self,
         tokens: dict[str, object],
         *,
-        oidc_config: OIDC | None = None,
+        credential: OIDCCredential | None = None,
         userinfo_error: Exception | None = None,
-    ) -> OIDC:
-        oidc_config = oidc_config or OIDC(
+    ) -> OIDCCredential:
+        credential = credential or OIDCCredential(
+            idp="test",
             endpoints=Endpoint(
                 discovery="https://example.com/.well-known/openid-configuration"
             ),
@@ -61,8 +62,8 @@ class TestAuthenticateFunction:
             mock_client.get.side_effect = [discovery_response, userinfo_response]
             mock_client.post.return_value = registration_response
 
-            return await authenticate(
-                oidc_config,
+            return await authenticate_credential(
+                credential,
                 expected_issuer="https://example.com",
                 device_flow=AsyncMock(return_value=tokens),
             )
@@ -71,8 +72,9 @@ class TestAuthenticateFunction:
     async def test_authenticate_preserves_issued_tokens_when_userinfo_fails(
         self,
     ) -> None:
-        """A failed legacy UserInfo request retains the newly issued token state."""
-        oidc_config = OIDC(
+        """A failed UserInfo request retains the newly issued token state."""
+        credential = OIDCCredential(
+            idp="test",
             endpoints=Endpoint(
                 discovery="https://example.com/.well-known/openid-configuration"
             ),
@@ -80,8 +82,8 @@ class TestAuthenticateFunction:
             token=Token(access="old-access", refresh="old-refresh"),
             expiry={"access": 1, "refresh": 2},
         )
-        endpoints = oidc_config.endpoints
-        client = oidc_config.client
+        endpoints = credential.endpoints
+        client = credential.client
         userinfo_error = httpx.HTTPStatusError(
             "userinfo failed",
             request=httpx.Request("GET", "https://example.com/userinfo"),
@@ -97,18 +99,18 @@ class TestAuthenticateFunction:
                     "scope": "openid profile",
                     "expires_at": 1893456000,
                 },
-                oidc_config=oidc_config,
+                credential=credential,
                 userinfo_error=userinfo_error,
             )
 
-        assert oidc_config.endpoints is endpoints
-        assert oidc_config.client is client
-        assert oidc_config.token.access is not None
-        assert oidc_config.token.access.get_secret_value() == "new-access"
-        assert oidc_config.token.refresh is not None
-        assert oidc_config.token.refresh.get_secret_value() == "new-refresh"
-        assert oidc_config.expiry.access == 1893456000
-        assert oidc_config.expiry.refresh is None
+        assert credential.endpoints is endpoints
+        assert credential.client is client
+        assert credential.token.access is not None
+        assert credential.token.access.get_secret_value() == "new-access"
+        assert credential.token.refresh is not None
+        assert credential.token.refresh.get_secret_value() == "new-refresh"
+        assert credential.expiry.access == 1893456000
+        assert credential.expiry.refresh is None
 
     @pytest.mark.asyncio
     async def test_authenticate_persists_issued_tokens(self) -> None:

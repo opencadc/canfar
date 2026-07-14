@@ -78,10 +78,6 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
         patch(
             "authlib.integrations.httpx_client.AsyncOAuth2Client"
         ) as oauth_client_class,
-        patch(
-            "canfar.auth.oidc.authenticate",
-            side_effect=AssertionError("legacy OIDC authentication was used"),
-        ) as legacy_authenticate,
         patch("canfar.utils.console.get_console", return_value=console),
         patch("webbrowser.get") as browser,
         patch("segno.make") as make_qr,
@@ -124,7 +120,6 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     assert credential.token.scope == "openid profile email"
     assert credential.expiry.access == 1893456000
     assert credential.expiry.refresh is None
-    legacy_authenticate.assert_not_called()
 
 
 def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
@@ -132,13 +127,7 @@ def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
     certificate = tmp_path / "cadcproxy.pem"
     gathered = {"path": str(certificate), "expiry": 1893456000.0}
 
-    with (
-        patch("canfar.auth.x509.gather", return_value=gathered) as gather,
-        patch(
-            "canfar.auth.x509.authenticate",
-            side_effect=AssertionError("legacy X.509 authentication was used"),
-        ) as legacy_authenticate,
-    ):
+    with patch("canfar.auth.x509.gather", return_value=gathered) as gather:
         result = authenticate_for_cli(get_idp("cadc"))
 
     assert isinstance(result, X509Credential)
@@ -146,7 +135,6 @@ def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
     assert result.path == certificate
     assert result.expiry == 1893456000.0
     gather.assert_called_once_with()
-    legacy_authenticate.assert_not_called()
 
 
 def test_authenticate_for_cli_normalizes_x509_gather_failure() -> None:

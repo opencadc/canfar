@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping  # noqa: TC003 - needed by get_type_hints
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
 
@@ -34,7 +33,6 @@ from canfar.config.editor import get_value as _get_value
 from canfar.config.editor import set_value as _set_value
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
-    AuthContext,
     AuthenticationCredential,
     X509Credential,
 )
@@ -528,56 +526,6 @@ class Configuration(BaseSettings):
         )
         self._replace_state(active=active, servers=servers)
 
-    @property
-    def context(self) -> AuthContext:
-        """Return the active Authentication as a legacy ``AuthContext`` view.
-
-        Returns:
-            Legacy ``OIDC`` or ``X509`` model with embedded active server.
-        """
-        from canfar.models.config_compat import (  # noqa: PLC0415
-            credential_to_legacy_context,
-        )
-
-        credential = self.get_credential(self.active.authentication)
-        try:
-            server = self.get_active_server()
-        except KeyError:
-            server = None
-        return credential_to_legacy_context(credential, server)
-
-    @property
-    def contexts(self) -> Mapping[str, AuthContext]:
-        """Return a legacy dict-like view keyed by IDP."""
-        from canfar.models.config_compat import (  # noqa: PLC0415
-            LegacyContextsMapping,
-        )
-
-        return LegacyContextsMapping(self)
-
-    def set_legacy_context(self, idp: str, context: AuthContext) -> None:
-        """Insert or replace authentication from a legacy context assignment.
-
-        Args:
-            idp: Canonical identity provider key.
-            context: Legacy ``AuthContext`` view to persist.
-        """
-        from canfar.models.config_compat import (  # noqa: PLC0415
-            legacy_context_to_credential,
-        )
-
-        authentication = {
-            **self.authentication,
-            idp: legacy_context_to_credential(context, idp),
-        }
-        servers = dict(self.servers)
-        if context.server is not None and context.server.name is not None:
-            servers[context.server.name] = context.server.model_copy(
-                update={"idp": idp},
-                deep=True,
-            )
-        self._replace_state(authentication=authentication, servers=servers)
-
     def upsert_server(self, server: Server) -> None:
         """Insert or replace a validated server record keyed by Server Name."""
         self.upsert_servers((server,))
@@ -591,7 +539,7 @@ class Configuration(BaseSettings):
         self._replace_state(servers=updated)
 
 
-__all__ = ["CONFIG_PATH", "AuthContext", "Configuration", "ConsoleConfig"]
+__all__ = ["CONFIG_PATH", "Configuration", "ConsoleConfig"]
 
 
 class _CanfarEnvSettingsSource(EnvSettingsSource):
