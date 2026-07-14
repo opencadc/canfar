@@ -248,7 +248,7 @@ class HTTPClient(BaseSettings):
             )
             raise ValueError(msg) from exc
         if server.url is None:
-            msg = f"Server not found for Authentication Record: {server}"
+            msg = f"Active server has no URL configured: {server}"
             raise ValueError(msg)
         return URL(f"{server.url}/{server.version}")
 

@@ -342,6 +342,26 @@ class TestBaseURLConstruction:
         ):
             client._get_base_url()
 
+    def test_active_server_without_url_raises_error(
+        self, canfar_client_fixture
+    ) -> None:
+        """Test that active server with no URL raises ValueError."""
+        custom_context = X509(
+            path=Path("/test/cert.pem"),
+            expiry=9999999999.0,
+            server=Server(
+                name="Test Server",
+                uri=AnyUrl("ivo://test.org/canfar"),
+                version="v1",
+            ),
+        )
+
+        config = configuration_from_legacy_context("test", custom_context)
+
+        client = canfar_client_fixture(config=config)
+        with pytest.raises(ValueError, match="Active server has no URL configured"):
+            client._get_base_url()
+
 
 class TestCertificateValidation:
     """Test certificate validation functionality."""

@@ -24,7 +24,7 @@
 - Docs build: `uv run --group docs mkdocs build`
 - Full test suite: `uv run --no-sync pytest`
 
-Run the full test suite only when a valid CANFAR auth context and certificate are available. Otherwise use the deterministic non-slow test command.
+Run the full test suite only when a valid CANFAR Authentication Record and certificate are available. Otherwise use the deterministic non-slow test command.
 
 ## Agent skills
 
