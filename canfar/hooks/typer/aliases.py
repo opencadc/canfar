@@ -10,6 +10,8 @@ from typer.core import TyperGroup
 if TYPE_CHECKING:
     from typer._click.core import Command, Context
 
+ROOT_CHILD_ARGS_META_KEY = "canfar.root_child_args"
+
 
 class AliasGroup(TyperGroup):
     """AliasGroup to handle command aliases in Typer.
@@ -19,6 +21,13 @@ class AliasGroup(TyperGroup):
     """
 
     _CMD_SPLIT_P = re.compile(r" ?[,|] ?")
+
+    def parse_args(self, ctx: Context, args: list[str]) -> list[str]:
+        """Preserve the root command's parsed child arguments for setup errors."""
+        child_args = super().parse_args(ctx, args)
+        if ctx.parent is None:
+            ctx.meta[ROOT_CHILD_ARGS_META_KEY] = list(child_args)
+        return child_args
 
     def get_command(self, ctx: Context, cmd_name: str) -> Command | None:
         """Retrieve a command by name, supporting aliases.

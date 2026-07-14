@@ -2,6 +2,7 @@
 
 from canfar.errors.codes import ErrorCode
 from canfar.errors.model import (
+    LoggingEnvironmentError,
     StructuredError,
     structured_error_to_json,
     structured_error_to_yaml,
@@ -9,6 +10,7 @@ from canfar.errors.model import (
 
 __all__ = [
     "ErrorCode",
+    "LoggingEnvironmentError",
     "StructuredError",
     "structured_error_to_json",
     "structured_error_to_yaml",

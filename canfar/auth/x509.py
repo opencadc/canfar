@@ -17,7 +17,7 @@ from cryptography.hazmat.backends import default_backend
 from canfar import CERT_PATH, get_logger
 
 if TYPE_CHECKING:
-    from canfar.models import auth
+    from canfar.models.auth import X509Credential
 
 log = get_logger(__name__)
 
@@ -245,24 +245,20 @@ def expiry(path: Path = CERT_PATH) -> float:
         raise CertificateError(msg) from err
 
 
-def authenticate(config: auth.X509) -> auth.X509:
-    """Authenticate using X509 certificate.
-
-    Args:
-        config (auth.X509): X509 configuration.
-
-    Returns:
-        auth.X509: X509 configuration.
-
-    Raises:
-        ValueError: If certificate cannot be read or parsed.
-    """
+def authenticate_credential(credential: X509Credential) -> X509Credential:
+    """Acquire and validate an X.509 Authentication Record."""
     try:
         data = gather()
-        config.path = data["path"]
-        config.expiry = data["expiry"]
+        candidate = type(credential).model_validate(
+            {
+                "idp": credential.idp,
+                "path": data["path"],
+                "expiry": data["expiry"],
+            }
+        )
+        credential.path, credential.expiry = candidate.path, candidate.expiry
     except Exception as err:
         msg = f"Failed to authenticate with X509 certificate: {err}"
         raise ValueError(msg) from err
 
-    return config
+    return credential

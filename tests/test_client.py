@@ -15,14 +15,14 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
-from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
+from pydantic import AnyUrl, SecretStr, ValidationError
 
 from canfar.client import HTTPClient
-from canfar.models.auth import OIDC, X509, Client, Endpoint, Expiry, Token
+from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
-from tests.helpers.config import configuration_from_legacy_context
+from tests.helpers.config import configuration_with_credential, oidc_config, x509_config
 from tests.test_auth_x509 import generate_cert
 
 
@@ -67,7 +67,6 @@ class TestInitializationAndConfiguration:
         client = canfar_client_fixture()
         assert client.timeout == 30
         assert client.concurrency == 32
-        assert client.loglevel == "INFO"
         assert client.token is None
         assert client.certificate is None
         assert client.url is None
@@ -83,7 +82,6 @@ class TestInitializationAndConfiguration:
             certificate=Path("/test/cert.pem"),
             url="https://example.com/api",
             config=config,
-            loglevel="DEBUG",
         )
         assert client.timeout == 60
         assert client.concurrency == 64
@@ -92,7 +90,6 @@ class TestInitializationAndConfiguration:
         assert client.certificate is None
         assert str(client.url) == "https://example.com/api"
         assert client.config is config
-        assert client.loglevel == "DEBUG"
 
     def test_environment_variables(self, canfar_client_fixture, monkeypatch) -> None:
         """Test that environment variables are picked up correctly."""
@@ -100,7 +97,6 @@ class TestInitializationAndConfiguration:
         monkeypatch.setenv("CANFAR_CONCURRENCY", "16")
         monkeypatch.setenv("CANFAR_TOKEN", "env-token")
         monkeypatch.setenv("CANFAR_URL", "https://env.example.com")
-        monkeypatch.setenv("CANFAR_LOGLEVEL", "WARNING")
 
         client = canfar_client_fixture()
         assert client.timeout == 45
@@ -108,7 +104,6 @@ class TestInitializationAndConfiguration:
         assert client.token.get_secret_value() == "env-token"
         # URL gets normalized with trailing slash
         assert str(client.url) == "https://env.example.com/"
-        assert client.loglevel == "WARNING"
 
     def test_precedence_constructor_over_env(
         self, canfar_client_fixture, monkeypatch
@@ -307,19 +302,11 @@ class TestBaseURLConstruction:
 
     def test_configured_url_from_context(self, canfar_client_fixture) -> None:
         """Test base URL construction from configuration context."""
-        # Create a custom context with specific server settings
-        custom_context = X509(
+        config = x509_config(
+            server_name="TestServer",
+            server_url="https://config.example.com",
             path=Path("/test/cert.pem"),
-            expiry=9999999999.0,
-            server=Server(
-                name="Test Server",
-                uri=AnyUrl("ivo://test.org/canfar"),
-                url=AnyHttpUrl("https://config.example.com"),
-                version="v1",
-            ),
         )
-
-        config = configuration_from_legacy_context("test", custom_context)
 
         client = canfar_client_fixture(config=config)
         base_url = client._get_base_url()
@@ -327,15 +314,35 @@ class TestBaseURLConstruction:
 
     def test_no_server_in_context_raises_error(self, canfar_client_fixture) -> None:
         """Test that missing server in context raises ValueError."""
-        # Create a context without server
-        custom_context = X509(
-            path=Path("/test/cert.pem"), expiry=9999999999.0, server=None
+        config = configuration_with_credential(
+            X509Credential(
+                idp="test", path=Path("/test/cert.pem"), expiry=9999999999.0
+            ),
         )
 
-        config = configuration_from_legacy_context("test", custom_context)
+        client = canfar_client_fixture(config=config)
+        with pytest.raises(
+            ValueError, match="Server not found for Authentication Record"
+        ):
+            client._get_base_url()
+
+    def test_active_server_without_url_raises_error(
+        self, canfar_client_fixture
+    ) -> None:
+        """Test that active server with no URL raises ValueError."""
+        config = configuration_with_credential(
+            X509Credential(
+                idp="test", path=Path("/test/cert.pem"), expiry=9999999999.0
+            ),
+            server=Server(
+                name="TestServer",
+                uri=AnyUrl("ivo://test.org/canfar"),
+                version="v1",
+            ),
+        )
 
         client = canfar_client_fixture(config=config)
-        with pytest.raises(ValueError, match="Server not found in auth context"):
+        with pytest.raises(ValueError, match="Active server has no URL configured"):
             client._get_base_url()
 
 
@@ -358,7 +365,9 @@ class TestCertificateValidation:
         assert client.certificate is None  # Certificate should be nullified
 
         # Verify that the client uses token authentication
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
         assert "Authorization" in headers
         assert headers["Authorization"] == "Bearer test-token"
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-TOKEN"
@@ -428,7 +437,9 @@ class TestHTTPClientCreationAndHeaders:
             "canfar.client.formatdate",
             return_value="Wed, 09 Jun 2026 12:00:00 GMT",
         ) as mock_formatdate:
-            headers = client._get_http_headers()
+            headers = client._get_http_headers(
+                credential=client._resolved_authentication_record()
+            )
 
         mock_formatdate.assert_called_once_with(usegmt=True)
         assert "Content-Type" in headers
@@ -448,7 +459,9 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com"
         )
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["Authorization"] == "Bearer test-token"
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-TOKEN"
@@ -459,56 +472,42 @@ class TestHTTPClientCreationAndHeaders:
         _create_test_certificate(cert_path)
 
         client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["X-Skaha-Authentication-Type"] == "RUNTIME-X509"
         assert "Authorization" not in headers
 
     def test_oidc_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for OIDC context authentication."""
-        # Create a real OIDC context
-        oidc_context = OIDC(
-            server=Server(
-                name="Test OIDC",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://oidc.example.com"),
-                version="v1",
-            ),
-            endpoints=Endpoint(
-                discovery="https://oidc.example.com/.well-known/openid-configuration",
-                token="https://oidc.example.com/token",
-            ),
-            client=Client(identity="test-client", secret="test-secret"),
-            token=Token(access="oidc-access-token", refresh="refresh-token"),
-            expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
+        config = oidc_config(
+            idp="oidc",
+            access="oidc-access-token",
+            access_expiry=9999999999.0,
+            refresh_expiry=9999999999.0,
         )
 
-        config = configuration_from_legacy_context("oidc", oidc_context)
-
         client = canfar_client_fixture(config=config)
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["Authorization"] == "Bearer oidc-access-token"
         assert headers["X-Skaha-Authentication-Type"] == "OIDC"
 
     def test_x509_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for X509 context authentication."""
-        # Create a real X509 context
-        x509_context = X509(
+        config = x509_config(
+            idp="x509",
+            server_name="TestX509",
             path=Path("/test/cert.pem"),
-            expiry=9999999999.0,
-            server=Server(
-                name="Test X509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
         )
 
-        config = configuration_from_legacy_context("x509", x509_context)
-
         client = canfar_client_fixture(config=config)
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert headers["X-Skaha-Authentication-Type"] == "X509"
         assert "Authorization" not in headers
@@ -522,7 +521,9 @@ class TestHTTPClientCreationAndHeaders:
         client = canfar_client_fixture(
             token=SecretStr("test-token"), url="https://example.com", config=config
         )
-        headers = client._get_http_headers()
+        headers = client._get_http_headers(
+            credential=client._resolved_authentication_record()
+        )
 
         assert "X-Skaha-Registry-Auth" in headers
 
@@ -536,14 +537,18 @@ class TestHTTPClientCreationAndHeaders:
         )
 
         # Test sync client kwargs
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
         assert "timeout" in sync_kwargs
         # httpx.Timeout doesn't have a .timeout attribute, it's the object itself
         assert isinstance(sync_kwargs["timeout"], httpx.Timeout)
         assert "limits" not in sync_kwargs  # Only for async
 
         # Test async client kwargs
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
         assert "timeout" in async_kwargs
         assert isinstance(async_kwargs["timeout"], httpx.Timeout)
         assert "limits" in async_kwargs
@@ -551,34 +556,26 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_oidc_refresh_hook_added(self, canfar_client_fixture) -> None:
         """Test that OIDC refresh hook is added for OIDC contexts."""
-        # Create a real OIDC context
-        oidc_context = OIDC(
-            server=Server(
-                name="Test OIDC",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://oidc.example.com"),
-                version="v1",
-            ),
-            endpoints=Endpoint(
-                discovery="https://oidc.example.com/.well-known/openid-configuration",
-                token="https://oidc.example.com/token",
-            ),
-            client=Client(identity="test-client", secret="test-secret"),
-            token=Token(access="oidc-access-token", refresh="refresh-token"),
-            expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
+        config = oidc_config(
+            idp="oidc",
+            access="oidc-access-token",
+            access_expiry=9999999999.0,
+            refresh_expiry=9999999999.0,
         )
-
-        config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
 
         # Test sync client kwargs
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
         assert "event_hooks" in sync_kwargs
         assert "request" in sync_kwargs["event_hooks"]
 
         # Test async client kwargs
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
         assert "event_hooks" in async_kwargs
         assert "request" in async_kwargs["event_hooks"]
 
@@ -597,18 +594,6 @@ class TestContextManagerBehavior:
             assert ctx_client is client
             # Verify client is created
             assert isinstance(ctx_client.client, httpx.Client)
-
-        # After exit, client should be closed
-        assert client._client is None
-
-    def test_sync_session_context(self, canfar_client_fixture) -> None:
-        """Test synchronous session context manager."""
-        client = canfar_client_fixture(
-            token=SecretStr("test-token"), url="https://example.com"
-        )
-
-        with client._session() as session:
-            assert isinstance(session, httpx.Client)
 
         # After exit, client should be closed
         assert client._client is None
@@ -657,18 +642,6 @@ class TestContextManagerBehavior:
         # After exit, asynclient should be closed
         assert client._asynclient is None
 
-    async def test_async_session_context(self, canfar_client_fixture) -> None:
-        """Test asynchronous session context manager."""
-        client = canfar_client_fixture(
-            token=SecretStr("test-token"), url="https://example.com"
-        )
-
-        async with client._asession() as session:
-            assert isinstance(session, httpx.AsyncClient)
-
-        # After exit, asynclient should be closed
-        assert client._asynclient is None
-
     async def test_aclose_async_client(self, canfar_client_fixture) -> None:
         """Test closing asynchronous client."""
         client = canfar_client_fixture(
@@ -706,24 +679,19 @@ class TestSSLContextAndClientKwargs:
         """Runtime token must not install saved-config expiry request hook."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("x509", x509_context)
+        config = x509_config(idp="x509", path=cert_path)
         client = canfar_client_fixture(
             config=config,
             token=SecretStr("runtime-token"),
             url="https://runtime.com",
         )
 
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
 
         assert sync_kwargs["event_hooks"]["request"] == []
         assert async_kwargs["event_hooks"]["request"] == []
@@ -734,20 +702,15 @@ class TestSSLContextAndClientKwargs:
         """Saved expired x509 config must still install expiry request hook."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("x509", x509_context)
+        config = x509_config(idp="x509", path=cert_path)
         client = canfar_client_fixture(config=config)
 
-        sync_kwargs = client._get_client_kwargs(asynchronous=False)
-        async_kwargs = client._get_client_kwargs(asynchronous=True)
+        sync_kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
+        async_kwargs = client._get_client_kwargs(
+            asynchronous=True, credential=client._resolved_authentication_record()
+        )
 
         assert len(sync_kwargs["event_hooks"]["request"]) == 1
         assert len(async_kwargs["event_hooks"]["request"]) == 1
@@ -762,7 +725,9 @@ class TestSSLContextAndClientKwargs:
         _create_test_certificate(cert_path)
 
         client = canfar_client_fixture(certificate=cert_path, url="https://example.com")
-        kwargs = client._get_client_kwargs(asynchronous=False)
+        kwargs = client._get_client_kwargs(
+            asynchronous=False, credential=client._resolved_authentication_record()
+        )
 
         assert "verify" in kwargs
         assert isinstance(kwargs["verify"], ssl.SSLContext)

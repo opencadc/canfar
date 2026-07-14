@@ -15,6 +15,7 @@ from canfar.cli.ps import ps
 from canfar.cli.stats import stats
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 runner = CliRunner()
@@ -118,7 +119,7 @@ def test_ps_outputs_running_table_and_debug_anomalies() -> None:
     assert result.exit_code == 0
     assert "running-1" in result.stdout
     assert "done-1" not in result.stdout
-    assert "Session Response Warnings" in result.stdout
+    assert "Session Response Warnings" in result.stderr
     session.fetch.assert_awaited_once_with(kind=None, status=None)
 
 
@@ -165,8 +166,16 @@ def test_ps_quiet_prints_all_matching_session_ids() -> None:
     assert result.stdout.splitlines() == ["running-1", "done-1", "running-2"]
 
 
-def test_ps_json_emits_filtered_session_array(tmp_path: Path) -> None:
-    """``ps --json`` emits validated session models with running-only filtering."""
+@pytest.mark.parametrize(
+    ("flag", "load"),
+    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+)
+def test_ps_machine_emits_filtered_session_array(
+    tmp_path: Path,
+    flag: str,
+    load: Callable[[str], object],
+) -> None:
+    """Machine ``ps`` emits validated session models with running-only filtering."""
     config_path = tmp_path / "config.yaml"
     payloads = [
         _session_payload("running-1", status="Running"),
@@ -179,34 +188,14 @@ def test_ps_json_emits_filtered_session_array(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--json"])
+        result = runner.invoke(ps, [flag])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
-    data = json.loads(result.stdout)
+    data = load(result.stdout)
     assert isinstance(data, list)
     assert [item["id"] for item in data] == ["running-1"]
     assert all(set(item) == _SESSION_KEYS for item in data)
-
-
-def test_ps_yaml_emits_filtered_session_array(tmp_path: Path) -> None:
-    """``ps --yaml`` emits the same filtered session payload as ``--json``."""
-    config_path = tmp_path / "config.yaml"
-    payloads = [_session_payload("running-1", status="Running")]
-
-    with (
-        _patch_config(config_path),
-        patch("canfar.cli.ps.AsyncSession") as session_cls,
-    ):
-        session = _mock_async_session(session_cls)
-        session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--yaml"])
-
-    assert result.exit_code == 0
-    data = yaml.safe_load(result.stdout)
-    assert isinstance(data, list)
-    assert data[0]["id"] == "running-1"
-    assert set(data[0]) == _SESSION_KEYS
 
 
 def test_ps_json_kind_filter_parity(tmp_path: Path) -> None:
@@ -262,22 +251,6 @@ def test_ps_quiet_with_json_exits_two() -> None:
     assert "quiet" in result.stderr.lower()
 
 
-def test_ps_json_stdout_is_data_only(tmp_path: Path) -> None:
-    """``ps --json`` suppresses the human-mode active-server banner."""
-    config_path = tmp_path / "config.yaml"
-
-    with (
-        _patch_config(config_path),
-        patch("canfar.cli.ps.AsyncSession") as session_cls,
-    ):
-        session = _mock_async_session(session_cls)
-        session.fetch.return_value = []
-        result = runner.invoke(ps, ["--json"])
-
-    assert result.exit_code == 0
-    assert not result.stdout.startswith("@")
-
-
 def test_ps_allows_empty_running_view() -> None:
     """Test ps reports empty running view when only completed sessions exist."""
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
@@ -294,7 +267,7 @@ def test_ps_allows_empty_running_view() -> None:
         result = runner.invoke(ps, [])
 
     assert result.exit_code == 0
-    assert "No pending or running sessions found" in result.stdout
+    assert "No pending or running sessions found" in result.stderr
 
 
 def test_stats_outputs_cluster_tables() -> None:
@@ -306,12 +279,12 @@ def test_stats_outputs_cluster_tables() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, ["--debug"])
+        result = runner.invoke(stats, [])
 
     assert result.exit_code == 0
     assert "CANFAR Platform Load" in result.stdout
     assert "Maximum Requests Size" in result.stdout
-    session_cls.assert_called_once_with(loglevel="DEBUG")
+    session_cls.assert_called_once_with()
 
 
 def test_stats_renders_only_cpu_and_ram_columns() -> None:
@@ -328,7 +301,7 @@ def test_stats_renders_only_cpu_and_ram_columns() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, ["--debug"])
+        result = runner.invoke(stats, [])
 
     assert result.exit_code == 0
     # The CPU/RAM table and its values are rendered.

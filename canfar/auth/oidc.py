@@ -3,24 +3,30 @@
 from __future__ import annotations
 
 import asyncio
-import contextlib
-import math
 import socket
 import time
-import webbrowser
-from typing import Any
+from collections.abc import Awaitable, Callable, Generator
+from contextlib import contextmanager
+from typing import TYPE_CHECKING, Any
 
 import httpx
-import segno
-from pydantic import SecretStr
-from rich.progress import BarColumn, Progress, TextColumn, TimeRemainingColumn
+from authlib.integrations.base_client.errors import OAuthError
+from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
+from pydantic import SecretStr, ValidationError
 
 from canfar import get_logger
-from canfar.models.auth import OIDC
-from canfar.utils import jwt
-from canfar.utils.console import console
+from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Token
+
+if TYPE_CHECKING:
+    from authlib.integrations.httpx_client import AsyncOAuth2Client
 
 log = get_logger(__name__)
+_BASIC_AUTH_METHOD = "client_secret_basic"
+
+DeviceFlow = Callable[
+    [str, str, str, str, "AsyncOAuth2Client"],
+    Awaitable[dict[str, Any]],
+]
 
 
 class AuthPendingError(Exception):
@@ -31,13 +37,19 @@ class SlowDownError(Exception):
     """Exception raised when the client should slow down its requests."""
 
 
-async def discover(url: str, client: httpx.AsyncClient | None = None) -> dict[str, Any]:
+async def discover(
+    url: str,
+    client: httpx.AsyncClient | None = None,
+    *,
+    expected_issuer: str,
+) -> dict[str, Any]:
     """Discover OIDC provider configuration.
 
     Args:
         url (str): OIDC Discovery URL.
         client (httpx.AsyncClient | None, optional): Optional async HTTP client.
             If None, creates a new one. Defaults to None.
+        expected_issuer: Exact issuer configured for the Identity Provider.
 
     Returns:
         dict[str, Any]: OIDC provider configuration.
@@ -51,6 +63,21 @@ async def discover(url: str, client: httpx.AsyncClient | None = None) -> dict[st
         response = await client.get(url)
         response.raise_for_status()
         data = response.json()
+
+    if data.get("issuer") != expected_issuer:
+        msg = "OIDC discovery issuer mismatch"
+        raise ValueError(msg)
+
+    required = {
+        "device_authorization_endpoint",
+        "registration_endpoint",
+        "token_endpoint",
+        "userinfo_endpoint",
+    }
+    missing = sorted(field for field in required if not data.get(field))
+    if missing:
+        msg = f"OIDC discovery missing required metadata: {', '.join(missing)}"
+        raise ValueError(msg)
 
     log.debug("OIDC Discovery Data: %s", data)
     return data
@@ -90,21 +117,17 @@ async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[st
         response.raise_for_status()
         data = response.json()
 
-    log.debug("OIDC Client Registration Data: %s", data)
+    log.debug("OIDC dynamic client registration succeeded.")
     return data
 
 
-async def _poll_token(
-    url: str, identity: str, secret: str, code: str, client: httpx.AsyncClient
-) -> dict[str, Any]:
+async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[str, Any]:
     """Poll for OIDC tokens.
 
     Args:
         url (str): Token endpoint URL.
-        identity (str): Client ID.
-        secret (str): Client secret.
         code (str): Device code.
-        client (httpx.AsyncClient): Async HTTP client.
+        client: Authlib async OAuth client.
 
     Returns:
         dict[str, Any]: Token response data.
@@ -114,27 +137,60 @@ async def _poll_token(
         SlowDownError: When client should slow down requests.
         ValueError: For unknown errors.
     """
-    resp = await client.post(
-        url,
-        data={
-            "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
-            "device_code": code,
-            "client_id": identity,
-            "client_secret": secret,
-        },
-        auth=(identity, secret),
-    )
-    data: dict[str, Any] = resp.json()
-    log.debug("OIDC Token Response: %s", data)
-    if resp.status_code == 200:
-        return data
-    err = data.get("error")
-    if err == "authorization_pending":
-        raise AuthPendingError
-    if err == "slow_down":
-        raise SlowDownError
-    msg = f"Unknown error in polling for tokens: {err}"
-    raise ValueError(msg)
+    try:
+        token: dict[str, Any] = await client.fetch_token(
+            url,
+            grant_type=DEVICE_CODE_GRANT_TYPE,
+            device_code=code,
+        )
+    except OAuthError as error:
+        if error.error == "authorization_pending":
+            raise AuthPendingError from None
+        if error.error == "slow_down":
+            raise SlowDownError from None
+        if error.error == "access_denied":
+            msg = "OIDC device authorization was denied"
+            raise PermissionError(msg) from None
+        if error.error == "expired_token":
+            msg = "OIDC device authorization expired"
+            raise TimeoutError(msg) from None
+        msg = "OIDC device authorization failed"
+        raise ValueError(msg) from None
+    except httpx.HTTPStatusError:
+        msg = "OIDC device authorization failed"
+        raise ValueError(msg) from None
+    except ValueError:
+        msg = "OIDC device authorization failed: malformed token response"
+        raise ValueError(msg) from None
+    if not isinstance(token, dict) or "access_token" not in token:
+        msg = "OIDC device authorization failed: malformed token response"
+        raise ValueError(msg)
+    return token
+
+
+@contextmanager
+def _map_refresh_errors() -> Generator[None, None, None]:
+    """Map Authlib/httpx refresh failures to the fixed, secret-safe messages."""
+    try:
+        yield
+    except (OAuthError, httpx.HTTPError):
+        msg = "OIDC token refresh failed"
+        raise ValueError(msg) from None
+    except (TypeError, ValueError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
+
+
+def _validated_refresh(refreshed: Any) -> dict[str, Any]:
+    """Return the refreshed token mapping, or raise on a malformed response."""
+    if (
+        not isinstance(refreshed, dict)
+        or not isinstance(refreshed.get("access_token"), str)
+        or not refreshed["access_token"]
+    ):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    return dict(refreshed)
 
 
 async def refresh(
@@ -142,7 +198,7 @@ async def refresh(
     identity: str,
     secret: str,
     token: str,
-) -> SecretStr:
+) -> dict[str, Any]:
     """Refresh OIDC access token using refresh token.
 
     Args:
@@ -152,41 +208,23 @@ async def refresh(
         token (str): Refresh token.
 
     Returns:
-        pydantic.SecretStr: New access token.
+        Complete Authlib token mapping.
 
     Raises:
-        httpx.HTTPStatusError: For HTTP errors.
-        KeyError: If refresh token is invalid or expired.
-        Exception: For other errors.
+        ValueError: If the token response does not contain an access token.
     """
-    payload: dict[str, Any] = {
-        "grant_type": "refresh_token",
-        "refresh_token": token,
-        "client_id": identity,
-        "client_secret": secret,
-    }
+    from authlib.integrations.httpx_client import (  # noqa: PLC0415
+        AsyncOAuth2Client,
+    )
 
-    try:
-        async with httpx.AsyncClient() as client:
-            log.debug("Refreshing OIDC access token")
-            response = await client.post(url, data=payload, auth=(identity, secret))
-            response.raise_for_status()
-            data: dict[str, Any] = response.json()
-            log.debug("refresh http request successful")
-            access: SecretStr = SecretStr(data["access_token"])
-            return access
-    except httpx.HTTPStatusError as error:
-        msg = "HTTP error while refreshing OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except KeyError as error:
-        msg = "server response does not contain access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except Exception as error:
-        msg = "Failed to refresh OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
+    with _map_refresh_errors():
+        async with AsyncOAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as client:
+            refreshed = await client.refresh_token(url, refresh_token=token)
+    return _validated_refresh(refreshed)
 
 
 def sync_refresh(
@@ -194,7 +232,7 @@ def sync_refresh(
     identity: str,
     secret: str,
     token: str,
-) -> SecretStr:
+) -> dict[str, Any]:
     """Refresh OIDC access token using refresh token.
 
     Args:
@@ -204,41 +242,23 @@ def sync_refresh(
         token (str): Refresh token.
 
     Returns:
-        pydantic.SecretStr: New access token.
+        Complete Authlib token mapping.
 
     Raises:
-        httpx.HTTPStatusError: For HTTP errors.
-        KeyError: If refresh token is invalid or expired.
-        Exception: For other errors.
+        ValueError: If the token response does not contain an access token.
     """
-    payload: dict[str, Any] = {
-        "grant_type": "refresh_token",
-        "refresh_token": token,
-        "client_id": identity,
-        "client_secret": secret,
-    }
+    from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
 
-    try:
-        with httpx.Client() as client:
-            log.debug("Refreshing OIDC access token")
-            response = client.post(url, data=payload, auth=(identity, secret))
-            response.raise_for_status()
-            data: dict[str, Any] = response.json()
-            log.debug("refresh http request successful")
-            access: SecretStr = SecretStr(data["access_token"])
-            return access
-    except httpx.HTTPStatusError as error:
-        msg = "HTTP error while refreshing OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except KeyError as error:
-        msg = "server response does not contain access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
-    except Exception as error:
-        msg = "Failed to refresh OIDC access token"
-        log.exception(msg)
-        raise ValueError(msg) from error
+    with (
+        _map_refresh_errors(),
+        OAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as client,
+    ):
+        refreshed = client.refresh_token(url, refresh_token=token)
+    return _validated_refresh(refreshed)
 
 
 async def authflow(
@@ -246,7 +266,7 @@ async def authflow(
     token_url: str,
     identity: str,
     secret: str,
-    client: httpx.AsyncClient | None = None,
+    client: AsyncOAuth2Client | None = None,
 ) -> dict[str, Any]:
     """OIDC Authorization Flow.
 
@@ -255,49 +275,98 @@ async def authflow(
         token_url (str): Token endpoint.
         identity (str): Client identity.
         secret (str): Client secret.
-        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+        client: Optional Authlib async OAuth client.
             If None, creates a new one. Defaults to None.
 
     Returns:
         dict[str, Any]: OIDC tokens including access and refresh tokens.
     """
-    payload: dict[str, Any] = {
-        "client_id": identity,
-        "scope": "openid profile email offline_access",
-    }
-
     if client is None:
-        async with httpx.AsyncClient() as http_client:
+        from authlib.integrations.httpx_client import (  # noqa: PLC0415
+            AsyncOAuth2Client,
+        )
+
+        async with AsyncOAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as http_client:
             return await _authflow_impl(
-                device_auth_url, token_url, identity, secret, payload, http_client
+                device_auth_url, token_url, identity, secret, http_client
             )
     else:
         return await _authflow_impl(
-            device_auth_url, token_url, identity, secret, payload, client
+            device_auth_url,
+            token_url,
+            identity,
+            secret,
+            client,
         )
 
 
-async def _cancel_pending_tasks(pending: set[asyncio.Task[Any]]) -> None:
-    """Cancel pending tasks gracefully.
+async def start_device_authorization(
+    url: str,
+    identity: str,
+    secret: str,
+    client: httpx.AsyncClient,
+) -> DeviceAuthorization:
+    """Request an OIDC device authorization challenge.
 
     Args:
-        pending (set[asyncio.Task[Any]]): Set of pending tasks to cancel.
-    """
-    for task in pending:
-        task.cancel()
+        url: Device authorization endpoint.
+        identity: Registered client ID.
+        secret: Registered client secret.
+        client: Async HTTP client.
 
-    # Wait for cancelled tasks to finish gracefully
-    for task in pending:
-        with contextlib.suppress(asyncio.CancelledError):
-            await task
+    Returns:
+        Typed challenge data suitable for a caller-owned presentation layer.
+    """
+    response = await client.post(
+        url,
+        data={
+            "client_id": identity,
+            "scope": "openid profile email offline_access",
+        },
+        auth=(identity, secret),
+    )
+    response.raise_for_status()
+    try:
+        challenge = DeviceAuthorization.model_validate(response.json())
+    except ValidationError:
+        msg = "Invalid OIDC device authorization response"
+        raise ValueError(msg) from None
+    log.debug("OIDC device authorization challenge received")
+    return challenge
+
+
+async def poll_device_token(
+    token_url: str,
+    challenge: DeviceAuthorization,
+    client: AsyncOAuth2Client,
+) -> dict[str, Any]:
+    """Poll for tokens for an OIDC device authorization challenge.
+
+    Args:
+        token_url: Token endpoint.
+        challenge: Challenge returned by :func:`start_device_authorization`.
+        client: Authlib async OAuth client configured for the registered client.
+
+    Returns:
+        OIDC token response data.
+    """
+    return await _poll_with_backoff(
+        token_url,
+        challenge.device_code.get_secret_value(),
+        client,
+        challenge.interval,
+        challenge.expires_in,
+    )
 
 
 async def _poll_with_backoff(
     token_url: str,
-    identity: str,
-    secret: str,
     code: str,
-    client: httpx.AsyncClient,
+    client: AsyncOAuth2Client,
     initial_interval: int,
     expires: int,
 ) -> dict[str, Any]:
@@ -305,10 +374,8 @@ async def _poll_with_backoff(
 
     Args:
         token_url (str): Token endpoint URL.
-        identity (str): Client ID.
-        secret (str): Client secret.
         code (str): Device code.
-        client (httpx.AsyncClient): Async HTTP client.
+        client: Authlib async OAuth client.
         initial_interval (int): Initial polling interval in seconds.
         expires (int): Expiration time in seconds.
 
@@ -319,26 +386,23 @@ async def _poll_with_backoff(
         TimeoutError: When the device flow times out.
     """
     interval = initial_interval
-    count: int = 0
-    start: float = time.time()
+    deadline = time.monotonic() + expires
 
-    while True:
+    while time.monotonic() < deadline:
         try:
-            return await _poll_token(token_url, identity, secret, code, client)
+            return await _poll_token(token_url, code, client)
         except AuthPendingError:
-            await asyncio.sleep(interval)
+            pass
         except SlowDownError:
-            # bump the slow_count and recompute interval
-            count += 1
-            interval = max(
-                interval,
-                int(interval * (1 + math.log(count + 1))),
-            )
-            await asyncio.sleep(interval)
-        # check timeout
-        if time.time() - start > expires:
-            msg = "Device flow timed out"
-            raise TimeoutError(msg)
+            interval += 5
+        except httpx.TransportError:
+            interval *= 2
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            await asyncio.sleep(min(interval, remaining))
+
+    msg = "Device flow timed out"
+    raise TimeoutError(msg)
 
 
 async def _authflow_impl(
@@ -346,8 +410,7 @@ async def _authflow_impl(
     token_url: str,
     identity: str,
     secret: str,
-    payload: dict[str, Any],
-    client: httpx.AsyncClient,
+    client: AsyncOAuth2Client,
 ) -> dict[str, Any]:
     """Implementation of the auth flow with an existing client.
 
@@ -356,8 +419,7 @@ async def _authflow_impl(
         token_url (str): Token endpoint.
         identity (str): Client identity.
         secret (str): Client secret.
-        payload (dict[str, Any]): Request payload for device authorization.
-        client (httpx.AsyncClient): Async HTTP client.
+        client: Authlib async OAuth client.
 
     Returns:
         dict[str, Any]: OIDC tokens including access and refresh tokens.
@@ -365,148 +427,117 @@ async def _authflow_impl(
     Raises:
         TimeoutError: When the device flow times out.
     """
-    response = await client.post(device_auth_url, data=payload, auth=(identity, secret))
-    response.raise_for_status()
-    verification = response.json()
-    log.debug("OIDC Device Authorization Response: %s", verification)
-
-    # Verification Details
-    uri: str = str(verification["verification_uri_complete"])
-    expires: int = int(verification["expires_in"])
-    interval: int = int(verification.get("interval", 5))
-    code: str = str(verification["device_code"])
-
-    console.print("[green]✓[/green] Follow the link below to authorize:")
-    console.print(f"\n  {uri}\n")
-    qr = segno.make(uri, error="H")
-    qr.terminal(compact=True)
-
-    try:
-        webbrowser.get().open(uri, new=2)
-    except webbrowser.Error:
-        console.print("[yellow]Failed to open browser. Please visit the URL manually.")
-
-    progress = Progress(
-        TextColumn("[bold blue]{task.description}"),
-        BarColumn(bar_width=None),
-        TimeRemainingColumn(),
+    challenge = await start_device_authorization(
+        device_auth_url,
+        identity,
+        secret,
+        client,
     )
-    task_id = progress.add_task("Waiting for approval", total=expires)
 
-    async def poll_loop() -> dict[str, Any]:
-        """Poll for tokens with exponential backoff."""
-        return await _poll_with_backoff(
-            token_url, identity, secret, code, client, interval, expires
-        )
-
-    async def progress_updater() -> None:
-        """Update progress bar every second."""
-        elapsed = 0
-        while elapsed < expires:
-            await asyncio.sleep(1)
-            elapsed += 1
-            progress.update(task_id, advance=1)
-
-    # Run progress bar and polling concurrently
-    with progress:
-        try:
-            # Create tasks for concurrent execution
-            poll_task = asyncio.create_task(poll_loop())
-            progress_task = asyncio.create_task(progress_updater())
-
-            # Wait for the polling task to complete
-            done, pending = await asyncio.wait(
-                [poll_task, progress_task],
-                return_when=asyncio.FIRST_COMPLETED,
-                timeout=expires + 5,  # Add small buffer
-            )
-
-            # Cancel any remaining tasks
-            await _cancel_pending_tasks(pending)
-
-            # Check if polling completed successfully
-            if poll_task in done:
-                return await poll_task
-
-            msg = "Device flow timed out"
-            raise TimeoutError(msg) from None
-
-        except asyncio.TimeoutError as exc:
-            msg = "Device flow timed out"
-            raise TimeoutError(msg) from exc
+    return await poll_device_token(token_url, challenge, client)
 
 
-async def authenticate(oidc: OIDC, *, timeout: int | None = None) -> OIDC:
+async def authenticate_credential(
+    credential: OIDCCredential,
+    *,
+    expected_issuer: str,
+    timeout: int | None = None,
+    device_flow: DeviceFlow | None = None,
+    on_authenticated: Callable[[str | None], None] | None = None,
+) -> OIDCCredential:
     """Authenticate using OIDC Device Authorization Flow.
 
     Args:
-        oidc (OIDC): OIDC configuration.
+        credential: Canonical OIDC Authentication Record.
+        expected_issuer: Exact issuer configured for the Identity Provider.
         timeout: HTTP timeout in seconds for OIDC HTTP requests.
+        device_flow: Device authorization coordinator. Defaults to the
+            presentation-free protocol flow.
+        on_authenticated: Optional observer for the authenticated username.
 
     Returns:
-        OIDC: Updated OIDC configuration with tokens.
+        Updated OIDC Authentication Record with tokens.
     """
-    console.print("[bold blue]Starting OIDC Device Authentication[/bold blue]")
-    if timeout is None:
+    request_timeout = None if timeout is None else httpx.Timeout(timeout)
+    if request_timeout is None:
         client_context = httpx.AsyncClient()
     else:
-        client_context = httpx.AsyncClient(timeout=httpx.Timeout(timeout))
+        client_context = httpx.AsyncClient(timeout=request_timeout)
 
     async with client_context as client:
-        response: dict[str, Any] = await discover(str(oidc.endpoints.discovery), client)
-        oidc.endpoints.device = response["device_authorization_endpoint"]
-        oidc.endpoints.registration = response["registration_endpoint"]
-        oidc.endpoints.token = response["token_endpoint"]
+        response: dict[str, Any] = await discover(
+            str(credential.endpoints.discovery),
+            client,
+            expected_issuer=expected_issuer,
+        )
+        credential.endpoints.device = response["device_authorization_endpoint"]
+        credential.endpoints.registration = response["registration_endpoint"]
+        credential.endpoints.token = response["token_endpoint"]
 
         log.debug("Discovered OIDC configuration:")
-        log.debug("Device Registration Endpoint: %s", oidc.endpoints.registration)
-        log.debug("Device Authorization Endpoint: %s", oidc.endpoints.device)
-        log.debug("Token Endpoint: %s", oidc.endpoints.token)
-
-        console.print("[green]✓[/green] OIDC Configuration discovered successfully")
+        log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
+        log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
+        log.debug("Token Endpoint: %s", credential.endpoints.token)
 
         device: dict[str, Any] = await register(
-            str(oidc.endpoints.registration), client
+            str(credential.endpoints.registration), client
         )
-        oidc.client.identity = device["client_id"]
-        oidc.client.secret = SecretStr(device["client_secret"])
+        credential.client.identity = device["client_id"]
+        client_secret = device["client_secret"]
+        credential.client.secret = SecretStr(client_secret)
 
-        console.print("[green]✓[/green] OIDC device registered successfully")
-
-        tokens = await authflow(
-            str(oidc.endpoints.device),
-            str(oidc.endpoints.token),
-            str(oidc.client.identity),
-            oidc.client.secret.get_secret_value() if oidc.client.secret else "",
-            client,
+        from authlib.integrations.httpx_client import (  # noqa: PLC0415
+            AsyncOAuth2Client,
         )
 
-        oidc.token.access = SecretStr(tokens["access_token"])
-        oidc.token.refresh = SecretStr(tokens["refresh_token"])
-        oidc.expiry.refresh = jwt.expiry(oidc.token.refresh.get_secret_value())
-        oidc.expiry.access = jwt.expiry(oidc.token.access.get_secret_value())
+        if request_timeout is None:
+            oauth_context = AsyncOAuth2Client(
+                credential.client.identity,
+                client_secret,
+                token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+            )
+        else:
+            oauth_context = AsyncOAuth2Client(
+                credential.client.identity,
+                client_secret,
+                token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+                timeout=request_timeout,
+            )
 
-        console.print("[green]✓[/green] OIDC device authenticated successfully")
+        async with oauth_context as oauth_client:
+            authorize = device_flow or authflow
+            tokens = await authorize(
+                str(credential.endpoints.device),
+                str(credential.endpoints.token),
+                str(credential.client.identity),
+                client_secret,
+                oauth_client,
+            )
+
+        try:
+            token = Token(
+                access=tokens["access_token"],
+                refresh=tokens.get("refresh_token"),
+                token_type=tokens.get("token_type"),
+                scope=tokens.get("scope"),
+            )
+            expiry = Expiry(access=tokens.get("expires_at"), refresh=None)
+        except (KeyError, TypeError, ValidationError):
+            msg = "OIDC device authorization failed: malformed token response"
+            raise ValueError(msg) from None
+        credential.token, credential.expiry = token, expiry
 
         url: str = response["userinfo_endpoint"]
         headers = {
             "Authorization": (
-                f"Bearer {oidc.token.access.get_secret_value()}"
-                if oidc.token.access
+                f"Bearer {credential.token.access.get_secret_value()}"
+                if credential.token.access
                 else ""
             ),
         }
         user = await client.get(url, headers=headers)
         user.raise_for_status()
         username = user.json().get("preferred_username")
-
-        console.print(f"[green]✓[/green] Successfully authenticated as {username}")
-        return oidc
-
-
-if __name__ == "__main__":
-    oidc_config = OIDC()  # ty: ignore[missing-argument]
-    oidc_config.endpoints.discovery = (
-        "https://ska-iam.stfc.ac.uk/.well-known/openid-configuration"
-    )
-    asyncio.run(authenticate(oidc_config))
+        if on_authenticated is not None:
+            on_authenticated(username)
+        return credential

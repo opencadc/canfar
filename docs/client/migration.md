@@ -12,7 +12,10 @@ This guide helps you migrate from the `skaha` Python package to `canfar`.
   - `headless` session `kind` parameter is no longer required.
   - `session.info()` query now returns `Completed` instead of `Succeeded`.
 - Configuration path: `~/.skaha/config.yaml` → `~/.canfar/config.yaml`.
-- Logger name and location: logger `canfar`; logs under `~/.canfar/client.log`.
+- Logger name: `canfar`. Current releases write no default log file; file output
+  is explicit through root `--log-file` or a `pathlib.Path` passed to
+  `canfar.configure_logging()`. See
+  [Logging](../cli/logging.md).
 - Environment variables: prefix change `SKAHA_…` → `CANFAR_…`.
 - CLI entry point: `canfar` (single entry point).
 - User-Agent header: `python-canfar/{version}`.
@@ -47,10 +50,10 @@ This guide helps you migrate from the `skaha` Python package to `canfar`.
 ## Environment variables
 
 ```bash title="Before"
-`SKAHA_TIMEOUT`, `SKAHA_CONCURRENCY`, `SKAHA_TOKEN`, `SKAHA_URL`, `SKAHA_LOGLEVEL
+SKAHA_TIMEOUT, SKAHA_CONCURRENCY, SKAHA_TOKEN, SKAHA_URL, SKAHA_LOGLEVEL
 ```
 ```bash title="After"
-`CANFAR_TIMEOUT`, `CANFAR_CONCURRENCY`, `CANFAR_TOKEN`, `CANFAR_URL`, `CANFAR_LOGLEVEL`
+CANFAR_TIMEOUT, CANFAR_CONCURRENCY, CANFAR_TOKEN, CANFAR_URL, CANFAR_LOGLEVEL
 ```
 
 ## Configuration

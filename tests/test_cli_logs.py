@@ -34,7 +34,7 @@ def test_logs_outputs_logs_and_empty_message() -> None:
         result = runner.invoke(logs, ["abc"])
 
     assert result.exit_code == 0
-    assert "No logs found" in result.stdout
+    assert "No logs found" in result.stderr
 
 
 def test_logs_reports_fetch_error() -> None:
@@ -45,5 +45,7 @@ def test_logs_reports_fetch_error() -> None:
         result = runner.invoke(logs, ["abc"])
 
     assert result.exit_code == 1
-    assert "Could not fetch logs" in result.stdout
-    assert "boom" in result.stdout
+    assert "Could not fetch logs" not in result.stdout
+    assert "boom" not in result.stdout
+    assert "Could not fetch logs" in result.stderr
+    assert "boom" in result.stderr

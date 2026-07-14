@@ -44,13 +44,18 @@ class TestCatch:
         mock_response.read.assert_called_once()
         mock_response.raise_for_status.assert_called_once()
 
-    def test_catch_redacts_bearer_token_in_error_body(self) -> None:
-        """HTTP status logs redact bearer tokens from response bodies."""
-        request = httpx.Request("GET", "https://example.com/skaha/v1/context")
+    def test_catch_logs_no_response_body_or_query(self) -> None:
+        """HTTP status logs retain safe context without body or query data."""
+        query_secret = "query-secret-sentinel"
+        body_secret = "body-secret-sentinel"
+        request = httpx.Request(
+            "GET",
+            f"https://url-user:url-pass@example.com/skaha/v1/context?token={query_secret}",
+        )
         response = httpx.Response(
             401,
             request=request,
-            text="unhandled auth: Authorization Bearer abc.def.ghi",
+            text=f"provider response {body_secret}",
         )
 
         with (
@@ -59,9 +64,14 @@ class TestCatch:
         ):
             catch(response)
 
-        error_text = " ".join(str(arg) for arg in log.warning.call_args.args)
-        assert "abc.def.ghi" not in error_text
-        assert "Authorization Bearer <redacted>" in error_text
+        logged = repr(log.method_calls)
+        assert query_secret not in logged
+        assert body_secret not in logged
+        assert "url-user" not in logged
+        assert "url-pass" not in logged
+        assert "https://example.com/skaha/v1/context" in logged
+        assert "GET" in logged
+        assert "401" in logged
         assert log.warning.call_args.kwargs["exc_info"] is False
 
     def test_catch_other_http_error(self) -> None:
@@ -175,13 +185,18 @@ class TestACatch:
         mock_response.raise_for_status.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_acatch_redacts_bearer_token_in_error_body(self) -> None:
-        """Async HTTP status logs redact bearer tokens from response bodies."""
-        request = httpx.Request("GET", "https://example.com/skaha/v1/context")
+    async def test_acatch_logs_no_response_body_or_query(self) -> None:
+        """Async HTTP status logs retain safe context without body or query data."""
+        query_secret = "async-query-secret-sentinel"
+        body_secret = "async-body-secret-sentinel"
+        request = httpx.Request(
+            "POST",
+            f"https://url-user:url-pass@example.com/skaha/v1/context?token={query_secret}",
+        )
         response = httpx.Response(
             401,
             request=request,
-            text="unhandled auth: Authorization Bearer abc.def.ghi",
+            text=f"provider response {body_secret}",
         )
 
         with (
@@ -190,9 +205,14 @@ class TestACatch:
         ):
             await acatch(response)
 
-        error_text = " ".join(str(arg) for arg in log.warning.call_args.args)
-        assert "abc.def.ghi" not in error_text
-        assert "Authorization Bearer <redacted>" in error_text
+        logged = repr(log.method_calls)
+        assert query_secret not in logged
+        assert body_secret not in logged
+        assert "url-user" not in logged
+        assert "url-pass" not in logged
+        assert "https://example.com/skaha/v1/context" in logged
+        assert "POST" in logged
+        assert "401" in logged
         assert log.warning.call_args.kwargs["exc_info"] is False
 
     @pytest.mark.asyncio

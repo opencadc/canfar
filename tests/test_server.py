@@ -1,15 +1,18 @@
-"""Behavior tests for the server selection and fetch seam."""
+"""Behavior tests for the server selection and discovery seam."""
 
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx
 import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
 from canfar.errors import ErrorCode
+from canfar.models.active import ActiveConfig
 from canfar.models.auth import OIDCCredential, X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
@@ -20,8 +23,6 @@ from canfar.server import (
     ServerSelectionRequiredError,
     _discover_for_idp,
     _discovered_to_server,
-    _enrich_from_capabilities,
-    _validate_server,
     activate,
     discover,
     use,
@@ -31,13 +32,19 @@ from canfar.server import (
 )
 from tests.helpers.config import assign_servers
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
-_CONTEXT_PAYLOAD = {
-    "cores": {"defaultLimit": 16, "options": [1, 2, 4, 8, 16]},
-    "memoryGB": {"defaultLimit": 192, "options": [1, 2, 4, 8, 16, 32, 64, 128, 192]},
-    "gpus": {"options": [0, 1, 2, 4]},
-}
+
+
+def _http_client_factory(
+    transport: httpx.BaseTransport,
+) -> Callable[..., httpx.Client]:
+    """Return an HTTPX client factory bound to a test transport."""
+    client_type = httpx.Client
+    return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
 def _cadc_server(**updates: object) -> Server:
@@ -52,6 +59,15 @@ def _cadc_server(**updates: object) -> Server:
     }
     base.update(updates)
     return Server(**base)
+
+
+def _anonymous_config(*servers: Server, idp: str = "cadc") -> Configuration:
+    """Build a valid Configuration whose X.509 record has no credential path."""
+    return Configuration(
+        active=ActiveConfig(authentication=idp, server=None),
+        authentication={idp: X509Credential(idp=idp)},
+        servers={server.name: server for server in servers if server.name is not None},
+    )
 
 
 class TestServerList:
@@ -201,7 +217,7 @@ class TestServerUse:
                 config: Configuration,
                 **_kwargs: object,
             ) -> list[Server]:
-                config._upsert_server(discovered)  # noqa: SLF001
+                config.upsert_server(discovered)
                 return [discovered]
 
             with (
@@ -266,128 +282,45 @@ class TestServerUse:
             assert Configuration().active.server == previous
 
 
-class TestServerFetch:
-    """Tests for Server.fetch() and Server.afetch()."""
-
-    def test_fetch_returns_new_model_without_mutating_original(self) -> None:
-        """fetch() returns a populated copy and leaves the source unchanged."""
-        server = _cadc_server()
-        response = MagicMock()
-        response.json.return_value = _CONTEXT_PAYLOAD
-        response.raise_for_status = MagicMock()
-
-        mock_client = MagicMock()
-        mock_client.client.get.return_value = response
-
-        with patch("canfar.client.HTTPClient", return_value=mock_client):
-            populated = server.fetch()
-
-        assert populated is not server
-        assert server.cores == 2
-        assert server.ram == 16
-        assert server.gpus == 0
-        assert populated.cores == 16
-        assert populated.ram == 192
-        assert populated.gpus == 4
-
-    def test_fetch_uses_provided_config_for_http_client(self) -> None:
-        """fetch() authenticates context requests with the provided config."""
-        server = _cadc_server()
-        config = Configuration()
-        response = MagicMock()
-        response.json.return_value = _CONTEXT_PAYLOAD
-        response.raise_for_status = MagicMock()
-
-        mock_client = MagicMock()
-        mock_client.client.get.return_value = response
-
-        with patch("canfar.client.HTTPClient", return_value=mock_client) as factory:
-            server.fetch(timeout=7, config=config)
-
-        factory.assert_called_once()
-        assert factory.call_args.kwargs["config"] is config
-        assert factory.call_args.kwargs["timeout"] == 7
-        assert factory.call_args.kwargs["raise_http_errors"] is False
-
-    @pytest.mark.asyncio
-    async def test_afetch_returns_new_model_without_mutating_original(self) -> None:
-        """afetch() returns a populated copy and leaves the source unchanged."""
-        server = _cadc_server()
-        response = MagicMock()
-        response.json.return_value = _CONTEXT_PAYLOAD
-        response.raise_for_status = MagicMock()
-
-        mock_client = MagicMock()
-        mock_client.asynclient.get = AsyncMock(return_value=response)
-
-        with patch("canfar.client.HTTPClient", return_value=mock_client):
-            populated = await server.afetch()
-
-        assert populated is not server
-        assert populated.cores == 16
-        assert populated.ram == 192
-        assert populated.gpus == 4
-
-    @pytest.mark.asyncio
-    async def test_fetch_and_afetch_return_equivalent_models(self) -> None:
-        """Sync and async fetch variants produce equivalent validated state."""
-        server = _cadc_server()
-        response = MagicMock()
-        response.json.return_value = _CONTEXT_PAYLOAD
-        response.raise_for_status = MagicMock()
-
-        sync_client = MagicMock()
-        sync_client.client.get.return_value = response
-        async_client = MagicMock()
-        async_client.asynclient.get = AsyncMock(return_value=response)
-
-        with patch("canfar.client.HTTPClient", side_effect=[sync_client, async_client]):
-            sync_result = server.fetch()
-            async_result = await server.afetch()
-
-        assert sync_result.model_dump() == async_result.model_dump()
-
-    def test_fetch_applies_defaults_when_context_unavailable(self) -> None:
-        """fetch() returns default resource settings when context fetch fails."""
-        server = _cadc_server()
-        mock_client = MagicMock()
-        mock_client.client.get.side_effect = OSError("connection refused")
-
-        with patch("canfar.client.HTTPClient", return_value=mock_client):
-            populated = server.fetch()
-
-        assert populated is not server
-        assert populated.cores == 2
-        assert populated.ram == 16
-        assert populated.gpus == 0
-
-    @pytest.mark.asyncio
-    async def test_afetch_applies_defaults_when_context_unavailable(self) -> None:
-        """afetch() returns default resource settings when context fetch fails."""
-        server = _cadc_server()
-        mock_client = MagicMock()
-        mock_client.asynclient.get = AsyncMock(
-            side_effect=OSError("connection refused"),
-        )
-
-        with patch("canfar.client.HTTPClient", return_value=mock_client):
-            populated = await server.afetch()
-
-        assert populated is not server
-        assert populated.cores == 2
-        assert populated.ram == 16
-        assert populated.gpus == 0
-
-    def test_fetch_requires_url_and_version(self) -> None:
-        """fetch() rejects servers missing URL or API version."""
-        server = _cadc_server(version=None)
-
-        with pytest.raises(ValueError, match="URL and version"):
-            server.fetch()
-
-
 class TestServerDiscovery:
     """Tests for IDP-scoped discovery helpers."""
+
+    def test_discover_returns_canonical_state_for_duplicate_server_names(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Returned and saved discovery state share one deterministic winner."""
+        alpha = _cadc_server(
+            name="Alpha",
+            uri=AnyUrl("ivo://alpha.example/skaha"),
+            url=AnyHttpUrl("https://alpha.example/skaha"),
+        )
+        earlier = _cadc_server(
+            name="Duplicate",
+            uri=AnyUrl("ivo://a.example/skaha"),
+            url=AnyHttpUrl("https://a.example/skaha"),
+        )
+        winner = _cadc_server(
+            name="Duplicate",
+            uri=AnyUrl("ivo://z.example/skaha"),
+            url=AnyHttpUrl("https://z.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar.server._discover_for_idp",
+                return_value=[winner, alpha, earlier],
+            ),
+        ):
+            config = _anonymous_config()
+            discovered = discover("cadc", config=config)
+            persisted = Configuration()
+
+        assert discovered == [alpha, winner]
+        assert list(config.servers.values()) == discovered
+        assert list(persisted.servers.values()) == discovered
 
     def test_discover_merges_servers_through_public_api(self, tmp_path: Path) -> None:
         """Public discovery persists newly discovered servers for an IDP."""
@@ -411,6 +344,116 @@ class TestServerDiscovery:
         assert str(saved.get_server_by_uri("ivo://cadc.example/skaha").url) == (
             "https://cadc.example/skaha"
         )
+
+    @pytest.mark.parametrize(
+        "capabilities_case",
+        [
+            "empty",
+            "malformed",
+            "network",
+            "non-success",
+            "partial",
+            "success",
+            "timeout",
+        ],
+    )
+    def test_discover_merges_only_complete_capability_metadata(
+        self,
+        tmp_path: Path,
+        capabilities_case: str,
+    ) -> None:
+        """Discovery updates endpoint facts without replacing known optional data."""
+        registry_url = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+        registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
+
+        def registry_response(request: httpx.Request) -> httpx.Response:
+            if request.method == "GET" and str(request.url) == registry_url:
+                return httpx.Response(200, text=registry_body, request=request)
+            if request.method == "HEAD" and str(request.url) == _CADC_URL:
+                return httpx.Response(200, request=request)
+            message = f"Unexpected request: {request.method} {request.url}"
+            raise AssertionError(message)
+
+        async_transport = httpx.MockTransport(registry_response)
+        partial = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-2">
+                <interface>
+                  <accessURL use="base">https://ws-uv.canfar.net/skaha/v2</accessURL>
+                </interface>
+              </capability>
+            </capabilities>
+        """
+        success = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-2">
+                <interface>
+                  <accessURL use="base">https://ws-uv.canfar.net/skaha/v2.1</accessURL>
+                  <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def capabilities_response(request: httpx.Request) -> httpx.Response:
+            if capabilities_case == "network":
+                message = "connection refused"
+                raise httpx.ConnectError(message, request=request)
+            if capabilities_case == "timeout":
+                message = "timed out"
+                raise httpx.ReadTimeout(message, request=request)
+            if capabilities_case == "non-success":
+                return httpx.Response(503, request=request)
+            content = {
+                "empty": "",
+                "malformed": "<capabilities>",
+                "partial": partial,
+                "success": success,
+            }[capabilities_case]
+            return httpx.Response(200, text=content, request=request)
+
+        capabilities_transport = httpx.MockTransport(capabilities_response)
+        real_async_client = httpx.AsyncClient
+        known = _cadc_server(
+            name="canfar",
+            cores=8,
+            ram=64,
+            gpus=1,
+            status="reachable",
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config(known)
+            config.save()
+
+            with (
+                patch(
+                    "canfar.utils.discover.httpx.AsyncClient",
+                    side_effect=lambda **_kwargs: real_async_client(
+                        transport=async_transport,
+                    ),
+                ),
+                patch(
+                    "canfar.client.Client",
+                    side_effect=_http_client_factory(capabilities_transport),
+                ),
+            ):
+                discovered = discover("cadc", config=config)
+
+            persisted = Configuration().servers["canfar"]
+
+        expected = (
+            known.model_copy(
+                update={"version": "v2.1", "auths": ["oidc"]},
+                deep=True,
+            )
+            if capabilities_case == "success"
+            else known
+        )
+        assert discovered == [expected]
+        assert config.servers["canfar"] == expected
+        assert persisted == expected
 
     def test_activate_without_selector_requires_prompt_for_multiple_servers(
         self,
@@ -535,7 +578,7 @@ class TestServerDiscovery:
         )
         mock_discovery = AsyncMock()
         mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
-        mock_discovery.extract.return_value = [endpoint]
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
         mock_discovery.check = AsyncMock(side_effect=lambda item: item)
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
@@ -545,8 +588,11 @@ class TestServerDiscovery:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.server.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server._enrich_from_capabilities",
-                side_effect=lambda item, **_kwargs: item.model_copy(deep=True),
+                "canfar.server.enrich",
+                side_effect=lambda item, **_kwargs: item.model_copy(
+                    update={"version": "v1", "auths": ["oidc"]},
+                    deep=True,
+                ),
             ),
             patch("canfar.server.Configuration", Configuration),
         ):
@@ -572,7 +618,7 @@ class TestServerDiscovery:
 
         mock_discovery = AsyncMock()
         mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
-        mock_discovery.extract.return_value = [endpoint]
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
         mock_discovery.check = AsyncMock(side_effect=lambda item: item)
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
@@ -580,7 +626,7 @@ class TestServerDiscovery:
         with (
             patch("canfar.server.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server._enrich_from_capabilities",
+                "canfar.server.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
                     update={"version": "v1", "auths": ["x509"]},
                     deep=True,
@@ -604,12 +650,23 @@ class TestServerDiscovery:
             status=200,
             name="Broken",
         )
+        transport = httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                text="<capabilities>",
+                request=request,
+            )
+        )
 
         with patch(
-            "canfar.models.http.vosi.capabilities",
-            side_effect=ValueError("mismatched tag"),
+            "canfar.client.Client",
+            side_effect=_http_client_factory(transport),
         ):
-            server = _discovered_to_server(endpoint, "srcnet")
+            server = _discovered_to_server(
+                endpoint,
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
 
         assert server.idp == "srcnet"
         assert server.name == "Broken"
@@ -625,47 +682,24 @@ class TestServerDiscovery:
             status=200,
             name=None,
         )
+        transport = httpx.MockTransport(
+            lambda request: httpx.Response(
+                503,
+                request=request,
+            )
+        )
 
         with patch(
-            "canfar.models.http.vosi.capabilities",
-            side_effect=ValueError("unreachable"),
+            "canfar.client.Client",
+            side_effect=_http_client_factory(transport),
         ):
-            server = _discovered_to_server(endpoint, "srcnet")
+            server = _discovered_to_server(
+                endpoint,
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
 
         assert server.name == "swesrc-chalmers-se"
-
-    def test_enrich_from_capabilities_non_strict_returns_server_on_failure(
-        self,
-    ) -> None:
-        """Non-strict enrichment preserves registry metadata for listing."""
-        server = _cadc_server(version=None, auths=None)
-
-        with (
-            patch(
-                "canfar.models.http.vosi.capabilities",
-                side_effect=ValueError("mismatched tag"),
-            ),
-            patch("canfar.server.log") as log,
-        ):
-            enriched = _enrich_from_capabilities(server, strict=False)
-
-        assert enriched.version is None
-        assert enriched.auths is None
-        log.debug.assert_called_once()
-        log.warning.assert_not_called()
-
-    def test_enrich_from_capabilities_strict_raises_on_failure(self) -> None:
-        """Strict enrichment fails when capabilities cannot be parsed."""
-        server = _cadc_server(version=None, auths=None)
-
-        with (
-            patch(
-                "canfar.models.http.vosi.capabilities",
-                side_effect=ValueError("mismatched tag"),
-            ),
-            pytest.raises(ServerFetchError, match="Failed to fetch capabilities"),
-        ):
-            _enrich_from_capabilities(server, strict=True)
 
     @pytest.mark.asyncio
     async def test_discover_for_idp_raises_when_registry_fetch_fails(self) -> None:
@@ -692,7 +726,7 @@ class TestServerDiscovery:
             MagicMock(name="CADC", success=True, content="prod"),
             MagicMock(name="CADC@keel-dev", success=True, content="dev"),
         ]
-        mock_discovery.extract.return_value = []
+        mock_discovery.extract = MagicMock(return_value=[])
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
@@ -707,91 +741,6 @@ class TestServerDiscovery:
         )
         assert factory.call_args.kwargs["timeout"] == 11
         assert mock_discovery.extract.call_args.kwargs["dev"] is True
-
-    def test_validate_server_honors_timeout(self) -> None:
-        """Server validation passes login timeout to capabilities and fetch."""
-        server = _cadc_server(version=None, auths=None)
-        fetched = server.model_copy(
-            update={"version": "v1", "auths": ["x509"], "cores": 16},
-            deep=True,
-        )
-
-        with (
-            patch.object(
-                Server,
-                "capabilities",
-                return_value=[
-                    {
-                        "baseurl": _CADC_URL,
-                        "version": "v1",
-                        "auth_modes": ["x509"],
-                    }
-                ],
-            ) as capabilities,
-            patch.object(Server, "fetch", return_value=fetched) as fetch,
-        ):
-            validated = _validate_server(server, timeout=13)
-
-        assert validated.cores == 16
-        capabilities.assert_called_once_with(timeout=13)
-        fetch.assert_called_once()
-        assert fetch.call_args.kwargs["timeout"] == 13
-        assert isinstance(fetch.call_args.kwargs["config"], Configuration)
-
-    def test_validate_server_uses_candidate_authentication_pair(self) -> None:
-        """Validation uses the selected IDP before active state is saved."""
-        cadc = _cadc_server(version=None, auths=None)
-        srcnet = _cadc_server(
-            idp="srcnet",
-            name="SRCNet",
-            uri=AnyUrl("ivo://srcnet.example/skaha"),
-            url=AnyHttpUrl("https://srcnet.example/skaha"),
-            auths=["oidc"],
-        )
-        config = Configuration()
-        config.authentication = {
-            "srcnet": OIDCCredential(idp="srcnet"),
-            "cadc": X509Credential(
-                idp="cadc", path=Path("/cadc.pem"), expiry=9999999999.0
-            ),
-        }
-        assign_servers(config, srcnet, cadc)
-        config.active = config.active.model_copy(
-            update={"authentication": "srcnet", "server": "SRCNet"}
-        )
-        captured: dict[str, Configuration] = {}
-
-        def fetch(
-            self: Server,
-            *,
-            timeout: int | None = None,
-            config: Configuration | None = None,
-        ) -> Server:
-            assert timeout == 5
-            assert config is not None
-            captured["config"] = config
-            return self
-
-        with (
-            patch.object(
-                Server,
-                "capabilities",
-                return_value=[
-                    {
-                        "baseurl": _CADC_URL,
-                        "version": "v1",
-                        "auth_modes": ["x509"],
-                    }
-                ],
-            ),
-            patch.object(Server, "fetch", fetch),
-        ):
-            _validate_server(cadc, config=config, idp="cadc", timeout=5)
-
-        validation_config = captured["config"]
-        assert validation_config.active.authentication == "cadc"
-        assert validation_config.active.server == "CADC-CANFAR"
-        assert config.active.authentication == "srcnet"
 
 
 class TestServerModelFields:

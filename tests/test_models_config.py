@@ -11,7 +11,14 @@ import yaml
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar.models.active import ActiveConfig
-from canfar.models.auth import OIDCCredential, X509Credential
+from canfar.models.auth import (
+    Client,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
+    X509Credential,
+)
 from canfar.models.config import Configuration, _CanfarEnvSettingsSource
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
@@ -239,7 +246,21 @@ class TestConfigurationSerialization:
 
     def test_complex_round_trip_serialization(self, tmp_path: Path) -> None:
         """Complex configuration can be saved and loaded back."""
-        oidc = OIDCCredential(idp="srcnet")
+        oidc = OIDCCredential(
+            idp="srcnet",
+            endpoints=Endpoint(
+                discovery="https://example.com/.well-known/openid-configuration",
+                token="https://example.com/token",
+            ),
+            client=Client(identity="client-id", secret="client-secret"),
+            token=Token(
+                access="access-token",
+                refresh="refresh-token",
+                token_type="Bearer",
+                scope="openid profile email",
+            ),
+            expiry=Expiry(access=1893456000),
+        )
         x509 = X509Credential(
             idp="cadc",
             path=Path("/custom/path/cert.pem"),
@@ -282,7 +303,18 @@ class TestConfigurationSerialization:
 
         assert loaded.active.authentication == "srcnet"
         assert loaded.registry.username == "test-user"
-        assert isinstance(loaded.authentication["srcnet"], OIDCCredential)
+        loaded_oidc = loaded.authentication["srcnet"]
+        assert isinstance(loaded_oidc, OIDCCredential)
+        assert loaded_oidc.client.secret is not None
+        assert loaded_oidc.client.secret.get_secret_value() == "client-secret"
+        assert loaded_oidc.token.access is not None
+        assert loaded_oidc.token.access.get_secret_value() == "access-token"
+        assert loaded_oidc.token.refresh is not None
+        assert loaded_oidc.token.refresh.get_secret_value() == "refresh-token"
+        assert loaded_oidc.token.token_type == "Bearer"
+        assert loaded_oidc.token.scope == "openid profile email"
+        assert loaded_oidc.expiry.access == 1893456000
+        assert loaded_oidc.expiry.refresh is None
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""
@@ -291,6 +323,86 @@ class TestConfigurationSerialization:
         with patch("canfar.models.config.CONFIG_PATH", nested_path):
             config.save()
         assert nested_path.exists()
+
+    def test_failed_serialization_preserves_existing_configuration(
+        self, tmp_path: Path
+    ) -> None:
+        """A failed save cannot truncate the last valid configuration."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+        original = b"version: 1\nmarker: keep-me\n"
+        config_path.write_bytes(original)
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar.config.store.yaml.dump",
+                side_effect=TypeError("cannot serialize"),
+            ),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert config_path.read_bytes() == original
+
+    def test_invalid_assignment_cannot_replace_last_valid_configuration(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Saving validates assignment-mutated state before atomic replacement."""
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.save()
+            original = config_path.read_bytes()
+            config.active.authentication = "missing"
+
+            with pytest.raises(OSError, match="Failed to save configuration"):
+                config.save()
+
+            loaded = Configuration()
+
+        assert config_path.read_bytes() == original
+        assert loaded.active.authentication == "cadc"
+        assert set(tmp_path.iterdir()) == {config_path}
+
+    def test_failed_replacement_preserves_existing_configuration(
+        self, tmp_path: Path
+    ) -> None:
+        """A failed atomic replacement leaves no partial configuration behind."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+        original = b"version: 1\nmarker: keep-me\n"
+        config_path.write_bytes(original)
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar.config.store.Path.replace",
+                side_effect=OSError("cannot replace"),
+            ),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert config_path.read_bytes() == original
+        assert set(tmp_path.iterdir()) == {config_path}
+
+    def test_failed_first_write_leaves_no_configuration(self, tmp_path: Path) -> None:
+        """A failed first save leaves neither a target nor temporary file."""
+        config = Configuration()
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.config.store.os.fsync", side_effect=OSError("disk full")),
+            pytest.raises(OSError, match="Failed to save configuration"),
+        ):
+            config.save()
+
+        assert not config_path.exists()
+        assert list(tmp_path.iterdir()) == []
 
     def test_yaml_file_content_structure(self, tmp_path: Path) -> None:
         """Saved YAML uses current top-level keys."""

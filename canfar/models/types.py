@@ -25,6 +25,3 @@ Status: TypeAlias = Literal[
 
 View: TypeAlias = Literal["all"]
 """Session view constants."""
-
-Mode: TypeAlias = Literal["x509", "oidc", "token", "default"]
-"""Authentication mode constants."""

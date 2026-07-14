@@ -50,23 +50,6 @@ class TestCreateParameters:
         assert env_vars["REPLICA_ID"] == "1"
         assert env_vars["REPLICA_COUNT"] == "1"
 
-    def test_create_parameters_without_env(self) -> None:
-        """Test create_parameters without providing env parameter (covers line 60)."""
-        result = create_parameters(
-            name="test-session",
-            image="images.canfar.net/skaha/terminal:1.1.1",
-            env=None,  # Explicitly no env
-        )
-
-        assert len(result) == 1
-        payload = result[0]
-
-        # Should still have env with replica variables
-        env_items = [item for key, item in payload if key == "env"]
-        env_vars = dict([item.split("=", 1) for item in env_items])
-        assert env_vars["REPLICA_ID"] == "1"
-        assert env_vars["REPLICA_COUNT"] == "1"
-
     def test_create_parameters_multiple_replicas(self) -> None:
         """Test create_parameters with multiple replicas (covers line 65)."""
         result = create_parameters(
@@ -88,41 +71,6 @@ class TestCreateParameters:
             env_vars = dict([item.split("=", 1) for item in env_items])
             assert env_vars["REPLICA_ID"] == str(i + 1)
             assert env_vars["REPLICA_COUNT"] == "3"
-
-    def test_create_parameters_single_replica_naming(self) -> None:
-        """Test create_parameters with single replica keeps original name."""
-        result = create_parameters(
-            name="test-session",
-            image="images.canfar.net/skaha/terminal:1.1.1",
-            replicas=1,
-        )
-
-        assert len(result) == 1
-        payload = result[0]
-        payload_dict = dict(payload)
-
-        # Single replica should keep original name (not test-session-1)
-        assert payload_dict["name"] == "test-session"
-
-    def test_create_parameters_with_env(self) -> None:
-        """Test create_parameters with custom environment variables."""
-        custom_env = {"CUSTOM_VAR": "custom_value", "DEBUG": "true"}
-        result = create_parameters(
-            name="test-session",
-            image="images.canfar.net/skaha/terminal:1.1.1",
-            env=custom_env,
-        )
-
-        assert len(result) == 1
-        payload = result[0]
-
-        # Check that custom env vars are included along with replica vars
-        env_items = [item for key, item in payload if key == "env"]
-        env_vars = dict([item.split("=", 1) for item in env_items])
-        assert env_vars["CUSTOM_VAR"] == "custom_value"
-        assert env_vars["DEBUG"] == "true"
-        assert env_vars["REPLICA_ID"] == "1"
-        assert env_vars["REPLICA_COUNT"] == "1"
 
     def test_create_parameters_all_options(self) -> None:
         """Test create_parameters with all optional parameters for headless."""
@@ -160,3 +108,36 @@ class TestCreateParameters:
             assert env_vars["FOO"] == "BAR"
             assert env_vars["REPLICA_ID"] == str(i + 1)
             assert env_vars["REPLICA_COUNT"] == "2"
+
+    def test_create_parameters_preserves_field_and_environment_order(self) -> None:
+        """Keep the form tuple order stable for repeated environment fields."""
+        assert create_parameters(
+            name="session",
+            image="custom/image:latest",
+            cores=2,
+            env={"A": "1", "B": "2"},
+        ) == [
+            [
+                ("name", "session"),
+                ("image", "images.canfar.net/custom/image:latest"),
+                ("cores", 2),
+                ("type", "headless"),
+                ("env", "A=1"),
+                ("env", "B=2"),
+                ("env", "REPLICA_ID=1"),
+                ("env", "REPLICA_COUNT=1"),
+            ]
+        ]
+
+    def test_create_parameters_overrides_reserved_replica_environment(self) -> None:
+        """System replica metadata wins without duplicate form fields."""
+        [payload] = create_parameters(
+            name="session",
+            image="custom/image:latest",
+            env={"REPLICA_ID": "caller", "REPLICA_COUNT": "caller"},
+        )
+
+        assert [value for key, value in payload if key == "env"] == [
+            "REPLICA_ID=1",
+            "REPLICA_COUNT=1",
+        ]

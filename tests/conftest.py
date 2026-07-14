@@ -17,11 +17,7 @@ ISOLATED_HOME = Path(
 
 
 def pytest_configure(config: pytest.Config) -> None:  # noqa: ARG001
-    """Isolate ``HOME`` before collection imports ``canfar``.
-
-    ``canfar.utils.console`` loads ``Configuration()`` at import time, so an
-    incompatible ``~/.canfar/config.yaml`` would break collection otherwise.
-    """
+    """Isolate ``HOME`` so tests never consume developer configuration."""
     ISOLATED_HOME.mkdir(parents=True, exist_ok=True)
     os.environ["CANFAR_TEST_HOME"] = str(ISOLATED_HOME)
     os.environ["HOME"] = str(ISOLATED_HOME)

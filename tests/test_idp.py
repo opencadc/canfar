@@ -103,6 +103,12 @@ class TestGetIdpSrcnet:
 
         assert idp.key == "srcnet"
 
+    def test_get_idp_srcnet_has_exact_oidc_issuer(self) -> None:
+        """SRCNet records the exact issuer expected from discovery."""
+        idp = get_idp("srcnet")
+
+        assert str(idp.oidc_issuer) == "https://ska-iam.stfc.ac.uk/"
+
 
 class TestGetIdpUnknown:
     """Tests for get_idp() with unknown keys."""

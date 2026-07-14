@@ -13,7 +13,7 @@ from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 events = typer.Typer(
     name="events",
@@ -28,25 +28,17 @@ def get_events(
         list[str],
         typer.Argument(help="One or more session IDs."),
     ],
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
 ) -> None:
     """Get events from the science platform server."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_events() -> None:
         """Fetch events for the requested sessions and render them."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             all_events = await session.events(ids=session_ids)
 
         if not all_events:
-            console.print(
+            get_console(stderr=True).print(
                 "[yellow]No events found for the specified session(s).[/yellow]"
             )
             return
@@ -73,6 +65,6 @@ def get_events(
                     if len(parts) == 5:
                         table.add_row(*parts)
 
-                console.print(table)
+                get_console().print(table)
 
     run(_get_events())

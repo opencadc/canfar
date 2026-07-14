@@ -25,14 +25,25 @@ def test_open_command_opens_url_and_reports_missing_data() -> None:
     ):
         session = _mock_async_session(session_cls)
         session.info.return_value = [
-            {"id": "abc", "connectURL": "https://example.test/session/abc"},
+            {
+                "id": "abc",
+                "status": "Running",
+                "connectURL": "https://example.test/session/abc",
+            },
+            {
+                "id": "stopped",
+                "status": "Stopped",
+                "connectURL": "https://example.test/session/stopped",
+            },
             {"id": "missing"},
         ]
-        result = runner.invoke(open_command, ["abc", "missing"])
+        result = runner.invoke(open_command, ["abc", "stopped", "missing"])
 
     assert result.exit_code == 0
     assert "Opening session abc" in result.stdout
-    assert "No connectURL found for session missing" in result.stdout
+    assert "Opening session stopped" not in result.stdout
+    assert "Session stopped is not ready to connect (status: Stopped)." in result.stderr
+    assert "No connectURL found for session missing" in result.stderr
     open_tab.assert_called_once_with("https://example.test/session/abc")
 
 
@@ -44,4 +55,4 @@ def test_open_command_no_session_info() -> None:
         result = runner.invoke(open_command, ["abc"])
 
     assert result.exit_code == 0
-    assert "No information found" in result.stdout
+    assert "No information found" in result.stderr

@@ -13,7 +13,7 @@ from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Context
@@ -54,7 +54,10 @@ def prune_sessions(
         str,
         typer.Argument(
             ...,
-            help="Prefix or regex pattern to match session names.",
+            help=(
+                "Prefix or regex pattern to match session names. "
+                "Quote patterns with shell metacharacters (e.g. '*', '?')."
+            ),
             metavar="PREFIX",
         ),
     ],
@@ -74,27 +77,22 @@ def prune_sessions(
             help="Filter by session status.",
         ),
     ] = "Succeeded",
-    debug: Annotated[
-        bool,
-        typer.Option("--debug", help="Enable debug logging."),
-    ] = False,
 ) -> None:
     """Delete sessions by criteria.
 
     Examples:
     canfar prune session-name headless Succeeded
-    canfar prune session.* notebook Running
+    canfar prune 'session.*' notebook Running
     """
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _prune() -> None:
         """Delete matching sessions from the science platform server."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             response = await session.destroy_with(
                 prefix=prefix, kind=kind, status=status
             )
-            console.print(
+            get_console().print(
                 f"[bold green] Deleted {len(response)} sessions.[/bold green]"
             )
 

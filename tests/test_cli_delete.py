@@ -33,7 +33,7 @@ def test_delete_force_success_error_and_cancel() -> None:
         result = runner.invoke(delete, ["--force", "abc"])
 
     assert result.exit_code == 0
-    assert "Error during deletion: delete failed" in result.stdout
+    assert "Error during deletion: delete failed" in result.stderr
 
     with patch("canfar.cli.delete.Confirm.ask", return_value=False):
         result = runner.invoke(delete, ["abc"])

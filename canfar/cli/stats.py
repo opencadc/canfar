@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Annotated
-
 import typer
 from rich import box
 from rich.table import Table
@@ -12,7 +10,7 @@ from canfar.cli._run import run
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 stats = typer.Typer(
     name="stats",
@@ -22,22 +20,13 @@ stats = typer.Typer(
 
 
 @stats.callback(invoke_without_command=True)
-def get_stats(
-    debug: Annotated[
-        bool,
-        typer.Option(
-            "--debug",
-            help="Enable debug logging.",
-        ),
-    ] = False,
-) -> None:
+def get_stats() -> None:
     """Display cluster-wide usage and status statistics."""
     maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_stats() -> None:
         """Fetch cluster-wide statistics and render them."""
-        log_level = "DEBUG" if debug else "INFO"
-        async with AsyncSession(loglevel=log_level) as session:
+        async with AsyncSession() as session:
             data = await session.stats()
 
         # Main table
@@ -70,9 +59,11 @@ def get_stats(
         # Add the first row with nested tables
         table.add_row(cores_table, ram_table)
 
-        console.print(table)
-        console.print("[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM")
-        console.print(
+        get_console().print(table)
+        get_console().print(
+            "[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM"
+        )
+        get_console(stderr=True).print(
             "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
         )
 

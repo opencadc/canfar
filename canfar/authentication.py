@@ -78,7 +78,7 @@ def login(idp: str, force: bool = False) -> None:
         return
 
     credential = _authenticate(idp_info)
-    _upsert_credential(config, credential)
+    config.upsert_credential(credential)
     server_service.discover(idp, config=config, save=False)
     config.save()
 
@@ -107,16 +107,7 @@ def use(idp: str) -> None:
             hint="Run canfar.login() for this IDP before selecting it.",
         ) from exc
 
-    remembered = config.get_remembered_server_for_idp(idp)
-    if remembered is not None:
-        config.set_active_selection(idp, remembered)
-    else:
-        selections = config._server_selection_history()  # noqa: SLF001
-        config.active.authentication = idp
-        if not _active_server_compatible(config, idp):
-            config.active.server = None
-        config.active.servers = selections
-
+    config.set_active_authentication(idp)
     config.save()
 
 
@@ -161,21 +152,7 @@ def remove(idp: str, *, force: bool = False) -> None:
             hint="Use --force or switch authentication before removing.",
         )
 
-    config.authentication.pop(idp, None)
-    config.servers = {
-        name: server for name, server in config.servers.items() if server.idp != idp
-    }
-    config.active.servers.pop(idp, None)
-
-    if config.active.authentication == idp:
-        if config.authentication:
-            config.active.authentication = next(iter(config.authentication))
-            config.active.server = None
-        else:
-            config.active = config.active.model_copy(
-                update={"authentication": "cadc", "server": None}
-            )
-
+    config.remove_authentication(idp)
     config.save()
 
 
@@ -198,10 +175,8 @@ def purge(*, force: bool = False) -> None:
         )
 
     config = Configuration()  # ty: ignore[missing-argument]
-    registry = config.registry.model_copy(deep=True)
-    console = config.console.model_copy(deep=True)
-    fresh = Configuration(registry=registry, console=console)  # ty: ignore[missing-argument]
-    fresh.save()
+    config.purge_authentication()
+    config.save()
 
 
 def show() -> Authentication:
@@ -231,16 +206,6 @@ def show() -> Authentication:
 
 def _has_authentication(config: Configuration, idp: str) -> bool:
     return idp in config.authentication
-
-
-def _active_server_compatible(config: Configuration, idp: str) -> bool:
-    if config.active.server is None:
-        return False
-    try:
-        server = config.get_active_server()
-    except KeyError:
-        return False
-    return server.idp == idp
 
 
 def _authentication_for_credential(
@@ -276,13 +241,6 @@ def _credential_expiry(credential: AuthenticationCredential) -> float | None:
         return credential.expiry or None
     access_expiry = credential.expiry.access
     return access_expiry or None
-
-
-def _upsert_credential(
-    config: Configuration,
-    credential: AuthenticationCredential,
-) -> None:
-    config.authentication[credential.idp] = credential
 
 
 def _authenticate(idp_info: IdpInfo) -> AuthenticationCredential:
