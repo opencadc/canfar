@@ -129,7 +129,7 @@ class TestSyncHook:
         hook_func(request)
         mock_refresh.assert_not_called()
 
-    @patch("canfar.auth.oidc.sync_refresh", side_effect=Exception("Network Error"))
+    @patch("canfar.auth.oidc.sync_refresh", side_effect=ValueError("Network Error"))
     def test_refresh_failure_raises_error(self, mock_refresh, oidc_client) -> None:  # noqa: ARG002
         """Verify that a failure during refresh raises AuthenticationError."""
         hook_func = refresh(oidc_client)
@@ -199,7 +199,7 @@ class TestAsyncHook:
         await hook_func(request)
         mock_refresh.assert_not_called()
 
-    @patch("canfar.auth.oidc.refresh", side_effect=Exception("Async Network Error"))
+    @patch("canfar.auth.oidc.refresh", side_effect=ValueError("Async Network Error"))
     async def test_async_refresh_failure_raises_error(
         self,
         mock_refresh,  # noqa: ARG002

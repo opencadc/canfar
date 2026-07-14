@@ -3,6 +3,7 @@
 import json
 from unittest.mock import AsyncMock, patch
 
+import httpx
 import pytest
 import yaml
 from typer.testing import CliRunner
@@ -293,7 +294,7 @@ class TestCreateCLI:
         """Test create command exception handling."""
         mock_session = AsyncMock()
         mock_session_cls.return_value.__aenter__.return_value = mock_session
-        mock_session.create.side_effect = Exception("API Error")
+        mock_session.create.side_effect = httpx.HTTPError("API Error")
 
         result = runner.invoke(create, ["headless", "skaha/worker:v1"])
 
@@ -323,7 +324,7 @@ class TestCreateCLI:
             "body": mock_session.create,
             "exit": mock_session_cls.return_value.__aexit__,
         }[phase]
-        failing_call.side_effect = RuntimeError(secret)
+        failing_call.side_effect = httpx.HTTPError(secret)
 
         result = runner.invoke(create, ["headless", "skaha/worker:v1", flag])
 
