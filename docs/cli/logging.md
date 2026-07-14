@@ -138,16 +138,12 @@ Every file event contains:
 | `level` | Yes | Logging level name, such as `INFO` or `ERROR`. |
 | `logger` | Yes | Logger name, such as `canfar.sessions`. |
 | `message` | Yes | Rendered message. |
-| `event_code` | No | Stable event code when the record supplies one. |
-| `request_id` | No | Request correlation identifier when supplied as a string. |
-| `trace_id` | No | Trace correlation identifier when supplied as a string. |
-| `span_id` | No | Span correlation identifier when supplied as a string. |
 | `exception` | No | Escaped exception or stack text. |
 
 Example shape:
 
 ```json
-{"timestamp":"2026-07-11T12:34:56.789Z","level":"INFO","logger":"canfar.sessions","message":"Session request accepted","request_id":"request-123"}
+{"timestamp":"2026-07-11T12:34:56.789Z","level":"INFO","logger":"canfar.sessions","message":"Session request accepted"}
 ```
 
 Authentication Record secrets use Pydantic `SecretStr` and render as masked

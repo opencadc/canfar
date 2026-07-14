@@ -143,10 +143,6 @@ class _JSONLinesFormatter(logging.Formatter):
             "logger": record.name,
             "message": record.getMessage(),
         }
-        for name in ("event_code", "request_id", "trace_id", "span_id"):
-            value = getattr(record, name, None)
-            if isinstance(value, str):
-                payload[name] = value
         diagnostics = [value for value in (record.exc_text, record.stack_info) if value]
         if diagnostics:
             payload["exception"] = "\n".join(diagnostics)

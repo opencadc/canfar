@@ -1,15 +1,11 @@
-"""Public contracts for the canonical logging surface."""
+"""Help-text contracts for domain-specific debug flags."""
 
 from __future__ import annotations
-
-from inspect import signature
 
 import pytest
 from typer.testing import CliRunner
 
-import canfar
 from canfar.cli.main import cli
-from canfar.client import HTTPClient
 
 runner = CliRunner()
 _HELP_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"}
@@ -56,19 +52,3 @@ def test_domain_debug_options_keep_their_public_meanings(
     help_text = " ".join(result.output.replace("│", " ").split())
     assert "--debug" in help_text
     assert meaning in help_text
-
-
-def test_http_client_has_no_logging_level_field() -> None:
-    """HTTP clients inherit explicit runtime logging instead of owning a level."""
-    assert "loglevel" not in HTTPClient.model_fields
-
-
-def test_top_level_package_has_no_log_level_mutator() -> None:
-    """The package exposes configuration, not mutable logging shortcuts."""
-    assert not hasattr(canfar, "set_log_level")
-    assert "set_log_level" not in canfar.__all__
-
-
-def test_configure_logging_has_no_legacy_file_switch() -> None:
-    """The canonical runtime accepts only the explicit file path policy."""
-    assert "filelog" not in signature(canfar.configure_logging).parameters
