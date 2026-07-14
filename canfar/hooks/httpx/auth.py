@@ -167,7 +167,6 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.debug("Skipping auth refresh without a saved OIDC record.")
             return
 
-        # Skip if the access token is not expired
         if not credential.expired:
             if credential.token.access is not None:
                 _apply_access_header(
@@ -201,7 +200,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 request,
             )
 
-        except Exception:  # noqa: BLE001 - sanitize every boundary failure
+        except (ValueError, OSError):
             msg = "Failed to refresh OIDC token"
             raise AuthenticationError(msg) from None
 
@@ -263,7 +262,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
                     request,
                 )
 
-            except Exception:  # noqa: BLE001 - sanitize every boundary failure
+            except (ValueError, OSError):
                 msg = "Failed to refresh OIDC token"
                 raise AuthenticationError(msg) from None
 

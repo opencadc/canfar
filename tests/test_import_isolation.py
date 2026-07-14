@@ -97,51 +97,6 @@ assert sys.excepthook is original_excepthook
     assert result.stderr == ""
 
 
-def test_canonical_imports_do_not_load_legacy_config_adapter(tmp_path: Path) -> None:
-    """Canonical config and client use do not import legacy context adapters."""
-    script = """
-import os
-import sys
-from collections.abc import Mapping
-from typing import get_type_hints
-
-os.environ["HOME"] = sys.argv[1]
-
-from canfar.client import HTTPClient
-from canfar.models.auth import AuthContext
-from canfar.models.config import Configuration
-
-with HTTPClient(
-    config=Configuration(),
-    token="runtime-token",
-    url="https://example.com",
-) as client:
-    client.client
-
-hints = get_type_hints(Configuration.contexts.fget)
-assert hints["return"] == Mapping[str, AuthContext]
-assert "canfar.models.config_compat" not in sys.modules
-
-from canfar.models.config import AuthContext as PublicAuthContext
-from canfar.models.config_compat import AuthContext as DirectAuthContext
-
-assert PublicAuthContext is DirectAuthContext
-"""
-    result = subprocess.run(  # noqa: S603
-        [sys.executable, "-c", script, str(tmp_path)],
-        capture_output=True,
-        text=True,
-        check=False,
-        env={
-            key: value
-            for key, value in os.environ.items()
-            if not key.startswith("CANFAR_")
-        },
-    )
-
-    assert result.returncode == 0, result.stderr
-
-
 def test_logging_module_has_no_logfire_or_opentelemetry_imports() -> None:
     """Stdlib logging path must not depend on Logfire or OpenTelemetry."""
     source = Path("canfar/utils/logging.py").read_text(encoding="utf-8")

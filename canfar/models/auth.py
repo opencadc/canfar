@@ -5,13 +5,12 @@ from __future__ import annotations
 import math
 import time
 from pathlib import Path  # noqa: TC003
-from typing import Annotated, Literal, TypeAlias
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from canfar import get_logger
 from canfar.auth import x509
-from canfar.models.http import Server
 
 log = get_logger(__name__)
 
@@ -167,105 +166,6 @@ class DeviceAuthorization(BaseModel):
     ]
 
 
-class OIDC(BaseModel):
-    """Complete OIDC configuration."""
-
-    mode: Literal["oidc"] = "oidc"
-    endpoints: Annotated[
-        Endpoint,
-        Field(default_factory=Endpoint, description="OIDC Endpoints."),
-    ]
-    client: Annotated[
-        Client,
-        Field(default_factory=Client, description="OIDC Client Credentials."),
-    ]
-    token: Annotated[
-        Token,
-        Field(default_factory=Token, description="OIDC Tokens"),
-    ]
-    server: Annotated[
-        Server,
-        Field(default_factory=Server, description="Science Platform Server."),
-    ]
-    expiry: Annotated[
-        Expiry,
-        Field(default_factory=Expiry, description="OIDC Token Expiry."),
-    ]
-
-    @property
-    def valid(self) -> bool:
-        """Check if all required information for getting new access tokens exists.
-
-        Returns:
-            bool: True if all required OIDC information is present, False otherwise.
-        """
-        return _oidc_valid(self.endpoints, self.client, self.token)
-
-    @property
-    def expired(self) -> bool:
-        """Check if the OIDC access token is active.
-
-        Returns:
-            bool: True if the access token is active, False otherwise.
-        """
-        return _oidc_expired(self.expiry)
-
-
-class X509(BaseModel):
-    """X.509 certificate configuration."""
-
-    mode: Literal["x509"] = "x509"
-    path: Annotated[
-        Path | None,
-        Field(
-            title="x509 Certificate",
-            description="Pathlike to PEM certificate",
-        ),
-    ] = None
-    expiry: Annotated[
-        float,
-        Field(
-            default=0.0,
-            title="x509 Expiry Time",
-            description="ctime of cert expiration",
-        ),
-    ]
-    server: Annotated[
-        Server | None,
-        Field(description="X509 server information"),
-    ] = None
-
-    @property
-    def valid(self) -> bool:
-        """Check if the certificate filepath is defined and expiry is in the future.
-
-        Returns:
-            bool: True if certificate path exists and is not expired, False otherwise.
-        """
-        if self.path is None:
-            return False
-        try:
-            x509.valid(self.path)
-        except (FileNotFoundError, ValueError) as err:
-            msg = "Failed to validate x509 certificate: %s", err
-            log.exception(msg)
-            return False
-        return True
-
-    @property
-    def expired(self) -> bool:
-        """Check if the X.509 certificate is expired.
-
-        Returns:
-            bool: True if the certificate is expired, False otherwise.
-        """
-        expiry = _x509_expiry(self.path, self.expiry)
-        if expiry is None:
-            return True
-        self.expiry = expiry
-        return expiry <= time.time()
-
-
 class X509Credential(BaseModel):
     """X.509 authentication credential decoupled from server selection."""
 
@@ -341,17 +241,12 @@ AuthenticationCredential = Annotated[
 ]
 """Discriminated union of v1 authentication credentials without embedded server."""
 
-AuthContext: TypeAlias = OIDC | X509
-"""Legacy authentication context shape with embedded server."""
-
 __all__ = [
-    "OIDC",
-    "X509",
-    "AuthContext",
     "AuthMode",
     "Authentication",
     "AuthenticationCredential",
     "Client",
+    "DeviceAuthorization",
     "Endpoint",
     "Expiry",
     "OIDCCredential",

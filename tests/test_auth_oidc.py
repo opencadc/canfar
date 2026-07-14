@@ -345,8 +345,6 @@ class TestAuthflowFunction:
         ) as client:
             tokens = await poll_device_token(
                 "https://example.com/token",
-                "client_id",
-                "client_secret",
                 challenge,
                 client,
             )
@@ -388,8 +386,6 @@ class TestAuthflowFunction:
             with patch("asyncio.sleep", new_callable=AsyncMock) as sleep:
                 tokens = await poll_device_token(
                     "https://example.com/token",
-                    "client_id",
-                    "client_secret",
                     challenge,
                     client,
                 )
@@ -425,8 +421,6 @@ class TestAuthflowFunction:
             ):
                 await poll_device_token(
                     "https://example.com/token",
-                    "client_id",
-                    "client_secret",
                     challenge,
                     client,
                 )
@@ -447,8 +441,6 @@ class TestAuthflowFunction:
             with patch("asyncio.sleep", new_callable=AsyncMock) as sleep:
                 tokens = await poll_device_token(
                     "https://example.com/token",
-                    "client_id",
-                    "client_secret",
                     challenge,
                     client,
                 )
@@ -551,8 +543,6 @@ class TestAuthflowFunction:
             with pytest.raises(error, match=match) as exc:
                 await poll_device_token(
                     "https://example.com/token",
-                    "client_id",
-                    "client_secret",
                     challenge,
                     client,
                 )

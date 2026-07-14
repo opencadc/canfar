@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
+import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client
-from pydantic import AnyHttpUrl
+from pydantic import AnyHttpUrl, SecretStr
 
-from canfar.cli.login_auth import authenticate_for_cli
+from canfar.cli.login_auth import _interactive_device_flow, authenticate_for_cli
 from canfar.idp import IdpInfo, get_idp
-from canfar.models.auth import OIDCCredential, X509Credential
+from canfar.models.auth import DeviceAuthorization, OIDCCredential, X509Credential
 
 _OPAQUE_ACCESS_TOKEN = "opaque-access-token"
 _OPAQUE_REFRESH_TOKEN = "opaque-refresh-token"
@@ -77,10 +78,6 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
         patch(
             "authlib.integrations.httpx_client.AsyncOAuth2Client"
         ) as oauth_client_class,
-        patch(
-            "canfar.auth.oidc.authenticate",
-            side_effect=AssertionError("legacy OIDC authentication was used"),
-        ) as legacy_authenticate,
         patch("canfar.utils.console.get_console", return_value=console),
         patch("webbrowser.get") as browser,
         patch("segno.make") as make_qr,
@@ -123,7 +120,6 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     assert credential.token.scope == "openid profile email"
     assert credential.expiry.access == 1893456000
     assert credential.expiry.refresh is None
-    legacy_authenticate.assert_not_called()
 
 
 def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
@@ -131,13 +127,7 @@ def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
     certificate = tmp_path / "cadcproxy.pem"
     gathered = {"path": str(certificate), "expiry": 1893456000.0}
 
-    with (
-        patch("canfar.auth.x509.gather", return_value=gathered) as gather,
-        patch(
-            "canfar.auth.x509.authenticate",
-            side_effect=AssertionError("legacy X.509 authentication was used"),
-        ) as legacy_authenticate,
-    ):
+    with patch("canfar.auth.x509.gather", return_value=gathered) as gather:
         result = authenticate_for_cli(get_idp("cadc"))
 
     assert isinstance(result, X509Credential)
@@ -145,7 +135,6 @@ def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
     assert result.path == certificate
     assert result.expiry == 1893456000.0
     gather.assert_called_once_with()
-    legacy_authenticate.assert_not_called()
 
 
 def test_authenticate_for_cli_normalizes_x509_gather_failure() -> None:
@@ -187,6 +176,79 @@ def test_authenticate_for_cli_oidc_requires_discovery_url() -> None:
 
     with pytest.raises(RuntimeError, match="discovery URL"):
         authenticate_for_cli(idp_info)
+
+
+@pytest.mark.asyncio
+async def test_interactive_device_flow_awaits_poll_not_progress() -> None:
+    """Progress finishing first must not timeout while poll is still pending."""
+    challenge = DeviceAuthorization(
+        verification_uri="https://example.com/device",
+        user_code=SecretStr("ABC123"),
+        expires_in=1,
+        interval=5,
+        device_code=SecretStr("device-code"),
+    )
+    expected_tokens = {
+        "access_token": _OPAQUE_ACCESS_TOKEN,
+        "refresh_token": _OPAQUE_REFRESH_TOKEN,
+    }
+    poll_started = asyncio.Event()
+    release_http = asyncio.Event()
+    real_sleep = asyncio.sleep
+
+    async def instant_progress_sleep(delay: float) -> None:
+        if delay == 1:
+            return
+        await real_sleep(delay)
+
+    async def slow_poll(*_args, **_kwargs):
+        poll_started.set()
+        await release_http.wait()
+        return expected_tokens
+
+    client = AsyncMock(spec=AsyncOAuth2Client)
+    console = MagicMock()
+    progress_instance = MagicMock()
+    progress_instance.__enter__ = MagicMock(return_value=progress_instance)
+    progress_instance.__exit__ = MagicMock(return_value=False)
+    progress_instance.add_task = MagicMock(return_value=1)
+
+    with (
+        patch(
+            "canfar.cli.login_auth.oidc.start_device_authorization",
+            AsyncMock(return_value=challenge),
+        ),
+        patch(
+            "canfar.cli.login_auth.oidc.poll_device_token",
+            side_effect=slow_poll,
+        ),
+        patch("canfar.utils.console.get_console", return_value=console),
+        patch("webbrowser.get"),
+        patch("segno.make"),
+        patch(
+            "canfar.cli.login_auth.rich_progress.Progress",
+            return_value=progress_instance,
+        ),
+        patch("asyncio.sleep", side_effect=instant_progress_sleep),
+    ):
+        flow_task = asyncio.create_task(
+            _interactive_device_flow(
+                "https://example.com/device",
+                "https://example.com/token",
+                "client-id",
+                "client-secret",
+                client,
+            )
+        )
+        await poll_started.wait()
+        for _ in range(10):
+            await real_sleep(0)
+            if flow_task.done():
+                break
+        release_http.set()
+        tokens = await flow_task
+
+    assert tokens == expected_tokens
 
 
 def test_authenticate_for_cli_oidc_requires_expected_issuer() -> None:

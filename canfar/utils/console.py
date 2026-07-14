@@ -27,10 +27,7 @@ def get_console(*, stderr: bool = False) -> Console:
     Returns:
         Rich console instance sized from user configuration.
     """
-    try:
-        width = Configuration().console.width  # ty: ignore[missing-argument]
-    except Exception:  # noqa: BLE001
-        width = 120
+    width = Configuration().console.width  # ty: ignore[missing-argument]
     return Console(width=width, stderr=stderr)
 
 

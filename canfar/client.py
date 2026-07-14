@@ -243,11 +243,12 @@ class HTTPClient(BaseSettings):
             server = self.config.get_active_server()
         except KeyError as exc:
             msg = (
-                f"Server not found in auth context: {self.config.active.authentication}"
+                "Server not found for Authentication Record: "
+                f"{self.config.active.authentication}"
             )
             raise ValueError(msg) from exc
         if server.url is None:
-            msg = f"Server not found in auth context: {server}"
+            msg = f"Active server has no URL configured: {server}"
             raise ValueError(msg)
         return URL(f"{server.url}/{server.version}")
 
@@ -277,13 +278,11 @@ class HTTPClient(BaseSettings):
             "event_hooks": {"request": request_hooks, "response": response_hooks},
             "base_url": self._get_base_url(),
         }
-        # Configure connection pooling for async clients
         if asynchronous:
             kwargs["limits"] = Limits(
                 max_connections=self.concurrency,
                 max_keepalive_connections=self.concurrency // 4,
             )
-        # Prioritize user-provided credentials over configuration
         if self.token:
             return kwargs
 
@@ -293,10 +292,6 @@ class HTTPClient(BaseSettings):
             kwargs["verify"] = self._get_ssl_context(self.certificate)
             return kwargs
 
-        # No user-provided credentials, use the saved Authentication Record.
-        # Note: The refresh hook must be the first request hook to run, since it may
-        #       update the record and headers. The expiry hook then checks the
-        #       updated record.
         if isinstance(credential, OIDCCredential):
             refresher = auth.arefresh(self) if asynchronous else auth.refresh(self)
             kwargs["event_hooks"]["request"].insert(0, refresher)

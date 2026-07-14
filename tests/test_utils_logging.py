@@ -121,15 +121,7 @@ def test_jsonl_file_sink_writes_flat_events(
     monkeypatch.delenv("CANFAR_LOGLEVEL", raising=False)
     try:
         configure_logging(loglevel="INFO", log_file=log_file)
-        get_logger("jsonl").info(
-            "hello",
-            extra={
-                "event_code": "logging.contract",
-                "request_id": "request-123",
-                "trace_id": "trace-456",
-                "span_id": "span-789",
-            },
-        )
+        get_logger("jsonl").info("hello")
         for handler in get_logger().handlers:
             handler.flush()
 
@@ -137,30 +129,11 @@ def test_jsonl_file_sink_writes_flat_events(
         assert event["level"] == "INFO"
         assert event["logger"] == "canfar.jsonl"
         assert event["message"] == "hello"
-        assert event["event_code"] == "logging.contract"
-        assert event["request_id"] == "request-123"
-        assert event["trace_id"] == "trace-456"
-        assert event["span_id"] == "span-789"
-        assert "timestamp" in event
+        assert set(event.keys()) == {"timestamp", "level", "logger", "message"}
     finally:
         for handler in get_logger().handlers[:]:
             handler.close()
             get_logger().removeHandler(handler)
-
-
-def test_jsonl_omits_non_string_correlation_fields(tmp_path: Path) -> None:
-    """Non-string correlation extras stay out of the flat JSONL schema."""
-    log_file = tmp_path / "flat.jsonl"
-    logger = CanfarLogger()
-    try:
-        logger.configure(loglevel=logging.INFO, log_file=log_file)
-        logger.logger.info("flat-event", extra={"request_id": {"nested": "x"}})
-        for handler in logger.logger.handlers:
-            handler.flush()
-        event = json.loads(log_file.read_text(encoding="utf-8"))
-        assert "request_id" not in event
-    finally:
-        logger._cleanup_handlers()  # noqa: SLF001
 
 
 def test_jsonl_rotates_with_small_max_size(tmp_path: Path) -> None:

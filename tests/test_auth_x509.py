@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
 from canfar.auth import x509 as x509_auth
-from canfar.models.auth import X509
+from canfar.models.auth import X509Credential
 
 
 # Helper function to generate a self-signed certificate for testing
@@ -197,12 +197,12 @@ def test_inspect_happy_path() -> None:
         )
 
 
-# --- Tests for canfar.auth.x509.authenticate --- #
+# --- Tests for canfar.auth.x509.authenticate_credential --- #
 
 
 @patch("canfar.auth.x509.gather")
-def test_authenticate_happy_path(mock_gather) -> None:
-    """Test that `authenticate` correctly updates the config on success."""
+def test_authenticate_credential_happy_path(mock_gather) -> None:
+    """Test that `authenticate_credential` correctly updates the credential."""
     with tempfile.NamedTemporaryFile(suffix=".pem") as temp_cert:
         cert_path = Path(temp_cert.name)
         generate_cert(cert_path)
@@ -212,23 +212,23 @@ def test_authenticate_happy_path(mock_gather) -> None:
             "expiry": datetime.datetime.now(datetime.timezone.utc).timestamp() + 1000,
         }
 
-        config = X509()
-        updated_config = x509_auth.authenticate(config)
+        credential = X509Credential(idp="test")
+        updated = x509_auth.authenticate_credential(credential)
 
-        assert updated_config is config
-        assert updated_config.path == str(cert_path.resolve())
-        assert updated_config.expiry == mock_gather.return_value["expiry"]
+        assert updated is credential
+        assert str(updated.path) == str(cert_path.resolve())
+        assert updated.expiry == mock_gather.return_value["expiry"]
         mock_gather.assert_called_once()
 
 
 @patch("canfar.auth.x509.gather")
-def test_authenticate_gather_fails(mock_gather) -> None:
-    """Test that `authenticate` raises a ValueError if `gather` fails."""
+def test_authenticate_credential_gather_fails(mock_gather) -> None:
+    """Test that `authenticate_credential` raises ValueError if `gather` fails."""
     mock_gather.side_effect = ValueError("Failed to retrieve certificate")
 
-    config = X509()
+    credential = X509Credential(idp="test")
     with pytest.raises(ValueError, match="Failed to authenticate"):
-        x509_auth.authenticate(config)
+        x509_auth.authenticate_credential(credential)
 
 
 # --- Tests for canfar.auth.x509.gather --- #

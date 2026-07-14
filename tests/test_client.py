@@ -15,21 +15,14 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
-from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
+from pydantic import AnyUrl, SecretStr, ValidationError
 
 from canfar.client import HTTPClient
-from canfar.models.auth import (
-    OIDC,
-    X509,
-    Client,
-    Endpoint,
-    Expiry,
-    Token,
-)
+from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 from canfar.models.registry import ContainerRegistry
-from tests.helpers.config import configuration_from_legacy_context
+from tests.helpers.config import configuration_with_credential, oidc_config, x509_config
 from tests.test_auth_x509 import generate_cert
 
 
@@ -309,19 +302,11 @@ class TestBaseURLConstruction:
 
     def test_configured_url_from_context(self, canfar_client_fixture) -> None:
         """Test base URL construction from configuration context."""
-        # Create a custom context with specific server settings
-        custom_context = X509(
+        config = x509_config(
+            server_name="TestServer",
+            server_url="https://config.example.com",
             path=Path("/test/cert.pem"),
-            expiry=9999999999.0,
-            server=Server(
-                name="Test Server",
-                uri=AnyUrl("ivo://test.org/canfar"),
-                url=AnyHttpUrl("https://config.example.com"),
-                version="v1",
-            ),
         )
-
-        config = configuration_from_legacy_context("test", custom_context)
 
         client = canfar_client_fixture(config=config)
         base_url = client._get_base_url()
@@ -329,15 +314,35 @@ class TestBaseURLConstruction:
 
     def test_no_server_in_context_raises_error(self, canfar_client_fixture) -> None:
         """Test that missing server in context raises ValueError."""
-        # Create a context without server
-        custom_context = X509(
-            path=Path("/test/cert.pem"), expiry=9999999999.0, server=None
+        config = configuration_with_credential(
+            X509Credential(
+                idp="test", path=Path("/test/cert.pem"), expiry=9999999999.0
+            ),
         )
 
-        config = configuration_from_legacy_context("test", custom_context)
+        client = canfar_client_fixture(config=config)
+        with pytest.raises(
+            ValueError, match="Server not found for Authentication Record"
+        ):
+            client._get_base_url()
+
+    def test_active_server_without_url_raises_error(
+        self, canfar_client_fixture
+    ) -> None:
+        """Test that active server with no URL raises ValueError."""
+        config = configuration_with_credential(
+            X509Credential(
+                idp="test", path=Path("/test/cert.pem"), expiry=9999999999.0
+            ),
+            server=Server(
+                name="TestServer",
+                uri=AnyUrl("ivo://test.org/canfar"),
+                version="v1",
+            ),
+        )
 
         client = canfar_client_fixture(config=config)
-        with pytest.raises(ValueError, match="Server not found in auth context"):
+        with pytest.raises(ValueError, match="Active server has no URL configured"):
             client._get_base_url()
 
 
@@ -476,24 +481,12 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_oidc_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for OIDC context authentication."""
-        # Create a real OIDC context
-        oidc_context = OIDC(
-            server=Server(
-                name="Test OIDC",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://oidc.example.com"),
-                version="v1",
-            ),
-            endpoints=Endpoint(
-                discovery="https://oidc.example.com/.well-known/openid-configuration",
-                token="https://oidc.example.com/token",
-            ),
-            client=Client(identity="test-client", secret="test-secret"),
-            token=Token(access="oidc-access-token", refresh="refresh-token"),
-            expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
+        config = oidc_config(
+            idp="oidc",
+            access="oidc-access-token",
+            access_expiry=9999999999.0,
+            refresh_expiry=9999999999.0,
         )
-
-        config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
         headers = client._get_http_headers(
@@ -505,19 +498,11 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_x509_context_headers(self, canfar_client_fixture) -> None:
         """Test headers for X509 context authentication."""
-        # Create a real X509 context
-        x509_context = X509(
+        config = x509_config(
+            idp="x509",
+            server_name="TestX509",
             path=Path("/test/cert.pem"),
-            expiry=9999999999.0,
-            server=Server(
-                name="Test X509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
         )
-
-        config = configuration_from_legacy_context("x509", x509_context)
 
         client = canfar_client_fixture(config=config)
         headers = client._get_http_headers(
@@ -571,24 +556,12 @@ class TestHTTPClientCreationAndHeaders:
 
     def test_oidc_refresh_hook_added(self, canfar_client_fixture) -> None:
         """Test that OIDC refresh hook is added for OIDC contexts."""
-        # Create a real OIDC context
-        oidc_context = OIDC(
-            server=Server(
-                name="Test OIDC",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://oidc.example.com"),
-                version="v1",
-            ),
-            endpoints=Endpoint(
-                discovery="https://oidc.example.com/.well-known/openid-configuration",
-                token="https://oidc.example.com/token",
-            ),
-            client=Client(identity="test-client", secret="test-secret"),
-            token=Token(access="oidc-access-token", refresh="refresh-token"),
-            expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
+        config = oidc_config(
+            idp="oidc",
+            access="oidc-access-token",
+            access_expiry=9999999999.0,
+            refresh_expiry=9999999999.0,
         )
-
-        config = configuration_from_legacy_context("oidc", oidc_context)
 
         client = canfar_client_fixture(config=config)
 
@@ -706,16 +679,7 @@ class TestSSLContextAndClientKwargs:
         """Runtime token must not install saved-config expiry request hook."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("x509", x509_context)
+        config = x509_config(idp="x509", path=cert_path)
         client = canfar_client_fixture(
             config=config,
             token=SecretStr("runtime-token"),
@@ -738,16 +702,7 @@ class TestSSLContextAndClientKwargs:
         """Saved expired x509 config must still install expiry request hook."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        x509_context = X509(
-            server=Server(
-                name="TestX509",
-                uri=AnyUrl("ivo://test.org/skaha"),
-                url=AnyHttpUrl("https://x509.example.com"),
-                version="v1",
-            ),
-            path=cert_path,
-        )
-        config = configuration_from_legacy_context("x509", x509_context)
+        config = x509_config(idp="x509", path=cert_path)
         client = canfar_client_fixture(config=config)
 
         sync_kwargs = client._get_client_kwargs(

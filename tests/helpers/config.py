@@ -2,30 +2,26 @@
 
 from __future__ import annotations
 
-import re
 from typing import TYPE_CHECKING
 
-from pydantic import AnyUrl
+from pydantic import AnyHttpUrl, AnyUrl
 
 from canfar.models.active import ActiveConfig
+from canfar.models.auth import (
+    Client,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
+    X509Credential,
+)
 from canfar.models.config import Configuration
-from canfar.models.config_compat import legacy_context_to_credential
+from canfar.models.http import Server
 
 if TYPE_CHECKING:
-    from canfar.models.auth import OIDC, X509
-    from canfar.models.http import Server
+    from pathlib import Path
 
-
-_SERVER_NAME_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
-
-
-def _server_config_key(name: str, fallback: str) -> str:
-    if _SERVER_NAME_PATTERN.match(name):
-        return name
-    slug = re.sub(r"[^A-Za-z0-9_-]", "", name)
-    if slug and _SERVER_NAME_PATTERN.match(slug):
-        return slug
-    return fallback
+    from canfar.models.auth import AuthenticationCredential
 
 
 def servers_by_name(*servers: Server) -> dict[str, Server]:
@@ -51,35 +47,103 @@ def assign_servers(config: Configuration, *servers: Server) -> None:
         config.active = config.active.model_copy(update={"server": servers[0].name})
 
 
-def configuration_from_legacy_context(key: str, context: OIDC | X509) -> Configuration:
-    """Build a ``Configuration`` from a legacy auth context fixture.
+def oidc_credential(
+    idp: str = "test",
+    *,
+    discovery: str | None = "https://oidc.example.com/.well-known/openid-configuration",
+    token_url: str = "https://oidc.example.com/token",  # noqa: S107
+    identity: str = "test-client",
+    secret: str = "test-secret",  # noqa: S107
+    access: str = "access-token",
+    refresh: str = "refresh-token",
+    access_expiry: float = 9_999_999_999.0,
+    refresh_expiry: float = 9_999_999_999.0,
+) -> OIDCCredential:
+    """Build a complete OIDC credential for tests."""
+    return OIDCCredential(
+        idp=idp,
+        endpoints=Endpoint(discovery=discovery, token=token_url),
+        client=Client(identity=identity, secret=secret),
+        token=Token(access=access, refresh=refresh),
+        expiry=Expiry(access=access_expiry, refresh=refresh_expiry),
+    )
+
+
+def x509_credential(
+    idp: str = "test",
+    *,
+    path: Path | None = None,
+    expiry: float = 9_999_999_999.0,
+) -> X509Credential:
+    """Build an X.509 credential for tests."""
+    return X509Credential(idp=idp, path=path, expiry=expiry)
+
+
+def configuration_with_credential(
+    credential: AuthenticationCredential,
+    *,
+    server: Server | None = None,
+) -> Configuration:
+    """Build a ``Configuration`` with one credential and optional server.
 
     Args:
-        key: Legacy context name used as the canonical IDP key (lowercased).
-        context: Legacy authentication context with optional embedded server.
+        credential: Authentication credential to store.
+        server: Optional server to include. Server ``idp`` is set to match credential.
 
     Returns:
-        Valid configuration instance mirroring the legacy fixture.
+        Valid configuration instance.
     """
-    idp = key.lower()
-    credential = legacy_context_to_credential(context, idp)
+    idp = credential.idp
     servers: dict[str, Server] = {}
     active_server: str | None = None
 
-    if context.server is not None:
-        server = context.server.model_copy(deep=True)
-        updates: dict[str, object] = {"idp": idp}
-        if server.uri is None:
-            updates["uri"] = AnyUrl(f"ivo://test.{idp}/skaha")
-        if server.name is None:
-            updates["name"] = idp
-        server = server.model_copy(update=updates)
-        key = _server_config_key(server.name or idp, idp)
-        servers[key] = server.model_copy(update={"name": key}, deep=True)
-        active_server = key
+    if server is not None:
+        s = server.model_copy(update={"idp": idp}, deep=True)
+        if s.name is None:
+            s = s.model_copy(update={"name": idp})
+        if s.uri is None:
+            s = s.model_copy(update={"uri": AnyUrl(f"ivo://test.{idp}/skaha")})
+        assert s.name is not None
+        servers[s.name] = s
+        active_server = s.name
 
     return Configuration(
         active=ActiveConfig(authentication=idp, server=active_server),
         authentication={idp: credential},
         servers=servers,
     )
+
+
+def oidc_config(
+    idp: str = "test",
+    *,
+    server_name: str = "TestOIDC",
+    server_url: str = "https://oidc.example.com",
+    access_expiry: float = 9_999_999_999.0,
+    refresh_expiry: float = 9_999_999_999.0,
+    **kwargs: object,
+) -> Configuration:
+    """Build a Configuration with an OIDC credential and server."""
+    cred = oidc_credential(
+        idp,
+        access_expiry=access_expiry,
+        refresh_expiry=refresh_expiry,
+        **kwargs,
+    )
+    server = Server(name=server_name, url=AnyHttpUrl(server_url), version="v1")
+    return configuration_with_credential(cred, server=server)
+
+
+def x509_config(
+    idp: str = "test",
+    *,
+    server_name: str = "TestX509",
+    server_url: str = "https://x509.example.com",
+    path: Path | None = None,
+    expiry: float = 9_999_999_999.0,
+    version: str = "v1",
+) -> Configuration:
+    """Build a Configuration with an X.509 credential and server."""
+    cred = x509_credential(idp, path=path, expiry=expiry)
+    server = Server(name=server_name, url=AnyHttpUrl(server_url), version=version)
+    return configuration_with_credential(cred, server=server)

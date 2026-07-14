@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import click
+import httpx
 import typer
 from pydantic import ValidationError
 
@@ -16,7 +17,9 @@ from canfar.cli.machine import (
     maybe_emit_banner,
     resolve_mode,
 )
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
+from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import CreateRequest
 from canfar.models.types import Kind
@@ -285,15 +288,17 @@ def creation(
             "\n[bold yellow]Operation cancelled by user.[/bold yellow]",
         )
         raise typer.Exit(130) from KeyboardInterrupt
-    except Exception as err:
+    except (ConfigResetRequiredError, AuthExpiredError, AuthContextError) as err:
         _render_create_failure(
-            StructuredError(
-                code=ErrorCode.TRANSPORT_FAILURE,
-                message="Unable to create session(s).",
-                hint=(
-                    "Check authentication and Science Platform connectivity, "
-                    "then retry."
-                ),
+            output.boundary_failure(err),
+            mode,
+            f"[bold red]Error: {err}[/bold red]",
+        )
+        raise typer.Exit(1) from err
+    except httpx.HTTPError as err:
+        _render_create_failure(
+            output.boundary_failure(
+                err, transport_message="Unable to create session(s)."
             ),
             mode,
             f"[bold red]Error: {err}[/bold red]",

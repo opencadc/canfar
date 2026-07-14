@@ -71,20 +71,19 @@ async def _interactive_device_flow(
             progress.update(task_id, advance=1)
 
     poll_task = asyncio.create_task(
-        oidc.poll_device_token(token_url, identity, secret, challenge, client)
+        oidc.poll_device_token(token_url, challenge, client)
     )
     progress_task = asyncio.create_task(update_progress())
     try:
         with progress:
-            done, _ = await asyncio.wait(
-                [poll_task, progress_task],
-                return_when=asyncio.FIRST_COMPLETED,
-                timeout=challenge.expires_in + 5,
-            )
-            if poll_task not in done:
+            try:
+                tokens = await asyncio.wait_for(
+                    poll_task,
+                    timeout=challenge.expires_in + 5,
+                )
+            except asyncio.TimeoutError:
                 msg = "Device flow timed out"
-                raise TimeoutError(msg)
-            tokens = await poll_task
+                raise TimeoutError(msg) from None
     finally:
         for task in (poll_task, progress_task):
             if not task.done():

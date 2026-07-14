@@ -17,7 +17,6 @@ from canfar.cli import output
 from canfar.cli._run import run
 from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
-from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
@@ -27,6 +26,8 @@ from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from typing import NoReturn
+
+    from canfar.errors import StructuredError
 
 ps = typer.Typer(
     name="ps",
@@ -65,47 +66,15 @@ def _fetch_session_payloads(
     """Fetch session payloads and map expected boundary failures."""
     try:
         return run(_fetch_sessions(kind, status))
-    except ConfigResetRequiredError as err:
+    except (
+        ConfigResetRequiredError,
+        AuthExpiredError,
+        AuthContextError,
+        httpx.HTTPError,
+    ) as err:
         _raise_fetch_failure(
             err,
-            StructuredError(
-                code=err.code,
-                message=err.message,
-                hint="Reset the configuration and log in again.",
-            ),
-            mode,
-        )
-    except AuthExpiredError as err:
-        _raise_fetch_failure(
-            err,
-            StructuredError(
-                code=ErrorCode.AUTHENTICATION_EXPIRED,
-                message=str(err),
-                hint="Authenticate again and retry.",
-            ),
-            mode,
-        )
-    except AuthContextError as err:
-        _raise_fetch_failure(
-            err,
-            StructuredError(
-                code=ErrorCode.AUTHENTICATION_CREDENTIAL_INVALID,
-                message=str(err),
-                hint="Check the active Authentication Record and retry.",
-            ),
-            mode,
-        )
-    except httpx.HTTPError as err:
-        _raise_fetch_failure(
-            err,
-            StructuredError(
-                code=ErrorCode.TRANSPORT_FAILURE,
-                message="Unable to list sessions.",
-                hint=(
-                    "Check authentication and Science Platform connectivity, "
-                    "then retry."
-                ),
-            ),
+            output.boundary_failure(err, transport_message="Unable to list sessions."),
             mode,
         )
 
