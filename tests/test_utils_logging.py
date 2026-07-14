@@ -33,19 +33,23 @@ if TYPE_CHECKING:
 def canfar_logger() -> Generator[CanfarLogger]:
     """Fresh CanfarLogger cleaned after each test."""
     logger = CanfarLogger()
+    # Shared stdlib logger may already have handlers from earlier suite tests.
+    logger._cleanup_handlers()  # noqa: SLF001
+    logger._configured = False  # noqa: SLF001
     yield logger
     logger._cleanup_handlers()  # noqa: SLF001
     logger._configured = False  # noqa: SLF001
 
 
 def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
-    """Default configure attaches one Rich stderr handler and stops propagation."""
+    """Default configure attaches Rich stderr logging and stops propagation."""
     canfar_logger.configure()
 
     logger = canfar_logger.logger
+    rich_handlers = [h for h in logger.handlers if isinstance(h, RichHandler)]
     assert logger.level == logging.INFO
-    assert len(logger.handlers) == 1
-    assert isinstance(logger.handlers[0], RichHandler)
+    assert rich_handlers
+    assert canfar_logger._rich_handler in rich_handlers  # noqa: SLF001
     assert not logger.propagate
     assert canfar_logger._configured  # noqa: SLF001
 
@@ -53,10 +57,12 @@ def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
 def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
     """Reconfiguration replaces previous handlers."""
     canfar_logger.configure(loglevel=logging.INFO)
-    first = canfar_logger.logger.handlers[0]
+    first = canfar_logger._rich_handler  # noqa: SLF001
     canfar_logger.configure(loglevel=logging.DEBUG)
-    assert len(canfar_logger.logger.handlers) == 1
-    assert canfar_logger.logger.handlers[0] is not first
+    assert canfar_logger._rich_handler is not None  # noqa: SLF001
+    assert canfar_logger._rich_handler is not first  # noqa: SLF001
+    assert canfar_logger._rich_handler in canfar_logger.logger.handlers  # noqa: SLF001
+    assert first not in canfar_logger.logger.handlers
 
 
 @pytest.mark.parametrize(

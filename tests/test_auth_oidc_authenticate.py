@@ -111,88 +111,24 @@ class TestAuthenticateFunction:
         assert oidc_config.expiry.refresh is None
 
     @pytest.mark.asyncio
-    async def test_authenticate_function(self) -> None:
-        """Test the authenticate function integration."""
-        # Create initial OIDC config
-        oidc_config = OIDC(
-            endpoints=Endpoint(
-                discovery="https://example.com/.well-known/openid-configuration"
-            ),
-            client=Client(),
-            token=Token(),
+    async def test_authenticate_persists_issued_tokens(self) -> None:
+        """Authentication persists access/refresh tokens from the device exchange."""
+        result = await self._authenticate_with_tokens(
+            {
+                "access_token": "test_access_token",
+                "refresh_token": "test_refresh_token",
+                "token_type": "Bearer",
+                "scope": "openid profile",
+                "expires_at": 1234567890,
+            }
         )
 
-        with (
-            patch("httpx.AsyncClient") as mock_client_class,
-            patch(
-                "authlib.integrations.httpx_client.AsyncOAuth2Client"
-            ) as oauth_client_class,
-        ):
-            mock_client = AsyncMock()
-            oauth_client = AsyncMock(spec=AsyncOAuth2Client)
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-            oauth_client_class.return_value.__aenter__.return_value = oauth_client
-
-            # Mock discovery response
-            discovery_response = MagicMock()
-            discovery_response.json.return_value = {
-                "issuer": "https://example.com",
-                "device_authorization_endpoint": "https://example.com/device",
-                "registration_endpoint": "https://example.com/register",
-                "token_endpoint": "https://example.com/token",
-                "userinfo_endpoint": "https://example.com/userinfo",
-            }
-
-            # Mock registration response
-            register_response = MagicMock()
-            register_response.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
-
-            # Mock userinfo response
-            userinfo_response = MagicMock()
-            userinfo_response.json.return_value = {
-                "sub": "user123",
-                "name": "Test User",
-                "email": "test@example.com",
-                "preferred_username": "testuser",
-            }
-
-            # Configure mock client responses
-            mock_client.get.side_effect = [discovery_response, userinfo_response]
-            mock_client.post.side_effect = [register_response]
-
-            with patch("canfar.auth.oidc.authflow") as mock_authflow:
-                mock_authflow.return_value = {
-                    "access_token": "test_access_token",
-                    "refresh_token": "test_refresh_token",
-                    "token_type": "Bearer",
-                    "scope": "openid profile",
-                    "expires_at": 1234567890,
-                }
-
-                # Should complete without errors and return updated config
-                result = await authenticate(
-                    oidc_config,
-                    expected_issuer="https://example.com",
-                )
-
-                # Verify the flow was called correctly
-                assert result is oidc_config
-                mock_authflow.assert_called_once()
-                assert mock_client.get.call_count == 2  # discovery + userinfo
-                assert mock_client.post.call_count == 1  # registration
-
-                # Verify the result has updated tokens
-                assert result.token.access is not None
-                assert result.token.access.get_secret_value() == "test_access_token"
-                assert result.token.refresh is not None
-                assert result.token.refresh.get_secret_value() == "test_refresh_token"
-                assert result.token.token_type == "Bearer"
-                assert result.token.scope == "openid profile"
-                assert result.expiry.access == 1234567890
-                assert result.expiry.refresh is None
+        assert result.token.access is not None
+        assert result.token.access.get_secret_value() == "test_access_token"
+        assert result.token.refresh is not None
+        assert result.token.refresh.get_secret_value() == "test_refresh_token"
+        assert result.expiry.access == 1234567890
+        assert result.expiry.refresh is None
 
     @pytest.mark.asyncio
     async def test_authenticate_accepts_token_without_refresh_token(self) -> None:

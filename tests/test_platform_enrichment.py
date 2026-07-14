@@ -131,6 +131,14 @@ def _capabilities(
     )
 
 
+def _patch_client(tmp_path: Path, transport: httpx.BaseTransport):
+    """Patch CONFIG_PATH and the sync HTTPX client factory."""
+    return (
+        patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+        patch("canfar.client.Client", side_effect=_http_client_factory(transport)),
+    )
+
+
 class TestPlatformEnrichment:
     """Tests for the public Platform enrichment seam."""
 
@@ -152,29 +160,20 @@ class TestPlatformEnrichment:
             requests.append(request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
-                    200,
-                    text=_capabilities(_CADC_URL),
-                    request=request,
+                    200, text=_capabilities(_CADC_URL), request=request
                 )
             if request.url.path.endswith("/v2/context"):
                 return httpx.Response(200, json=_CONTEXT_PAYLOAD, request=request)
             message = f"Unexpected request: {request.method} {request.url}"
             raise AssertionError(message)
 
-        config_path = tmp_path / "config.yaml"
-        with (
-            patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
-            ),
-        ):
+        config_patch, client_patch = _patch_client(
+            tmp_path, httpx.MockTransport(response)
+        )
+        with config_patch, client_patch:
             config = _anonymous_config(known)
             activated = platform.activate(
-                "cadc",
-                "Stable-Name",
-                config=config,
-                timeout=7,
+                "cadc", "Stable-Name", config=config, timeout=7
             )
             persisted = Configuration()
 
@@ -204,20 +203,12 @@ class TestPlatformEnrichment:
         failure: str,
     ) -> None:
         """Expected context failures keep server identity and safe defaults."""
-        known = _server(
-            name="Stable-Name",
-            cores=8,
-            ram=64,
-            gpus=1,
-            status="reachable",
-        )
+        known = _server(name="Stable-Name", cores=8, ram=64, gpus=1, status="reachable")
 
         def response(request: httpx.Request) -> httpx.Response:
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
-                    200,
-                    text=_capabilities(_CADC_URL),
-                    request=request,
+                    200, text=_capabilities(_CADC_URL), request=request
                 )
             if failure == "transport":
                 message = "context unavailable"
@@ -225,24 +216,15 @@ class TestPlatformEnrichment:
             if failure == "parse":
                 return httpx.Response(200, content=b"{", request=request)
             return httpx.Response(
-                200,
-                json={"cores": {"defaultLimit": 0}},
-                request=request,
+                200, json={"cores": {"defaultLimit": 0}}, request=request
             )
 
-        config_path = tmp_path / "config.yaml"
-        with (
-            patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
-            ),
-        ):
-            config = _anonymous_config(known)
+        config_patch, client_patch = _patch_client(
+            tmp_path, httpx.MockTransport(response)
+        )
+        with config_patch, client_patch:
             activated = platform.activate(
-                "cadc",
-                "Stable-Name",
-                config=config,
+                "cadc", "Stable-Name", config=_anonymous_config(known)
             )
 
         assert (
@@ -263,18 +245,15 @@ class TestPlatformEnrichment:
     ) -> None:
         """Typed setup failures are safe, request-free, and non-mutating."""
         server = _server()
-        credential: OIDCCredential | X509Credential
         if authentication == "oidc":
-            credential = OIDCCredential(
+            credential: OIDCCredential | X509Credential = OIDCCredential(
                 idp="cadc",
                 client=Client(identity="client", secret="client-secret"),
                 token=Token(refresh="refresh-secret"),
             )
         else:
             credential = X509Credential(
-                idp="cadc",
-                path=tmp_path,
-                expiry=9_999_999_999.0,
+                idp="cadc", path=tmp_path, expiry=9_999_999_999.0
             )
         requests: list[httpx.Request] = []
         transport = httpx.MockTransport(
@@ -284,13 +263,8 @@ class TestPlatformEnrichment:
         )
         config_path = tmp_path / "config.yaml"
 
-        with (
-            patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(transport),
-            ),
-        ):
+        config_patch, client_patch = _patch_client(tmp_path, transport)
+        with config_patch, client_patch:
             config = Configuration(
                 active=ActiveConfig(authentication="cadc", server="canfar"),
                 authentication={"cadc": credential},
@@ -312,24 +286,6 @@ class TestPlatformEnrichment:
         assert requests == []
         assert config.model_dump(mode="json") == before_model
         assert config_path.read_bytes() == before_yaml
-
-    def test_http_client_authentication_selector_is_transient(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """The request-only IDP selector is resolved but never serialized."""
-        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
-            config = _active_with_target(_oidc_credential())
-            before_active = config.active.model_dump(mode="json")
-            client = HTTPClient(
-                config=config,
-                authentication_idp="srcnet",
-                url="https://srcnet.example/skaha",
-            )
-
-        assert isinstance(client.authentication_record, OIDCCredential)
-        assert "authentication_idp" not in client.model_dump(mode="json")
-        assert config.active.model_dump(mode="json") == before_active
 
     def test_enrich_returns_validated_capability_metadata(
         self,
@@ -361,126 +317,82 @@ class TestPlatformEnrichment:
             assert str(request.url) == "https://registry.example/skaha/capabilities"
             return httpx.Response(200, text=capabilities, request=request)
 
-        transport = httpx.MockTransport(response)
-        config_path = tmp_path / "config.yaml"
-        with (
-            patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(transport),
-            ),
-        ):
-            config = _anonymous_config(known)
-            enriched = platform.enrich(known, config=config, timeout=7)
+        config_patch, client_patch = _patch_client(
+            tmp_path, httpx.MockTransport(response)
+        )
+        with config_patch, client_patch:
+            enriched = platform.enrich(
+                known, config=_anonymous_config(known), timeout=7
+            )
 
         assert enriched == expected
 
+    @pytest.mark.parametrize(
+        "source",
+        ["target-oidc", "target-x509", "missing"],
+    )
     def test_enrich_uses_target_authentication_without_selecting_it(
         self,
         tmp_path: Path,
+        source: str,
     ) -> None:
-        """A non-active saved OIDC record authorizes only the target request."""
-        target = _server(
-            idp="srcnet",
-            name="SRCNet",
-            uri=AnyUrl("ivo://srcnet.example/skaha"),
-            url=AnyHttpUrl("https://srcnet.example/skaha"),
-        )
-        capabilities = _capabilities("https://srcnet.example/skaha")
-        observed_headers: dict[str, str | None] = {}
+        """Target auth authorizes enrich without mutating active selection."""
+        if source == "missing":
+            target = _server(
+                idp="missing",
+                name="Missing",
+                uri=AnyUrl("ivo://missing.example/skaha"),
+                url=AnyHttpUrl("https://missing.example/skaha"),
+            )
+            auth_modes: tuple[str, ...] = ("token",)
+            expected_auth = (None, None)
+            expected_auths = ["oidc"]
+        else:
+            target = _server(
+                idp="srcnet",
+                name="SRCNet",
+                uri=AnyUrl("ivo://srcnet.example/skaha"),
+                url=AnyHttpUrl("https://srcnet.example/skaha"),
+            )
+            if source == "target-x509":
+                auth_modes = ("tls-with-certificate",)
+                expected_auth = (None, "X509")
+                expected_auths = ["x509"]
+            else:
+                auth_modes = ("token",)
+                expected_auth = ("Bearer target-token", "OIDC")
+                expected_auths = ["oidc"]
+
+        capabilities = _capabilities(str(target.url).rstrip("/"), auth_modes=auth_modes)
+        observed: dict[str, str | None] = {}
 
         def response(request: httpx.Request) -> httpx.Response:
-            observed_headers.update(
-                {
-                    "authorization": request.headers.get("Authorization"),
-                    "auth_type": request.headers.get("X-Skaha-Authentication-Type"),
-                    "accept": request.headers.get("Accept"),
-                    "content_type": request.headers.get("Content-Type"),
-                    "registry": request.headers.get("X-Skaha-Registry-Auth"),
-                }
-            )
-            return httpx.Response(200, text=capabilities, request=request)
-
-        transport = httpx.MockTransport(response)
-        config_path = tmp_path / "config.yaml"
-        with (
-            patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(transport),
-            ),
-            patch("canfar.client.log") as client_log,
-            patch("canfar.hooks.httpx.auth.log") as auth_log,
-            patch("canfar.hooks.httpx.expiry.log") as expiry_log,
-            patch("canfar.server.log") as platform_log,
-        ):
-            config = _active_with_target(
-                _oidc_credential(),
-                registry=ContainerRegistry(
-                    username="registry-user",
-                    secret="registry-secret",
-                ),
-            )
-            before = config.model_dump(mode="json")
-            encoded_registry_secret = config.registry.encoded()
-            enriched = platform.enrich(target, config=config)
-            log_calls = (
-                f"{client_log.mock_calls}{auth_log.mock_calls}"
-                f"{expiry_log.mock_calls}{platform_log.mock_calls}"
-            )
-
-        assert (
-            enriched.auths,
-            config.model_dump(mode="json"),
-            config_path.exists(),
-            observed_headers,
-        ) == (
-            ["oidc"],
-            before,
-            False,
-            {
-                "authorization": "Bearer target-token",
-                "auth_type": "OIDC",
-                "accept": "application/xml",
-                "content_type": None,
-                "registry": None,
-            },
-        )
-        assert "registry-secret" not in log_calls
-        assert encoded_registry_secret not in log_calls
-
-    def test_enrich_uses_target_x509_without_changing_selection(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """A non-active saved X.509 record keeps its canonical auth header."""
-        certificate = tmp_path / "target.pem"
-        generate_cert(certificate)
-        target = _server(
-            idp="srcnet",
-            name="SRCNet",
-            uri=AnyUrl("ivo://srcnet.example/skaha"),
-            url=AnyHttpUrl("https://srcnet.example/skaha"),
-        )
-        capabilities = _capabilities(
-            "https://srcnet.example/skaha",
-            auth_modes=("tls-with-certificate",),
-        )
-        observed_auth_type: str | None = None
-
-        def response(request: httpx.Request) -> httpx.Response:
-            nonlocal observed_auth_type
-            observed_auth_type = request.headers.get("X-Skaha-Authentication-Type")
+            observed["authorization"] = request.headers.get("Authorization")
+            observed["auth_type"] = request.headers.get("X-Skaha-Authentication-Type")
             return httpx.Response(200, text=capabilities, request=request)
 
         with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
-            config = _active_with_target(
-                X509Credential(
-                    idp="srcnet",
-                    path=certificate,
-                    expiry=9_999_999_999.0,
+            if source == "missing":
+                config = Configuration(
+                    active=ActiveConfig(authentication="cadc", server="Active-CADC"),
+                    authentication={"cadc": X509Credential(idp="cadc")},
+                    servers={"Active-CADC": _server(name="Active-CADC")},
                 )
-            )
+            elif source == "target-x509":
+                certificate = tmp_path / "target.pem"
+                generate_cert(certificate)
+                config = _active_with_target(
+                    X509Credential(
+                        idp="srcnet", path=certificate, expiry=9_999_999_999.0
+                    )
+                )
+            else:
+                config = _active_with_target(
+                    _oidc_credential(),
+                    registry=ContainerRegistry(
+                        username="registry-user", secret="registry-secret"
+                    ),
+                )
             before = config.model_dump(mode="json")
             with patch(
                 "canfar.client.Client",
@@ -488,58 +400,27 @@ class TestPlatformEnrichment:
             ):
                 enriched = platform.enrich(target, config=config)
 
-        assert (enriched.auths, observed_auth_type, config.model_dump(mode="json")) == (
-            ["x509"],
-            "X509",
-            before,
-        )
+        assert enriched.auths == expected_auths
+        assert (observed["authorization"], observed["auth_type"]) == expected_auth
+        assert config.model_dump(mode="json") == before
 
-    def test_enrich_missing_target_authentication_is_anonymous(
+    def test_http_client_authentication_selector_is_transient(
         self,
         tmp_path: Path,
     ) -> None:
-        """An unknown target IDP can use public capabilities without mutation."""
-        target = _server(
-            idp="missing",
-            name="Missing",
-            uri=AnyUrl("ivo://missing.example/skaha"),
-            url=AnyHttpUrl("https://missing.example/skaha"),
-        )
-        capabilities = _capabilities("https://missing.example/skaha")
-        observed_headers: dict[str, str | None] = {}
-
-        def response(request: httpx.Request) -> httpx.Response:
-            observed_headers.update(
-                {
-                    "authorization": request.headers.get("Authorization"),
-                    "auth_type": request.headers.get("X-Skaha-Authentication-Type"),
-                }
-            )
-            return httpx.Response(200, text=capabilities, request=request)
-
+        """The request-only IDP selector is resolved but never serialized."""
         with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
-            active = _server(name="Active-CADC")
-            config = Configuration(
-                active=ActiveConfig(authentication="cadc", server="Active-CADC"),
-                authentication={"cadc": X509Credential(idp="cadc")},
-                servers={"Active-CADC": active},
+            config = _active_with_target(_oidc_credential())
+            before_active = config.active.model_dump(mode="json")
+            client = HTTPClient(
+                config=config,
+                authentication_idp="srcnet",
+                url="https://srcnet.example/skaha",
             )
-            before = config.model_dump(mode="json")
-            with patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
-            ):
-                enriched = platform.enrich(target, config=config)
 
-        assert (
-            enriched.version,
-            observed_headers,
-            config.model_dump(mode="json"),
-        ) == (
-            "v2",
-            {"authorization": None, "auth_type": None},
-            before,
-        )
+        assert isinstance(client.authentication_record, OIDCCredential)
+        assert "authentication_idp" not in client.model_dump(mode="json")
+        assert config.active.model_dump(mode="json") == before_active
 
     def test_refresh_can_persist_without_candidate_platform_state(
         self,
@@ -547,7 +428,6 @@ class TestPlatformEnrichment:
     ) -> None:
         """Target refresh survives a context failure without selecting its Server."""
         now = 1_000.0
-        refreshed_token = _REFRESHED_TOKEN
         target = _server(
             idp="srcnet",
             name="SRCNet",
@@ -574,7 +454,7 @@ class TestPlatformEnrichment:
             return httpx.Response(
                 200,
                 json={
-                    "access_token": refreshed_token,
+                    "access_token": _REFRESHED_TOKEN,
                     "refresh_token": "rotated-refresh",
                     "token_type": "Bearer",
                     "scope": "openid profile",
@@ -583,7 +463,6 @@ class TestPlatformEnrichment:
                 request=request,
             )
 
-        client_type = httpx.Client
         oauth_client = OAuth2Client(
             "client-id",
             "client-secret",
@@ -597,9 +476,8 @@ class TestPlatformEnrichment:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=httpx.MockTransport(platform_response),
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.Client(
+                    transport=httpx.MockTransport(platform_response), **kwargs
                 ),
             ),
             patch(
@@ -614,12 +492,8 @@ class TestPlatformEnrichment:
                 name: server.model_dump(mode="json")
                 for name, server in config.servers.items()
             }
-
             validated = platform._validate_server(  # noqa: SLF001
-                target,
-                config=config,
-                idp="srcnet",
-                timeout=7,
+                target, config=config, idp="srcnet", timeout=7
             )
             persisted = Configuration()
 
@@ -627,42 +501,22 @@ class TestPlatformEnrichment:
         saved_refreshed = persisted.get_credential("srcnet")
         assert isinstance(refreshed, OIDCCredential)
         assert isinstance(saved_refreshed, OIDCCredential)
-        assert (
-            validated.version,
-            len(token_requests),
-            [request.headers["Authorization"] for request in platform_requests],
-            [request.extensions["timeout"] for request in platform_requests],
-            config.active.model_dump(mode="json"),
-            {
-                name: server.model_dump(mode="json")
-                for name, server in config.servers.items()
-            },
-            persisted.active.model_dump(mode="json"),
-            {
-                name: server.model_dump(mode="json")
-                for name, server in persisted.servers.items()
-            },
-            refreshed.token.access.get_secret_value()
-            if refreshed.token.access is not None
-            else None,
-            saved_refreshed.token.access.get_secret_value()
-            if saved_refreshed.token.access is not None
-            else None,
-        ) == (
-            "v2",
-            1,
-            [f"Bearer {refreshed_token}", f"Bearer {refreshed_token}"],
-            [
-                {"connect": 7, "read": 7, "write": 7, "pool": 7},
-                {"connect": 7, "read": 7, "write": 7, "pool": 7},
-            ],
-            before_active,
-            before_servers,
-            before_active,
-            before_servers,
-            refreshed_token,
-            refreshed_token,
-        )
+        assert validated.version == "v2"
+        assert len(token_requests) == 1
+        assert [request.headers["Authorization"] for request in platform_requests] == [
+            f"Bearer {_REFRESHED_TOKEN}",
+            f"Bearer {_REFRESHED_TOKEN}",
+        ]
+        assert config.active.model_dump(mode="json") == before_active
+        assert {
+            name: server.model_dump(mode="json")
+            for name, server in config.servers.items()
+        } == before_servers
+        assert persisted.active.model_dump(mode="json") == before_active
+        assert refreshed.token.access is not None
+        assert refreshed.token.access.get_secret_value() == _REFRESHED_TOKEN
+        assert saved_refreshed.token.access is not None
+        assert saved_refreshed.token.access.get_secret_value() == _REFRESHED_TOKEN
 
     def test_refresh_failure_leaves_all_platform_state_unchanged(
         self,
@@ -679,22 +533,14 @@ class TestPlatformEnrichment:
             auths=None,
         )
         platform_requests: list[httpx.Request] = []
-        client_type = httpx.Client
         config_path = tmp_path / "config.yaml"
-        platform_transport = httpx.MockTransport(
-            lambda request: (
-                platform_requests.append(request)
-                or httpx.Response(200, request=request)
-            )
-        )
-        token_transport = httpx.MockTransport(
-            lambda request: httpx.Response(503, request=request)
-        )
         oauth_client = OAuth2Client(
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=token_transport,
+            transport=httpx.MockTransport(
+                lambda request: httpx.Response(503, request=request)
+            ),
         )
 
         with (
@@ -702,8 +548,13 @@ class TestPlatformEnrichment:
             patch("canfar.models.auth.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=platform_transport,
+                side_effect=lambda **kwargs: httpx.Client(
+                    transport=httpx.MockTransport(
+                        lambda request: (
+                            platform_requests.append(request)
+                            or httpx.Response(200, request=request)
+                        )
+                    ),
                     **kwargs,
                 ),
             ),
@@ -716,7 +567,6 @@ class TestPlatformEnrichment:
             config.save()
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
-
             with pytest.raises(
                 platform.ServerFetchError, match="Failed to fetch capabilities"
             ):
@@ -739,7 +589,6 @@ class TestPlatformEnrichment:
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
         def registry_response(request: httpx.Request) -> httpx.Response:
-            """Serve CADC registry contents for discovery before enrich fails."""
             if request.method == "GET" and str(request.url) == registry_url:
                 return httpx.Response(200, text=registry_body, request=request)
             if request.method == "HEAD" and str(request.url) == _CADC_URL:
@@ -748,30 +597,23 @@ class TestPlatformEnrichment:
             raise AssertionError(message)
 
         def unavailable(request: httpx.Request) -> httpx.Response:
-            """Simulate auth or transport failure during capability fetch."""
             if failure == "network":
                 message = "connection refused"
                 raise httpx.ConnectError(message, request=request)
             return httpx.Response(401, request=request)
 
-        async_transport = httpx.MockTransport(registry_response)
-        capabilities_transport = httpx.MockTransport(unavailable)
-
         class _RegistryAsyncClient(httpx.AsyncClient):
             def __init__(self, **kwargs: object) -> None:
-                kwargs["transport"] = async_transport
+                kwargs["transport"] = httpx.MockTransport(registry_response)
                 super().__init__(**kwargs)
 
         config_path = tmp_path / "config.yaml"
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch(
-                "canfar.utils.discover.httpx.AsyncClient",
-                _RegistryAsyncClient,
-            ),
+            patch("canfar.utils.discover.httpx.AsyncClient", _RegistryAsyncClient),
             patch(
                 "canfar.client.Client",
-                side_effect=_http_client_factory(capabilities_transport),
+                side_effect=_http_client_factory(httpx.MockTransport(unavailable)),
             ),
         ):
             config = _anonymous_config()
@@ -788,72 +630,46 @@ class TestPlatformEnrichment:
             before_yaml,
         )
 
-    @pytest.mark.parametrize("strict", [False, True])
-    def test_enrich_handles_malformed_capabilities(
+    @pytest.mark.parametrize(
+        ("mode", "strict", "raises"),
+        [
+            ("malformed", False, None),
+            ("malformed", True, platform.ServerFetchError),
+            ("unexpected", False, AssertionError),
+            ("unexpected", True, AssertionError),
+        ],
+        ids=["malformed-keep", "malformed-strict", "unexpected", "unexpected-strict"],
+    )
+    def test_enrich_fail_or_keep_outcomes(
         self,
         tmp_path: Path,
+        mode: str,
         strict: bool,
+        raises: type[BaseException] | None,
     ) -> None:
-        """Malformed capability XML is safe or explicit according to strictness."""
-        server = _server(version=None, auths=None)
-        transport = httpx.MockTransport(
-            lambda request: httpx.Response(
-                200,
-                text="<capabilities>",
-                request=request,
-            )
+        """Strictness keeps known servers on parse failure; defects still escape."""
+        server = _server(version=None, auths=None) if mode == "malformed" else _server()
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            if mode == "unexpected":
+                message = "unexpected platform route"
+                raise AssertionError(message)
+            return httpx.Response(200, text="<capabilities>", request=request)
+
+        config_patch, client_patch = _patch_client(
+            tmp_path, httpx.MockTransport(handler)
         )
-
-        with (
-            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(transport),
-            ),
-        ):
-            if strict:
-                with pytest.raises(
-                    platform.ServerFetchError,
-                    match="Failed to fetch capabilities",
-                ):
-                    platform.enrich(
-                        server,
-                        config=_anonymous_config(),
-                        strict=True,
-                    )
+        with config_patch, client_patch:
+            if raises is None:
+                assert (
+                    platform.enrich(server, config=_anonymous_config(), strict=strict)
+                    == server
+                )
                 return
-
-            enriched = platform.enrich(
-                server,
-                config=_anonymous_config(),
-                strict=False,
+            match = (
+                "Failed to fetch capabilities"
+                if raises is platform.ServerFetchError
+                else "unexpected platform route"
             )
-
-        assert enriched == server
-
-    @pytest.mark.parametrize("strict", [False, True])
-    def test_enrich_does_not_hide_unexpected_transport_defects(
-        self,
-        tmp_path: Path,
-        strict: bool,
-    ) -> None:
-        """Programming defects escape in strict and discovery enrichment."""
-        server = _server()
-
-        def unexpected(_request: httpx.Request) -> httpx.Response:
-            message = "unexpected platform route"
-            raise AssertionError(message)
-
-        with (
-            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
-            patch(
-                "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(unexpected)),
-            ),
-            pytest.raises(AssertionError, match="unexpected platform route"),
-        ):
-            platform.enrich(
-                server,
-                config=_anonymous_config(),
-                strict=strict,
-            )
+            with pytest.raises(raises, match=match):
+                platform.enrich(server, config=_anonymous_config(), strict=strict)

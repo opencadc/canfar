@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import ExitStack
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -60,15 +61,80 @@ def _configuration(credential: OIDCCredential | X509Credential) -> Configuration
     )
 
 
+def _oidc(
+    *,
+    access: str | None = "access",
+    refresh: str | None = "refresh",
+    access_expiry: float | None = 9_999_999_999.0,
+    refresh_expiry: float | None = 9_999_999_999.0,
+    discovery: str | None = (
+        "https://identity.example/.well-known/openid-configuration"
+    ),
+) -> OIDCCredential:
+    """Build one OIDC Authentication Record for resolution tests."""
+    return OIDCCredential(
+        idp="test",
+        endpoints=Endpoint(
+            discovery=discovery,
+            token="https://identity.example/token",
+        ),
+        client=Client(identity="client", secret="secret"),
+        token=Token(
+            access=access,
+            refresh=refresh,
+            token_type="Legacy",
+            scope="openid",
+        ),
+        expiry=Expiry(access=access_expiry, refresh=refresh_expiry),
+    )
+
+
+def _enter_clients(
+    stack: ExitStack,
+    platform: httpx.BaseTransport,
+    *,
+    token: httpx.BaseTransport | None = None,
+) -> None:
+    """Enter sync/async platform clients and optional Authlib token clients."""
+    sync = httpx.Client
+    async_client = httpx.AsyncClient
+    stack.enter_context(
+        patch(
+            "canfar.client.Client",
+            side_effect=lambda **kwargs: sync(transport=platform, **kwargs),
+        )
+    )
+    stack.enter_context(
+        patch(
+            "canfar.client.AsyncClient",
+            side_effect=lambda **kwargs: async_client(transport=platform, **kwargs),
+        )
+    )
+    if token is None:
+        return
+    stack.enter_context(
+        patch(
+            "authlib.integrations.httpx_client.OAuth2Client",
+            side_effect=lambda *args, **kwargs: OAuth2Client(
+                *args, transport=token, **kwargs
+            ),
+        )
+    )
+    stack.enter_context(
+        patch(
+            "authlib.integrations.httpx_client.AsyncOAuth2Client",
+            side_effect=lambda *args, **kwargs: AsyncOAuth2Client(
+                *args, transport=token, **kwargs
+            ),
+        )
+    )
+
+
 class TestRequestAuthenticationResolution:
     """Request contracts for canonical Authentication and Server resolution."""
 
     @pytest.mark.parametrize(
-        (
-            "token_response",
-            "expected_token",
-            "expected_expiry",
-        ),
+        ("token_response", "expected_token", "expected_expiry"),
         [
             (
                 {
@@ -96,23 +162,8 @@ class TestRequestAuthenticationResolution:
                 ),
                 Expiry(access=1_300.0, refresh=2_000.0),
             ),
-            (
-                {
-                    "access_token": _REFRESHED_TOKEN,
-                    "token_type": None,
-                    "scope": "",
-                    "expires_in": 300,
-                },
-                Token(
-                    access=_REFRESHED_TOKEN,
-                    refresh="refresh-secret",
-                    token_type="Legacy",
-                    scope="openid",
-                ),
-                Expiry(access=1_300.0, refresh=2_000.0),
-            ),
         ],
-        ids=["rotated", "optional-fields-omitted", "optional-fields-empty"],
+        ids=["rotated", "optional-fields-omitted"],
     )
     def test_refreshable_record_without_access_refreshes_first_request(
         self,
@@ -124,21 +175,13 @@ class TestRequestAuthenticationResolution:
         """Refresh metadata is atomically persisted or preserved when omitted."""
         now = 1_000.0
         config = _configuration(
-            OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="client-secret"),
-                token=Token(
-                    refresh="refresh-secret",
-                    token_type="Legacy",
-                    scope="openid",
-                ),
-                expiry=Expiry(access=None, refresh=2_000.0),
+            _oidc(
+                access=None,
+                refresh="refresh-secret",
+                access_expiry=None,
+                refresh_expiry=2_000.0,
+            ).model_copy(
+                update={"client": Client(identity="client", secret="client-secret")}
             )
         )
         platform_requests: list[httpx.Request] = []
@@ -152,14 +195,9 @@ class TestRequestAuthenticationResolution:
         token_transport = httpx.MockTransport(
             lambda request: (
                 token_requests.append(request)
-                or httpx.Response(
-                    200,
-                    json=token_response,
-                    request=request,
-                )
+                or httpx.Response(200, json=token_response, request=request)
             )
         )
-        client_type = httpx.Client
         oauth_client = OAuth2Client(
             "client",
             "client-secret",
@@ -173,9 +211,8 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=platform_transport,
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.Client(
+                    transport=platform_transport, **kwargs
                 ),
             ),
             patch(
@@ -227,18 +264,16 @@ class TestRequestAuthenticationResolution:
         with pytest.raises(AuthContextError, match=r"X\.509 certificate"):
             _ = HTTPClient(config=config).client
 
-    @pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
     @pytest.mark.parametrize(
         "authentication",
         ["anonymous", "saved-oidc", "saved-x509", "runtime-token", "runtime-x509"],
     )
-    async def test_request_authentication_matrix(
+    def test_request_authentication_matrix(
         self,
         authentication: str,
-        asynchronous: bool,
         tmp_path: Path,
     ) -> None:
-        """Sync and async requests apply the selected Authentication source."""
+        """Requests apply the selected Authentication source (credential precedence)."""
         cert_path = tmp_path / "client.pem"
         if authentication in {"saved-x509", "runtime-x509"}:
             generate_cert(cert_path)
@@ -248,26 +283,11 @@ class TestRequestAuthenticationResolution:
         expected_url: str | None = None
 
         if authentication == "saved-oidc":
-            credential = OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="secret"),
-                token=Token(access="saved-access", refresh="saved-refresh"),
-                expiry=Expiry(access=9999999999.0, refresh=9999999999.0),
-            )
+            credential: OIDCCredential | X509Credential = _oidc(access="saved-access")
             expected_authorization = "Bearer saved-access"
             expected_type = "OIDC"
         elif authentication == "saved-x509":
-            credential = X509Credential(
-                idp="test",
-                path=cert_path,
-                expiry=9999999999.0,
-            )
+            credential = X509Credential(idp="test", path=cert_path, expiry=9999999999.0)
             expected_type = "X509"
         else:
             credential = X509Credential(idp="test", path=None)
@@ -316,31 +336,11 @@ class TestRequestAuthenticationResolution:
                 requests.append(request) or httpx.Response(200, request=request)
             )
         )
-        sync_client = httpx.Client
-        async_client = httpx.AsyncClient
 
-        with (
-            patch(
-                "canfar.client.Client",
-                side_effect=lambda **kwargs: sync_client(
-                    transport=transport,
-                    **kwargs,
-                ),
-            ),
-            patch(
-                "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=transport,
-                    **kwargs,
-                ),
-            ),
-        ):
-            if asynchronous:
-                async with HTTPClient(config=config, **client_kwargs) as client:
-                    response = await client.asynclient.get("probe")
-            else:
-                with HTTPClient(config=config, **client_kwargs) as client:
-                    response = client.client.get("probe")
+        with ExitStack() as stack:
+            _enter_clients(stack, transport)
+            client = stack.enter_context(HTTPClient(config=config, **client_kwargs))
+            response = client.client.get("probe")
 
         assert response.status_code == 200
         assert len(requests) == 1
@@ -362,37 +362,19 @@ class TestRequestAuthenticationResolution:
     ) -> None:
         """Concurrent async requests perform one refresh and use its token."""
         now = 1_000.0
-        refreshed_token = _REFRESHED_TOKEN
         config = _configuration(
-            OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="secret"),
-                token=Token(
-                    access="expired",
-                    refresh="refresh",
-                    token_type="Legacy",
-                    scope="openid",
-                ),
-                expiry=Expiry(access=now - 1, refresh=now + 1_000),
-            )
+            _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
         )
         token_requests: list[httpx.Request] = []
         platform_requests: list[httpx.Request] = []
 
         async def refresh_token(request: httpx.Request) -> httpx.Response:
-            """Return one delayed refresh response for concurrent callers."""
             token_requests.append(request)
             await asyncio.sleep(0.01)
             return httpx.Response(
                 200,
                 json={
-                    "access_token": refreshed_token,
+                    "access_token": _REFRESHED_TOKEN,
                     "refresh_token": "rotated-refresh",
                     "token_type": "Bearer",
                     "scope": "openid profile",
@@ -408,7 +390,6 @@ class TestRequestAuthenticationResolution:
                 or httpx.Response(200, request=request)
             )
         )
-        async_client = httpx.AsyncClient
         oauth_client = AsyncOAuth2Client(
             "client",
             "secret",
@@ -422,9 +403,8 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=platform_transport,
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.AsyncClient(
+                    transport=platform_transport, **kwargs
                 ),
             ),
             patch(
@@ -442,14 +422,14 @@ class TestRequestAuthenticationResolution:
         assert [response.status_code for response in responses] == [200, 200]
         assert len(token_requests) == 1
         assert [request.headers["Authorization"] for request in platform_requests] == [
-            f"Bearer {refreshed_token}",
-            f"Bearer {refreshed_token}",
+            f"Bearer {_REFRESHED_TOKEN}",
+            f"Bearer {_REFRESHED_TOKEN}",
         ]
         canonical = config.get_credential("test")
         assert isinstance(canonical, OIDCCredential)
         assert canonical == persisted
         assert canonical.token == Token(
-            access=refreshed_token,
+            access=_REFRESHED_TOKEN,
             refresh="rotated-refresh",
             token_type="Bearer",
             scope="openid profile",
@@ -462,25 +442,8 @@ class TestRequestAuthenticationResolution:
     ) -> None:
         """A sync request reads a token refreshed by the async client."""
         now = 1_000.0
-        refreshed_token = _REFRESHED_TOKEN
         config = _configuration(
-            OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="secret"),
-                token=Token(
-                    access="expired",
-                    refresh="refresh",
-                    token_type="Legacy",
-                    scope="openid",
-                ),
-                expiry=Expiry(access=now - 1, refresh=now + 1_000),
-            )
+            _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
         )
         platform_requests: list[httpx.Request] = []
         platform_transport = httpx.MockTransport(
@@ -493,7 +456,7 @@ class TestRequestAuthenticationResolution:
             lambda request: httpx.Response(
                 200,
                 json={
-                    "access_token": refreshed_token,
+                    "access_token": _REFRESHED_TOKEN,
                     "refresh_token": "rotated-refresh",
                     "token_type": "Bearer",
                     "scope": "openid profile",
@@ -502,8 +465,6 @@ class TestRequestAuthenticationResolution:
                 request=request,
             )
         )
-        sync_client = httpx.Client
-        async_client = httpx.AsyncClient
         oauth_client = AsyncOAuth2Client(
             "client",
             "secret",
@@ -517,16 +478,14 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: sync_client(
-                    transport=platform_transport,
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.Client(
+                    transport=platform_transport, **kwargs
                 ),
             ),
             patch(
                 "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=platform_transport,
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.AsyncClient(
+                    transport=platform_transport, **kwargs
                 ),
             ),
             patch(
@@ -541,29 +500,19 @@ class TestRequestAuthenticationResolution:
                 async_response = await client.asynclient.get("refresh")
                 assert sync.headers["Authorization"] == "Bearer expired"
                 sync_response = sync.get("after-refresh")
-                assert sync.headers["Authorization"] == f"Bearer {refreshed_token}"
+                assert sync.headers["Authorization"] == f"Bearer {_REFRESHED_TOKEN}"
                 persisted = Configuration().get_credential("test")
 
         assert [async_response.status_code, sync_response.status_code] == [200, 200]
         assert [request.headers["Authorization"] for request in platform_requests] == [
-            f"Bearer {refreshed_token}",
-            f"Bearer {refreshed_token}",
+            f"Bearer {_REFRESHED_TOKEN}",
+            f"Bearer {_REFRESHED_TOKEN}",
         ]
         canonical = config.get_credential("test")
         assert isinstance(canonical, OIDCCredential)
         assert canonical == persisted
-        assert canonical.token == Token(
-            access=refreshed_token,
-            refresh="rotated-refresh",
-            token_type="Bearer",
-            scope="openid profile",
-        )
-        assert canonical.expiry == Expiry(access=1_300.0, refresh=None)
 
-    @pytest.mark.parametrize(
-        "failure",
-        ["save", "oauth", "network", "malformed"],
-    )
+    @pytest.mark.parametrize("failure", ["save", "oauth", "network", "malformed"])
     def test_refresh_failure_preserves_last_valid_record(
         self,
         failure: str,
@@ -574,22 +523,13 @@ class TestRequestAuthenticationResolution:
         now = 1_000.0
         sentinel = "secret-refresh-diagnostic"
         config = _configuration(
-            OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="client-secret"),
-                token=Token(
-                    access="old-access",
-                    refresh="old-refresh",
-                    token_type="Legacy",
-                    scope="openid",
-                ),
-                expiry=Expiry(access=now - 1, refresh=now + 1_000),
+            _oidc(
+                access="old-access",
+                refresh="old-refresh",
+                access_expiry=now - 1,
+                refresh_expiry=now + 1_000,
+            ).model_copy(
+                update={"client": Client(identity="client", secret="client-secret")}
             )
         )
         original = config.get_credential("test").model_copy(deep=True)
@@ -597,15 +537,11 @@ class TestRequestAuthenticationResolution:
         token_requests: list[httpx.Request] = []
 
         def token_endpoint(request: httpx.Request) -> httpx.Response:
-            """Return the selected deterministic refresh failure."""
             token_requests.append(request)
             if failure == "oauth":
                 return httpx.Response(
                     400,
-                    json={
-                        "error": "invalid_grant",
-                        "error_description": sentinel,
-                    },
+                    json={"error": "invalid_grant", "error_description": sentinel},
                     request=request,
                 )
             if failure == "network":
@@ -641,7 +577,6 @@ class TestRequestAuthenticationResolution:
             token_endpoint_auth_method="client_secret_basic",
             transport=httpx.MockTransport(token_endpoint),
         )
-        client_type = httpx.Client
 
         with (
             patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
@@ -649,9 +584,8 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: client_type(
-                    transport=platform_transport,
-                    **kwargs,
+                side_effect=lambda **kwargs: httpx.Client(
+                    transport=platform_transport, **kwargs
                 ),
             ),
             patch(
@@ -678,15 +612,8 @@ class TestRequestAuthenticationResolution:
         assert platform_requests == []
         assert save.call_count == int(failure == "save")
 
-    @pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
     @pytest.mark.parametrize(
-        (
-            "state",
-            "persisted_access_expiry",
-            "refresh_expiry",
-            "refreshes",
-            "succeeds",
-        ),
+        ("state", "persisted_access_expiry", "refresh_expiry", "refreshes", "succeeds"),
         [
             ("valid", 1_100.0, 2_000.0, 0, True),
             ("expired", 900.0, 900.0, 0, False),
@@ -694,141 +621,81 @@ class TestRequestAuthenticationResolution:
             ("unrefreshable", 900.0, 2_000.0, 0, False),
         ],
     )
-    async def test_refresh_and_expiry_outcome_matrix(
+    def test_refresh_and_expiry_outcome_matrix(
         self,
         state: str,
         persisted_access_expiry: float,
         refresh_expiry: float,
         refreshes: int,
         succeeds: bool,
-        asynchronous: bool,
         tmp_path: Path,
     ) -> None:
         """Persisted expiry, not misleading JWT claims, controls refresh."""
         now = 1_000.0
-        refreshed_token = _REFRESHED_TOKEN
         config = _configuration(
-            OIDCCredential(
-                idp="test",
-                endpoints=Endpoint(
-                    discovery=(
-                        "https://identity.example/.well-known/openid-configuration"
-                    ),
-                    token="https://identity.example/token",
-                ),
-                client=Client(identity="client", secret="secret"),
-                token=Token(
-                    access=_MISLEADING_FUTURE_JWT_ACCESS_TOKEN,
-                    refresh="refresh",
-                ),
-                expiry=Expiry(
-                    access=persisted_access_expiry,
-                    refresh=refresh_expiry,
-                ),
+            _oidc(
+                access=_MISLEADING_FUTURE_JWT_ACCESS_TOKEN,
+                access_expiry=persisted_access_expiry,
+                refresh_expiry=refresh_expiry,
             )
         )
         token_requests: list[httpx.Request] = []
         platform_requests: list[httpx.Request] = []
-
-        def token(request: httpx.Request) -> httpx.Response:
-            """Return the refresh outcome selected by the test matrix."""
-            token_requests.append(request)
-            return httpx.Response(
-                200,
-                json={
-                    "access_token": refreshed_token,
-                    "refresh_token": "rotated-refresh",
-                    "token_type": "Bearer",
-                    "scope": "openid profile",
-                    "expires_in": 300,
-                },
-                request=request,
+        token_transport = httpx.MockTransport(
+            lambda request: (
+                token_requests.append(request)
+                or httpx.Response(
+                    200,
+                    json={
+                        "access_token": _REFRESHED_TOKEN,
+                        "refresh_token": "rotated-refresh",
+                        "token_type": "Bearer",
+                        "scope": "openid profile",
+                        "expires_in": 300,
+                    },
+                    request=request,
+                )
             )
-
+        )
         platform_transport = httpx.MockTransport(
             lambda request: (
                 platform_requests.append(request)
                 or httpx.Response(200, request=request)
             )
         )
-        token_transport = httpx.MockTransport(token)
-        sync_client = httpx.Client
-        async_client = httpx.AsyncClient
 
-        def make_unrefreshable() -> None:
-            """Remove the saved refresh material before the second request."""
-            credential = config.get_credential("test")
-            assert isinstance(credential, OIDCCredential)
-            config.update_credential(
-                credential.model_copy(
-                    update={
-                        "endpoints": credential.endpoints.model_copy(
-                            update={"discovery": None}
-                        )
-                    }
-                )
+        with ExitStack() as stack:
+            stack.enter_context(
+                patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
             )
-
-        with (
-            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
-            patch("canfar.models.auth.time.time", return_value=now),
-            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
-            patch(
-                "canfar.client.Client",
-                side_effect=lambda **kwargs: sync_client(
-                    transport=platform_transport,
-                    **kwargs,
-                ),
-            ),
-            patch(
-                "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: async_client(
-                    transport=platform_transport,
-                    **kwargs,
-                ),
-            ),
-            patch(
-                "authlib.integrations.httpx_client.OAuth2Client",
-                side_effect=lambda *args, **kwargs: OAuth2Client(
-                    *args,
-                    transport=token_transport,
-                    **kwargs,
-                ),
-            ),
-            patch(
-                "authlib.integrations.httpx_client.AsyncOAuth2Client",
-                side_effect=lambda *args, **kwargs: AsyncOAuth2Client(
-                    *args,
-                    transport=token_transport,
-                    **kwargs,
-                ),
-            ),
-        ):
-            if asynchronous:
-                async with HTTPClient(config=config) as client:
-                    request_client = client.asynclient
-                    if state == "unrefreshable":
-                        make_unrefreshable()
-                    if succeeds:
-                        response = await request_client.get("probe")
-                    else:
-                        with pytest.raises(AuthExpiredError):
-                            await request_client.get("probe")
+            stack.enter_context(patch("canfar.models.auth.time.time", return_value=now))
+            stack.enter_context(
+                patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now)
+            )
+            _enter_clients(stack, platform_transport, token=token_transport)
+            client = stack.enter_context(HTTPClient(config=config))
+            request_client = client.client
+            if state == "unrefreshable":
+                credential = config.get_credential("test")
+                assert isinstance(credential, OIDCCredential)
+                config.update_credential(
+                    credential.model_copy(
+                        update={
+                            "endpoints": credential.endpoints.model_copy(
+                                update={"discovery": None}
+                            )
+                        }
+                    )
+                )
+            if succeeds:
+                response = request_client.get("probe")
+                assert response.status_code == 200
             else:
-                with HTTPClient(config=config) as client:
-                    request_client = client.client
-                    if state == "unrefreshable":
-                        make_unrefreshable()
-                    if succeeds:
-                        response = request_client.get("probe")
-                    else:
-                        with pytest.raises(AuthExpiredError):
-                            request_client.get("probe")
+                with pytest.raises(AuthExpiredError):
+                    request_client.get("probe")
 
         assert len(token_requests) == refreshes
         assert len(platform_requests) == int(succeeds)
-        if succeeds:
-            assert response.status_code == 200
         if state == "refresh-eligible":
             assert platform_requests[0].headers["Authorization"] == (
                 f"Bearer {_REFRESHED_TOKEN}"

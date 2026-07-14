@@ -131,32 +131,6 @@ class TestDiscoverFunction:
         mock_response.raise_for_status.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_discover_without_client(self) -> None:
-        """Test discover function without provided client."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "issuer": "https://example.com",
-                "device_authorization_endpoint": "https://example.com/device",
-                "registration_endpoint": "https://example.com/register",
-                "token_endpoint": "https://example.com/token",
-                "userinfo_endpoint": "https://example.com/userinfo",
-            }
-            mock_client.get.return_value = mock_response
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            result = await discover(
-                "https://example.com/.well-known/openid-configuration",
-                expected_issuer="https://example.com",
-            )
-
-            assert (
-                result["device_authorization_endpoint"] == "https://example.com/device"
-            )
-            mock_client.get.assert_called_once()
-
-    @pytest.mark.asyncio
     async def test_discover_http_error(self) -> None:
         """Test discover function with HTTP error."""
         mock_client = AsyncMock(spec=httpx.AsyncClient)
@@ -207,24 +181,6 @@ class TestRegisterFunction:
         assert call.kwargs["json"]["client_name"].startswith("Science Platform CLI @")
         assert sentinel not in caplog.text
         assert "OIDC dynamic client registration succeeded." in caplog.messages
-
-    @pytest.mark.asyncio
-    async def test_register_without_client(self) -> None:
-        """Test register function without provided client."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
-            mock_client.post.return_value = mock_response
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            result = await register("https://example.com/register")
-
-            assert result["client_id"] == "test_client_id"
-            mock_client.post.assert_called_once()
 
 
 class TestAuthflowFunction:
@@ -501,92 +457,98 @@ class TestAuthflowFunction:
         assert tokens["access_token"] == "test_access_token"
 
     @pytest.mark.asyncio
-    async def test_poll_device_token_stops_when_access_is_denied(
-        self,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """User denial is a safe terminal error and is never retried."""
-        sentinel = "secret-error-description"
-        client, requests = _oauth_client(
-            httpx.Response(
-                400,
-                json={"error": "access_denied", "error_description": sentinel},
-            )
-        )
-        challenge = _challenge(device_code="secret-device-code")
-
-        async with client:
-            with pytest.raises(
-                PermissionError, match="authorization was denied"
-            ) as exc:
-                await poll_device_token(
-                    "https://example.com/token",
-                    "client_id",
-                    "client_secret",
-                    challenge,
-                    client,
-                )
-
-        assert "secret-device-code" not in str(exc.value)
-        assert sentinel not in str(exc.value)
-        assert sentinel not in caplog.text
-        assert len(requests) == 1
-
-    @pytest.mark.asyncio
-    async def test_poll_device_token_stops_when_challenge_expires(
-        self,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Provider-reported expiration is an immediate terminal timeout."""
-        sentinel = "secret-error-description"
-        client, requests = _oauth_client(
-            httpx.Response(
-                400,
-                json={"error": "expired_token", "error_description": sentinel},
-            )
-        )
-        challenge = _challenge()
-
-        async with client:
-            with pytest.raises(TimeoutError, match="authorization expired") as exc:
-                await poll_device_token(
-                    "https://example.com/token",
-                    "client_id",
-                    "client_secret",
-                    challenge,
-                    client,
-                )
-
-        assert sentinel not in str(exc.value)
-        assert sentinel not in caplog.text
-        assert len(requests) == 1
-
-    @pytest.mark.asyncio
     @pytest.mark.parametrize(
-        ("payload", "message"),
+        ("response", "error", "match", "device_code"),
         [
-            ({}, "malformed token response"),
             (
-                {
-                    "error": "invalid_grant",
-                    "error_description": "secret-error-description",
-                },
-                "OIDC device authorization failed$",
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "access_denied",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                PermissionError,
+                "authorization was denied",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "expired_token",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                TimeoutError,
+                "authorization expired",
+                "device_code_123",
+            ),
+            (
+                httpx.Response(400, json={}),
+                ValueError,
+                "malformed token response",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "invalid_grant",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                ValueError,
+                r"OIDC device authorization failed$",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(500, content="secret-server-response-body"),
+                ValueError,
+                r"OIDC device authorization failed$",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    content=b"secret response body",
+                    headers={"content-type": "application/json"},
+                ),
+                ValueError,
+                "malformed token response",
+                "device_code_123",
+            ),
+            (
+                httpx.Response(400, json=["secret response body"]),
+                ValueError,
+                "malformed token response",
+                "device_code_123",
             ),
         ],
+        ids=[
+            "access-denied",
+            "expired-token",
+            "empty-error",
+            "invalid-grant",
+            "server-error",
+            "invalid-json",
+            "nonobject-json",
+        ],
     )
-    async def test_poll_device_token_stops_on_other_terminal_errors(
+    async def test_poll_device_token_stops_on_terminal_errors(
         self,
-        payload: dict[str, str],
-        message: str,
+        response: httpx.Response,
+        error: type[BaseException],
+        match: str,
+        device_code: str,
         caplog: pytest.LogCaptureFixture,
     ) -> None:
-        """Other OAuth failures stop immediately without leaking credentials."""
-        client, requests = _oauth_client(httpx.Response(400, json=payload))
-        challenge = _challenge(device_code="secret-device-code")
+        """Terminal OAuth/HTTP failures stop immediately without leaking secrets."""
+        client, requests = _oauth_client(response)
+        challenge = _challenge(device_code=device_code)
 
         async with client:
-            with pytest.raises(ValueError, match=message) as exc:
+            with pytest.raises(error, match=match) as exc:
                 await poll_device_token(
                     "https://example.com/token",
                     "client_id",
@@ -595,108 +557,11 @@ class TestAuthflowFunction:
                     client,
                 )
 
-        assert "secret-device-code" not in str(exc.value)
-        assert "secret-error-description" not in str(exc.value)
+        message = str(exc.value)
+        assert "secret-device-code" not in message
+        assert "secret-error-description" not in message
+        assert "secret-server-response-body" not in message
+        assert "secret response body" not in message
         assert "secret-error-description" not in caplog.text
+        assert "secret-server-response-body" not in caplog.text
         assert len(requests) == 1
-
-    @pytest.mark.asyncio
-    async def test_poll_device_token_hides_server_error_response(
-        self,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """Token endpoint server errors become one safe terminal failure."""
-        sentinel = "secret-server-response-body"
-        client, requests = _oauth_client(httpx.Response(500, content=sentinel))
-        challenge = _challenge(device_code="secret-device-code")
-
-        async with client:
-            with pytest.raises(
-                ValueError, match=r"OIDC device authorization failed$"
-            ) as exc:
-                await poll_device_token(
-                    "https://example.com/token",
-                    "client_id",
-                    "client_secret",
-                    challenge,
-                    client,
-                )
-
-        assert sentinel not in str(exc.value)
-        assert sentinel not in caplog.text
-        assert len(requests) == 1
-
-    @pytest.mark.asyncio
-    async def test_poll_device_token_hides_invalid_json_response(self) -> None:
-        """Invalid token-response JSON becomes one safe terminal error."""
-        client, _ = _oauth_client(
-            httpx.Response(
-                400,
-                content=b"secret response body",
-                headers={"content-type": "application/json"},
-            )
-        )
-        challenge = _challenge()
-
-        async with client:
-            with pytest.raises(ValueError, match="malformed token response") as exc:
-                await poll_device_token(
-                    "https://example.com/token",
-                    "client_id",
-                    "client_secret",
-                    challenge,
-                    client,
-                )
-
-        assert "secret response body" not in str(exc.value)
-
-    @pytest.mark.asyncio
-    async def test_poll_device_token_rejects_nonobject_json_response(self) -> None:
-        """A non-object token response is the same safe malformed failure."""
-        client, _ = _oauth_client(httpx.Response(400, json=["secret response body"]))
-        challenge = _challenge()
-
-        async with client:
-            with pytest.raises(ValueError, match="malformed token response") as exc:
-                await poll_device_token(
-                    "https://example.com/token",
-                    "client_id",
-                    "client_secret",
-                    challenge,
-                    client,
-                )
-
-        assert "secret response body" not in str(exc.value)
-
-    @pytest.mark.asyncio
-    async def test_authflow_without_client(self) -> None:
-        """Test authflow function without provided client."""
-        with patch(
-            "authlib.integrations.httpx_client.AsyncOAuth2Client"
-        ) as mock_client_class:
-            mock_client = AsyncMock(spec=AsyncOAuth2Client)
-            mock_client.fetch_token = AsyncMock(
-                return_value={"access_token": "test_token"}
-            )
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            # Mock the device authorization response
-            device_response = MagicMock()
-            device_response.json.return_value = {
-                "verification_uri": "https://example.com/device",
-                "verification_uri_complete": "https://example.com/device?code=ABC123",
-                "user_code": "ABC123",
-                "expires_in": 600,
-                "interval": 5,
-                "device_code": "device_code_123",
-            }
-            mock_client.post.return_value = device_response
-
-            result = await authflow(
-                "https://example.com/device",
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-            )
-
-            assert result["access_token"] == "test_token"

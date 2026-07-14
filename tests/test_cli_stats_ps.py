@@ -15,6 +15,7 @@ from canfar.cli.ps import ps
 from canfar.cli.stats import stats
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 runner = CliRunner()
@@ -165,8 +166,16 @@ def test_ps_quiet_prints_all_matching_session_ids() -> None:
     assert result.stdout.splitlines() == ["running-1", "done-1", "running-2"]
 
 
-def test_ps_json_emits_filtered_session_array(tmp_path: Path) -> None:
-    """``ps --json`` emits validated session models with running-only filtering."""
+@pytest.mark.parametrize(
+    ("flag", "load"),
+    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+)
+def test_ps_machine_emits_filtered_session_array(
+    tmp_path: Path,
+    flag: str,
+    load: Callable[[str], object],
+) -> None:
+    """Machine ``ps`` emits validated session models with running-only filtering."""
     config_path = tmp_path / "config.yaml"
     payloads = [
         _session_payload("running-1", status="Running"),
@@ -179,34 +188,14 @@ def test_ps_json_emits_filtered_session_array(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--json"])
+        result = runner.invoke(ps, [flag])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
-    data = json.loads(result.stdout)
+    data = load(result.stdout)
     assert isinstance(data, list)
     assert [item["id"] for item in data] == ["running-1"]
     assert all(set(item) == _SESSION_KEYS for item in data)
-
-
-def test_ps_yaml_emits_filtered_session_array(tmp_path: Path) -> None:
-    """``ps --yaml`` emits the same filtered session payload as ``--json``."""
-    config_path = tmp_path / "config.yaml"
-    payloads = [_session_payload("running-1", status="Running")]
-
-    with (
-        _patch_config(config_path),
-        patch("canfar.cli.ps.AsyncSession") as session_cls,
-    ):
-        session = _mock_async_session(session_cls)
-        session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--yaml"])
-
-    assert result.exit_code == 0
-    data = yaml.safe_load(result.stdout)
-    assert isinstance(data, list)
-    assert data[0]["id"] == "running-1"
-    assert set(data[0]) == _SESSION_KEYS
 
 
 def test_ps_json_kind_filter_parity(tmp_path: Path) -> None:

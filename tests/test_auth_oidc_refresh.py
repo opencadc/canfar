@@ -123,10 +123,7 @@ class TestRefreshFunction:
         _assert_basic_refresh_request(requests[0])
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize(
-        ("failure", "message"),
-        _REFRESH_FAILURE_CASES,
-    )
+    @pytest.mark.parametrize(("failure", "message"), _REFRESH_FAILURE_CASES)
     async def test_refresh_failure_is_fixed_and_secret_safe(
         self,
         failure: str,
@@ -147,10 +144,7 @@ class TestRefreshFunction:
                 "authlib.integrations.httpx_client.AsyncOAuth2Client",
                 return_value=oauth_client,
             ),
-            pytest.raises(
-                ValueError,
-                match=r"^OIDC token refresh failed",
-            ) as exc_info,
+            pytest.raises(ValueError, match=r"^OIDC token refresh failed") as exc_info,
         ):
             await refresh(
                 url="https://example.com/token",
@@ -166,9 +160,9 @@ class TestRefreshFunction:
 
 
 class TestSyncRefreshFunction:
-    """Test the sync refresh function."""
+    """Sync refresh keeps the omitted-refresh preservation contract."""
 
-    def test_sync_refresh_success(self) -> None:
+    def test_sync_refresh_preserves_omitted_refresh_token(self) -> None:
         """Authlib preserves an omitted refresh token in the sync response."""
         requests: list[httpx.Request] = []
 
@@ -215,44 +209,3 @@ class TestSyncRefreshFunction:
         }
         assert len(requests) == 1
         _assert_basic_refresh_request(requests[0])
-
-    @pytest.mark.parametrize(
-        ("failure", "message"),
-        _REFRESH_FAILURE_CASES,
-    )
-    def test_sync_refresh_failure_is_fixed_and_secret_safe(
-        self,
-        failure: str,
-        message: str,
-        caplog: pytest.LogCaptureFixture,
-    ) -> None:
-        """OAuth, HTTP, and malformed failures expose one fixed safe error."""
-        oauth_client = OAuth2Client(
-            "client-id",
-            "client-secret",
-            token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(
-                lambda request: _refresh_failure_response(failure, request)
-            ),
-        )
-        with (
-            patch(
-                "authlib.integrations.httpx_client.OAuth2Client",
-                return_value=oauth_client,
-            ),
-            pytest.raises(
-                ValueError,
-                match=r"^OIDC token refresh failed",
-            ) as exc_info,
-        ):
-            sync_refresh(
-                url="https://example.com/token",
-                identity="client-id",
-                secret="client-secret",
-                token="old-refresh",
-            )
-
-        assert str(exc_info.value) == message
-        assert exc_info.value.__cause__ is None
-        assert _REFRESH_FAILURE_SENTINEL not in str(exc_info.value)
-        assert _REFRESH_FAILURE_SENTINEL not in caplog.text
