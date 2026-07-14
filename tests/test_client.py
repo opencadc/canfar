@@ -337,7 +337,9 @@ class TestBaseURLConstruction:
         config = configuration_from_legacy_context("test", custom_context)
 
         client = canfar_client_fixture(config=config)
-        with pytest.raises(ValueError, match="Server not found in auth context"):
+        with pytest.raises(
+            ValueError, match="Server not found for Authentication Record"
+        ):
             client._get_base_url()
 
 

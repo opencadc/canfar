@@ -9,7 +9,7 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - User-facing library operations live in `canfar/sessions.py`, `canfar/images.py`, `canfar/context.py`, and `canfar/overview.py`.
 - Typer command adapters live in `canfar/cli/` and should stay thin over library modules.
 - Auth flows live in `canfar/auth/`; request/response hooks live in `canfar/hooks/`.
-- Discovery, display, logging, request builders, and other helper modules live in `canfar/utils/`.
+- Discovery, logging, request builders, and other helper modules live in `canfar/utils/`.
 
 ## Current Seams
 

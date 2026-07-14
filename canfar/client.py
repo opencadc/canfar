@@ -243,11 +243,12 @@ class HTTPClient(BaseSettings):
             server = self.config.get_active_server()
         except KeyError as exc:
             msg = (
-                f"Server not found in auth context: {self.config.active.authentication}"
+                "Server not found for Authentication Record: "
+                f"{self.config.active.authentication}"
             )
             raise ValueError(msg) from exc
         if server.url is None:
-            msg = f"Server not found in auth context: {server}"
+            msg = f"Server not found for Authentication Record: {server}"
             raise ValueError(msg)
         return URL(f"{server.url}/{server.version}")
 
