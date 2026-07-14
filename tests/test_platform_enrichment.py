@@ -157,6 +157,7 @@ class TestPlatformEnrichment:
         requests: list[httpx.Request] = []
 
         def response(request: httpx.Request) -> httpx.Response:
+            """Serve capabilities and context for activation enrichment."""
             requests.append(request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
@@ -206,6 +207,7 @@ class TestPlatformEnrichment:
         known = _server(name="Stable-Name", cores=8, ram=64, gpus=1, status="reachable")
 
         def response(request: httpx.Request) -> httpx.Response:
+            """Serve capabilities and a parametrized unusable context reply."""
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
                     200, text=_capabilities(_CADC_URL), request=request
@@ -314,6 +316,7 @@ class TestPlatformEnrichment:
         )
 
         def response(request: httpx.Request) -> httpx.Response:
+            """Serve validated capability metadata for enrich."""
             assert str(request.url) == "https://registry.example/skaha/capabilities"
             return httpx.Response(200, text=capabilities, request=request)
 
@@ -365,13 +368,18 @@ class TestPlatformEnrichment:
 
         capabilities = _capabilities(str(target.url).rstrip("/"), auth_modes=auth_modes)
         observed: dict[str, str | None] = {}
+        config_path = tmp_path / "config.yaml"
 
         def response(request: httpx.Request) -> httpx.Response:
+            """Capture enrich capabilities request headers and return XML."""
             observed["authorization"] = request.headers.get("Authorization")
             observed["auth_type"] = request.headers.get("X-Skaha-Authentication-Type")
+            observed["accept"] = request.headers.get("Accept")
+            observed["content_type"] = request.headers.get("Content-Type")
+            observed["registry"] = request.headers.get("X-Skaha-Registry-Auth")
             return httpx.Response(200, text=capabilities, request=request)
 
-        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
             if source == "missing":
                 config = Configuration(
                     active=ActiveConfig(authentication="cadc", server="Active-CADC"),
@@ -402,7 +410,11 @@ class TestPlatformEnrichment:
 
         assert enriched.auths == expected_auths
         assert (observed["authorization"], observed["auth_type"]) == expected_auth
+        assert observed["accept"] == "application/xml"
+        assert observed["content_type"] is None
+        assert observed["registry"] is None
         assert config.model_dump(mode="json") == before
+        assert config_path.exists() is False
 
     def test_http_client_authentication_selector_is_transient(
         self,
@@ -441,6 +453,7 @@ class TestPlatformEnrichment:
         token_requests: list[httpx.Request] = []
 
         def platform_response(request: httpx.Request) -> httpx.Response:
+            """Serve capabilities then a failed context fetch during refresh."""
             platform_requests.append(request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(200, text=capabilities, request=request)
@@ -450,6 +463,7 @@ class TestPlatformEnrichment:
             raise AssertionError(message)
 
         def token_response(request: httpx.Request) -> httpx.Response:
+            """Return a successful OIDC token refresh payload."""
             token_requests.append(request)
             return httpx.Response(
                 200,
@@ -589,6 +603,7 @@ class TestPlatformEnrichment:
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
         def registry_response(request: httpx.Request) -> httpx.Response:
+            """Serve CADC registry contents for discovery before enrich fails."""
             if request.method == "GET" and str(request.url) == registry_url:
                 return httpx.Response(200, text=registry_body, request=request)
             if request.method == "HEAD" and str(request.url) == _CADC_URL:
@@ -597,6 +612,7 @@ class TestPlatformEnrichment:
             raise AssertionError(message)
 
         def unavailable(request: httpx.Request) -> httpx.Response:
+            """Simulate auth or transport failure during capability fetch."""
             if failure == "network":
                 message = "connection refused"
                 raise httpx.ConnectError(message, request=request)
@@ -651,6 +667,7 @@ class TestPlatformEnrichment:
         server = _server(version=None, auths=None) if mode == "malformed" else _server()
 
         def handler(request: httpx.Request) -> httpx.Response:
+            """Return malformed capabilities or raise an unexpected defect."""
             if mode == "unexpected":
                 message = "unexpected platform route"
                 raise AssertionError(message)
