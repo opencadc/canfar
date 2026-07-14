@@ -45,4 +45,4 @@ class TestEventsCLI:
         result = runner.invoke(events, ["session-id"])
 
         assert result.exit_code == 0
-        assert "No events found" in result.stdout
+        assert "No events found" in result.stderr

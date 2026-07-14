@@ -40,6 +40,14 @@ class StructuredError(BaseModel):
     )
 
 
+class LoggingEnvironmentError(StructuredError):
+    """Structured failure for an invalid CANFAR logging environment value."""
+
+    env_var: str = Field(description="Invalid environment variable name.")
+    provided_value: str = Field(description="Rejected environment value.")
+    expected: list[str] = Field(description="Accepted logging-level values.")
+
+
 def structured_error_to_json(error: StructuredError) -> str:
     """Serialize a structured error to a JSON string for machine-mode stderr.
 

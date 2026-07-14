@@ -5,22 +5,27 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Literal
+from xml.etree.ElementTree import ParseError
 
-from pydantic import AnyHttpUrl, AnyUrl
+import httpx
+from defusedxml.common import DefusedXmlException
+from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar import get_logger
-from canfar.config.selection import (
-    get_active_server,
-    get_remembered_server_for_idp,
-    set_active_selection,
-    upsert_server,
-    with_active_selection,
-)
+from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
+from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
 from canfar.idp import registry_sources
 from canfar.models.config import Configuration
-from canfar.models.http import Server
+from canfar.models.http import (
+    DEFAULT_SERVER_CORES,
+    DEFAULT_SERVER_GPUS,
+    DEFAULT_SERVER_RAM_GB,
+    Server,
+)
 from canfar.models.registry import IVOARegistrySearch
+from canfar.utils import vosi
 from canfar.utils.discover import Discover
 
 log = get_logger(__name__)
@@ -106,18 +111,56 @@ def discover(
         ServerDiscoveryError: If discovery fails or finds no usable servers.
     """
     target_config = config or Configuration()  # ty: ignore[missing-argument]
-    discovered = asyncio.run(_discover_for_idp(idp, dev=dev, timeout=timeout))
-    if not discovered:
+    discovered = asyncio.run(
+        _discover_for_idp(
+            idp,
+            config=target_config,
+            dev=dev,
+            timeout=timeout,
+        )
+    )
+    known_servers = dict(target_config.servers)
+    canonical: dict[str, Server] = {}
+    for server in sorted(
+        discovered,
+        key=lambda item: (
+            item.name is None,
+            (item.name or "").casefold(),
+            str(item.uri or ""),
+            str(item.url or ""),
+        ),
+    ):
+        name = server.name
+        if name is None:
+            continue
+        known = canonical.get(name, known_servers.get(name))
+        if server.version is None or not server.auths:
+            if known is not None and known.version is not None and known.auths:
+                canonical[name] = known
+            continue
+        merged_server = server
+        if known is not None:
+            updates = server.model_dump(
+                include={"idp", "name", "uri", "url", "version", "auths"},
+                exclude_none=True,
+            )
+            merged_server = known.model_copy(update=updates, deep=True)
+        canonical[name] = merged_server
+
+    if not canonical:
         msg = f"No servers discovered for IDP '{idp}'."
         raise ServerDiscoveryError(
             msg,
             code=ErrorCode.SERVER_NONE_AVAILABLE,
         )
-    for server in discovered:
-        upsert_server(target_config, server)
+    merged = [
+        canonical[name]
+        for name in sorted(canonical, key=lambda value: (value.casefold(), value))
+    ]
+    target_config.upsert_servers(merged)
     if save:
         target_config.save()
-    return discovered
+    return merged
 
 
 def activate(
@@ -156,7 +199,7 @@ def activate(
     if selector is None:
         active_server = _active_server_for_idp(target_config, idp)
         if active_server is not None:
-            set_active_selection(target_config, idp, active_server)
+            target_config.set_active_selection(idp, active_server)
             target_config.save()
             return ServerActivation(server=active_server, reason="active")
 
@@ -205,7 +248,7 @@ def activate(
         idp=idp,
         timeout=timeout,
     )
-    set_active_selection(target_config, idp, validated)
+    target_config.set_active_selection(idp, validated)
     target_config.save()
     return ServerActivation(server=validated, reason=reason)
 
@@ -280,7 +323,7 @@ def _active_server_for_idp(config: Configuration, idp: str) -> Server | None:
     if config.active.server is None:
         return None
     try:
-        active_server = get_active_server(config)
+        active_server = config.get_active_server()
     except KeyError:
         return None
     if active_server.idp != idp:
@@ -293,7 +336,7 @@ def _remembered_server_for_idp(
     idp: str,
     servers: list[Server],
 ) -> Server | None:
-    remembered = get_remembered_server_for_idp(config, idp)
+    remembered = config.get_remembered_server_for_idp(idp)
     if remembered is None or remembered.uri is None:
         return None
     if remembered.name is None:
@@ -335,6 +378,7 @@ def _resolve_selector(
 async def _discover_for_idp(
     idp: str,
     *,
+    config: Configuration | None = None,
     dev: bool = False,
     timeout: int = 2,
 ) -> list[Server]:
@@ -342,6 +386,7 @@ async def _discover_for_idp(
 
     Args:
         idp: Canonical IDP key.
+        config: Configuration whose Authentication Record authorizes enrichment.
         dev: Include development registries and endpoints.
         timeout: HTTP timeout in seconds for discovery requests.
 
@@ -369,7 +414,7 @@ async def _discover_for_idp(
 
         endpoints = []
         for registry in successful_registries:
-            endpoints.extend(await discovery.extract(registry, dev=dev))
+            endpoints.extend(discovery.extract(registry, dev=dev))
         if not endpoints:
             return []
 
@@ -377,7 +422,12 @@ async def _discover_for_idp(
             *(discovery.check(endpoint) for endpoint in endpoints)
         )
         return [
-            _discovered_to_server(endpoint, idp, timeout=timeout)
+            _discovered_to_server(
+                endpoint,
+                idp,
+                config=config,
+                timeout=timeout,
+            )
             for endpoint in checked
             if endpoint.status == 200
         ]
@@ -394,6 +444,7 @@ def _discovered_to_server(
     endpoint: DiscoveredServer,
     idp: str,
     *,
+    config: Configuration | None = None,
     timeout: int = 2,
 ) -> Server:
     """Convert a registry discovery record to a persisted HTTP server model.
@@ -404,6 +455,7 @@ def _discovered_to_server(
     Args:
         endpoint: Discovered registry endpoint.
         idp: Canonical IDP key.
+        config: Configuration whose Authentication Record authorizes enrichment.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
 
     Returns:
@@ -416,19 +468,31 @@ def _discovered_to_server(
         uri=uri,
         url=AnyHttpUrl(endpoint.url),
     )
-    return _enrich_from_capabilities(server, strict=False, timeout=timeout)
+    return enrich(
+        server,
+        config=config,
+        strict=False,
+        timeout=timeout,
+    )
 
 
-def _enrich_from_capabilities(
+def enrich(
     server: Server,
     *,
+    config: Configuration | None = None,
+    authentication_idp: str | None = None,
     strict: bool = True,
     timeout: int = 2,
 ) -> Server:
-    """Populate version and auth modes from VOSI capabilities when missing.
+    """Return a validated Server enriched from its VOSI capabilities.
 
     Args:
         server: Server record to enrich.
+        config: Configuration whose Authentication Record should authorize the
+            capability request. The transient selector does not change or persist
+            Authentication or Server Selection.
+        authentication_idp: Optional Authentication Record selector. Defaults to
+            the Server IDP, then the active Authentication.
         strict: When ``False``, return the original server if capabilities
             cannot be retrieved or parsed. Discovery uses non-strict mode so
             one malformed endpoint does not abort listing for an IDP.
@@ -445,41 +509,100 @@ def _enrich_from_capabilities(
         msg = "Server URL is required to inspect capabilities."
         raise ServerFetchError(msg)
 
-    if server.version and server.auths:
-        return server.model_copy(deep=True)
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
+    active_idp = authentication_idp or server.idp or base_config.active.authentication
+    try:
+        from canfar.client import HTTPClient  # noqa: PLC0415
+
+        with HTTPClient(
+            config=base_config,
+            authentication_idp=active_idp,
+            url=server.url,
+            timeout=timeout,
+            raise_http_errors=False,
+        ) as client:
+            request_client = client.client
+            request_client.headers["Accept"] = "application/xml"
+            request_client.headers.pop("Content-Type", None)
+            request_client.headers.pop("X-Skaha-Registry-Auth", None)
+            response = request_client.get("capabilities")
+            response.raise_for_status()
+            capabilities = vosi.capabilities(xml=response.text)
+    except (
+        httpx.HTTPError,
+        OSError,
+        AuthContextError,
+        AuthExpiredError,
+        CertificateError,
+        HTTPAuthenticationError,
+        ParseError,
+        DefusedXmlException,
+    ) as exc:
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"Failed to fetch capabilities for {server.url}: {exc}",
+            cause=exc,
+            debug="Skipping capability enrichment for %s during discovery: %s",
+            args=(server.url, exc),
+        )
+
+    primary = next(
+        (
+            capability
+            for capability in capabilities
+            if capability.get("version") and capability.get("auth_modes")
+        ),
+        None,
+    )
+    if primary is None:
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"No complete session capabilities found for {server.url}.",
+            debug=(
+                "No complete session capabilities found for %s during discovery; "
+                "keeping registry metadata only."
+            ),
+            args=(server.url,),
+        )
 
     try:
-        capabilities = server.capabilities(timeout=timeout)
-    except Exception as exc:
-        if strict:
-            msg = f"Failed to fetch capabilities for {server.url}: {exc}"
-            raise ServerFetchError(msg) from exc
-        log.debug(
-            "Skipping capability enrichment for %s during discovery: %s",
-            server.url,
-            exc,
+        return Server.model_validate(
+            {
+                **server.model_dump(mode="python"),
+                "url": primary["baseurl"],
+                "version": primary["version"],
+                "auths": primary["auth_modes"],
+            }
         )
-        return server.model_copy(deep=True)
-
-    if not capabilities:
-        if strict:
-            msg = f"No session capabilities found for {server.url}."
-            raise ServerFetchError(msg)
-        log.debug(
-            "No session capabilities found for %s during discovery; "
-            "keeping registry metadata only.",
-            server.url,
+    except ValidationError as exc:
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"Invalid capabilities for {server.url}: {exc}",
+            cause=exc,
+            debug=(
+                "Ignoring invalid capability enrichment for %s during discovery: %s"
+            ),
+            args=(server.url, exc),
         )
-        return server.model_copy(deep=True)
 
-    primary = capabilities[0]
-    return server.model_copy(
-        update={
-            "version": server.version or primary.get("version"),
-            "auths": server.auths or primary.get("auth_modes"),
-        },
-        deep=True,
-    )
+
+def _keep_or_raise(
+    server: Server,
+    *,
+    strict: bool,
+    error: str,
+    debug: str,
+    args: tuple[object, ...] = (),
+    cause: BaseException | None = None,
+) -> Server:
+    """Raise on strict enrich failures; otherwise keep the original server."""
+    if strict:
+        raise ServerFetchError(error) from cause
+    log.debug(debug, *args)
+    return server.model_copy(deep=True)
 
 
 def _validate_server(
@@ -503,12 +626,73 @@ def _validate_server(
     Raises:
         ServerFetchError: If capability enrichment fails or URL/version are missing.
     """
-    enriched = _enrich_from_capabilities(server, strict=True, timeout=timeout)
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
+    active_idp = idp or server.idp or base_config.active.authentication
+    enriched = enrich(
+        server,
+        config=base_config,
+        authentication_idp=active_idp,
+        strict=True,
+        timeout=timeout,
+    )
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."
         raise ServerFetchError(msg)
 
-    base_config = config or Configuration()  # ty: ignore[missing-argument]
-    active_idp = idp or enriched.idp or base_config.active.authentication
-    validation_config = with_active_selection(base_config, active_idp, enriched)
-    return enriched.fetch(timeout=timeout, config=validation_config)
+    return _fetch_resources(
+        enriched,
+        timeout=timeout,
+        config=base_config,
+        authentication_idp=active_idp,
+    )
+
+
+def _fetch_resources(
+    server: Server,
+    *,
+    config: Configuration,
+    authentication_idp: str,
+    timeout: int,
+) -> Server:
+    """Return a Server populated from its authenticated context endpoint."""
+    from canfar.client import HTTPClient  # noqa: PLC0415
+
+    if server.url is None or server.version is None:
+        msg = "Server URL and version are required for resource enrichment."
+        raise ValueError(msg)
+    client = HTTPClient(
+        config=config,
+        authentication_idp=authentication_idp,
+        url=AnyHttpUrl(f"{server.url}/{server.version}"),
+        timeout=timeout,
+        raise_http_errors=False,
+    )
+    try:
+        with client:
+            response = client.client.get("context")
+            response.raise_for_status()
+            data = dict(response.json())
+
+        cores_data = data.get("cores") or {}
+        ram_data = data.get("memoryGB") or {}
+        gpus_data = data.get("gpus") or {}
+        cores = cores_data.get("defaultLimit")
+        ram = ram_data.get("defaultLimit")
+        gpu_options = gpus_data.get("options") or []
+        return Server.model_validate(
+            {
+                **server.model_dump(mode="python"),
+                "cores": cores if cores is not None else DEFAULT_SERVER_CORES,
+                "ram": ram if ram is not None else DEFAULT_SERVER_RAM_GB,
+                "gpus": max(gpu_options) if gpu_options else DEFAULT_SERVER_GPUS,
+            }
+        )
+    except (httpx.HTTPError, OSError, ValueError, TypeError):
+        return server.model_copy(
+            update={
+                "cores": DEFAULT_SERVER_CORES,
+                "ram": DEFAULT_SERVER_RAM_GB,
+                "gpus": DEFAULT_SERVER_GPUS,
+            },
+            deep=True,
+        )

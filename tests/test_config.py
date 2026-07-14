@@ -7,14 +7,15 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+from pydantic import ValidationError
 
 from canfar.config.editor import set_value as set_config_value
 from canfar.config.migration import (
     ConfigResetRequiredError,
     ensure_current_config,
 )
-from canfar.config.selection import set_active_selection as select_active_server
 from canfar.config.store import save_config
+from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
 
@@ -146,6 +147,175 @@ class TestConfigServersPaths:
 class TestConfigServices:
     """Test configuration storage and action helpers."""
 
+    def test_invalid_server_selection_preserves_configuration(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """An invalid Server Selection changes neither memory nor persisted YAML."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.save()
+            persisted = config_path.read_bytes()
+
+            invalid = Server(
+                idp="cadc",
+                name="invalid.name",
+                uri="ivo://invalid.example/skaha",
+                url="https://invalid.example/skaha",
+                version="v1",
+                auths=["x509"],
+            )
+            with pytest.raises(ValidationError, match="Invalid server name"):
+                config.set_active_selection("cadc", invalid)
+
+        assert config.active.server == "canfar"
+        assert set(config.servers) == {"canfar"}
+        assert config_path.read_bytes() == persisted
+
+    def test_upsert_credential_preserves_other_authentication_records(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Adding an Authentication Record preserves and persists existing records."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            cadc_path = config.authentication["cadc"].path
+            config.upsert_credential(
+                X509Credential(
+                    idp="srcnet",
+                    path=Path("/srcnet/cert.pem"),
+                    expiry=42.0,
+                ),
+            )
+            config.save()
+            loaded = Configuration()
+
+        assert set(loaded.authentication) == {"cadc", "srcnet"}
+        assert loaded.authentication["cadc"].path == cadc_path
+        assert loaded.authentication["srcnet"].path == Path("/srcnet/cert.pem")
+
+    def test_update_unknown_credential_preserves_configuration(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Updating an unknown Authentication Record changes no state."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.save()
+            state = config.model_dump(mode="python")
+            persisted = config_path.read_bytes()
+
+            with pytest.raises(
+                KeyError,
+                match="Authentication record for IDP 'srcnet' not found",
+            ):
+                config.update_credential(
+                    X509Credential(
+                        idp="srcnet",
+                        path=Path("/srcnet/cert.pem"),
+                        expiry=42.0,
+                    ),
+                )
+
+        assert config.model_dump(mode="python") == state
+        assert config_path.read_bytes() == persisted
+
+    def test_update_known_credential_preserves_unrelated_state(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Updating a known Authentication Record changes only that record."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.upsert_credential(
+                X509Credential(
+                    idp="srcnet",
+                    path=Path("/srcnet/cert.pem"),
+                    expiry=42.0,
+                ),
+            )
+            active = config.active.model_dump(mode="python")
+            servers = config.servers
+
+            config.update_credential(
+                X509Credential(
+                    idp="cadc",
+                    path=Path("/updated/cadc.pem"),
+                    expiry=84.0,
+                ),
+            )
+            config.save()
+            loaded = Configuration()
+
+        assert loaded.authentication["cadc"].path == Path("/updated/cadc.pem")
+        assert loaded.authentication["srcnet"].path == Path("/srcnet/cert.pem")
+        assert loaded.active.model_dump(mode="python") == active
+        assert loaded.servers == servers
+
+    def test_upsert_server_preserves_other_science_platform_servers(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Adding a Science Platform Server preserves existing Server Names."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.upsert_server(
+                Server(
+                    idp="srcnet",
+                    name="SRCNet",
+                    uri="ivo://srcnet.example/skaha",
+                    url="https://srcnet.example/skaha",
+                    version="v1",
+                    auths=["oidc"],
+                ),
+            )
+            config.save()
+            loaded = Configuration()
+
+        assert set(loaded.servers) == {"canfar", "SRCNet"}
+        assert str(loaded.servers["canfar"].uri) == "ivo://cadc.nrc.ca/skaha"
+        assert str(loaded.servers["SRCNet"].uri) == "ivo://srcnet.example/skaha"
+
+    def test_remove_authentication_preserves_unrelated_records(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Removing one Authentication also removes only its associated Servers."""
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.upsert_credential(
+                X509Credential(
+                    idp="srcnet",
+                    path=Path("/srcnet/cert.pem"),
+                    expiry=42.0,
+                ),
+            )
+            config.upsert_server(
+                Server(
+                    idp="srcnet",
+                    name="SRCNet",
+                    uri="ivo://srcnet.example/skaha",
+                    url="https://srcnet.example/skaha",
+                    version="v1",
+                    auths=["oidc"],
+                ),
+            )
+            config.set_active_selection("srcnet", config.servers["SRCNet"])
+            config.remove_authentication("cadc")
+            config.save()
+            loaded = Configuration()
+
+        assert set(loaded.authentication) == {"srcnet"}
+        assert set(loaded.servers) == {"SRCNet"}
+        assert loaded.active.authentication == "srcnet"
+        assert loaded.active.server == "SRCNet"
+
     def test_editor_and_store_update_config_without_model_io(
         self,
         tmp_path: Path,
@@ -174,7 +344,7 @@ class TestConfigServices:
             auths=["x509"],
         )
 
-        select_active_server(config, "cadc", server)
+        config.set_active_selection("cadc", server)
 
         assert config.active.server == "CADC-CANFAR"
         assert config.get_server_by_uri("ivo://cadc.example/skaha").name == (

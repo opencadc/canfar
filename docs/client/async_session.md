@@ -8,8 +8,11 @@
 `AsyncSession.create` matches `Session.create`: it returns a `list` of session
 IDs, omits failed launches without raising, and returns an empty list if every
 attempt fails. Check the list after awaiting the call. HTTP and timeout details
-are logged by the client; use `CANFAR_LOGLEVEL=DEBUG` or CLI `--debug` where
-available to see them.
+are logged when the application configures logging. Call
+`canfar.configure_logging()` at the Python application entry point; it honors
+`CANFAR_LOGLEVEL`. In the CLI, use a root control such as
+`canfar --log-level debug create ...`. See
+[Logging](../cli/logging.md).
 
 ::: canfar.sessions.AsyncSession
     handler: python

@@ -1,29 +1,107 @@
 """Comprehensive tests for the OIDC authentication module."""
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from __future__ import annotations
+
+import base64
+import logging
+import time
+from unittest.mock import AsyncMock, MagicMock, call, patch
+from urllib.parse import parse_qs
 
 import httpx
 import pytest
+from authlib.integrations.httpx_client import AsyncOAuth2Client
 
 from canfar.auth.oidc import (
-    AuthPendingError,
-    SlowDownError,
-    _cancel_pending_tasks,
-    _poll_token,
-    _poll_with_backoff,
-    authenticate,
     authflow,
     discover,
-    refresh,
+    poll_device_token,
     register,
-    sync_refresh,
+    start_device_authorization,
 )
-from canfar.models.auth import OIDC, Client, Endpoint, Token
+from canfar.models.auth import DeviceAuthorization
+
+
+def _challenge(
+    *,
+    expires_in: int = 60,
+    interval: int = 5,
+    device_code: str = "device_code_123",
+) -> DeviceAuthorization:
+    """Return the standard RFC 8628 challenge used by polling contracts."""
+    return DeviceAuthorization(
+        verification_uri="https://example.com/device",
+        user_code="ABC123",
+        expires_in=expires_in,
+        interval=interval,
+        device_code=device_code,
+    )
+
+
+def _oauth_client(
+    *responses: httpx.Response | Exception,
+) -> tuple[AsyncOAuth2Client, list[httpx.Request]]:
+    """Return an Authlib client backed by deterministic token responses."""
+    remaining = iter(responses)
+    requests: list[httpx.Request] = []
+
+    async def token_endpoint(request: httpx.Request) -> httpx.Response:
+        """Return the next deterministic token response."""
+        requests.append(request)
+        response = next(remaining)
+        if isinstance(response, Exception):
+            raise response
+        return response
+
+    return (
+        AsyncOAuth2Client(
+            "client_id",
+            "client_secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=httpx.MockTransport(token_endpoint),
+        ),
+        requests,
+    )
 
 
 class TestDiscoverFunction:
     """Test the discover function."""
+
+    @pytest.mark.asyncio
+    async def test_discover_rejects_nonexact_issuer(self) -> None:
+        """Discovery issuer must exactly match the configured IDP issuer."""
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = {"issuer": "https://example.com/"}
+        client.get.return_value = response
+
+        with pytest.raises(ValueError, match="OIDC discovery issuer mismatch"):
+            await discover(
+                "https://example.com/.well-known/openid-configuration",
+                client,
+                expected_issuer="https://example.com",
+            )
+
+    @pytest.mark.asyncio
+    async def test_discover_rejects_missing_required_endpoint(self) -> None:
+        """Discovery fails safely when required CANFAR endpoints are absent."""
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = {
+            "issuer": "https://example.com",
+            "device_authorization_endpoint": "https://example.com/device",
+            "registration_endpoint": "https://example.com/register",
+            "token_endpoint": None,
+            "userinfo_endpoint": "https://example.com/userinfo",
+        }
+        client.get.return_value = response
+
+        with pytest.raises(ValueError, match="token_endpoint"):
+            await discover(
+                "https://example.com/.well-known/openid-configuration",
+                client,
+                expected_issuer="https://example.com",
+            )
 
     @pytest.mark.asyncio
     async def test_discover_with_client(self) -> None:
@@ -31,14 +109,18 @@ class TestDiscoverFunction:
         mock_client = AsyncMock(spec=httpx.AsyncClient)
         mock_response = MagicMock()
         mock_response.json.return_value = {
+            "issuer": "https://example.com",
             "device_authorization_endpoint": "https://example.com/device",
+            "registration_endpoint": "https://example.com/register",
             "token_endpoint": "https://example.com/token",
             "userinfo_endpoint": "https://example.com/userinfo",
         }
         mock_client.get.return_value = mock_response
 
         result = await discover(
-            "https://example.com/.well-known/openid-configuration", mock_client
+            "https://example.com/.well-known/openid-configuration",
+            mock_client,
+            expected_issuer="https://example.com",
         )
 
         assert result["device_authorization_endpoint"] == "https://example.com/device"
@@ -47,28 +129,6 @@ class TestDiscoverFunction:
             "https://example.com/.well-known/openid-configuration"
         )
         mock_response.raise_for_status.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_discover_without_client(self) -> None:
-        """Test discover function without provided client."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "device_authorization_endpoint": "https://example.com/device",
-                "token_endpoint": "https://example.com/token",
-            }
-            mock_client.get.return_value = mock_response
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            result = await discover(
-                "https://example.com/.well-known/openid-configuration"
-            )
-
-            assert (
-                result["device_authorization_endpoint"] == "https://example.com/device"
-            )
-            mock_client.get.assert_called_once()
 
     @pytest.mark.asyncio
     async def test_discover_http_error(self) -> None:
@@ -82,7 +142,9 @@ class TestDiscoverFunction:
 
         with pytest.raises(httpx.HTTPStatusError):
             await discover(
-                "https://example.com/.well-known/openid-configuration", mock_client
+                "https://example.com/.well-known/openid-configuration",
+                mock_client,
+                expected_issuer="https://example.com",
             )
 
 
@@ -90,660 +152,406 @@ class TestRegisterFunction:
     """Test the register function."""
 
     @pytest.mark.asyncio
-    async def test_register_with_client(self) -> None:
-        """Test register function with provided client."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.json.return_value = {
-            "client_id": "test_client_id",
-            "client_secret": "test_client_secret",
+    async def test_register_with_client(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Registration returns complete data without logging its secret."""
+        sentinel = "registration-client-secret-sentinel"
+        registered = {
+            "client_id": "test-client-id",
+            "client_secret": sentinel,
         }
-        mock_client.post.return_value = mock_response
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = registered
+        client.post.return_value = response
 
-        result = await register("https://example.com/register", mock_client)
+        logger = logging.getLogger("canfar.auth.oidc")
+        logger.addHandler(caplog.handler)
+        try:
+            caplog.set_level(logging.DEBUG, logger="canfar.auth.oidc")
+            result = await register("https://identity.example/register", client)
+        finally:
+            logger.removeHandler(caplog.handler)
 
-        assert result["client_id"] == "test_client_id"
-        assert result["client_secret"] == "test_client_secret"
-        mock_client.post.assert_called_once()
-        call_args = mock_client.post.call_args
-        assert call_args[0][0] == "https://example.com/register"
-        assert "client_name" in call_args[1]["json"]
-        # Check that client_name starts with "Science Platform CLI @"
-        client_name = call_args[1]["json"]["client_name"]
-        assert client_name.startswith("Science Platform CLI @")
-
-    @pytest.mark.asyncio
-    async def test_register_without_client(self) -> None:
-        """Test register function without provided client."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_response = MagicMock()
-            mock_response.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
-            mock_client.post.return_value = mock_response
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            result = await register("https://example.com/register")
-
-            assert result["client_id"] == "test_client_id"
-            mock_client.post.assert_called_once()
-
-
-class TestPollTokenFunction:
-    """Test the _poll_token function."""
-
-    @pytest.mark.asyncio
-    async def test_poll_token_success(self) -> None:
-        """Test successful token polling."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = {
-            "access_token": "test_access_token",
-            "refresh_token": "test_refresh_token",
-            "token_type": "Bearer",
-        }
-        mock_client.post.return_value = mock_response
-
-        result = await _poll_token(
-            "https://example.com/token",
-            "client_id",
-            "client_secret",
-            "device_code",
-            mock_client,
-        )
-
-        assert result["access_token"] == "test_access_token"
-        assert result["refresh_token"] == "test_refresh_token"
-        mock_client.post.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_poll_token_auth_pending(self) -> None:
-        """Test token polling with authorization pending."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.json.return_value = {"error": "authorization_pending"}
-        mock_client.post.return_value = mock_response
-
-        with pytest.raises(AuthPendingError):
-            await _poll_token(
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                "device_code",
-                mock_client,
-            )
-
-    @pytest.mark.asyncio
-    async def test_poll_token_slow_down(self) -> None:
-        """Test token polling with slow down error."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.json.return_value = {"error": "slow_down"}
-        mock_client.post.return_value = mock_response
-
-        with pytest.raises(SlowDownError):
-            await _poll_token(
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                "device_code",
-                mock_client,
-            )
-
-    @pytest.mark.asyncio
-    async def test_poll_token_unknown_error(self) -> None:
-        """Test token polling with unknown error."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-        mock_response = MagicMock()
-        mock_response.status_code = 400
-        mock_response.json.return_value = {"error": "invalid_grant"}
-        mock_client.post.return_value = mock_response
-
-        with pytest.raises(
-            ValueError, match="Unknown error in polling for tokens: invalid_grant"
-        ):
-            await _poll_token(
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                "device_code",
-                mock_client,
-            )
-
-
-class TestCancelPendingTasks:
-    """Test the _cancel_pending_tasks helper function."""
-
-    @pytest.mark.asyncio
-    async def test_cancel_pending_tasks(self) -> None:
-        """Test cancelling pending tasks."""
-
-        # Create real async tasks that we can cancel
-        async def dummy_task() -> None:
-            await asyncio.sleep(10)  # Long sleep to ensure cancellation
-
-        task1 = asyncio.create_task(dummy_task())
-        task2 = asyncio.create_task(dummy_task())
-
-        pending_tasks = {task1, task2}
-
-        # Should not raise any exceptions
-        await _cancel_pending_tasks(pending_tasks)
-
-        # Verify tasks were cancelled
-        assert task1.cancelled()
-        assert task2.cancelled()
-
-
-class TestPollWithBackoff:
-    """Test the _poll_with_backoff function."""
-
-    @pytest.mark.asyncio
-    async def test_poll_with_backoff_success(self) -> None:
-        """Test successful polling with backoff."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-
-        with patch("canfar.auth.oidc._poll_token") as mock_poll:
-            mock_poll.return_value = {"access_token": "test_token"}
-
-            result = await _poll_with_backoff(
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                "device_code",
-                mock_client,
-                5,  # initial_interval
-                600,  # expires
-            )
-
-            assert result["access_token"] == "test_token"
-            mock_poll.assert_called_once()
-
-    @pytest.mark.asyncio
-    @pytest.mark.slow
-    async def test_poll_with_backoff_timeout(self) -> None:
-        """Test polling with backoff timeout."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-
-        with patch("canfar.auth.oidc._poll_token") as mock_poll:
-            mock_poll.side_effect = AuthPendingError()
-            with patch("time.time") as mock_time:
-                # Simulate time progression to trigger timeout
-                mock_time.side_effect = [
-                    0,
-                    0,
-                    0,
-                    700,
-                ]  # Start, first check, second check, timeout
-
-                with pytest.raises(TimeoutError, match="Device flow timed out"):
-                    await _poll_with_backoff(
-                        "https://example.com/token",
-                        "client_id",
-                        "client_secret",
-                        "device_code",
-                        mock_client,
-                        5,  # initial_interval
-                        600,  # expires
-                    )
-
-    @pytest.mark.asyncio
-    async def test_poll_with_backoff_slow_down(self) -> None:
-        """Test polling with backoff and slow down."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
-
-        with (
-            patch("canfar.auth.oidc._poll_token") as mock_poll,
-            patch("asyncio.sleep") as mock_sleep,
-        ):
-            # First call raises SlowDownError, second succeeds
-            mock_poll.side_effect = [
-                SlowDownError(),
-                {"access_token": "test_token"},
-            ]
-
-            result = await _poll_with_backoff(
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                "device_code",
-                mock_client,
-                5,  # initial_interval
-                600,  # expires
-            )
-
-            assert result["access_token"] == "test_token"
-            assert mock_poll.call_count == 2
-            # Should have slept with increased interval due to slow down
-            mock_sleep.assert_called()
+        assert result == registered
+        call = client.post.await_args
+        assert call.args == ("https://identity.example/register",)
+        assert call.kwargs["json"]["client_name"].startswith("Science Platform CLI @")
+        assert sentinel not in caplog.text
+        assert "OIDC dynamic client registration succeeded." in caplog.messages
 
 
 class TestAuthflowFunction:
     """Test the authflow function."""
 
     @pytest.mark.asyncio
-    async def test_authflow_with_client(self) -> None:
-        """Test authflow function with provided client."""
-        mock_client = AsyncMock(spec=httpx.AsyncClient)
+    async def test_authflow_runs_without_interactive_ui(self) -> None:
+        """Protocol-only device Authentication has no interactive side effects."""
+        client, _ = _oauth_client(
+            httpx.Response(
+                200,
+                json={
+                    "verification_uri": "https://example.com/device",
+                    "verification_uri_complete": (
+                        "https://example.com/device?code=ABC123"
+                    ),
+                    "user_code": "ABC123",
+                    "expires_in": 600,
+                    "interval": 5,
+                    "device_code": "device_code_123",
+                },
+            ),
+            httpx.Response(
+                200,
+                json={
+                    "access_token": "test_access_token",
+                    "refresh_token": "test_refresh_token",
+                },
+            ),
+        )
 
-        # Mock the device authorization response
-        device_response = MagicMock()
-        device_response.json.return_value = {
-            "verification_uri_complete": "https://example.com/device?code=ABC123",
-            "expires_in": 600,
-            "interval": 5,
-            "device_code": "device_code_123",
-        }
-        mock_client.post.return_value = device_response
-
-        with (
-            patch("canfar.auth.oidc._poll_with_backoff") as mock_poll,
-            patch("webbrowser.get") as mock_browser,
-            patch("segno.make") as mock_qr,
-            patch("rich.progress.Progress") as mock_progress,
-        ):
-            mock_poll.return_value = {"access_token": "test_token"}
-            mock_browser.return_value.open = MagicMock()
-            mock_qr.return_value.terminal = MagicMock()
-
-            # Mock progress context manager
-            mock_progress_instance = MagicMock()
-            mock_progress.return_value.__enter__.return_value = mock_progress_instance
-            mock_progress.return_value.__exit__.return_value = None
-
-            result = await authflow(
-                "https://example.com/device",
-                "https://example.com/token",
-                "client_id",
-                "client_secret",
-                mock_client,
-            )
-
-            assert result["access_token"] == "test_token"
-            mock_client.post.assert_called_once()
-            mock_browser.return_value.open.assert_called_once()
-
-    @pytest.mark.asyncio
-    async def test_authflow_without_client(self) -> None:
-        """Test authflow function without provided client."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-
-            # Mock the device authorization response
-            device_response = MagicMock()
-            device_response.json.return_value = {
-                "verification_uri_complete": "https://example.com/device?code=ABC123",
-                "expires_in": 600,
-                "interval": 5,
-                "device_code": "device_code_123",
-            }
-            mock_client.post.return_value = device_response
-
+        interactive_side_effect = AssertionError(
+            "OIDC protocol invoked interactive presentation"
+        )
+        async with client:
             with (
-                patch("canfar.auth.oidc._poll_with_backoff") as mock_poll,
-                patch("webbrowser.get") as mock_browser,
-                patch("segno.make") as mock_qr,
-                patch("rich.progress.Progress") as mock_progress,
+                patch(
+                    "canfar.utils.console.get_console",
+                    side_effect=interactive_side_effect,
+                ),
+                patch("webbrowser.get", side_effect=interactive_side_effect),
+                patch("segno.make", side_effect=interactive_side_effect),
             ):
-                mock_poll.return_value = {"access_token": "test_token"}
-                mock_browser.return_value.open = MagicMock()
-                mock_qr.return_value.terminal = MagicMock()
-
-                # Mock progress context manager
-                mock_progress_instance = MagicMock()
-                mock_progress.return_value.__enter__.return_value = (
-                    mock_progress_instance
-                )
-                mock_progress.return_value.__exit__.return_value = None
-
-                result = await authflow(
+                tokens = await authflow(
                     "https://example.com/device",
                     "https://example.com/token",
                     "client_id",
                     "client_secret",
+                    client,
                 )
 
-                assert result["access_token"] == "test_token"
-
-
-class TestAuthenticateFunction:
-    """Test the authenticate function."""
+        assert tokens["access_token"] == "test_access_token"
 
     @pytest.mark.asyncio
-    async def test_authenticate_function(self) -> None:
-        """Test the authenticate function integration."""
-        # Create initial OIDC config
-        oidc_config = OIDC(
-            endpoints=Endpoint(
-                discovery="https://example.com/.well-known/openid-configuration"
-            ),
-            client=Client(),
-            token=Token(),
+    async def test_start_device_authorization_returns_domain_challenge(self) -> None:
+        """Device authorization returns typed domain data for presentation."""
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = {
+            "verification_uri": "https://example.com/device",
+            "verification_uri_complete": "https://example.com/device?code=ABC123",
+            "user_code": "ABC123",
+            "expires_in": 600,
+            "interval": 5,
+            "device_code": "device_code_123",
+        }
+        client.post.return_value = response
+
+        challenge = await start_device_authorization(
+            "https://example.com/device",
+            "client_id",
+            "client_secret",
+            client,
         )
 
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
+        assert challenge == DeviceAuthorization(
+            verification_uri="https://example.com/device",
+            verification_uri_complete="https://example.com/device?code=ABC123",
+            user_code="ABC123",
+            expires_in=600,
+            interval=5,
+            device_code="device_code_123",
+        )
 
-            # Mock discovery response
-            discovery_response = MagicMock()
-            discovery_response.json.return_value = {
-                "device_authorization_endpoint": "https://example.com/device",
-                "registration_endpoint": "https://example.com/register",
-                "token_endpoint": "https://example.com/token",
-                "userinfo_endpoint": "https://example.com/userinfo",
-            }
+    @pytest.mark.asyncio
+    async def test_start_device_authorization_accepts_required_rfc_fields(self) -> None:
+        """Complete verification URI and interval remain optional per RFC 8628."""
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = {
+            "verification_uri": "https://example.com/device",
+            "user_code": "ABC123",
+            "expires_in": 600,
+            "device_code": "device_code_123",
+        }
+        client.post.return_value = response
 
-            # Mock registration response
-            register_response = MagicMock()
-            register_response.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
+        challenge = await start_device_authorization(
+            "https://example.com/device",
+            "client_id",
+            "client_secret",
+            client,
+        )
 
-            # Mock userinfo response
-            userinfo_response = MagicMock()
-            userinfo_response.json.return_value = {
-                "sub": "user123",
-                "name": "Test User",
-                "email": "test@example.com",
-                "preferred_username": "testuser",
-            }
+        assert challenge.verification_uri == "https://example.com/device"
+        assert challenge.verification_uri_complete is None
+        assert challenge.user_code.get_secret_value() == "ABC123"
+        assert challenge.interval == 5
 
-            # Configure mock client responses
-            mock_client.get.side_effect = [discovery_response, userinfo_response]
-            mock_client.post.side_effect = [register_response]
+    @pytest.mark.asyncio
+    async def test_start_device_authorization_hides_malformed_secrets(self) -> None:
+        """Malformed challenge errors never echo provider-issued secret values."""
+        client = AsyncMock(spec=httpx.AsyncClient)
+        response = MagicMock()
+        response.json.return_value = {
+            "user_code": "secret-user-code",
+            "expires_in": 600,
+            "device_code": "secret-device-code",
+        }
+        client.post.return_value = response
 
-            with (
-                patch("canfar.auth.oidc.authflow") as mock_authflow,
-                patch("canfar.utils.jwt.expiry") as mock_jwt_decode,
-            ):
-                mock_authflow.return_value = {
+        with pytest.raises(
+            ValueError,
+            match="Invalid OIDC device authorization response",
+        ) as exc:
+            await start_device_authorization(
+                "https://example.com/device",
+                "client_id",
+                "client_secret",
+                client,
+            )
+
+        assert "secret-user-code" not in str(exc.value)
+        assert "secret-device-code" not in str(exc.value)
+
+    @pytest.mark.asyncio
+    async def test_poll_device_token_completes_domain_challenge(self) -> None:
+        """Authlib exchanges a typed challenge using client_secret_basic."""
+        requests: list[httpx.Request] = []
+
+        async def token_endpoint(request: httpx.Request) -> httpx.Response:
+            requests.append(request)
+            return httpx.Response(
+                200,
+                json={
                     "access_token": "test_access_token",
                     "refresh_token": "test_refresh_token",
-                }
-                mock_jwt_decode.return_value = 1234567890
-
-                # Should complete without errors and return updated config
-                result = await authenticate(oidc_config)
-
-                # Verify the flow was called correctly
-                mock_authflow.assert_called_once()
-                assert mock_client.get.call_count == 2  # discovery + userinfo
-                assert mock_client.post.call_count == 1  # registration
-
-                # Verify the result has updated tokens
-                assert result.token.access is not None
-                assert result.token.access.get_secret_value() == "test_access_token"
-                assert result.token.refresh is not None
-                assert result.token.refresh.get_secret_value() == "test_refresh_token"
-                assert result.expiry.access == 1234567890
-                assert result.expiry.refresh == 1234567890
-
-
-class TestRefreshFunction:
-    """Test the async refresh function."""
-
-    @pytest.mark.asyncio
-    async def test_refresh_success(self) -> None:
-        """Test successful async token refresh."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"access_token": "new_access_token"}
-
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            result = await refresh(
-                url="https://example.com/token",
-                identity="client_id",
-                secret="client_secret",
-                token="refresh_token",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 3600,
+                },
             )
 
-            assert result.get_secret_value() == "new_access_token"
-            mock_client.post.assert_called_once()
+        challenge = _challenge(expires_in=600)
+        before = time.time()
 
-    @pytest.mark.asyncio
-    async def test_refresh_http_error(self) -> None:
-        """Test async refresh with HTTP error (lines 179-182)."""
-        mock_response = MagicMock()
-        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
-            "Bad Request", request=MagicMock(), response=MagicMock()
-        )
-
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            with pytest.raises(ValueError, match="HTTP error while refreshing"):
-                await refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-    @pytest.mark.asyncio
-    async def test_refresh_key_error(self) -> None:
-        """Test async refresh with missing access token in response (lines 183-186)."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"error": "invalid_grant"}
-
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            with pytest.raises(ValueError, match="server response does not contain"):
-                await refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-    @pytest.mark.asyncio
-    async def test_refresh_general_exception(self) -> None:
-        """Test async refresh with general exception (lines 187-190)."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client_class.side_effect = Exception("Network error")
-
-            with pytest.raises(ValueError, match="Failed to refresh OIDC access token"):
-                await refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-
-class TestSyncRefreshFunction:
-    """Test the sync refresh function."""
-
-    def test_sync_refresh_success(self) -> None:
-        """Test successful sync token refresh."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"access_token": "new_access_token"}
-
-        with patch("httpx.Client") as mock_client_class:
-            mock_client = MagicMock()
-            mock_client_class.return_value.__enter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            result = sync_refresh(
-                url="https://example.com/token",
-                identity="client_id",
-                secret="client_secret",
-                token="refresh_token",
+        async with AsyncOAuth2Client(
+            "client_id",
+            "client_secret",
+            token_endpoint_auth_method="client_secret_basic",
+            transport=httpx.MockTransport(token_endpoint),
+        ) as client:
+            tokens = await poll_device_token(
+                "https://example.com/token",
+                challenge,
+                client,
             )
 
-            assert result.get_secret_value() == "new_access_token"
-            mock_client.post.assert_called_once()
-
-    def test_sync_refresh_http_error(self) -> None:
-        """Test sync refresh with HTTP error (lines 232-235)."""
-        mock_response = MagicMock()
-        mock_response.raise_for_status.side_effect = httpx.HTTPStatusError(
-            "Bad Request", request=MagicMock(), response=MagicMock()
-        )
-
-        with patch("httpx.Client") as mock_client_class:
-            mock_client = MagicMock()
-            mock_client_class.return_value.__enter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            with pytest.raises(ValueError, match="HTTP error while refreshing"):
-                sync_refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-    def test_sync_refresh_key_error(self) -> None:
-        """Test sync refresh with missing access token in response (lines 236-239)."""
-        mock_response = MagicMock()
-        mock_response.json.return_value = {"error": "invalid_grant"}
-
-        with patch("httpx.Client") as mock_client_class:
-            mock_client = MagicMock()
-            mock_client_class.return_value.__enter__.return_value = mock_client
-            mock_client.post.return_value = mock_response
-
-            with pytest.raises(ValueError, match="server response does not contain"):
-                sync_refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-    def test_sync_refresh_general_exception(self) -> None:
-        """Test sync refresh with general exception (lines 240-242)."""
-        with patch("httpx.Client") as mock_client_class:
-            mock_client_class.side_effect = Exception("Network error")
-
-            with pytest.raises(ValueError, match="Failed to refresh OIDC access token"):
-                sync_refresh(
-                    url="https://example.com/token",
-                    identity="client_id",
-                    secret="client_secret",
-                    token="refresh_token",
-                )
-
-
-class TestIntegration:
-    """Integration tests for OIDC module."""
+        request = requests[0]
+        form = parse_qs(request.content.decode())
+        credentials = base64.b64encode(b"client_id:client_secret").decode()
+        assert request.headers["Authorization"] == f"Basic {credentials}"
+        assert "client_secret" not in form
+        assert form["grant_type"] == ["urn:ietf:params:oauth:grant-type:device_code"]
+        assert form["device_code"] == ["device_code_123"]
+        assert tokens["refresh_token"] == "test_refresh_token"
+        assert tokens["expires_at"] - before == pytest.approx(3600, abs=1)
 
     @pytest.mark.asyncio
-    async def test_full_flow_integration(self) -> None:
-        """Test the complete OIDC flow integration."""
-        with patch("httpx.AsyncClient") as mock_client_class:
-            mock_client = AsyncMock()
-            mock_client_class.return_value.__aenter__.return_value = mock_client
+    async def test_poll_device_token_adds_five_seconds_after_slow_down(
+        self,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """RFC 8628 slow_down adds five seconds to all later polling intervals."""
+        sentinel = "secret-error-description"
+        client, _ = _oauth_client(
+            httpx.Response(
+                400,
+                json={"error": "slow_down", "error_description": sentinel},
+            ),
+            httpx.Response(
+                400,
+                json={
+                    "error": "authorization_pending",
+                    "error_description": sentinel,
+                },
+            ),
+            httpx.Response(200, json={"access_token": "test_access_token"}),
+        )
+        challenge = _challenge()
 
-            # Mock all HTTP responses
-            discovery_resp = MagicMock()
-            discovery_resp.json.return_value = {
-                "device_authorization_endpoint": "https://example.com/device",
-                "registration_endpoint": "https://example.com/register",
-                "token_endpoint": "https://example.com/token",
-                "userinfo_endpoint": "https://example.com/userinfo",
-            }
+        async with client:
+            with patch("asyncio.sleep", new_callable=AsyncMock) as sleep:
+                tokens = await poll_device_token(
+                    "https://example.com/token",
+                    challenge,
+                    client,
+                )
 
-            registration_resp = MagicMock()
-            registration_resp.json.return_value = {
-                "client_id": "test_client_id",
-                "client_secret": "test_client_secret",
-            }
+        assert sleep.await_args_list == [call(10), call(10)]
+        assert tokens["access_token"] == "test_access_token"
+        assert sentinel not in caplog.text
 
-            device_auth_resp = MagicMock()
-            device_auth_resp.json.return_value = {
-                "verification_uri_complete": "https://example.com/device?code=ABC123",
-                "expires_in": 600,
-                "interval": 5,
-                "device_code": "device_code_123",
-            }
+    @pytest.mark.asyncio
+    async def test_poll_device_token_stops_at_monotonic_deadline(self) -> None:
+        """Pending authorization never polls beyond the challenge lifetime."""
+        pending = httpx.Response(400, json={"error": "authorization_pending"})
+        client, requests = _oauth_client(
+            pending,
+            httpx.Response(400, json={"error": "authorization_pending"}),
+            httpx.Response(200, json={"access_token": "too-late"}),
+        )
+        challenge = _challenge(expires_in=6)
+        clock = 0.0
 
-            token_resp = MagicMock()
-            token_resp.json.return_value = {
-                "access_token": "test_access_token",
-                "refresh_token": "test_refresh_token",
-                "token_type": "Bearer",
-            }
+        def monotonic() -> float:
+            return clock
 
-            userinfo_resp = MagicMock()
-            userinfo_resp.json.return_value = {
-                "sub": "user123",
-                "name": "Test User",
-                "email": "test@example.com",
-            }
+        async def advance(seconds: float) -> None:
+            nonlocal clock
+            clock += seconds
 
-            # Configure responses
-            mock_client.get.side_effect = [
-                discovery_resp,
-                userinfo_resp,
-            ]  # discovery, userinfo
-            mock_client.post.side_effect = [
-                registration_resp,
-                device_auth_resp,
-                token_resp,
-            ]  # register, device auth, token
-
-            # Mock UI components
+        async with client:
             with (
-                patch("webbrowser.get") as mock_browser,
-                patch("segno.make") as mock_qr,
-                patch("rich.progress.Progress") as mock_progress,
-                patch("asyncio.sleep"),  # Speed up the test
+                patch("time.monotonic", side_effect=monotonic),
+                patch("asyncio.sleep", side_effect=advance) as sleep,
+                pytest.raises(TimeoutError, match="Device flow timed out"),
             ):
-                mock_browser.return_value.open = MagicMock()
-                mock_qr.return_value.terminal = MagicMock()
-
-                # Mock progress context manager
-                mock_progress_instance = MagicMock()
-                mock_progress.return_value.__enter__.return_value = (
-                    mock_progress_instance
-                )
-                mock_progress.return_value.__exit__.return_value = None
-
-                # Test the complete flow
-                config = await discover(
-                    "https://example.com/.well-known/openid-configuration",
-                    mock_client,
-                )
-                client_info = await register(
-                    config["registration_endpoint"], mock_client
+                await poll_device_token(
+                    "https://example.com/token",
+                    challenge,
+                    client,
                 )
 
-                # For the authflow, mock the polling to succeed immediately
-                with patch("canfar.auth.oidc._poll_token") as mock_poll_token:
-                    mock_poll_token.return_value = {
-                        "access_token": "test_access_token",
-                        "refresh_token": "test_refresh_token",
-                    }
+        assert len(requests) == 2
+        assert sleep.await_args_list == [call(5), call(1)]
 
-                    tokens = await authflow(
-                        config["device_authorization_endpoint"],
-                        config["token_endpoint"],
-                        client_info["client_id"],
-                        client_info["client_secret"],
-                        mock_client,
-                    )
+    @pytest.mark.asyncio
+    async def test_poll_device_token_backs_off_after_network_timeout(self) -> None:
+        """Network timeouts reduce polling frequency before retrying."""
+        client, _ = _oauth_client(
+            httpx.ConnectTimeout("network timeout"),
+            httpx.Response(200, json={"access_token": "test_access_token"}),
+        )
+        challenge = _challenge()
 
-                # Verify results
-                assert (
-                    config["device_authorization_endpoint"]
-                    == "https://example.com/device"
+        async with client:
+            with patch("asyncio.sleep", new_callable=AsyncMock) as sleep:
+                tokens = await poll_device_token(
+                    "https://example.com/token",
+                    challenge,
+                    client,
                 )
-                assert client_info["client_id"] == "test_client_id"
-                assert tokens["access_token"] == "test_access_token"
+
+        sleep.assert_awaited_once_with(10)
+        assert tokens["access_token"] == "test_access_token"
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize(
+        ("response", "error", "match", "device_code"),
+        [
+            (
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "access_denied",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                PermissionError,
+                "authorization was denied",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "expired_token",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                TimeoutError,
+                "authorization expired",
+                "device_code_123",
+            ),
+            (
+                httpx.Response(400, json={}),
+                ValueError,
+                "malformed token response",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    json={
+                        "error": "invalid_grant",
+                        "error_description": "secret-error-description",
+                    },
+                ),
+                ValueError,
+                r"OIDC device authorization failed$",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(500, content="secret-server-response-body"),
+                ValueError,
+                r"OIDC device authorization failed$",
+                "secret-device-code",
+            ),
+            (
+                httpx.Response(
+                    400,
+                    content=b"secret response body",
+                    headers={"content-type": "application/json"},
+                ),
+                ValueError,
+                "malformed token response",
+                "device_code_123",
+            ),
+            (
+                httpx.Response(400, json=["secret response body"]),
+                ValueError,
+                "malformed token response",
+                "device_code_123",
+            ),
+        ],
+        ids=[
+            "access-denied",
+            "expired-token",
+            "empty-error",
+            "invalid-grant",
+            "server-error",
+            "invalid-json",
+            "nonobject-json",
+        ],
+    )
+    async def test_poll_device_token_stops_on_terminal_errors(
+        self,
+        response: httpx.Response,
+        error: type[BaseException],
+        match: str,
+        device_code: str,
+        caplog: pytest.LogCaptureFixture,
+    ) -> None:
+        """Terminal OAuth/HTTP failures stop immediately without leaking secrets."""
+        client, requests = _oauth_client(response)
+        challenge = _challenge(device_code=device_code)
+
+        async with client:
+            with pytest.raises(error, match=match) as exc:
+                await poll_device_token(
+                    "https://example.com/token",
+                    challenge,
+                    client,
+                )
+
+        message = str(exc.value)
+        assert "secret-device-code" not in message
+        assert "secret-error-description" not in message
+        assert "secret-server-response-body" not in message
+        assert "secret response body" not in message
+        assert "secret-error-description" not in caplog.text
+        assert "secret-server-response-body" not in caplog.text
+        assert len(requests) == 1

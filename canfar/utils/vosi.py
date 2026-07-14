@@ -1,10 +1,8 @@
 from __future__ import annotations
 
 import re
-from collections import OrderedDict
 from typing import TypedDict, cast
 
-import httpx
 from defusedxml import ElementTree
 
 # --- Constants & helpers ------------------------------------------------------
@@ -112,18 +110,8 @@ def _parse_version_tuple(v: str | None) -> tuple[int, ...] | None:
     return tuple(int(p) for p in m.group(1).split("."))
 
 
-def _version_sort_key(v: str | None) -> tuple[int, tuple[int, ...]]:
-    """Key for sorting versions (latest first)."""
-    tup = _parse_version_tuple(v)
-    if tup is None:
-        return (1, (0,))
-    return (0, tup)
-
-
 def capabilities(  # noqa: PLR0912 too many branches (clarity)
-    url: str | None = None,
-    xml: str | None = None,
-    timeout: int | None = None,
+    xml: str,
 ) -> list[Capability]:
     """Parse sessions capabilities into a list of endpoint families.
 
@@ -139,9 +127,7 @@ def capabilities(  # noqa: PLR0912 too many branches (clarity)
       * Output is sorted by version (latest first).
 
     Args:
-        url: A VOSI capabilities XML payload as a string.
-        xml: A VOSI capabilities XML payload as a string.
-        timeout: HTTP timeout in seconds when ``url`` is provided.
+        xml: A VOSI capabilities XML payload.
 
     Returns:
         A list of dictionaries of the form:
@@ -154,19 +140,10 @@ def capabilities(  # noqa: PLR0912 too many branches (clarity)
             ...
         ]
     """
-    if xml:
-        root = ElementTree.fromstring(xml)
-    elif url:
-        if timeout is None:
-            response = httpx.get(url)
-        else:
-            response = httpx.get(url, timeout=timeout)
-        xml = response.text
-    else:
-        msg = "Either url or xml must be provided"
-        raise ValueError(msg)
+    if not xml.strip():
+        return []
     root = ElementTree.fromstring(xml)
-    buckets: OrderedDict[tuple[str, str | None], Capability] = OrderedDict()
+    buckets: dict[tuple[str, str | None], Capability] = {}
 
     for cap in root.findall(".//{*}capability"):
         std_id = cap.get("standardID")
@@ -216,10 +193,9 @@ def capabilities(  # noqa: PLR0912 too many branches (clarity)
 
     items: list[Capability] = list(buckets.values())
 
-    def sort_key(item: Capability) -> tuple[int, tuple[int, ...], str]:
-        v = item.get("version")
-        marker, tup = _version_sort_key(v)
-        return (marker, tup, item["baseurl"])
-
-    items.sort(key=sort_key, reverse=True)
+    items.sort(key=lambda item: item["baseurl"])
+    items.sort(
+        key=lambda item: _parse_version_tuple(item.get("version")) or (),
+        reverse=True,
+    )
     return items

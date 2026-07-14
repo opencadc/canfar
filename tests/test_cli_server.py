@@ -50,16 +50,30 @@ def _write_config(path: Path) -> None:
 
 
 def test_server_ls_lists_active_idp_servers(tmp_path: Path) -> None:
-    """``server ls`` renders known servers for the active IDP."""
+    """``server ls`` loads once and renders those known servers."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
+    known = Server(
+        idp="cadc",
+        name="CADC-CANFAR",
+        uri=AnyUrl(_CADC_URI),
+        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+        version="v1",
+        auths=["x509"],
+    )
 
-    with _patch_config(config_path):
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.server.auth_show") as show,
+        patch("canfar.cli.server.server_list", return_value=[known]) as list_,
+    ):
         result = runner.invoke(cli, ["server", "ls"])
 
     assert result.exit_code == 0
     assert "CADC-CANFAR" in result.stdout
     assert _CADC_URI in result.stdout
+    show.assert_called_once_with()
+    list_.assert_called_once_with()
 
 
 def test_server_use_selects_by_uri(tmp_path: Path) -> None:

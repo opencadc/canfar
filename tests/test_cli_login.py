@@ -5,6 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 from typer.testing import CliRunner
@@ -40,6 +41,20 @@ def test_login_help_is_available() -> None:
     result = runner.invoke(cli, ["login", "--help"])
     assert result.exit_code == 0
     assert "Login to CANFAR Science Platform" in result.stdout
+
+
+@pytest.mark.parametrize(
+    "arguments",
+    [["login", "cadc"], ["auth", "login", "cadc"]],
+    ids=["canonical", "compatibility-alias"],
+)
+def test_login_defaults_to_ten_second_timeout(arguments: list[str]) -> None:
+    """Canonical and compatibility login commands default to ten seconds."""
+    with patch("canfar.cli.login._login_flow") as login_flow:
+        result = runner.invoke(cli, arguments)
+
+    assert result.exit_code == 0
+    login_flow.assert_called_once_with("cadc", force=False, dev=False, timeout=10)
 
 
 def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> None:
@@ -127,8 +142,8 @@ def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
         result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
 
     assert result.exit_code == 0
-    assert "canfar auth login will be removed soon" in result.stdout
-    assert "canfar login" in result.stdout
+    assert "canfar auth login will be removed soon" in result.stderr
+    assert "canfar login" in result.stderr
     with (
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
@@ -293,4 +308,4 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
         result = runner.invoke(cli, ["login", "cadc"])
 
     assert result.exit_code == 1
-    assert "already exists" in result.stdout
+    assert "already exists" in result.stderr

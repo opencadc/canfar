@@ -9,7 +9,7 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - User-facing library operations live in `canfar/sessions.py`, `canfar/images.py`, `canfar/context.py`, and `canfar/overview.py`.
 - Typer command adapters live in `canfar/cli/` and should stay thin over library modules.
 - Auth flows live in `canfar/auth/`; request/response hooks live in `canfar/hooks/`.
-- Discovery, display, logging, request builders, and other helper modules live in `canfar/utils/`.
+- Discovery, logging, request builders, and other helper modules live in `canfar/utils/`.
 
 ## Current Seams
 
@@ -18,6 +18,17 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - `Session` and `AsyncSession` duplicate many operations in sync/async form. Keep behavior aligned when changing either adapter.
 - CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.
 - Request builders in `canfar/utils/build.py` are useful test surfaces for payload shape and validation.
+- Logging is stdlib `logging` plus Rich stderr and optional `--log-file` JSONL (`canfar/utils/logging.py`). There is no Logfire, OTLP, or `telemetry.py` layer.
+
+## Authentication Configuration
+
+`OIDCCredential` and `X509Credential` Authentication Records live in
+`Configuration.authentication`, accessed through `Configuration.get_credential`,
+`upsert_credential`, and `update_credential`. `ActiveConfig` owns the active
+Authentication and Server Selection references; `HTTPClient` composes
+`Configuration` and resolves those records for transport. Server Selection
+history lives on `Configuration` / `ActiveConfig` directly (there is no
+separate `selection.py` shim).
 
 ## Test Caveats
 
@@ -31,3 +42,9 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - Avoid new seams until at least two adapters need them.
 - Prefer Pydantic models for structured request/config data instead of ad hoc dict handling at call sites.
 - Keep secret-bearing config output redacted or explicitly justified.
+
+## Historical notes
+
+Files under `docs/agents/research/` and `docs/agents/reviews/` are dated
+snapshots from audits and research. Prefer this file and `docs/cli/` for
+current design; treat older notes as historical unless they match the code.

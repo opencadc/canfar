@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
+from contextlib import suppress
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -10,8 +14,6 @@ from pydantic import ValidationError
 from canfar.models.auth import OIDCCredential
 
 if TYPE_CHECKING:
-    from pathlib import Path
-
     from canfar.models.config import Configuration
 
 
@@ -51,11 +53,27 @@ def save_config(config: Configuration, path: Path | None = None) -> None:
     """Save ``config`` to YAML."""
     target = path or _default_config_path()
     target.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
     try:
-        data = config.model_dump(mode="json", exclude_none=True)
-        _restore_oidc_secrets(config, data)
-        with target.open(mode="w", encoding="utf-8") as handle:
-            yaml.dump(data, handle, default_flow_style=False, sort_keys=True, indent=2)
+        candidate = config._validated_copy()  # noqa: SLF001
+        data = candidate.model_dump(mode="json", exclude_none=True)
+        _restore_oidc_secrets(candidate, data)
+        serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=target.parent,
+            prefix=f".{target.name}.",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(serialized)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(target)
     except (OSError, TypeError, ValidationError) as exc:
+        if temporary is not None:
+            with suppress(OSError):
+                temporary.unlink(missing_ok=True)
         msg = f"Failed to save configuration to {target}: {exc}"
         raise OSError(msg) from exc

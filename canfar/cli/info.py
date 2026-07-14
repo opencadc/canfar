@@ -16,12 +16,13 @@ from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
 from canfar.models.session import FetchResponse
 from canfar.sessions import AsyncSession
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 info = typer.Typer(
     name="info",
     help="Get detailed information about sessions.",
     no_args_is_help=True,
+    context_settings={"allow_interspersed_args": True},
 )
 
 ALL_FIELDS: dict[str, str] = {
@@ -145,12 +146,12 @@ def _display(session_info: dict[str, Any], debug: bool = False) -> None:
     table.add_row("CPU Usage", cpu_usage)
     table.add_row("RAM Usage", ram_usage)
     table.add_row("GPU Usage", gpu_usage)
-    console.print(table)
+    get_console().print(table)
 
     if debug and data.anomalies:
-        console.print("[yellow]Session Response Warnings:[/yellow]")
+        get_console(stderr=True).print("[yellow]Session Response Warnings:[/yellow]")
         for note in dict.fromkeys(data.anomalies):
-            console.print(f"[dim]- {note}[/dim]")
+            get_console(stderr=True).print(f"[dim]- {note}[/dim]")
 
 
 async def _get_info(
@@ -158,11 +159,10 @@ async def _get_info(
     debug: bool,
 ) -> None:
     """Get detailed information about one or more sessions."""
-    log_level = "DEBUG" if debug else "INFO"
-    async with AsyncSession(loglevel=log_level) as session:
+    async with AsyncSession() as session:
         sessions_info = await session.info(ids=session_ids)
     if not sessions_info:
-        console.print(
+        get_console(stderr=True).print(
             "[yellow]No information found for the specified session(s).[/yellow]"
         )
         return
@@ -180,7 +180,7 @@ def get_info(
         bool,
         typer.Option(
             "--debug",
-            help="Enable debug logging.",
+            help="Show Session response warnings.",
         ),
     ] = False,
 ) -> None:

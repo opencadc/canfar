@@ -4,14 +4,17 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import toml
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
 
 _PYPROJECT = Path(__file__).parent.parent / "pyproject.toml"
 
 
 def _load() -> dict[str, object]:
-    with _PYPROJECT.open() as f:
-        return toml.load(f)
+    with _PYPROJECT.open("rb") as f:
+        return tomllib.load(f)
 
 
 def test_mypy_config_absent() -> None:
@@ -37,3 +40,10 @@ def test_mypy_dev_dependency_absent() -> None:
     assert not any(dep.startswith("mypy") for dep in dev_deps), (
         "mypy still listed as a dev dependency."
     )
+
+
+def test_toolchain_parser_is_not_a_runtime_dependency() -> None:
+    """The test-only TOML reader must not ship with the CANFAR client."""
+    data = _load()
+    dependencies: list[str] = data.get("project", {}).get("dependencies", [])
+    assert not any(dep.startswith("toml") for dep in dependencies)

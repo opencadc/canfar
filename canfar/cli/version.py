@@ -12,7 +12,7 @@ from rich.table import Table
 from canfar import __version__
 from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.output import OutputMode
-from canfar.utils.console import console
+from canfar.utils.console import get_console
 
 
 def callback(
@@ -27,11 +27,13 @@ def callback(
     maybe_emit_banner(OutputMode.HUMAN)
     if not debug:
         # Simple version output
-        console.print(f"CANFAR Python Client {__version__}")
+        get_console().print(f"CANFAR Python Client {__version__}")
         raise typer.Exit(0)
 
     # Detailed debug information
-    console.print("\n[bold blue]CANFAR Python Client Debug Information[/bold blue]")
+    get_console().print(
+        "\n[bold blue]CANFAR Python Client Debug Information[/bold blue]"
+    )
 
     # Client Information
     table = Table(show_header=False, box=None, padding=(0, 1))
@@ -56,10 +58,10 @@ def callback(
     table.add_row("Architecture", platform.machine())
     table.add_row("Platform", platform.platform())
 
-    console.print(table)
+    get_console().print(table)
 
     # Key Dependencies
-    console.print("\n[bold blue]Key Dependencies[/bold blue]")
+    get_console().print("\n[bold blue]Key Dependencies[/bold blue]")
     deps_table = Table(show_header=True, box=None)
     deps_table.add_column("Package", style="bold green", width=22)
     deps_table.add_column("Version", style="white")
@@ -77,14 +79,16 @@ def callback(
         version_str = _get_package_version(dep)
         deps_table.add_row(dep, version_str)
 
-    console.print(deps_table)
+    get_console().print(deps_table)
 
     # Additional information
-    console.print("\n[bold blue]Additional Information[/bold blue]")
-    console.print("• Repository: https://github.com/opencadc/canfar")
-    console.print("• Issues: https://github.com/opencadc/canfar/issues")
-    console.print("• Documentation: https://opencadc.github.io/canfar/")
-    console.print("\n[dim]Please include this information when reporting bugs.[/dim]")
+    get_console().print("\n[bold blue]Additional Information[/bold blue]")
+    get_console().print("• Repository: https://github.com/opencadc/canfar")
+    get_console().print("• Issues: https://github.com/opencadc/canfar/issues")
+    get_console().print("• Documentation: https://opencadc.github.io/canfar/")
+    get_console().print(
+        "\n[dim]Please include this information when reporting bugs.[/dim]"
+    )
     raise typer.Exit(0)
 
 

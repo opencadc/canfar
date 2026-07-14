@@ -11,21 +11,58 @@ from httpx import HTTPError, Response
 
 from canfar import get_logger
 from canfar.client import HTTPClient
+from canfar.models.session import CreateRequest
 from canfar.utils import build
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from canfar.models.types import Kind, Status, View
 log = get_logger(__name__)
 
 
 def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
-    """Log a failed HTTP task with caller context.
+    """Log a failed HTTP task with safe caller context.
 
-    Status codes, bodies, and timeouts are already logged by httpx response hooks
-    (``catch`` / ``acatch``); this adds identifying context (payload or session id)
-    without duplicating tracebacks.
+    Status codes and safe request context are already logged by HTTPX response hooks;
+    this adds a Session identifier or replica position and exception class only.
     """
-    log.error("%s: %s: %s", operation, context, exc)
+    log.error("%s: %s (%s)", operation, context, type(exc).__name__)
+
+
+def _ids(value: str | list[str]) -> list[str]:
+    """Normalize one or many Session identifiers without changing their order."""
+    return [value] if isinstance(value, str) else value
+
+
+def _session_name_pattern(selector: str) -> re.Pattern[str]:
+    """Compile a regular expression or an anchored literal Session selector."""
+    meta = frozenset(".^$*+?{}[]()|")
+    if any(char in meta for char in selector):
+        log.info("destroy_with using regex pattern: %s", selector)
+        pattern = selector
+    else:
+        log.info("destroy_with using literal prefix: %s", selector)
+        pattern = rf"^{re.escape(selector)}"
+    try:
+        return re.compile(pattern)
+    except re.error as exc:
+        msg = f"Invalid regex pattern '{selector}': {exc}"
+        log.exception(msg)
+        raise ValueError(msg) from exc
+
+
+def _matching_session_ids(sessions: list[Any], regex: re.Pattern[str]) -> list[str]:
+    """Return session IDs whose names match the compiled selector."""
+    return [session["id"] for session in sessions if regex.search(session["name"])]
+
+
+def connection_url(session: Mapping[str, Any]) -> str | None:
+    """Return the URL only when a Session is ready for a connection."""
+    value = session.get("connectURL")
+    if session.get("status") != "Running" or not isinstance(value, str):
+        return None
+    return value or None
 
 
 class Session(HTTPClient):
@@ -41,7 +78,6 @@ class Session(HTTPClient):
         >>> session = Session(
                 timeout=120,
                 concurrency=100, # No effect on sync client
-                loglevel=40,
             )
     """
 
@@ -117,9 +153,7 @@ class Session(HTTPClient):
             >>> session.info(ids="hjko98yghj")
             >>> session.info(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        # Convert id to list if it is a string
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: list[dict[str, Any]] = []
         for value in ids:
             try:
@@ -147,8 +181,7 @@ class Session(HTTPClient):
             >>> session.logs(ids="hjko98yghj")
             >>> session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
 
@@ -172,8 +205,8 @@ class Session(HTTPClient):
 
     def create(
         self,
-        name: str,
-        image: str,
+        name: str | CreateRequest,
+        image: str | None = None,
         cores: int | None = None,
         ram: int | None = None,
         kind: Kind = "headless",
@@ -186,8 +219,8 @@ class Session(HTTPClient):
         """Launch a canfar session.
 
         Args:
-            name (str): A unique name for the session.
-            image (str): Container image to use for the session.
+            name: Domain request or a unique name for the Session.
+            image: Container Image when ``name`` is a string.
             cores (int, optional): Number of cores.
                 Defaults to None, i.e. flexible mode.
             ram (int, optional): Amount of RAM (GB).
@@ -243,15 +276,16 @@ class Session(HTTPClient):
             replicas,
         )
         results: list[str] = []
-        log.debug("Creating %d %s session[s].", replicas, kind)
-        for payload in payloads:
+        session_kind = name.kind if isinstance(name, CreateRequest) else kind
+        log.debug("Creating %d %s session[s].", len(payloads), session_kind)
+        for replica, payload in enumerate(payloads, start=1):
             try:
                 response: Response = self.client.post(url="session", params=payload)
                 results.append(response.text.rstrip("\r\n"))
             except HTTPError as err:
                 _log_http_task_failure(
-                    "Failed to create session with payload",
-                    payload,
+                    "Failed to create session",
+                    f"replica {replica}/{len(payloads)}",
                     err,
                 )
         return results
@@ -279,8 +313,7 @@ class Session(HTTPClient):
             >>> session.events(ids="hjko98yghj")
             >>> session.events(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: list[dict[str, str]] = []
         parameters: dict[str, str] = {"view": "events"}
         for value in ids:
@@ -315,8 +348,7 @@ class Session(HTTPClient):
             >>> session.destroy(ids="hjko98yghj")
             >>> session.destroy(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: dict[str, bool] = {}
         for value in ids:
             try:
@@ -359,25 +391,9 @@ class Session(HTTPClient):
             >>> session.destroy_with(prefix="test")  # literal prefix
             >>> session.destroy_with(prefix="desktop$")  # regex
         """
-        meta = set(".^$*+?{}[]()|")
-        has_meta = any(ch in meta for ch in prefix)
-        try:
-            if has_meta:
-                log.info("destroy_with using regex pattern: %s", prefix)
-                regex = re.compile(prefix)
-            else:
-                log.info("destroy_with using literal prefix: %s", prefix)
-                regex = re.compile(rf"^{re.escape(prefix)}")
-        except re.error as exc:
-            msg = f"Invalid regex pattern '{prefix}': {exc}"
-            log.exception(msg)
-            raise ValueError(msg) from exc
-
+        regex = _session_name_pattern(prefix)
         sessions = self.fetch(kind=kind, status=status)
-        ids: list[str] = [
-            session["id"] for session in sessions if regex.search(session["name"])
-        ]
-        return self.destroy(ids)
+        return self.destroy(_matching_session_ids(sessions, regex))
 
     def connect(self, ids: list[str] | str) -> None:
         """Open session[s] in a web browser.
@@ -391,19 +407,17 @@ class Session(HTTPClient):
             >>> session.connect(ids="hjko98yghj")
             >>> session.connect(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
-        info = self.info(ids)
+        info = self.info(_ids(ids))
         log.debug(info)
         for session in info:
             status: str = session.get("status", "unknown")
-            if status != "Running":
+            url = connection_url(session)
+            if url is None and status != "Running":
                 log.warning("Session %s is currently %s.", session["id"], status)
                 log.warning("Please wait for the session to be ready.")
                 continue
-            connect_url = session.get("connectURL")
-            if connect_url:
-                open_new_tab(connect_url)
+            if url is not None:
+                open_new_tab(url)
 
 
 class AsyncSession(HTTPClient):
@@ -423,7 +437,6 @@ class AsyncSession(HTTPClient):
                 token="token",
                 timeout=30,
                 concurrency=100,
-                loglevel=40,
             )
     """
 
@@ -481,7 +494,6 @@ class AsyncSession(HTTPClient):
         parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
         response: Response = await self.asynclient.get(url="session", params=parameters)
         data: list[dict[str, str]] = response.json()
-        log.debug(data)
         return data
 
     async def stats(self) -> dict[str, Any]:
@@ -502,7 +514,6 @@ class AsyncSession(HTTPClient):
         parameters = {"view": "stats"}
         response: Response = await self.asynclient.get("session", params=parameters)
         data: dict[str, Any] = response.json()
-        log.debug(data)
         return data
 
     async def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
@@ -520,11 +531,8 @@ class AsyncSession(HTTPClient):
             >>> await session.info(ids="hjko98yghj")
             >>> await session.info(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        # Convert id to list if it is a string
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: list[dict[str, Any]] = []
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(value: str) -> dict[str, Any]:
@@ -563,13 +571,11 @@ class AsyncSession(HTTPClient):
             >>> await session.logs(ids="hjko98yghj")
             >>> await session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
 
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
-        tasks: list[Any] = []
 
         async def bounded(value: str) -> tuple[str, str]:
             async with semaphore:
@@ -597,8 +603,8 @@ class AsyncSession(HTTPClient):
 
     async def create(
         self,
-        name: str,
-        image: str,
+        name: str | CreateRequest,
+        image: str | None = None,
         cores: int | None = None,
         ram: int | None = None,
         kind: Kind = "headless",
@@ -611,8 +617,8 @@ class AsyncSession(HTTPClient):
         """Launch a canfar session.
 
         Args:
-            name (str): A unique name for the session.
-            image (str): Container image to use for the session.
+            name: Domain request or a unique name for the Session.
+            image: Container Image when ``name`` is a string.
             cores (int, optional): Number of cores.
                 Defaults to None, i.e. flexible mode.
             ram (int, optional): Amount of RAM (GB).
@@ -668,24 +674,23 @@ class AsyncSession(HTTPClient):
             replicas,
         )
         results: list[str] = []
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(parameters: list[tuple[str, Any]]) -> Any:
             async with semaphore:
-                log.debug("HTTP Request Parameters: %s", parameters)
                 response = await self.asynclient.post(url="session", params=parameters)
                 return response.text.rstrip("\r\n")
 
         tasks = [bounded(payload) for payload in payloads]
-        msg = f"Creating {replicas} {kind} session[s]."
+        session_kind = name.kind if isinstance(name, CreateRequest) else kind
+        msg = f"Creating {len(payloads)} {session_kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
-        for payload, reply in zip(payloads, responses, strict=True):
+        for replica, reply in enumerate(responses, start=1):
             if isinstance(reply, Exception):
                 _log_http_task_failure(
-                    "Failed to create session with payload",
-                    payload,
+                    "Failed to create session",
+                    f"replica {replica}/{len(payloads)}",
                     reply,
                 )
             elif isinstance(reply, str):
@@ -716,11 +721,9 @@ class AsyncSession(HTTPClient):
             >>> await session.events(ids="hjko98yghj")
             >>> await session.events(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: list[dict[str, str]] = []
         parameters: dict[str, str] = {"view": "events"}
-        tasks: list[Any] = []
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
         async def bounded(value: str) -> dict[str, str]:
@@ -741,7 +744,7 @@ class AsyncSession(HTTPClient):
                     reply,
                 )
             elif isinstance(reply, dict):
-                results.append(dict(reply))
+                results.append(reply)
 
         if verbose and results:
             for result in results:
@@ -767,11 +770,9 @@ class AsyncSession(HTTPClient):
             >>> await session.destroy(ids="hjko98yghj")
             >>> await session.destroy(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = _ids(ids)
         results: dict[str, bool] = {}
         semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
-        tasks: list[Any] = []
 
         async def bounded(value: str) -> tuple[str, bool]:
             async with semaphore:
@@ -795,6 +796,7 @@ class AsyncSession(HTTPClient):
     async def destroy_with(
         self,
         prefix: str,
+        *,
         kind: Kind = "headless",
         status: Status = "Completed",
     ) -> dict[str, bool]:
@@ -823,25 +825,9 @@ class AsyncSession(HTTPClient):
             >>> await session.destroy_with(prefix="test")  # literal prefix
             >>> await session.destroy_with(prefix="desktop$")  # regex
         """
-        meta: bool = any(char in set(".^$*+?{}[]()|") for char in prefix)
-        try:
-            if meta:
-                log.info("Regex Pattern: %s", prefix)
-                regex = re.compile(prefix)
-            else:
-                log.info("Literal Prefix: %s", prefix)
-                regex = re.compile(rf"^{re.escape(prefix)}")
-        except re.error as err:
-            msg = f"Invalid regex pattern '{prefix}': {err}"
-            log.exception(msg)
-            raise ValueError(msg) from err
-
-        ids: list[str] = [
-            session["id"]
-            for session in await self.fetch(kind=kind, status=status)
-            if regex.search(session["name"])
-        ]
-        return await self.destroy(ids)
+        regex = _session_name_pattern(prefix)
+        sessions = await self.fetch(kind=kind, status=status)
+        return await self.destroy(_matching_session_ids(sessions, regex))
 
     async def connect(self, ids: list[str] | str) -> None:
         """Connect to a session[s] in a web browser.
@@ -855,16 +841,14 @@ class AsyncSession(HTTPClient):
             >>> await session.connect(ids="hjko98yghj")
             >>> await session.connect(ids=["hjko98yghj", "ikvp1jtp"])
         """
-        if isinstance(ids, str):
-            ids = [ids]
-        info = await self.info(ids)
+        info = await self.info(_ids(ids))
         log.debug(info)
         for session in info:
             status: str = session.get("status", "unknown")
-            if status != "Running":
+            url = connection_url(session)
+            if url is None and status != "Running":
                 log.warning("Session %s is currently %s.", session["id"], status)
                 log.warning("Please wait for the session to be ready.")
                 continue
-            connect_url = session.get("connectURL")
-            if connect_url:
-                open_new_tab(connect_url)
+            if url is not None:
+                open_new_tab(url)

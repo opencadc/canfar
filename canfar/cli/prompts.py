@@ -7,11 +7,26 @@ from typing import TYPE_CHECKING
 
 import questionary
 
-from canfar.utils.display import _get_selection_style
-
 if TYPE_CHECKING:
     from canfar.idp import IdpInfo
     from canfar.models.http import Server
+
+
+def _get_selection_style() -> questionary.Style:
+    """Return the shared style for interactive CLI selections."""
+    return questionary.Style(
+        [
+            ("question", "bold"),
+            ("answer", "fg:#ff9d00 bold"),
+            ("pointer", "fg:#ff9d00 bold"),
+            ("highlighted", "fg:#ff9d00 bold"),
+            ("selected", "fg:#cc5454"),
+            ("separator", "fg:#cc5454"),
+            ("instruction", ""),
+            ("text", ""),
+            ("disabled", "fg:#858585 italic"),
+        ]
+    )
 
 
 def select_idp(idps: list[IdpInfo]) -> str:
