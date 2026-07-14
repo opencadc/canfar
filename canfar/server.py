@@ -13,10 +13,6 @@ from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar import get_logger
 from canfar.auth.x509 import CertificateError
-from canfar.config.selection import (
-    get_active_server,
-    get_remembered_server_for_idp,
-)
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
@@ -327,7 +323,7 @@ def _active_server_for_idp(config: Configuration, idp: str) -> Server | None:
     if config.active.server is None:
         return None
     try:
-        active_server = get_active_server(config)
+        active_server = config.get_active_server()
     except KeyError:
         return None
     if active_server.idp != idp:
@@ -340,7 +336,7 @@ def _remembered_server_for_idp(
     idp: str,
     servers: list[Server],
 ) -> Server | None:
-    remembered = get_remembered_server_for_idp(config, idp)
+    remembered = config.get_remembered_server_for_idp(idp)
     if remembered is None or remembered.uri is None:
         return None
     if remembered.name is None:
@@ -542,15 +538,14 @@ def enrich(
         ParseError,
         DefusedXmlException,
     ) as exc:
-        if strict:
-            msg = f"Failed to fetch capabilities for {server.url}: {exc}"
-            raise ServerFetchError(msg) from exc
-        log.debug(
-            "Skipping capability enrichment for %s during discovery: %s",
-            server.url,
-            exc,
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"Failed to fetch capabilities for {server.url}: {exc}",
+            cause=exc,
+            debug="Skipping capability enrichment for %s during discovery: %s",
+            args=(server.url, exc),
         )
-        return server.model_copy(deep=True)
 
     primary = next(
         (
@@ -561,15 +556,16 @@ def enrich(
         None,
     )
     if primary is None:
-        if strict:
-            msg = f"No complete session capabilities found for {server.url}."
-            raise ServerFetchError(msg)
-        log.debug(
-            "No complete session capabilities found for %s during discovery; "
-            "keeping registry metadata only.",
-            server.url,
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"No complete session capabilities found for {server.url}.",
+            debug=(
+                "No complete session capabilities found for %s during discovery; "
+                "keeping registry metadata only."
+            ),
+            args=(server.url,),
         )
-        return server.model_copy(deep=True)
 
     try:
         return Server.model_validate(
@@ -581,15 +577,32 @@ def enrich(
             }
         )
     except ValidationError as exc:
-        if strict:
-            msg = f"Invalid capabilities for {server.url}: {exc}"
-            raise ServerFetchError(msg) from exc
-        log.debug(
-            "Ignoring invalid capability enrichment for %s during discovery: %s",
-            server.url,
-            exc,
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=f"Invalid capabilities for {server.url}: {exc}",
+            cause=exc,
+            debug=(
+                "Ignoring invalid capability enrichment for %s during discovery: %s"
+            ),
+            args=(server.url, exc),
         )
-        return server.model_copy(deep=True)
+
+
+def _keep_or_raise(
+    server: Server,
+    *,
+    strict: bool,
+    error: str,
+    debug: str,
+    args: tuple[object, ...] = (),
+    cause: BaseException | None = None,
+) -> Server:
+    """Raise on strict enrich failures; otherwise keep the original server."""
+    if strict:
+        raise ServerFetchError(error) from cause
+    log.debug(debug, *args)
+    return server.model_copy(deep=True)
 
 
 def _validate_server(

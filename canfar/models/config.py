@@ -32,18 +32,6 @@ from pydantic_settings.sources import EnvSettingsSource
 from canfar import CONFIG_PATH, get_logger
 from canfar.config.editor import get_value as _get_value
 from canfar.config.editor import set_value as _set_value
-from canfar.config.selection import active_context as _active_context
-from canfar.config.selection import get_active_server as _get_active_server
-from canfar.config.selection import get_credential as _get_credential
-from canfar.config.selection import (
-    get_remembered_server_for_idp as _get_remembered_server_for_idp,
-)
-from canfar.config.selection import get_server_by_uri as _get_server_by_uri
-from canfar.config.selection import get_server_for_idp as _get_server_for_idp
-from canfar.config.selection import legacy_contexts as _legacy_contexts
-from canfar.config.selection import (
-    server_selection_history as _server_selection_history,
-)
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
     AuthContext,
@@ -326,7 +314,19 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no credential exists for ``idp``.
         """
-        return _get_credential(self, idp)
+        try:
+            return self.authentication[idp]
+        except KeyError as exc:
+            msg = f"Authentication record for IDP '{idp}' not found."
+            raise KeyError(msg) from exc
+
+    def _get_server_by_name(self, name: str) -> Server:
+        """Return a known server by Server Name."""
+        try:
+            return self.servers[name]
+        except KeyError as exc:
+            msg = f"Server '{name}' not found."
+            raise KeyError(msg) from exc
 
     def upsert_credential(self, credential: AuthenticationCredential) -> None:
         """Insert or replace a validated Authentication Record.
@@ -432,7 +432,12 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``uri``.
         """
-        return _get_server_by_uri(self, uri)
+        target = str(uri)
+        for server in self.servers.values():
+            if server.uri is not None and str(server.uri) == target:
+                return server
+        msg = f"Server '{target}' not found."
+        raise KeyError(msg)
 
     def get_active_server(self) -> Server:
         """Return the active science platform server record.
@@ -440,7 +445,10 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no active server is selected.
         """
-        return _get_active_server(self)
+        if self.active.server is None:
+            msg = "No active server selected."
+            raise KeyError(msg)
+        return self._get_server_by_name(self.active.server)
 
     def get_server_for_idp(self, idp: str) -> Server:
         """Return the best-known server for an IDP.
@@ -457,7 +465,14 @@ class Configuration(BaseSettings):
         Raises:
             KeyError: If no server exists for ``idp``.
         """
-        return _get_server_for_idp(self, idp)
+        if self.active.authentication == idp and self.active.server is not None:
+            return self.get_active_server()
+
+        for server in self.servers.values():
+            if server.idp == idp:
+                return server
+        msg = f"No server found for IDP '{idp}'."
+        raise KeyError(msg)
 
     def get_remembered_server_for_idp(self, idp: str) -> Server | None:
         """Return the last selected server for ``idp`` when still valid.
@@ -469,11 +484,29 @@ class Configuration(BaseSettings):
             Matching server record, or ``None`` when no remembered selection is
             available for ``idp``.
         """
-        return _get_remembered_server_for_idp(self, idp)
+        name = self._server_selection_history().get(idp)
+        if name is None:
+            return None
+        try:
+            server = self._get_server_by_name(name)
+        except KeyError:
+            return None
+        if server.idp != idp:
+            return None
+        return server
 
     def _server_selection_history(self) -> dict[str, str]:
         """Return remembered selections seeded with the current active pair."""
-        return _server_selection_history(self)
+        selections = dict(self.active.servers)
+        if self.active.server is None:
+            return selections
+        try:
+            server = self.get_active_server()
+        except KeyError:
+            return selections
+        if server.idp == self.active.authentication and server.name is not None:
+            selections[self.active.authentication] = server.name
+        return selections
 
     def set_active_selection(self, idp: str, server: Server) -> None:
         """Persist ``idp`` and ``server`` as the active pair.
@@ -509,12 +542,25 @@ class Configuration(BaseSettings):
         Returns:
             Legacy ``OIDC`` or ``X509`` model with embedded active server.
         """
-        return _active_context(self)
+        from canfar.models.config_compat import (  # noqa: PLC0415
+            credential_to_legacy_context,
+        )
+
+        credential = self.get_credential(self.active.authentication)
+        try:
+            server = self.get_active_server()
+        except KeyError:
+            server = None
+        return credential_to_legacy_context(credential, server)
 
     @property
     def contexts(self) -> Mapping[str, AuthContext]:
         """Return a legacy dict-like view keyed by IDP."""
-        return _legacy_contexts(self)
+        from canfar.models.config_compat import (  # noqa: PLC0415
+            LegacyContextsMapping,
+        )
+
+        return LegacyContextsMapping(self)
 
     def set_legacy_context(self, idp: str, context: AuthContext) -> None:
         """Insert or replace authentication from a legacy context assignment.

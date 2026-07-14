@@ -14,7 +14,6 @@ from canfar.config.migration import (
     ConfigResetRequiredError,
     ensure_current_config,
 )
-from canfar.config.selection import set_active_selection as select_active_server
 from canfar.config.store import save_config
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
@@ -345,7 +344,7 @@ class TestConfigServices:
             auths=["x509"],
         )
 
-        select_active_server(config, "cadc", server)
+        config.set_active_selection("cadc", server)
 
         assert config.active.server == "CADC-CANFAR"
         assert config.get_server_by_uri("ivo://cadc.example/skaha").name == (

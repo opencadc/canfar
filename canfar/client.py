@@ -35,6 +35,8 @@ if TYPE_CHECKING:
 
 log = get_logger(__name__)
 
+_UNSET = object()
+
 
 class HTTPClient(BaseSettings):
     """HTTP Client for interacting with CANFAR Science Platform services (V2).
@@ -199,8 +201,9 @@ class HTTPClient(BaseSettings):
         Returns:
             AsyncClient: The asynchronous HTTPx client.
         """
-        kwargs = self._get_client_kwargs(asynchronous=True)
-        headers = self._get_http_headers()
+        credential = self._resolved_authentication_record()
+        kwargs = self._get_client_kwargs(asynchronous=True, credential=credential)
+        headers = self._get_http_headers(credential=credential)
         client = AsyncClient(**kwargs)
         client.headers.update(headers)
         return client
@@ -211,11 +214,24 @@ class HTTPClient(BaseSettings):
         Returns:
             Client: The synchronous HTTPx client.
         """
-        kwargs = self._get_client_kwargs(asynchronous=False)
-        headers = self._get_http_headers()
+        credential = self._resolved_authentication_record()
+        kwargs = self._get_client_kwargs(asynchronous=False, credential=credential)
+        headers = self._get_http_headers(credential=credential)
         client = Client(**kwargs)
         client.headers.update(headers)
         return client
+
+    def _resolved_authentication_record(self) -> AuthenticationCredential | None:
+        """Resolve saved Authentication Record once for client construction."""
+        if self.uses_runtime_credentials:
+            return None
+        credential = self.authentication_record
+        if isinstance(credential, OIDCCredential) and not credential.valid:
+            raise AuthContextError(
+                credential.idp,
+                "OIDC Authentication Record cannot refresh tokens.",
+            )
+        return credential
 
     def _get_base_url(self) -> URL:
         """Get the base URL for the client.
@@ -237,21 +253,26 @@ class HTTPClient(BaseSettings):
             raise ValueError(msg)
         return URL(f"{server.url}/{server.version}")
 
-    def _get_client_kwargs(self, asynchronous: bool) -> dict[str, Any]:
+    def _get_client_kwargs(
+        self,
+        asynchronous: bool,
+        *,
+        credential: AuthenticationCredential | None | object = _UNSET,
+    ) -> dict[str, Any]:
         """Get the keyword arguments for creating an HTTPx client.
 
         Args:
             asynchronous (bool): Whether the client is asynchronous.
+            credential: Pre-resolved Authentication Record, or unset to resolve.
 
         Returns:
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
+        if credential is _UNSET:
+            credential = self._resolved_authentication_record()
         catcher = errors.acatch if asynchronous else errors.catch
         response_hooks = [catcher] if self.raise_http_errors else []
         request_hooks: list[Any] = []
-        credential: AuthenticationCredential | None = None
-        if not self.uses_runtime_credentials:
-            credential = self.authentication_record
         if credential is not None:
             checker = expiry.acheck(self) if asynchronous else expiry.check(self)
             request_hooks.append(checker)
@@ -281,11 +302,6 @@ class HTTPClient(BaseSettings):
         #       update the record and headers. The expiry hook then checks the
         #       updated record.
         if isinstance(credential, OIDCCredential):
-            if not credential.valid:
-                raise AuthContextError(
-                    credential.idp,
-                    "OIDC Authentication Record cannot refresh tokens.",
-                )
             refresher = auth.arefresh(self) if asynchronous else auth.refresh(self)
             kwargs["event_hooks"]["request"].insert(0, refresher)
             return kwargs
@@ -322,12 +338,21 @@ class HTTPClient(BaseSettings):
         ctx.load_cert_chain(certfile=certfile)
         return ctx
 
-    def _get_http_headers(self) -> dict[str, str]:
+    def _get_http_headers(
+        self,
+        *,
+        credential: AuthenticationCredential | None | object = _UNSET,
+    ) -> dict[str, str]:
         """Generate HTTP headers for the client based on authentication mode.
+
+        Args:
+            credential: Pre-resolved Authentication Record, or unset to resolve.
 
         Returns:
             dict[str, str]: HTTP headers.
         """
+        if credential is _UNSET:
+            credential = self._resolved_authentication_record()
         headers: dict[str, str] = {
             "Content-Type": "application/x-www-form-urlencoded",
             "Accept": "application/json",
@@ -340,26 +365,19 @@ class HTTPClient(BaseSettings):
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-TOKEN"
         elif self.certificate:
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-X509"
-        else:
-            credential = self.authentication_record
-            if isinstance(credential, OIDCCredential):
-                if not credential.valid:
-                    raise AuthContextError(
-                        credential.idp,
-                        "OIDC Authentication Record cannot refresh tokens.",
-                    )
-                if credential.token.access is not None:
-                    headers["Authorization"] = (
-                        f"Bearer {credential.token.access.get_secret_value()}"
-                    )
-                elif not credential.refreshable:
-                    raise AuthContextError(
-                        credential.idp,
-                        "OIDC Authentication Record has no usable access token.",
-                    )
-                headers["X-Skaha-Authentication-Type"] = "OIDC"
-            elif isinstance(credential, X509Credential):
-                headers["X-Skaha-Authentication-Type"] = "X509"
+        elif isinstance(credential, OIDCCredential):
+            if credential.token.access is not None:
+                headers["Authorization"] = (
+                    f"Bearer {credential.token.access.get_secret_value()}"
+                )
+            elif not credential.refreshable:
+                raise AuthContextError(
+                    credential.idp,
+                    "OIDC Authentication Record has no usable access token.",
+                )
+            headers["X-Skaha-Authentication-Type"] = "OIDC"
+        elif isinstance(credential, X509Credential):
+            headers["X-Skaha-Authentication-Type"] = "X509"
         # Add container registry authentication if configured
         if self.config.registry.username:
             headers["X-Skaha-Registry-Auth"] = self.config.registry.encoded()
