@@ -22,7 +22,7 @@ from typing_extensions import Self
 from canfar import __version__, get_logger
 from canfar.auth import x509
 from canfar.exceptions.context import AuthContextError
-from canfar.hooks.httpx import auth, errors, expiry
+from canfar.hooks.httpx import auth, debug, errors, expiry
 from canfar.models.auth import (
     AuthenticationCredential,
     OIDCCredential,
@@ -268,11 +268,16 @@ class HTTPClient(BaseSettings):
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
         catcher = errors.acatch if asynchronous else errors.catch
-        response_hooks = [catcher] if self.raise_http_errors else []
+        req_logger = debug.arequest if asynchronous else debug.request
+        resp_logger = debug.aresponse if asynchronous else debug.response
+        response_hooks = [resp_logger]
+        if self.raise_http_errors:
+            response_hooks.append(catcher)
         request_hooks: list[Any] = []
         if credential is not None:
             checker = expiry.acheck(self) if asynchronous else expiry.check(self)
             request_hooks.append(checker)
+        request_hooks.append(req_logger)
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
             "event_hooks": {"request": request_hooks, "response": response_hooks},
