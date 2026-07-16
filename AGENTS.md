@@ -49,8 +49,6 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - Prefer Python stdlib utilities and Pydantic built-ins (`logging`, `model_dump`, `model_dump_json`, `SecretStr`) over custom serialization, config glue, Logfire, or telemetry stacks; keep the smallest footprint that preserves behavior (including CLI `--log-file`).
 - Prefer delete-first / net code and dependency reduction over new abstraction layers when cleaning maintainability debt.
 - Prefer fewer functional public-seam tests (CliRunner / httpx MockTransport) over large Authlib-mock or near-duplicate unit matrices.
-- For filesystem/data CLIs, prefer POSIX-shaped human output (`ls -l`/`-la`/`-lah`-style) over Rich tables/consoles; start with the most-used verbs, not full POSIX; embed via `fsspec_cli.App` (inject configured filesystems) rather than shipping a separate end-user binary.
-- For standalone/shared library specs (e.g. fsspec-cli), keep one self-contained reference document with no canfar domain-glossary or issue-tracker markdown cross-refs; external URLs are fine.
 
 ## Learned Workspace Facts
 
@@ -62,7 +60,6 @@ This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decis
 - CLI machine output (`--json`/`--yaml`) must be data-only on stdout; the human-mode active-server banner must not precede JSON/YAML payloads; serialize via Pydantic `model_dump(mode="json")` or `to_jsonable_python`, not custom redaction helpers.
 - Built-in default CADC/CANFAR server metadata lists `x509` only; `oidc` and other auth modes are merged from VOSI capabilities enrichment after discovery/login, not static defaults.
 - `canfar ps -q` must print all matching session IDs and apply the same `--all`/running-only status filter as table mode; `canfar prune` PREFIX values with shell metacharacters (e.g. `*`) must be quoted so the shell does not expand them.
-- VOSpace/`canfar data` uses `shinybrar/vosfs` as the sole fsspec engine and embeds `fsspec-cli` (`from fsspec_cli import App`; interim under vosfs `src/fsspec_cli` for that repo’s release train) for POSIX verbs—thin domain glue that injects configured filesystems, not a released generic CLI or protocol reimplementation; work branch `feat/vosfs` (`feat/vospace` stale); call `AbstractFileSystem` directly (no UPath); v1 verbs `ls`/`cp`/`mv`/`rm`/`mkdir`/`stat`; consolidated local spec at `docs/agents/specs/fsspec-cli.md`.
 - `canfar.helpers.distributed` is documented public API used in user batch scripts, not internal/dead code.
 - When `HTTPClient` has runtime `token` or `certificate`, skip saved Authentication Record expiry and OIDC refresh httpx hooks (`uses_runtime_credentials`); saved-config hooks apply only without runtime credentials.
 - Observability is stdlib `logging` only (no Logfire or `canfar/utils/telemetry.py`); token masking relies on Pydantic `SecretStr`, not custom log redaction; CLI `--log-file` remains the local file sink.
