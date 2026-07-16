@@ -8,8 +8,6 @@ import typer
 from rich.prompt import Confirm
 
 from canfar.cli._run import run
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.hooks.typer.aliases import AliasGroup
 from canfar.sessions import AsyncSession
 from canfar.utils.console import get_console
@@ -42,7 +40,6 @@ def delete_sessions(
     canfar delete abc123
     canfar delete abc123 def456
     """
-    maybe_emit_banner(OutputMode.HUMAN)
     if force:
         proceed: bool = True
     else:

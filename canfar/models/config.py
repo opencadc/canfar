@@ -84,6 +84,11 @@ class ConsoleConfig(BaseModel):
         description="Width of the console output.",
         ge=1,
     )
+    banner: bool = Field(
+        default=True,
+        title="Console Banner",
+        description="Show the active Server Selection in human CLI output.",
+    )
     file: Path | None = Field(
         default=None,
         title="Console File",

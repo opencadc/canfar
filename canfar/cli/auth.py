@@ -27,7 +27,7 @@ from canfar.authentication import (
     show as auth_show,
 )
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -216,7 +216,6 @@ def auth_default(
         return
 
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     _auth_show(mode)
 
 
@@ -227,7 +226,6 @@ def auth_show_command(
 ) -> None:
     """Active authentication state."""
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     _auth_show(mode)
 
 
@@ -238,7 +236,6 @@ def auth_list_command(
 ) -> None:
     """Available auth providers."""
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     try:
         summaries = auth_list()
     except ConfigResetRequiredError as exc:
@@ -278,7 +275,6 @@ def auth_login_command(
     from canfar.cli.prompts import select_idp  # noqa: PLC0415
     from canfar.idp import list_idps  # noqa: PLC0415
 
-    maybe_emit_banner(output.OutputMode.HUMAN)
     get_console(stderr=True).print(
         "\n[red]Deprecation Notice:[/red]"
         "\n[yellow]canfar auth login[/yellow] will be removed soon."
@@ -293,7 +289,6 @@ def auth_use_command(
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
 ) -> None:
     """Switch auth provider."""
-    maybe_emit_banner(output.OutputMode.HUMAN)
     config = Configuration()  # ty: ignore[missing-argument]
 
     try:
@@ -334,7 +329,6 @@ def auth_remove_command(
     ] = False,
 ) -> None:
     """Remove auth and associated servers."""
-    maybe_emit_banner(output.OutputMode.HUMAN)
     config = Configuration()  # ty: ignore[missing-argument]
     if config.active.authentication == idp and not force:
         should_remove = Confirm.ask(
@@ -370,7 +364,6 @@ def auth_purge_command(
     ] = False,
 ) -> None:
     """Remove all auths and servers."""
-    maybe_emit_banner(output.OutputMode.HUMAN)
     if not force:
         get_console(stderr=True).print(
             "[bold red]Authentication purge requires --force.[/bold red]"

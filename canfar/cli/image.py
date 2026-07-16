@@ -10,8 +10,6 @@ from rich import box
 from rich.table import Table
 from rich.text import Text
 
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.images import Images
 from canfar.models.types import Kind
 from canfar.utils.console import get_console
@@ -82,7 +80,6 @@ def ls(
     ] = None,
 ) -> None:
     """List available images."""
-    maybe_emit_banner(OutputMode.HUMAN)
     payload: list[Image] = Images().details()
     images = [image for image in payload if not kind or kind in image.types]
     if not images:

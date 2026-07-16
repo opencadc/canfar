@@ -7,12 +7,14 @@ from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
 import click
+import pytest
 import yaml
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
     from pathlib import Path
 
 runner = CliRunner()
@@ -26,7 +28,7 @@ def _patch_config(path: Path):
     return patch("canfar.models.config.CONFIG_PATH", path)
 
 
-def _write_config(path: Path) -> None:
+def _write_config(path: Path, *, banner: bool | None = None) -> None:
     """Write a minimal config fixture for machine-output tests."""
     data = {
         "version": 1,
@@ -55,6 +57,8 @@ def _write_config(path: Path) -> None:
             }
         },
     }
+    if banner is not None:
+        data["console"] = {"banner": banner}
     path.write_text(yaml.dump(data), encoding="utf-8")
 
 
@@ -70,17 +74,66 @@ def test_auth_ls_human_mode_emits_banner(tmp_path: Path) -> None:
     assert result.stdout.startswith("@")
 
 
-def test_auth_ls_json_stdout_is_data_only(tmp_path: Path) -> None:
-    """``auth ls --json`` emits JSON on stdout without the human-mode banner."""
+def test_config_can_disable_human_banner(tmp_path: Path) -> None:
+    """``console.banner=false`` keeps human CLI stdout banner-free."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "ls", "--json"])
+        set_result = runner.invoke(
+            cli,
+            ["config", "set", "console.banner", "false"],
+        )
+        command_result = runner.invoke(cli, ["auth", "ls"])
+        enable_result = runner.invoke(
+            cli,
+            ["config", "set", "console.banner", "true"],
+        )
+        enabled_command_result = runner.invoke(cli, ["auth", "ls"])
+
+    assert set_result.exit_code == 0
+    assert command_result.exit_code == 0
+    assert not command_result.stdout.startswith("@")
+    assert enable_result.exit_code == 0
+    assert enabled_command_result.exit_code == 0
+    assert enabled_command_result.stdout.startswith("@")
+
+
+def test_invalid_console_banner_value_fails_validation(tmp_path: Path) -> None:
+    """``console.banner`` accepts only values Pydantic can parse as booleans."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(
+            cli,
+            ["config", "set", "console.banner", "sometimes"],
+        )
+
+    assert result.exit_code == 1
+
+
+@pytest.mark.parametrize(
+    ("flag", "parser"),
+    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+)
+@pytest.mark.parametrize("banner", [True, False])
+def test_auth_ls_machine_stdout_is_data_only(
+    tmp_path: Path,
+    flag: str,
+    parser: Callable[[str], object],
+    banner: bool,
+) -> None:
+    """Machine flags always suppress the human banner configuration."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path, banner=banner)
+
+    with _patch_config(config_path):
+        result = runner.invoke(cli, ["auth", "ls", flag])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
-    json.loads(result.stdout)
+    parser(result.stdout)
 
 
 def test_auth_group_flag_before_subcommand_is_rejected(tmp_path: Path) -> None:

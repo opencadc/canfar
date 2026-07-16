@@ -10,7 +10,7 @@ from pydantic_settings.exceptions import SettingsError
 
 from canfar import CONFIG_PATH
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -44,7 +44,6 @@ def show(
 ) -> None:
     """Display client configuration."""
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -106,7 +105,6 @@ def get(
     canfar config get servers.canfar.url
     """
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -158,7 +156,6 @@ def set_value(
     canfar config set active.authentication cadc
     canfar config set servers.canfar.url https://ws-uv.canfar.net/skaha
     """
-    maybe_emit_banner(output.OutputMode.HUMAN)
     cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         parsed = yaml.safe_load(value)
@@ -172,5 +169,4 @@ def set_value(
 @config.command("path", help="Local path of config")
 def path() -> None:
     """Local path of config."""
-    maybe_emit_banner(output.OutputMode.HUMAN)
     get_console().print(f"[green]{CONFIG_PATH}[/green]")

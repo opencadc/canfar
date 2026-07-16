@@ -70,6 +70,22 @@ def test_main_cli_with_help_option() -> None:
     assert result.exit_code == 0
 
 
+def test_nested_help_does_not_emit_banner() -> None:
+    """Nested help remains free of command output decoration."""
+    result = runner.invoke(cli, ["config", "--help"])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+
+
+def test_implicit_nested_help_does_not_emit_banner() -> None:
+    """Bare nested groups keep implicit help free of command output."""
+    result = runner.invoke(cli, ["config"])
+
+    assert result.exit_code == 2
+    assert not result.stdout.startswith("@")
+
+
 def test_human_cli_runs_when_active_server_is_null(tmp_path: Path) -> None:
     """Human-mode CLI remains usable when no active server is selected."""
     config_path = tmp_path / "config.yaml"

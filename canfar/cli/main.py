@@ -17,7 +17,6 @@ from canfar.cli.image import image
 from canfar.cli.info import info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
-from canfar.cli.machine import reset
 from canfar.cli.open import open_command
 from canfar.cli.prune import prune
 from canfar.cli.ps import ps
@@ -27,7 +26,7 @@ from canfar.cli.version import version
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import ROOT_CHILD_ARGS_META_KEY, AliasGroup
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_active_server_banner, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
     InvalidLoggingEnvironmentError,
@@ -46,6 +45,18 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
     if "--yaml" in args:
         return output.OutputMode.YAML
     return output.OutputMode.HUMAN
+
+
+def _is_help_request(ctx: typer.Context, args: list[str]) -> bool:
+    """Return whether root dispatch will resolve to explicit or implicit help."""
+    if "--help" in args:
+        return True
+    if args or ctx.invoked_subcommand is None:
+        return False
+    if not isinstance(ctx.command, AliasGroup):
+        return False
+    command = ctx.command.get_command(ctx, ctx.invoked_subcommand)
+    return bool(command and getattr(command, "no_args_is_help", False))
 
 
 def callback(
@@ -75,7 +86,6 @@ def callback(
     ] = None,
 ) -> None:
     """Main callback that handles no subcommand case."""
-    reset()
     child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
     mode = _leaf_output_mode(child_args)
 
@@ -102,6 +112,8 @@ def callback(
     if ctx.invoked_subcommand is None:
         get_console().print(ctx.get_help())
         raise typer.Exit(0)
+    if mode is output.OutputMode.HUMAN and not _is_help_request(ctx, child_args):
+        emit_active_server_banner()
 
 
 cli: typer.Typer = typer.Typer(
@@ -247,7 +259,6 @@ cli.add_typer(
 
 def main() -> None:
     """Main entry point."""
-    reset()
     try:
         cli()
     except AuthExpiredError as err:
@@ -260,8 +271,6 @@ def main() -> None:
     except ConfigResetRequiredError as err:
         get_console(stderr=True).print(err)
         raise typer.Exit(1) from err
-    finally:
-        reset()
 
 
 if __name__ == "__main__":

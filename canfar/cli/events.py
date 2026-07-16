@@ -10,8 +10,6 @@ from rich import box
 from rich.table import Table
 
 from canfar.cli._run import run
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
 from canfar.utils.console import get_console
 
@@ -30,7 +28,6 @@ def get_events(
     ],
 ) -> None:
     """Get events from the science platform server."""
-    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_events() -> None:
         """Fetch events for the requested sessions and render them."""

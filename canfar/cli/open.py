@@ -8,8 +8,6 @@ from typing import Annotated
 import typer
 
 from canfar.cli._run import run
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession, connection_url
 
 open_command = typer.Typer(
@@ -27,7 +25,6 @@ def open_sessions(
     ],
 ) -> None:
     """Open one or more sessions in a web browser."""
-    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _open_sessions() -> None:
         """Look up the requested sessions and open their connect URLs."""
