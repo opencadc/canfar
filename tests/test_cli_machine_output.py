@@ -74,6 +74,21 @@ def test_auth_ls_human_mode_emits_banner(tmp_path: Path) -> None:
     assert result.stdout.startswith("@")
 
 
+def test_nested_image_command_emits_banner(tmp_path: Path) -> None:
+    """Nested human commands emit the banner at terminal dispatch."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.image.Images.details", return_value=[]),
+    ):
+        result = runner.invoke(cli, ["image", "ls"])
+
+    assert result.exit_code == 0
+    assert result.stdout.startswith("@CADC-CANFAR")
+
+
 def test_config_can_disable_human_banner(tmp_path: Path) -> None:
     """``console.banner=false`` keeps human CLI stdout banner-free."""
     config_path = tmp_path / "config.yaml"
@@ -158,6 +173,33 @@ def test_passthrough_json_argument_keeps_human_banner(tmp_path: Path) -> None:
     assert result.exit_code == 0
     assert result.stdout.startswith("@CADC-CANFAR")
     assert "Arguments: --json" in result.stdout
+
+
+@pytest.mark.parametrize("name", ["--json", "--yaml"])
+def test_machine_flag_spelling_as_option_value_keeps_human_banner(
+    tmp_path: Path,
+    name: str,
+) -> None:
+    """Machine flag spellings used as values leave output in human mode."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(
+            cli,
+            [
+                "create",
+                "--dry-run",
+                "headless",
+                "example.invalid/image",
+                "--name",
+                name,
+            ],
+        )
+
+    assert result.exit_code == 0
+    assert result.stdout.startswith("@CADC-CANFAR")
+    assert f"Name: {name}" in result.stdout
 
 
 def test_auth_group_flag_before_subcommand_is_rejected(tmp_path: Path) -> None:

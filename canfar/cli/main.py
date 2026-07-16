@@ -25,7 +25,11 @@ from canfar.cli.stats import stats
 from canfar.cli.version import version
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import ROOT_CHILD_ARGS_META_KEY, AliasGroup
+from canfar.hooks.typer.aliases import (
+    ROOT_CHILD_ARGS_META_KEY,
+    AliasGroup,
+    set_before_command,
+)
 from canfar.utils.console import emit_active_server_banner, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
@@ -35,6 +39,8 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from canfar.errors import StructuredError
 
 
@@ -47,17 +53,11 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
     return output.OutputMode.HUMAN
 
 
-def _is_help_request(ctx: typer.Context, args: list[str]) -> bool:
-    """Return whether root dispatch will resolve to explicit or implicit help."""
-    if not isinstance(ctx.command, AliasGroup) or ctx.invoked_subcommand is None:
-        return False
-    command = ctx.command.get_command(ctx, ctx.invoked_subcommand)
-    if command is None:
-        return False
-    help_options = (command.context_settings or {}).get("help_option_names", ["--help"])
-    return any(option in args for option in help_options) or bool(
-        not args and command.no_args_is_help
-    )
+def _emit_banner_for_command(params: Mapping[str, object]) -> None:
+    """Emit the active-server banner for a parsed human-output command."""
+    if params.get("json_output") or params.get("yaml_output"):
+        return
+    emit_active_server_banner()
 
 
 def callback(
@@ -90,13 +90,13 @@ def callback(
     child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
     if "--" in child_args:
         child_args = child_args[: child_args.index("--")]
-    mode = _leaf_output_mode(child_args)
+    setup_mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:
-        if mode is output.OutputMode.HUMAN:
+        if setup_mode is output.OutputMode.HUMAN:
             typer.echo(f"{error.code}: {error.message}", err=True)
         else:
-            output.to_stderr(error, mode)
+            output.to_stderr(error, setup_mode)
 
     try:
         configure_logging(
@@ -106,17 +106,16 @@ def callback(
             warning_writer=warning_writer,
         )
     except (InvalidLoggingEnvironmentError, InvalidLogFilePathError) as err:
-        if mode is output.OutputMode.HUMAN:
+        if setup_mode is output.OutputMode.HUMAN:
             typer.echo(str(err), err=True)
         else:
-            output.to_stderr(err.error, mode)
+            output.to_stderr(err.error, setup_mode)
         raise typer.Exit(2) from err
 
     if ctx.invoked_subcommand is None:
         get_console().print(ctx.get_help())
         raise typer.Exit(0)
-    if mode is output.OutputMode.HUMAN and not _is_help_request(ctx, child_args):
-        emit_active_server_banner()
+    set_before_command(ctx, _emit_banner_for_command)
 
 
 cli: typer.Typer = typer.Typer(
