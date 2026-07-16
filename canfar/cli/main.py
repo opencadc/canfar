@@ -49,14 +49,15 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
 
 def _is_help_request(ctx: typer.Context, args: list[str]) -> bool:
     """Return whether root dispatch will resolve to explicit or implicit help."""
-    if "--help" in args:
-        return True
-    if args or ctx.invoked_subcommand is None:
-        return False
-    if not isinstance(ctx.command, AliasGroup):
+    if not isinstance(ctx.command, AliasGroup) or ctx.invoked_subcommand is None:
         return False
     command = ctx.command.get_command(ctx, ctx.invoked_subcommand)
-    return bool(command and getattr(command, "no_args_is_help", False))
+    if command is None:
+        return False
+    help_options = (command.context_settings or {}).get("help_option_names", ["--help"])
+    return any(option in args for option in help_options) or bool(
+        not args and command.no_args_is_help
+    )
 
 
 def callback(
@@ -87,6 +88,8 @@ def callback(
 ) -> None:
     """Main callback that handles no subcommand case."""
     child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
+    if "--" in child_args:
+        child_args = child_args[: child_args.index("--")]
     mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:

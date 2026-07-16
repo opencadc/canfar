@@ -78,6 +78,14 @@ def test_nested_help_does_not_emit_banner() -> None:
     assert not result.stdout.startswith("@")
 
 
+def test_short_nested_help_does_not_emit_banner() -> None:
+    """Nested short help remains free of command output decoration."""
+    result = runner.invoke(cli, ["create", "-h"])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+
+
 def test_implicit_nested_help_does_not_emit_banner() -> None:
     """Bare nested groups keep implicit help free of command output."""
     result = runner.invoke(cli, ["config"])

@@ -136,6 +136,30 @@ def test_auth_ls_machine_stdout_is_data_only(
     parser(result.stdout)
 
 
+def test_passthrough_json_argument_keeps_human_banner(tmp_path: Path) -> None:
+    """A container argument named ``--json`` does not select machine output."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(
+            cli,
+            [
+                "create",
+                "--dry-run",
+                "headless",
+                "example.invalid/image",
+                "--",
+                "echo",
+                "--json",
+            ],
+        )
+
+    assert result.exit_code == 0
+    assert result.stdout.startswith("@CADC-CANFAR")
+    assert "Arguments: --json" in result.stdout
+
+
 def test_auth_group_flag_before_subcommand_is_rejected(tmp_path: Path) -> None:
     """Group-level ``--json``/``--yaml`` placement exits 2 with guidance."""
     config_path = tmp_path / "config.yaml"
