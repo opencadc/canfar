@@ -84,6 +84,21 @@ configure_logging(
 
 There is no per-`HTTPClient`, `Session`, or `AsyncSession` log-level setting.
 
+## HTTP request and response debug
+
+At `debug` (for example `--log-level debug` or `-vvvv`), every Science Platform
+HTTP call logs the request method and full URL, then the response status and
+body:
+
+```text
+DEBUG  GET https://ws-uv.canfar.net/skaha/v0/session?status=Running
+DEBUG  HTTP STATUS CODE -> 200
+[{"id":"...","status":"Running",...}]
+```
+
+These lines follow the normal logging policy: stderr (and the optional file
+sink), never mixed into `--json`/`--yaml` stdout payloads.
+
 ## stdout and stderr
 
 CANFAR keeps command data separate from diagnostics:

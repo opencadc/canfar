@@ -693,8 +693,10 @@ class TestSSLContextAndClientKwargs:
             asynchronous=True, credential=client._resolved_authentication_record()
         )
 
-        assert sync_kwargs["event_hooks"]["request"] == []
-        assert async_kwargs["event_hooks"]["request"] == []
+        assert len(sync_kwargs["event_hooks"]["request"]) == 1
+        assert len(async_kwargs["event_hooks"]["request"]) == 1
+        assert sync_kwargs["event_hooks"]["request"][0].__name__ == "request"
+        assert async_kwargs["event_hooks"]["request"][0].__name__ == "arequest"
 
     def test_expiry_hook_present_for_saved_expired_x509(
         self, canfar_client_fixture, tmp_path
@@ -712,10 +714,12 @@ class TestSSLContextAndClientKwargs:
             asynchronous=True, credential=client._resolved_authentication_record()
         )
 
-        assert len(sync_kwargs["event_hooks"]["request"]) == 1
-        assert len(async_kwargs["event_hooks"]["request"]) == 1
+        assert len(sync_kwargs["event_hooks"]["request"]) == 2
+        assert len(async_kwargs["event_hooks"]["request"]) == 2
         assert sync_kwargs["event_hooks"]["request"][0].__name__ == "hook"
         assert async_kwargs["event_hooks"]["request"][0].__name__ == "hook"
+        assert sync_kwargs["event_hooks"]["request"][1].__name__ == "request"
+        assert async_kwargs["event_hooks"]["request"][1].__name__ == "arequest"
 
     def test_get_client_kwargs_with_certificate(
         self, canfar_client_fixture, tmp_path
