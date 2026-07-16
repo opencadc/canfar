@@ -11,7 +11,7 @@ from rich.table import Table
 from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -70,7 +70,6 @@ def server_list_command(
 ) -> None:
     """List servers for the active Identity Provider."""
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
 
     try:
         auth_show()
@@ -128,7 +127,6 @@ def server_use_command(
     selector: Annotated[str, typer.Argument(help="Server name or URI.")],
 ) -> None:
     """Select the active server by name or URI."""
-    maybe_emit_banner(output.OutputMode.HUMAN)
     try:
         server_use(selector)
     except ServerSelectorError as exc:

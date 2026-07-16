@@ -7,7 +7,6 @@ from typing import Annotated
 import typer
 
 from canfar.cli import output
-from canfar.utils.console import emit_active_server_banner, reset_banner_state
 
 JsonOption = Annotated[
     bool,
@@ -20,11 +19,6 @@ YamlOption = Annotated[
     typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
 ]
 """Leaf command flag for YAML machine output."""
-
-
-def reset() -> None:
-    """Reset CLI banner state for a new invocation."""
-    reset_banner_state()
 
 
 def resolve_mode(json_output: bool, yaml_output: bool) -> output.OutputMode:
@@ -51,13 +45,3 @@ def resolve_mode(json_output: bool, yaml_output: bool) -> output.OutputMode:
     if yaml_output:
         return output.OutputMode.YAML
     return output.OutputMode.HUMAN
-
-
-def maybe_emit_banner(mode: output.OutputMode) -> None:
-    """Emit the active-server banner when output is human-readable.
-
-    Args:
-        mode: Resolved output mode for the current command.
-    """
-    if mode is output.OutputMode.HUMAN:
-        emit_active_server_banner()

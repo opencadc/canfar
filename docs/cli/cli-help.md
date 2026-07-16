@@ -192,11 +192,15 @@ canfar config path
 canfar config get console.width
 canfar config get servers.canfar.url
 canfar config set console.width 132
+canfar config set console.banner false
 canfar version
 canfar version --debug
 ```
 
 `config set` parses values as YAML.
+`console.banner` defaults to `true`. Set it to `false` to hide the
+`@<server-name>` prefix from human-readable CLI output. The banner is always
+disabled for `--json` and `--yaml` output.
 `version --debug` shows environment and dependency details for bug reports; it
 does not change the logging level.
 

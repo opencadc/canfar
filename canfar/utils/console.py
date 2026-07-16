@@ -2,19 +2,11 @@
 
 from __future__ import annotations
 
-from contextvars import ContextVar
 from functools import lru_cache
 
 from rich.console import Console
 
 from canfar.models.config import Configuration
-
-_banner_emitted: ContextVar[bool] = ContextVar("cli_banner_emitted", default=False)
-
-
-def reset_banner_state() -> None:
-    """Reset CLI banner emission state for a new invocation."""
-    _banner_emitted.set(False)
 
 
 @lru_cache(maxsize=2)
@@ -32,11 +24,10 @@ def get_console(*, stderr: bool = False) -> Console:
 
 
 def emit_active_server_banner() -> None:
-    """Print the active server banner once per CLI invocation in human mode."""
-    if _banner_emitted.get():
-        return
-    _banner_emitted.set(True)
+    """Print the active Server Selection when configured for human output."""
     cfg = Configuration()  # ty: ignore[missing-argument]
+    if not cfg.console.banner:
+        return
     try:
         name = cfg.get_active_server().name
     except KeyError:

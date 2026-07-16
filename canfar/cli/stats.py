@@ -7,8 +7,6 @@ from rich import box
 from rich.table import Table
 
 from canfar.cli._run import run
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.sessions import AsyncSession
 from canfar.utils.console import get_console
 
@@ -22,7 +20,6 @@ stats = typer.Typer(
 @stats.callback(invoke_without_command=True)
 def get_stats() -> None:
     """Display cluster-wide usage and status statistics."""
-    maybe_emit_banner(OutputMode.HUMAN)
 
     async def _get_stats() -> None:
         """Fetch cluster-wide statistics and render them."""

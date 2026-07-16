@@ -17,7 +17,6 @@ from canfar.cli.image import image
 from canfar.cli.info import info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import logs
-from canfar.cli.machine import reset
 from canfar.cli.open import open_command
 from canfar.cli.prune import prune
 from canfar.cli.ps import ps
@@ -26,8 +25,12 @@ from canfar.cli.stats import stats
 from canfar.cli.version import version
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import ROOT_CHILD_ARGS_META_KEY, AliasGroup
-from canfar.utils.console import get_console
+from canfar.hooks.typer.aliases import (
+    ROOT_CHILD_ARGS_META_KEY,
+    AliasGroup,
+    set_before_command,
+)
+from canfar.utils.console import emit_active_server_banner, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
     InvalidLoggingEnvironmentError,
@@ -36,6 +39,8 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Mapping
+
     from canfar.errors import StructuredError
 
 
@@ -46,6 +51,13 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
     if "--yaml" in args:
         return output.OutputMode.YAML
     return output.OutputMode.HUMAN
+
+
+def _emit_banner_for_command(params: Mapping[str, object]) -> None:
+    """Emit the active-server banner for a parsed human-output command."""
+    if params.get("json_output") or params.get("yaml_output"):
+        return
+    emit_active_server_banner()
 
 
 def callback(
@@ -75,15 +87,16 @@ def callback(
     ] = None,
 ) -> None:
     """Main callback that handles no subcommand case."""
-    reset()
     child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
-    mode = _leaf_output_mode(child_args)
+    if "--" in child_args:
+        child_args = child_args[: child_args.index("--")]
+    setup_mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:
-        if mode is output.OutputMode.HUMAN:
+        if setup_mode is output.OutputMode.HUMAN:
             typer.echo(f"{error.code}: {error.message}", err=True)
         else:
-            output.to_stderr(error, mode)
+            output.to_stderr(error, setup_mode)
 
     try:
         configure_logging(
@@ -93,15 +106,16 @@ def callback(
             warning_writer=warning_writer,
         )
     except (InvalidLoggingEnvironmentError, InvalidLogFilePathError) as err:
-        if mode is output.OutputMode.HUMAN:
+        if setup_mode is output.OutputMode.HUMAN:
             typer.echo(str(err), err=True)
         else:
-            output.to_stderr(err.error, mode)
+            output.to_stderr(err.error, setup_mode)
         raise typer.Exit(2) from err
 
     if ctx.invoked_subcommand is None:
         get_console().print(ctx.get_help())
         raise typer.Exit(0)
+    set_before_command(ctx, _emit_banner_for_command)
 
 
 cli: typer.Typer = typer.Typer(
@@ -247,7 +261,6 @@ cli.add_typer(
 
 def main() -> None:
     """Main entry point."""
-    reset()
     try:
         cli()
     except AuthExpiredError as err:
@@ -260,8 +273,6 @@ def main() -> None:
     except ConfigResetRequiredError as err:
         get_console(stderr=True).print(err)
         raise typer.Exit(1) from err
-    finally:
-        reset()
 
 
 if __name__ == "__main__":

@@ -10,8 +10,6 @@ import typer
 from rich.table import Table
 
 from canfar import __version__
-from canfar.cli.machine import maybe_emit_banner
-from canfar.cli.output import OutputMode
 from canfar.utils.console import get_console
 
 
@@ -24,7 +22,6 @@ def callback(
     ),
 ) -> None:
     """CANFAR Python Client version information."""
-    maybe_emit_banner(OutputMode.HUMAN)
     if not debug:
         # Simple version output
         get_console().print(f"CANFAR Python Client {__version__}")

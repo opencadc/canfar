@@ -14,7 +14,6 @@ from canfar.cli._run import run
 from canfar.cli.machine import (
     JsonOption,
     YamlOption,
-    maybe_emit_banner,
     resolve_mode,
 )
 from canfar.config.migration import ConfigResetRequiredError
@@ -220,7 +219,6 @@ def creation(
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
     if dry and mode is not output.OutputMode.HUMAN:
         typer.echo(
             "Incompatible flags: --dry-run cannot be used with --json or --yaml.",

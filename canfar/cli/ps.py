@@ -15,7 +15,7 @@ from rich.table import Table
 
 from canfar.cli import output
 from canfar.cli._run import run
-from canfar.cli.machine import JsonOption, YamlOption, maybe_emit_banner, resolve_mode
+from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -200,7 +200,6 @@ def show(
 ) -> None:
     """Show sessions."""
     mode = resolve_mode(json_output, yaml_output)
-    maybe_emit_banner(mode)
 
     if quiet and mode is not output.OutputMode.HUMAN:
         typer.echo(

@@ -7,9 +7,7 @@ from typing import Annotated
 import typer
 
 from canfar import CONFIG_PATH
-from canfar.cli import output
 from canfar.cli.login_auth import authenticate_for_cli
-from canfar.cli.machine import maybe_emit_banner
 from canfar.cli.prompts import select_idp, select_server
 from canfar.idp import get_idp, list_idps
 from canfar.models.config import Configuration
@@ -144,7 +142,6 @@ def register_login_command(app: typer.Typer) -> None:
         ] = 10,
     ) -> None:
         """Login to CANFAR Science Platform."""
-        maybe_emit_banner(output.OutputMode.HUMAN)
         selected_idp = idp or select_idp(list_idps())
         try:
             get_idp(selected_idp)
