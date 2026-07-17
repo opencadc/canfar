@@ -37,6 +37,7 @@ To setup the development environment, simply run:
 uv python install 3.13
 uv venv --python 3.13
 uv sync --all-extras --dev
+source .venv/bin/activate
 ```
 
 These commands will install the Python version, create a virtual environment, and install all dependencies required for development.
