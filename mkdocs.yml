@@ -236,6 +236,8 @@ nav:
           - 2026.1: releases/2026-1.md
           - 2025.2: releases/2025-2.md
           - 2025.1: releases/2025-1.md
+  - Services:
+      - YouCAT: services/youcat/index.md
   - Client:
       - Home: client/home.md
       - Authentication and Servers: cli/authentication-contexts.md
