@@ -179,8 +179,8 @@ class Configuration(BaseSettings):
         )
 
     @model_validator(mode="after")
-    def _inject_server_names(self) -> Configuration:
-        """Inject dict keys into each server record and validate Server Names."""
+    def _normalize_and_validate_servers(self) -> Configuration:
+        """Inject Server Names and validate Server and Storage Name keys."""
         updated: dict[str, Server] = {}
         storage_servers: dict[str, str] = {}
         for name, server in self.servers.items():

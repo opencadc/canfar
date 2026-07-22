@@ -17,11 +17,11 @@ Required, unique, user-facing handle for one **Science Platform Server**, used t
 _Avoid_: Label, alias, key
 
 **VOSpace Service**:
-Storage service associated with a **Science Platform Server**, identified by an IVOA registry resource URI and accessed through a base HTTP endpoint.
+Remote astronomical storage service associated with a **Science Platform Server**.
 _Avoid_: Storage backend, filesystem
 
 **Storage Name**:
-Required, globally unique, user-facing handle for one **VOSpace Service**. `local` is reserved for the user's local filesystem.
+Required, globally unique, user-facing handle for one **VOSpace Service**.
 _Avoid_: Server Name, alias, key
 
 **Identity Provider (IDP)**:

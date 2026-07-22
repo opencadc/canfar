@@ -9,7 +9,7 @@ from canfar.models.http import Server, VOSpaceService
 class TestVOSpaceService:
     """Test VOSpace Service configuration."""
 
-    def test_requires_registry_uri_and_http_endpoint(self) -> None:
+    def test_serializes_registry_uri_and_http_endpoint(self) -> None:
         """A VOSpace Service carries only its registry URI and base URL."""
         service = VOSpaceService(
             uri="ivo://cadc.nrc.ca/arc",
@@ -21,11 +21,19 @@ class TestVOSpaceService:
             "url": "https://ws-cadc.canfar.net/arc",
         }
 
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"uri": "not-a-url", "url": "https://ws-cadc.canfar.net/arc"},
+            {"uri": "ivo://cadc.nrc.ca/arc", "url": "vos://example.com/arc"},
+            {"url": "https://ws-cadc.canfar.net/arc"},
+            {"uri": "ivo://cadc.nrc.ca/arc"},
+        ],
+    )
+    def test_requires_valid_registry_uri_and_http_endpoint(self, payload: dict) -> None:
+        """Both VOSpace Service identifiers are required and validated."""
         with pytest.raises(ValidationError):
-            VOSpaceService(
-                uri="ivo://cadc.nrc.ca/arc",
-                url="vos://ws-cadc.canfar.net/arc",
-            )
+            VOSpaceService.model_validate(payload)
 
 
 class TestServer:
