@@ -9,6 +9,8 @@ from defusedxml import ElementTree
 
 LEGACY_SESSIONS_STDID = "vos://cadc.nrc.ca~vospace/CADC/std/Proc#sessions-1.0"
 PLATFORM_PREFIX = "http://www.opencadc.org/std/platform#session-"
+VOSPACE_NODES_STDID = "ivo://ivoa.net/std/VOSpace/v2.0#nodes"
+_XSI_TYPE = "{http://www.w3.org/2001/XMLSchema-instance}type"
 
 # Auth mode rename map
 AUTH_RENAME = {
@@ -199,3 +201,23 @@ def capabilities(  # noqa: PLR0912 too many branches (clarity)
         reverse=True,
     )
     return items
+
+
+def is_vospace_service(xml: str) -> bool:
+    """Return whether VOSI XML exposes the OpenCADC VOSpace node binding."""
+    root = ElementTree.fromstring(xml)
+    for capability in root.findall(".//{*}capability"):
+        if capability.get("standardID") != VOSPACE_NODES_STDID:
+            continue
+        for interface in capability.findall("{*}interface"):
+            if interface.get("role") != "std":
+                continue
+            if interface.get(_XSI_TYPE, "").rsplit(":", 1)[-1] != "ParamHTTP":
+                continue
+            if any(
+                (access.get("use") in {None, "base"})
+                and bool((access.text or "").strip())
+                for access in interface.findall("{*}accessURL")
+            ):
+                return True
+    return False
