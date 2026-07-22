@@ -59,10 +59,6 @@ dependencies = [
     "rich>=13.9.4",
     "segno>=1.6.6",
     "typer>=0.16.0",
-]
-
-[project.optional-dependencies]
-data = [
     "vosfs @ git+https://github.com/shinybrar/vosfs@v0.6.0",
     "fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.5.0#subdirectory=src/fsspec-cli",
 ]
