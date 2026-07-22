@@ -33,17 +33,19 @@ The standard installation includes data commands. Use a configured Storage Name
 or the reserved `local` name with an absolute path:
 
 ```bash
-canfar data ls -lh canSRC:/
-canfar data cp local:/absolute/path/file.fits canSRC:/folder/file.fits
+canfar data ls -lh canfar:/
+canfar data cp local:/absolute/path/file.fits canfar:/folder/file.fits
 ```
 
 Cross-source `mv` is unsupported. Copy the file, verify the destination, and
-then remove the source with a separate command:
+then remove the source with a separate command. In this example, `archive` is
+a placeholder for a second Storage Name that you configured; replace it with
+that Storage Name:
 
 ```bash
-canfar data cp canSRC:/folder/file.fits other:/folder/file.fits
-canfar data ls -lh other:/folder/file.fits
-canfar data rm canSRC:/folder/file.fits
+canfar data cp canfar:/folder/file.fits archive:/folder/file.fits
+canfar data ls -lh archive:/folder/file.fits
+canfar data rm canfar:/folder/file.fits
 ```
 
 ## 4. Create a notebook
