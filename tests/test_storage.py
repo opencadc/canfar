@@ -105,6 +105,34 @@ async def test_source_reloads_config_and_runtime_token_wins(
 
 
 @pytest.mark.asyncio
+async def test_source_factory_constructs_fresh_filesystem_per_acquisition(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Repeated acquisition constructs and closes distinct VOSpace filesystems."""
+    _config(credential=oidc_credential("inactive", access="current-token")).save()
+    filesystems: list[_Filesystem] = []
+
+    def build(endpoint: str, **kwargs: Any) -> _Filesystem:
+        filesystem = _Filesystem(endpoint, **kwargs)
+        filesystems.append(filesystem)
+        return filesystem
+
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", build)
+    source = _vospace_source("archive")
+
+    async with source() as first:
+        assert first.closed is False
+    assert first.closed is True
+
+    async with source() as second:
+        assert second.closed is False
+    assert second.closed is True
+
+    assert first is not second
+    assert filesystems == [first, second]
+
+
+@pytest.mark.asyncio
 async def test_environment_token_preserves_runtime_precedence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
