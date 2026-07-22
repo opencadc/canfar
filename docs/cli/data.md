@@ -26,6 +26,12 @@ Every remote source uses its configured Storage Name. The reserved `local`
 source addresses the machine where the command runs. Operands always use an
 explicit mapped name and absolute path:
 
+On each CLI invocation, CANFAR rebuilds the source mapping from every Storage
+Name on every configured Science Platform Server and always adds `local`.
+Active Server Selection does not filter data sources. Each mapped source is a
+factory that creates a fresh asynchronous filesystem when the command acquires
+it.
+
 ```text
 Storage-Name:/absolute/path
 local:/absolute/path
