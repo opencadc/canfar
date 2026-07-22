@@ -16,6 +16,14 @@ _Avoid_: Base URL, host, cluster
 Required, unique, user-facing handle for one **Science Platform Server**, used to reference it in configuration and commands.
 _Avoid_: Label, alias, key
 
+**VOSpace Service**:
+Storage service associated with a **Science Platform Server**, identified by an IVOA registry resource URI and accessed through a base HTTP endpoint.
+_Avoid_: Storage backend, filesystem
+
+**Storage Name**:
+Required, globally unique, user-facing handle for one **VOSpace Service**. `local` is reserved for the user's local filesystem.
+_Avoid_: Server Name, alias, key
+
 **Identity Provider (IDP)**:
 Organization that issues user identity for CANFAR authentication.
 Initial IDPs are `Canadian Astronomy Data Centre (CADC)` and `SKA Regional Centre Network (SRCNet)`.
@@ -69,6 +77,8 @@ _Avoid_: Resource profile, quota
 
 - A **CANFAR Science Platform** exposes one or more **Science Platform Servers**.
 - A **Science Platform Server** is identified by its **Server Name**; its IVOA URI is discovery metadata, and two Server Names may point at the same endpoint.
+- A **Science Platform Server** can expose multiple **VOSpace Services**.
+- A **VOSpace Service** is identified by its **Storage Name** and uses its parent **Science Platform Server**'s **Identity Provider (IDP)**.
 - An **Identity Provider (IDP)** can support one or more **Science Platform Servers**.
 - **Authentication** and **Platform** are separate seams with independent ownership.
 - An **Authentication Record** belongs to one **Identity Provider (IDP)**.

@@ -3,7 +3,29 @@
 import pytest
 from pydantic import ValidationError
 
-from canfar.models.http import Server
+from canfar.models.http import Server, VOSpaceService
+
+
+class TestVOSpaceService:
+    """Test VOSpace Service configuration."""
+
+    def test_requires_registry_uri_and_http_endpoint(self) -> None:
+        """A VOSpace Service carries only its registry URI and base URL."""
+        service = VOSpaceService(
+            uri="ivo://cadc.nrc.ca/arc",
+            url="https://ws-cadc.canfar.net/arc",
+        )
+
+        assert service.model_dump(mode="json") == {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        with pytest.raises(ValidationError):
+            VOSpaceService(
+                uri="ivo://cadc.nrc.ca/arc",
+                url="vos://ws-cadc.canfar.net/arc",
+            )
 
 
 class TestServer:
@@ -33,6 +55,7 @@ class TestServer:
         assert server.url is None
         assert server.version is None
         assert server.status is None
+        assert server.storage == {}
 
     def test_with_all_values(self) -> None:
         """Test Server with all custom values."""

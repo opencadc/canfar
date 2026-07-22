@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field
+from typing import Any
+
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field, field_validator
 
 DEFAULT_SERVER_CORES = 2
 """Default CPU core limit when context enrichment is unavailable."""
@@ -12,6 +14,15 @@ DEFAULT_SERVER_RAM_GB = 16
 
 DEFAULT_SERVER_GPUS = 0
 """Default GPU count when context enrichment is unavailable."""
+
+
+class VOSpaceService(BaseModel):
+    """VOSpace Service discovered through an IVOA registry."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    uri: AnyUrl
+    url: AnyHttpUrl
 
 
 class Server(BaseModel):
@@ -72,6 +83,12 @@ class Server(BaseModel):
         min_length=1,
         max_length=64,
     )
+    storage: dict[str, VOSpaceService] = Field(
+        default_factory=dict,
+        title="VOSpace Services",
+        description="VOSpace Services keyed by globally unique Storage Name.",
+    )
+
     cores: int = Field(
         default=DEFAULT_SERVER_CORES,
         title="Default CPU Core Limit",
@@ -98,3 +115,22 @@ class Server(BaseModel):
             "when known."
         ),
     )
+
+    @field_validator("storage", mode="before")
+    @classmethod
+    def _validate_storage_names(cls, value: Any) -> Any:
+        """Validate Storage Names before global string constraints run."""
+        if isinstance(value, dict):
+            for name in value:
+                if not isinstance(name, str) or (
+                    not name
+                    or name == "local"
+                    or any(character in name for character in ":\x00\n")
+                    or name.startswith("-")
+                ):
+                    msg = (
+                        f"Invalid Storage Name {name!r}: must be non-empty, must not "
+                        "be 'local', contain colon, NUL, or newline, or start with '-'."
+                    )
+                    raise ValueError(msg)
+        return value

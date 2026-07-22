@@ -182,6 +182,7 @@ class Configuration(BaseSettings):
     def _inject_server_names(self) -> Configuration:
         """Inject dict keys into each server record and validate Server Names."""
         updated: dict[str, Server] = {}
+        storage_servers: dict[str, str] = {}
         for name, server in self.servers.items():
             if not _SERVER_NAME_PATTERN.match(name):
                 msg = (
@@ -189,6 +190,14 @@ class Configuration(BaseSettings):
                     r"^[A-Za-z][A-Za-z0-9_-]*$"
                 )
                 raise ValueError(msg)
+            for storage_name in server.storage:
+                if previous_server := storage_servers.get(storage_name):
+                    msg = (
+                        f"Duplicate Storage Name '{storage_name}' in Science Platform "
+                        f"Servers '{previous_server}' and '{name}'."
+                    )
+                    raise ValueError(msg)
+                storage_servers[storage_name] = name
             updated[name] = server.model_copy(update={"name": name}, deep=True)
         self.servers = updated
         return self

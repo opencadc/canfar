@@ -129,6 +129,12 @@ dependencies = [
     { name = "typer" },
 ]
 
+[package.optional-dependencies]
+data = [
+    { name = "fsspec-cli" },
+    { name = "vosfs" },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "ipython", version = "8.39.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
@@ -158,6 +164,7 @@ requires-dist = [
     { name = "cadcutils", specifier = ">=1.5.4" },
     { name = "click", specifier = ">=8.4.1" },
     { name = "defusedxml", specifier = ">=0.7.1" },
+    { name = "fsspec-cli", marker = "extra == 'data'", git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.5.0" },
     { name = "httpx", extras = ["http2"], specifier = ">=0.28.1" },
     { name = "humanize", specifier = ">=4.12.3" },
     { name = "pydantic", specifier = ">=2.9.2" },
@@ -167,7 +174,9 @@ requires-dist = [
     { name = "rich", specifier = ">=13.9.4" },
     { name = "segno", specifier = ">=1.6.6" },
     { name = "typer", specifier = ">=0.16.0" },
+    { name = "vosfs", marker = "extra == 'data'", git = "https://github.com/shinybrar/vosfs?rev=v0.6.0" },
 ]
+provides-extras = ["data"]
 
 [package.metadata.requires-dev]
 dev = [
@@ -660,6 +669,24 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/35/94/00f2059e4835eace3ae8fde680b932c496f8ec7bdc99168dfa53fb2e6b79/filelock-3.29.7.tar.gz", hash = "sha256:5b481979797ae69e72f0b389d89a80bdd585c260c5b3f1fb9c0a5ba9bb3f195d", size = 71521, upload-time = "2026-07-08T05:46:58.716Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/60/02/be4a57b60c7149b55b9e3b3c13f609cd8eb5307c751f22bd8fb8d262e75b/filelock-3.29.7-py3-none-any.whl", hash = "sha256:987db6f789a3a2a59f55081801b2b3697cb97e2a736b5f1a9e99b559285fbc51", size = 46036, upload-time = "2026-07-08T05:46:57.53Z" },
+]
+
+[[package]]
+name = "fsspec"
+version = "2026.6.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/a1/ae4e3e5003468d6391d2c77b6fa1cd73bd5d13511d81c642d7b28ac90ed4/fsspec-2026.6.0.tar.gz", hash = "sha256:f5bac145310fe30e16e1471bd6840b2d990d609e872251d7e674241822abf01a", size = 313646, upload-time = "2026-06-16T01:57:28.105Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/22/4222d7ddf3da30f363edaa98e329c2bce6c65497c9cb2810931c8b2c0fbc/fsspec-2026.6.0-py3-none-any.whl", hash = "sha256:02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1", size = 203949, upload-time = "2026-06-16T01:57:26.358Z" },
+]
+
+[[package]]
+name = "fsspec-cli"
+version = "0.5.0"
+source = { git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.5.0#ddef461b464d41811b6ddbad8eb1a64e37d2d85e" }
+dependencies = [
+    { name = "fsspec" },
+    { name = "typer" },
 ]
 
 [[package]]
@@ -2165,6 +2192,16 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/34/d9/b477fddb68840b570af8b22afe9b035cbc277b5fb7b33dea390617a8b10f/virtualenv-21.6.1.tar.gz", hash = "sha256:15f978b7cd329f24855ff4a0c4b4899cc7678589f49adbdcbbb4d3232e641128", size = 5526620, upload-time = "2026-07-10T19:33:53.312Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c1/7c/4e7225d46d634a0d8d534dd8a6ce0c319d09b4d0cf0337eb314ca4789d8c/virtualenv-21.6.1-py3-none-any.whl", hash = "sha256:afe991df855715a2b2f60edfcc0107ef95a79fdfd8cb4cdaa71603d1c12e463b", size = 5506392, upload-time = "2026-07-10T19:33:51.629Z" },
+]
+
+[[package]]
+name = "vosfs"
+version = "0.6.0"
+source = { git = "https://github.com/shinybrar/vosfs?rev=v0.6.0#200eae23fbc5e2bd58693b5c14ce12b2795d0636" }
+dependencies = [
+    { name = "defusedxml" },
+    { name = "fsspec" },
+    { name = "httpx" },
 ]
 
 [[package]]
