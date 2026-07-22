@@ -105,6 +105,52 @@ async def test_source_reloads_config_and_runtime_token_wins(
 
 
 @pytest.mark.asyncio
+async def test_environment_token_preserves_runtime_precedence(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The source leaves an omitted token open to HTTPClient environment settings."""
+    _config(credential=x509_credential("inactive")).save()
+    monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
+    monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
+
+    async with _vospace_source("archive")() as filesystem:
+        assert filesystem.kwargs == {
+            "token": "environment-token",
+            "asynchronous": True,
+            "skip_instance_cache": True,
+        }
+
+
+@pytest.mark.asyncio
+async def test_environment_certificate_preserves_runtime_precedence(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """The source leaves an omitted certificate open to settings sources."""
+    certificate = tmp_path / "environment.pem"
+    _config(credential=oidc_credential("inactive")).save()
+    monkeypatch.delenv("CANFAR_TOKEN", raising=False)
+    monkeypatch.setenv("CANFAR_CERTIFICATE", certificate.as_posix())
+    monkeypatch.setattr(
+        "canfar.client.x509.inspect",
+        lambda path: {"path": path.as_posix(), "expiry": 9_999_999_999.0},
+    )
+    valid = Mock(return_value=certificate.as_posix())
+    monkeypatch.setattr("canfar.client.x509.valid", valid)
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
+
+    async with _vospace_source("archive")() as filesystem:
+        assert filesystem.kwargs == {
+            "certfile": certificate.as_posix(),
+            "asynchronous": True,
+            "skip_instance_cache": True,
+        }
+
+    valid.assert_called_once_with(certificate)
+
+
+@pytest.mark.asyncio
 async def test_expired_inactive_oidc_refreshes_once_and_persists(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
