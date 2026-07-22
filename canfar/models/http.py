@@ -24,6 +24,15 @@ class VOSpaceService(BaseModel):
     uri: AnyUrl
     url: AnyHttpUrl
 
+    @field_validator("url")
+    @classmethod
+    def _reject_capabilities_endpoint(cls, url: AnyHttpUrl) -> AnyHttpUrl:
+        """Require the VOSpace base endpoint rather than its capabilities URL."""
+        if (url.path or "").rstrip("/").endswith("/capabilities"):
+            msg = "VOSpace Service base URL must not end with /capabilities."
+            raise ValueError(msg)
+        return url
+
 
 class Server(BaseModel):
     """Science Platform Server Details."""
@@ -119,18 +128,33 @@ class Server(BaseModel):
     @field_validator("storage", mode="before")
     @classmethod
     def _validate_storage_names(cls, value: Any) -> Any:
-        """Validate Storage Names before global string constraints run."""
-        if isinstance(value, dict):
-            for name in value:
-                if not isinstance(name, str) or (
-                    not name
-                    or name == "local"
-                    or any(character in name for character in ":\x00\n")
-                    or name.startswith("-")
-                ):
-                    msg = (
-                        f"Invalid Storage Name {name!r}: must be non-empty, must not "
-                        "be 'local', contain colon, NUL, or newline, or start with '-'."
-                    )
-                    raise ValueError(msg)
-        return value
+        """Normalize and validate Storage Names before Pydantic transforms keys."""
+        if not isinstance(value, dict):
+            return value
+
+        normalized: dict[str, Any] = {}
+        original_name_by_normalized_name: dict[str, str] = {}
+        for original_name, service in value.items():
+            name = original_name.strip() if isinstance(original_name, str) else None
+            if name is None or (
+                not name
+                or name == "local"
+                or any(character in name for character in ":\x00\n")
+                or name.startswith("-")
+            ):
+                msg = (
+                    f"Invalid Storage Name {original_name!r}: after whitespace "
+                    "normalization it must be non-empty, differ from reserved 'local', "
+                    "contain no colon, NUL, or newline, and not start with '-'."
+                )
+                raise ValueError(msg)
+            if name in normalized:
+                previous_original_name = original_name_by_normalized_name[name]
+                msg = (
+                    f"Storage Names {previous_original_name!r} and {original_name!r} "
+                    f"both normalize to {name!r}; use unique names."
+                )
+                raise ValueError(msg)
+            normalized[name] = service
+            original_name_by_normalized_name[name] = original_name
+        return normalized

@@ -35,6 +35,18 @@ class TestVOSpaceService:
         with pytest.raises(ValidationError):
             VOSpaceService.model_validate(payload)
 
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://ws-cadc.canfar.net/arc/capabilities",
+            "https://ws-cadc.canfar.net/arc/capabilities/",
+        ],
+    )
+    def test_rejects_capabilities_endpoint_as_base_url(self, url: str) -> None:
+        """A VOSpace Service URL names the base service, not capabilities."""
+        with pytest.raises(ValidationError, match="must not end with /capabilities"):
+            VOSpaceService(uri="ivo://cadc.nrc.ca/arc", url=url)
+
 
 class TestServer:
     """Test Server class."""

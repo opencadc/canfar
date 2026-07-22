@@ -139,18 +139,28 @@ class TestConfigurationValidation:
 
     @pytest.mark.parametrize(
         "storage_name",
-        ["", "local", "archive:old", "archive\x00old", "archive\nold", "-archive"],
+        [
+            "",
+            "local",
+            " local ",
+            "archive:old",
+            "archive\x00old",
+            "archive\nold",
+            "-archive",
+        ],
     )
     def test_invalid_storage_name_rejected(self, storage_name: str) -> None:
         """Invalid Storage Names fail with the rejected name and constraints."""
         with pytest.raises(ValidationError, match="Invalid Storage Name") as exc_info:
-            Configuration(
-                servers={
-                    "canfar": {
-                        "storage": {
-                            storage_name: {
-                                "uri": "ivo://cadc.nrc.ca/arc",
-                                "url": "https://ws-cadc.canfar.net/arc",
+            Configuration.model_validate(
+                {
+                    "servers": {
+                        "canfar": {
+                            "storage": {
+                                storage_name: {
+                                    "uri": "ivo://cadc.nrc.ca/arc",
+                                    "url": "https://ws-cadc.canfar.net/arc",
+                                }
                             }
                         }
                     }
@@ -160,7 +170,7 @@ class TestConfigurationValidation:
         assert repr(storage_name) in str(exc_info.value)
 
     def test_duplicate_storage_name_across_servers_rejected(self) -> None:
-        """A Storage Name identifies at most one service across all Servers."""
+        """A Storage Name identifies one service across Science Platform Servers."""
         service = VOSpaceService(
             uri="ivo://cadc.nrc.ca/arc",
             url="https://ws-cadc.canfar.net/arc",
@@ -173,12 +183,27 @@ class TestConfigurationValidation:
                 "'canfar' and 'srcnet'"
             ),
         ):
-            Configuration(
-                servers={
-                    "canfar": Server(storage={"shared": service}),
-                    "srcnet": Server(storage={"shared": service}),
+            Configuration.model_validate(
+                {
+                    "servers": {
+                        "canfar": Server(storage={"shared": service}),
+                        "srcnet": Server(storage={"shared": service}),
+                    }
                 }
             )
+
+    def test_normalized_storage_name_collision_rejected(self) -> None:
+        """Whitespace normalization cannot silently replace a VOSpace Service."""
+        service = {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        with pytest.raises(
+            ValidationError,
+            match="Storage Names 'arc' and ' arc ' both normalize to 'arc'",
+        ):
+            Server(storage={"arc": service, " arc ": service})
 
     def test_valid_active_references(self) -> None:
         """Validation passes when active authentication and server exist."""
