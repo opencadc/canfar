@@ -23,6 +23,13 @@ class TestListIdps:
         assert len(idps) == 2
         assert all(isinstance(idp, IdpInfo) for idp in idps)
 
+    def test_builtin_primary_storage_preferences(self) -> None:
+        """Each built-in IDP declares its primary VOSpace resource leaf."""
+        assert {idp.key: idp.preferred_storage_leaf for idp in list_idps()} == {
+            "cadc": "arc",
+            "srcnet": "cavern",
+        }
+
 
 class TestGetIdpCadc:
     """Tests for get_idp() with the cadc entry."""

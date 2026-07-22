@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from urllib.parse import urlsplit, urlunsplit
 
 import httpx
 from typing_extensions import Self
@@ -75,7 +76,7 @@ class Discover:
             return IVOARegistry(name=name, content="", success=False, error=error_msg)
 
     def extract(self, registry: IVOARegistry, dev: bool = False) -> list[Server]:
-        """Extract capabilities endpoints from registry content."""
+        """Extract Science Platform and preferred VOSpace registry records."""
         if not registry.success or not registry.content:
             return []
 
@@ -89,8 +90,11 @@ class Discover:
             uri, url = line.split("=", 1)
             uri, url = uri.strip(), url.strip()
 
-            if url.endswith("/skaha/capabilities") and uri.endswith("/skaha"):
-                url = url.replace("/capabilities", "")
+            leaf = uri.rpartition("/")[2]
+            if leaf in {"skaha", self.config.preferred_storage_leaf}:
+                url = _without_terminal_capabilities(url)
+                if url is None:
+                    continue
                 # Apply exclusion filters
                 if not dev and any(
                     word in uri.lower() or word in url.lower()
@@ -105,7 +109,7 @@ class Discover:
                     registry=registry.name,
                     uri=uri,
                     url=url,
-                    name=self.config.names.get(uri),
+                    name=self.config.names.get(uri) if leaf == "skaha" else None,
                 )
                 endpoints.append(endpoint)
 
@@ -119,3 +123,11 @@ class Discover:
         except httpx.HTTPError:
             endpoint.status = None
         return endpoint
+
+
+def _without_terminal_capabilities(url: str) -> str | None:
+    """Remove only a terminal ``/capabilities`` path component."""
+    parsed = urlsplit(url)
+    if not parsed.path.endswith("/capabilities"):
+        return None
+    return urlunsplit(parsed._replace(path=parsed.path.removesuffix("/capabilities")))

@@ -15,7 +15,8 @@ from canfar.errors import ErrorCode
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import OIDCCredential, X509Credential
 from canfar.models.config import Configuration
-from canfar.models.http import Server
+from canfar.models.http import Server, VOSpaceService
+from canfar.models.registry import IVOARegistry, IVOARegistrySearch
 from canfar.models.registry import Server as DiscoveredServer
 from canfar.server import (
     ServerDiscoveryError,
@@ -25,11 +26,13 @@ from canfar.server import (
     _discovered_to_server,
     activate,
     discover,
+    enrich,
     use,
 )
 from canfar.server import (
     list_servers as server_list,
 )
+from canfar.utils.discover import Discover
 from tests.helpers.config import assign_servers
 
 if TYPE_CHECKING:
@@ -37,6 +40,16 @@ if TYPE_CHECKING:
 
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
+
+_VOSPACE_CAPABILITIES = """
+    <capabilities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <capability standardID="ivo://ivoa.net/std/VOSpace/v2.0#nodes">
+        <interface xsi:type="ParamHTTP" role="std">
+          <accessURL use="base">https://storage.example/arc/nodes</accessURL>
+        </interface>
+      </capability>
+    </capabilities>
+"""
 
 
 def _http_client_factory(
@@ -344,6 +357,244 @@ class TestServerDiscovery:
         assert str(saved.get_server_by_uri("ivo://cadc.example/skaha").url) == (
             "https://cadc.example/skaha"
         )
+
+    @pytest.mark.asyncio
+    async def test_registry_retains_only_skaha_and_preferred_storage_records(
+        self,
+    ) -> None:
+        """CADC discovery retains ARC despite Vault and preserves registry URLs."""
+        registry = IVOARegistry(
+            name="CADC",
+            content=(
+                "ivo://cadc.nrc.ca/skaha="
+                "https://platform.example/skaha/capabilities\n"
+                "ivo://cadc.nrc.ca/arc="
+                "https://storage.example/custom/capabilities\n"
+                "ivo://cadc.nrc.ca/vault="
+                "https://storage.example/vault/capabilities\n"
+                "ivo://other.example/arc="
+                "https://platform.example/skaha-arc/capabilities"
+            ),
+        )
+        search = IVOARegistrySearch(preferred_storage_leaf="arc")
+
+        async with Discover(search) as discovery:
+            resources = discovery.extract(registry)
+
+        assert [(resource.uri, resource.url) for resource in resources] == [
+            ("ivo://cadc.nrc.ca/skaha", "https://platform.example/skaha"),
+            ("ivo://cadc.nrc.ca/arc", "https://storage.example/custom"),
+            ("ivo://other.example/arc", "https://platform.example/skaha-arc"),
+        ]
+
+    def test_discover_refreshes_primary_storage_and_preserves_manual_entries(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Rediscovery updates only the generated Storage Name entry."""
+        manual = VOSpaceService(
+            uri="ivo://cadc.nrc.ca/custom",
+            url="https://manual.example/custom",
+        )
+        old_primary = VOSpaceService(
+            uri="ivo://cadc.nrc.ca/arc",
+            url="https://old.example/arc",
+        )
+        known = _cadc_server(
+            name="canfar",
+            storage={"canfar": old_primary, "archive": manual},
+        )
+        registry_body = "\n".join(
+            (
+                f"{_CADC_URI}={_CADC_URL}/capabilities",
+                "ivo://cadc.nrc.ca/arc=https://storage.example/arc/capabilities",
+                "ivo://cadc.nrc.ca/vault=https://storage.example/vault/capabilities",
+            )
+        )
+
+        def registry_response(request: httpx.Request) -> httpx.Response:
+            if request.method == "GET":
+                return httpx.Response(200, text=registry_body, request=request)
+            return httpx.Response(200, request=request)
+
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://ws-uv.canfar.net/skaha/v1</accessURL>
+                  <securityMethod
+                    standardID="ivo://ivoa.net/sso#tls-with-certificate" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def capabilities_response(request: httpx.Request) -> httpx.Response:
+            content = (
+                _VOSPACE_CAPABILITIES
+                if str(request.url) == "https://storage.example/arc/capabilities"
+                else session_capabilities
+            )
+            return httpx.Response(200, text=content, request=request)
+
+        real_async_client = httpx.AsyncClient
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config(known)
+            with (
+                patch(
+                    "canfar.utils.discover.httpx.AsyncClient",
+                    side_effect=lambda **_kwargs: real_async_client(
+                        transport=httpx.MockTransport(registry_response)
+                    ),
+                ),
+                patch(
+                    "canfar.client.Client",
+                    side_effect=_http_client_factory(
+                        httpx.MockTransport(capabilities_response)
+                    ),
+                ),
+            ):
+                [discovered] = discover("cadc", config=config)
+
+            persisted = Configuration().servers["canfar"]
+
+        assert (
+            discovered.storage
+            == persisted.storage
+            == {
+                "canfar": VOSpaceService(
+                    uri="ivo://cadc.nrc.ca/arc",
+                    url="https://storage.example/arc",
+                ),
+                "archive": manual,
+            }
+        )
+
+    @pytest.mark.parametrize("mode", ["missing", "malformed", "unreachable"])
+    def test_storage_inspection_fail_or_keep_outcomes(
+        self, mode: str, tmp_path: Path
+    ) -> None:
+        """Storage failures are kept non-strict and actionable when strict."""
+        storage_resource = (
+            None
+            if mode == "missing"
+            else DiscoveredServer(
+                registry="CADC",
+                uri="ivo://cadc.nrc.ca/arc",
+                url="https://storage.example/arc",
+            )
+        )
+
+        def response(request: httpx.Request) -> httpx.Response:
+            if mode == "unreachable":
+                message = "storage unavailable"
+                raise httpx.ConnectError(message, request=request)
+            return httpx.Response(200, text="<capabilities />", request=request)
+
+        server = _cadc_server()
+        transport = httpx.MockTransport(response)
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config()
+            with patch(
+                "canfar.client.Client", side_effect=_http_client_factory(transport)
+            ):
+                assert (
+                    enrich(
+                        server,
+                        config=config,
+                        storage_resource=storage_resource,
+                        strict=False,
+                    )
+                    == server
+                )
+
+            with (
+                patch(
+                    "canfar.client.Client",
+                    side_effect=_http_client_factory(transport),
+                ),
+                pytest.raises(ServerFetchError, match="VOSpace Service") as exc_info,
+            ):
+                enrich(
+                    server,
+                    config=config,
+                    storage_resource=storage_resource,
+                    strict=True,
+                )
+
+        if mode == "malformed":
+            assert isinstance(exc_info.value.__cause__, ValueError)
+
+    @pytest.mark.asyncio
+    async def test_srcnet_pairs_each_server_with_same_namespace_cavern(self) -> None:
+        """SRCNet Cavern records pair by IVOA namespace, not list position."""
+        resources = [
+            DiscoveredServer(
+                registry="SRCNet",
+                uri="ivo://canfar.net/src/skaha",
+                url="https://one.example/skaha",
+                status=200,
+                name="canSRC",
+            ),
+            DiscoveredServer(
+                registry="SRCNet",
+                uri="ivo://swesrc.chalmers.se/skaha",
+                url="https://two.example/skaha",
+                status=200,
+                name="sweSRC",
+            ),
+            DiscoveredServer(
+                registry="SRCNet",
+                uri="ivo://swesrc.chalmers.se/cavern",
+                url="https://storage.example/two",
+            ),
+            DiscoveredServer(
+                registry="SRCNet",
+                uri="ivo://canfar.net/src/cavern",
+                url="https://storage.example/one",
+            ),
+        ]
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=resources)
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+
+        def enriched(
+            server: Server,
+            *,
+            storage_resource: DiscoveredServer,
+            **_kwargs: object,
+        ) -> Server:
+            return server.model_copy(
+                update={
+                    "version": "v1",
+                    "auths": ["oidc"],
+                    "storage": {
+                        server.name: VOSpaceService(
+                            uri=storage_resource.uri,
+                            url=storage_resource.url,
+                        )
+                    },
+                },
+                deep=True,
+            )
+
+        with (
+            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar.server.enrich", side_effect=enriched),
+        ):
+            servers = await _discover_for_idp("srcnet")
+
+        assert {
+            server.name: str(server.storage[server.name].uri) for server in servers
+        } == {
+            "canSRC": "ivo://canfar.net/src/cavern",
+            "sweSRC": "ivo://swesrc.chalmers.se/cavern",
+        }
 
     @pytest.mark.parametrize(
         "capabilities_case",

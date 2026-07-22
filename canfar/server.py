@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import Literal
 from xml.etree.ElementTree import ParseError
 
 import httpx
@@ -16,22 +16,23 @@ from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
-from canfar.idp import registry_sources
+from canfar.idp import get_idp, registry_sources
 from canfar.models.config import Configuration
 from canfar.models.http import (
     DEFAULT_SERVER_CORES,
     DEFAULT_SERVER_GPUS,
     DEFAULT_SERVER_RAM_GB,
     Server,
+    VOSpaceService,
 )
 from canfar.models.registry import IVOARegistrySearch
+from canfar.models.registry import Server as RegistryResource
 from canfar.utils import vosi
 from canfar.utils.discover import Discover
 
 log = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from canfar.models.registry import Server as DiscoveredServer
+_STORAGE_RESOURCE_UNSET = object()
 
 
 class ServerSelectorError(ValueError):
@@ -136,6 +137,11 @@ def discover(
         known = canonical.get(name, known_servers.get(name))
         if server.version is None or not server.auths:
             if known is not None and known.version is not None and known.auths:
+                if server.storage:
+                    known = known.model_copy(
+                        update={"storage": {**known.storage, **server.storage}},
+                        deep=True,
+                    )
                 canonical[name] = known
             continue
         merged_server = server
@@ -144,6 +150,8 @@ def discover(
                 include={"idp", "name", "uri", "url", "version", "auths"},
                 exclude_none=True,
             )
+            if server.storage:
+                updates["storage"] = {**known.storage, **server.storage}
             merged_server = known.model_copy(update=updates, deep=True)
         canonical[name] = merged_server
 
@@ -397,7 +405,10 @@ async def _discover_for_idp(
         ServerDiscoveryError: If registry retrieval fails.
     """
     sources = registry_sources(idp, include_dev=dev)
-    search = IVOARegistrySearch(registries=sources)
+    search = IVOARegistrySearch(
+        registries=sources,
+        preferred_storage_leaf=get_idp(idp).preferred_storage_leaf,
+    )
     async with Discover(search, timeout=timeout) as discovery:
         registries = await asyncio.gather(
             *(discovery.fetch(url, name) for url, name in sources.items())
@@ -412,11 +423,20 @@ async def _discover_for_idp(
             msg = f"Failed to discover servers for IDP '{idp}': {errors}"
             raise ServerDiscoveryError(msg)
 
-        endpoints = []
+        resources = []
         for registry in successful_registries:
-            endpoints.extend(discovery.extract(registry, dev=dev))
+            resources.extend(discovery.extract(registry, dev=dev))
+        endpoints = [
+            resource for resource in resources if resource.uri.endswith("/skaha")
+        ]
         if not endpoints:
             return []
+
+        storage_by_namespace = {
+            (resource.registry, _registry_namespace(resource.uri)): resource
+            for resource in resources
+            if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
+        }
 
         checked = await asyncio.gather(
             *(discovery.check(endpoint) for endpoint in endpoints)
@@ -427,6 +447,9 @@ async def _discover_for_idp(
                 idp,
                 config=config,
                 timeout=timeout,
+                storage_resource=storage_by_namespace.get(
+                    (endpoint.registry, _registry_namespace(endpoint.uri))
+                ),
             )
             for endpoint in checked
             if endpoint.status == 200
@@ -440,12 +463,18 @@ def _host_slug(uri: AnyUrl) -> str | None:
     return uri.host.replace(".", "-")
 
 
+def _registry_namespace(uri: str) -> str:
+    """Return the IVOA registry URI namespace before its resource leaf."""
+    return uri.rpartition("/")[0]
+
+
 def _discovered_to_server(
-    endpoint: DiscoveredServer,
+    endpoint: RegistryResource,
     idp: str,
     *,
     config: Configuration | None = None,
     timeout: int = 2,
+    storage_resource: RegistryResource | None = None,
 ) -> Server:
     """Convert a registry discovery record to a persisted HTTP server model.
 
@@ -457,6 +486,7 @@ def _discovered_to_server(
         idp: Canonical IDP key.
         config: Configuration whose Authentication Record authorizes enrichment.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
+        storage_resource: Same-namespace preferred VOSpace registry record, if any.
 
     Returns:
         Server: Persisted server model with capabilities metadata when available.
@@ -473,6 +503,7 @@ def _discovered_to_server(
         config=config,
         strict=False,
         timeout=timeout,
+        storage_resource=storage_resource,
     )
 
 
@@ -483,6 +514,7 @@ def enrich(
     authentication_idp: str | None = None,
     strict: bool = True,
     timeout: int = 2,
+    storage_resource: RegistryResource | None | object = _STORAGE_RESOURCE_UNSET,
 ) -> Server:
     """Return a validated Server enriched from its VOSI capabilities.
 
@@ -497,6 +529,9 @@ def enrich(
             cannot be retrieved or parsed. Discovery uses non-strict mode so
             one malformed endpoint does not abort listing for an IDP.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
+        storage_resource: Retained same-namespace VOSpace registry record. Passing
+            ``None`` records that the preferred resource was absent; omitting the
+            argument leaves storage outside this inspection.
 
     Returns:
         Server: Copy with version and auth modes populated when discoverable.
@@ -505,29 +540,33 @@ def enrich(
         ServerFetchError: If ``strict`` is ``True`` and capabilities cannot
             be retrieved, parsed, or contain no session capabilities.
     """
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
+    active_idp = authentication_idp or server.idp or base_config.active.authentication
+    if storage_resource is not _STORAGE_RESOURCE_UNSET:
+        server = _enrich_storage(
+            server,
+            storage_resource=(
+                storage_resource
+                if isinstance(storage_resource, RegistryResource)
+                else None
+            ),
+            config=base_config,
+            authentication_idp=active_idp,
+            strict=strict,
+            timeout=timeout,
+        )
     if server.url is None:
         msg = "Server URL is required to inspect capabilities."
         raise ServerFetchError(msg)
-
-    base_config = config or Configuration()  # ty: ignore[missing-argument]
-    active_idp = authentication_idp or server.idp or base_config.active.authentication
     try:
-        from canfar.client import HTTPClient  # noqa: PLC0415
-
-        with HTTPClient(
-            config=base_config,
-            authentication_idp=active_idp,
-            url=server.url,
-            timeout=timeout,
-            raise_http_errors=False,
-        ) as client:
-            request_client = client.client
-            request_client.headers["Accept"] = "application/xml"
-            request_client.headers.pop("Content-Type", None)
-            request_client.headers.pop("X-Skaha-Registry-Auth", None)
-            response = request_client.get("capabilities")
-            response.raise_for_status()
-            capabilities = vosi.capabilities(xml=response.text)
+        capabilities = vosi.capabilities(
+            xml=_fetch_capabilities(
+                server.url,
+                config=base_config,
+                authentication_idp=active_idp,
+                timeout=timeout,
+            )
+        )
     except (
         httpx.HTTPError,
         OSError,
@@ -587,6 +626,102 @@ def enrich(
             ),
             args=(server.url, exc),
         )
+
+
+def _enrich_storage(
+    server: Server,
+    *,
+    storage_resource: RegistryResource | None,
+    config: Configuration,
+    authentication_idp: str,
+    strict: bool,
+    timeout: int,
+) -> Server:
+    """Validate and attach one retained primary VOSpace registry resource."""
+    error: BaseException | None = None
+    if storage_resource is None:
+        leaf = get_idp(authentication_idp).preferred_storage_leaf
+        subject = f"same-namespace '{leaf}' registry record"
+        error = ValueError(
+            f"No {subject} found for Science Platform Server '{server.name}'."
+        )
+    else:
+        subject = storage_resource.uri
+        try:
+            xml = _fetch_capabilities(
+                AnyHttpUrl(storage_resource.url),
+                config=config,
+                authentication_idp=authentication_idp,
+                timeout=timeout,
+            )
+            valid = vosi.is_vospace_service(xml)
+        except (
+            httpx.HTTPError,
+            OSError,
+            AuthContextError,
+            AuthExpiredError,
+            CertificateError,
+            HTTPAuthenticationError,
+            ParseError,
+            DefusedXmlException,
+            ValueError,
+        ) as exc:
+            error = exc
+        else:
+            if not valid:
+                error = ValueError(
+                    "required VOSpace node capability is missing or malformed"
+                )
+            elif server.name is None:
+                error = ValueError("Science Platform Server has no Server Name")
+
+    if error is not None:
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=(
+                f"Failed to inspect VOSpace Service '{subject}' for Science "
+                f"Platform Server '{server.name}': {error}"
+            ),
+            cause=error,
+            debug="Skipping VOSpace Service %s during discovery: %s",
+            args=(subject, error),
+        )
+
+    assert storage_resource is not None
+    assert server.name is not None
+    service = VOSpaceService(uri=storage_resource.uri, url=storage_resource.url)
+
+    return server.model_copy(
+        update={"storage": {**server.storage, server.name: service}},
+        deep=True,
+    )
+
+
+def _fetch_capabilities(
+    url: AnyHttpUrl,
+    *,
+    config: Configuration,
+    authentication_idp: str,
+    timeout: int,
+) -> str:
+    """Fetch one VOSI capabilities document through the existing HTTP seam."""
+    from canfar.client import HTTPClient  # noqa: PLC0415
+
+    with HTTPClient(
+        config=config,
+        authentication_idp=authentication_idp,
+        url=url,
+        timeout=timeout,
+        raise_http_errors=False,
+    ) as client:
+        request_client = client.client
+        request_client.headers["Accept"] = "application/xml"
+        request_client.headers.pop("Content-Type", None)
+        request_client.headers.pop("X-Skaha-Registry-Auth", None)
+        response = request_client.get("capabilities")
+        response.raise_for_status()
+        return response.text
 
 
 def _keep_or_raise(
