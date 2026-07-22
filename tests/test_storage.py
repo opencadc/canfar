@@ -104,7 +104,7 @@ async def test_expired_inactive_oidc_refreshes_once_and_persists(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """An inactive Server uses its own IDP and persists one shared refresh."""
+    """An inactive Science Platform Server uses its IDP and persists refresh."""
     config_path = tmp_path / "config.yaml"
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
     config = _config(
@@ -122,7 +122,7 @@ async def test_expired_inactive_oidc_refreshes_once_and_persists(
             "expires_at": 9_999_999_999.0,
         }
     )
-    monkeypatch.setattr("canfar._storage.oidc.refresh", refresh)
+    monkeypatch.setattr("canfar.client.oidc.refresh", refresh)
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
     async with _vospace_source("archive")() as filesystem:
@@ -142,6 +142,25 @@ async def test_expired_inactive_oidc_refreshes_once_and_persists(
 
 
 @pytest.mark.asyncio
+async def test_valid_saved_oidc_access_token_is_reused(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A current saved OIDC Authentication Record needs no refresh."""
+    config_path = tmp_path / "config.yaml"
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
+    _config(credential=oidc_credential("inactive", access="current-token")).save()
+    refresh = AsyncMock()
+    monkeypatch.setattr("canfar.client.oidc.refresh", refresh)
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
+
+    async with _vospace_source("archive")() as filesystem:
+        assert filesystem.kwargs["token"] == "current-token"
+
+    refresh.assert_not_awaited()
+
+
+@pytest.mark.asyncio
 async def test_saved_x509_is_validated_before_construction(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
@@ -157,7 +176,7 @@ async def test_saved_x509_is_validated_before_construction(
         inspect(path)
         return {"path": path.as_posix(), "expiry": 9_999_999_999.0}
 
-    monkeypatch.setattr("canfar._storage.x509.inspect", inspect_certificate)
+    monkeypatch.setattr("canfar.client.x509.inspect", inspect_certificate)
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
     async with _vospace_source("archive")() as filesystem:
@@ -167,7 +186,7 @@ async def test_saved_x509_is_validated_before_construction(
 
 
 @pytest.mark.asyncio
-async def test_runtime_x509_overrides_saved_oidc(
+async def test_runtime_x509_overrides_saved_authentication_record(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -177,17 +196,42 @@ async def test_runtime_x509_overrides_saved_oidc(
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
     _config(credential=oidc_credential("inactive")).save()
     monkeypatch.setattr(
-        "canfar._storage.x509.inspect",
+        "canfar.client.x509.inspect",
         lambda path: {"path": path.as_posix(), "expiry": 9_999_999_999.0},
     )
     valid = Mock(return_value=certificate.as_posix())
-    monkeypatch.setattr("canfar._storage.x509.valid", valid)
+    monkeypatch.setattr("canfar.client.x509.valid", valid)
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
     async with _vospace_source("archive", certificate=certificate)() as filesystem:
         assert filesystem.kwargs["certfile"] == certificate.as_posix()
 
     valid.assert_called_once_with(certificate)
+
+
+@pytest.mark.asyncio
+async def test_invalid_saved_x509_fails_before_vospace(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """An invalid X.509 Authentication Record fails with a clean login hint."""
+    config_path = tmp_path / "config.yaml"
+    certificate = tmp_path / "invalid.pem"
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
+    _config(credential=x509_credential("inactive", path=certificate)).save()
+    monkeypatch.setattr(
+        "canfar.client.x509.inspect",
+        Mock(side_effect=ValueError("certificate parse detail")),
+    )
+    constructor = Mock()
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
+
+    with pytest.raises(AuthContextError, match="canfar login") as exc_info:
+        async with _vospace_source("archive")():
+            pass
+
+    assert "certificate parse detail" not in str(exc_info.value)
+    constructor.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -234,7 +278,7 @@ async def test_unrefreshable_oidc_fails_secret_safe_before_vospace(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
-    """Bad saved auth reports a login hint without exposing secret values."""
+    """Bad saved Authentication reports a hint without exposing secret values."""
     config_path = tmp_path / "config.yaml"
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
     _config(
@@ -256,4 +300,23 @@ async def test_unrefreshable_oidc_fails_secret_safe_before_vospace(
     message = str(exc_info.value)
     assert "old-access-secret" not in message
     assert "refresh-secret" not in message
+    constructor.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_empty_saved_oidc_token_fails_cleanly(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """An empty saved token cannot fall through to certificate construction."""
+    config_path = tmp_path / "config.yaml"
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
+    _config(credential=oidc_credential("inactive", access="")).save()
+    constructor = Mock()
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
+
+    with pytest.raises(AuthContextError, match="canfar login"):
+        async with _vospace_source("archive")():
+            pass
+
     constructor.assert_not_called()

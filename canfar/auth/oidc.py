@@ -7,7 +7,7 @@ import socket
 import time
 from collections.abc import Awaitable, Callable, Generator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import httpx
 from authlib.integrations.base_client.errors import OAuthError
@@ -193,6 +193,20 @@ def _validated_refresh(refreshed: Any) -> dict[str, Any]:
         msg = "OIDC token refresh failed: malformed token response"
         raise ValueError(msg)
     return dict(refreshed)
+
+
+def _refresh_parameters(
+    credential: OIDCCredential,
+) -> tuple[str, str, str, str] | None:
+    """Return complete literal refresh inputs when the record is eligible."""
+    if not credential.refreshable:
+        return None
+    return (
+        cast("str", credential.endpoints.token),
+        cast("str", credential.client.identity),
+        cast("SecretStr", credential.client.secret).get_secret_value(),
+        cast("SecretStr", credential.token.refresh).get_secret_value(),
+    )
 
 
 def _persist_refreshed_credential(

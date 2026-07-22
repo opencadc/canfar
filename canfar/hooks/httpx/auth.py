@@ -30,7 +30,7 @@ Note:
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Any, Callable, cast
+from typing import TYPE_CHECKING, Any, Callable
 
 from canfar import get_logger
 from canfar.auth import oidc
@@ -68,24 +68,6 @@ def _apply_access_header(
     header = f"Bearer {token.get_secret_value()}"
     httpx_client_headers["Authorization"] = header
     request.headers["Authorization"] = header
-
-
-def _refresh_parameters(
-    credential: OIDCCredential,
-) -> tuple[str, str, str, str] | None:
-    """Return complete refresh inputs when the record is eligible."""
-    if not credential.refreshable:
-        return None
-    token_url = cast("str", credential.endpoints.token)
-    identity = cast("str", credential.client.identity)
-    client_secret = cast("SecretStr", credential.client.secret)
-    refresh_token = cast("SecretStr", credential.token.refresh)
-    return (
-        token_url,
-        identity,
-        client_secret.get_secret_value(),
-        refresh_token.get_secret_value(),
-    )
 
 
 def _apply_refreshed_token(
@@ -138,7 +120,7 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.debug("Skipping auth refresh, access token is not expired.")
             return
 
-        parameters = _refresh_parameters(credential)
+        parameters = oidc._refresh_parameters(credential)  # noqa: SLF001
         if parameters is None:
             log.warning("OIDC Authentication Record cannot be refreshed.")
             return
@@ -200,7 +182,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
                     )
                 return
 
-            parameters = _refresh_parameters(credential)
+            parameters = oidc._refresh_parameters(credential)  # noqa: SLF001
             if parameters is None:
                 log.warning("OIDC Authentication Record cannot be refreshed.")
                 return
