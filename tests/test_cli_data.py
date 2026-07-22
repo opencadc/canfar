@@ -41,14 +41,36 @@ def test_root_help_advertises_data() -> None:
 
 
 def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> None:
-    """CANFAR supplies named sources and policy without extending commands."""
-    captured: dict[str, object] = {}
-    factories: dict[str, object] = {}
+    """Every app build maps all configured Servers plus local, not only active."""
+    captured_sources: list[dict[str, object]] = []
+    captured_capabilities: list[object] = []
 
-    def source_factory(name: str) -> object:
-        factory = object()
-        factories[name] = factory
-        return factory
+    def source_factory(_name: str) -> object:
+        return object()
+
+    configurations = iter(
+        [
+            SimpleNamespace(
+                active=SimpleNamespace(server="first"),
+                servers={
+                    "first": SimpleNamespace(storage={"arc": object()}),
+                    "second": SimpleNamespace(storage={"cavern": object()}),
+                },
+            ),
+            SimpleNamespace(
+                active=SimpleNamespace(server="second"),
+                servers={
+                    "first": SimpleNamespace(storage={"arc": object()}),
+                    "second": SimpleNamespace(
+                        storage={"cavern": object(), "vault": object()}
+                    ),
+                },
+            ),
+        ]
+    )
+
+    def configuration() -> SimpleNamespace:
+        return next(configurations)
 
     class FakeApp:
         def __init__(
@@ -57,25 +79,29 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
             *,
             capabilities: object,
         ) -> None:
-            captured["sources"] = sources
-            captured["capabilities"] = capabilities
+            captured_sources.append(dict(sources))
+            captured_capabilities.append(capabilities)
             self.typer_app = typer.Typer()
 
-    monkeypatch.setattr(
-        data_cli,
-        "Configuration",
-        partial(_configuration, "arc", "cavern"),
-    )
+    monkeypatch.setattr(data_cli, "Configuration", configuration)
     monkeypatch.setattr(data_cli, "_vospace_source", source_factory)
     monkeypatch.setattr(data_cli, "App", FakeApp)
 
     data_cli._upstream_group()  # noqa: SLF001
+    data_cli._upstream_group()  # noqa: SLF001
 
-    assert captured["sources"] == {
-        **factories,
-        "local": data_cli._local_source,  # noqa: SLF001
-    }
-    assert captured["capabilities"] == {"recursion": {"copy": True, "remove": False}}
+    assert [set(sources) for sources in captured_sources] == [
+        {"arc", "cavern", "local"},
+        {"arc", "cavern", "vault", "local"},
+    ]
+    assert all(
+        sources["local"] is data_cli._local_source  # noqa: SLF001
+        for sources in captured_sources
+    )
+    assert captured_capabilities == [
+        {"recursion": {"copy": True, "remove": False}},
+        {"recursion": {"copy": True, "remove": False}},
+    ]
 
 
 @pytest.mark.asyncio

@@ -92,7 +92,7 @@ for node in ["canSRC", "sweSRC"]:
 
 == Data, same front door
 
-File management over named VOSpace Services, using the parent server's saved Authentication Record:
+File management over named VOSpace Services, using their configured Authentication Records:
 
 ```bash
 canfar data ls -lh canSRC:/
@@ -100,6 +100,7 @@ canfar data cp local:/absolute/path/filename canSRC:/data/filename
 ```
 
 - Cross-source movement is explicit `cp`, verify, then separate `rm`
-- Uses the named Storage Service's parent-server IDP, even when that server is inactive
+- Each VOSpace Service uses its parent Science Platform Server's IDP
+- CANFAR uses that IDP's saved Authentication Record, even when the Science Platform Server is inactive
 
 #align(center)[_Your files, your compute, your platform — one door, one login._]
