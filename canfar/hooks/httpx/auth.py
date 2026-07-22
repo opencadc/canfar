@@ -32,16 +32,15 @@ from __future__ import annotations
 import asyncio
 from typing import TYPE_CHECKING, Any, Callable, cast
 
-from pydantic import SecretStr, ValidationError
-
 from canfar import get_logger
 from canfar.auth import oidc
-from canfar.models.auth import Expiry, OIDCCredential, Token
+from canfar.models.auth import OIDCCredential
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, MutableMapping
 
     import httpx
+    from pydantic import SecretStr
 
     from canfar.client import HTTPClient
 
@@ -97,51 +96,13 @@ def _apply_refreshed_token(
     request: httpx.Request,
 ) -> None:
     """Atomically persist refreshed OIDC state, then update active headers."""
-    previous_refresh = credential.token.refresh
-    previous_refresh_value = (
-        previous_refresh.get_secret_value() if previous_refresh is not None else None
+    updated = oidc._persist_refreshed_credential(  # noqa: SLF001
+        client.config, credential, refreshed
     )
-    returned_refresh = refreshed.get("refresh_token")
-    refresh_value = (
-        returned_refresh
-        if isinstance(returned_refresh, str) and returned_refresh
-        else previous_refresh_value
-    )
-    rotated = refresh_value != previous_refresh_value
-    access_value = refreshed.get("access_token")
-    if not isinstance(access_value, str) or not access_value:
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg)
-    access_token = SecretStr(access_value)
-    token_type = refreshed.get("token_type")
-    if token_type is None or token_type == "":
-        token_type = credential.token.token_type
-    scope = refreshed.get("scope")
-    if scope is None or scope == "":
-        scope = credential.token.scope
-    try:
-        token = Token(
-            access=access_token,
-            refresh=SecretStr(refresh_value) if refresh_value is not None else None,
-            token_type=token_type,
-            scope=scope,
-        )
-        expiry = Expiry(
-            access=refreshed.get("expires_at"),
-            refresh=None if rotated else credential.expiry.refresh,
-        )
-    except (KeyError, TypeError, ValidationError):
-        msg = "OIDC token refresh failed: malformed token response"
-        raise ValueError(msg) from None
-
-    updated = credential.model_copy(update={"token": token, "expiry": expiry})
-    candidate = client.config.model_copy(deep=True)
-    candidate.update_credential(updated)
-    candidate.save()
-    client.config.update_credential(updated)
     log.debug("Authentication refreshed and configuration saved.")
 
-    _apply_access_header(access_token, httpx_client_headers, request)
+    assert updated.token.access is not None
+    _apply_access_header(updated.token.access, httpx_client_headers, request)
     log.debug("HTTP request headers updated with new token.")
     log.info("OIDC Access Token Refreshed.")
 

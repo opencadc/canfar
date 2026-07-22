@@ -20,6 +20,8 @@ from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Toke
 if TYPE_CHECKING:
     from authlib.integrations.httpx_client import AsyncOAuth2Client
 
+    from canfar.models.config import Configuration
+
 log = get_logger(__name__)
 _BASIC_AUTH_METHOD = "client_secret_basic"
 
@@ -191,6 +193,53 @@ def _validated_refresh(refreshed: Any) -> dict[str, Any]:
         msg = "OIDC token refresh failed: malformed token response"
         raise ValueError(msg)
     return dict(refreshed)
+
+
+def _persist_refreshed_credential(
+    config: Configuration,
+    credential: OIDCCredential,
+    refreshed: dict[str, Any],
+) -> OIDCCredential:
+    """Validate and atomically persist refreshed OIDC state."""
+    previous_refresh = credential.token.refresh
+    previous_refresh_value = (
+        previous_refresh.get_secret_value() if previous_refresh is not None else None
+    )
+    returned_refresh = refreshed.get("refresh_token")
+    refresh_value = (
+        returned_refresh
+        if isinstance(returned_refresh, str) and returned_refresh
+        else previous_refresh_value
+    )
+    access_value = refreshed.get("access_token")
+    if not isinstance(access_value, str) or not access_value:
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg)
+    try:
+        token = Token(
+            access=SecretStr(access_value),
+            refresh=SecretStr(refresh_value) if refresh_value is not None else None,
+            token_type=refreshed.get("token_type") or credential.token.token_type,
+            scope=refreshed.get("scope") or credential.token.scope,
+        )
+        expiry = Expiry(
+            access=refreshed.get("expires_at"),
+            refresh=(
+                None
+                if refresh_value != previous_refresh_value
+                else credential.expiry.refresh
+            ),
+        )
+    except (KeyError, TypeError, ValidationError):
+        msg = "OIDC token refresh failed: malformed token response"
+        raise ValueError(msg) from None
+
+    updated = credential.model_copy(update={"token": token, "expiry": expiry})
+    candidate = config.model_copy(deep=True)
+    candidate.update_credential(updated)
+    candidate.save()
+    config.update_credential(updated)
+    return updated
 
 
 async def refresh(
