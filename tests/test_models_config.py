@@ -149,9 +149,14 @@ class TestConfigurationValidation:
             "-archive",
         ],
     )
-    def test_invalid_storage_name_rejected(self, storage_name: str) -> None:
+    def test_invalid_storage_name_rejected(
+        self, storage_name: str, tmp_path: Path
+    ) -> None:
         """Invalid Storage Names fail with the rejected name and constraints."""
-        with pytest.raises(ValidationError, match="Invalid Storage Name") as exc_info:
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            pytest.raises(ValidationError, match="Invalid Storage Name") as exc_info,
+        ):
             Configuration.model_validate(
                 {
                     "servers": {
@@ -169,18 +174,23 @@ class TestConfigurationValidation:
 
         assert repr(storage_name) in str(exc_info.value)
 
-    def test_duplicate_storage_name_across_servers_rejected(self) -> None:
+    def test_duplicate_storage_name_across_servers_rejected(
+        self, tmp_path: Path
+    ) -> None:
         """A Storage Name identifies one service across Science Platform Servers."""
         service = VOSpaceService(
             uri="ivo://cadc.nrc.ca/arc",
             url="https://ws-cadc.canfar.net/arc",
         )
 
-        with pytest.raises(
-            ValidationError,
-            match=(
-                "Duplicate Storage Name 'shared' in Science Platform Servers "
-                "'canfar' and 'srcnet'"
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            pytest.raises(
+                ValidationError,
+                match=(
+                    "Duplicate Storage Name 'shared' in Science Platform Servers "
+                    "'canfar' and 'srcnet'"
+                ),
             ),
         ):
             Configuration.model_validate(
