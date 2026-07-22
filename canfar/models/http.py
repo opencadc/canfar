@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Annotated, Any
 
 from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field, field_validator
 
@@ -42,7 +42,6 @@ class Server(BaseModel):
         extra="forbid",
         json_schema_mode_override="serialization",
         str_strip_whitespace=True,
-        str_max_length=256,
         str_min_length=1,
     )
 
@@ -79,7 +78,7 @@ class Server(BaseModel):
         min_length=2,
         max_length=8,
     )
-    auths: list[str] | None = Field(
+    auths: list[Annotated[str, Field(max_length=256)]] | None = Field(
         default=None,
         title="Supported Auth Modes",
         description="Authentication modes supported by the Server",
@@ -123,6 +122,7 @@ class Server(BaseModel):
             "Persisted compatibility field for discovery reachability status "
             "when known."
         ),
+        max_length=256,
     )
 
     @field_validator("storage", mode="before")
@@ -135,13 +135,13 @@ class Server(BaseModel):
         normalized: dict[str, Any] = {}
         original_name_by_normalized_name: dict[str, str] = {}
         for original_name, service in value.items():
-            name = original_name.strip() if isinstance(original_name, str) else None
-            if name is None or (
-                not name
-                or name == "local"
-                or any(character in name for character in ":\x00\n")
-                or name.startswith("-")
+            if not isinstance(original_name, str) or any(
+                character in original_name for character in ":\x00\r\n"
             ):
+                name = None
+            else:
+                name = original_name.strip()
+            if name is None or (not name or name == "local" or name.startswith("-")):
                 msg = (
                     f"Invalid Storage Name {original_name!r}: after whitespace "
                     "normalization it must be non-empty, differ from reserved 'local', "

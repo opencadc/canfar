@@ -146,6 +146,9 @@ class TestConfigurationValidation:
             "archive:old",
             "archive\x00old",
             "archive\nold",
+            "archive\n",
+            "archive\r",
+            "archive\r\n",
             "-archive",
         ],
     )
@@ -173,6 +176,27 @@ class TestConfigurationValidation:
             )
 
         assert repr(storage_name) in str(exc_info.value)
+
+    def test_long_storage_name_allowed(self) -> None:
+        """Storage Names do not inherit Server field length limits."""
+        storage_name = "a" * 257
+        service = {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        server = Server(storage={storage_name: service})
+
+        assert list(server.storage) == [storage_name]
+
+    def test_storage_name_whitespace_is_trimmed(self) -> None:
+        """Valid surrounding whitespace remains normalized."""
+        service = {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        assert list(Server(storage={" arc ": service}).storage) == ["arc"]
 
     def test_duplicate_storage_name_across_servers_rejected(
         self, tmp_path: Path
