@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.14'",
@@ -118,6 +118,7 @@ dependencies = [
     { name = "cadcutils" },
     { name = "click" },
     { name = "defusedxml" },
+    { name = "fsspec-cli" },
     { name = "httpx", extra = ["http2"] },
     { name = "humanize" },
     { name = "pydantic" },
@@ -127,11 +128,6 @@ dependencies = [
     { name = "rich" },
     { name = "segno" },
     { name = "typer" },
-]
-
-[package.optional-dependencies]
-data = [
-    { name = "fsspec-cli" },
     { name = "vosfs" },
 ]
 
@@ -164,7 +160,7 @@ requires-dist = [
     { name = "cadcutils", specifier = ">=1.5.4" },
     { name = "click", specifier = ">=8.4.1" },
     { name = "defusedxml", specifier = ">=0.7.1" },
-    { name = "fsspec-cli", marker = "extra == 'data'", git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.5.0" },
+    { name = "fsspec-cli", git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.5.0" },
     { name = "httpx", extras = ["http2"], specifier = ">=0.28.1" },
     { name = "humanize", specifier = ">=4.12.3" },
     { name = "pydantic", specifier = ">=2.9.2" },
@@ -174,9 +170,8 @@ requires-dist = [
     { name = "rich", specifier = ">=13.9.4" },
     { name = "segno", specifier = ">=1.6.6" },
     { name = "typer", specifier = ">=0.16.0" },
-    { name = "vosfs", marker = "extra == 'data'", git = "https://github.com/shinybrar/vosfs?rev=v0.6.0" },
+    { name = "vosfs", git = "https://github.com/shinybrar/vosfs?rev=v0.6.0" },
 ]
-provides-extras = ["data"]
 
 [package.metadata.requires-dev]
 dev = [
