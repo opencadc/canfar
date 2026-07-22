@@ -105,6 +105,29 @@ def test_data_cat_delegates_without_active_server_banner(
     assert result.stdout == "upstream output\n"
 
 
+def test_data_long_listing_delegates_unchanged(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    """The documented ``ls -lh name:/path`` form reaches upstream unchanged."""
+    (tmp_path / "payload.txt").write_text("listed", encoding="utf-8")
+    monkeypatch.setattr(
+        data_cli,
+        "Configuration",
+        partial(_configuration, "canSRC"),
+    )
+    monkeypatch.setattr(
+        data_cli,
+        "_vospace_source",
+        lambda _name: data_cli._local_source,  # noqa: SLF001
+    )
+
+    result = runner.invoke(cli, ["data", "ls", "-lh", f"canSRC:{tmp_path}"])
+
+    assert result.exit_code == 0, result.output
+    assert "payload.txt" in result.stdout
+
+
 def test_data_recursive_copy_delegates_to_released_contract(
     monkeypatch,
     tmp_path: Path,
@@ -114,11 +137,20 @@ def test_data_recursive_copy_delegates_to_released_contract(
     source.mkdir()
     (source / "payload.txt").write_text("copied", encoding="utf-8")
     destination = tmp_path / "destination"
-    monkeypatch.setattr(data_cli, "Configuration", _configuration)
+    monkeypatch.setattr(
+        data_cli,
+        "Configuration",
+        partial(_configuration, "canSRC"),
+    )
+    monkeypatch.setattr(
+        data_cli,
+        "_vospace_source",
+        lambda _name: data_cli._local_source,  # noqa: SLF001
+    )
 
     result = runner.invoke(
         cli,
-        ["data", "cp", "-R", f"local:{source}", f"local:{destination}"],
+        ["data", "cp", "-R", f"local:{source}", f"canSRC:{destination}"],
     )
 
     assert result.exit_code == 0, result.output
@@ -170,6 +202,8 @@ def test_data_deprecated_operand_grammar_is_unsupported(
 
 def test_importing_data_module_does_not_load_configuration() -> None:
     """Registering the command performs no configuration filesystem I/O."""
+    package = sys.modules["canfar.cli"]
+    original_attribute = package.data
     original = sys.modules.pop("canfar.cli.data")
     try:
         with patch(
@@ -179,3 +213,4 @@ def test_importing_data_module_does_not_load_configuration() -> None:
             importlib.import_module("canfar.cli.data")
     finally:
         sys.modules["canfar.cli.data"] = original
+        package.data = original_attribute
