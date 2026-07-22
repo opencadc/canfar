@@ -391,7 +391,7 @@ class TestServerDiscovery:
         self,
         tmp_path: Path,
     ) -> None:
-        """Rediscovery updates only the generated Server Name storage entry."""
+        """Rediscovery updates only the generated Storage Name entry."""
         manual = VOSpaceService(
             uri="ivo://cadc.nrc.ca/custom",
             url="https://manual.example/custom",
@@ -472,7 +472,9 @@ class TestServerDiscovery:
         )
 
     @pytest.mark.parametrize("mode", ["missing", "malformed", "unreachable"])
-    def test_storage_inspection_fail_or_keep_outcomes(self, mode: str) -> None:
+    def test_storage_inspection_fail_or_keep_outcomes(
+        self, mode: str, tmp_path: Path
+    ) -> None:
         """Storage failures are kept non-strict and actionable when strict."""
         storage_resource = (
             None
@@ -492,27 +494,35 @@ class TestServerDiscovery:
 
         server = _cadc_server()
         transport = httpx.MockTransport(response)
-        with patch("canfar.client.Client", side_effect=_http_client_factory(transport)):
-            assert (
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config()
+            with patch(
+                "canfar.client.Client", side_effect=_http_client_factory(transport)
+            ):
+                assert (
+                    enrich(
+                        server,
+                        config=config,
+                        storage_resource=storage_resource,
+                        strict=False,
+                    )
+                    == server
+                )
+
+            with (
+                patch(
+                    "canfar.client.Client",
+                    side_effect=_http_client_factory(transport),
+                ),
+                pytest.raises(ServerFetchError, match="VOSpace Service") as exc_info,
+            ):
                 enrich(
                     server,
-                    config=_anonymous_config(),
+                    config=config,
                     storage_resource=storage_resource,
-                    strict=False,
+                    strict=True,
                 )
-                == server
-            )
-
-        with (
-            patch("canfar.client.Client", side_effect=_http_client_factory(transport)),
-            pytest.raises(ServerFetchError, match="VOSpace Service") as exc_info,
-        ):
-            enrich(
-                server,
-                config=_anonymous_config(),
-                storage_resource=storage_resource,
-                strict=True,
-            )
 
         if mode == "malformed":
             assert isinstance(exc_info.value.__cause__, ValueError)
