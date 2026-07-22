@@ -527,6 +527,58 @@ class TestServerDiscovery:
         if mode == "malformed":
             assert isinstance(exc_info.value.__cause__, ValueError)
 
+    def test_activation_surfaces_storage_failure_retained_by_discovery(self) -> None:
+        """Real non-strict discovery carries its storage error into activation."""
+        endpoint = DiscoveredServer(
+            registry="CADC source",
+            uri=_CADC_URI,
+            url=_CADC_URL,
+            status=200,
+            name="CADC-CANFAR",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://ws-uv.canfar.net/skaha/v1</accessURL>
+                  <securityMethod
+                    standardID="ivo://ivoa.net/sso#tls-with-certificate" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+        transport = httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                text=session_capabilities,
+                request=request,
+            )
+        )
+        config = _anonymous_config()
+
+        with (
+            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(transport),
+            ),
+        ):
+            [discovered] = discover("cadc", config=config, save=False)
+            with pytest.raises(
+                ServerFetchError,
+                match="same-namespace 'arc' registry record",
+            ):
+                activate("cadc", _CADC_URI, config=config)
+
+        assert discovered.version == "v1"
+        assert discovered.storage == {}
+
     @pytest.mark.asyncio
     async def test_srcnet_pairs_each_server_with_same_namespace_cavern(self) -> None:
         """SRCNet Cavern records pair by IVOA namespace, not list position."""
@@ -546,12 +598,12 @@ class TestServerDiscovery:
                 name="sweSRC",
             ),
             DiscoveredServer(
-                registry="SRCNet",
+                registry="SRCNet mirror B",
                 uri="ivo://swesrc.chalmers.se/cavern",
                 url="https://storage.example/two",
             ),
             DiscoveredServer(
-                registry="SRCNet",
+                registry="SRCNet mirror A",
                 uri="ivo://canfar.net/src/cavern",
                 url="https://storage.example/one",
             ),
