@@ -90,17 +90,16 @@ for node in ["canSRC", "sweSRC"]:
     await session.create(image="skaha/base-notebook:latest", cmd="env")
 ```
 
-== Next: storage, same front door
+== Data, same front door
 
-Coming in #link("https://github.com/opencadc/canfar/pull/83")[#raw("#83")] — file management over VOSpace, no second login:
+File management over named VOSpace Services, using the parent server's saved Authentication Record:
 
 ```bash
-canfar server use sweSRC
-canfar storage ls
-canfar storage mv /data/filename @canSRC:/data/ # Syntax TBD
+canfar data ls -lh canSRC:/
+canfar data cp local:/absolute/path/filename canSRC:/data/filename
 ```
 
-- Familiar verbs: `ls` · `cp` · `mkdir` · `mv` · `rm`
-- Reuses your active identity — *no extra auth*
+- Cross-source movement is explicit `cp`, verify, then separate `rm`
+- Uses the named Storage Service's parent-server IDP, even when that server is inactive
 
 #align(center)[_Your files, your compute, your platform — one door, one login._]

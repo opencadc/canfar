@@ -259,6 +259,7 @@ nav:
               - Helpers: client/helpers.md
       - CLI:
           - 5-Minute Tutorial: cli/quick-start.md
+          - Data Commands: cli/data.md
           - Authentication and Servers: cli/authentication-contexts.md
           - Logging: cli/logging.md
           - Reference: cli/cli-help.md
