@@ -8,12 +8,6 @@ Create a notebook Session from a terminal, open it, inspect it, and clean it up.
 pip install canfar --upgrade
 ```
 
-Install the pinned optional storage dependencies when you need data support:
-
-```bash
-pip install "canfar[data]" --upgrade
-```
-
 ## 2. Log in
 
 ```bash
