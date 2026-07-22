@@ -1,5 +1,48 @@
 # Changelog
 
+## [1.5.0](https://github.com/opencadc/canfar/compare/v1.4.1...v1.5.0) (2026-07-22)
+
+
+### Features
+
+* **client:** log HTTP URL and status at debug level ([1bda687](https://github.com/opencadc/canfar/commit/1bda687c3580c02667605913dcf00c93ce434759))
+* **client:** log HTTP URL and status at debug level ([2168d34](https://github.com/opencadc/canfar/commit/2168d34a175d3b6b8db4c3d5d16575e4417403f1))
+* **cli:** make create a domain request adapter ([#194](https://github.com/opencadc/canfar/issues/194)) ([3595f5c](https://github.com/opencadc/canfar/commit/3595f5cd72f4bb9e343c9d479dc3a328c258f8e1))
+* **logging:** add opt-in OTLP export ([#191](https://github.com/opencadc/canfar/issues/191)) ([6ae2025](https://github.com/opencadc/canfar/commit/6ae202546bb016237c521cbf8abd46cf616fef17))
+* **logging:** add rotating JSONL file sink ([#192](https://github.com/opencadc/canfar/issues/192)) ([7a5bca7](https://github.com/opencadc/canfar/commit/7a5bca78729fc26863b78aab5a8a5971fd52caf9))
+* **logging:** add secret-safe HTTPX tracing ([#188](https://github.com/opencadc/canfar/issues/188)) ([08df4f1](https://github.com/opencadc/canfar/commit/08df4f1f1986b229b73f3e413a4944639e8690e7))
+* **maintainability:** integrate platform session and logging contracts ([#156](https://github.com/opencadc/canfar/issues/156)) ([81da64c](https://github.com/opencadc/canfar/commit/81da64c02212e45dfc9f9ba165ce8e10e7b60397))
+* **maintainability:** systematic improvements ([5d8e2e6](https://github.com/opencadc/canfar/commit/5d8e2e663f9cb97da15cadd833f55a627e8f92a7))
+
+
+### Bug Fixes
+
+* **auth:** accept omitted device refresh tokens ([#180](https://github.com/opencadc/canfar/issues/180)) ([247600a](https://github.com/opencadc/canfar/commit/247600a143bdeb86c515a4bf453869d72883377a))
+* **auth:** increase login timeout default to 10 seconds ([#156](https://github.com/opencadc/canfar/issues/156)) ([6b637a1](https://github.com/opencadc/canfar/commit/6b637a1eff43bcc75ffef117e8493023cb65b6e3))
+* **auth:** wrap config save OSError during OIDC refresh ([80ee986](https://github.com/opencadc/canfar/commit/80ee986df42da751963b0cf8c4de557d661d3e3a))
+* **ci:** resolve CodeQL and github-code-quality findings ([cadb28e](https://github.com/opencadc/canfar/commit/cadb28e40fbd62ae9b541eb96331bdd4058736a7))
+* **ci:** stabilize CLI and discovery tests under CI terminals ([649e331](https://github.com/opencadc/canfar/commit/649e331b3f59f4f905c77b95daa1b4c8f419848f))
+* **cli:** await poll task not progress for device timeout ([4e31d17](https://github.com/opencadc/canfar/commit/4e31d17d7b1915a7eb768d0e9fa90240d070a10b))
+* **cli:** derive banner mode from parsed options ([6b4d77a](https://github.com/opencadc/canfar/commit/6b4d77ac7c65a7ee242f2adddfcf55107fa442ee))
+* **client:** clarify missing-URL server error message ([4f88441](https://github.com/opencadc/canfar/commit/4f884417ad2644861611844feae70c5e0edf791d))
+* **cli:** make server banner configurable ([417acc2](https://github.com/opencadc/canfar/commit/417acc22cf589181dd7cb459d3df501d52f1e0b2))
+* **cli:** preserve banner semantics for passthrough args ([769a110](https://github.com/opencadc/canfar/commit/769a110e91f18b7530d99ef7a41997594bf62763))
+* **config:** persist configuration atomically ([#166](https://github.com/opencadc/canfar/issues/166)) ([f1d8cc7](https://github.com/opencadc/canfar/commit/f1d8cc732c168e150b3b581e8ce6b2810091bf4e))
+* **config:** validate before atomic persistence ([#166](https://github.com/opencadc/canfar/issues/166)) ([666544f](https://github.com/opencadc/canfar/commit/666544f2648596d68124e72ce55ee8d3c3317ddd))
+* **sessions:** align destroy_with sync/async keyword-only parity ([4a47e30](https://github.com/opencadc/canfar/commit/4a47e303cd7ece2fd7fba5b93b3f488f6e80f5fc))
+
+
+### Documentation
+
+* **agents:** drop stale display and auth-context wording ([1f3a286](https://github.com/opencadc/canfar/commit/1f3a286f672c49641eb92e119700b2b34e28cdb4))
+* **agents:** drop stale selection and Logfire architecture claims ([3a8092b](https://github.com/opencadc/canfar/commit/3a8092be8fdffaaace947be6b6021322a345581a))
+* **cli:** document create machine output ([#194](https://github.com/opencadc/canfar/issues/194)) ([01dd94f](https://github.com/opencadc/canfar/commit/01dd94f2f926880ed4bd806cadb45bd50929ef61))
+* **cli:** quote prune regex examples for shell safety ([a2ccfee](https://github.com/opencadc/canfar/commit/a2ccfee84b5d7161f491113b78c76ed1d53efebd))
+* **demo:** added typst demo ([f6609e2](https://github.com/opencadc/canfar/commit/f6609e23acda7159f18f83ee6ed156b71c67870f))
+* **logging:** publish canonical observability policy ([#193](https://github.com/opencadc/canfar/issues/193)) ([f69f2a0](https://github.com/opencadc/canfar/commit/f69f2a0e0de98ecaa73d76a33a9e1259f586244a))
+* **maintainability:** record audit and Authlib research ([#156](https://github.com/opencadc/canfar/issues/156)) ([3b2691f](https://github.com/opencadc/canfar/commit/3b2691fdd613e1ceda4a985f8a22b1184bb2732e))
+* **readme:** modify canfar open to use json + jq ([#128](https://github.com/opencadc/canfar/issues/128)) ([ac2c3de](https://github.com/opencadc/canfar/commit/ac2c3deb58d0500827b8968a0fd536954d52a0fe))
+
 ## [1.4.1](https://github.com/opencadc/canfar/compare/v1.4.0...v1.4.1) (2026-06-11)
 
 
