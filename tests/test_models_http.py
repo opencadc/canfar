@@ -3,7 +3,49 @@
 import pytest
 from pydantic import ValidationError
 
-from canfar.models.http import Server
+from canfar.models.http import Server, VOSpaceService
+
+
+class TestVOSpaceService:
+    """Test VOSpace Service configuration."""
+
+    def test_serializes_registry_uri_and_http_endpoint(self) -> None:
+        """A VOSpace Service carries only its registry URI and base URL."""
+        service = VOSpaceService(
+            uri="ivo://cadc.nrc.ca/arc",
+            url="https://ws-cadc.canfar.net/arc",
+        )
+
+        assert service.model_dump(mode="json") == {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {"uri": "not-a-url", "url": "https://ws-cadc.canfar.net/arc"},
+            {"uri": "ivo://cadc.nrc.ca/arc", "url": "vos://example.com/arc"},
+            {"url": "https://ws-cadc.canfar.net/arc"},
+            {"uri": "ivo://cadc.nrc.ca/arc"},
+        ],
+    )
+    def test_requires_valid_registry_uri_and_http_endpoint(self, payload: dict) -> None:
+        """Both VOSpace Service identifiers are required and validated."""
+        with pytest.raises(ValidationError):
+            VOSpaceService.model_validate(payload)
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "https://ws-cadc.canfar.net/arc/capabilities",
+            "https://ws-cadc.canfar.net/arc/capabilities/",
+        ],
+    )
+    def test_rejects_capabilities_endpoint_as_base_url(self, url: str) -> None:
+        """A VOSpace Service URL names the base service, not capabilities."""
+        with pytest.raises(ValidationError, match="must not end with /capabilities"):
+            VOSpaceService(uri="ivo://cadc.nrc.ca/arc", url=url)
 
 
 class TestServer:
@@ -33,6 +75,7 @@ class TestServer:
         assert server.url is None
         assert server.version is None
         assert server.status is None
+        assert server.storage == {}
 
     def test_with_all_values(self) -> None:
         """Test Server with all custom values."""

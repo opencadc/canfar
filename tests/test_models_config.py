@@ -20,7 +20,7 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.config import Configuration, _CanfarEnvSettingsSource
-from canfar.models.http import Server
+from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import ContainerRegistry
 
 
@@ -136,6 +136,84 @@ class TestConfigurationValidation:
                     ),
                 },
             )
+
+    @pytest.mark.parametrize(
+        "storage_name",
+        [
+            "",
+            "local",
+            " local ",
+            "archive:old",
+            "archive\x00old",
+            "archive\nold",
+            "-archive",
+        ],
+    )
+    def test_invalid_storage_name_rejected(
+        self, storage_name: str, tmp_path: Path
+    ) -> None:
+        """Invalid Storage Names fail with the rejected name and constraints."""
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            pytest.raises(ValidationError, match="Invalid Storage Name") as exc_info,
+        ):
+            Configuration.model_validate(
+                {
+                    "servers": {
+                        "canfar": {
+                            "storage": {
+                                storage_name: {
+                                    "uri": "ivo://cadc.nrc.ca/arc",
+                                    "url": "https://ws-cadc.canfar.net/arc",
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+
+        assert repr(storage_name) in str(exc_info.value)
+
+    def test_duplicate_storage_name_across_servers_rejected(
+        self, tmp_path: Path
+    ) -> None:
+        """A Storage Name identifies one service across Science Platform Servers."""
+        service = VOSpaceService(
+            uri="ivo://cadc.nrc.ca/arc",
+            url="https://ws-cadc.canfar.net/arc",
+        )
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            pytest.raises(
+                ValidationError,
+                match=(
+                    "Duplicate Storage Name 'shared' in Science Platform Servers "
+                    "'canfar' and 'srcnet'"
+                ),
+            ),
+        ):
+            Configuration.model_validate(
+                {
+                    "servers": {
+                        "canfar": Server(storage={"shared": service}),
+                        "srcnet": Server(storage={"shared": service}),
+                    }
+                }
+            )
+
+    def test_normalized_storage_name_collision_rejected(self) -> None:
+        """Whitespace normalization cannot silently replace a VOSpace Service."""
+        service = {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        with pytest.raises(
+            ValidationError,
+            match="Storage Names 'arc' and ' arc ' both normalize to 'arc'",
+        ):
+            Server(storage={"arc": service, " arc ": service})
 
     def test_valid_active_references(self) -> None:
         """Validation passes when active authentication and server exist."""
@@ -315,6 +393,58 @@ class TestConfigurationSerialization:
         assert loaded_oidc.token.scope == "openid profile email"
         assert loaded_oidc.expiry.access == 1893456000
         assert loaded_oidc.expiry.refresh is None
+
+    def test_v1_storage_json_and_yaml_round_trip(self, tmp_path: Path) -> None:
+        """Multiple VOSpace Services retain stable nested Storage Names."""
+        config = Configuration.model_validate(
+            _sample_config(
+                servers={
+                    "canfar": {
+                        **_sample_config()["servers"]["canfar"],
+                        "storage": {
+                            "canSRC": {
+                                "uri": "ivo://cadc.nrc.ca/arc",
+                                "url": "https://ws-cadc.canfar.net/arc",
+                            },
+                            "canSRCs3": {
+                                "uri": "ivo://cadc.nrc.ca/arc-s3",
+                                "url": "https://ws-cadc.canfar.net/arc-s3",
+                            },
+                        },
+                    }
+                }
+            )
+        )
+
+        json_data = config.model_dump(mode="json")
+        assert list(json_data["servers"]["canfar"]["storage"]) == [
+            "canSRC",
+            "canSRCs3",
+        ]
+        assert "name" not in json_data["servers"]["canfar"]["storage"]["canSRC"]
+        assert Configuration.model_validate_json(config.model_dump_json()) == config
+
+        config_path = tmp_path / "config.yaml"
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config.save()
+            loaded = Configuration()
+
+        assert list(loaded.servers["canfar"].storage) == ["canSRC", "canSRCs3"]
+        assert loaded.servers["canfar"].idp == "cadc"
+        assert loaded == config
+
+    def test_existing_v1_configuration_without_storage_loads_unchanged(
+        self, tmp_path: Path
+    ) -> None:
+        """The optional storage mapping does not require a schema migration."""
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(yaml.safe_dump(_sample_config()), encoding="utf-8")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        assert config.version == 1
+        assert config.servers["canfar"].storage == {}
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""

@@ -179,9 +179,10 @@ class Configuration(BaseSettings):
         )
 
     @model_validator(mode="after")
-    def _inject_server_names(self) -> Configuration:
-        """Inject dict keys into each server record and validate Server Names."""
+    def _normalize_and_validate_servers(self) -> Configuration:
+        """Inject Server Names and validate Server and Storage Name keys."""
         updated: dict[str, Server] = {}
+        server_name_by_storage_name: dict[str, str] = {}
         for name, server in self.servers.items():
             if not _SERVER_NAME_PATTERN.match(name):
                 msg = (
@@ -189,6 +190,16 @@ class Configuration(BaseSettings):
                     r"^[A-Za-z][A-Za-z0-9_-]*$"
                 )
                 raise ValueError(msg)
+            for storage_name in server.storage:
+                if previous_server_name := server_name_by_storage_name.get(
+                    storage_name
+                ):
+                    msg = (
+                        f"Duplicate Storage Name '{storage_name}' in Science Platform "
+                        f"Servers '{previous_server_name}' and '{name}'."
+                    )
+                    raise ValueError(msg)
+                server_name_by_storage_name[storage_name] = name
             updated[name] = server.model_copy(update={"name": name}, deep=True)
         self.servers = updated
         return self
