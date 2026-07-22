@@ -340,6 +340,21 @@ class Configuration(BaseSettings):
             raise KeyError(msg)
         return self.servers[name]
 
+    def _resolve_storage(self, storage_name: str) -> tuple[str, str]:
+        """Resolve a Storage Name to its endpoint and parent server IDP."""
+        for server in self.servers.values():
+            service = server.storage.get(storage_name)
+            if service is not None:
+                if server.idp is None:
+                    msg = (
+                        f"Storage Name '{storage_name}' belongs to a Science Platform "
+                        "Server without an IDP."
+                    )
+                    raise ValueError(msg)
+                return str(service.url), server.idp
+        msg = f"Storage Name '{storage_name}' is not configured."
+        raise KeyError(msg)
+
     def upsert_credential(self, credential: AuthenticationCredential) -> None:
         """Insert or replace a validated Authentication Record.
 

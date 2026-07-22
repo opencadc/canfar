@@ -20,7 +20,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
 from canfar import __version__, get_logger
-from canfar.auth import x509
+from canfar.auth import oidc, x509
 from canfar.exceptions.context import AuthContextError
 from canfar.hooks.httpx import auth, debug, errors, expiry
 from canfar.models.auth import (
@@ -230,6 +230,41 @@ class HTTPClient(BaseSettings):
                 "OIDC Authentication Record cannot refresh tokens.",
             )
         return credential
+
+    async def _materialize_credentials(self) -> tuple[str | None, str | None]:
+        """Return one literal token or validated certificate path."""
+        if self.token is not None:
+            token = self.token.get_secret_value()
+            if token:
+                return token, None
+            raise ValueError
+        if self.certificate is not None:
+            return None, x509.valid(self.certificate)
+
+        credential = self.authentication_record
+        if isinstance(credential, X509Credential):
+            if credential.path is None:
+                raise ValueError
+            return None, str(x509.inspect(credential.path)["path"])
+        if not isinstance(credential, OIDCCredential):
+            raise TypeError
+
+        if credential.expired:
+            parameters = oidc._refresh_parameters(credential)  # noqa: SLF001
+            if parameters is None:
+                raise ValueError
+            refreshed = await oidc.refresh(*parameters)
+            credential = oidc._persist_refreshed_credential(  # noqa: SLF001
+                self.config,
+                credential,
+                refreshed,
+            )
+        if credential.token.access is None:
+            raise ValueError
+        token = credential.token.access.get_secret_value()
+        if not token:
+            raise ValueError
+        return token, None
 
     def _get_base_url(self) -> URL:
         """Get the base URL for the client.

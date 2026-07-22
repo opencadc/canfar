@@ -1,0 +1,74 @@
+"""Private adapters for configured VOSpace Services."""
+
+from __future__ import annotations
+
+from contextlib import asynccontextmanager
+from typing import TYPE_CHECKING
+
+from canfar.client import HTTPClient
+from canfar.exceptions.context import AuthContextError
+from canfar.models.config import Configuration
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+    from pathlib import Path
+    from typing import NoReturn
+
+    from fsspec.spec import AbstractFileSystem
+    from fsspec_cli import AsyncFilesystemSource
+    from pydantic import SecretStr
+
+
+def _vospace_source(
+    storage_name: str,
+    *,
+    token: str | SecretStr | None = None,
+    certificate: Path | None = None,
+) -> AsyncFilesystemSource:
+    """Return a fresh authenticated async filesystem source."""
+
+    @asynccontextmanager
+    async def source() -> AsyncIterator[AbstractFileSystem]:
+        config = Configuration()
+        endpoint, idp = config._resolve_storage(storage_name)  # noqa: SLF001
+        try:
+            client = HTTPClient(
+                config=config,
+                authentication_idp=idp,
+                url=endpoint,
+                token=token,
+                certificate=certificate,
+            )
+            token_value, certfile = await client._materialize_credentials()  # noqa: SLF001
+        except (KeyError, OSError, TypeError, ValueError):
+            _fail_authentication(idp)
+
+        from vosfs import VOSpaceFileSystem  # noqa: PLC0415
+
+        if token_value is not None:
+            filesystem = VOSpaceFileSystem(
+                endpoint,
+                token=token_value,
+                asynchronous=True,
+                skip_instance_cache=True,
+            )
+        else:
+            assert certfile is not None
+            filesystem = VOSpaceFileSystem(
+                endpoint,
+                certfile=certfile,
+                asynchronous=True,
+                skip_instance_cache=True,
+            )
+        try:
+            yield filesystem
+        finally:
+            await filesystem.aclose()
+
+    return source
+
+
+def _fail_authentication(idp: str) -> NoReturn:
+    """Raise the fixed secret-safe authentication failure."""
+    reason = "Credential cannot be used. Run 'canfar login' for this IDP."
+    raise AuthContextError(idp, reason) from None
