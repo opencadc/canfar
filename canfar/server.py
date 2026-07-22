@@ -433,7 +433,7 @@ async def _discover_for_idp(
             return []
 
         storage_by_namespace = {
-            (resource.registry, _registry_namespace(resource.uri)): resource
+            _registry_namespace(resource.uri): resource
             for resource in resources
             if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
         }
@@ -448,7 +448,7 @@ async def _discover_for_idp(
                 config=config,
                 timeout=timeout,
                 storage_resource=storage_by_namespace.get(
-                    (endpoint.registry, _registry_namespace(endpoint.uri))
+                    _registry_namespace(endpoint.uri)
                 ),
             )
             for endpoint in checked
@@ -525,9 +525,11 @@ def enrich(
             Authentication or Server Selection.
         authentication_idp: Optional Authentication Record selector. Defaults to
             the Server IDP, then the active Authentication.
-        strict: When ``False``, return the original server if capabilities
-            cannot be retrieved or parsed. Discovery uses non-strict mode so
-            one malformed endpoint does not abort listing for an IDP.
+        strict: When ``False``, keep usable registry and existing storage data
+            when session or storage capabilities cannot be retrieved or parsed.
+            Other successful enrichment may still be returned, so the result can
+            be partial. Discovery uses non-strict mode so one malformed endpoint
+            does not abort listing for an IDP.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
         storage_resource: Retained same-namespace VOSpace registry record. Passing
             ``None`` records that the preferred resource was absent; omitting the
@@ -542,6 +544,14 @@ def enrich(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = authentication_idp or server.idp or base_config.active.authentication
+    if (
+        strict
+        and storage_resource is _STORAGE_RESOURCE_UNSET
+        and server.name in base_config._storage_discovery_errors  # noqa: SLF001
+    ):
+        raise ServerFetchError(
+            base_config._storage_discovery_errors[server.name]  # noqa: SLF001
+        )
     if storage_resource is not _STORAGE_RESOURCE_UNSET:
         server = _enrich_storage(
             server,
@@ -607,7 +617,7 @@ def enrich(
         )
 
     try:
-        return Server.model_validate(
+        enriched = Server.model_validate(
             {
                 **server.model_dump(mode="python"),
                 "url": primary["baseurl"],
@@ -626,6 +636,8 @@ def enrich(
             ),
             args=(server.url, exc),
         )
+    else:
+        return enriched
 
 
 def _enrich_storage(
@@ -676,26 +688,32 @@ def _enrich_storage(
                 error = ValueError("Science Platform Server has no Server Name")
 
     if error is not None:
-        return _keep_or_raise(
+        message = (
+            f"Failed to inspect VOSpace Service '{subject}' for Science "
+            f"Platform Server '{server.name}': {error}"
+        )
+        kept = _keep_or_raise(
             server,
             strict=strict,
-            error=(
-                f"Failed to inspect VOSpace Service '{subject}' for Science "
-                f"Platform Server '{server.name}': {error}"
-            ),
+            error=message,
             cause=error,
             debug="Skipping VOSpace Service %s during discovery: %s",
             args=(subject, error),
         )
+        if server.name is not None:
+            config._storage_discovery_errors[server.name] = message  # noqa: SLF001
+        return kept
 
     assert storage_resource is not None
     assert server.name is not None
     service = VOSpaceService(uri=storage_resource.uri, url=storage_resource.url)
 
-    return server.model_copy(
+    enriched = server.model_copy(
         update={"storage": {**server.storage, server.name: service}},
         deep=True,
     )
+    config._storage_discovery_errors.pop(server.name, None)  # noqa: SLF001
+    return enriched
 
 
 def _fetch_capabilities(

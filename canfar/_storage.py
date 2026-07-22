@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from contextlib import asynccontextmanager
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthContextError
@@ -32,12 +32,17 @@ def _vospace_source(
         config = Configuration()
         endpoint, idp = config._resolve_storage(storage_name)  # noqa: SLF001
         try:
+            client_kwargs: dict[str, Any] = {
+                "config": config,
+                "authentication_idp": idp,
+                "url": endpoint,
+            }
+            if token is not None:
+                client_kwargs["token"] = token
+            if certificate is not None:
+                client_kwargs["certificate"] = certificate
             client = HTTPClient(
-                config=config,
-                authentication_idp=idp,
-                url=endpoint,
-                token=token,
-                certificate=certificate,
+                **client_kwargs,
             )
             token_value, certfile = await client._materialize_credentials()  # noqa: SLF001
         except (KeyError, OSError, TypeError, ValueError):
