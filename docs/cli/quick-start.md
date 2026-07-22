@@ -27,7 +27,26 @@ canfar auth show
 canfar server ls
 ```
 
-## 3. Create a notebook
+## 3. Work with data
+
+The standard installation includes data commands. Use a configured Storage Name
+or the reserved `local` name with an absolute path:
+
+```bash
+canfar data ls -lh canSRC:/
+canfar data cp local:/absolute/path/file.fits canSRC:/folder/file.fits
+```
+
+Cross-source `mv` is unsupported. Copy the file, verify the destination, and
+then remove the source with a separate command:
+
+```bash
+canfar data cp canSRC:/folder/file.fits other:/folder/file.fits
+canfar data ls -lh other:/folder/file.fits
+canfar data rm canSRC:/folder/file.fits
+```
+
+## 4. Create a notebook
 
 ```bash
 canfar create notebook skaha/astroml:latest
@@ -40,7 +59,7 @@ registry. Use the full image name when you want to be explicit:
 canfar create notebook images.canfar.net/skaha/astroml:latest
 ```
 
-## 4. Check status
+## 5. Check status
 
 ```bash
 canfar ps
@@ -53,7 +72,7 @@ Use machine output in scripts:
 canfar ps --json
 ```
 
-## 5. Open the notebook
+## 6. Open the notebook
 
 ```bash
 canfar open $(canfar ps -q)
@@ -61,14 +80,14 @@ canfar open $(canfar ps -q)
 
 Notebook Sessions usually take 60-120 seconds to become reachable.
 
-## 6. Inspect startup events
+## 7. Inspect startup events
 
 ```bash
 canfar events $(canfar ps -q)
 canfar logs $(canfar ps -q)
 ```
 
-## 7. Clean up
+## 8. Clean up
 
 ```bash
 canfar delete $(canfar ps -q)
