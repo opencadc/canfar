@@ -13,7 +13,7 @@ canfar login cadc
 ```
 
 CANFAR installs the audited upstream releases as normal dependencies through
-immutable Git references:
+tagged Git references:
 
 - `vosfs @ git+https://github.com/shinybrar/vosfs@v0.6.0`
 - `fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.5.0#subdirectory=src/fsspec-cli`
@@ -84,8 +84,8 @@ Recursive removal is disabled by application policy. `rm -R` exits with status
 rm: recursive removal disabled by application
 ```
 
-Because directory removal is disabled, directory movement is not a supported
-workflow in this release. Any future one-command relocation would be a
+Because recursive directory removal is disabled, directory movement is not a
+supported workflow in this release. Any future one-command relocation would be a
 separately named, opt-in orchestration feature with stronger destination
 verification and residual-state semantics—not portable `mv`.
 
