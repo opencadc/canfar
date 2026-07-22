@@ -184,6 +184,18 @@ canfar stats
 Use `canfar image --help` and `canfar stats --help` for command-specific
 options.
 
+## Data
+
+```bash
+canfar data ls -lh canfar:/
+canfar data cp local:/absolute/path/file.fits canfar:/folder/file.fits
+```
+
+Data operands use explicit `Storage-Name:/absolute/path` or
+`local:/absolute/path` syntax. See [Data commands](data.md) for recursive copy,
+cross-source copy and verification, recursive-removal policy, and the exact
+supported boundary.
+
 ## Client configuration
 
 ```bash
