@@ -25,6 +25,8 @@ class IVOARegistrySearch(BaseModel):
         }
     )
 
+    preferred_storage_leaf: str | None = None
+
     names: dict[str, str] = Field(
         default={
             "ivo://canfar.net/src/skaha": "canSRC",
@@ -67,6 +69,8 @@ class IVOARegistry(BaseModel):
 
     name: str
     content: str
+    source: str | None = None
+    development: bool = False
     success: bool = True
     error: str | None = None
 
@@ -75,6 +79,7 @@ class Server(BaseModel):
     """Model to store Canfar Server endpoint information."""
 
     registry: str
+    development: bool = False
     uri: str
     url: str
     status: int | None = None

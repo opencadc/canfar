@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -10,6 +11,7 @@ import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from pydantic import AnyHttpUrl, SecretStr
 
+from canfar.auth.x509 import CertificateError
 from canfar.cli.login_auth import _interactive_device_flow, authenticate_for_cli
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import DeviceAuthorization, OIDCCredential, X509Credential
@@ -122,18 +124,66 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     assert credential.expiry.refresh is None
 
 
-def test_authenticate_for_cli_builds_x509_record_from_gather(tmp_path) -> None:
-    """CLI X.509 acquisition maps gathered certificate data without legacy state."""
+def test_authenticate_for_cli_reuses_valid_x509_certificate(tmp_path) -> None:
+    """CLI login reuses a valid certificate from the default Authentication Record."""
     certificate = tmp_path / "cadcproxy.pem"
-    gathered = {"path": str(certificate), "expiry": 1893456000.0}
+    inspected = {"path": str(certificate), "expiry": 1893456000.0}
 
-    with patch("canfar.auth.x509.gather", return_value=gathered) as gather:
+    with (
+        patch("canfar.auth.x509.inspect", return_value=inspected) as inspect,
+        patch("canfar.auth.x509.gather") as gather,
+    ):
         result = authenticate_for_cli(get_idp("cadc"))
 
     assert isinstance(result, X509Credential)
     assert result.idp == "cadc"
     assert result.path == certificate
     assert result.expiry == 1893456000.0
+    inspect.assert_called_once_with()
+    gather.assert_not_called()
+
+
+def test_authenticate_for_cli_reports_expired_x509_before_renewal(tmp_path) -> None:
+    """CLI login explains how long ago the default certificate expired."""
+    certificate = tmp_path / "cadcproxy.pem"
+    expired_at = datetime.now(timezone.utc) - timedelta(minutes=10)
+    renewed = {"path": str(certificate), "expiry": 1893456000.0}
+    console = MagicMock()
+
+    with (
+        patch(
+            "canfar.auth.x509.inspect",
+            side_effect=CertificateError("expired", expired_at=expired_at),
+        ),
+        patch("canfar.auth.x509.gather", return_value=renewed) as gather,
+        patch(
+            "canfar.cli.login_auth.humanize.naturaltime",
+            return_value="10 minutes ago",
+        ),
+        patch("canfar.cli.login_auth.console_utils.get_console", return_value=console),
+    ):
+        result = authenticate_for_cli(get_idp("cadc"))
+
+    assert result.path == certificate
+    gather.assert_called_once_with()
+    console.print.assert_called_once_with(
+        "[yellow]x509 certificate expired 10 minutes ago[/yellow]"
+    )
+
+
+def test_authenticate_for_cli_force_renews_x509_certificate(tmp_path) -> None:
+    """Forced CLI login obtains a new certificate without inspecting the old one."""
+    certificate = tmp_path / "cadcproxy.pem"
+    gathered = {"path": str(certificate), "expiry": 1893456000.0}
+
+    with (
+        patch("canfar.auth.x509.inspect") as inspect,
+        patch("canfar.auth.x509.gather", return_value=gathered) as gather,
+    ):
+        result = authenticate_for_cli(get_idp("cadc"), force=True)
+
+    assert result.path == certificate
+    inspect.assert_not_called()
     gather.assert_called_once_with()
 
 
@@ -149,7 +199,7 @@ def test_authenticate_for_cli_normalizes_x509_gather_failure() -> None:
             match=r"^Failed to authenticate with X509 certificate:",
         ),
     ):
-        authenticate_for_cli(get_idp("cadc"))
+        authenticate_for_cli(get_idp("cadc"), force=True)
 
 
 def test_authenticate_for_cli_normalizes_malformed_x509_gather_result() -> None:
@@ -161,7 +211,7 @@ def test_authenticate_for_cli_normalizes_malformed_x509_gather_result() -> None:
             match=r"^Failed to authenticate with X509 certificate:",
         ),
     ):
-        authenticate_for_cli(get_idp("cadc"))
+        authenticate_for_cli(get_idp("cadc"), force=True)
 
 
 def test_authenticate_for_cli_oidc_requires_discovery_url() -> None:

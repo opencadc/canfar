@@ -179,9 +179,10 @@ class Configuration(BaseSettings):
         )
 
     @model_validator(mode="after")
-    def _inject_server_names(self) -> Configuration:
-        """Inject dict keys into each server record and validate Server Names."""
+    def _normalize_and_validate_servers(self) -> Configuration:
+        """Inject Server Names and validate Server and Storage Name keys."""
         updated: dict[str, Server] = {}
+        server_name_by_storage_name: dict[str, str] = {}
         for name, server in self.servers.items():
             if not _SERVER_NAME_PATTERN.match(name):
                 msg = (
@@ -189,6 +190,16 @@ class Configuration(BaseSettings):
                     r"^[A-Za-z][A-Za-z0-9_-]*$"
                 )
                 raise ValueError(msg)
+            for storage_name in server.storage:
+                if previous_server_name := server_name_by_storage_name.get(
+                    storage_name
+                ):
+                    msg = (
+                        f"Duplicate Storage Name '{storage_name}' in Science Platform "
+                        f"Servers '{previous_server_name}' and '{name}'."
+                    )
+                    raise ValueError(msg)
+                server_name_by_storage_name[storage_name] = name
             updated[name] = server.model_copy(update={"name": name}, deep=True)
         self.servers = updated
         return self
@@ -328,6 +339,21 @@ class Configuration(BaseSettings):
             msg = f"Server '{name}' not found."
             raise KeyError(msg)
         return self.servers[name]
+
+    def _resolve_storage(self, storage_name: str) -> tuple[str, str]:
+        """Resolve a Storage Name to its endpoint and parent server IDP."""
+        for server in self.servers.values():
+            service = server.storage.get(storage_name)
+            if service is not None:
+                if server.idp is None:
+                    msg = (
+                        f"Storage Name '{storage_name}' belongs to a Science Platform "
+                        "Server without an IDP."
+                    )
+                    raise ValueError(msg)
+                return str(service.url), server.idp
+        msg = f"Storage Name '{storage_name}' is not configured."
+        raise KeyError(msg)
 
     def upsert_credential(self, credential: AuthenticationCredential) -> None:
         """Insert or replace a validated Authentication Record.

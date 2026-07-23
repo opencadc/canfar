@@ -149,6 +149,7 @@ def test_server_ls_json_output(tmp_path: Path) -> None:
         "version",
         "auths",
         "idp",
+        "storage",
         "cores",
         "ram",
         "gpus",

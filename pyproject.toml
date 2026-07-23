@@ -5,6 +5,9 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel.force-include]
 "canfar/utils/data/scientists.txt" = "canfar/utils/data/scientists.txt"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [project]
 name = "canfar"
 version = "1.4.1"
@@ -56,6 +59,8 @@ dependencies = [
     "rich>=13.9.4",
     "segno>=1.6.6",
     "typer>=0.16.0",
+    "vosfs @ git+https://github.com/shinybrar/vosfs@v0.6.0",
+    "fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.5.0#subdirectory=src/fsspec-cli",
 ]
 
 [tool.uv]
@@ -227,6 +232,9 @@ docstring-code-line-length = "dynamic"
 
 # ty configuration (replaces mypy)
 [tool.ty]
+
+[tool.ty.rules]
+unused-ignore-comment = "ignore"
 
 [tool.ty.environment]
 python-version = "3.10"

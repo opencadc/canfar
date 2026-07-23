@@ -25,6 +25,16 @@ log = get_logger(__name__)
 class CertificateError(ValueError):
     """Raised when an X.509 certificate cannot be used."""
 
+    def __init__(
+        self,
+        message: str,
+        *,
+        expired_at: datetime | None = None,
+    ) -> None:
+        """Initialize a certificate error with optional structured expiry."""
+        super().__init__(message)
+        self.expired_at = expired_at
+
 
 def _to_utc(value: datetime) -> datetime:
     """Return timezone aware datetime.
@@ -88,7 +98,7 @@ def assert_valid_dates(
             f"Certificate {destination} expired on {valid_until.isoformat()}; "
             f"current time {now_utc.isoformat()}."
         )
-        raise CertificateError(msg)
+        raise CertificateError(msg, expired_at=valid_until)
 
 
 def gather(

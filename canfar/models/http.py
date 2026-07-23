@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field
+from typing import Annotated, Any
+
+from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field, field_validator
 
 DEFAULT_SERVER_CORES = 2
 """Default CPU core limit when context enrichment is unavailable."""
@@ -14,6 +16,24 @@ DEFAULT_SERVER_GPUS = 0
 """Default GPU count when context enrichment is unavailable."""
 
 
+class VOSpaceService(BaseModel):
+    """VOSpace Service discovered through an IVOA registry."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    uri: AnyUrl
+    url: AnyHttpUrl
+
+    @field_validator("url")
+    @classmethod
+    def _reject_capabilities_endpoint(cls, url: AnyHttpUrl) -> AnyHttpUrl:
+        """Require the VOSpace base endpoint rather than its capabilities URL."""
+        if (url.path or "").rstrip("/").endswith("/capabilities"):
+            msg = "VOSpace Service base URL must not end with /capabilities."
+            raise ValueError(msg)
+        return url
+
+
 class Server(BaseModel):
     """Science Platform Server Details."""
 
@@ -22,7 +42,6 @@ class Server(BaseModel):
         extra="forbid",
         json_schema_mode_override="serialization",
         str_strip_whitespace=True,
-        str_max_length=256,
         str_min_length=1,
     )
 
@@ -59,7 +78,7 @@ class Server(BaseModel):
         min_length=2,
         max_length=8,
     )
-    auths: list[str] | None = Field(
+    auths: list[Annotated[str, Field(max_length=256)]] | None = Field(
         default=None,
         title="Supported Auth Modes",
         description="Authentication modes supported by the Server",
@@ -72,6 +91,12 @@ class Server(BaseModel):
         min_length=1,
         max_length=64,
     )
+    storage: dict[str, VOSpaceService] = Field(
+        default_factory=dict,
+        title="VOSpace Services",
+        description="VOSpace Services keyed by globally unique Storage Name.",
+    )
+
     cores: int = Field(
         default=DEFAULT_SERVER_CORES,
         title="Default CPU Core Limit",
@@ -97,4 +122,39 @@ class Server(BaseModel):
             "Persisted compatibility field for discovery reachability status "
             "when known."
         ),
+        max_length=256,
     )
+
+    @field_validator("storage", mode="before")
+    @classmethod
+    def _validate_storage_names(cls, value: Any) -> Any:
+        """Normalize and validate Storage Names before Pydantic transforms keys."""
+        if not isinstance(value, dict):
+            return value
+
+        normalized: dict[str, Any] = {}
+        original_name_by_normalized_name: dict[str, str] = {}
+        for original_name, service in value.items():
+            if not isinstance(original_name, str) or any(
+                character in original_name for character in ":\x00\r\n"
+            ):
+                name = None
+            else:
+                name = original_name.strip()
+            if name is None or (not name or name == "local" or name.startswith("-")):
+                msg = (
+                    f"Invalid Storage Name {original_name!r}: after whitespace "
+                    "normalization it must be non-empty, differ from reserved 'local', "
+                    "contain no colon, NUL, or newline, and not start with '-'."
+                )
+                raise ValueError(msg)
+            if name in normalized:
+                previous_original_name = original_name_by_normalized_name[name]
+                msg = (
+                    f"Storage Names {previous_original_name!r} and {original_name!r} "
+                    f"both normalize to {name!r}; use unique names."
+                )
+                raise ValueError(msg)
+            normalized[name] = service
+            original_name_by_normalized_name[name] = original_name
+        return normalized

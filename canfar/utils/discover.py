@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import time
+from urllib.parse import urlsplit, urlunsplit
 
 import httpx
 from typing_extensions import Self
@@ -50,12 +51,19 @@ class Discover:
         """
         await self.client.aclose()
 
-    async def fetch(self, url: str, name: str) -> IVOARegistry:
+    async def fetch(
+        self,
+        url: str,
+        name: str,
+        *,
+        development: bool = False,
+    ) -> IVOARegistry:
         """Fetch registry contents.
 
         Args:
             url (str): Registry URL.
             name (str): Common name for the registry.
+            development: Whether this source contains development records.
 
         Returns:
             RegistryInfo: Registry information.
@@ -69,13 +77,26 @@ class Discover:
                 f"[dim]Fetched {name} in {elapsed:.2f}s[/dim]"
             )
 
-            return IVOARegistry(name=name, content=response.text, success=True)
+            return IVOARegistry(
+                name=name,
+                source=url,
+                development=development,
+                content=response.text,
+                success=True,
+            )
         except httpx.HTTPError as error:
             error_msg = str(error)
-            return IVOARegistry(name=name, content="", success=False, error=error_msg)
+            return IVOARegistry(
+                name=name,
+                source=url,
+                development=development,
+                content="",
+                success=False,
+                error=error_msg,
+            )
 
     def extract(self, registry: IVOARegistry, dev: bool = False) -> list[Server]:
-        """Extract capabilities endpoints from registry content."""
+        """Extract Science Platform and preferred VOSpace registry records."""
         if not registry.success or not registry.content:
             return []
 
@@ -89,23 +110,28 @@ class Discover:
             uri, url = line.split("=", 1)
             uri, url = uri.strip(), url.strip()
 
-            if url.endswith("/skaha/capabilities") and uri.endswith("/skaha"):
-                url = url.replace("/capabilities", "")
-                # Apply exclusion filters
-                if not dev and any(
+            leaf = uri.rpartition("/")[2]
+            if leaf in {"skaha", self.config.preferred_storage_leaf}:
+                url = _without_terminal_capabilities(url)
+                if url is None:
+                    continue
+                record_development = any(
                     word in uri.lower() or word in url.lower()
                     for word in self.config.excluded
-                ):
+                )
+                # Apply exclusion filters
+                if not dev and record_development:
                     continue
 
                 # Apply omit filters
                 if (registry.name, uri) in self.config.omit:
                     continue
                 endpoint = Server(
-                    registry=registry.name,
+                    registry=registry.source or registry.name,
+                    development=registry.development or record_development,
                     uri=uri,
                     url=url,
-                    name=self.config.names.get(uri),
+                    name=self.config.names.get(uri) if leaf == "skaha" else None,
                 )
                 endpoints.append(endpoint)
 
@@ -119,3 +145,11 @@ class Discover:
         except httpx.HTTPError:
             endpoint.status = None
         return endpoint
+
+
+def _without_terminal_capabilities(url: str) -> str | None:
+    """Remove only a terminal ``/capabilities`` path component."""
+    parsed = urlsplit(url)
+    if not parsed.path.endswith("/capabilities"):
+        return None
+    return urlunsplit(parsed._replace(path=parsed.path.removesuffix("/capabilities")))

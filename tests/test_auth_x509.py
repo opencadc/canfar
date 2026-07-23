@@ -130,6 +130,18 @@ def test_expiry_not_yet_valid() -> None:
             x509_auth.expiry(cert_path)
 
 
+def test_expiry_exposes_expiration_time(tmp_path) -> None:
+    """Expired certificates expose their end time for human-facing diagnostics."""
+    cert_path = tmp_path / "expired.pem"
+    generate_cert(cert_path, expired=True)
+
+    with pytest.raises(x509_auth.CertificateError) as excinfo:
+        x509_auth.expiry(cert_path)
+
+    assert excinfo.value.expired_at is not None
+    assert excinfo.value.expired_at < datetime.datetime.now(datetime.timezone.utc)
+
+
 def test_expiry_with_invalid_content() -> None:
     """Test that `expiry` raises ValueError for a file with invalid content."""
     with tempfile.NamedTemporaryFile(mode="w", suffix=".pem") as temp_cert:

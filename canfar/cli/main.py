@@ -11,6 +11,7 @@ from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
 from canfar.cli.create import create
+from canfar.cli.data import data
 from canfar.cli.delete import delete
 from canfar.cli.events import events
 from canfar.cli.image import image
@@ -115,7 +116,8 @@ def callback(
     if ctx.invoked_subcommand is None:
         get_console().print(ctx.get_help())
         raise typer.Exit(0)
-    set_before_command(ctx, _emit_banner_for_command)
+    if ctx.invoked_subcommand != "data":
+        set_before_command(ctx, _emit_banner_for_command)
 
 
 cli: typer.Typer = typer.Typer(
@@ -159,6 +161,12 @@ cli.add_typer(
     help="Manage science platform servers.",
     no_args_is_help=True,
     rich_help_panel="Auth Management",
+)
+
+cli.add_typer(
+    data,
+    name="data",
+    rich_help_panel="Data Management",
 )
 
 cli.add_typer(

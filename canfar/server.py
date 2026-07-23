@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from xml.etree.ElementTree import ParseError
 
 import httpx
@@ -12,26 +12,35 @@ from defusedxml.common import DefusedXmlException
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar import get_logger
+from canfar._discovery import (
+    RegistryEvidenceError,
+    discover_storage_resource,
+    load_registry_evidence,
+    prepare_enrichment_workers,
+    select_storage_resource,
+)
 from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
-from canfar.idp import registry_sources
+from canfar.idp import get_idp
 from canfar.models.config import Configuration
 from canfar.models.http import (
     DEFAULT_SERVER_CORES,
     DEFAULT_SERVER_GPUS,
     DEFAULT_SERVER_RAM_GB,
     Server,
+    VOSpaceService,
 )
-from canfar.models.registry import IVOARegistrySearch
+from canfar.models.registry import Server as RegistryResource
 from canfar.utils import vosi
-from canfar.utils.discover import Discover
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 log = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from canfar.models.registry import Server as DiscoveredServer
+_STORAGE_RESOURCE_UNSET = object()
 
 
 class ServerSelectorError(ValueError):
@@ -136,6 +145,11 @@ def discover(
         known = canonical.get(name, known_servers.get(name))
         if server.version is None or not server.auths:
             if known is not None and known.version is not None and known.auths:
+                if server.storage:
+                    known = known.model_copy(
+                        update={"storage": {**known.storage, **server.storage}},
+                        deep=True,
+                    )
                 canonical[name] = known
             continue
         merged_server = server
@@ -144,6 +158,8 @@ def discover(
                 include={"idp", "name", "uri", "url", "version", "auths"},
                 exclude_none=True,
             )
+            if server.storage:
+                updates["storage"] = {**known.storage, **server.storage}
             merged_server = known.model_copy(update=updates, deep=True)
         canonical[name] = merged_server
 
@@ -246,6 +262,7 @@ def activate(
         resolved,
         config=target_config,
         idp=idp,
+        dev=dev,
         timeout=timeout,
     )
     target_config.set_active_selection(idp, validated)
@@ -396,41 +413,64 @@ async def _discover_for_idp(
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
-    sources = registry_sources(idp, include_dev=dev)
-    search = IVOARegistrySearch(registries=sources)
-    async with Discover(search, timeout=timeout) as discovery:
-        registries = await asyncio.gather(
-            *(discovery.fetch(url, name) for url, name in sources.items())
-        )
-        successful_registries = [
-            registry for registry in registries if registry.success
-        ]
-        if not successful_registries:
-            errors = "; ".join(
-                f"{registry.name}: {registry.error}" for registry in registries
-            )
-            msg = f"Failed to discover servers for IDP '{idp}': {errors}"
-            raise ServerDiscoveryError(msg)
+    evidence = await load_registry_evidence(
+        idp,
+        dev=dev,
+        timeout=timeout,
+        check_platforms=True,
+    )
+    if not evidence.available:
+        errors = "; ".join(evidence.errors)
+        msg = f"Failed to discover servers for IDP '{idp}': {errors}"
+        raise ServerDiscoveryError(msg)
 
-        endpoints = []
-        for registry in successful_registries:
-            endpoints.extend(discovery.extract(registry, dev=dev))
-        if not endpoints:
-            return []
+    endpoints = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith("/skaha") and resource.status == 200
+    ]
+    if not endpoints:
+        return []
 
-        checked = await asyncio.gather(
-            *(discovery.check(endpoint) for endpoint in endpoints)
-        )
-        return [
-            _discovered_to_server(
-                endpoint,
-                idp,
-                config=config,
-                timeout=timeout,
+    storage_resources = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
+    ]
+    workers = await prepare_enrichment_workers(
+        config,
+        idp,
+        endpoint=endpoints[0],
+        count=len(endpoints),
+    )
+    if workers is None:
+        return [_registry_resource_to_server(endpoint, idp) for endpoint in endpoints]
+
+    return list(
+        await asyncio.gather(
+            *(
+                asyncio.to_thread(
+                    _discovered_to_server,
+                    endpoint,
+                    idp,
+                    config=worker_config,
+                    token=workers.token,
+                    certificate=workers.certificate,
+                    timeout=timeout,
+                    storage_resource=_select_storage_resource(
+                        endpoint,
+                        storage_resources,
+                        strict=False,
+                    ),
+                )
+                for endpoint, worker_config in zip(
+                    endpoints,
+                    workers.configs,
+                    strict=True,
+                )
             )
-            for endpoint in checked
-            if endpoint.status == 200
-        ]
+        )
+    )
 
 
 def _host_slug(uri: AnyUrl) -> str | None:
@@ -440,12 +480,74 @@ def _host_slug(uri: AnyUrl) -> str | None:
     return uri.host.replace(".", "-")
 
 
+def _select_storage_resource(
+    endpoint: RegistryResource,
+    resources: list[RegistryResource],
+    *,
+    strict: bool,
+) -> RegistryResource | None:
+    """Map private registry ambiguity to the public server fetch error."""
+    try:
+        return select_storage_resource(endpoint, resources, strict=strict)
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
+
+
+async def _discover_storage_resource(
+    server: Server,
+    idp: str,
+    *,
+    dev: bool,
+    timeout: int,
+) -> RegistryResource | None:
+    """Return fresh registry evidence for a server's primary VOSpace service."""
+    try:
+        return await discover_storage_resource(
+            str(server.uri) if server.uri is not None else None,
+            str(server.url) if server.url is not None else None,
+            server.name,
+            idp,
+            dev=dev,
+            timeout=timeout,
+        )
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
+
+
+def _configured_storage_resource(server: Server) -> RegistryResource | None:
+    """Convert the persisted primary VOSpace service to inspection evidence."""
+    if server.name is None:
+        return None
+    service = server.storage.get(server.name)
+    if service is None:
+        return None
+    return RegistryResource(
+        registry="configuration",
+        uri=str(service.uri),
+        url=str(service.url),
+    )
+
+
+def _registry_resource_to_server(endpoint: RegistryResource, idp: str) -> Server:
+    """Convert registry endpoint identity without performing capability I/O."""
+    uri = AnyUrl(endpoint.uri)
+    return Server(
+        idp=idp,
+        name=endpoint.name or _host_slug(uri),
+        uri=uri,
+        url=AnyHttpUrl(endpoint.url),
+    )
+
+
 def _discovered_to_server(
-    endpoint: DiscoveredServer,
+    endpoint: RegistryResource,
     idp: str,
     *,
     config: Configuration | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     timeout: int = 2,
+    storage_resource: RegistryResource | None = None,
 ) -> Server:
     """Convert a registry discovery record to a persisted HTTP server model.
 
@@ -456,23 +558,23 @@ def _discovered_to_server(
         endpoint: Discovered registry endpoint.
         idp: Canonical IDP key.
         config: Configuration whose Authentication Record authorizes enrichment.
+        token: Pre-materialized runtime bearer token for worker isolation.
+        certificate: Pre-materialized runtime certificate for worker isolation.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
+        storage_resource: Same-namespace preferred VOSpace registry record, if any.
 
     Returns:
         Server: Persisted server model with capabilities metadata when available.
     """
-    uri = AnyUrl(endpoint.uri)
-    server = Server(
-        idp=idp,
-        name=endpoint.name or _host_slug(uri),
-        uri=uri,
-        url=AnyHttpUrl(endpoint.url),
-    )
+    server = _registry_resource_to_server(endpoint, idp)
     return enrich(
         server,
         config=config,
+        token=token,
+        certificate=certificate,
         strict=False,
         timeout=timeout,
+        storage_resource=storage_resource,
     )
 
 
@@ -481,8 +583,11 @@ def enrich(
     *,
     config: Configuration | None = None,
     authentication_idp: str | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     strict: bool = True,
     timeout: int = 2,
+    storage_resource: RegistryResource | None | object = _STORAGE_RESOURCE_UNSET,
 ) -> Server:
     """Return a validated Server enriched from its VOSI capabilities.
 
@@ -493,10 +598,17 @@ def enrich(
             Authentication or Server Selection.
         authentication_idp: Optional Authentication Record selector. Defaults to
             the Server IDP, then the active Authentication.
-        strict: When ``False``, return the original server if capabilities
-            cannot be retrieved or parsed. Discovery uses non-strict mode so
-            one malformed endpoint does not abort listing for an IDP.
+        token: Optional runtime bearer token for capability requests.
+        certificate: Optional runtime certificate for capability requests.
+        strict: When ``False``, keep usable registry and existing storage data
+            when session or storage capabilities cannot be retrieved or parsed.
+            Other successful enrichment may still be returned, so the result can
+            be partial. Discovery uses non-strict mode so one malformed endpoint
+            does not abort listing for an IDP.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
+        storage_resource: Retained same-namespace VOSpace registry record. Passing
+            ``None`` records that the preferred resource was absent; omitting the
+            argument leaves storage outside this inspection.
 
     Returns:
         Server: Copy with version and auth modes populated when discoverable.
@@ -505,29 +617,37 @@ def enrich(
         ServerFetchError: If ``strict`` is ``True`` and capabilities cannot
             be retrieved, parsed, or contain no session capabilities.
     """
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
+    active_idp = authentication_idp or server.idp or base_config.active.authentication
+    if storage_resource is not _STORAGE_RESOURCE_UNSET:
+        server = _enrich_storage(
+            server,
+            storage_resource=(
+                storage_resource
+                if isinstance(storage_resource, RegistryResource)
+                else None
+            ),
+            config=base_config,
+            authentication_idp=active_idp,
+            token=token,
+            certificate=certificate,
+            strict=strict,
+            timeout=timeout,
+        )
     if server.url is None:
         msg = "Server URL is required to inspect capabilities."
         raise ServerFetchError(msg)
-
-    base_config = config or Configuration()  # ty: ignore[missing-argument]
-    active_idp = authentication_idp or server.idp or base_config.active.authentication
     try:
-        from canfar.client import HTTPClient  # noqa: PLC0415
-
-        with HTTPClient(
-            config=base_config,
-            authentication_idp=active_idp,
-            url=server.url,
-            timeout=timeout,
-            raise_http_errors=False,
-        ) as client:
-            request_client = client.client
-            request_client.headers["Accept"] = "application/xml"
-            request_client.headers.pop("Content-Type", None)
-            request_client.headers.pop("X-Skaha-Registry-Auth", None)
-            response = request_client.get("capabilities")
-            response.raise_for_status()
-            capabilities = vosi.capabilities(xml=response.text)
+        capabilities = vosi.capabilities(
+            xml=_fetch_capabilities(
+                server.url,
+                config=base_config,
+                authentication_idp=active_idp,
+                token=token,
+                certificate=certificate,
+                timeout=timeout,
+            )
+        )
     except (
         httpx.HTTPError,
         OSError,
@@ -589,6 +709,115 @@ def enrich(
         )
 
 
+def _enrich_storage(
+    server: Server,
+    *,
+    storage_resource: RegistryResource | None,
+    config: Configuration,
+    authentication_idp: str,
+    token: str | None,
+    certificate: Path | None,
+    strict: bool,
+    timeout: int,
+) -> Server:
+    """Validate and attach one retained primary VOSpace registry resource."""
+    error: BaseException | None = None
+    if storage_resource is None:
+        leaf = get_idp(authentication_idp).preferred_storage_leaf
+        subject = f"same-namespace '{leaf}' registry record"
+        error = ValueError(
+            f"No {subject} found for Science Platform Server '{server.name}'."
+        )
+    else:
+        subject = storage_resource.uri
+        try:
+            xml = _fetch_capabilities(
+                AnyHttpUrl(storage_resource.url),
+                config=config,
+                authentication_idp=authentication_idp,
+                token=token,
+                certificate=certificate,
+                timeout=timeout,
+            )
+            valid = vosi.is_vospace_service(xml)
+        except (
+            httpx.HTTPError,
+            OSError,
+            AuthContextError,
+            AuthExpiredError,
+            CertificateError,
+            HTTPAuthenticationError,
+            ParseError,
+            DefusedXmlException,
+            ValueError,
+        ) as exc:
+            error = exc
+        else:
+            if not valid:
+                error = ValueError(
+                    "required VOSpace node capability is missing or malformed"
+                )
+            elif server.name is None:
+                error = ValueError("Science Platform Server has no Server Name")
+
+    if error is not None:
+        message = (
+            f"Failed to inspect VOSpace Service '{subject}' for Science "
+            f"Platform Server '{server.name}': {error}"
+        )
+        return _keep_or_raise(
+            server,
+            strict=strict,
+            error=message,
+            cause=error,
+            debug="Skipping VOSpace Service %s during discovery: %s",
+            args=(subject, error),
+        )
+    assert storage_resource is not None
+    assert server.name is not None
+    service = VOSpaceService.model_validate(
+        {"uri": storage_resource.uri, "url": storage_resource.url}
+    )
+
+    return server.model_copy(
+        update={"storage": {**server.storage, server.name: service}},
+        deep=True,
+    )
+
+
+def _fetch_capabilities(
+    url: AnyHttpUrl,
+    *,
+    config: Configuration,
+    authentication_idp: str,
+    token: str | None = None,
+    certificate: Path | None = None,
+    timeout: int,
+) -> str:
+    """Fetch one VOSI capabilities document through the existing HTTP seam."""
+    from canfar.client import HTTPClient  # noqa: PLC0415
+
+    client_kwargs: dict[str, Any] = {
+        "config": config,
+        "authentication_idp": authentication_idp,
+        "url": url,
+        "timeout": timeout,
+        "raise_http_errors": False,
+    }
+    if token is not None:
+        client_kwargs["token"] = token
+    if certificate is not None:
+        client_kwargs["certificate"] = certificate
+    with HTTPClient(**client_kwargs) as client:
+        request_client = client.client
+        request_client.headers["Accept"] = "application/xml"
+        request_client.headers.pop("Content-Type", None)
+        request_client.headers.pop("X-Skaha-Registry-Auth", None)
+        response = request_client.get("capabilities")
+        response.raise_for_status()
+        return response.text
+
+
 def _keep_or_raise(
     server: Server,
     *,
@@ -610,6 +839,7 @@ def _validate_server(
     *,
     config: Configuration | None = None,
     idp: str | None = None,
+    dev: bool = False,
     timeout: int = 2,
 ) -> Server:
     """Fetch and validate a server before persisting it as active.
@@ -618,6 +848,7 @@ def _validate_server(
         server: Candidate server record.
         config: Configuration to use while validating the candidate selection.
         idp: Authentication IDP to pair with the candidate server.
+        dev: Include development registry evidence during validation.
         timeout: HTTP timeout in seconds for validation requests.
 
     Returns:
@@ -628,12 +859,23 @@ def _validate_server(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = idp or server.idp or base_config.active.authentication
+    storage_resource = _configured_storage_resource(server)
+    if storage_resource is None:
+        storage_resource = asyncio.run(
+            _discover_storage_resource(
+                server,
+                active_idp,
+                dev=dev,
+                timeout=timeout,
+            )
+        )
     enriched = enrich(
         server,
         config=base_config,
         authentication_idp=active_idp,
         strict=True,
         timeout=timeout,
+        storage_resource=storage_resource,
     )
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."
