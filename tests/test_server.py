@@ -840,6 +840,133 @@ class TestServerDiscovery:
             "Bearer runtime-token"
         ]
 
+    @pytest.mark.asyncio
+    async def test_environment_token_materializes_without_saved_credential(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Environment bearer auth survives preparation and worker fan-out."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        requests: list[httpx.Request] = []
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def response(request: httpx.Request) -> httpx.Response:
+            requests.append(request)
+            return httpx.Response(200, text=session_capabilities, request=request)
+
+        monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
+        monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(httpx.MockTransport(response)),
+            ),
+        ):
+            [server] = await _discover_for_idp(
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
+
+        assert server.version == "v1"
+        assert [request.headers["Authorization"] for request in requests] == [
+            "Bearer environment-token"
+        ]
+
+    @pytest.mark.asyncio
+    async def test_environment_certificate_materializes_without_saved_credential(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Environment certificate auth survives preparation and worker fan-out."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod
+                    standardID="ivo://ivoa.net/sso#tls-with-certificate" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+        certificate = tmp_path / "environment.pem"
+        valid = MagicMock(return_value=certificate.as_posix())
+        ssl_context = MagicMock()
+
+        monkeypatch.delenv("CANFAR_TOKEN", raising=False)
+        monkeypatch.setenv("CANFAR_CERTIFICATE", certificate.as_posix())
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.x509.inspect",
+                return_value={
+                    "path": certificate.as_posix(),
+                    "expiry": 9_999_999_999.0,
+                },
+            ),
+            patch("canfar.client.x509.valid", new=valid),
+            patch(
+                "canfar.client.HTTPClient._get_ssl_context",
+                return_value=ssl_context,
+            ) as get_ssl_context,
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(
+                    httpx.MockTransport(
+                        lambda request: httpx.Response(
+                            200,
+                            text=session_capabilities,
+                            request=request,
+                        )
+                    )
+                ),
+            ),
+        ):
+            [server] = await _discover_for_idp(
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
+
+        assert server.version == "v1"
+        valid.assert_called_once_with(certificate)
+        get_ssl_context.assert_called_once_with(certificate)
+
     @pytest.mark.parametrize(
         "capabilities_case",
         [

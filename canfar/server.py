@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal
 from xml.etree.ElementTree import ParseError
 
 import httpx
@@ -795,15 +795,18 @@ def _fetch_capabilities(
     """Fetch one VOSI capabilities document through the existing HTTP seam."""
     from canfar.client import HTTPClient  # noqa: PLC0415
 
-    with HTTPClient(
-        config=config,
-        authentication_idp=authentication_idp,
-        token=token,
-        certificate=certificate,
-        url=url,
-        timeout=timeout,
-        raise_http_errors=False,
-    ) as client:
+    client_kwargs: dict[str, Any] = {
+        "config": config,
+        "authentication_idp": authentication_idp,
+        "url": url,
+        "timeout": timeout,
+        "raise_http_errors": False,
+    }
+    if token is not None:
+        client_kwargs["token"] = token
+    if certificate is not None:
+        client_kwargs["certificate"] = certificate
+    with HTTPClient(**client_kwargs) as client:
         request_client = client.client
         request_client.headers["Accept"] = "application/xml"
         request_client.headers.pop("Content-Type", None)

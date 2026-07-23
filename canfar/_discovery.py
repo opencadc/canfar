@@ -209,7 +209,7 @@ async def prepare_enrichment_workers(
     )
     token: str | None = None
     certificate: Path | None = None
-    if client.authentication_record is not None:
+    if client.uses_runtime_credentials or client.authentication_record is not None:
         try:
             token, certfile = await client._materialize_credentials()  # noqa: SLF001
         except (
