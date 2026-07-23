@@ -51,12 +51,19 @@ class Discover:
         """
         await self.client.aclose()
 
-    async def fetch(self, url: str, name: str) -> IVOARegistry:
+    async def fetch(
+        self,
+        url: str,
+        name: str,
+        *,
+        development: bool = False,
+    ) -> IVOARegistry:
         """Fetch registry contents.
 
         Args:
             url (str): Registry URL.
             name (str): Common name for the registry.
+            development: Whether this source contains development records.
 
         Returns:
             RegistryInfo: Registry information.
@@ -70,10 +77,23 @@ class Discover:
                 f"[dim]Fetched {name} in {elapsed:.2f}s[/dim]"
             )
 
-            return IVOARegistry(name=name, content=response.text, success=True)
+            return IVOARegistry(
+                name=name,
+                source=url,
+                development=development,
+                content=response.text,
+                success=True,
+            )
         except httpx.HTTPError as error:
             error_msg = str(error)
-            return IVOARegistry(name=name, content="", success=False, error=error_msg)
+            return IVOARegistry(
+                name=name,
+                source=url,
+                development=development,
+                content="",
+                success=False,
+                error=error_msg,
+            )
 
     def extract(self, registry: IVOARegistry, dev: bool = False) -> list[Server]:
         """Extract Science Platform and preferred VOSpace registry records."""
@@ -106,7 +126,8 @@ class Discover:
                 if (registry.name, uri) in self.config.omit:
                     continue
                 endpoint = Server(
-                    registry=registry.name,
+                    registry=registry.source or registry.name,
+                    development=registry.development,
                     uri=uri,
                     url=url,
                     name=self.config.names.get(uri) if leaf == "skaha" else None,

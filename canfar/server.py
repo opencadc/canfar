@@ -254,6 +254,7 @@ def activate(
         resolved,
         config=target_config,
         idp=idp,
+        dev=dev,
         timeout=timeout,
     )
     target_config.set_active_selection(idp, validated)
@@ -404,14 +405,23 @@ async def _discover_for_idp(
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
+    idp_info = get_idp(idp)
     sources = registry_sources(idp, include_dev=dev)
+    development_sources = set(idp_info.dev_registries)
     search = IVOARegistrySearch(
         registries=sources,
-        preferred_storage_leaf=get_idp(idp).preferred_storage_leaf,
+        preferred_storage_leaf=idp_info.preferred_storage_leaf,
     )
     async with Discover(search, timeout=timeout) as discovery:
         registries = await asyncio.gather(
-            *(discovery.fetch(url, name) for url, name in sources.items())
+            *(
+                discovery.fetch(
+                    url,
+                    name,
+                    development=url in development_sources,
+                )
+                for url, name in sources.items()
+            )
         )
         successful_registries = [
             registry for registry in registries if registry.success
@@ -432,28 +442,35 @@ async def _discover_for_idp(
         if not endpoints:
             return []
 
-        storage_by_namespace = {
-            _registry_namespace(resource.uri): resource
+        storage_resources = [
+            resource
             for resource in resources
             if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
-        }
+        ]
 
         checked = await asyncio.gather(
             *(discovery.check(endpoint) for endpoint in endpoints)
         )
-        return [
-            _discovered_to_server(
-                endpoint,
-                idp,
-                config=config,
-                timeout=timeout,
-                storage_resource=storage_by_namespace.get(
-                    _registry_namespace(endpoint.uri)
-                ),
+        reachable = [endpoint for endpoint in checked if endpoint.status == 200]
+        return list(
+            await asyncio.gather(
+                *(
+                    asyncio.to_thread(
+                        _discovered_to_server,
+                        endpoint,
+                        idp,
+                        config=config,
+                        timeout=timeout,
+                        storage_resource=_select_storage_resource(
+                            endpoint,
+                            storage_resources,
+                            strict=False,
+                        ),
+                    )
+                    for endpoint in reachable
+                )
             )
-            for endpoint in checked
-            if endpoint.status == 200
-        ]
+        )
 
 
 def _host_slug(uri: AnyUrl) -> str | None:
@@ -466,6 +483,132 @@ def _host_slug(uri: AnyUrl) -> str | None:
 def _registry_namespace(uri: str) -> str:
     """Return the IVOA registry URI namespace before its resource leaf."""
     return uri.rpartition("/")[0]
+
+
+def _select_storage_resource(
+    endpoint: RegistryResource,
+    resources: list[RegistryResource],
+    *,
+    strict: bool,
+) -> RegistryResource | None:
+    """Pair an endpoint with one unambiguous same-environment VOSpace record."""
+    candidates = [
+        resource
+        for resource in resources
+        if _registry_namespace(resource.uri) == _registry_namespace(endpoint.uri)
+        and resource.development == endpoint.development
+    ]
+    same_registry = [
+        resource for resource in candidates if resource.registry == endpoint.registry
+    ]
+    preferred = same_registry or candidates
+    if len(preferred) == 1:
+        return preferred[0]
+    if len(preferred) > 1:
+        message = (
+            "Multiple preferred VOSpace registry records found for Science "
+            f"Platform Server '{endpoint.name or endpoint.uri}' in namespace "
+            f"'{_registry_namespace(endpoint.uri)}'."
+        )
+        if strict:
+            raise ServerFetchError(message)
+        log.debug("%s Omitting generated storage configuration.", message)
+    return None
+
+
+async def _discover_storage_resource(
+    server: Server,
+    idp: str,
+    *,
+    dev: bool,
+    timeout: int,
+) -> RegistryResource | None:
+    """Return fresh registry evidence for a server's primary VOSpace service."""
+    if server.uri is None:
+        msg = "Server URI is required to inspect its VOSpace Service."
+        raise ServerFetchError(msg)
+
+    idp_info = get_idp(idp)
+    sources = registry_sources(idp, include_dev=dev)
+    development_sources = set(idp_info.dev_registries)
+    search = IVOARegistrySearch(
+        registries=sources,
+        preferred_storage_leaf=idp_info.preferred_storage_leaf,
+    )
+    async with Discover(search, timeout=timeout) as discovery:
+        registries = await asyncio.gather(
+            *(
+                discovery.fetch(
+                    url,
+                    name,
+                    development=url in development_sources,
+                )
+                for url, name in sources.items()
+            )
+        )
+        successful = [registry for registry in registries if registry.success]
+        if not successful:
+            errors = "; ".join(
+                f"{registry.name}: {registry.error}" for registry in registries
+            )
+            msg = (
+                f"Failed to inspect VOSpace registry records for IDP '{idp}': {errors}"
+            )
+            raise ServerFetchError(msg)
+
+        resources = [
+            resource
+            for registry in successful
+            for resource in discovery.extract(registry, dev=dev)
+        ]
+
+    endpoints = [
+        resource
+        for resource in resources
+        if resource.uri == str(server.uri) and resource.uri.endswith("/skaha")
+    ]
+    matching_urls = [
+        endpoint
+        for endpoint in endpoints
+        if server.url is not None and endpoint.url == str(server.url)
+    ]
+    if len(matching_urls) == 1:
+        endpoint = matching_urls[0]
+    elif len(endpoints) == 1:
+        endpoint = endpoints[0]
+    elif not endpoints:
+        msg = (
+            f"No Science Platform registry record found for Server '{server.name}' "
+            f"with URI '{server.uri}'."
+        )
+        raise ServerFetchError(msg)
+    else:
+        msg = (
+            f"Multiple Science Platform registry records found for Server "
+            f"'{server.name}' with URI '{server.uri}'."
+        )
+        raise ServerFetchError(msg)
+
+    storage_resources = [
+        resource
+        for resource in resources
+        if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
+    ]
+    return _select_storage_resource(endpoint, storage_resources, strict=True)
+
+
+def _configured_storage_resource(server: Server) -> RegistryResource | None:
+    """Convert the persisted primary VOSpace service to inspection evidence."""
+    if server.name is None:
+        return None
+    service = server.storage.get(server.name)
+    if service is None:
+        return None
+    return RegistryResource(
+        registry="configuration",
+        uri=str(service.uri),
+        url=str(service.url),
+    )
 
 
 def _discovered_to_server(
@@ -544,14 +687,6 @@ def enrich(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = authentication_idp or server.idp or base_config.active.authentication
-    if (
-        strict
-        and storage_resource is _STORAGE_RESOURCE_UNSET
-        and server.name in base_config._storage_discovery_errors  # noqa: SLF001
-    ):
-        raise ServerFetchError(
-            base_config._storage_discovery_errors[server.name]  # noqa: SLF001
-        )
     if storage_resource is not _STORAGE_RESOURCE_UNSET:
         server = _enrich_storage(
             server,
@@ -617,7 +752,7 @@ def enrich(
         )
 
     try:
-        enriched = Server.model_validate(
+        return Server.model_validate(
             {
                 **server.model_dump(mode="python"),
                 "url": primary["baseurl"],
@@ -636,8 +771,6 @@ def enrich(
             ),
             args=(server.url, exc),
         )
-    else:
-        return enriched
 
 
 def _enrich_storage(
@@ -692,7 +825,7 @@ def _enrich_storage(
             f"Failed to inspect VOSpace Service '{subject}' for Science "
             f"Platform Server '{server.name}': {error}"
         )
-        kept = _keep_or_raise(
+        return _keep_or_raise(
             server,
             strict=strict,
             error=message,
@@ -700,20 +833,14 @@ def _enrich_storage(
             debug="Skipping VOSpace Service %s during discovery: %s",
             args=(subject, error),
         )
-        if server.name is not None:
-            config._storage_discovery_errors[server.name] = message  # noqa: SLF001
-        return kept
-
     assert storage_resource is not None
     assert server.name is not None
     service = VOSpaceService(uri=storage_resource.uri, url=storage_resource.url)
 
-    enriched = server.model_copy(
+    return server.model_copy(
         update={"storage": {**server.storage, server.name: service}},
         deep=True,
     )
-    config._storage_discovery_errors.pop(server.name, None)  # noqa: SLF001
-    return enriched
 
 
 def _fetch_capabilities(
@@ -763,6 +890,7 @@ def _validate_server(
     *,
     config: Configuration | None = None,
     idp: str | None = None,
+    dev: bool = False,
     timeout: int = 2,
 ) -> Server:
     """Fetch and validate a server before persisting it as active.
@@ -771,6 +899,7 @@ def _validate_server(
         server: Candidate server record.
         config: Configuration to use while validating the candidate selection.
         idp: Authentication IDP to pair with the candidate server.
+        dev: Include development registry evidence during validation.
         timeout: HTTP timeout in seconds for validation requests.
 
     Returns:
@@ -781,12 +910,23 @@ def _validate_server(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = idp or server.idp or base_config.active.authentication
+    storage_resource = _configured_storage_resource(server)
+    if storage_resource is None:
+        storage_resource = asyncio.run(
+            _discover_storage_resource(
+                server,
+                active_idp,
+                dev=dev,
+                timeout=timeout,
+            )
+        )
     enriched = enrich(
         server,
         config=base_config,
         authentication_idp=active_idp,
         strict=True,
         timeout=timeout,
+        storage_resource=storage_resource,
     )
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."

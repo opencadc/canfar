@@ -12,7 +12,6 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    PrivateAttr,
     model_validator,
 )
 
@@ -114,8 +113,6 @@ class Configuration(BaseSettings):
         json_schema_mode_override="serialization",
         str_strip_whitespace=True,
     )
-
-    _storage_discovery_errors: dict[str, str] = PrivateAttr(default_factory=dict)
 
     version: Literal[1] = Field(
         default=1,
