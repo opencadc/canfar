@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from xml.etree.ElementTree import ParseError
 
 import httpx
@@ -12,11 +12,18 @@ from defusedxml.common import DefusedXmlException
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar import get_logger
+from canfar._discovery import (
+    RegistryEvidenceError,
+    discover_storage_resource,
+    load_registry_evidence,
+    prepare_enrichment_workers,
+    select_storage_resource,
+)
 from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
-from canfar.idp import get_idp, registry_sources
+from canfar.idp import get_idp
 from canfar.models.config import Configuration
 from canfar.models.http import (
     DEFAULT_SERVER_CORES,
@@ -25,10 +32,11 @@ from canfar.models.http import (
     Server,
     VOSpaceService,
 )
-from canfar.models.registry import IVOARegistrySearch
 from canfar.models.registry import Server as RegistryResource
 from canfar.utils import vosi
-from canfar.utils.discover import Discover
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 log = get_logger(__name__)
 
@@ -86,16 +94,6 @@ class ServerActivation:
 
     server: Server
     reason: Literal["active", "remembered", "single", "selected"]
-
-
-@dataclass(frozen=True)
-class _RegistryEvidence:
-    """Registry resources plus acquisition outcome for one IDP inspection."""
-
-    preferred_storage_leaf: str | None
-    resources: tuple[RegistryResource, ...]
-    errors: tuple[str, ...]
-    available: bool
 
 
 def discover(
@@ -394,91 +392,6 @@ def _resolve_selector(
     return None
 
 
-async def _load_registry_evidence(
-    idp: str,
-    *,
-    dev: bool,
-    timeout: int,
-    check_platforms: bool,
-) -> _RegistryEvidence:
-    """Acquire and extract registry records through one shared pipeline."""
-    idp_info = get_idp(idp)
-    sources = registry_sources(idp, include_dev=dev)
-    development_sources = set(idp_info.dev_registries)
-    search = IVOARegistrySearch(
-        registries=sources,
-        preferred_storage_leaf=idp_info.preferred_storage_leaf,
-    )
-    async with Discover(search, timeout=timeout) as discovery:
-        registries = await asyncio.gather(
-            *(
-                discovery.fetch(
-                    url,
-                    name,
-                    development=url in development_sources,
-                )
-                for url, name in sources.items()
-            )
-        )
-        successful = [registry for registry in registries if registry.success]
-        resources = [
-            resource
-            for registry in successful
-            for resource in discovery.extract(registry, dev=dev)
-        ]
-        if check_platforms:
-            endpoints = [
-                resource for resource in resources if resource.uri.endswith("/skaha")
-            ]
-            await asyncio.gather(*(discovery.check(endpoint) for endpoint in endpoints))
-
-    return _RegistryEvidence(
-        preferred_storage_leaf=idp_info.preferred_storage_leaf,
-        resources=tuple(resources),
-        errors=tuple(
-            f"{registry.name}: {registry.error}"
-            for registry in registries
-            if not registry.success
-        ),
-        available=bool(successful),
-    )
-
-
-async def _enrichment_config_copies(
-    config: Configuration | None,
-    idp: str,
-    *,
-    endpoint: RegistryResource,
-    count: int,
-) -> list[Configuration] | None:
-    """Materialize credentials once, then isolate worker configuration state."""
-    from canfar.client import HTTPClient  # noqa: PLC0415
-
-    base_config = config or Configuration()
-    client = HTTPClient(
-        config=base_config,
-        authentication_idp=idp,
-        url=AnyHttpUrl(endpoint.url),
-    )
-    if client.authentication_record is not None:
-        try:
-            await client._materialize_credentials()  # noqa: SLF001
-        except (
-            KeyError,
-            OSError,
-            AuthContextError,
-            AuthExpiredError,
-            CertificateError,
-            TypeError,
-            ValueError,
-        ) as exc:
-            log.debug("Skipping capability enrichment for IDP %s: %s", idp, exc)
-            return None
-
-    values = base_config.model_dump(mode="python")
-    return [Configuration.model_validate(values) for _ in range(count)]
-
-
 async def _discover_for_idp(
     idp: str,
     *,
@@ -500,7 +413,7 @@ async def _discover_for_idp(
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
-    evidence = await _load_registry_evidence(
+    evidence = await load_registry_evidence(
         idp,
         dev=dev,
         timeout=timeout,
@@ -524,13 +437,13 @@ async def _discover_for_idp(
         for resource in evidence.resources
         if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
     ]
-    worker_configs = await _enrichment_config_copies(
+    workers = await prepare_enrichment_workers(
         config,
         idp,
         endpoint=endpoints[0],
         count=len(endpoints),
     )
-    if worker_configs is None:
+    if workers is None:
         return [_registry_resource_to_server(endpoint, idp) for endpoint in endpoints]
 
     return list(
@@ -541,6 +454,8 @@ async def _discover_for_idp(
                     endpoint,
                     idp,
                     config=worker_config,
+                    token=workers.token,
+                    certificate=workers.certificate,
                     timeout=timeout,
                     storage_resource=_select_storage_resource(
                         endpoint,
@@ -550,7 +465,7 @@ async def _discover_for_idp(
                 )
                 for endpoint, worker_config in zip(
                     endpoints,
-                    worker_configs,
+                    workers.configs,
                     strict=True,
                 )
             )
@@ -565,40 +480,17 @@ def _host_slug(uri: AnyUrl) -> str | None:
     return uri.host.replace(".", "-")
 
 
-def _registry_namespace(uri: str) -> str:
-    """Return the IVOA registry URI namespace before its resource leaf."""
-    return uri.rpartition("/")[0]
-
-
 def _select_storage_resource(
     endpoint: RegistryResource,
     resources: list[RegistryResource],
     *,
     strict: bool,
 ) -> RegistryResource | None:
-    """Pair an endpoint with one unambiguous same-environment VOSpace record."""
-    candidates = [
-        resource
-        for resource in resources
-        if _registry_namespace(resource.uri) == _registry_namespace(endpoint.uri)
-        and resource.development == endpoint.development
-    ]
-    same_registry = [
-        resource for resource in candidates if resource.registry == endpoint.registry
-    ]
-    preferred = same_registry or candidates
-    if len(preferred) == 1:
-        return preferred[0]
-    if len(preferred) > 1:
-        message = (
-            "Multiple preferred VOSpace registry records found for Science "
-            f"Platform Server '{endpoint.name or endpoint.uri}' in namespace "
-            f"'{_registry_namespace(endpoint.uri)}'."
-        )
-        if strict:
-            raise ServerFetchError(message)
-        log.debug("%s Omitting generated storage configuration.", message)
-    return None
+    """Map private registry ambiguity to the public server fetch error."""
+    try:
+        return select_storage_resource(endpoint, resources, strict=strict)
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
 
 
 async def _discover_storage_resource(
@@ -609,54 +501,17 @@ async def _discover_storage_resource(
     timeout: int,
 ) -> RegistryResource | None:
     """Return fresh registry evidence for a server's primary VOSpace service."""
-    if server.uri is None:
-        msg = "Server URI is required to inspect its VOSpace Service."
-        raise ServerFetchError(msg)
-
-    evidence = await _load_registry_evidence(
-        idp,
-        dev=dev,
-        timeout=timeout,
-        check_platforms=False,
-    )
-    if not evidence.available:
-        errors = "; ".join(evidence.errors)
-        msg = f"Failed to inspect VOSpace registry records for IDP '{idp}': {errors}"
-        raise ServerFetchError(msg)
-
-    endpoints = [
-        resource
-        for resource in evidence.resources
-        if resource.uri == str(server.uri) and resource.uri.endswith("/skaha")
-    ]
-    matching_urls = [
-        endpoint
-        for endpoint in endpoints
-        if server.url is not None and endpoint.url == str(server.url)
-    ]
-    if len(matching_urls) == 1:
-        endpoint = matching_urls[0]
-    elif len(endpoints) == 1:
-        endpoint = endpoints[0]
-    elif not endpoints:
-        msg = (
-            f"No Science Platform registry record found for Server '{server.name}' "
-            f"with URI '{server.uri}'."
+    try:
+        return await discover_storage_resource(
+            str(server.uri) if server.uri is not None else None,
+            str(server.url) if server.url is not None else None,
+            server.name,
+            idp,
+            dev=dev,
+            timeout=timeout,
         )
-        raise ServerFetchError(msg)
-    else:
-        msg = (
-            f"Multiple Science Platform registry records found for Server "
-            f"'{server.name}' with URI '{server.uri}'."
-        )
-        raise ServerFetchError(msg)
-
-    storage_resources = [
-        resource
-        for resource in evidence.resources
-        if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
-    ]
-    return _select_storage_resource(endpoint, storage_resources, strict=True)
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
 
 
 def _configured_storage_resource(server: Server) -> RegistryResource | None:
@@ -689,6 +544,8 @@ def _discovered_to_server(
     idp: str,
     *,
     config: Configuration | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     timeout: int = 2,
     storage_resource: RegistryResource | None = None,
 ) -> Server:
@@ -701,6 +558,8 @@ def _discovered_to_server(
         endpoint: Discovered registry endpoint.
         idp: Canonical IDP key.
         config: Configuration whose Authentication Record authorizes enrichment.
+        token: Pre-materialized runtime bearer token for worker isolation.
+        certificate: Pre-materialized runtime certificate for worker isolation.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
         storage_resource: Same-namespace preferred VOSpace registry record, if any.
 
@@ -711,6 +570,8 @@ def _discovered_to_server(
     return enrich(
         server,
         config=config,
+        token=token,
+        certificate=certificate,
         strict=False,
         timeout=timeout,
         storage_resource=storage_resource,
@@ -722,6 +583,8 @@ def enrich(
     *,
     config: Configuration | None = None,
     authentication_idp: str | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     strict: bool = True,
     timeout: int = 2,
     storage_resource: RegistryResource | None | object = _STORAGE_RESOURCE_UNSET,
@@ -735,6 +598,8 @@ def enrich(
             Authentication or Server Selection.
         authentication_idp: Optional Authentication Record selector. Defaults to
             the Server IDP, then the active Authentication.
+        token: Optional runtime bearer token for capability requests.
+        certificate: Optional runtime certificate for capability requests.
         strict: When ``False``, keep usable registry and existing storage data
             when session or storage capabilities cannot be retrieved or parsed.
             Other successful enrichment may still be returned, so the result can
@@ -764,6 +629,8 @@ def enrich(
             ),
             config=base_config,
             authentication_idp=active_idp,
+            token=token,
+            certificate=certificate,
             strict=strict,
             timeout=timeout,
         )
@@ -776,6 +643,8 @@ def enrich(
                 server.url,
                 config=base_config,
                 authentication_idp=active_idp,
+                token=token,
+                certificate=certificate,
                 timeout=timeout,
             )
         )
@@ -846,6 +715,8 @@ def _enrich_storage(
     storage_resource: RegistryResource | None,
     config: Configuration,
     authentication_idp: str,
+    token: str | None,
+    certificate: Path | None,
     strict: bool,
     timeout: int,
 ) -> Server:
@@ -864,6 +735,8 @@ def _enrich_storage(
                 AnyHttpUrl(storage_resource.url),
                 config=config,
                 authentication_idp=authentication_idp,
+                token=token,
+                certificate=certificate,
                 timeout=timeout,
             )
             valid = vosi.is_vospace_service(xml)
@@ -915,6 +788,8 @@ def _fetch_capabilities(
     *,
     config: Configuration,
     authentication_idp: str,
+    token: str | None = None,
+    certificate: Path | None = None,
     timeout: int,
 ) -> str:
     """Fetch one VOSI capabilities document through the existing HTTP seam."""
@@ -923,6 +798,8 @@ def _fetch_capabilities(
     with HTTPClient(
         config=config,
         authentication_idp=authentication_idp,
+        token=token,
+        certificate=certificate,
         url=url,
         timeout=timeout,
         raise_http_errors=False,

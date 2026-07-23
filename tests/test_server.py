@@ -565,7 +565,7 @@ class TestServerDiscovery:
         config = _anonymous_config()
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.client.Client",
                 side_effect=_http_client_factory(transport),
@@ -640,7 +640,7 @@ class TestServerDiscovery:
             )
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch("canfar.server.enrich", side_effect=enriched),
         ):
             servers = await _discover_for_idp("srcnet")
@@ -753,6 +753,8 @@ class TestServerDiscovery:
             worker_config = kwargs["config"]
             assert isinstance(worker_config, Configuration)
             worker_configs.append(worker_config)
+            assert kwargs["token"] == "current-token"
+            assert kwargs["certificate"] is None
             concurrent.wait()
             return Server(
                 idp=idp,
@@ -765,7 +767,7 @@ class TestServerDiscovery:
 
         materialize = AsyncMock(return_value=("current-token", None))
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch("canfar.server._discovered_to_server", side_effect=convert),
             patch(
                 "canfar.client.HTTPClient._materialize_credentials",
@@ -778,6 +780,65 @@ class TestServerDiscovery:
         materialize.assert_awaited_once_with()
         assert len({id(worker_config) for worker_config in worker_configs}) == 2
         assert all(worker_config is not config for worker_config in worker_configs)
+
+    @pytest.mark.asyncio
+    async def test_worker_requests_use_pre_materialized_runtime_token(self) -> None:
+        """Fan-out requests cannot invoke saved-record refresh or persistence."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        config = Configuration(
+            active=ActiveConfig(authentication="srcnet", server=None),
+            authentication={"srcnet": OIDCCredential(idp="srcnet")},
+            servers={},
+        )
+        requests: list[httpx.Request] = []
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def response(request: httpx.Request) -> httpx.Response:
+            requests.append(request)
+            return httpx.Response(200, text=session_capabilities, request=request)
+
+        materialize = AsyncMock(return_value=("runtime-token", None))
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.HTTPClient._materialize_credentials",
+                new=materialize,
+            ),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(httpx.MockTransport(response)),
+            ),
+            patch("canfar.auth.oidc.sync_refresh") as refresh,
+        ):
+            [server] = await _discover_for_idp("srcnet", config=config)
+
+        assert server.version == "v1"
+        materialize.assert_awaited_once_with()
+        refresh.assert_not_called()
+        assert [request.headers["Authorization"] for request in requests] == [
+            "Bearer runtime-token"
+        ]
 
     @pytest.mark.parametrize(
         "capabilities_case",
@@ -1020,7 +1081,7 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.server.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -1058,7 +1119,7 @@ class TestServerDiscovery:
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.server.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -1147,7 +1208,7 @@ class TestServerDiscovery:
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             pytest.raises(ServerDiscoveryError, match="Failed to discover"),
         ):
             await _discover_for_idp("cadc")
@@ -1164,7 +1225,9 @@ class TestServerDiscovery:
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("canfar.server.Discover", return_value=mock_discovery) as factory:
+        with patch(
+            "canfar._discovery.Discover", return_value=mock_discovery
+        ) as factory:
             servers = await _discover_for_idp("cadc", dev=True, timeout=11)
 
         assert servers == []
