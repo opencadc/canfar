@@ -88,6 +88,16 @@ class ServerActivation:
     reason: Literal["active", "remembered", "single", "selected"]
 
 
+@dataclass(frozen=True)
+class _RegistryEvidence:
+    """Registry resources plus acquisition outcome for one IDP inspection."""
+
+    preferred_storage_leaf: str | None
+    resources: tuple[RegistryResource, ...]
+    errors: tuple[str, ...]
+    available: bool
+
+
 def discover(
     idp: str,
     *,
@@ -384,6 +394,91 @@ def _resolve_selector(
     return None
 
 
+async def _load_registry_evidence(
+    idp: str,
+    *,
+    dev: bool,
+    timeout: int,
+    check_platforms: bool,
+) -> _RegistryEvidence:
+    """Acquire and extract registry records through one shared pipeline."""
+    idp_info = get_idp(idp)
+    sources = registry_sources(idp, include_dev=dev)
+    development_sources = set(idp_info.dev_registries)
+    search = IVOARegistrySearch(
+        registries=sources,
+        preferred_storage_leaf=idp_info.preferred_storage_leaf,
+    )
+    async with Discover(search, timeout=timeout) as discovery:
+        registries = await asyncio.gather(
+            *(
+                discovery.fetch(
+                    url,
+                    name,
+                    development=url in development_sources,
+                )
+                for url, name in sources.items()
+            )
+        )
+        successful = [registry for registry in registries if registry.success]
+        resources = [
+            resource
+            for registry in successful
+            for resource in discovery.extract(registry, dev=dev)
+        ]
+        if check_platforms:
+            endpoints = [
+                resource for resource in resources if resource.uri.endswith("/skaha")
+            ]
+            await asyncio.gather(*(discovery.check(endpoint) for endpoint in endpoints))
+
+    return _RegistryEvidence(
+        preferred_storage_leaf=idp_info.preferred_storage_leaf,
+        resources=tuple(resources),
+        errors=tuple(
+            f"{registry.name}: {registry.error}"
+            for registry in registries
+            if not registry.success
+        ),
+        available=bool(successful),
+    )
+
+
+async def _enrichment_config_copies(
+    config: Configuration | None,
+    idp: str,
+    *,
+    endpoint: RegistryResource,
+    count: int,
+) -> list[Configuration] | None:
+    """Materialize credentials once, then isolate worker configuration state."""
+    from canfar.client import HTTPClient  # noqa: PLC0415
+
+    base_config = config or Configuration()
+    client = HTTPClient(
+        config=base_config,
+        authentication_idp=idp,
+        url=AnyHttpUrl(endpoint.url),
+    )
+    if client.authentication_record is not None:
+        try:
+            await client._materialize_credentials()  # noqa: SLF001
+        except (
+            KeyError,
+            OSError,
+            AuthContextError,
+            AuthExpiredError,
+            CertificateError,
+            TypeError,
+            ValueError,
+        ) as exc:
+            log.debug("Skipping capability enrichment for IDP %s: %s", idp, exc)
+            return None
+
+    values = base_config.model_dump(mode="python")
+    return [Configuration.model_validate(values) for _ in range(count)]
+
+
 async def _discover_for_idp(
     idp: str,
     *,
@@ -405,72 +500,62 @@ async def _discover_for_idp(
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
-    idp_info = get_idp(idp)
-    sources = registry_sources(idp, include_dev=dev)
-    development_sources = set(idp_info.dev_registries)
-    search = IVOARegistrySearch(
-        registries=sources,
-        preferred_storage_leaf=idp_info.preferred_storage_leaf,
+    evidence = await _load_registry_evidence(
+        idp,
+        dev=dev,
+        timeout=timeout,
+        check_platforms=True,
     )
-    async with Discover(search, timeout=timeout) as discovery:
-        registries = await asyncio.gather(
+    if not evidence.available:
+        errors = "; ".join(evidence.errors)
+        msg = f"Failed to discover servers for IDP '{idp}': {errors}"
+        raise ServerDiscoveryError(msg)
+
+    endpoints = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith("/skaha") and resource.status == 200
+    ]
+    if not endpoints:
+        return []
+
+    storage_resources = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
+    ]
+    worker_configs = await _enrichment_config_copies(
+        config,
+        idp,
+        endpoint=endpoints[0],
+        count=len(endpoints),
+    )
+    if worker_configs is None:
+        return [_registry_resource_to_server(endpoint, idp) for endpoint in endpoints]
+
+    return list(
+        await asyncio.gather(
             *(
-                discovery.fetch(
-                    url,
-                    name,
-                    development=url in development_sources,
-                )
-                for url, name in sources.items()
-            )
-        )
-        successful_registries = [
-            registry for registry in registries if registry.success
-        ]
-        if not successful_registries:
-            errors = "; ".join(
-                f"{registry.name}: {registry.error}" for registry in registries
-            )
-            msg = f"Failed to discover servers for IDP '{idp}': {errors}"
-            raise ServerDiscoveryError(msg)
-
-        resources = []
-        for registry in successful_registries:
-            resources.extend(discovery.extract(registry, dev=dev))
-        endpoints = [
-            resource for resource in resources if resource.uri.endswith("/skaha")
-        ]
-        if not endpoints:
-            return []
-
-        storage_resources = [
-            resource
-            for resource in resources
-            if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
-        ]
-
-        checked = await asyncio.gather(
-            *(discovery.check(endpoint) for endpoint in endpoints)
-        )
-        reachable = [endpoint for endpoint in checked if endpoint.status == 200]
-        return list(
-            await asyncio.gather(
-                *(
-                    asyncio.to_thread(
-                        _discovered_to_server,
+                asyncio.to_thread(
+                    _discovered_to_server,
+                    endpoint,
+                    idp,
+                    config=worker_config,
+                    timeout=timeout,
+                    storage_resource=_select_storage_resource(
                         endpoint,
-                        idp,
-                        config=config,
-                        timeout=timeout,
-                        storage_resource=_select_storage_resource(
-                            endpoint,
-                            storage_resources,
-                            strict=False,
-                        ),
-                    )
-                    for endpoint in reachable
+                        storage_resources,
+                        strict=False,
+                    ),
+                )
+                for endpoint, worker_config in zip(
+                    endpoints,
+                    worker_configs,
+                    strict=True,
                 )
             )
         )
+    )
 
 
 def _host_slug(uri: AnyUrl) -> str | None:
@@ -528,43 +613,20 @@ async def _discover_storage_resource(
         msg = "Server URI is required to inspect its VOSpace Service."
         raise ServerFetchError(msg)
 
-    idp_info = get_idp(idp)
-    sources = registry_sources(idp, include_dev=dev)
-    development_sources = set(idp_info.dev_registries)
-    search = IVOARegistrySearch(
-        registries=sources,
-        preferred_storage_leaf=idp_info.preferred_storage_leaf,
+    evidence = await _load_registry_evidence(
+        idp,
+        dev=dev,
+        timeout=timeout,
+        check_platforms=False,
     )
-    async with Discover(search, timeout=timeout) as discovery:
-        registries = await asyncio.gather(
-            *(
-                discovery.fetch(
-                    url,
-                    name,
-                    development=url in development_sources,
-                )
-                for url, name in sources.items()
-            )
-        )
-        successful = [registry for registry in registries if registry.success]
-        if not successful:
-            errors = "; ".join(
-                f"{registry.name}: {registry.error}" for registry in registries
-            )
-            msg = (
-                f"Failed to inspect VOSpace registry records for IDP '{idp}': {errors}"
-            )
-            raise ServerFetchError(msg)
-
-        resources = [
-            resource
-            for registry in successful
-            for resource in discovery.extract(registry, dev=dev)
-        ]
+    if not evidence.available:
+        errors = "; ".join(evidence.errors)
+        msg = f"Failed to inspect VOSpace registry records for IDP '{idp}': {errors}"
+        raise ServerFetchError(msg)
 
     endpoints = [
         resource
-        for resource in resources
+        for resource in evidence.resources
         if resource.uri == str(server.uri) and resource.uri.endswith("/skaha")
     ]
     matching_urls = [
@@ -591,8 +653,8 @@ async def _discover_storage_resource(
 
     storage_resources = [
         resource
-        for resource in resources
-        if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
+        for resource in evidence.resources
+        if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
     ]
     return _select_storage_resource(endpoint, storage_resources, strict=True)
 
@@ -608,6 +670,17 @@ def _configured_storage_resource(server: Server) -> RegistryResource | None:
         registry="configuration",
         uri=str(service.uri),
         url=str(service.url),
+    )
+
+
+def _registry_resource_to_server(endpoint: RegistryResource, idp: str) -> Server:
+    """Convert registry endpoint identity without performing capability I/O."""
+    uri = AnyUrl(endpoint.uri)
+    return Server(
+        idp=idp,
+        name=endpoint.name or _host_slug(uri),
+        uri=uri,
+        url=AnyHttpUrl(endpoint.url),
     )
 
 
@@ -634,13 +707,7 @@ def _discovered_to_server(
     Returns:
         Server: Persisted server model with capabilities metadata when available.
     """
-    uri = AnyUrl(endpoint.uri)
-    server = Server(
-        idp=idp,
-        name=endpoint.name or _host_slug(uri),
-        uri=uri,
-        url=AnyHttpUrl(endpoint.url),
-    )
+    server = _registry_resource_to_server(endpoint, idp)
     return enrich(
         server,
         config=config,

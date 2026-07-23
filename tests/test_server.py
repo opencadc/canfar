@@ -670,6 +670,28 @@ class TestServerDiscovery:
 
         assert _select_storage_resource(endpoint, [dev_storage], strict=False) is None
 
+    @pytest.mark.asyncio
+    async def test_mixed_registry_records_keep_per_record_environment(self) -> None:
+        """Development-looking records stay isolated within a production source."""
+        registry = IVOARegistry(
+            name="SRCNet",
+            source="https://registry.example/resources",
+            content=(
+                "ivo://example.org/skaha="
+                "https://platform.example/skaha/capabilities\n"
+                "ivo://example.org/cavern="
+                "https://storage.example/dev/capabilities"
+            ),
+        )
+        search = IVOARegistrySearch(preferred_storage_leaf="cavern")
+
+        async with Discover(search) as discovery:
+            endpoint, storage = discovery.extract(registry, dev=True)
+
+        assert endpoint.development is False
+        assert storage.development is True
+        assert _select_storage_resource(endpoint, [storage], strict=False) is None
+
     def test_ambiguous_cross_registry_storage_is_not_last_write_wins(self) -> None:
         """Multiple namespace fallbacks are omitted or actionable, never arbitrary."""
         endpoint = DiscoveredServer(
@@ -695,7 +717,7 @@ class TestServerDiscovery:
     async def test_capability_enrichment_runs_concurrently_off_event_loop(
         self,
     ) -> None:
-        """Blocking authenticated capability clients run in concurrent workers."""
+        """Workers run concurrently with isolated, pre-materialized config copies."""
         endpoints = [
             DiscoveredServer(
                 registry="SRCNet",
@@ -716,12 +738,21 @@ class TestServerDiscovery:
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
         concurrent = Barrier(2, timeout=2)
+        worker_configs: list[Configuration] = []
+        config = Configuration(
+            active=ActiveConfig(authentication="srcnet", server=None),
+            authentication={"srcnet": OIDCCredential(idp="srcnet")},
+            servers={},
+        )
 
         def convert(
             endpoint: DiscoveredServer,
             idp: str,
-            **_kwargs: object,
+            **kwargs: object,
         ) -> Server:
+            worker_config = kwargs["config"]
+            assert isinstance(worker_config, Configuration)
+            worker_configs.append(worker_config)
             concurrent.wait()
             return Server(
                 idp=idp,
@@ -732,13 +763,21 @@ class TestServerDiscovery:
                 auths=["oidc"],
             )
 
+        materialize = AsyncMock(return_value=("current-token", None))
         with (
             patch("canfar.server.Discover", return_value=mock_discovery),
             patch("canfar.server._discovered_to_server", side_effect=convert),
+            patch(
+                "canfar.client.HTTPClient._materialize_credentials",
+                new=materialize,
+            ),
         ):
-            servers = await _discover_for_idp("srcnet")
+            servers = await _discover_for_idp("srcnet", config=config)
 
         assert [server.name for server in servers] == ["site-1", "site-2"]
+        materialize.assert_awaited_once_with()
+        assert len({id(worker_config) for worker_config in worker_configs}) == 2
+        assert all(worker_config is not config for worker_config in worker_configs)
 
     @pytest.mark.parametrize(
         "capabilities_case",

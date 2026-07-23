@@ -115,11 +115,12 @@ class Discover:
                 url = _without_terminal_capabilities(url)
                 if url is None:
                     continue
-                # Apply exclusion filters
-                if not dev and any(
+                record_development = any(
                     word in uri.lower() or word in url.lower()
                     for word in self.config.excluded
-                ):
+                )
+                # Apply exclusion filters
+                if not dev and record_development:
                     continue
 
                 # Apply omit filters
@@ -127,7 +128,7 @@ class Discover:
                     continue
                 endpoint = Server(
                     registry=registry.source or registry.name,
-                    development=registry.development,
+                    development=registry.development or record_development,
                     uri=uri,
                     url=url,
                     name=self.config.names.get(uri) if leaf == "skaha" else None,
