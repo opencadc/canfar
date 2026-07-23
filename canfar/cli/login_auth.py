@@ -6,6 +6,7 @@ import asyncio
 import webbrowser
 from typing import TYPE_CHECKING, Any
 
+import humanize
 import segno
 from rich import progress as rich_progress
 
@@ -98,12 +99,14 @@ def authenticate_for_cli(
     idp_info: IdpInfo,
     *,
     timeout: int | None = None,
+    force: bool = False,
 ) -> AuthenticationCredential:
     """Acquire Authentication credentials interactively for CLI login.
 
     Args:
         idp_info: Built-in Identity Provider metadata.
         timeout: HTTP timeout in seconds for OIDC requests.
+        force: Obtain a new X.509 certificate instead of reusing an existing one.
 
     Returns:
         Saved-ready authentication credential without embedded server.
@@ -113,19 +116,38 @@ def authenticate_for_cli(
         RuntimeError: If OIDC discovery URL is missing for an OIDC IDP.
     """
     if idp_info.auth_mode == "x509":
-        return _authenticate_x509(idp_info.key)
+        return _authenticate_x509(idp_info.key, force=force)
     return _authenticate_oidc(idp_info, timeout=timeout)
 
 
-def _authenticate_x509(idp: str) -> X509Credential:
-    """Run interactive X509 certificate acquisition.
+def _authenticate_x509(idp: str, *, force: bool = False) -> X509Credential:
+    """Reuse a valid X.509 certificate or acquire a replacement.
 
     Args:
         idp: Canonical Identity Provider key.
+        force: Obtain a new certificate without inspecting the existing one.
 
     Returns:
         X509 credential record for persisted configuration.
     """
+    if not force:
+        try:
+            info = x509.inspect()
+        except x509.CertificateError as exc:
+            if exc.expired_at is not None:
+                age = humanize.naturaltime(exc.expired_at)
+                console_utils.get_console().print(
+                    f"[yellow]x509 certificate expired {age}[/yellow]"
+                )
+        except (FileNotFoundError, PermissionError, ValueError):
+            pass
+        else:
+            return X509Credential(
+                idp=idp,
+                path=info["path"],
+                expiry=float(info["expiry"] or 0.0),
+            )
+
     return x509.authenticate_credential(X509Credential(idp=idp, expiry=0.0))
 
 

@@ -253,6 +253,7 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     assert result.exit_code == 0
     authenticate.assert_called_once()
     assert authenticate.call_args.kwargs["timeout"] == 9
+    assert authenticate.call_args.kwargs["force"] is True
     validate.assert_called_once()
     validated = validate.call_args.args[0]
     assert str(validated.uri) == _CADC_URI

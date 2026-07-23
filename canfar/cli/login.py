@@ -66,7 +66,7 @@ def _login_flow(
 
     idp_info = get_idp(idp)
     try:
-        credential = authenticate_for_cli(idp_info, timeout=timeout)
+        credential = authenticate_for_cli(idp_info, timeout=timeout, force=force)
     except (ValueError, RuntimeError) as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
