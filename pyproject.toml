@@ -233,6 +233,9 @@ docstring-code-line-length = "dynamic"
 # ty configuration (replaces mypy)
 [tool.ty]
 
+[tool.ty.rules]
+unused-ignore-comment = "ignore"
+
 [tool.ty.environment]
 python-version = "3.10"
 

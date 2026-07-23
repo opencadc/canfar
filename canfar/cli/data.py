@@ -36,7 +36,7 @@ async def _local_source() -> AsyncIterator[AbstractFileSystem]:
 
 def _sources() -> dict[str, AsyncFilesystemSource]:
     """Build the mapped sources for one data command invocation."""
-    config = Configuration()
+    config = Configuration()  # ty: ignore[missing-argument]
     sources = {
         storage_name: _vospace_source(storage_name)
         for server in config.servers.values()

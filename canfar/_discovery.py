@@ -201,7 +201,7 @@ async def prepare_enrichment_workers(
     """Materialize credentials once, then isolate worker configuration state."""
     from canfar.client import HTTPClient  # noqa: PLC0415
 
-    base_config = config or Configuration()
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
     client = HTTPClient(
         config=base_config,
         authentication_idp=idp,
