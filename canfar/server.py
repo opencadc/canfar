@@ -775,7 +775,9 @@ def _enrich_storage(
         )
     assert storage_resource is not None
     assert server.name is not None
-    service = VOSpaceService(uri=storage_resource.uri, url=storage_resource.url)
+    service = VOSpaceService.model_validate(
+        {"uri": storage_resource.uri, "url": storage_resource.url}
+    )
 
     return server.model_copy(
         update={"storage": {**server.storage, server.name: service}},

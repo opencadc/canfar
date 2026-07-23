@@ -28,7 +28,7 @@ def _vospace_source(
 
     @asynccontextmanager
     async def source() -> AsyncIterator[AbstractFileSystem]:
-        config = Configuration()
+        config = Configuration()  # ty: ignore[missing-argument]
         endpoint, idp = config._resolve_storage(storage_name)  # noqa: SLF001
         try:
             client_kwargs: dict[str, Any] = {
