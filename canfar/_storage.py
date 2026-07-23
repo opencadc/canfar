@@ -12,7 +12,6 @@ from canfar.models.config import Configuration
 if TYPE_CHECKING:
     from collections.abc import AsyncIterator
     from pathlib import Path
-    from typing import NoReturn
 
     from fsspec.spec import AbstractFileSystem
     from fsspec_cli import AsyncFilesystemSource
@@ -46,7 +45,8 @@ def _vospace_source(
             )
             token_value, certfile = await client._materialize_credentials()  # noqa: SLF001
         except (KeyError, OSError, TypeError, ValueError):
-            _fail_authentication(idp)
+            reason = "Credential cannot be used. Run 'canfar login' for this IDP."
+            raise AuthContextError(idp, reason) from None
 
         from vosfs import VOSpaceFileSystem  # noqa: PLC0415
 
@@ -71,9 +71,3 @@ def _vospace_source(
             await filesystem.aclose()
 
     return source
-
-
-def _fail_authentication(idp: str) -> NoReturn:
-    """Raise the fixed secret-safe authentication failure."""
-    reason = "Credential cannot be used. Run 'canfar login' for this IDP."
-    raise AuthContextError(idp, reason) from None
