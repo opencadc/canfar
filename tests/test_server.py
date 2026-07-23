@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from threading import Barrier
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -24,6 +25,7 @@ from canfar.server import (
     ServerSelectionRequiredError,
     _discover_for_idp,
     _discovered_to_server,
+    _select_storage_resource,
     activate,
     discover,
     enrich,
@@ -527,8 +529,8 @@ class TestServerDiscovery:
         if mode == "malformed":
             assert isinstance(exc_info.value.__cause__, ValueError)
 
-    def test_activation_surfaces_storage_failure_retained_by_discovery(self) -> None:
-        """Real non-strict discovery carries its storage error into activation."""
+    def test_activation_freshly_inspects_storage_missing_during_discovery(self) -> None:
+        """Activation obtains fresh evidence without transient Configuration state."""
         endpoint = DiscoveredServer(
             registry="CADC source",
             uri=_CADC_URI,
@@ -563,25 +565,27 @@ class TestServerDiscovery:
         config = _anonymous_config()
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.client.Client",
                 side_effect=_http_client_factory(transport),
             ),
         ):
             [discovered] = discover("cadc", config=config, save=False)
+            reloaded = Configuration.model_validate(config.model_dump(mode="python"))
             with pytest.raises(
                 ServerFetchError,
                 match="same-namespace 'arc' registry record",
             ):
-                activate("cadc", _CADC_URI, config=config)
+                activate("cadc", _CADC_URI, config=reloaded)
 
         assert discovered.version == "v1"
         assert discovered.storage == {}
+        assert "_storage_discovery_errors" not in Configuration.__private_attributes__
 
     @pytest.mark.asyncio
-    async def test_srcnet_pairs_each_server_with_same_namespace_cavern(self) -> None:
-        """SRCNet Cavern records pair by IVOA namespace, not list position."""
+    async def test_cross_registry_singletons_pair_by_namespace(self) -> None:
+        """A lone same-environment fallback may cross registry provenance."""
         resources = [
             DiscoveredServer(
                 registry="SRCNet",
@@ -636,7 +640,7 @@ class TestServerDiscovery:
             )
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch("canfar.server.enrich", side_effect=enriched),
         ):
             servers = await _discover_for_idp("srcnet")
@@ -647,6 +651,321 @@ class TestServerDiscovery:
             "canSRC": "ivo://canfar.net/src/cavern",
             "sweSRC": "ivo://swesrc.chalmers.se/cavern",
         }
+
+    def test_storage_pairing_never_crosses_prod_and_dev_sources(self) -> None:
+        """A same-namespace record from another environment is not a fallback."""
+        endpoint = DiscoveredServer(
+            registry="https://registry.example/prod",
+            development=False,
+            uri="ivo://cadc.nrc.ca/skaha",
+            url="https://platform.example/skaha",
+            name="canfar",
+        )
+        dev_storage = DiscoveredServer(
+            registry="https://registry.example/dev",
+            development=True,
+            uri="ivo://cadc.nrc.ca/arc",
+            url="https://storage.example/arc",
+        )
+
+        assert _select_storage_resource(endpoint, [dev_storage], strict=False) is None
+
+    @pytest.mark.asyncio
+    async def test_mixed_registry_records_keep_per_record_environment(self) -> None:
+        """Development-looking records stay isolated within a production source."""
+        registry = IVOARegistry(
+            name="SRCNet",
+            source="https://registry.example/resources",
+            content=(
+                "ivo://example.org/skaha="
+                "https://platform.example/skaha/capabilities\n"
+                "ivo://example.org/cavern="
+                "https://storage.example/dev/capabilities"
+            ),
+        )
+        search = IVOARegistrySearch(preferred_storage_leaf="cavern")
+
+        async with Discover(search) as discovery:
+            endpoint, storage = discovery.extract(registry, dev=True)
+
+        assert endpoint.development is False
+        assert storage.development is True
+        assert _select_storage_resource(endpoint, [storage], strict=False) is None
+
+    def test_ambiguous_cross_registry_storage_is_not_last_write_wins(self) -> None:
+        """Multiple namespace fallbacks are omitted or actionable, never arbitrary."""
+        endpoint = DiscoveredServer(
+            registry="https://registry.example/platform",
+            uri="ivo://example.org/skaha",
+            url="https://platform.example/skaha",
+            name="example",
+        )
+        storage = [
+            DiscoveredServer(
+                registry=f"https://registry.example/storage-{index}",
+                uri="ivo://example.org/cavern",
+                url=f"https://storage-{index}.example/cavern",
+            )
+            for index in (1, 2)
+        ]
+
+        assert _select_storage_resource(endpoint, storage, strict=False) is None
+        with pytest.raises(ServerFetchError, match="Multiple preferred VOSpace"):
+            _select_storage_resource(endpoint, storage, strict=True)
+
+    @pytest.mark.asyncio
+    async def test_capability_enrichment_runs_concurrently_off_event_loop(
+        self,
+    ) -> None:
+        """Workers run concurrently with isolated, pre-materialized config copies."""
+        endpoints = [
+            DiscoveredServer(
+                registry="SRCNet",
+                uri=f"ivo://site-{index}.example/skaha",
+                url=f"https://site-{index}.example/skaha",
+                status=200,
+                name=f"site-{index}",
+            )
+            for index in (1, 2)
+        ]
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(
+            success=True,
+            content="line",
+        )
+        mock_discovery.extract = MagicMock(return_value=endpoints)
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        concurrent = Barrier(2, timeout=2)
+        worker_configs: list[Configuration] = []
+        config = Configuration(
+            active=ActiveConfig(authentication="srcnet", server=None),
+            authentication={"srcnet": OIDCCredential(idp="srcnet")},
+            servers={},
+        )
+
+        def convert(
+            endpoint: DiscoveredServer,
+            idp: str,
+            **kwargs: object,
+        ) -> Server:
+            worker_config = kwargs["config"]
+            assert isinstance(worker_config, Configuration)
+            worker_configs.append(worker_config)
+            assert kwargs["token"] == "current-token"
+            assert kwargs["certificate"] is None
+            concurrent.wait()
+            return Server(
+                idp=idp,
+                name=endpoint.name,
+                uri=AnyUrl(endpoint.uri),
+                url=AnyHttpUrl(endpoint.url),
+                version="v1",
+                auths=["oidc"],
+            )
+
+        materialize = AsyncMock(return_value=("current-token", None))
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch("canfar.server._discovered_to_server", side_effect=convert),
+            patch(
+                "canfar.client.HTTPClient._materialize_credentials",
+                new=materialize,
+            ),
+        ):
+            servers = await _discover_for_idp("srcnet", config=config)
+
+        assert [server.name for server in servers] == ["site-1", "site-2"]
+        materialize.assert_awaited_once_with()
+        assert len({id(worker_config) for worker_config in worker_configs}) == 2
+        assert all(worker_config is not config for worker_config in worker_configs)
+
+    @pytest.mark.asyncio
+    async def test_worker_requests_use_pre_materialized_runtime_token(self) -> None:
+        """Fan-out requests cannot invoke saved-record refresh or persistence."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        config = Configuration(
+            active=ActiveConfig(authentication="srcnet", server=None),
+            authentication={"srcnet": OIDCCredential(idp="srcnet")},
+            servers={},
+        )
+        requests: list[httpx.Request] = []
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def response(request: httpx.Request) -> httpx.Response:
+            requests.append(request)
+            return httpx.Response(200, text=session_capabilities, request=request)
+
+        materialize = AsyncMock(return_value=("runtime-token", None))
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.HTTPClient._materialize_credentials",
+                new=materialize,
+            ),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(httpx.MockTransport(response)),
+            ),
+            patch("canfar.auth.oidc.sync_refresh") as refresh,
+        ):
+            [server] = await _discover_for_idp("srcnet", config=config)
+
+        assert server.version == "v1"
+        materialize.assert_awaited_once_with()
+        refresh.assert_not_called()
+        assert [request.headers["Authorization"] for request in requests] == [
+            "Bearer runtime-token"
+        ]
+
+    @pytest.mark.asyncio
+    async def test_environment_token_materializes_without_saved_credential(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        """Environment bearer auth survives preparation and worker fan-out."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        requests: list[httpx.Request] = []
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+
+        def response(request: httpx.Request) -> httpx.Response:
+            requests.append(request)
+            return httpx.Response(200, text=session_capabilities, request=request)
+
+        monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
+        monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(httpx.MockTransport(response)),
+            ),
+        ):
+            [server] = await _discover_for_idp(
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
+
+        assert server.version == "v1"
+        assert [request.headers["Authorization"] for request in requests] == [
+            "Bearer environment-token"
+        ]
+
+    @pytest.mark.asyncio
+    async def test_environment_certificate_materializes_without_saved_credential(
+        self,
+        monkeypatch: pytest.MonkeyPatch,
+        tmp_path: Path,
+    ) -> None:
+        """Environment certificate auth survives preparation and worker fan-out."""
+        endpoint = DiscoveredServer(
+            registry="SRCNet",
+            uri="ivo://site.example/skaha",
+            url="https://site.example/skaha",
+            status=200,
+            name="site",
+        )
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=[endpoint])
+        mock_discovery.check = AsyncMock(side_effect=lambda item: item)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        session_capabilities = """
+            <capabilities>
+              <capability standardID="http://www.opencadc.org/std/platform#session-1">
+                <interface>
+                  <accessURL use="base">https://site.example/skaha/v1</accessURL>
+                  <securityMethod
+                    standardID="ivo://ivoa.net/sso#tls-with-certificate" />
+                </interface>
+              </capability>
+            </capabilities>
+        """
+        certificate = tmp_path / "environment.pem"
+        valid = MagicMock(return_value=certificate.as_posix())
+        ssl_context = MagicMock()
+
+        monkeypatch.delenv("CANFAR_TOKEN", raising=False)
+        monkeypatch.setenv("CANFAR_CERTIFICATE", certificate.as_posix())
+        with (
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
+            patch(
+                "canfar.client.x509.inspect",
+                return_value={
+                    "path": certificate.as_posix(),
+                    "expiry": 9_999_999_999.0,
+                },
+            ),
+            patch("canfar.client.x509.valid", new=valid),
+            patch(
+                "canfar.client.HTTPClient._get_ssl_context",
+                return_value=ssl_context,
+            ) as get_ssl_context,
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(
+                    httpx.MockTransport(
+                        lambda request: httpx.Response(
+                            200,
+                            text=session_capabilities,
+                            request=request,
+                        )
+                    )
+                ),
+            ),
+        ):
+            [server] = await _discover_for_idp(
+                "srcnet",
+                config=_anonymous_config(idp="srcnet"),
+            )
+
+        assert server.version == "v1"
+        valid.assert_called_once_with(certificate)
+        get_ssl_context.assert_called_once_with(certificate)
 
     @pytest.mark.parametrize(
         "capabilities_case",
@@ -889,7 +1208,7 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.server.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -927,7 +1246,7 @@ class TestServerDiscovery:
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             patch(
                 "canfar.server.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -1016,7 +1335,7 @@ class TestServerDiscovery:
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.server.Discover", return_value=mock_discovery),
+            patch("canfar._discovery.Discover", return_value=mock_discovery),
             pytest.raises(ServerDiscoveryError, match="Failed to discover"),
         ):
             await _discover_for_idp("cadc")
@@ -1033,7 +1352,9 @@ class TestServerDiscovery:
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
-        with patch("canfar.server.Discover", return_value=mock_discovery) as factory:
+        with patch(
+            "canfar._discovery.Discover", return_value=mock_discovery
+        ) as factory:
             servers = await _discover_for_idp("cadc", dev=True, timeout=11)
 
         assert servers == []

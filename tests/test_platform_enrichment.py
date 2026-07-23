@@ -23,7 +23,7 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.config import Configuration
-from canfar.models.http import Server
+from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import ContainerRegistry
 from tests.test_auth_x509 import generate_cert
 
@@ -39,6 +39,25 @@ _CONTEXT_PAYLOAD = {
     "memoryGB": {"defaultLimit": 192},
     "gpus": {"options": [0, 1, 2, 4]},
 }
+_VOSPACE_CAPABILITIES = """
+    <capabilities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <capability standardID="ivo://ivoa.net/std/VOSpace/v2.0#nodes">
+        <interface xsi:type="ParamHTTP" role="std">
+          <accessURL use="base">https://storage.example/arc/nodes</accessURL>
+        </interface>
+      </capability>
+    </capabilities>
+"""
+
+
+def _primary_storage(name: str, *, leaf: str = "arc") -> dict[str, VOSpaceService]:
+    """Return persisted primary storage evidence for activation tests."""
+    return {
+        name: VOSpaceService(
+            uri=AnyUrl(f"ivo://storage.example/{leaf}"),
+            url=AnyHttpUrl(f"https://storage.example/{leaf}"),
+        )
+    }
 
 
 def _http_client_factory(
@@ -149,6 +168,7 @@ class TestPlatformEnrichment:
         """Activation owns HTTP enrichment while Server remains persisted data."""
         known = _server(
             name="Stable-Name",
+            storage=_primary_storage("Stable-Name"),
             cores=8,
             ram=64,
             gpus=1,
@@ -159,6 +179,8 @@ class TestPlatformEnrichment:
         def response(request: httpx.Request) -> httpx.Response:
             """Serve capabilities and context for activation enrichment."""
             requests.append(request)
+            if request.url.host == "storage.example":
+                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
                     200, text=_capabilities(_CADC_URL), request=request
@@ -189,10 +211,12 @@ class TestPlatformEnrichment:
         assert persisted.active.server == "Stable-Name"
         assert persisted.servers["Stable-Name"] == activated.server
         assert [request.url.path for request in requests] == [
+            "/arc/capabilities",
             "/skaha/capabilities",
             "/skaha/v2/context",
         ]
         assert [request.extensions["timeout"] for request in requests] == [
+            {"connect": 7, "read": 7, "write": 7, "pool": 7},
             {"connect": 7, "read": 7, "write": 7, "pool": 7},
             {"connect": 7, "read": 7, "write": 7, "pool": 7},
         ]
@@ -204,10 +228,19 @@ class TestPlatformEnrichment:
         failure: str,
     ) -> None:
         """Expected context failures keep server identity and safe defaults."""
-        known = _server(name="Stable-Name", cores=8, ram=64, gpus=1, status="reachable")
+        known = _server(
+            name="Stable-Name",
+            storage=_primary_storage("Stable-Name"),
+            cores=8,
+            ram=64,
+            gpus=1,
+            status="reachable",
+        )
 
         def response(request: httpx.Request) -> httpx.Response:
             """Serve capabilities and a parametrized unusable context reply."""
+            if request.url.host == "storage.example":
+                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(
                     200, text=_capabilities(_CADC_URL), request=request
@@ -445,6 +478,7 @@ class TestPlatformEnrichment:
             name="SRCNet",
             uri=AnyUrl("ivo://srcnet.example/skaha"),
             url=AnyHttpUrl("https://srcnet.example/skaha"),
+            storage=_primary_storage("SRCNet", leaf="cavern"),
             version=None,
             auths=None,
         )
@@ -455,6 +489,8 @@ class TestPlatformEnrichment:
         def platform_response(request: httpx.Request) -> httpx.Response:
             """Serve capabilities then a failed context fetch during refresh."""
             platform_requests.append(request)
+            if request.url.host == "storage.example":
+                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
                 return httpx.Response(200, text=capabilities, request=request)
             if request.url.path.endswith("/v2/context"):
@@ -518,6 +554,7 @@ class TestPlatformEnrichment:
         assert validated.version == "v2"
         assert len(token_requests) == 1
         assert [request.headers["Authorization"] for request in platform_requests] == [
+            f"Bearer {_REFRESHED_TOKEN}",
             f"Bearer {_REFRESHED_TOKEN}",
             f"Bearer {_REFRESHED_TOKEN}",
         ]

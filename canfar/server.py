@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 from xml.etree.ElementTree import ParseError
 
 import httpx
@@ -12,11 +12,18 @@ from defusedxml.common import DefusedXmlException
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar import get_logger
+from canfar._discovery import (
+    RegistryEvidenceError,
+    discover_storage_resource,
+    load_registry_evidence,
+    prepare_enrichment_workers,
+    select_storage_resource,
+)
 from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
-from canfar.idp import get_idp, registry_sources
+from canfar.idp import get_idp
 from canfar.models.config import Configuration
 from canfar.models.http import (
     DEFAULT_SERVER_CORES,
@@ -25,10 +32,11 @@ from canfar.models.http import (
     Server,
     VOSpaceService,
 )
-from canfar.models.registry import IVOARegistrySearch
 from canfar.models.registry import Server as RegistryResource
 from canfar.utils import vosi
-from canfar.utils.discover import Discover
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 log = get_logger(__name__)
 
@@ -254,6 +262,7 @@ def activate(
         resolved,
         config=target_config,
         idp=idp,
+        dev=dev,
         timeout=timeout,
     )
     target_config.set_active_selection(idp, validated)
@@ -404,56 +413,64 @@ async def _discover_for_idp(
     Raises:
         ServerDiscoveryError: If registry retrieval fails.
     """
-    sources = registry_sources(idp, include_dev=dev)
-    search = IVOARegistrySearch(
-        registries=sources,
-        preferred_storage_leaf=get_idp(idp).preferred_storage_leaf,
+    evidence = await load_registry_evidence(
+        idp,
+        dev=dev,
+        timeout=timeout,
+        check_platforms=True,
     )
-    async with Discover(search, timeout=timeout) as discovery:
-        registries = await asyncio.gather(
-            *(discovery.fetch(url, name) for url, name in sources.items())
-        )
-        successful_registries = [
-            registry for registry in registries if registry.success
-        ]
-        if not successful_registries:
-            errors = "; ".join(
-                f"{registry.name}: {registry.error}" for registry in registries
+    if not evidence.available:
+        errors = "; ".join(evidence.errors)
+        msg = f"Failed to discover servers for IDP '{idp}': {errors}"
+        raise ServerDiscoveryError(msg)
+
+    endpoints = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith("/skaha") and resource.status == 200
+    ]
+    if not endpoints:
+        return []
+
+    storage_resources = [
+        resource
+        for resource in evidence.resources
+        if resource.uri.endswith(f"/{evidence.preferred_storage_leaf}")
+    ]
+    workers = await prepare_enrichment_workers(
+        config,
+        idp,
+        endpoint=endpoints[0],
+        count=len(endpoints),
+    )
+    if workers is None:
+        return [_registry_resource_to_server(endpoint, idp) for endpoint in endpoints]
+
+    return list(
+        await asyncio.gather(
+            *(
+                asyncio.to_thread(
+                    _discovered_to_server,
+                    endpoint,
+                    idp,
+                    config=worker_config,
+                    token=workers.token,
+                    certificate=workers.certificate,
+                    timeout=timeout,
+                    storage_resource=_select_storage_resource(
+                        endpoint,
+                        storage_resources,
+                        strict=False,
+                    ),
+                )
+                for endpoint, worker_config in zip(
+                    endpoints,
+                    workers.configs,
+                    strict=True,
+                )
             )
-            msg = f"Failed to discover servers for IDP '{idp}': {errors}"
-            raise ServerDiscoveryError(msg)
-
-        resources = []
-        for registry in successful_registries:
-            resources.extend(discovery.extract(registry, dev=dev))
-        endpoints = [
-            resource for resource in resources if resource.uri.endswith("/skaha")
-        ]
-        if not endpoints:
-            return []
-
-        storage_by_namespace = {
-            _registry_namespace(resource.uri): resource
-            for resource in resources
-            if resource.uri.endswith(f"/{search.preferred_storage_leaf}")
-        }
-
-        checked = await asyncio.gather(
-            *(discovery.check(endpoint) for endpoint in endpoints)
         )
-        return [
-            _discovered_to_server(
-                endpoint,
-                idp,
-                config=config,
-                timeout=timeout,
-                storage_resource=storage_by_namespace.get(
-                    _registry_namespace(endpoint.uri)
-                ),
-            )
-            for endpoint in checked
-            if endpoint.status == 200
-        ]
+    )
 
 
 def _host_slug(uri: AnyUrl) -> str | None:
@@ -463,9 +480,63 @@ def _host_slug(uri: AnyUrl) -> str | None:
     return uri.host.replace(".", "-")
 
 
-def _registry_namespace(uri: str) -> str:
-    """Return the IVOA registry URI namespace before its resource leaf."""
-    return uri.rpartition("/")[0]
+def _select_storage_resource(
+    endpoint: RegistryResource,
+    resources: list[RegistryResource],
+    *,
+    strict: bool,
+) -> RegistryResource | None:
+    """Map private registry ambiguity to the public server fetch error."""
+    try:
+        return select_storage_resource(endpoint, resources, strict=strict)
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
+
+
+async def _discover_storage_resource(
+    server: Server,
+    idp: str,
+    *,
+    dev: bool,
+    timeout: int,
+) -> RegistryResource | None:
+    """Return fresh registry evidence for a server's primary VOSpace service."""
+    try:
+        return await discover_storage_resource(
+            str(server.uri) if server.uri is not None else None,
+            str(server.url) if server.url is not None else None,
+            server.name,
+            idp,
+            dev=dev,
+            timeout=timeout,
+        )
+    except RegistryEvidenceError as exc:
+        raise ServerFetchError(str(exc)) from exc
+
+
+def _configured_storage_resource(server: Server) -> RegistryResource | None:
+    """Convert the persisted primary VOSpace service to inspection evidence."""
+    if server.name is None:
+        return None
+    service = server.storage.get(server.name)
+    if service is None:
+        return None
+    return RegistryResource(
+        registry="configuration",
+        uri=str(service.uri),
+        url=str(service.url),
+    )
+
+
+def _registry_resource_to_server(endpoint: RegistryResource, idp: str) -> Server:
+    """Convert registry endpoint identity without performing capability I/O."""
+    uri = AnyUrl(endpoint.uri)
+    return Server(
+        idp=idp,
+        name=endpoint.name or _host_slug(uri),
+        uri=uri,
+        url=AnyHttpUrl(endpoint.url),
+    )
 
 
 def _discovered_to_server(
@@ -473,6 +544,8 @@ def _discovered_to_server(
     idp: str,
     *,
     config: Configuration | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     timeout: int = 2,
     storage_resource: RegistryResource | None = None,
 ) -> Server:
@@ -485,22 +558,20 @@ def _discovered_to_server(
         endpoint: Discovered registry endpoint.
         idp: Canonical IDP key.
         config: Configuration whose Authentication Record authorizes enrichment.
+        token: Pre-materialized runtime bearer token for worker isolation.
+        certificate: Pre-materialized runtime certificate for worker isolation.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
         storage_resource: Same-namespace preferred VOSpace registry record, if any.
 
     Returns:
         Server: Persisted server model with capabilities metadata when available.
     """
-    uri = AnyUrl(endpoint.uri)
-    server = Server(
-        idp=idp,
-        name=endpoint.name or _host_slug(uri),
-        uri=uri,
-        url=AnyHttpUrl(endpoint.url),
-    )
+    server = _registry_resource_to_server(endpoint, idp)
     return enrich(
         server,
         config=config,
+        token=token,
+        certificate=certificate,
         strict=False,
         timeout=timeout,
         storage_resource=storage_resource,
@@ -512,6 +583,8 @@ def enrich(
     *,
     config: Configuration | None = None,
     authentication_idp: str | None = None,
+    token: str | None = None,
+    certificate: Path | None = None,
     strict: bool = True,
     timeout: int = 2,
     storage_resource: RegistryResource | None | object = _STORAGE_RESOURCE_UNSET,
@@ -525,6 +598,8 @@ def enrich(
             Authentication or Server Selection.
         authentication_idp: Optional Authentication Record selector. Defaults to
             the Server IDP, then the active Authentication.
+        token: Optional runtime bearer token for capability requests.
+        certificate: Optional runtime certificate for capability requests.
         strict: When ``False``, keep usable registry and existing storage data
             when session or storage capabilities cannot be retrieved or parsed.
             Other successful enrichment may still be returned, so the result can
@@ -544,14 +619,6 @@ def enrich(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = authentication_idp or server.idp or base_config.active.authentication
-    if (
-        strict
-        and storage_resource is _STORAGE_RESOURCE_UNSET
-        and server.name in base_config._storage_discovery_errors  # noqa: SLF001
-    ):
-        raise ServerFetchError(
-            base_config._storage_discovery_errors[server.name]  # noqa: SLF001
-        )
     if storage_resource is not _STORAGE_RESOURCE_UNSET:
         server = _enrich_storage(
             server,
@@ -562,6 +629,8 @@ def enrich(
             ),
             config=base_config,
             authentication_idp=active_idp,
+            token=token,
+            certificate=certificate,
             strict=strict,
             timeout=timeout,
         )
@@ -574,6 +643,8 @@ def enrich(
                 server.url,
                 config=base_config,
                 authentication_idp=active_idp,
+                token=token,
+                certificate=certificate,
                 timeout=timeout,
             )
         )
@@ -617,7 +688,7 @@ def enrich(
         )
 
     try:
-        enriched = Server.model_validate(
+        return Server.model_validate(
             {
                 **server.model_dump(mode="python"),
                 "url": primary["baseurl"],
@@ -636,8 +707,6 @@ def enrich(
             ),
             args=(server.url, exc),
         )
-    else:
-        return enriched
 
 
 def _enrich_storage(
@@ -646,6 +715,8 @@ def _enrich_storage(
     storage_resource: RegistryResource | None,
     config: Configuration,
     authentication_idp: str,
+    token: str | None,
+    certificate: Path | None,
     strict: bool,
     timeout: int,
 ) -> Server:
@@ -664,6 +735,8 @@ def _enrich_storage(
                 AnyHttpUrl(storage_resource.url),
                 config=config,
                 authentication_idp=authentication_idp,
+                token=token,
+                certificate=certificate,
                 timeout=timeout,
             )
             valid = vosi.is_vospace_service(xml)
@@ -692,7 +765,7 @@ def _enrich_storage(
             f"Failed to inspect VOSpace Service '{subject}' for Science "
             f"Platform Server '{server.name}': {error}"
         )
-        kept = _keep_or_raise(
+        return _keep_or_raise(
             server,
             strict=strict,
             error=message,
@@ -700,20 +773,14 @@ def _enrich_storage(
             debug="Skipping VOSpace Service %s during discovery: %s",
             args=(subject, error),
         )
-        if server.name is not None:
-            config._storage_discovery_errors[server.name] = message  # noqa: SLF001
-        return kept
-
     assert storage_resource is not None
     assert server.name is not None
     service = VOSpaceService(uri=storage_resource.uri, url=storage_resource.url)
 
-    enriched = server.model_copy(
+    return server.model_copy(
         update={"storage": {**server.storage, server.name: service}},
         deep=True,
     )
-    config._storage_discovery_errors.pop(server.name, None)  # noqa: SLF001
-    return enriched
 
 
 def _fetch_capabilities(
@@ -721,18 +788,25 @@ def _fetch_capabilities(
     *,
     config: Configuration,
     authentication_idp: str,
+    token: str | None = None,
+    certificate: Path | None = None,
     timeout: int,
 ) -> str:
     """Fetch one VOSI capabilities document through the existing HTTP seam."""
     from canfar.client import HTTPClient  # noqa: PLC0415
 
-    with HTTPClient(
-        config=config,
-        authentication_idp=authentication_idp,
-        url=url,
-        timeout=timeout,
-        raise_http_errors=False,
-    ) as client:
+    client_kwargs: dict[str, Any] = {
+        "config": config,
+        "authentication_idp": authentication_idp,
+        "url": url,
+        "timeout": timeout,
+        "raise_http_errors": False,
+    }
+    if token is not None:
+        client_kwargs["token"] = token
+    if certificate is not None:
+        client_kwargs["certificate"] = certificate
+    with HTTPClient(**client_kwargs) as client:
         request_client = client.client
         request_client.headers["Accept"] = "application/xml"
         request_client.headers.pop("Content-Type", None)
@@ -763,6 +837,7 @@ def _validate_server(
     *,
     config: Configuration | None = None,
     idp: str | None = None,
+    dev: bool = False,
     timeout: int = 2,
 ) -> Server:
     """Fetch and validate a server before persisting it as active.
@@ -771,6 +846,7 @@ def _validate_server(
         server: Candidate server record.
         config: Configuration to use while validating the candidate selection.
         idp: Authentication IDP to pair with the candidate server.
+        dev: Include development registry evidence during validation.
         timeout: HTTP timeout in seconds for validation requests.
 
     Returns:
@@ -781,12 +857,23 @@ def _validate_server(
     """
     base_config = config or Configuration()  # ty: ignore[missing-argument]
     active_idp = idp or server.idp or base_config.active.authentication
+    storage_resource = _configured_storage_resource(server)
+    if storage_resource is None:
+        storage_resource = asyncio.run(
+            _discover_storage_resource(
+                server,
+                active_idp,
+                dev=dev,
+                timeout=timeout,
+            )
+        )
     enriched = enrich(
         server,
         config=base_config,
         authentication_idp=active_idp,
         strict=True,
         timeout=timeout,
+        storage_resource=storage_resource,
     )
     if enriched.url is None or enriched.version is None:
         msg = "Server URL and version are required before activation."

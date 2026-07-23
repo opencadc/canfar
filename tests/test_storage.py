@@ -24,8 +24,6 @@ if TYPE_CHECKING:
 class _Filesystem:
     """Record construction and cleanup without VOSpace I/O."""
 
-    async_impl = True
-
     def __init__(self, endpoint: str, **kwargs: Any) -> None:
         self.endpoint = endpoint
         self.kwargs = kwargs
@@ -97,7 +95,6 @@ async def test_source_reloads_config_and_runtime_token_wins(
             "asynchronous": True,
             "skip_instance_cache": True,
         }
-        assert filesystem.async_impl is True
         assert filesystem.asynchronous is True
         assert filesystem.closed is False
 
