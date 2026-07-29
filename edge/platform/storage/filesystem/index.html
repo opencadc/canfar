@@ -2217,7 +2217,7 @@
 
 
 <h1 id="filesystem-access">Filesystem Access<a class="headerlink" href="#filesystem-access" title="Permanent link">&para;</a></h1>
-<p><strong>CANFAR's ARC storage systems as filesystems, SSHFS mounting from external computers, and permission management.</strong></p>
+<p><strong>CANFAR's ARC (Cavern) storage systems as filesystems, SSHFS mounting from external computers, and permission management.</strong></p>
 <div class="admonition abstract">
 <p class="admonition-title">🎯 Filesystem Guide Overview</p>
 <p><strong>Master direct storage access:</strong></p>
@@ -2232,6 +2232,15 @@
 <h2 id="arc-storage-as-filesystems">🗂️ ARC Storage as Filesystems<a class="headerlink" href="#arc-storage-as-filesystems" title="Permanent link">&para;</a></h2>
 <h3 id="within-canfar-sessions">Within CANFAR Sessions<a class="headerlink" href="#within-canfar-sessions" title="Permanent link">&para;</a></h3>
 <p>When you start any CANFAR session (Notebook, Desktop, or batch job), ARC storage is automatically mounted as standard directories:</p>
+<div class="admonition abstract">
+<p class="admonition-title">🎯 Storage Naming</p>
+<p><strong>ARC or Cavern:</strong></p>
+<p>Both use the same VOSpace image.</p>
+<ul>
+<li><strong>ARC</strong>: The CANFAR user storage system</li>
+<li><strong>Cavern</strong>: The generic deployment for user storage</li>
+</ul>
+</div>
 <div class="highlight"><pre><span></span><code><span class="c1"># Automatic mounts in every session</span>
 /arc/home/<span class="o">[</span>user<span class="o">]</span>/<span class="w">          </span><span class="c1"># Your personal 10GB space</span>
 /arc/projects/<span class="o">[</span>project<span class="o">]</span>/<span class="w">   </span><span class="c1"># Shared project spaces (if member)</span>
@@ -2303,6 +2312,87 @@ chmod<span class="w"> </span><span class="m">644</span><span class="w"> </span>d
 chmod<span class="w"> </span><span class="m">755</span><span class="w"> </span>analysis_script.py<span class="w">      </span><span class="c1"># Executable script</span>
 chgrp<span class="w"> </span>projectgroup<span class="w"> </span>shared_data/<span class="w">   </span><span class="c1"># Change group ownership</span>
 </code></pre></div>
+<h3 id="creating-a-project-allocation">Creating a Project Allocation<a class="headerlink" href="#creating-a-project-allocation" title="Permanent link">&para;</a></h3>
+<p>A project allocation under <code>/arc/projects/[project]</code> is <strong>not</strong> another folder created with <code>mkdir</code>. It is a VOSpace container node that carries a <strong>quota</strong> (in bytes) and an associated <strong>team Group</strong> for membership and access. Ordinary directory operations only work <em>inside</em> an allocation that already exists.</p>
+<div class="admonition danger">
+<p class="admonition-title">🔐 Admin only — Allocations owner required</p>
+<p>Creating an allocation must be invoked <strong>as the Allocations owner</strong> (the admin identity used for allocation nodes; currently <code>storops</code>). <strong>This procedure is not for general users.</strong> End users cannot create project allocations this way — request one via <a href="mailto:support@canfar.net">support@canfar.net</a> (see the <a href="../../support/faq/#how-much-storage-do-i-get-and-where-should-i-put-data">FAQ</a>). Group membership for access is managed separately through <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/">Group Management</a>.</p>
+</div>
+<p>The steps below adapt the low-level node create process for ARC project allocations. The same VOSpace node model applies to related services (for example vault); for ARC, use the arc nodes endpoint and authority.</p>
+<h4 id="create-the-allocation">Create the allocation<a class="headerlink" href="#create-the-allocation" title="Permanent link">&para;</a></h4>
+<ol>
+<li>Create an XML file from this minimal template:</li>
+</ol>
+<div class="highlight"><pre><span></span><code><span class="cp">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;</span>
+<span class="nt">&lt;vos:node</span><span class="w"> </span><span class="na">xmlns:vos=</span><span class="s">&quot;http://www.ivoa.net/xml/VOSpace/v2.0&quot;</span>
+<span class="w"> </span><span class="na">xmlns:xsi=</span><span class="s">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+<span class="w"> </span><span class="na">uri=</span><span class="s">&quot;vos://AUTHORITY/projects/NAME&quot;</span><span class="w"> </span><span class="na">xsi:type=</span><span class="s">&quot;vos:ContainerNode&quot;</span><span class="nt">&gt;</span>
+<span class="w"> </span><span class="nt">&lt;vos:properties&gt;</span>
+<span class="w"> </span><span class="nt">&lt;vos:property</span><span class="w"> </span><span class="na">uri=</span><span class="s">&quot;ivo://ivoa.net/vospace/core#creator&quot;</span><span class="nt">&gt;</span>USERNAME<span class="nt">&lt;/vos:property&gt;</span>
+<span class="w"> </span><span class="nt">&lt;vos:property</span><span class="w"> </span><span class="na">uri=</span><span class="s">&quot;ivo://cadc.nrc.ca/vospace/core#inheritPermissions&quot;</span><span class="nt">&gt;</span>true<span class="nt">&lt;/vos:property&gt;</span>
+<span class="w"> </span><span class="nt">&lt;vos:property</span><span class="w"> </span><span class="na">uri=</span><span class="s">&quot;ivo://ivoa.net/vospace/core#quota&quot;</span><span class="nt">&gt;</span>NUMBYTES<span class="nt">&lt;/vos:property&gt;</span>
+<span class="w"> </span><span class="nt">&lt;/vos:properties&gt;</span>
+<span class="w"> </span><span class="nt">&lt;vos:nodes</span><span class="w"> </span><span class="nt">/&gt;</span>
+<span class="nt">&lt;/vos:node&gt;</span>
+</code></pre></div>
+<p><code>AUTHORITY</code> is the VOSpace authority for that site’s ARC (Cavern) service (it differs by deployment). For example, on CANFAR ARC it is typically <code>cadc.nrc.ca~arc</code>, so a project named <code>myproject</code> would use:</p>
+<div class="highlight"><pre><span></span><code>vos://cadc.nrc.ca~arc/projects/myproject
+</code></pre></div>
+<p>For SRCNet deployments, it would look like that site's identification.  For <code>canSRC</code>, for example:</p>
+<div class="highlight"><pre><span></span><code>vos://canfar.net~staging-src~cavern
+</code></pre></div>
+<p>Always confirm the value from the site’s root node (step 5 below) rather than hard-coding an authority from another environment.</p>
+<ol>
+<li>
+<p>Edit the file:</p>
+<ol>
+<li>Put the project name in the <code>uri</code> path (replace <code>NAME</code>). The path must match the mounted tree: <code>/arc/projects/[project]</code> ↔ <code>projects/NAME</code>.</li>
+<li>Put the owner’s username in the <code>#creator</code> property (replace <code>USERNAME</code>).</li>
+<li>Put the desired quota in bytes in the <code>#quota</code> property (replace <code>NUMBYTES</code>).</li>
+<li>Leave <code>#inheritPermissions</code> as <code>true</code> (sane default).</li>
+<li>Set the authority part of the <code>uri</code> from the ARC root node for that site:</li>
+</ol>
+</li>
+</ol>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>https://example.org/arc/nodes?limit<span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+<ol>
+<li>Create the container node authenticated as the Allocations owner. Certificate and Bearer token authentication are both accepted:</li>
+</ol>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--cert<span class="w"> </span>certificate.pem<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;content-type: text/xml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--upload-file<span class="w"> </span>&lt;xml<span class="w"> </span>file&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+
+curl<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--header<span class="w"> </span><span class="s2">&quot;content-type: text/xml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--upload-file<span class="w"> </span>&lt;xml<span class="w"> </span>file&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+</code></pre></div>
+<p><code>NAME</code> in the URL must match the name in the XML <code>uri</code>, or the create request is rejected. On success, the service returns an XML representation of the created node (it may include additional default properties).</p>
+<h4 id="check-allocation-status">Check allocation status<a class="headerlink" href="#check-allocation-status" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>https://example.org/arc/nodes/projects/NAME?limit<span class="o">=</span><span class="m">0</span>
+</code></pre></div>
+<p><code>limit=0</code> means “do not list children.” Auth is optional for a publicly readable parent, but you can use Allocations-owner credentials (certificate or Bearer token) as above.</p>
+<h4 id="delete-an-empty-allocation">Delete an empty allocation<a class="headerlink" href="#delete-an-empty-allocation" title="Permanent link">&para;</a></h4>
+<p>If you make a mistake and the node has no children:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--cert<span class="w"> </span>certificate.pem<span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+
+curl<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span>-X<span class="w"> </span>DELETE<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+</code></pre></div>
+<p>This fails if the container has any child nodes.</p>
+<h4 id="update-quota-on-an-existing-allocation">Update quota on an existing allocation<a class="headerlink" href="#update-quota-on-an-existing-allocation" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>--cert<span class="w"> </span>certificate.pem<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;content-type: text/xml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-binary<span class="w"> </span>@&lt;xml<span class="w"> </span>file&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+
+curl<span class="w"> </span>--header<span class="w"> </span><span class="s2">&quot;Authorization: Bearer TOKEN&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--header<span class="w"> </span><span class="s2">&quot;content-type: text/xml&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--data-binary<span class="w"> </span>@&lt;xml<span class="w"> </span>file&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>https://example.org/arc/nodes/projects/NAME
+</code></pre></div>
+<p>The XML only needs the properties you intend to change (typically <code>#quota</code>). Include only that property so other node properties are not changed by accident. Changing the owner of a node via this path is not implemented.</p>
 <h3 id="working-with-large-datasets">Working with Large Datasets<a class="headerlink" href="#working-with-large-datasets" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Check available space</span>
 df<span class="w"> </span>-h<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
@@ -2757,7 +2847,7 @@ rsync<span class="w"> </span>-avz<span class="w"> </span>--exclude<span class="o
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 29, 2026 16:59:38 UTC">July 29, 2026</span>
   </span>
 
     
