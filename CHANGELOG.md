@@ -1,5 +1,96 @@
 # Changelog
 
+## [1.5.0](https://github.com/opencadc/canfar/compare/v1.4.1...v1.5.0) (2026-08-10)
+
+
+### Features
+
+* **client:** log HTTP URL and status at debug level ([1bda687](https://github.com/opencadc/canfar/commit/1bda687c3580c02667605913dcf00c93ce434759))
+* **client:** log HTTP URL and status at debug level ([2168d34](https://github.com/opencadc/canfar/commit/2168d34a175d3b6b8db4c3d5d16575e4417403f1))
+* **cli:** make create a domain request adapter ([#194](https://github.com/opencadc/canfar/issues/194)) ([3595f5c](https://github.com/opencadc/canfar/commit/3595f5cd72f4bb9e343c9d479dc3a328c258f8e1))
+* **config:** add named VOSpace services ([d699d79](https://github.com/opencadc/canfar/commit/d699d794a789a9c6633cb4bdc84cb0e08ccb4dc9))
+* **config:** add named VOSpace services ([1271ff8](https://github.com/opencadc/canfar/commit/1271ff8e400983b2ab643fb5269a311440b557cb))
+* **data:** embed upstream fsspec commands ([e45debe](https://github.com/opencadc/canfar/commit/e45debe4a03ba5da893ee4b0ebaf9be4ba07f0b1))
+* **data:** embed upstream fsspec commands ([7193c69](https://github.com/opencadc/canfar/commit/7193c6958b74c4b9135ee9d28f544f0b841d2cde))
+* **data:** integrate vosfs data commands ([5f95cfe](https://github.com/opencadc/canfar/commit/5f95cfe72ae0852b20414ea1ebcf7d576cd41f65))
+* **discovery:** discover primary VOSpace services ([5ce4e6f](https://github.com/opencadc/canfar/commit/5ce4e6ff504303a7ec4a87d9ffce859603e40744))
+* **discovery:** discover primary VOSpace services ([d69de91](https://github.com/opencadc/canfar/commit/d69de914eeeb26ebbce524f6ecedee2284ee92d8))
+* **logging:** add opt-in OTLP export ([#191](https://github.com/opencadc/canfar/issues/191)) ([6ae2025](https://github.com/opencadc/canfar/commit/6ae202546bb016237c521cbf8abd46cf616fef17))
+* **logging:** add rotating JSONL file sink ([#192](https://github.com/opencadc/canfar/issues/192)) ([7a5bca7](https://github.com/opencadc/canfar/commit/7a5bca78729fc26863b78aab5a8a5971fd52caf9))
+* **logging:** add secret-safe HTTPX tracing ([#188](https://github.com/opencadc/canfar/issues/188)) ([08df4f1](https://github.com/opencadc/canfar/commit/08df4f1f1986b229b73f3e413a4944639e8690e7))
+* **maintainability:** integrate platform session and logging contracts ([#156](https://github.com/opencadc/canfar/issues/156)) ([81da64c](https://github.com/opencadc/canfar/commit/81da64c02212e45dfc9f9ba165ce8e10e7b60397))
+* **maintainability:** systematic improvements ([5d8e2e6](https://github.com/opencadc/canfar/commit/5d8e2e663f9cb97da15cadd833f55a627e8f92a7))
+* **storage:** expose Storage Identifiers as importable filesystems ([239861d](https://github.com/opencadc/canfar/commit/239861dcd5f93a2a7b37a4e610f2522d4c2b17b7))
+* **storage:** map arc and vault VOSpace Services for CADC ([fe175f6](https://github.com/opencadc/canfar/commit/fe175f646745596a40c7a3179e5832de6cdff329))
+* **storage:** materialize authenticated vosfs sources ([8ecdabe](https://github.com/opencadc/canfar/commit/8ecdabedca9d479640abe34f3b46196b33b0a316))
+* **storage:** materialize authenticated vosfs sources ([639c245](https://github.com/opencadc/canfar/commit/639c245d1ba52d352dc6a787ac79310721e6ba29))
+
+
+### Bug Fixes
+
+* **auth:** accept omitted device refresh tokens ([#180](https://github.com/opencadc/canfar/issues/180)) ([247600a](https://github.com/opencadc/canfar/commit/247600a143bdeb86c515a4bf453869d72883377a))
+* **auth:** increase login timeout default to 10 seconds ([#156](https://github.com/opencadc/canfar/issues/156)) ([6b637a1](https://github.com/opencadc/canfar/commit/6b637a1eff43bcc75ffef117e8493023cb65b6e3))
+* **auth:** reuse valid CADC proxy certificates ([cb36468](https://github.com/opencadc/canfar/commit/cb36468a2102126c7b600c230e9b8686e50a5dbf))
+* **auth:** wrap config save OSError during OIDC refresh ([80ee986](https://github.com/opencadc/canfar/commit/80ee986df42da751963b0cf8c4de557d661d3e3a))
+* **ci:** resolve CodeQL and github-code-quality findings ([cadb28e](https://github.com/opencadc/canfar/commit/cadb28e40fbd62ae9b541eb96331bdd4058736a7))
+* **ci:** stabilize CLI and discovery tests under CI terminals ([649e331](https://github.com/opencadc/canfar/commit/649e331b3f59f4f905c77b95daa1b4c8f419848f))
+* **ci:** support pinned ty checks ([92b5535](https://github.com/opencadc/canfar/commit/92b5535d521b29ec486ffdc7c7c9a0f6731060cc))
+* **ci:** support pinned ty checks ([94c3b51](https://github.com/opencadc/canfar/commit/94c3b515e49fb4b98ebac80b15bf48659f68a65e))
+* **cli:** await poll task not progress for device timeout ([4e31d17](https://github.com/opencadc/canfar/commit/4e31d17d7b1915a7eb768d0e9fa90240d070a10b))
+* **cli:** derive banner mode from parsed options ([6b4d77a](https://github.com/opencadc/canfar/commit/6b4d77ac7c65a7ee242f2adddfcf55107fa442ee))
+* **client:** clarify missing-URL server error message ([4f88441](https://github.com/opencadc/canfar/commit/4f884417ad2644861611844feae70c5e0edf791d))
+* **cli:** make server banner configurable ([417acc2](https://github.com/opencadc/canfar/commit/417acc22cf589181dd7cb459d3df501d52f1e0b2))
+* **cli:** preserve banner semantics for passthrough args ([769a110](https://github.com/opencadc/canfar/commit/769a110e91f18b7530d99ef7a41997594bf62763))
+* **config:** persist configuration atomically ([#166](https://github.com/opencadc/canfar/issues/166)) ([f1d8cc7](https://github.com/opencadc/canfar/commit/f1d8cc732c168e150b3b581e8ce6b2810091bf4e))
+* **config:** validate before atomic persistence ([#166](https://github.com/opencadc/canfar/issues/166)) ([666544f](https://github.com/opencadc/canfar/commit/666544f2648596d68124e72ce55ee8d3c3317ddd))
+* **config:** validate normalized storage names ([9de7bcc](https://github.com/opencadc/canfar/commit/9de7bcc481850e6c106fc0a60be592dda3f17648))
+* **config:** validate raw storage names ([5f75b13](https://github.com/opencadc/canfar/commit/5f75b13196ae181d3363d79fa99861a3d42969f1))
+* **discovery:** carry storage failures into activation ([c8f0924](https://github.com/opencadc/canfar/commit/c8f09242f07d7153d9eb22ee79a23012ce3d5412))
+* **server:** harden VOSpace discovery and inspection ([e2bf7b9](https://github.com/opencadc/canfar/commit/e2bf7b900df1e87e8111fe56042b86cdcda12cc9))
+* **server:** isolate registry discovery evidence ([1f3cfbe](https://github.com/opencadc/canfar/commit/1f3cfbe295a5cc2111b1008db0eded5ba13de4c8))
+* **server:** make storage inspection stateless ([e06c6eb](https://github.com/opencadc/canfar/commit/e06c6ebd60047ea476afbebedc82767afc0d8aa4))
+* **server:** preserve environment credentials ([afb822f](https://github.com/opencadc/canfar/commit/afb822f0b1f9c47be3c336b1a6fb465576826ce0))
+* **sessions:** align destroy_with sync/async keyword-only parity ([4a47e30](https://github.com/opencadc/canfar/commit/4a47e303cd7ece2fd7fba5b93b3f488f6e80f5fc))
+* **storage:** address authenticated source review ([9cb8d6c](https://github.com/opencadc/canfar/commit/9cb8d6ca01e6c6ebd6bc2ac5c361a98223117b74))
+* **storage:** address wave 2 review findings ([4cdd1bf](https://github.com/opencadc/canfar/commit/4cdd1bfc00c6b58afe6f147dda3acae8f84fbf13))
+* **storage:** preserve environment credential precedence ([29a49dc](https://github.com/opencadc/canfar/commit/29a49dcb7c019047bb5c0ee091a650ae852586ab))
+* **tests:** assert recursion policy without rich-rendered text ([20760e9](https://github.com/opencadc/canfar/commit/20760e96d58b7df9754b6cc94aa83ba5aca44b90))
+
+
+### Performance Improvements
+
+* **storage:** cache VOSpace directory listings per command ([5018104](https://github.com/opencadc/canfar/commit/501810479cd22f25e8ae9bcd22378384abbba09d))
+
+
+### Documentation
+
+* **agents:** drop stale display and auth-context wording ([1f3a286](https://github.com/opencadc/canfar/commit/1f3a286f672c49641eb92e119700b2b34e28cdb4))
+* **agents:** drop stale selection and Logfire architecture claims ([3a8092b](https://github.com/opencadc/canfar/commit/3a8092be8fdffaaace947be6b6021322a345581a))
+* allocations creation doc ([7a1ed69](https://github.com/opencadc/canfar/commit/7a1ed69a4f192ca16d8825a580719e5f258901ae))
+* allocations creation doc ([eff47b5](https://github.com/opencadc/canfar/commit/eff47b58e6ed16e0c5a042a74d8d9cadf46d4406))
+* **cli:** document create machine output ([#194](https://github.com/opencadc/canfar/issues/194)) ([01dd94f](https://github.com/opencadc/canfar/commit/01dd94f2f926880ed4bd806cadb45bd50929ef61))
+* **client:** add a Data Access guide for the Python client ([39286e4](https://github.com/opencadc/canfar/commit/39286e45391f8d32728bc0a35bac3836a90fa833))
+* **cli:** quote prune regex examples for shell safety ([a2ccfee](https://github.com/opencadc/canfar/commit/a2ccfee84b5d7161f491113b78c76ed1d53efebd))
+* **data:** align VOSpace credential ownership ([48306d7](https://github.com/opencadc/canfar/commit/48306d74eb831f0b2c6dfde246e241aa97b2ef0a))
+* **data:** call the operand prefix an identifier ([511199f](https://github.com/opencadc/canfar/commit/511199fec2054dc57875a9de4f3a70834c4cd29d))
+* **data:** clarify credential and removal policy ([a888015](https://github.com/opencadc/canfar/commit/a8880159b55322886fe774b36ceb67ff6ab4599d))
+* **data:** clarify source mapping lifecycle ([5db3df9](https://github.com/opencadc/canfar/commit/5db3df9ec9e8c2ec10c5dd4092bb04775deff143))
+* **data:** correct storage names and verified command behaviour ([265b585](https://github.com/opencadc/canfar/commit/265b585574bf1fb2a48ef1565a2d9ade1c2fe270))
+* **data:** correct the byte-range caching guidance ([b26261f](https://github.com/opencadc/canfar/commit/b26261f58a875fe454ace903543fbc50bf62980a))
+* **data:** document listing, file, and byte-range caching ([63c6f72](https://github.com/opencadc/canfar/commit/63c6f72ed545d02f48e97ba5e4ee14996ad9e836))
+* **data:** document supported transfer workflows ([f919b3c](https://github.com/opencadc/canfar/commit/f919b3c181dbbcfbc013c0ce2184c70bda976cf0))
+* **data:** explain explicit cross-source copy ([d12b197](https://github.com/opencadc/canfar/commit/d12b197ce110c5b7dc00ea6eace76c51cef3bf98))
+* **data:** remove obsolete optional install ([0ef59c9](https://github.com/opencadc/canfar/commit/0ef59c98f71f219e6a2c544b83a9e04374b9021b))
+* **data:** separate client and service byte-range limits ([dfe3680](https://github.com/opencadc/canfar/commit/dfe368033ab57dea188f47fd8d4871593666d9cc))
+* **data:** use default CADC storage name ([7feaa71](https://github.com/opencadc/canfar/commit/7feaa71e0d455c1d3cd42006922903a6909a7de3))
+* **data:** use default CADC storage name ([3ec51a3](https://github.com/opencadc/canfar/commit/3ec51a356d4da5b05eb6176cd319b398dd823dd6))
+* **data:** validate VOSpace integration ([e41441a](https://github.com/opencadc/canfar/commit/e41441a0c557c29faa086f92398fb2f1a06796bc))
+* **demo:** added typst demo ([f6609e2](https://github.com/opencadc/canfar/commit/f6609e23acda7159f18f83ee6ed156b71c67870f))
+* **logging:** publish canonical observability policy ([#193](https://github.com/opencadc/canfar/issues/193)) ([f69f2a0](https://github.com/opencadc/canfar/commit/f69f2a0e0de98ecaa73d76a33a9e1259f586244a))
+* **maintainability:** record audit and Authlib research ([#156](https://github.com/opencadc/canfar/issues/156)) ([3b2691f](https://github.com/opencadc/canfar/commit/3b2691fdd613e1ceda4a985f8a22b1184bb2732e))
+* **readme:** modify canfar open to use json + jq ([#128](https://github.com/opencadc/canfar/issues/128)) ([ac2c3de](https://github.com/opencadc/canfar/commit/ac2c3deb58d0500827b8968a0fd536954d52a0fe))
+* update notification for allocations ([c27f21c](https://github.com/opencadc/canfar/commit/c27f21cc7b82b752095f2f8100128f32b206452e))
+
 ## [1.4.1](https://github.com/opencadc/canfar/compare/v1.4.0...v1.4.1) (2026-06-11)
 
 
