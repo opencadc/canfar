@@ -12,13 +12,13 @@
         <meta name="author" content="Shiny Brar">
       
       
-        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/client/quick-start/">
+        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/client/data/">
       
       
-        <link rel="prev" href="../get-started/">
+        <link rel="prev" href="../advanced-examples/">
       
       
-        <link rel="next" href="../examples/">
+        <link rel="next" href="../async_session/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>5-Minute Tutorial - CANFAR</title>
+        <title>Data Access - CANFAR</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#python-quickstart" class="md-skip">
+        <a href="#data-access" class="md-skip">
           Skip to content
         </a>
       
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              5-Minute Tutorial
+              Data Access
             
           </span>
         </div>
@@ -784,8 +784,6 @@
                 
   
   
-    
-  
   
   
     
@@ -809,11 +807,13 @@
     
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_4" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
         
           
           <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
@@ -834,7 +834,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -877,37 +877,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    5-Minute Tutorial
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
         
   
   
@@ -923,103 +896,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#1-authenticate" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        1. Authenticate
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#2-create-a-notebook" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. Create a notebook
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#3-open-the-notebook" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. Open the notebook
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#4-inspect-events-and-logs" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. Inspect events and logs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#5-clean-up" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Clean up
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#async-version" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Async version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1166,10 +1042,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../data/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Access
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -1185,6 +1088,92 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#open-a-vospace-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Open a VOSpace Service
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filesystem-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Filesystem operations
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#get-a-local-path" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Get a local path
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scientific-tools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Scientific tools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#async" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Async
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1843,10 +1832,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#1-authenticate" class="md-nav__link">
+  <a href="#open-a-vospace-service" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. Authenticate
+        Open a VOSpace Service
       
     </span>
   </a>
@@ -1854,10 +1843,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#2-create-a-notebook" class="md-nav__link">
+  <a href="#filesystem-operations" class="md-nav__link">
     <span class="md-ellipsis">
       
-        2. Create a notebook
+        Filesystem operations
       
     </span>
   </a>
@@ -1865,10 +1854,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-the-notebook" class="md-nav__link">
+  <a href="#get-a-local-path" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Open the notebook
+        Get a local path
       
     </span>
   </a>
@@ -1876,10 +1865,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-inspect-events-and-logs" class="md-nav__link">
+  <a href="#cache" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Inspect events and logs
+        Cache
       
     </span>
   </a>
@@ -1887,10 +1876,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#5-clean-up" class="md-nav__link">
+  <a href="#scientific-tools" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. Clean up
+        Scientific tools
       
     </span>
   </a>
@@ -1898,21 +1887,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#async-version" class="md-nav__link">
+  <a href="#async" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Async version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        Async
       
     </span>
   </a>
@@ -1936,7 +1914,7 @@
 
 
   
-    <a href="https://github.com/opencadc/canfar/blob/main/docs/client/quick-start.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/client/data.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
     </a>
@@ -1945,90 +1923,238 @@
     
       
     
-    <a href="https://github.com/opencadc/canfar/raw/main/docs/client/quick-start.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/client/data.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
     </a>
   
 
 
-<h1 id="python-quickstart">Python Quickstart<a class="headerlink" href="#python-quickstart" title="Permanent link">&para;</a></h1>
-<p>This guide creates a notebook Session, inspects it, and deletes it from Python.</p>
-<h2 id="1-authenticate">1. Authenticate<a class="headerlink" href="#1-authenticate" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--upgrade
-canfar<span class="w"> </span>login<span class="w"> </span>cadc
+<h1 id="data-access">Data Access<a class="headerlink" href="#data-access" title="Permanent link">&para;</a></h1>
+<p>Read and write CANFAR VOSpace Services from Python. <code>canfar</code> resolves the
+endpoints and credentials; <a href="https://github.com/shinybrar/vosfs"><code>vosfs</code></a> is the
+<a href="https://filesystem-spec.readthedocs.io/">fsspec</a> filesystem that talks to them,
+so every tool that already speaks fsspec — astropy, pandas, dask, zarr — works
+without an adapter.</p>
+<p>The same Storage Identifiers the CLI uses are importable by name.</p>
+<h2 id="open-a-vospace-service">Open a VOSpace Service<a class="headerlink" href="#open-a-vospace-service" title="Permanent link">&para;</a></h2>
+<p>Import a Storage Identifier and you get a ready, authenticated filesystem. Run
+<code>canfar login</code> first; the credential resolution is the same one the CLI uses.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">arc</span><span class="p">,</span> <span class="n">vault</span><span class="p">,</span> <span class="n">local</span>
 </code></pre></div>
-<p>Use <code>canfar login srcnet</code> for SRCNet.</p>
-<h2 id="2-create-a-notebook">2. Create a notebook<a class="headerlink" href="#2-create-a-notebook" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<p>Any configured Storage Identifier works this way. To see which are available:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">identifiers</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="n">identifiers</span><span class="p">()</span>      <span class="c1"># [&#39;arc&#39;, &#39;vault&#39;, &#39;local&#39;]</span>
 </code></pre></div>
-<p><code>create()</code> returns a list of Session IDs.</p>
-<h2 id="3-open-the-notebook">3. Open the notebook<a class="headerlink" href="#3-open-the-notebook" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<p>The notebook can take a minute or two to become reachable. Check status:</p>
-<div class="highlight"><pre><span></span><code><span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">running</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="4-inspect-events-and-logs">4. Inspect events and logs<a class="headerlink" href="#4-inspect-events-and-logs" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="5-clean-up">5. Clean up<a class="headerlink" href="#5-clean-up" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="async-version">Async version<a class="headerlink" href="#async-version" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+<p>Import binds the filesystem once, which is what you usually want. To build one
+explicitly — to override a credential, or to name an identifier held in a
+variable — use <code>filesystem</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="n">vault</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">staging</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">,</span> <span class="n">token</span><span class="o">=</span><span class="s2">&quot;...&quot;</span><span class="p">)</span>        <span class="c1"># runtime bearer token</span>
+<span class="n">archive</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;arc&quot;</span><span class="p">,</span> <span class="n">certificate</span><span class="o">=</span><span class="s2">&quot;/path/to/proxy.pem&quot;</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<p><code>local</code> is reserved for the machine your code runs on and needs no credential.</p>
+<h2 id="filesystem-operations">Filesystem operations<a class="headerlink" href="#filesystem-operations" title="Permanent link">&para;</a></h2>
+<p>The object is a standard fsspec filesystem, so the usual verbs apply:</p>
+<div class="highlight"><pre><span></span><code><span class="n">cutouts</span> <span class="o">=</span> <span class="s2">&quot;/ALMA/test-data/cutouts&quot;</span>
+<span class="n">target</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cutouts</span><span class="si">}</span><span class="s2">/test-4d-cube-cutout.fits&quot;</span>
+
+<span class="n">vault</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="n">cutouts</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>      <span class="c1"># [&#39;/ALMA/.../test-4d-cube-cutout.fits&#39;, ...]</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">target</span><span class="p">)[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span>           <span class="c1"># 169920</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>                 <span class="c1"># True</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">cutouts</span><span class="p">)</span>                 <span class="c1"># True</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cutouts</span><span class="si">}</span><span class="s2">/*cutout.fits&quot;</span><span class="p">)</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">cutouts</span><span class="p">)</span>                  <span class="c1"># recursive listing</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">du</span><span class="p">(</span><span class="n">cutouts</span><span class="p">)</span>                    <span class="c1"># 3712320</span>
+</code></pre></div>
+<p>Reads come in whole-object, ranged, and file-like forms:</p>
+<div class="highlight"><pre><span></span><code><span class="n">whole</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>                       <span class="c1"># 169920 bytes</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>             <span class="c1"># first 2880 bytes only</span>
+<span class="n">first</span><span class="p">,</span> <span class="n">second</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_ranges</span><span class="p">([</span><span class="n">target</span><span class="p">,</span> <span class="n">target</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="mi">80</span><span class="p">,</span> <span class="mi">180</span><span class="p">])</span>
+
+<span class="k">with</span> <span class="n">vault</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="n">handle</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">80</span><span class="p">)</span>
+
+<span class="n">vault</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">vault</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+</code></pre></div>
+<p>Writes use <code>put_file</code>, <code>pipe_file</code>, <code>mkdir</code>, and <code>rm</code>. Directory listings are
+cached in memory for the lifetime of the filesystem object, so a long-lived
+object can serve a stale listing; build a fresh one, or pass
+<code>use_listings_cache=False</code>, when you need to observe another writer's changes.</p>
+<h2 id="get-a-local-path">Get a local path<a class="headerlink" href="#get-a-local-path" title="Permanent link">&para;</a></h2>
+<p>Some libraries want a real path rather than a file object — anything that
+memory-maps, or a C extension that opens by name. Materialise the file:</p>
+<div class="highlight"><pre><span></span><code><span class="n">vault</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;/scratch/cutout.fits&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>get_file</code> is the standard fsspec verb; <code>put_file</code> is its counterpart for
+uploads.</p>
+<h2 id="cache">Cache<a class="headerlink" href="#cache" title="Permanent link">&para;</a></h2>
+<p>Nothing is cached to disk unless you ask. On a CANFAR session <code>/scratch</code> is
+fast local NVMe, is not backed up, and is cleared when the session ends, which
+is exactly what a cache wants. Locally, any directory works.</p>
+<h3 id="whole-files">Whole files<a class="headerlink" href="#whole-files" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.implementations.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">WholeFileCacheFileSystem</span>
+
+<span class="n">cached</span> <span class="o">=</span> <span class="n">WholeFileCacheFileSystem</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="n">vault</span><span class="p">,</span> <span class="n">cache_storage</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache&quot;</span><span class="p">)</span>
+
+<span class="n">cached</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>   <span class="c1"># cold: fetched over the network</span>
+<span class="n">cached</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>   <span class="c1"># warm: served from /scratch</span>
+</code></pre></div>
+<p>A cold read of the 166 KiB cutout took 2.96 s; the warm read took 0.4 ms.</p>
+<p>Use <code>SimpleCacheFileSystem</code> when you do not need the expiry and staleness
+metadata <code>WholeFileCacheFileSystem</code> keeps. Passing <code>cache_storage</code> a list of
+directories tries each in order and treats only the last as writable, so a
+shared read-only cache can back your own.</p>
+<h3 id="byte-ranges">Byte ranges<a class="headerlink" href="#byte-ranges" title="Permanent link">&para;</a></h3>
+<p><code>vosfs</code> sends an HTTP <code>Range</code> header and uses the response when the byte
+endpoint answers <code>206</code>, so a partial read transfers only the bytes you asked
+for. Support is per-backend:</p>
 <table>
 <thead>
 <tr>
-<th>Symptom</th>
-<th>Check</th>
+<th>Storage Identifier</th>
+<th>Backend</th>
+<th>Ranged reads</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Authentication fails</td>
-<td>Run <code>canfar --log-level debug login cadc --force</code>.</td>
+<td><code>vault</code></td>
+<td><code>minoc</code></td>
+<td>Yes — a partial read returns <code>206</code> and transfers only that slice</td>
 </tr>
 <tr>
-<td>Session does not start</td>
-<td>Run <code>canfar stats</code>, then try smaller <code>cores</code> or <code>ram</code>.</td>
-</tr>
-<tr>
-<td>Browser URL fails</td>
-<td>Wait 60-120 seconds and confirm the Session is <code>Running</code>.</td>
-</tr>
-<tr>
-<td>Script needs stable output</td>
-<td>Use CLI machine output such as <code>canfar ps --json</code>.</td>
+<td><code>arc</code></td>
+<td>Cavern</td>
+<td>No — the whole object is fetched and sliced, correct but not cheaper</td>
 </tr>
 </tbody>
 </table>
-<p>See <a href="../../cli/logging/">Logging</a> for the CLI and Python
-logging controls.</p>
+<p>Against <code>vault</code>, cache blocks instead of whole files when you touch small parts
+of a large cube. <code>MMapCache</code> keeps fetched blocks in a sparse file:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">MMapCache</span>
+
+<span class="n">cube</span> <span class="o">=</span> <span class="s2">&quot;/ALMA/test-data/cutouts/test-4d-cube.fits&quot;</span>
+<span class="n">size</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">cube</span><span class="p">)[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span>
+
+<span class="n">blocks</span> <span class="o">=</span> <span class="n">MMapCache</span><span class="p">(</span>
+    <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache/cube.blocks&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">header</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>   <span class="c1"># one ranged request, one block of four</span>
+</code></pre></div>
+<p>Reading a FITS header from the 3.4 MB cube materialises one block of four. The
+saving is in bytes transferred rather than seconds on small files, because
+VOSpace transfer negotiation dominates a short request; it grows with file
+size. Against <code>arc</code> a block cache still costs a whole download per block, so
+cache whole files there.</p>
+<h3 id="ram">RAM<a class="headerlink" href="#ram" title="Permanent link">&para;</a></h3>
+<p>Omit <code>location</code> and <code>MMapCache</code> uses an anonymous memory map — a RAM cache that
+never touches disk, for when <code>/scratch</code> is absent or you want the data gone
+when the process exits:</p>
+<div class="highlight"><pre><span></span><code><span class="n">blocks</span> <span class="o">=</span> <span class="n">MMapCache</span><span class="p">(</span>
+    <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div>
+<p>A warm re-read of a cached range returned in 18 µs.</p>
+<h3 id="what-does-not-work">What does not work<a class="headerlink" href="#what-does-not-work" title="Permanent link">&para;</a></h3>
+<p><code>blockcache</code> (<code>CachingFileSystem</code>) cannot wrap a VOSpace Service. <code>Range</code> is
+honoured for byte reads, not through the file-object path:</p>
+<div class="highlight"><pre><span></span><code>AttributeError: &#39;StagedReadFile&#39; object has no attribute &#39;blocksize&#39;
+</code></pre></div>
+<p>Stacked caches do not help either: chaining them (<code>filecache::simplecache::</code>)
+builds the layers, but the inner layer is never filled and never serves. Use
+exactly one cache layer, on your fastest local disk.</p>
+<h2 id="scientific-tools">Scientific tools<a class="headerlink" href="#scientific-tools" title="Permanent link">&para;</a></h2>
+<h3 id="astropy">astropy<a class="headerlink" href="#astropy" title="Permanent link">&para;</a></h3>
+<p>Read a header without downloading the file, using one ranged request:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
+
+<span class="n">raw</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>
+<span class="n">header</span> <span class="o">=</span> <span class="n">fits</span><span class="o">.</span><span class="n">Header</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">raw</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;latin-1&quot;</span><span class="p">))</span>
+<span class="n">header</span><span class="p">[</span><span class="s2">&quot;NAXIS&quot;</span><span class="p">],</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;OBJECT&quot;</span><span class="p">]</span>    <span class="c1"># 4, &#39;hers1&#39;</span>
+</code></pre></div>
+<p>Or hand the file object straight to astropy:</p>
+<div class="highlight"><pre><span></span><code><span class="k">with</span> <span class="n">vault</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">,</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
+    <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span>      <span class="c1"># (1, 96, 26, 16)</span>
+</code></pre></div>
+<p>To memory-map, materialise the file first — <code>memmap=True</code> needs a real path:</p>
+<div class="highlight"><pre><span></span><code><span class="n">vault</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="s2">&quot;/scratch/cutout.fits&quot;</span><span class="p">)</span>
+
+<span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/scratch/cutout.fits&quot;</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>     <span class="c1"># paged in on demand, not loaded up front</span>
+</code></pre></div>
+<h3 id="numpy">numpy<a class="headerlink" href="#numpy" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">raw</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+<span class="n">values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">raw</span><span class="p">[</span><span class="mi">2880</span><span class="p">:</span><span class="mi">2880</span> <span class="o">+</span> <span class="mi">64</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s2">&quot;&gt;f4&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="pandas">pandas<a class="headerlink" href="#pandas" title="Permanent link">&para;</a></h3>
+<p>Astronomy tables usually arrive as FITS rather than CSV. Read one remotely and
+convert:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">astropy.table</span><span class="w"> </span><span class="kn">import</span> <span class="n">Table</span>
+
+<span class="k">with</span> <span class="n">vault</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/APASS/north/091106/n091106.0101.cat&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">Table</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;fits&quot;</span><span class="p">)</span>
+
+<span class="n">frame</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>    <span class="c1"># 2373 rows</span>
+<span class="n">frame</span><span class="o">.</span><span class="n">columns</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>            <span class="c1"># [&#39;NUMBER&#39;, &#39;MAG_AUTO&#39;, &#39;MAGERR_AUTO&#39;]</span>
+</code></pre></div>
+<p>For delimited text, pass the file object to pandas directly:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="k">with</span> <span class="n">vault</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/path/to/table.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="dask">dask<a class="headerlink" href="#dask" title="Permanent link">&para;</a></h3>
+<p>Memory-map a materialised cube and chunk it, so only the blocks a computation
+touches are paged in:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">dask.array</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">da</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">astropy.io</span><span class="w"> </span><span class="kn">import</span> <span class="n">fits</span>
+
+<span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/scratch/cutout.fits&quot;</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
+    <span class="n">array</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_array</span><span class="p">(</span><span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">chunks</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">24</span><span class="p">,</span> <span class="mi">26</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="n">array</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="async">Async<a class="headerlink" href="#async" title="Permanent link">&para;</a></h2>
+<p>Every read has an async twin. Build the filesystem with <code>asynchronous=True</code>,
+use the underscore-prefixed coroutines, and close it when done:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">vosfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">VOSpaceFileSystem</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
+    <span class="n">service</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">servers</span><span class="p">[</span><span class="s2">&quot;canfar&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">storage</span><span class="p">[</span><span class="s2">&quot;vault&quot;</span><span class="p">]</span>
+    <span class="n">vault</span> <span class="o">=</span> <span class="n">VOSpaceFileSystem</span><span class="p">(</span>
+        <span class="nb">str</span><span class="p">(</span><span class="n">service</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
+        <span class="n">certfile</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">get_credential</span><span class="p">(</span><span class="s2">&quot;cadc&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">path</span><span class="p">),</span>
+        <span class="n">asynchronous</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="k">await</span> <span class="n">vault</span><span class="o">.</span><span class="n">_ls</span><span class="p">(</span><span class="n">cutouts</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="k">await</span> <span class="n">vault</span><span class="o">.</span><span class="n">_cat_file</span><span class="p">(</span><span class="n">cube</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">await</span> <span class="n">vault</span><span class="o">.</span><span class="n">aclose</span><span class="p">()</span>
+
+
+<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+<p>Async filesystems cannot open file objects — <code>open()</code> is rejected, and the
+fsspec caches are synchronous — so use the synchronous form for caching and for
+libraries that want a file handle.</p>
 
 
 
@@ -2051,7 +2177,7 @@ logging controls.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 26, 2026 06:46:12 UTC">July 26, 2026</span>
   </span>
 
     
@@ -2061,7 +2187,7 @@ logging controls.</p>
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 24, 2021 20:34:21 UTC">October 24, 2021</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 25, 2026 09:26:13 UTC">July 25, 2026</span>
   </span>
 
     
@@ -2082,16 +2208,6 @@ logging controls.</p>
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
-        </a>
-      
-        <a href="https://github.com/web-flow" class="md-author" title="@web-flow">
-          
-          <img src="https://avatars.githubusercontent.com/u/19864447?v=4&size=72" alt="web-flow">
-        </a>
-      
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

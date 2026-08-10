@@ -12,13 +12,13 @@
         <meta name="author" content="Shiny Brar">
       
       
-        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/releases/2026-2/">
+        <link rel="canonical" href="https://opencadc.github.io/canfar/edge/cli/data/">
       
       
-        <link rel="prev" href="../releases/">
+        <link rel="prev" href="../quick-start/">
       
       
-        <link rel="next" href="../2026-1/">
+        <link rel="next" href="../authentication-contexts/">
       
       
         
@@ -29,7 +29,7 @@
     
     
       
-        <title>2026.2 - CANFAR</title>
+        <title>Data Commands - CANFAR</title>
       
     
     
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#canfar-science-platform-release-20262" class="md-skip">
+        <a href="#data-commands" class="md-skip">
           Skip to content
         </a>
       
@@ -127,7 +127,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              2026.2
+              Data Commands
             
           </span>
         </div>
@@ -266,12 +266,10 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
+      <li class="md-tabs__item">
         <a href="../../platform/" class="md-tabs__link">
           
   
@@ -290,10 +288,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../client/home/" class="md-tabs__link">
           
   
@@ -433,8 +433,6 @@
       
   
   
-    
-  
   
   
     
@@ -449,1374 +447,6 @@
         
       
         
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-        
-        
-      
-      
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Platform
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2" id="__nav_2_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Platform
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/get-started/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Getting Started
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/concepts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Concepts
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/best-practices/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Best Practices
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/permissions/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Permissions
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/doi/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    DOI
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/cvmfs/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Software Repositories (CVMFS)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/cloud/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Cloud (legacy)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_9" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/sessions/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Sessions
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_9" id="__nav_2_9_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_9_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_9">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Sessions
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/notebook/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Notebooks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/carta/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CARTA
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/firefly/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Firefly
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/desktop/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Desktop
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/batch/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Batch
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/sessions/contributed/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Contributed
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_10" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/storage/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Storage
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_10" id="__nav_2_10_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_10_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_10">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Storage
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/storage/filesystem/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Filesystem
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/storage/transfers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Data Transfers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/storage/vospace/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    VOSpace
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_11" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/containers/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Containers
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_11" id="__nav_2_11_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_11_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_11">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Containers
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/containers/build/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Building Containers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/containers/registry/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Registry
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_12" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/community/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Community
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_12" id="__nav_2_12_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_12_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_12">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Community
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/community/CASA_and_more/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CASA
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    
-    
-      
-        
-          
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
-      
-        
-        
-          
-        
-        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2_13" >
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../../platform/support/" class="md-nav__link ">
-              
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Support
-  
-
-    
-  </span>
-  
-  
-
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_2_13" id="__nav_2_13_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_13_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2_13">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Support
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../platform/support/faq/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    FAQ
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    
-    
-      
-        
-      
-        
-      
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-      
-        
-          
-          
-        
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_14" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_2_14" id="__nav_2_14_label" tabindex="">
-            
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Releases
-  
-
-    
-  </span>
-  
-  
-
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_14_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2_14">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Releases
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../releases/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CANFAR Releases
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2026.2
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2026.2
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#june-11-2026" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        June 11, 2026
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../2026-1/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2026.1
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../2025-2/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2025.2
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../2025-1/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    2025.1
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
-      
-    </li>
-  
-
-    
-      
-      
-  
-  
-  
-  
-    
-    
       
         
       
@@ -1858,14 +488,14 @@
   
   
   
-    <a href="../../client/home/" class="md-nav__link">
+    <a href="../../platform/" class="md-nav__link">
       
   
   
   <span class="md-ellipsis">
     
   
-    Client
+    Platform
   
 
     
@@ -1879,6 +509,1176 @@
     </a>
   
 
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+      
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Client
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Client
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/home/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_3" id="__nav_3_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    What's New
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    What's New
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/updates/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Updates
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/migration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migration Guide
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_4" id="__nav_3_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/get-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Installation & Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5-Minute Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Examples
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Basic
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/advanced-examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Advanced
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Access
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_7" id="__nav_3_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
+  
+  
+  
+    <a href="../../client/async_session/" class="md-nav__link">
+      
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Python API
+  
+
+    
+  </span>
+  
+  
+
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
+  
+
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CLI
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    CLI
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quick-start/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    5-Minute Tutorial
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Commands
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Commands
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#install-and-authenticate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Install and authenticate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#address-mapped-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address mapped sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-files-and-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy files and directories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-data-between-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move data between sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-data-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache data locally
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-and-accepted-omissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output and accepted omissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upstream-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upstream releases
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../authentication-contexts/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Authentication and Servers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../cli-help/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+      
+        
+          
+          
+        
+      
+    
+    
+      
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_9" id="__nav_3_9_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Demos
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_9">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Demos
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../demos/srcnet-workshop/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SRCnet Workshop
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/bug-reports/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Bug Reports
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -2043,10 +1843,76 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#june-11-2026" class="md-nav__link">
+  <a href="#install-and-authenticate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        June 11, 2026
+        Install and authenticate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#address-mapped-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Address mapped sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#copy-files-and-directories" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Copy files and directories
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#move-data-between-sources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Move data between sources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cache-data-locally" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Cache data locally
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-and-accepted-omissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output and accepted omissions
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upstream-releases" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upstream releases
       
     </span>
   </a>
@@ -2070,7 +1936,7 @@
 
 
   
-    <a href="https://github.com/opencadc/canfar/blob/main/docs/releases/2026-2.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
+    <a href="https://github.com/opencadc/canfar/blob/main/docs/cli/data.md" title="Edit this page" class="md-content__button md-icon" rel="edit">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm-2.3 6.35c.22-.21.22-.56 0-.77L15.42 7.3a.53.53 0 0 0-.77 0l-1 1 2.05 2.05zM7 14.94V17h2.06l6.06-6.06-2.06-2.06z"/></svg>
     </a>
@@ -2079,229 +1945,184 @@
     
       
     
-    <a href="https://github.com/opencadc/canfar/raw/main/docs/releases/2026-2.md" title="View source of this page" class="md-content__button md-icon">
+    <a href="https://github.com/opencadc/canfar/raw/main/docs/cli/data.md" title="View source of this page" class="md-content__button md-icon">
       
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 9a3 3 0 0 1 3 3 3 3 0 0 1-3 3 3 3 0 0 1-3-3 3 3 0 0 1 3-3m0-4.5c5 0 9.27 3.11 11 7.5-1.73 4.39-6 7.5-11 7.5S2.73 16.39 1 12c1.73-4.39 6-7.5 11-7.5M3.18 12a9.821 9.821 0 0 0 17.64 0 9.821 9.821 0 0 0-17.64 0"/></svg>
     </a>
   
 
 
-<h1 id="canfar-science-platform-release-20262">CANFAR Science Platform Release 2026.2<a class="headerlink" href="#canfar-science-platform-release-20262" title="Permanent link">&para;</a></h1>
-<h2 id="june-11-2026">June 11, 2026<a class="headerlink" href="#june-11-2026" title="Permanent link">&para;</a></h2>
-<div class="admonition success">
-<p class="admonition-title">CSP 2026.2</p>
-<h3 id="upcoming-infrastructure-upgrade"><strong>📢 Upcoming Infrastructure Upgrade</strong><a class="headerlink" href="#upcoming-infrastructure-upgrade" title="Permanent link">&para;</a></h3>
-<p>Over the next few months, the CANFAR Science Platform is moving to new hardware. We will transition all users from our existing compute and storage infrastructure to a new, faster, and more reliable cluster.</p>
-<p><strong>What is changing?</strong></p>
-<ul>
-<li><strong>Compute</strong> — sessions and batch jobs will run on new hardware with faster CPUs, more memory per node, and improved GPU availability.</li>
-<li><strong>Storage</strong> — your home and project spaces (<code>/arc</code>) are moving to a new storage system with better performance and more capacity.</li>
-</ul>
-<p><strong>What stays the same?</strong></p>
-<ul>
-<li>Your account, your container images, and the way you log in.</li>
-<li><strong>Your data.</strong> Everything in home and project directories will be migrated.</li>
-</ul>
-<div class="admonition info">
-<p class="admonition-title">Nothing to do yet</p>
-<p>There is no action required right now. Watch your inbox over the coming weeks for the detailed migration schedule and step-by-step guidance.</p>
-</div>
-<h3 id="new-features"><strong>✨ New Features</strong><a class="headerlink" href="#new-features" title="Permanent link">&para;</a></h3>
-<ul>
-<li>New Science Portal UI with improved mobile device experience.</li>
-<li><a href="https://github.com/CARTAvis/carta/releases/tag/v5.1.0">CARTA 5.1.0</a> available.</li>
-</ul>
-<h3 id="python-client-cli-improvements"><strong>🐍 Python Client &amp; CLI Improvements</strong><a class="headerlink" href="#python-client-cli-improvements" title="Permanent link">&para;</a></h3>
-<div class="admonition warning">
-<p class="admonition-title">Configuration Reset Required</p>
-<p>This release moves the CANFAR client to a new revision controlled configuration format. After upgrading, you will be required to re-login,</p>
-<div class="highlight"><pre><span></span><code>rm<span class="w"> </span>~/.canfar/config.yaml
+<h1 id="data-commands">Data commands<a class="headerlink" href="#data-commands" title="Permanent link">&para;</a></h1>
+<p>Use <code>canfar data</code> to work with configured VOSpace Services and the local
+filesystem through the embedded <code>fsspec-cli</code> command application.</p>
+<h2 id="install-and-authenticate">Install and authenticate<a class="headerlink" href="#install-and-authenticate" title="Permanent link">&para;</a></h2>
+<p>Data commands are included in the standard installation:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar
 canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
-<p>That single command authenticates you, discovers available Science Platform servers, and selects one.</p>
-</div>
-<ul>
-<li>
-<p><strong>New login flow</strong> — <code>canfar login</code> is now the one front door for authentication. Pass your identity provider directly, or run it bare to pick from a list:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Log in to CADC directly</span>
-canfar<span class="w"> </span>login<span class="w"> </span>cadc
-<span class="c1"># Or choose your identity provider interactively</span>
-canfar<span class="w"> </span>login
+<h2 id="address-mapped-sources">Address mapped sources<a class="headerlink" href="#address-mapped-sources" title="Permanent link">&para;</a></h2>
+<p>Every operand starts with a Storage Identifier: the handle of a configured
+VOSpace Service, or the reserved <code>local</code> identifier for the machine where the
+command runs. Operands always pair an identifier with an absolute path:</p>
+<div class="highlight"><pre><span></span><code>storage-identifier:/absolute/path
+local:/absolute/path
 </code></pre></div>
-<p>The same flow is available at package level for scripts and notebooks:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
-<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;cadc&quot;</span><span class="p">)</span>
-<span class="n">canfar</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;canfar&quot;</span><span class="p">)</span>
+<p>Every mapped source is available concurrently, regardless of the active Server
+Selection. A default CADC login maps two VOSpace Services, <code>arc</code> and <code>vault</code>,
+plus <code>local</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/
+canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>
+canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>vault:/
 </code></pre></div>
-</li>
-<li>
-<p><strong>Manage identities and servers</strong> — new <code>canfar auth</code> and <code>canfar server</code> command groups let you inspect and switch authentication and servers without editing config files:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet<span class="w">      </span><span class="c1"># Login with SRCNet</span>
-canfar<span class="w"> </span>auth<span class="w">              </span><span class="c1"># show active authentication</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>ls<span class="w">           </span><span class="c1"># list all saved identities</span>
-canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>srcnet<span class="w">   </span><span class="c1"># switch identity provider</span>
-canfar<span class="w"> </span>server<span class="w"> </span>ls<span class="w">         </span><span class="c1"># list servers for the active identity</span>
-canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>canSRC<span class="w"> </span><span class="c1"># pick a server</span>
+<p>Use <code>ls -lh</code>, or the <code>ll -h</code> long-form command, for a human-readable listing.
+The <code>-h</code> flag reports human-readable sizes and requires a long listing, so
+<code>ls -h</code> on its own exits with <code>ls: -h: requires long listing</code>.</p>
+<p>Operands must name a mapped source. Empty <code>:/path</code>, bare local paths such as
+<code>/tmp/file</code>, and <code>active:/path</code> are all rejected; there is no <code>active</code> alias
+and no <code>canfar storage</code> command.</p>
+<h2 id="copy-files-and-directories">Copy files and directories<a class="headerlink" href="#copy-files-and-directories" title="Permanent link">&para;</a></h2>
+<p>Copy one file between local and remote sources:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/absolute/path/file.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits<span class="w"> </span>local:/absolute/path/file.fits
 </code></pre></div>
-<p>The CLI remembers the last valid server for each identity provider, so switching back and forth is seamless.</p>
-</li>
-<li>
-<p><strong>Script-friendly machine output</strong> — <code>--json</code> and <code>--yaml</code> are now supported on <code>auth</code>, <code>server</code>, <code>ps</code> and <code>config</code> commands. Output is clean, stable-keyed data on stdout — errors and diagnostics go to stderr — so piping into tools like <code>jq</code> is safe,</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>active.server<span class="w"> </span>--json
+<p>Copy between two VOSpace Services, for example a public test cutout from
+<code>vault</code> into your <code>arc</code> home directory:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/ALMA/test-data/cutouts/test-4d-cube-cutout.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/test-4d-cube-cutout.fits
+canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/test-4d-cube-cutout.fits
 </code></pre></div>
-</li>
-<li>
-<p><strong>Scientist session names</strong> — sessions launched without an explicit <code>--name</code> now get memorable defaults like <code>einstein</code>, <code>curie</code>, or <code>ramanujan</code> instead of random word pairs.</p>
-</li>
-</ul>
-<h3 id="platform-fixes">🐛 Platform Fixes<a class="headerlink" href="#platform-fixes" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Enabled the deletion of non-empty user storage folders through the Storage UI</li>
-<li>CANFAR CLI and Python Library:<ul>
-<li>The active-server banner (<code>@&lt;server-name&gt;</code>) now appears only in human-readable output, never in JSON/YAML, keeping machine output safe to pipe.</li>
-<li>Documentation and docstring examples corrected to match the implemented code signatures.</li>
-<li><code>canfar.helpers.distributed</code> (<code>chunk</code>, <code>stripe</code>) batch helpers documented with corrected, runnable examples.</li>
-</ul>
-</li>
-<li>The <strong>skaha</strong> service is enjoying some optimizations that should help speed up session creation<ul>
-<li>Now relies on the Cavern self-allocation for new users.</li>
-<li>Small internal optimizations where effort was previously wasted.</li>
-</ul>
-</li>
-<li><strong>Cavern</strong> - Now enables the ability for new users to "self-allocate".  Permissions are controlled either by Group setting, or using the SRCNet Permissions API.</li>
-<li>See the new <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L89">Helm Chart configuration</a> for allocation authorization.</li>
-</ul>
-<h3 id="technical-changes">⚙️ Technical Changes<a class="headerlink" href="#technical-changes" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Science Portal UI/UX components are now based on a modern technology stack: Next.js, TypeScript, and React.  This will simplify and expedite our capability to iterate and improve the portal components in the future.</li>
-<li>Readiness checks added for all session types.  Sessions aren't put in the 'Running' state until session initialization procedures are complete.</li>
-<li>CARTA 5.1.0 with <a href="https://github.com/astrofrog/psrecord">psrecord</a> available (Requires CanfarSP 2026.2)</li>
-<li>
-<p>CANFAR CLI and Python Library</p>
-<div class="admonition warning">
-<p class="admonition-title">Compatibility Notes</p>
-<ul>
-<li><code>canfar context</code> has been removed. Use <code>canfar auth</code>and <code>canfar server</code> commands instead.</li>
-<li><code>canfar auth login</code> is deprecated and will be removed in a future release. Switch to <code>canfar login</code>.</li>
-<li>Persisted client configuration now uses an explicit <code>version: 1</code> schema.</li>
-</ul>
-</div>
-<ul>
-<li><code>canfar.authentication</code> and <code>canfar.server</code> Python modules provide noninteractive helpers for authentication and server discovery, validation, and selection in scripts.</li>
-<li>Runtime <code>token</code>/<code>certificate</code> skip saved-auth expiry hooks — no false <code>AuthExpiredError</code> with stale x509 config (<a href="https://github.com/opencadc/canfar/issues/115">#115</a>).</li>
-</ul>
-</li>
-<li>
-<p>Bug Fix: Removal of <code>fsGroupChangePolicy</code> and <code>fsGroup</code> - Ensures that kubernetes will avoid performing a recursive permission modification on job startup.</p>
-</li>
-</ul>
-<h3 id="deployment-notes">📦 Deployment Notes<a class="headerlink" href="#deployment-notes" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Improved and simplified deployment documentation<ul>
-<li>Complexity of matching keys between skaha and cavern no longer required</li>
-<li>Improved Kueue deployment documentation</li>
-</ul>
-</li>
-<li>The CANFAR Portal Branding Logo is now configurable</li>
-<li>Deployers have the option to configure skaha and cavern to use the SRCNet Permissions API for authorization decisions.</li>
-<li>For updated deployment instructions, refer to the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments repository</a>.</li>
-<li>Looking for a reference deployment to get past a deployment issue?  You can now see what <a href="https://src.canfar.net/science-portal">canSRC</a> deploys as our <a href="https://github.com/cadc-ccda-infra/keel-deploy/tree/main/helm/values/src.canfar.net">ArgoCD Application</a>.</li>
-</ul>
-<div class="admonition warning">
-<p class="admonition-title">Potential Breaking Changes</p>
-<ul>
-<li>
-<p>The <strong>skaha</strong> service is the only one that requires a Service Account as it will interact with the Kubernetes Cluster. The skaha helm chart<code>serviceAccountName</code> value will be required to be converted to the new <code>serviceAccount</code> object:
-<div class="highlight"><pre><span></span><code><span class="c1"># Old Helm Configuration</span>
-<span class="nt">deployment</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">skaha</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">serviceAccountName</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">skaha</span>
-<span class="c1"># New Helm Configuration</span>
-<span class="nt">serviceAccount</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">skaha</span>
-<span class="w">  </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
-</code></pre></div></p>
-</li>
-<li>
-<p>Beware of maintaining RBAC rules through Helm Charts. Changes have been made to make the charts a little more ArgoCD friendly.
-  <div class="highlight"><pre><span></span><code><span class="nt">rbac</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="w">  </span><span class="nt">clusterRole</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">create</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<p>Recursive copy is enabled for admitted local and remote source pairs:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>local:/absolute/path/dataset<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/dataset
 </code></pre></div>
-  The <code>deployment.skaha.sessions.limitRange</code> and <code>deployment.skaha.sessions.kueue</code> also maintain their own RBAC settings.  See <a href="https://github.com/opencadc/science-platform/blob/main/helm">science platform helm chart</a> for full options.</p>
-</li>
-<li>
-<p>If <strong>Cavern</strong> was previously installed with a local PostgreSQL in the cluster, it may now require authentication provided.  This can be done with a secret, or just setup username and password.  The UWS database is volatile. See <a href="https://github.com/opencadc/deployments/blob/main/helm/applications/cavern/values.yaml#L144">cavern helm chart</a> for more information.</p>
-</li>
-</ul>
-</div>
-<h3 id="releases">🔖 Releases<a class="headerlink" href="#releases" title="Permanent link">&para;</a></h3>
-<h4 id="python-client-cli">Python Client &amp; CLI<a class="headerlink" href="#python-client-cli" title="Permanent link">&para;</a></h4>
+<p>The tagged upstream implementation builds a bounded manifest, copies files
+through host-local staging when sources differ, and verifies destination
+metadata. Recursive copy is not atomic and does not create a snapshot; inspect
+the destination before removing any source data.</p>
+<h2 id="move-data-between-sources">Move data between sources<a class="headerlink" href="#move-data-between-sources" title="Permanent link">&para;</a></h2>
+<p>Cross-source <code>mv</code> is unsupported and exits with status 2:</p>
+<div class="highlight"><pre><span></span><code>mv: cross-source move unsupported
+</code></pre></div>
+<p>Move a file between sources explicitly by copying it, verifying the
+destination, and only then issuing a separate source removal:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/folder/file.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>rm<span class="w"> </span>vault:/folder/file.fits
+</code></pre></div>
+<p>Do not use this sequence as a one-command or atomic move.</p>
+<p>Recursive removal is disabled by application policy, so <code>rm</code> accepts no <code>-R</code> or
+<code>-r</code> flag at all and exits with status 2:</p>
+<div class="highlight"><pre><span></span><code>No such option: -R
+</code></pre></div>
+<p>Because recursive directory removal is disabled, directory movement is not a
+supported workflow in this release. Any future one-command relocation would be a
+separately named, opt-in orchestration feature with stronger destination
+verification and residual-state semantics—not portable <code>mv</code>.</p>
+<h2 id="cache-data-locally">Cache data locally<a class="headerlink" href="#cache-data-locally" title="Permanent link">&para;</a></h2>
+<h3 id="directory-listings">Directory listings<a class="headerlink" href="#directory-listings" title="Permanent link">&para;</a></h3>
+<p>Directory listings are cached automatically. Each command builds and closes its
+own filesystem, so a cached listing only ever serves the command that produced
+it and can never return a listing that outlives it. Repeated lookups while one
+command walks a tree are served without another round trip.</p>
+<h3 id="files-and-byte-ranges">Files and byte ranges<a class="headerlink" href="#files-and-byte-ranges" title="Permanent link">&para;</a></h3>
+<p>There is no CLI flag for caching file contents, but <code>vosfs</code> is a normal
+<a href="https://filesystem-spec.readthedocs.io/">fsspec</a> filesystem, so any fsspec
+cache can wrap it from Python. On a CANFAR session, <code>/scratch</code> is fast local
+disk and is the right place to point a cache; it is not backed up and is
+cleared when the session ends, which is exactly what a cache wants.</p>
+<p>Cache whole files under a named directory. The first read fetches over the
+network, and later reads come from <code>/scratch</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.implementations.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">WholeFileCacheFileSystem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">vosfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">VOSpaceFileSystem</span>
+
+<span class="n">vault</span> <span class="o">=</span> <span class="n">VOSpaceFileSystem</span><span class="p">(</span>
+    <span class="s2">&quot;https://cadc-west-01.canfar.net/vault&quot;</span><span class="p">,</span>
+    <span class="n">certfile</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.ssl&quot;</span> <span class="o">/</span> <span class="s2">&quot;cadcproxy.pem&quot;</span><span class="p">),</span>
+<span class="p">)</span>
+<span class="n">cached</span> <span class="o">=</span> <span class="n">WholeFileCacheFileSystem</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="n">vault</span><span class="p">,</span> <span class="n">cache_storage</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache&quot;</span><span class="p">)</span>
+
+<span class="n">data</span> <span class="o">=</span> <span class="n">cached</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="s2">&quot;/ALMA/test-data/cutouts/test-4d-cube-cutout.fits&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>Use <code>SimpleCacheFileSystem</code> instead when you do not need the expiry and
+staleness metadata that <code>WholeFileCacheFileSystem</code> keeps. Passing
+<code>cache_storage</code> a list of directories tries each in order and treats only the
+last as writable, so a shared read-only cache can back your own.</p>
+<h3 id="cache-byte-ranges">Cache byte ranges<a class="headerlink" href="#cache-byte-ranges" title="Permanent link">&para;</a></h3>
+<p><code>vosfs</code> sends an HTTP <code>Range</code> header and uses the response when the byte
+endpoint answers <code>206</code>, so a partial read such as <code>cat_file(path, start, end)</code>
+transfers only the bytes you asked for. Range support is per-backend:</p>
 <table>
 <thead>
 <tr>
-<th>Component</th>
-<th>Version</th>
+<th>Storage Identifier</th>
+<th>Backend</th>
+<th>Ranged reads</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>canfar</td>
-<td><a href="https://pypi.org/project/canfar/">1.4+</a></td>
+<td><code>vault</code></td>
+<td><code>minoc</code></td>
+<td>Yes — a partial read returns <code>206</code> and transfers only that slice</td>
+</tr>
+<tr>
+<td><code>arc</code></td>
+<td>Cavern</td>
+<td>No — the whole object is fetched and sliced, which is correct but not cheaper</td>
 </tr>
 </tbody>
 </table>
-<h4 id="helm-charts-container-images">Helm Charts &amp; Container Images<a class="headerlink" href="#helm-charts-container-images" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Helm Chart Version</th>
-<th>Container Image</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>base</td>
-<td>0.4.0</td>
-<td>N/A</td>
-</tr>
-<tr>
-<td>cavern</td>
-<td>0.10.0</td>
-<td>0.10.0</td>
-</tr>
-<tr>
-<td>skaha</td>
-<td>1.6.0</td>
-<td>1.3.0</td>
-</tr>
-<tr>
-<td>posix-mapper</td>
-<td>0.5.0</td>
-<td>0.3.2</td>
-</tr>
-<tr>
-<td>science-portal</td>
-<td>2.0.0</td>
-<td>2.0.0</td>
-</tr>
-<tr>
-<td>storage-ui</td>
-<td>0.9.0</td>
-<td>1.4.3</td>
-</tr>
-</tbody>
-</table>
-<p>See <a href="https://www.opencadc.org/deployments/helm/#canfar-science-platform"><strong>detailed upgrade and deployment guidance</strong></a> for administrators and operators. <em>These docs are going through an overhaul and are expected to improve significantly over the coming months.</em></p>
-<h3 id="contact-support">💬 Contact &amp; Support<a class="headerlink" href="#contact-support" title="Permanent link">&para;</a></h3>
-<p>For any questions about this release, or for information relating to CANFAR issues or deployment support, head over to the <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord Server</a> or please contact us at <a href="mailto:support@canfar.net">support@canfar.net</a>.</p>
-<p><br>
-<div style="text-align: center;">
-Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2764.svg" title=":heart:" /> at CADC
-</div></p>
-</div>
+<p>Because a range is now a real partial transfer against <code>vault</code>, a block cache
+is worth using there. <code>MMapCache</code> keeps fetched blocks in a sparse file, so
+only the blocks you touch occupy disk:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">MMapCache</span>
+
+<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/ALMA/test-data/cutouts/test-4d-cube.fits&quot;</span>
+<span class="n">size</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span>
+<span class="n">blocks</span> <span class="o">=</span> <span class="n">MMapCache</span><span class="p">(</span>
+    <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span>
+    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
+    <span class="n">location</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache/test-4d-cube.blocks&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">header</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>  <span class="c1"># one FITS header block, one 1 MiB range request</span>
+</code></pre></div>
+<p>Reading a FITS header from a 3.4 MB cube this way issues a single ranged
+request and materialises one block of four; a second read of the same range is
+served from <code>/scratch</code>. The saving is in bytes transferred rather than seconds
+on small files, because VOSpace transfer negotiation dominates a short request.
+It grows with file size, and matters most when many reads hit different parts
+of one large cube.</p>
+<p>Against <code>arc</code> a block cache still costs a whole download per block, so cache
+whole files there instead.</p>
+<p>The <code>blockcache</code> filesystem remains unavailable over a VOSpace Service. <code>Range</code>
+is honoured for byte reads, not through the file-object path, so wrapping
+<code>CachingFileSystem</code> still fails:</p>
+<div class="highlight"><pre><span></span><code>AttributeError: &#39;StagedReadFile&#39; object has no attribute &#39;blocksize&#39;
+</code></pre></div>
+<p>Stacked caches do not help either: chaining them (<code>filecache::simplecache::</code>)
+builds the layers, but the inner layer is never filled and never serves, so use
+exactly one cache layer on your fastest local disk.</p>
+<p>These caches use the synchronous filesystem interface. Build the filesystem
+without <code>asynchronous=True</code>, as above.</p>
+<h2 id="output-and-accepted-omissions">Output and accepted omissions<a class="headerlink" href="#output-and-accepted-omissions" title="Permanent link">&para;</a></h2>
+<p>Data command stdout belongs to the embedded command; CANFAR does not prepend
+the active-Server banner or add JSON/YAML envelopes. Diagnostics are written to
+stderr.</p>
+<p>The Python equivalent of these commands is documented in
+<a href="../../client/data/">Data Access</a>.</p>
+<p>This release intentionally provides no FUSE mount, signed-URL extension,
+progress display, confirmation prompt, <code>:/path</code> or bare-path shorthand,
+<code>active</code> alias, <code>canfar storage</code> alias, recursive removal, or cross-source <code>mv</code>
+workflow.</p>
+<h2 id="upstream-releases">Upstream releases<a class="headerlink" href="#upstream-releases" title="Permanent link">&para;</a></h2>
+<p>CANFAR installs pinned, tagged releases of
+<a href="https://github.com/shinybrar/vosfs/releases/tag/v0.8.0"><code>vosfs</code></a> and
+<a href="https://github.com/shinybrar/vosfs/releases/tag/fsspec-cli-v0.7.0"><code>fsspec-cli</code></a>.
+CANFAR tests its composition, configuration, authentication, and output seams;
+exhaustive filesystem-command and backend matrices remain in the upstream
+project.</p>
 
 
 
@@ -2324,7 +2145,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 11, 2026 19:14:43 UTC">June 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 25, 2026 09:39:51 UTC">July 25, 2026</span>
   </span>
 
     
@@ -2334,11 +2155,34 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Created">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M14.47 15.08 11 13V7h1.5v5.25l3.08 1.83c-.41.28-.79.62-1.11 1m-1.39 4.84c-.36.05-.71.08-1.08.08-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8c0 .37-.03.72-.08 1.08.69.1 1.33.32 1.92.64.1-.56.16-1.13.16-1.72 0-5.5-4.5-10-10-10S2 6.5 2 12s4.47 10 10 10c.59 0 1.16-.06 1.72-.16-.32-.59-.54-1.23-.64-1.92M18 15v3h-3v2h3v3h2v-3h3v-2h-3v-3z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:49:41 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 22, 2026 23:35:51 UTC">July 22, 2026</span>
   </span>
 
     
     
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
     
   </aside>
 
