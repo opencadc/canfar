@@ -2,29 +2,27 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from canfar.models.config import Configuration
 
 
-def _parse_dotted_path(path: str) -> list[str | int]:
-    segments: list[str | int] = []
+def _parse_dotted_path(path: str) -> list[str]:
+    segments: list[str] = []
     for raw in path.split("."):
         if not raw:
             msg = f"Invalid path {path!r}: empty segment"
             raise ValueError(msg)
-        segments.append(int(raw) if raw.isdigit() else raw)
+        if raw.isdigit():
+            msg = "List indices are not supported in configuration paths"
+            raise ValueError(msg)
+        segments.append(raw)
     return segments
 
 
-def _get_from_container(container: Any, key: str | int) -> Any:
-    if isinstance(key, int):
-        if not isinstance(container, list):
-            msg = f"Expected list for index {key}"
-            raise TypeError(msg)
-        return container[key]
-
+def _get_from_container(container: Any, key: str) -> Any:
     if isinstance(container, dict):
         return container[key]
 
@@ -32,14 +30,7 @@ def _get_from_container(container: Any, key: str | int) -> Any:
     raise KeyError(msg)
 
 
-def _set_in_container(container: Any, key: str | int, value: Any) -> None:
-    if isinstance(key, int):
-        if not isinstance(container, list):
-            msg = f"Expected list for index {key}"
-            raise TypeError(msg)
-        container[key] = value
-        return
-
+def _set_in_container(container: Any, key: str, value: Any) -> None:
     if isinstance(container, dict):
         container[key] = value
         return
@@ -48,11 +39,7 @@ def _set_in_container(container: Any, key: str | int, value: Any) -> None:
     raise TypeError(msg)
 
 
-def _ensure_child_container(parent: Any, key: str | int) -> Any:
-    if isinstance(key, int):
-        msg = "List indices are not supported for intermediate path segments"
-        raise TypeError(msg)
-
+def _ensure_child_container(parent: Any, key: str) -> Any:
     if not isinstance(parent, dict):
         msg = f"Expected mapping for key {key!r}"
         raise TypeError(msg)
@@ -85,3 +72,27 @@ def set_value(config: Configuration, path: str, value: Any) -> Configuration:
 
     _set_in_container(cursor, segments[-1], value)
     return config.__class__.model_validate(data)
+
+
+@dataclass(slots=True)
+class ConfigurationEditor:
+    """Bound editing and persistence boundary for a Configuration."""
+
+    _config: Configuration
+
+    def get(self, key: str) -> Any:
+        """Read a scalar, mapping, or whole-list value by dotted path."""
+        return get_value(self._config, key)
+
+    def set(self, key: str, value: Any) -> Configuration:
+        """Validate and install a dotted-path update on the bound config."""
+        updated = set_value(self._config, key, value)
+        self._config.__dict__.update(updated.__dict__)
+        self._config.__pydantic_fields_set__ = updated.__pydantic_fields_set__.copy()
+        return self._config
+
+    def save(self) -> None:
+        """Atomically persist the bound Configuration."""
+        from canfar.config.store import save_config  # noqa: PLC0415
+
+        save_config(self._config)

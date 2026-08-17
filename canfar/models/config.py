@@ -29,6 +29,7 @@ from pydantic_settings import (
 from pydantic_settings.sources import EnvSettingsSource
 
 from canfar import CONFIG_PATH, get_logger
+from canfar.config.editor import ConfigurationEditor as _ConfigurationEditor
 from canfar.config.editor import get_value as _get_value
 from canfar.config.editor import set_value as _set_value
 from canfar.models.active import ActiveConfig
@@ -317,6 +318,11 @@ class Configuration(BaseSettings):
         from canfar.config.store import save_config  # noqa: PLC0415
 
         save_config(self)
+
+    @property
+    def editor(self) -> _ConfigurationEditor:
+        """Return the bound editing and persistence boundary."""
+        return _ConfigurationEditor(self)
 
     def _validated_copy(self, **updates: Any) -> Configuration:
         """Validate a source-isolated copy of this complete Configuration."""
