@@ -13,88 +13,11 @@ permissions: read-all
 jobs:
   tests:
     if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
-        os: [ubuntu-latest]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-    env:
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      full-suite: true
+    secrets:
       CANFAR_BASEURL: ${{ secrets.CANFAR_BASEURL }}
       CANFAR_USERNAME: ${{ secrets.CANFAR_USERNAME }}
       CANFAR_PASSWORD: ${{ secrets.CANFAR_PASSWORD }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-    steps:
-    - name: Harden Runner
-      timeout-minutes: 10
-      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-      with:
-        egress-policy: audit
-
-    -
-      name: Setup code repository
-      timeout-minutes: 10
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        fetch-depth: 1
-    -
-      name: Setup uv
-      timeout-minutes: 10
-      uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
-      with:
-        enable-cache: true
-    -
-      name: Setup Python ${{ matrix.python-version }}
-      timeout-minutes: 10
-      run: |
-        uv python install ${{ matrix.python-version }}
-        uv venv --python ${{ matrix.python-version }}
-        uv sync --all-extras --dev
-    -
-      name: Verify CANFAR credentials
-      timeout-minutes: 10
-      run: |
-        set -euo pipefail
-        if [ -z "${CANFAR_BASEURL}" ] || [ -z "${CANFAR_USERNAME}" ] || [ -z "${CANFAR_PASSWORD}" ]; then
-          echo "CANFAR credentials are required for the full test suite" >&2
-          exit 1
-        fi
-    -
-      name: Login to CANFAR
-      timeout-minutes: 10
-      run: |
-        set -euo pipefail
-        printf "machine %s\n  login %s\n  password %s\n" "${CANFAR_BASEURL}" "${CANFAR_USERNAME}" "${CANFAR_PASSWORD}" > ~/.netrc
-        uv run cadc-get-cert --days-valid 1 --netrc-file ~/.netrc
-        rm ~/.netrc
-        test -f "${HOME}/.ssl/cadcproxy.pem"
-    -
-      name: Run full test suite
-      timeout-minutes: 10
-      run: |
-        set -euo pipefail
-        CANFAR_TEST_HOME="$HOME" uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
-    -
-      name: Remove CANFAR Certificate
-      timeout-minutes: 10
-      if: always()
-      run: |
-        rm -rf ~/.ssl/
-    -
-      name: Upload coverage to Codecov
-      timeout-minutes: 10
-      if: ${{ !cancelled() && env.CODECOV_TOKEN != '' }}
-      uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
-      with:
-        fail_ci_if_error: true # Fail the CI if an error occurs during the upload
-        token: ${{ env.CODECOV_TOKEN }}
-        flags: ${{ matrix.python-version }}
-        verbose: true # optional (default = false)
-    -
-      name: Upload test results to Codecov
-      timeout-minutes: 10
-      if: ${{ !cancelled() && env.CODECOV_TOKEN != '' }}
-      uses: codecov/test-results-action@0fa95f0e1eeaafde2c782583b36b28ad0d8c77d3 # v1.2.1
-      with:
-        token: ${{ env.CODECOV_TOKEN }}
