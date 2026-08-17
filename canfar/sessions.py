@@ -43,6 +43,16 @@ def _task_result(
     return result
 
 
+def _destroy_failure(session_id: str, exc: BaseException | None = None) -> bool:
+    """Log a failed Session deletion and preserve the false result policy."""
+    msg = f"Failed to destroy session {session_id}"
+    if exc is not None:
+        msg += f": {exc}"
+    # Both callers invoke this from their HTTPError handler; keep traceback logging.
+    log.exception(msg)  # noqa: LOG004
+    return False
+
+
 def _ids(value: str | list[str]) -> list[str]:
     """Normalize one or many Session identifiers without changing their order."""
     return [value] if isinstance(value, str) else value
@@ -431,9 +441,7 @@ class Session(HTTPClient):
                 self.client.delete(url=_session_url(value))
                 results[value] = True
             except HTTPError:
-                msg = f"Failed to destroy session {value}"
-                log.exception(msg)
-                results[value] = False
+                results[value] = _destroy_failure(value)
         return results
 
     def destroy_with(
@@ -841,9 +849,7 @@ class AsyncSession(HTTPClient):
             try:
                 await self.asynclient.delete(url=_session_url(value))
             except HTTPError as err:
-                msg = f"Failed to destroy session {value}: {err}"
-                log.exception(msg)
-                return value, False
+                return value, _destroy_failure(value, err)
             else:
                 return value, True
 
