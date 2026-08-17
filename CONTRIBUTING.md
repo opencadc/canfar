@@ -80,7 +80,16 @@ uv run pytest
 
 Some tests in the Skaha test suite are marked as "slow" because they involve network operations, waiting for session states, or other time-consuming operations. These tests can take several minutes to complete.
 
-**Run all tests (including slow ones):**
+**Run the deterministic pull-request suite:**
+```bash
+uv run pytest -m "not slow" tests
+```
+
+Pull requests targeting `main` or `feat/interfaces` use this non-slow suite in CI.
+The unfiltered suite runs in CI only after a code or test change is merged into
+`main`; documentation- and workflow-only merges do not trigger it.
+
+**Run all tests (including slow ones) locally:**
 ```bash
 uv run pytest
 ```
@@ -101,7 +110,7 @@ The slow tests are primarily integration tests that interact with the CANFAR Sci
 - Authentication timeout tests
 - Session statistics tests
 
-For rapid development and testing, it's recommended to use `-m "not slow"` to skip these time-consuming tests during your development cycle, and run the full test suite before submitting your pull request.
+For rapid development and testing, use `-m "not slow"` to skip these time-consuming tests during your development cycle. Run the full suite locally when you have valid CANFAR credentials and a certificate.
 
 ### 6. Commit Your Changes
 
