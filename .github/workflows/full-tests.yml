@@ -1,7 +1,7 @@
 name: Full Tests
 
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
     branches: [ main ]
     paths:
@@ -52,9 +52,17 @@ jobs:
         uv venv --python ${{ matrix.python-version }}
         uv sync --all-extras --dev
     -
+      name: Verify CANFAR credentials
+      timeout-minutes: 10
+      run: |
+        set -euo pipefail
+        if [ -z "${CANFAR_BASEURL}" ] || [ -z "${CANFAR_USERNAME}" ] || [ -z "${CANFAR_PASSWORD}" ]; then
+          echo "CANFAR credentials are required for the full test suite" >&2
+          exit 1
+        fi
+    -
       name: Login to CANFAR
       timeout-minutes: 10
-      if: ${{ env.CANFAR_BASEURL != '' && env.CANFAR_USERNAME != '' && env.CANFAR_PASSWORD != '' }}
       run: |
         set -euo pipefail
         printf "machine %s\n  login %s\n  password %s\n" "${CANFAR_BASEURL}" "${CANFAR_USERNAME}" "${CANFAR_PASSWORD}" > ~/.netrc
@@ -66,7 +74,7 @@ jobs:
       timeout-minutes: 10
       run: |
         set -euo pipefail
-        uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+        CANFAR_TEST_HOME="$HOME" uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
     -
       name: Remove CANFAR Certificate
       timeout-minutes: 10

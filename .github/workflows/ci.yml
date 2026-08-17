@@ -47,9 +47,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10
     env:
-      CANFAR_BASEURL: ${{ secrets.CANFAR_BASEURL }}
-      CANFAR_USERNAME: ${{ secrets.CANFAR_USERNAME }}
-      CANFAR_PASSWORD: ${{ secrets.CANFAR_PASSWORD }}
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
     steps:
     - name: Harden Runner
@@ -78,27 +75,11 @@ jobs:
         uv venv --python ${{ matrix.python-version }}
         uv sync --all-extras --dev
     -
-      name: Login to CANFAR
-      timeout-minutes: 10
-      if: ${{ env.CANFAR_BASEURL != '' && env.CANFAR_USERNAME != '' && env.CANFAR_PASSWORD != '' }}
-      run: |
-        set -euo pipefail
-        printf "machine %s\n  login %s\n  password %s\n" "${CANFAR_BASEURL}" "${CANFAR_USERNAME}" "${CANFAR_PASSWORD}" > ~/.netrc
-        uv run cadc-get-cert --days-valid 1 --netrc-file ~/.netrc
-        rm ~/.netrc
-        test -f "${HOME}/.ssl/cadcproxy.pem"
-    -
       name: Run tests
       timeout-minutes: 10
       run: |
         set -euo pipefail
         uv run pytest -m "not slow" tests --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
-    -
-      name: Remove CANFAR Certificate
-      timeout-minutes: 10
-      if: always()
-      run: |
-        rm -rf ~/.ssl/
     -
       name: Upload coverage to Codecov
       timeout-minutes: 10

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from threading import Barrier
 from typing import TYPE_CHECKING
@@ -52,6 +53,13 @@ _VOSPACE_CAPABILITIES = """
       </capability>
     </capabilities>
 """
+
+
+def test_enrich_preserves_storage_resource_annotation() -> None:
+    """The public enrichment signature retains its released annotation text."""
+    annotation = inspect.signature(enrich).parameters["storage_resource"].annotation
+
+    assert annotation == "RegistryResource | None | object"
 
 
 def _http_client_factory(
