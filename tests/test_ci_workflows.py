@@ -58,6 +58,17 @@ def test_full_suite_is_limited_to_merged_code_prs_into_main():
         "CANFAR_PASSWORD": "${{ secrets.CANFAR_PASSWORD }}",
         "CODECOV_TOKEN": "${{ secrets.CODECOV_TOKEN }}",
     }
+    assert (
+        'if [ -z "${CANFAR_BASEURL}" ] || [ -z "${CANFAR_USERNAME}" ] '
+        '|| [ -z "${CANFAR_PASSWORD}" ]; then'
+    ) in commands
+    assert "CANFAR credentials are required for the full test suite" in commands
+    login_step = next(
+        step
+        for step in workflow["jobs"]["tests"]["steps"]
+        if step.get("name") == "Login to CANFAR"
+    )
+    assert "if" not in login_step
     assert 'CANFAR_TEST_HOME="$HOME" uv run pytest' in commands
     assert "uv run cadc-get-cert" in commands
     assert "rm -rf ~/.ssl/" in commands
