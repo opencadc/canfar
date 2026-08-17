@@ -1,44 +1,18 @@
-name: Continous Integration
+name: Full Tests
 
 on:
   pull_request:
-    branches: [ main, feat/interfaces ]
-  push:
+    types: [closed]
     branches: [ main ]
-    paths-ignore:
-      - 'docs/**'
+    paths:
+      - 'canfar/**'
+      - 'tests/**'
 
 permissions: read-all
 
 jobs:
-  pre-commit-checks:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-    - name: Harden Runner
-      timeout-minutes: 10
-      uses: step-security/harden-runner@bf7454d06d71f1098171f2acdf0cd4708d7b5920 # v2.20.0
-      with:
-        egress-policy: audit
-
-    -
-      name: Setup code repository
-      timeout-minutes: 10
-      uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      with:
-        fetch-depth: 1
-    - name: Setup Python
-      timeout-minutes: 10
-      uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
-      with:
-        python-version: 3.12
-    -
-      name: pre-commit
-      timeout-minutes: 10
-      uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
-
   tests:
-    needs: pre-commit-checks
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
     strategy:
       fail-fast: false
       matrix:
@@ -88,11 +62,11 @@ jobs:
         rm ~/.netrc
         test -f "${HOME}/.ssl/cadcproxy.pem"
     -
-      name: Run tests
+      name: Run full test suite
       timeout-minutes: 10
       run: |
         set -euo pipefail
-        uv run pytest -m "not slow" tests --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+        uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
     -
       name: Remove CANFAR Certificate
       timeout-minutes: 10
