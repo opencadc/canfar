@@ -61,6 +61,7 @@ dependencies = [
     "typer>=0.16.0",
     "vosfs @ git+https://github.com/shinybrar/vosfs@v0.8.0",
     "fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.7.0#subdirectory=src/fsspec-cli",
+    "cryptography>=42.0.0",
 ]
 
 [tool.uv]
