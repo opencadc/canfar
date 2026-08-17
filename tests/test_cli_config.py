@@ -190,14 +190,14 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
     assert isinstance(result.exception, RuntimeError)
 
     with patch("canfar.cli.config.Configuration") as cfg:
-        cfg.return_value.get_value.side_effect = KeyError("missing")
+        cfg.return_value.editor.get.side_effect = KeyError("missing")
         result = runner.invoke(config, ["get", "missing"])
 
     assert result.exit_code == 1
     assert "missing" in result.stderr
 
     with patch("canfar.cli.config.Configuration") as cfg:
-        cfg.return_value.set_value.side_effect = TypeError("wrong")
+        cfg.return_value.editor.set.side_effect = TypeError("wrong")
         result = runner.invoke(config, ["set", "console.width", "120"])
 
     assert result.exit_code == 1

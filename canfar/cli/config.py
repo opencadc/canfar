@@ -124,7 +124,7 @@ def get(
         raise typer.Exit(1) from err
 
     try:
-        value = cfg.get_value(key)
+        value = cfg.editor.get(key)
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
         failure = StructuredError(
             code=ErrorCode.COMMAND_VALIDATION_FAILED,
@@ -159,8 +159,8 @@ def set_value(
     cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         parsed = yaml.safe_load(value)
-        updated = cfg.set_value(key, parsed)
-        updated.save()
+        cfg.editor.set(key, parsed)
+        cfg.editor.save()
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
         get_console(stderr=True).print(f"[bold red]Error:[/bold red] {err}")
         raise typer.Exit(1) from err
