@@ -203,7 +203,7 @@ class Session(HTTPClient):
 
         return results
 
-    def create(
+    def create(  # noqa: PLR0917
         self,
         name: str | CreateRequest,
         image: str | None = None,
@@ -601,7 +601,7 @@ class AsyncSession(HTTPClient):
             return None
         return results
 
-    async def create(
+    async def create(  # noqa: PLR0917
         self,
         name: str | CreateRequest,
         image: str | None = None,

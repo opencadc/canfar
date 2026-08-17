@@ -143,7 +143,7 @@ def _render_create_result(
         "allow_interspersed_args": True,
     },
 )
-def creation(
+def creation(  # noqa: PLR0917
     kind: Annotated[
         Kind,
         typer.Argument(

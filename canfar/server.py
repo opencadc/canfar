@@ -612,7 +612,7 @@ def enrich(
     certificate: Path | None = None,
     strict: bool = True,
     timeout: int = 2,
-    storage_resource: RegistryResource | None | object = _STORAGE_RESOURCE_UNSET,
+    storage_resource: RegistryResource | object | None = _STORAGE_RESOURCE_UNSET,
 ) -> Server:
     """Return a validated Server enriched from its VOSI capabilities.
 
