@@ -165,28 +165,34 @@ def test_expiry_error_message_contains_times(tmp_path) -> None:
     assert "current time" in message
 
 
-def test_expiry_handles_missing_not_valid_before_utc(monkeypatch, tmp_path) -> None:
-    """Expiry should fall back to naive datetime attributes when needed."""
+def test_expiry_uses_current_cryptography_certificate_api(
+    monkeypatch, tmp_path
+) -> None:
+    """Expiry reads certificates through the current Cryptography API."""
     cert_path = tmp_path / "cert.pem"
     generate_cert(cert_path, valid_for_days=3)
 
     original_loader = x509_auth.x509.load_pem_x509_certificate
+    original_cert = original_loader(cert_path.read_bytes())
 
-    class MinimalCert:
-        """Certificate exposing only naive validity attributes."""
+    class ModernCertificate:
+        """Certificate exposing only the supported UTC-aware validity fields."""
 
-        def __init__(self, cert: x509.Certificate) -> None:
-            self.not_valid_before = cert.not_valid_before
-            self.not_valid_after = cert.not_valid_after
+        not_valid_before_utc = original_cert.not_valid_before_utc
+        not_valid_after_utc = original_cert.not_valid_after_utc
 
-    def fake_loader(data: bytes, backend) -> MinimalCert:  # type: ignore[override]
-        cert = original_loader(data, backend)
-        return MinimalCert(cert)
+    def load_certificate(data: bytes) -> ModernCertificate:
+        assert data == cert_path.read_bytes()
+        return ModernCertificate()
 
-    monkeypatch.setattr(x509_auth.x509, "load_pem_x509_certificate", fake_loader)
+    monkeypatch.setattr(
+        x509_auth.x509,
+        "load_pem_x509_certificate",
+        load_certificate,
+    )
 
     expiry_ts = x509_auth.expiry(cert_path)
-    assert isinstance(expiry_ts, float)
+    assert expiry_ts == pytest.approx(original_cert.not_valid_after_utc.timestamp())
 
 
 # --- Tests for canfar.auth.x509.inspect --- #
