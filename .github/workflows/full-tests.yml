@@ -1,7 +1,7 @@
 name: Full Tests
 
 on:
-  pull_request:
+  pull_request_target:
     types: [closed]
     branches: [ main ]
     paths:
@@ -66,7 +66,7 @@ jobs:
       timeout-minutes: 10
       run: |
         set -euo pipefail
-        uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
+        CANFAR_TEST_HOME="$HOME" uv run pytest --cov --cov-report=xml --junitxml=junit.xml -o junit_family=legacy
     -
       name: Remove CANFAR Certificate
       timeout-minutes: 10
