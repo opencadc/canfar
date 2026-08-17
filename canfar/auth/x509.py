@@ -12,7 +12,6 @@ from typing import TYPE_CHECKING, Any
 
 from cadcutils.net.auth import Subject, get_cert
 from cryptography import x509
-from cryptography.hazmat.backends import default_backend
 
 from canfar import CERT_PATH, get_logger
 
@@ -34,42 +33,6 @@ class CertificateError(ValueError):
         """Initialize a certificate error with optional structured expiry."""
         super().__init__(message)
         self.expired_at = expired_at
-
-
-def _to_utc(value: datetime) -> datetime:
-    """Return timezone aware datetime.
-
-    Args:
-        value (datetime): Input datetime.
-
-    Returns:
-        datetime: Timezone aware datetime.
-    """
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
-
-
-def _validity_window(cert: x509.Certificate) -> tuple[datetime, datetime]:
-    """Return validity start/end datetimes in UTC.
-
-    Args:
-        cert (x509.Certificate): Certificate to inspect.
-
-    Raises:
-        CertificateError: If certificate is expired or not yet valid.
-
-    Returns:
-        tuple[datetime, datetime]: Validity start and end datetimes in UTC.
-    """
-    try:
-        start = getattr(cert, "not_valid_before_utc", None) or cert.not_valid_before
-        end = getattr(cert, "not_valid_after_utc", None) or cert.not_valid_after
-    except AttributeError as err:  # pragma: no cover - defensive path
-        msg = "Certificate is missing validity information."
-        raise CertificateError(msg) from err
-
-    return _to_utc(start), _to_utc(end)
 
 
 def assert_valid_dates(
@@ -240,8 +203,9 @@ def expiry(path: Path = CERT_PATH) -> float:
     try:
         destination = path.resolve(strict=True)
         data = destination.read_bytes()
-        cert = x509.load_pem_x509_certificate(data, default_backend())
-        valid_from, valid_until = _validity_window(cert)
+        cert = x509.load_pem_x509_certificate(data)
+        valid_from = cert.not_valid_before_utc
+        valid_until = cert.not_valid_after_utc
         assert_valid_dates(destination, valid_from, valid_until)
         return valid_until.timestamp()
     except FileNotFoundError as err:
