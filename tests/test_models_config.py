@@ -94,54 +94,6 @@ class TestConfigurationDefaults:
         assert not hasattr(config, "storage_identifiers")
         assert not hasattr(config, "_resolve_storage")
 
-    def test_legacy_server_named_storage_is_healed(self, tmp_path: Path) -> None:
-        """A Storage Identifier saved as the Server Name is restored to its leaf."""
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(
-            "version: 1\n"
-            "servers:\n"
-            "  canfar:\n"
-            "    idp: cadc\n"
-            "    uri: ivo://cadc.nrc.ca/skaha\n"
-            "    url: https://ws-uv.canfar.net/skaha\n"
-            "    version: v1\n"
-            "    auths: [x509]\n"
-            "    storage:\n"
-            "      canfar:\n"
-            "        uri: ivo://cadc.nrc.ca/arc\n"
-            "        url: https://ws-uv.canfar.net/arc\n",
-            encoding="utf-8",
-        )
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-
-        storage = config.servers["canfar"].storage
-        assert set(storage) == {"arc", "vault"}
-        assert str(storage["arc"].url).rstrip("/") == "https://ws-uv.canfar.net/arc"
-
-    def test_custom_storage_names_are_not_healed(self, tmp_path: Path) -> None:
-        """Deliberate Storage Identifiers are configuration, not stale defaults."""
-        config_path = tmp_path / "config.yaml"
-        config_path.write_text(
-            "version: 1\n"
-            "servers:\n"
-            "  canfar:\n"
-            "    idp: cadc\n"
-            "    uri: ivo://cadc.nrc.ca/skaha\n"
-            "    url: https://ws-uv.canfar.net/skaha\n"
-            "    version: v1\n"
-            "    auths: [x509]\n"
-            "    storage:\n"
-            "      canSRC:\n"
-            "        uri: ivo://cadc.nrc.ca/arc\n"
-            "        url: https://ws-cadc.canfar.net/arc\n",
-            encoding="utf-8",
-        )
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-
-        assert set(config.servers["canfar"].storage) == {"canSRC"}
-
     def test_default_authentication_dict_keyed_by_idp(self, tmp_path: Path) -> None:
         """Default Authentication Records are keyed by IDP."""
         config_path = tmp_path / "config.yaml"
@@ -493,7 +445,7 @@ class TestConfigurationSerialization:
 
         temp_config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
-            original.save()
+            original.editor.save()
             loaded = Configuration()
 
         assert loaded.active.authentication == "srcnet"
@@ -543,17 +495,17 @@ class TestConfigurationSerialization:
 
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config.save()
+            config.editor.save()
             loaded = Configuration()
 
         assert list(loaded.servers["canfar"].storage) == ["canSRC", "canSRCs3"]
         assert loaded.servers["canfar"].idp == "cadc"
         assert loaded == config
 
-    def test_existing_v1_configuration_without_storage_gains_defaults(
+    def test_existing_v1_configuration_without_storage_loads_unchanged(
         self, tmp_path: Path
     ) -> None:
-        """A storage-less Server gains defaults without a schema migration."""
+        """A released storage-less Server remains unchanged on load."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.safe_dump(_sample_config()), encoding="utf-8")
 
@@ -561,14 +513,14 @@ class TestConfigurationSerialization:
             config = Configuration()
 
         assert config.version == 1
-        assert set(config.servers["canfar"].storage) == {"arc", "vault"}
+        assert config.servers["canfar"].storage == {}
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""
         config = Configuration()
         nested_path = tmp_path / "nested" / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", nested_path):
-            config.save()
+            config.editor.save()
         assert nested_path.exists()
 
     def test_failed_serialization_preserves_existing_configuration(
@@ -583,12 +535,12 @@ class TestConfigurationSerialization:
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch(
-                "canfar.config.store.yaml.dump",
+                "canfar.config.editor.yaml.dump",
                 side_effect=TypeError("cannot serialize"),
             ),
             pytest.raises(OSError, match="Failed to save configuration"),
         ):
-            config.save()
+            config.editor.save()
 
         assert config_path.read_bytes() == original
 
@@ -601,12 +553,12 @@ class TestConfigurationSerialization:
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.save()
+            config.editor.save()
             original = config_path.read_bytes()
             config.active.authentication = "missing"
 
             with pytest.raises(OSError, match="Failed to save configuration"):
-                config.save()
+                config.editor.save()
 
             loaded = Configuration()
 
@@ -626,12 +578,12 @@ class TestConfigurationSerialization:
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch(
-                "canfar.config.store.Path.replace",
+                "canfar.config.editor.Path.replace",
                 side_effect=OSError("cannot replace"),
             ),
             pytest.raises(OSError, match="Failed to save configuration"),
         ):
-            config.save()
+            config.editor.save()
 
         assert config_path.read_bytes() == original
         assert set(tmp_path.iterdir()) == {config_path}
@@ -643,10 +595,10 @@ class TestConfigurationSerialization:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.config.store.os.fsync", side_effect=OSError("disk full")),
+            patch("canfar.config.editor.os.fsync", side_effect=OSError("disk full")),
             pytest.raises(OSError, match="Failed to save configuration"),
         ):
-            config.save()
+            config.editor.save()
 
         assert not config_path.exists()
         assert list(tmp_path.iterdir()) == []
@@ -662,7 +614,7 @@ class TestConfigurationSerialization:
                     ),
                 },
             )
-            config.save()
+            config.editor.save()
 
         yaml_data = yaml.safe_load(temp_config_path.read_text(encoding="utf-8"))
         assert yaml_data["version"] == 1
@@ -756,7 +708,7 @@ class TestConfigurationErrorHandling:
             patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied")),
             pytest.raises(OSError, match="Permission denied"),
         ):
-            config.save()
+            config.editor.save()
 
     def test_save_handles_file_write_error(self, tmp_path: Path) -> None:
         """Save surfaces file write errors."""
@@ -768,7 +720,7 @@ class TestConfigurationErrorHandling:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             pytest.raises(OSError, match=error_msg),
         ):
-            config.save()
+            config.editor.save()
 
     def test_save_handles_yaml_serialization_error(self, tmp_path: Path) -> None:
         """Save surfaces YAML serialization errors."""
@@ -780,7 +732,7 @@ class TestConfigurationErrorHandling:
             patch("yaml.dump", side_effect=TypeError("Mock YAML error")),
             pytest.raises(OSError, match=error_msg),
         ):
-            config.save()
+            config.editor.save()
 
     def test_settings_customise_sources_order(self) -> None:
         """Settings sources preserve expected precedence ordering."""

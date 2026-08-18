@@ -305,7 +305,7 @@ class TestPlatformEnrichment:
                 authentication={"cadc": credential},
                 servers={"canfar": server},
             )
-            config.save()
+            config.editor.save()
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
             if strict:
@@ -536,7 +536,7 @@ class TestPlatformEnrichment:
             ),
         ):
             config = _active_with_target(_oidc_credential(access_expiry=now - 1))
-            config.save()
+            config.editor.save()
             before_active = config.active.model_dump(mode="json")
             before_servers = {
                 name: server.model_dump(mode="json")
@@ -547,8 +547,8 @@ class TestPlatformEnrichment:
             )
             persisted = Configuration()
 
-        refreshed = config.get_credential("srcnet")
-        saved_refreshed = persisted.get_credential("srcnet")
+        refreshed = config.authentication["srcnet"]
+        saved_refreshed = persisted.authentication["srcnet"]
         assert isinstance(refreshed, OIDCCredential)
         assert isinstance(saved_refreshed, OIDCCredential)
         assert validated.version == "v2"
@@ -615,7 +615,7 @@ class TestPlatformEnrichment:
             ),
         ):
             config = _active_with_target(_oidc_credential(access_expiry=now - 1))
-            config.save()
+            config.editor.save()
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
             with pytest.raises(
@@ -670,7 +670,7 @@ class TestPlatformEnrichment:
             ),
         ):
             config = _anonymous_config()
-            config.save()
+            config.editor.save()
             before_model = config.model_dump(mode="json")
             before_yaml = config_path.read_bytes()
             with pytest.raises(

@@ -167,7 +167,7 @@ class HTTPClient(BaseSettings):
             else self.authentication_idp
         )
         try:
-            credential = self.config.get_credential(idp)
+            credential = self.config.authentication[idp]
         except KeyError:
             return None
         if isinstance(credential, X509Credential) and credential.path is None:
@@ -338,8 +338,14 @@ class HTTPClient(BaseSettings):
         """
         if self.url:
             return URL(str(self.url))
+        if self.config.active.server is None:
+            msg = (
+                "Server not found for Authentication Record: "
+                f"{self.config.active.authentication}"
+            )
+            raise ValueError(msg)
         try:
-            server = self.config.get_active_server()
+            server = self.config.servers[self.config.active.server]
         except KeyError as exc:
             msg = (
                 "Server not found for Authentication Record: "

@@ -302,7 +302,9 @@ def activate_authentication(
 ) -> None:
     """Activate an Authentication Record and its remembered Server Selection."""
     target_config = config or Configuration()  # ty: ignore[missing-argument]
-    target_config.get_credential(idp)
+    if idp not in target_config.authentication:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        raise KeyError(msg)
     servers = _servers_for_idp(target_config, idp)
     remembered = _remembered_server_for_idp(target_config, idp, servers)
     if remembered is not None:

@@ -36,8 +36,14 @@ def emit_active_server_banner() -> None:
     if not cfg.console.banner:
         return
     try:
-        name = cfg.get_active_server().name
+        name = (
+            cfg.servers[cfg.active.server].name
+            if cfg.active.server is not None
+            else None
+        )
     except KeyError:
+        name = None
+    if name is None:
         name = "unknown"
     get_console().print(f"@{name}", style="dim underline")
 

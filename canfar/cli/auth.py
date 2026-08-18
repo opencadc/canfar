@@ -257,10 +257,13 @@ def auth_use_command(
 
     try:
         get_idp(idp)
-        config.get_credential(idp)
     except KeyError as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
+    if idp not in config.authentication:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        get_console(stderr=True).print(f"[bold red]{msg}[/bold red]")
+        raise typer.Exit(1)
 
     try:
         activation = activate_server(idp, config=config)

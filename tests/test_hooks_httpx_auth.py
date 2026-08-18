@@ -39,10 +39,6 @@ def oidc_client() -> HTTPClient:
 class TestSyncHook:
     """Tests for the synchronous `hook` function."""
 
-    @patch(
-        "canfar.models.config.Configuration.update_credential",
-        side_effect=AssertionError("refresh must use config.editor"),
-    )
     @patch("canfar.config.editor.ConfigurationEditor.save")
     @patch(
         "canfar.auth.oidc.sync_refresh",
@@ -58,7 +54,6 @@ class TestSyncHook:
         self,
         mock_refresh,
         mock_save,
-        mock_update,
         oidc_client,
     ) -> None:
         """Verify a successful token refresh updates state and headers."""
@@ -69,7 +64,6 @@ class TestSyncHook:
 
         mock_refresh.assert_called_once()
         mock_save.assert_called_once()
-        mock_update.assert_not_called()
 
         # Verify the request header was updated
         assert request.headers["Authorization"] == "Bearer new-access-token"
@@ -77,9 +71,9 @@ class TestSyncHook:
         # Verify the main client's headers were updated
         assert oidc_client.client.headers["Authorization"] == "Bearer new-access-token"
 
-        credential = oidc_client.config.get_credential(
+        credential = oidc_client.config.authentication[
             oidc_client.config.active.authentication
-        )
+        ]
         assert isinstance(credential, OIDCCredential)
         assert credential.token.access is not None
         assert credential.token.access.get_secret_value() == "new-access-token"
@@ -116,18 +110,19 @@ class TestSyncHook:
     @patch("canfar.auth.oidc.sync_refresh")
     def test_skip_if_token_not_expired(self, mock_refresh, oidc_client) -> None:
         """Verify the hook does nothing if the access token is not expired."""
-        credential = oidc_client.config.get_credential(
+        credential = oidc_client.config.authentication[
             oidc_client.config.active.authentication
-        )
+        ]
         assert isinstance(credential, OIDCCredential)
-        oidc_client.config.update_credential(
+        oidc_client.config.editor.set(
+            f"authentication.{credential.idp}",
             credential.model_copy(
                 update={
                     "expiry": credential.expiry.model_copy(
                         update={"access": time.time() + 3600}
                     )
                 }
-            )
+            ),
         )
         hook_func = refresh(oidc_client)
         request = httpx.Request("GET", "/")
@@ -148,10 +143,6 @@ class TestSyncHook:
 class TestAsyncHook:
     """Tests for the asynchronous `ahook` function."""
 
-    @patch(
-        "canfar.models.config.Configuration.update_credential",
-        side_effect=AssertionError("refresh must use config.editor"),
-    )
     @patch("canfar.config.editor.ConfigurationEditor.save")
     @patch(
         "canfar.auth.oidc.refresh",
@@ -167,7 +158,6 @@ class TestAsyncHook:
         self,
         mock_refresh,
         mock_save,
-        mock_update,
         oidc_client,
     ) -> None:
         """Verify a successful async token refresh updates state and headers."""
@@ -178,16 +168,15 @@ class TestAsyncHook:
 
         mock_refresh.assert_called_once()
         mock_save.assert_called_once()
-        mock_update.assert_not_called()
 
         assert request.headers["Authorization"] == "Bearer new-async-token"
         assert (
             oidc_client.asynclient.headers["Authorization"] == "Bearer new-async-token"
         )
 
-        credential = oidc_client.config.get_credential(
+        credential = oidc_client.config.authentication[
             oidc_client.config.active.authentication
-        )
+        ]
         assert isinstance(credential, OIDCCredential)
         assert credential.token.access is not None
         assert credential.token.access.get_secret_value() == "new-async-token"

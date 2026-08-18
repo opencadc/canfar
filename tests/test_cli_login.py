@@ -82,10 +82,6 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
         patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
-        patch(
-            "canfar.models.config.Configuration.upsert_credential",
-            side_effect=AssertionError("authentication must use config.editor"),
-        ),
         patch("canfar.server._validate_server", return_value=validated),
         patch(
             "canfar.cli.login.discover",
@@ -150,7 +146,7 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
         saved = Configuration()
     assert saved.active.authentication == "cadc"
     assert saved.active.server == "CADC-CANFAR"
-    assert saved.get_credential("cadc").path == Path("/new/cert.pem")
+    assert saved.authentication["cadc"].path == Path("/new/cert.pem")
 
 
 def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:

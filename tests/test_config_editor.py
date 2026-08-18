@@ -14,6 +14,39 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+def test_configuration_exposes_only_data_and_editor_for_editing(
+    tmp_path: Path,
+) -> None:
+    """Legacy service operations are not part of the persisted data model."""
+    config_path = tmp_path / "config.yaml"
+    removed = (
+        "save",
+        "get_value",
+        "set_value",
+        "get_credential",
+        "storage_identifiers",
+        "_resolve_storage",
+        "upsert_credential",
+        "update_credential",
+        "set_active_authentication",
+        "remove_authentication",
+        "purge_authentication",
+        "get_server_by_uri",
+        "get_active_server",
+        "get_server_for_idp",
+        "get_remembered_server_for_idp",
+        "set_active_selection",
+        "upsert_server",
+        "upsert_servers",
+    )
+
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+
+    assert all(not hasattr(config, name) for name in removed)
+    assert hasattr(config, "editor")
+
+
 def test_editor_reads_scalars_mappings_and_whole_lists(tmp_path: Path) -> None:
     """The editor resolves dotted paths without exposing list indexing."""
     config_path = tmp_path / "config.yaml"
@@ -103,7 +136,7 @@ def test_editor_save_failure_preserves_existing_file(tmp_path: Path) -> None:
         config.editor.set("console.width", 134)
 
         with (
-            patch("canfar.config.store.os.fsync", side_effect=OSError("disk full")),
+            patch("canfar.config.editor.os.fsync", side_effect=OSError("disk full")),
             pytest.raises(OSError, match="Failed to save configuration"),
         ):
             config.editor.save()
