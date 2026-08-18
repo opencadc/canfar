@@ -13,6 +13,11 @@ import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
+from canfar._server_discovery import (
+    _discover_for_idp,
+    _discovered_to_server,
+    _select_storage,
+)
 from canfar.errors import ErrorCode
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import OIDCCredential, RuntimeCredential, X509Credential
@@ -24,9 +29,6 @@ from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
     ServerSelectionRequiredError,
-    _discover_for_idp,
-    _discovered_to_server,
-    _select_storage,
     activate,
     discover,
     enrich,
@@ -155,7 +157,10 @@ class TestServerList:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
         ):
             config = _anonymous_config()
             discover("cadc", config=config)
@@ -406,7 +411,7 @@ class TestServerDiscovery:
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch(
-                "canfar.server._discover_for_idp",
+                "canfar._server_discovery._discover_for_idp",
                 return_value=[winner, alpha, earlier],
             ),
         ):
@@ -429,7 +434,10 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             servers = discover("cadc")
@@ -722,7 +730,7 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
-            patch("canfar.server.enrich", side_effect=enriched),
+            patch("canfar._server_discovery.enrich", side_effect=enriched),
         ):
             servers = await _discover_for_idp("srcnet")
 
@@ -849,7 +857,10 @@ class TestServerDiscovery:
         materialize = AsyncMock(return_value=RuntimeCredential(token="current-token"))
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
-            patch("canfar.server._discovered_to_server", side_effect=convert),
+            patch(
+                "canfar._server_discovery._discovered_to_server",
+                side_effect=convert,
+            ),
             patch(
                 "canfar.client.HTTPClient._materialize_credentials",
                 new=materialize,
@@ -1198,7 +1209,10 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             discover("cadc")
@@ -1225,9 +1239,15 @@ class TestServerDiscovery:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.server.Configuration", Configuration),
         ):
-            with patch("canfar.server._discover_for_idp", return_value=[first]):
+            with patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[first],
+            ):
                 discover("cadc")
-            with patch("canfar.server._discover_for_idp", return_value=[moved]):
+            with patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[moved],
+            ):
                 discover("cadc")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
@@ -1258,7 +1278,10 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[renamed]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[renamed],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             discover("cadc")
@@ -1291,7 +1314,7 @@ class TestServerDiscovery:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server.enrich",
+                "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
                     update={"version": "v1", "auths": ["oidc"]},
                     deep=True,
@@ -1329,7 +1352,7 @@ class TestServerDiscovery:
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server.enrich",
+                "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
                     update={"version": "v1", "auths": ["x509"]},
                     deep=True,
