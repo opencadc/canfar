@@ -2,15 +2,26 @@
 
 from __future__ import annotations
 
+import asyncio
+import sys
 from typing import TYPE_CHECKING, NoReturn
 
+import httpx
+
 import canfar.server as server_service
+from canfar.auth import oidc
 from canfar.errors import ErrorCode, StructuredError
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
     Authentication,
     AuthenticationCredential,
     AuthMode,
+    Client,
+    DeviceAuthorization,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
     X509Credential,
 )
 from canfar.models.config import (
@@ -86,6 +97,39 @@ def login(idp: str, force: bool = False) -> None:
     config.editor.set(f"authentication.{credential.idp}", credential)
     server_service.discover(idp, config=config, save=False)
     config.editor.save()
+
+
+async def alogin(idp: str, force: bool = False) -> None:
+    """Authenticate an IDP from an existing asynchronous event loop.
+
+    The OIDC protocol uses native asynchronous HTTP and polling. Synchronous
+    X.509 inspection and Science Platform discovery run in worker threads so
+    this API does not block the caller's event loop.
+
+    Args:
+        idp: Canonical Identity Provider key.
+        force: Re-authenticate and rediscover when true.
+
+    Raises:
+        KeyError: Unknown IDP key.
+        AuthenticationError: Credential or discovery failure.
+    """
+    idp_info = get_idp(idp)
+    config = Configuration()  # ty: ignore[missing-argument]
+
+    if _has_authentication(config, idp) and not force:
+        return
+
+    credential = await _authenticate_async(idp_info)
+    editor = config.editor
+    editor.set(f"authentication.{credential.idp}", credential)
+    await asyncio.to_thread(
+        server_service.discover,
+        idp,
+        config=config,
+        save=False,
+    )
+    await asyncio.to_thread(editor.save)
 
 
 def use(idp: str) -> None:
@@ -331,10 +375,15 @@ def _credential_expiry(credential: AuthenticationCredential) -> float | None:
 
 def _authenticate(idp_info: IdpInfo) -> AuthenticationCredential:
     if idp_info.auth_mode == "x509":
-        credential = _authenticate_x509(idp_info.key)
-    else:
-        _authenticate_oidc(idp_info.key)
-    return credential
+        return _authenticate_x509(idp_info.key)
+    return _authenticate_oidc(idp_info)
+
+
+async def _authenticate_async(idp_info: IdpInfo) -> AuthenticationCredential:
+    """Acquire one Authentication Record without blocking an event loop."""
+    if idp_info.auth_mode == "x509":
+        return await asyncio.to_thread(_authenticate_x509, idp_info.key)
+    return await _authenticate_oidc_async(idp_info)
 
 
 def _authenticate_x509(idp: str) -> X509Credential:
@@ -356,18 +405,88 @@ def _authenticate_x509(idp: str) -> X509Credential:
     )
 
 
-def _authenticate_oidc(idp: str) -> NoReturn:
-    _fail(
-        code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-        message=f"OIDC authentication for IDP '{idp}' requires interactive login.",
-        hint="Use the CLI login flow for first-time OIDC authentication.",
+def _print_device_challenge(challenge: DeviceAuthorization) -> None:
+    """Print only user-facing device authorization data to the terminal."""
+    lines = [f"Verification URL: {challenge.verification_uri}"]
+    if challenge.verification_uri_complete is not None:
+        lines.append(
+            f"Verification URL (complete): {challenge.verification_uri_complete}"
+        )
+    lines.append(f"Device code: {challenge.user_code.get_secret_value()}")
+    sys.stdout.write(
+        "\n".join(lines) + "\n",
     )
+    sys.stdout.flush()
+
+
+def _oidc_credential(idp: str, info: IdpInfo) -> OIDCCredential:
+    """Build an empty OIDC Authentication Record from IDP metadata."""
+    if info.oidc_discovery_url is None:
+        msg = f"OIDC discovery URL is not configured for IDP '{idp}'."
+        raise RuntimeError(msg)
+    if info.oidc_issuer is None:
+        msg = f"OIDC issuer is not configured for IDP '{idp}'."
+        raise RuntimeError(msg)
+    return OIDCCredential(
+        idp=idp,
+        endpoints=Endpoint(discovery=str(info.oidc_discovery_url)),
+        client=Client(),
+        token=Token(),
+        expiry=Expiry(),
+    )
+
+
+def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
+    """Acquire one OIDC Authentication Record with native sync I/O."""
+    credential = _oidc_credential(info.key, info)
+    try:
+        return oidc.sync_authenticate_credential(
+            credential,
+            expected_issuer=str(info.oidc_issuer),
+            on_challenge=_print_device_challenge,
+        )
+    except (
+        PermissionError,
+        TimeoutError,
+        TypeError,
+        ValueError,
+        httpx.HTTPError,
+    ) as exc:
+        raise _authentication_error(
+            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+            message=f"OIDC authentication failed: {exc}",
+            hint="Complete the device authorization before it expires.",
+        ) from exc
+
+
+async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
+    """Acquire one OIDC Authentication Record with native async I/O."""
+    credential = _oidc_credential(info.key, info)
+    try:
+        return await oidc.authenticate_credential(
+            credential,
+            expected_issuer=str(info.oidc_issuer),
+            on_challenge=_print_device_challenge,
+        )
+    except (
+        PermissionError,
+        TimeoutError,
+        TypeError,
+        ValueError,
+        httpx.HTTPError,
+    ) as exc:
+        raise _authentication_error(
+            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+            message=f"OIDC authentication failed: {exc}",
+            hint="Complete the device authorization before it expires.",
+        ) from exc
 
 
 __all__ = [
     "AuthMode",
     "Authentication",
     "AuthenticationError",
+    "alogin",
     "list",
     "login",
     "purge",
