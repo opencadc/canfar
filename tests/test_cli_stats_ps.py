@@ -217,9 +217,7 @@ def test_ps_json_kind_filter_parity(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = [payloads[0]]
-        result = runner.invoke(
-            cli, ["ps", "--kind", "headless", "--output", "json"]
-        )
+        result = runner.invoke(cli, ["ps", "--kind", "headless", "--output", "json"])
 
     assert result.exit_code == 0
     session.fetch.assert_awaited_once_with(kind="headless", status=None)

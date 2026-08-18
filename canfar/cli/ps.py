@@ -28,6 +28,7 @@ if TYPE_CHECKING:
 
     from canfar.errors import StructuredError
 
+
 async def _fetch_sessions(
     kind: Kind | None,
     status: Status | None,

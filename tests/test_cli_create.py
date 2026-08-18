@@ -235,9 +235,7 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.return_value = []
 
-        result = runner.invoke(
-            cli, ["create", "headless", "skaha/worker:v1", *flag]
-        )
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -378,9 +376,7 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = httpx.HTTPError(secret)
 
-        result = runner.invoke(
-            cli, ["create", "headless", "skaha/worker:v1", *flag]
-        )
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -433,9 +429,7 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = KeyboardInterrupt(secret)
 
-        result = runner.invoke(
-            cli, ["create", "headless", "skaha/worker:v1", *flag]
-        )
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 130
         assert result.stdout == ""
