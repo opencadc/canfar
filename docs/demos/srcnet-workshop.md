@@ -61,7 +61,8 @@ pipx install canfar
 
 ### Step 2: First Contact (Authentication)
 
-Tell `canfar` who you are. This command discovers all available servers worldwide and guides you through a one-time login.
+Tell `canfar` who you are. This command discovers the servers available to the
+selected identity and guides you through a one-time login.
 
 ```bash
 canfar login srcnet -f
@@ -70,13 +71,14 @@ canfar login srcnet -f
 ??? info "Auth Walkthrough"
     <script src="https://asciinema.org/a/a0bGaulLPlR2g3Go95I5BYKIz.js" id="asciicast-a0bGaulLPlR2g3Go95I5BYKIz" async="true"></script> #pragma: allowlist secret
 
-You'll be prompted for your credentials, and the CLI handles the rest, saving a secure token for future commands.
+You'll be prompted for your credentials, and the CLI handles the rest, saving
+an Authentication Record for future commands.
 
 !!! success "What just happened?"
 
     - We installed the `canfar` python package, which provides the `canfar` command-line interface (CLI).
     - We authenticated with the CANFAR Science Platform.
-    - All future commands will use this active Authentication and Server selection automatically.
+    - Future commands use the selected Authentication Record and Server.
 
 ---
 
@@ -87,8 +89,9 @@ Let's launch a Jupyter notebook that comes pre-loaded with common astronomy libr
 ### Step 1: Create the Notebook
 
 ```bash
-# Launch a notebook using a pre-built astronomy image
-canfar create notebook skaha/astroml:latest
+# See the images available on this server, then launch one
+canfar image ls --kind notebook
+canfar create notebook IMAGE_NAME
 ```
 
 ??? "Create Notebook Walkthrough"
@@ -138,7 +141,7 @@ What if you have a Python script that runs your analysis, and you don't need the
 Let's say you have a script named `echo.py`.
 
 ```bash
-canfar create headless skaha/astroml:latest -- python echo.py
+canfar create headless IMAGE_NAME -- python echo.py
 ```
 
 !!! tip "Interactive to Batch, Seamlessly"
@@ -157,7 +160,7 @@ canfar logs <SESSION_ID>
 Need to process hundreds of files? You can launch multiple copies (replicas) of your headless job with a single command.
 
 ```bash
-canfar create --replicas 10 headless skaha/astroml:latest -- python echo.py
+canfar create --replicas 10 headless IMAGE_NAME -- python echo.py
 ```
 
 You now have 10 containers in parallel. But how do you divide the work?
@@ -187,10 +190,10 @@ all_files = glob("/arc/projects/your_project/*.fits")
 
 # 2. 'chunk' automatically gives each replica its unique subset of files
 #    It reads environment variables ($REPLICA_ID, $REPLICA_COUNT) set by CANFAR.
-my_files = distributed.chunk(all_files)
+my_files = list(distributed.chunk(all_files))
 
 # 3. Process only your assigned files
-print(f"This replica will process {len(list(my_files))} files.")
+print(f"This replica will process {len(my_files)} files.")
 for datafile in my_files:
     run_analysis(datafile)
 
@@ -211,17 +214,16 @@ Here is the complete workflow, from launching jobs programmatically to processin
 from canfar.sessions import Session
 
 # This uses the same Authentication from `canfar login`
-session = Session()
-
-# Launch 100 replicas, each running our processing script
-ids = session.create(
-    name="galaxy-processing-batch",
-    kind="headless",
-    image="skaha/astroml:latest",
-    cmd="python",
-    args="my_script.py",
-    replicas=100,
-)
+with Session() as session:
+    # Launch 100 replicas, each running our processing script
+    ids = session.create(
+        name="galaxy-processing-batch",
+        kind="headless",
+        image="IMAGE_NAME",
+        cmd="python",
+        args="my_script.py",
+        replicas=100,
+    )
 
 print(f"Successfully launched {len(ids)} processing jobs!")
 ```

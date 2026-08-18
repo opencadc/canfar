@@ -33,7 +33,7 @@ Ubiquitous *front door* to the CANFAR Science Platform.
     *Before — server-first* (≤ 1.3.5)
     ```bash
     canfar login
-    canfar context      # removed
+    # Then select the target Server before starting work
     ```
     - Auth bound to a Server / context up front
     - Switching meant re-wiring config
@@ -84,10 +84,10 @@ The same flow at package level, for notebooks and pipelines:
 ```python
 from canfar import login, server, sessions
 login("srcnet")
-for node in ["canSRC", "sweSRC"]:
-    server.use(node)
-    session = sessions.AsyncSession()
-    await session.create(image="skaha/base-notebook:latest", cmd="env")
+async with sessions.AsyncSession() as session:
+    for node in ["canSRC", "sweSRC"]:
+        server.use(node)
+        await session.create(image="skaha/base-notebook:latest", cmd="env")
 ```
 
 == Data, same front door

@@ -1,495 +1,101 @@
-# User Management & Permissions
+# Accounts, groups, and permissions
 
-**Accounts, groups, access control, and API authentication on the CANFAR platform for collaborative astronomical research.**
+CANFAR access is evaluated at several boundaries: your CADC identity, the
+active Science Platform Server, the Storage Identifier you use, the project
+groups that grant access, and the Container Image you request. A successful
+login does not grant access to every server, project, image, or data object.
 
-!!! abstract "🎯 Permission System Overview"
-    **Essential access control concepts for all users:**
-    
-    - **Account Management**: CADC identity and authentication systems
-    - **Group Collaboration**: Team-based resource sharing and project management
-    - **Access Control Lists**: Fine-grained file and directory permissions
-    - **Container Registry**: Software environment access and distribution
-    - **API Authentication**: Programmatic access and automation
+## Identity and server access
 
-## 🔐 CANFAR Permission Architecture
-
-CANFAR's security model consists of multiple integrated layers providing flexible, secure access control for astronomical research collaboration.
-
-### Authentication & Authorisation Layers
-
-**CADC Identity System**
-:   Your foundational identity for all Canadian astronomy services, providing single sign-on across CANFAR, data archives, and VO services.
-
-**Group-Based Collaboration**
-:   Teams and projects organized through hierarchical group membership with shared resource access and management capabilities.
-
-**Harbor Container Registry**
-:   Software environment access control determining who can access, modify, and distribute container images.
-
-**Access Control Lists (ACLs)**
-:   Fine-grained POSIX-extended permissions for precise file and directory access control on shared storage systems.
-
-**API Authentication Framework**
-:   Secure programmatic access enabling automation, integration, and custom application development.
-
-### Permission Model Benefits
-
-=== "Individual Researchers"
-    - **Single Identity**: One CADC account for all astronomical services
-    - **Self-Service**: Manage personal permissions and group memberships
-    - **Secure Access**: Multi-factor authentication and token-based API access
-    - **Data Protection**: Granular control over personal and shared data
-
-=== "Research Teams"
-    - **Collaborative Workspaces**: Shared storage, containers, and computing resources
-    - **Role-Based Access**: Flexible administrator and member roles
-    - **Project Isolation**: Security boundaries between different research projects
-    - **External Collaboration**: Controlled access for external partners and institutions
-
-=== "System Administrators"
-    - **Centralized Management**: Unified interface for user and resource administration
-    - **Audit Capabilities**: Comprehensive logging and permission tracking
-    - **Scalable Security**: Supports large multi-institutional collaborations
-    - **Automated Workflows**: API-driven permission management and integration
-
-## 👥 Group Management & Collaboration
-
-Groups form the foundation of collaborative research on CANFAR, providing shared access to computing resources, storage systems, and container environments while maintaining security boundaries between projects.
-
-### Group-Based Resource Sharing
-
-```mermaid
-graph TD
-    Admin["👑 Group Administrator"]
-    Members["👤 Group Members"]
-    Resources["💾 Shared Resources"]
-    
-    Admin --> |"Manages"| Members
-    Admin --> |"Controls access to"| Resources
-    Members --> |"Access"| Resources
-    
-    Resources --> Projects["📁 /arc/projects/[project]/"]
-    Resources --> Storage["💾 Storage Quotas"]
-    Resources --> Containers["🐳 Container Access"]
-```
-
-### Group Administration Interface
-
-**Access Group Management:**
-:   [CADC Group Management Portal](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/)
-
-### Creating Research Groups
-
-**Step 1: Create New Group**
-
-1. Navigate to the CADC Group Management portal
-2. Click **"New Group"** 
-3. Provide descriptive group name (e.g., `cfhtls-survey`, `exoplanet-collab`)
-4. Add comprehensive project description
-5. Click **Create** to establish the group
-
-**Step 2: Add Team Members**
-
-1. Locate your group in the management interface
-2. Click **"Edit"** in the Membership column
-3. Search by real names (not CADC usernames)
-4. Select appropriate users from search results
-5. Click **"Add member"** to grant access
-
-**Step 3: Assign Administrative Roles**
-
-1. Click **"Edit"** in the Administrators column
-2. Add users requiring group management capabilities
-3. Administrators gain full group control and resource allocation rights
-
-!!! tip "User Discovery"
-    **Search by full names** (e.g., "John Smith") rather than CADC usernames. The system will find users and display their associated usernames.
-
-### Group Role Hierarchy
-
-| Role | Access Level | Responsibilities | Best For |
-|------|--------------|------------------|----------|
-| **Administrator** | Full group management, resource allocation, member control | Group creation, permission management, resource requests | Project PIs, team leads, institutional coordinators |
-| **Member** | Shared resource access, collaboration capabilities | Data analysis, research participation, resource usage | Researchers, students, collaborators, external partners |
-
-### Group Resource Access
-
-**Shared Storage Access:**
-:   Groups automatically receive shared directories in `/arc/projects/[project]/` with managed quotas and backup policies.
-
-**Container Image Sharing:**
-:   Group-specific namespaces in Harbor container registry for sharing custom software environments.
-
-**Computing Resource Allocation:**
-:   Shared computational quotas and session management across group members.
-
-**Collaborative Session Management:**
-:   Ability to share and handoff interactive sessions between group members.
-
-### Multi-Institutional Collaboration
-
-**External User Integration:**
-:   Add researchers from other institutions to your CANFAR groups while maintaining institutional security boundaries.
-
-**Cross-Project Permissions:**
-:   Users can belong to multiple groups, enabling interdisciplinary collaboration and resource sharing.
-
-**Temporary Access:**
-:   Grant time-limited access for visiting researchers, students, or short-term collaborations.
-
-!!! success "Collaboration Benefits"
-    **Groups enable seamless research collaboration** by providing standardized environments, shared data access, and unified resource management across institutional boundaries.
-
-## 🐳 Container Registry Access (Harbor)
-
-Harbor serves as CANFAR's container registry for storing, managing, and distributing software environments. Understanding Harbor permissions is essential for teams building custom containers or managing specialized software stacks.
-
-### Registry Overview
-
-**Harbor Registry Access:**
-:   [https://images.canfar.net](https://images.canfar.net)
-
-**Purpose:**
-:   Centralized repository for container images with role-based access control, vulnerability scanning, and automated build integration.
-
-### Harbor Permission Levels
-
-| Role | Repository Access | Image Management | Project Control |
-|------|------------------|------------------|-----------------|
-| **Guest** | Pull public images only | View public metadata | Browse public projects |
-| **Developer** | Pull all group images, push to assigned repositories | Upload, tag, and delete own images | View project configurations |
-| **Master** | Full repository access within project | Complete image lifecycle management | Project settings, user management |
-
-### Harbor Access Management
-
-**Permission Requests:**
-:   Harbor permissions are managed by CANFAR administrators. Contact [support@canfar.net](mailto:support@canfar.net) for:
-
-- **Repository Access**: Request developer or master access to existing projects
-- **New Projects**: Set up dedicated projects for your research group
-- **Team Management**: Add or modify permissions for team members
-- **Repository Configuration**: Set up automated builds and integration workflows
-
-### Working with Harbor
-
-**Authentication:**
+Authenticate with the identity provider that owns the target server:
 
 ```bash
-# Login to Harbor registry
-docker login images.canfar.net
+canfar login cadc
+canfar server ls
+canfar server use SERVER_NAME
+canfar config get active.server
 ```
 
-**Pulling Images:**
+The names and capabilities in `canfar server ls` are deployment data. If the
+server is missing or login succeeds but a request is forbidden, contact the
+operator for that Science Platform deployment. See the [client
+overview](../client/overview.md) for credential and server selection details.
+
+## Groups and project data
+
+Project storage is intended for collaboration. A project administrator grants
+membership through the [CADC group management portal](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/);
+the resulting permissions are enforced by the storage service. Use the paths
+and Storage Identifiers supplied by your project rather than assuming that a
+project name, quota, or sharing policy is the same on every deployment.
+
+For data operations, start by listing the identifiers and paths you can use:
 
 ```bash
-# Pull public container images
-docker pull images.canfar.net/skaha/astroml:latest
-
-# Pull private group images (requires permissions)
-docker pull images.canfar.net/[project]/[container]:[tag]
+canfar data ls -lh arc:/projects/<project>
+canfar data info arc:/projects/<project>/catalog.csv
 ```
 
-**Pushing Images (Developer/Master roles):**
+`local:` refers to the machine running the command. `arc:` and `vault:` are
+examples of configured remote identifiers; use the identifiers returned by
+your platform configuration and the [storage guide](storage/index.md) for your
+deployment. A forbidden
+operation usually means that your account is not a member of the owning group,
+the path is outside the project's allocation, or the active credentials do not
+match the service.
+
+Do not put credentials in a path, a notebook, an image, or a Session command.
+Use the configured Authentication Record or an explicitly supplied runtime
+credential as described in the [client overview](../client/overview.md) and
+[storage guide](storage/index.md).
+
+## Container images
+
+Image visibility and push rights are controlled by the registry project. Find
+images visible to the active server with:
 
 ```bash
-# Build and tag your container
-docker build -t images.canfar.net/[project]/[container]:[tag] .
-
-# Push to project repository
-docker push images.canfar.net/[project]/[container]:[tag]
+canfar image ls
+canfar image ls --kind headless
 ```
 
-### Project Organization
+Use the complete reference returned by the listing. A pull failure can mean a
+missing tag, a private project, or a registry that the target server cannot
+reach; ask the registry or platform operator which case applies. See
+[Container Registry](containers/registry.md).
 
-**Public Projects:**
-:   CANFAR-maintained base images available to all users (e.g., `skaha/astroml`)
+## Session resources
 
-**Group Projects:**
-:   Private repositories for research teams with controlled access and custom software environments
-
-**Personal Projects:**
-:   Individual user spaces for development and testing before team integration
-
-!!! tip "Container Strategy"
-    **Start with public base images** and extend them for your specific needs. Request team projects for sharing custom environments across your research group.
-
-## 🛡️ Access Control Lists (ACLs)
-
-Access Control Lists provide fine-grained file and directory permissions beyond traditional POSIX capabilities, enabling flexible collaboration across research teams while maintaining security boundaries.
-
-### ACL Fundamentals
-
-**What ACLs Provide:**
-:   Extended POSIX permissions allowing multiple users and groups to have different access levels to the same files and directories.
-
-**Why ACLs Matter for Research:**
-:   Enable complex collaborative scenarios where traditional owner/group/other permissions are insufficient for multi-institutional projects.
-
-### Traditional POSIX vs ACL Permissions
-
-=== "POSIX Limitations"
-    **Traditional Issues:**
-    
-    - Only one group can own a file or directory
-    - No granular control for multiple collaborating groups
-    - Sharing across research teams requires complex workarounds
-    - Binary all-or-nothing access for group members
-
-=== "ACL Advantages"
-    **Extended Capabilities:**
-    
-    - Multiple users and groups with different permissions per file
-    - Granular read/write access for specific researchers
-    - Selective collaboration without compromising security
-    - Fine-tuned access for external partners and institutions
-
-### ACL vs POSIX Comparison
-
-| Collaboration Scenario | POSIX Solution | ACL Solution |
-|------------------------|----------------|--------------|
-| **Single Team Project** | `rwxrwx---` (group access) | Same as POSIX, no advantage |
-| **Multi-Group Collaboration** | Must choose one primary group | Grant specific access to multiple groups |
-| **External Researcher Access** | Add to group or make world-readable | Grant individual read access only |
-| **Selective Write Permissions** | All group members get write access | Grant write access to specific users only |
-| **Cross-Institutional Sharing** | Complex group management | Flexible user and group combinations |
-
-### Viewing ACL Permissions
-
-**Check Current ACLs:**
+Resource requests are checked when a Session is admitted. They do not change
+data permissions or project membership. For a rejected or long-running
+request, inspect the Session and its events:
 
 ```bash
-# View detailed ACL information for files or directories
-getfacl /arc/projects/[project]/[directory]/
+canfar ps --all
+canfar info SESSION_ID
+canfar events SESSION_ID
 ```
 
-**Example ACL Output:**
+See [batch troubleshooting](sessions/batch.md#monitor-and-troubleshoot) for
+`Pending` and image-pull checks.
 
-```
-# file: sensitive_data/
-# owner: alice
-# group: myproject-team
-user::rwx                    # Owner permissions
-user:bob:r--                 # Bob has read-only access
-user:carol:rw-               # Carol can read and write  
-group::r--                   # Primary group has read-only
-group:external-team:r--      # External group has read access
-mask::rwx                    # Maximum effective permissions
-other::---                   # No access for others
-```
+## When access is denied
 
-!!! warning "ACL Mask Behaviour"
-    The ACL "mask" entry limits maximum effective permissions for named users and groups. If permissions seem restricted, check the mask value.
+Collect the smallest useful diagnostic set without exposing credentials:
 
-### Setting and Managing ACLs
+1. the active Server Name and Storage Identifier;
+2. the command shape and redacted path or image reference;
+3. the Session ID and status, if a Session is involved; and
+4. the exact error and relevant `info`/`events` output.
 
-**Grant User Access:**
+Ask the project administrator to confirm group membership and path ownership.
+If membership is correct, contact the service operator through
+[support](support/index.md). Do not retry destructive operations while the
+ownership or path is uncertain.
 
-```bash
-# Give user 'bob' read access to a directory
-setfacl -m u:bob:r-- /arc/projects/[project]/shared_data/
+## Related guides
 
-# Grant user 'alice' read and write access to specific files
-setfacl -m u:alice:rw- /arc/projects/[project]/scripts/analysis.py
-```
-
-**Grant Group Access:**
-
-```bash
-# Allow external group read access to results
-setfacl -m g:external-collab:r-- /arc/projects/[project]/public_results/
-
-# Grant write access to multiple collaborating groups
-setfacl -m g:partner-institution:rw- /arc/projects/[project]/shared_analysis/
-```
-
-**Remove ACL Entries:**
-
-```bash
-# Remove specific user access
-setfacl -x u:bob /arc/projects/[project]/sensitive_data/
-
-# Remove all ACL entries (revert to POSIX only)
-setfacl -b /arc/projects/[project]/temp_data/
-```
-
-**Recursive Operations:**
-
-```bash
-# Apply ACLs to entire directory trees
-setfacl -R -m g:collaborators:r-- /arc/projects/[project]/results/
-```
-
-**Recommended Directory Structure:**
-
-```
-/arc/projects/[project]/
-├── public/              # World-readable results
-│   └── (ACL: group:world:r--)
-├── team/                # Full team access  
-│   └── (ACL: group:myproject-team:rw-)
-├── admin/               # Administrator-only access
-│   └── (ACL: user:pi:rw-, group:admins:rw-)
-├── external/            # Controlled external collaboration
-│   └── (ACL: user:collaborator:r--, group:external-team:r--)
-└── sensitive/           # Restricted access with specific permissions
-    └── (ACL: user:analyst1:rw-, user:analyst2:r--)
-```
-
-**Security Best Practices:**
-
-- **Principle of Least Privilege**: Grant minimum access required for each user or group
-- **Regular Audits**: Review ACLs periodically using `getfacl` to ensure appropriate access
-- **Documentation**: Maintain records of why specific ACLs were set and who requested them
-- **Group Preference**: Use group-based permissions when possible for easier management
-- **Inheritance Planning**: Set default ACLs on directories to automatically apply to new files
-
-**ACL Troubleshooting:**
-
-If ACL changes don't take effect as expected:
-
-1. **Check the ACL mask**: `getfacl filename` and verify mask entry
-2. **Update mask if needed**: `setfacl -m m::rwx filename`  
-3. **Set default ACLs for directories**: `setfacl -d -m g:groupname:rw directory/`
-4. **Verify group membership**: Ensure users belong to specified groups
-
-!!! success "Collaboration Success"
-    **ACLs enable sophisticated research collaboration** across institutional boundaries while maintaining data security and access control granularity.
-
-## 🔌 API Authentication & Programmatic Access
-
-CANFAR provides comprehensive REST APIs enabling automation, integration, and custom application development. Understanding authentication methods is essential for programmatic platform usage.
-
-### Authentication Framework
-
-**API Access Purpose:**
-:   Enable automation, workflow integration, and custom tool development using CANFAR platform capabilities.
-
-**Authentication Requirements:**
-:   All API calls require proper authentication tokens or certificates for secure access to platform resources.
-
-### Authentication Methods
-
-=== "🔧 CANFAR CLI (Recommended)"
-
-    **Best for:** Interactive use, development, short-term automation
-    
-    **Setup:**
-    
-    ```bash
-    # Login and store authentication token
-    canfar login cadc
-    
-    # Subsequent commands use stored credentials
-    canfar ps
-    canfar create notebook skaha/astroml:latest
-    canfar info [session-id]
-    ```
-    
-    **Benefits:**
-    - Easy setup and token management
-    - Automatic token refresh handling
-    - Integrated with all CANFAR platform services
-    - Ideal for development and testing workflows
-
-=== "🔒 Proxy Certificates"
-
-    **Best for:** Long-term automation, production scripts, file operations
-    
-    **Setup:**
-    ```bash
-    # Install CADC utilities
-    pip install cadcutils
-    
-    # Generate 10-day proxy certificate  
-    cadc-get-cert -u [username]
-    
-    # Certificate stored in ~/.ssl/cadcproxy.pem
-    # Automatically used by CADC tools and APIs
-    ```
-    
-    **Benefits:**
-    - Extended validity (10 days)
-    - Compatible with all CADC services
-    - Suitable for production automation
-    - Works with VOSpace and data archive APIs
-
-### API Integration Examples
-
-**Session Management:**
-
-```python
-from canfar.sessions import Session
-
-session = Session()
-ids = session.create(
-    name="permission-check",
-    image="skaha/astroml:latest",
-    kind="notebook",
-)
-
-# Monitor session status
-status = session.info(ids)
-
-# List all active sessions
-active_sessions = session.fetch()
-```
-
-**Batch Processing Integration:**
-
-```python
-from canfar.sessions import Session
-
-session = Session()
-job_ids = session.create(
-    name="automated-analysis",
-    image="skaha/astroml:latest",
-    kind="headless",
-    cmd="python",
-    args="analysis.py",
-    cores=4,
-    ram=8,
-)
-```
-
-## 🚨 Common Issues & Troubleshooting
-
-For solutions to common permission and access issues, including:
-- Permission Denied Accessing `/arc/projects/[project]`
-- Harbor Container Registry Access Issues
-- API Authentication Failures
-- ACL Changes Not Taking Effect
-- Group Changes Not Visible
-
-Please refer to the **[Troubleshooting section of the FAQ](support/faq.md#troubleshooting)**.
-
-!!! warning "Security Best Practices"
-    **Protect Your Credentials:**
-    
-    - Never share CADC passwords or authentication tokens
-    - Use group-based permissions instead of individual token sharing
-    - Regularly review access permissions for sensitive data
-    - Report suspected security issues immediately to support
-
-## 🔗 Advanced Permission Management
-
-### Multi-Institutional Collaboration
-
-**Cross-Institution Access:**
-:   CANFAR supports researchers from multiple institutions through flexible group membership and external user integration.
-
-**Guest Researcher Workflows:**
-:   Temporary access patterns for visiting researchers, students, and short-term collaborations.
-
-**Resource Delegation:**
-:   Project administrators can delegate specific permissions without granting full administrative access.
-
-### Enterprise Integration
-
-**LDAP/Active Directory:**
-:   Contact CANFAR administrators for integration with institutional identity management systems.
-
-**Single Sign-On:**
-:   CADC authentication integrates with Canadian academic identity federations and international collaborations.
-
-**Compliance Requirements:**
-:   Support for institutional data governance and compliance requirements through audit logging and access controls.
+- [Getting started](get-started.md)
+- [Storage](storage/index.md)
+- [Container Registry](containers/registry.md)
+- [Support](support/index.md)
