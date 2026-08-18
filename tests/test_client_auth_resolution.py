@@ -593,7 +593,7 @@ class TestRequestAuthenticationResolution:
                 return_value=oauth_client,
             ),
             patch(
-                "canfar.models.config.Configuration.save",
+                "canfar.config.editor.ConfigurationEditor.save",
                 side_effect=(OSError(sentinel) if failure == "save" else None),
             ) as save,
             HTTPClient(config=config) as client,

@@ -419,6 +419,10 @@ class TestAuthenticationLogin:
                 return_value=credential,
             ),
             patch(
+                "canfar.models.config.Configuration.upsert_credential",
+                side_effect=AssertionError("authentication must use config.editor"),
+            ),
+            patch(
                 "canfar.authentication.server_service.discover",
                 side_effect=lambda _idp, *, config, **_kwargs: (
                     _merge_servers(
