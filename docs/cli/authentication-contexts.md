@@ -155,7 +155,7 @@ Legacy or unsupported config files are backed up to
 | Unsupported placement | `canfar auth -o json ls` exits 2. |
 | stdout | Data only in machine mode. |
 | stderr | Diagnostics and errors. |
-| Unsupported commands | Exit 1 with `machine output not supported for this command yet` and `use default human output for now`. |
+| Unsupported commands | Leaf commands without machine output do not define `-o/--output`; Click rejects the option with exit 2 and a parser error on stderr. |
 
 Lists have no ordering guarantee. Scripts should select by IDP key, Server
 Name, URI, Session ID, or another stable field.
