@@ -14,7 +14,7 @@ from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.httpx.auth import AuthenticationError
+from canfar.hooks.httpx.auth import AuthenticationError, arefresh
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
     Client,
@@ -435,6 +435,67 @@ class TestRequestAuthenticationResolution:
             scope="openid profile",
         )
         assert canonical.expiry == Expiry(access=1_300.0, refresh=None)
+
+    async def test_refresh_hooks_share_one_client_lock(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Independent async hook factories cannot race token persistence."""
+        now = 1_000.0
+        config = _configuration(
+            _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
+        )
+        token_requests: list[httpx.Request] = []
+
+        async def refresh_token(request: httpx.Request) -> httpx.Response:
+            token_requests.append(request)
+            await asyncio.sleep(0.01)
+            return httpx.Response(
+                200,
+                json={
+                    "access_token": _REFRESHED_TOKEN,
+                    "refresh_token": "rotated-refresh",
+                    "token_type": "Bearer",
+                    "scope": "openid profile",
+                    "expires_in": 300,
+                },
+                request=request,
+            )
+
+        token_transport = httpx.MockTransport(refresh_token)
+        platform_transport = httpx.MockTransport(
+            lambda request: httpx.Response(200, request=request)
+        )
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            patch("canfar.models.auth.time.time", return_value=now),
+            patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
+            patch(
+                "canfar.client.AsyncClient",
+                side_effect=lambda **kwargs: httpx.AsyncClient(
+                    transport=platform_transport, **kwargs
+                ),
+            ),
+            patch(
+                "authlib.integrations.httpx_client.AsyncOAuth2Client",
+                side_effect=lambda *args, **kwargs: AsyncOAuth2Client(
+                    *args, transport=token_transport, **kwargs
+                ),
+            ),
+        ):
+            async with HTTPClient(config=config) as client:
+                first = arefresh(client)
+                second = arefresh(client)
+                await asyncio.gather(
+                    first(httpx.Request("GET", "https://platform.example/one")),
+                    second(httpx.Request("GET", "https://platform.example/two")),
+                )
+
+        assert len(token_requests) == 1
+        credential = config.get_credential("test")
+        assert isinstance(credential, OIDCCredential)
+        assert credential.token.access == SecretStr(_REFRESHED_TOKEN)
 
     async def test_async_refresh_repairs_existing_sync_client(
         self,
