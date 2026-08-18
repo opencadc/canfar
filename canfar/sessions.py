@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
 from typing import TYPE_CHECKING, Any, TypeVar
 from webbrowser import open_new_tab
 
 from httpx import HTTPError, Response
 
-from canfar import get_logger
 from canfar.client import HTTPClient
 from canfar.models.session import CreateRequest
 from canfar.utils import build
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from canfar.models.types import Kind, Status, View
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 _Result = TypeVar("_Result")
 
 

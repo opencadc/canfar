@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from pathlib import Path
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict
 
-from canfar import get_logger
 from canfar.auth.x509 import CertificateError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.idp import get_idp, registry_sources
@@ -16,7 +16,7 @@ from canfar.models.registry import IVOARegistrySearch
 from canfar.models.registry import Server as RegistryResource
 from canfar.utils.discover import Discover
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class RegistryEvidenceError(RuntimeError):

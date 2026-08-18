@@ -29,16 +29,22 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+def _emit_exception_log(logger: logging.Logger) -> None:
+    """Emit one exception record for the JSONL formatter contract."""
+    try:
+        json.loads("not-json")
+    except json.JSONDecodeError:
+        logger.exception("operation failed")
+
+
 @pytest.fixture
 def canfar_logger() -> Generator[CanfarLogger]:
     """Fresh CanfarLogger cleaned after each test."""
     logger = CanfarLogger()
     # Shared stdlib logger may already have handlers from earlier suite tests.
     logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
     yield logger
     logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
 
 
 def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
@@ -51,7 +57,6 @@ def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
     assert rich_handlers
     assert canfar_logger._rich_handler in rich_handlers  # noqa: SLF001
     assert not logger.propagate
-    assert canfar_logger._configured  # noqa: SLF001
 
 
 def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
@@ -63,6 +68,24 @@ def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
     assert canfar_logger._rich_handler is not first  # noqa: SLF001
     assert canfar_logger._rich_handler in canfar_logger.logger.handlers  # noqa: SLF001
     assert first not in canfar_logger.logger.handlers
+
+
+def test_separate_logger_lifecycles_do_not_accumulate_handlers(
+    tmp_path: Path,
+) -> None:
+    """Repeated application lifecycles leave one stderr/file sink pair."""
+    first = CanfarLogger()
+    second = CanfarLogger()
+    try:
+        first.configure(loglevel=logging.INFO, log_file=tmp_path / "first.jsonl")
+        second.configure(loglevel=logging.INFO, log_file=tmp_path / "second.jsonl")
+
+        logger = logging.getLogger(LOGGER_NAME)
+        assert len([h for h in logger.handlers if isinstance(h, RichHandler)]) == 1
+        assert len([h for h in logger.handlers if h is second._file_handler]) == 1  # noqa: SLF001
+        assert first._file_handler not in logger.handlers  # noqa: SLF001
+    finally:
+        second._cleanup_handlers()  # noqa: SLF001
 
 
 @pytest.mark.parametrize(
@@ -130,6 +153,24 @@ def test_jsonl_file_sink_writes_flat_events(
         assert event["logger"] == "canfar.jsonl"
         assert event["message"] == "hello"
         assert set(event.keys()) == {"timestamp", "level", "logger", "message"}
+    finally:
+        for handler in get_logger().handlers[:]:
+            handler.close()
+            get_logger().removeHandler(handler)
+
+
+def test_jsonl_file_sink_includes_exception_text(tmp_path: Path) -> None:
+    """Exception diagnostics remain available as one escaped JSONL field."""
+    log_file = tmp_path / "exception.jsonl"
+    try:
+        configure_logging(loglevel="INFO", log_file=log_file)
+        _emit_exception_log(get_logger("jsonl"))
+        for handler in get_logger().handlers:
+            handler.flush()
+
+        event = json.loads(log_file.read_text(encoding="utf-8"))
+        assert "exception" in event
+        assert "JSONDecodeError" in event["exception"]
     finally:
         for handler in get_logger().handlers[:]:
             handler.close()

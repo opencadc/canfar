@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 from typing import TYPE_CHECKING, Literal
 from xml.etree.ElementTree import ParseError
 
@@ -10,7 +11,6 @@ import httpx
 from defusedxml.common import DefusedXmlException
 from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, ValidationError
 
-from canfar import get_logger
 from canfar.auth.x509 import CertificateError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
@@ -31,7 +31,7 @@ from canfar.utils.registry import RegistryEvidenceError
 if TYPE_CHECKING:
     from pathlib import Path
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 _STORAGE_RESOURCE_UNSET = object()
 

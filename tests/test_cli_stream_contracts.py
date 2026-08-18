@@ -439,6 +439,31 @@ def test_invalid_logging_environment_uses_leaf_output_format(
     assert result.stderr.lstrip().startswith(prefix)
 
 
+def test_setup_failure_ignores_machine_option_after_command_delimiter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Passthrough command arguments cannot change root setup diagnostics."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(
+        cli,
+        [
+            "create",
+            "--dry-run",
+            "headless",
+            "example.invalid/image",
+            "--",
+            "echo",
+            "--output",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.startswith("logging.invalid_env_value env_var=CANFAR_LOGLEVEL")
+
+
 def test_relative_log_file_creates_parents_without_contaminating_stdout(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
