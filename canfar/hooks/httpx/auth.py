@@ -29,7 +29,6 @@ Note:
 
 from __future__ import annotations
 
-import asyncio
 from typing import TYPE_CHECKING, Any, Callable
 
 from canfar import get_logger
@@ -51,12 +50,32 @@ class AuthenticationError(Exception):
     """Exception raised when authentication refresh fails."""
 
 
+RefreshParameters = tuple[str, str, str, str]
+
+
 def _get_oidc_credential(client: HTTPClient) -> OIDCCredential | None:
     """Return the selected canonical OIDC record unless runtime auth wins."""
     if client.uses_runtime_credentials:
         return None
     credential = client.authentication_record
     return credential if isinstance(credential, OIDCCredential) else None
+
+
+def _refresh(
+    client: HTTPClient,
+) -> tuple[OIDCCredential, RefreshParameters | None] | None:
+    """Resolve one OIDC record and prepare its refresh inputs."""
+    credential = _get_oidc_credential(client)
+    if credential is None:
+        log.debug("Skipping auth refresh without a saved OIDC record.")
+        return None
+    if not credential.expired:
+        return credential, None
+    parameters = oidc._refresh(credential)  # noqa: SLF001
+    if parameters is None:
+        log.warning("OIDC Authentication Record cannot be refreshed.")
+        return None
+    return credential, parameters
 
 
 def _apply_access_header(
@@ -105,12 +124,11 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        credential = _get_oidc_credential(client)
-        if credential is None:
-            log.debug("Skipping auth refresh without a saved OIDC record.")
+        prepared = _refresh(client)
+        if prepared is None:
             return
-
-        if not credential.expired:
+        credential, parameters = prepared
+        if parameters is None:
             if credential.token.access is not None:
                 _apply_access_header(
                     credential.token.access,
@@ -118,11 +136,6 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                     request,
                 )
             log.debug("Skipping auth refresh, access token is not expired.")
-            return
-
-        parameters = oidc._refresh(credential)  # noqa: SLF001
-        if parameters is None:
-            log.warning("OIDC Authentication Record cannot be refreshed.")
             return
         token_url, identity, client_secret, refresh_token = parameters
 
@@ -159,7 +172,6 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     Returns:
         Callable[[httpx.Request], Awaitable[None]]: The async auth hook.
     """
-    lock = asyncio.Lock()
 
     async def ahook(request: httpx.Request) -> None:
         """Asynchronous refresh hook for httpx clients.
@@ -167,24 +179,19 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        async with lock:
-            credential = _get_oidc_credential(client)
-            if credential is None:
-                log.debug("Skipping auth refresh without a saved OIDC record.")
+        async with client._get_refresh_lock():  # noqa: SLF001
+            prepared = _refresh(client)
+            if prepared is None:
                 return
-
-            if not credential.expired:
+            credential, parameters = prepared
+            if parameters is None:
                 if credential.token.access is not None:
                     _apply_access_header(
                         credential.token.access,
                         client.asynclient.headers,
                         request,
                     )
-                return
-
-            parameters = oidc._refresh(credential)  # noqa: SLF001
-            if parameters is None:
-                log.warning("OIDC Authentication Record cannot be refreshed.")
+                log.debug("Skipping auth refresh, access token is not expired.")
                 return
             token_url, identity, client_secret, refresh_token = parameters
 

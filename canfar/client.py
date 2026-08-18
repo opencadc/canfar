@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import ssl
 from datetime import datetime, timezone
 from email.utils import formatdate
@@ -123,6 +124,7 @@ class HTTPClient(BaseSettings):
     # Private attributes
     _client: Client | None = PrivateAttr(default=None)
     _asynclient: AsyncClient | None = PrivateAttr(default=None)
+    _refresh_lock: asyncio.Lock | None = PrivateAttr(default=None)
 
     # Client Properties
     @property
@@ -148,7 +150,7 @@ class HTTPClient(BaseSettings):
     @property
     def uses_runtime_credentials(self) -> bool:
         """Return whether runtime token or certificate credentials are active."""
-        return bool(self.token or self.certificate)
+        return self.token is not None or self.certificate is not None
 
     @property
     def authentication_record(self) -> AuthenticationCredential | None:
@@ -176,17 +178,17 @@ class HTTPClient(BaseSettings):
         Returns:
             Self: The configured client.
         """
-        if self.token and self.certificate:
+        if self.token is not None and self.certificate is not None:
             log.warning("Both runtime token and certificate values provided.")
             log.warning("Runtime token takes precedence over certificate.")
             log.warning("Certificate will be ignored in favor of the token.")
             self.certificate = None  # Nullify certificate to ensure token is used
 
-        if (self.token or self.certificate) and not self.url:
+        if self.uses_runtime_credentials and not self.url:
             msg = "Server URL must be provided when using runtime credentials."
             raise ValueError(msg)
 
-        if self.certificate:
+        if self.certificate is not None:
             info = x509.inspect(self.certificate)
             expiry = datetime.fromtimestamp(info["expiry"], tz=timezone.utc).isoformat()
             msg = f"{self.certificate} valid till {expiry}"
@@ -231,6 +233,12 @@ class HTTPClient(BaseSettings):
                 "OIDC Authentication Record cannot refresh tokens.",
             )
         return credential
+
+    def _get_refresh_lock(self) -> asyncio.Lock:
+        """Return the one async refresh lock shared by this client."""
+        if self._refresh_lock is None:
+            self._refresh_lock = asyncio.Lock()
+        return self._refresh_lock
 
     @classmethod
     def build(
@@ -293,15 +301,21 @@ class HTTPClient(BaseSettings):
             raise TypeError
 
         if credential.expired:
-            parameters = oidc._refresh(credential)  # noqa: SLF001
-            if parameters is None:
-                raise ValueError
-            refreshed = await oidc.refresh(*parameters)
-            credential = oidc._persist(  # noqa: SLF001
-                self.config,
-                credential,
-                refreshed,
-            )
+            async with self._get_refresh_lock():
+                current = self.authentication_record
+                if not isinstance(current, OIDCCredential):
+                    raise TypeError
+                credential = current
+                if credential.expired:
+                    parameters = oidc._refresh(credential)  # noqa: SLF001
+                    if parameters is None:
+                        raise ValueError
+                    refreshed = await oidc.refresh(*parameters)
+                    credential = oidc._persist(  # noqa: SLF001
+                        self.config,
+                        credential,
+                        refreshed,
+                    )
         if credential.token.access is None:
             raise ValueError
         token = credential.token.access.get_secret_value()
@@ -345,20 +359,12 @@ class HTTPClient(BaseSettings):
         Returns:
             dict[str, Any]: Keyword arguments for creating an HTTPx client.
         """
-        catcher = errors.acatch if asynchronous else errors.catch
-        req_logger = debug.arequest if asynchronous else debug.request
-        resp_logger = debug.aresponse if asynchronous else debug.response
-        response_hooks = [resp_logger]
-        if self.raise_http_errors:
-            response_hooks.append(catcher)
-        request_hooks: list[Any] = []
-        if credential is not None:
-            checker = expiry.acheck(self) if asynchronous else expiry.check(self)
-            request_hooks.append(checker)
-        request_hooks.append(req_logger)
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
-            "event_hooks": {"request": request_hooks, "response": response_hooks},
+            "event_hooks": self._get_event_hooks(
+                asynchronous=asynchronous,
+                credential=credential,
+            ),
             "base_url": self._get_base_url(),
         }
         if asynchronous:
@@ -366,18 +372,12 @@ class HTTPClient(BaseSettings):
                 max_connections=self.concurrency,
                 max_keepalive_connections=self.concurrency // 4,
             )
-        if self.token:
+        if self.token is not None:
             return kwargs
 
-        if self.certificate:
-            msg = "creating runtime ssl context with: {self.certificate}"
-            log.debug(msg)
+        if self.certificate is not None:
+            log.debug("Creating runtime SSL context with: %s", self.certificate)
             kwargs["verify"] = self._get_ssl_context(self.certificate)
-            return kwargs
-
-        if isinstance(credential, OIDCCredential):
-            refresher = auth.arefresh(self) if asynchronous else auth.refresh(self)
-            kwargs["event_hooks"]["request"].insert(0, refresher)
             return kwargs
 
         if isinstance(credential, X509Credential):
@@ -396,6 +396,31 @@ class HTTPClient(BaseSettings):
                 ) from err
             return kwargs
         return kwargs
+
+    def _get_event_hooks(
+        self,
+        *,
+        asynchronous: bool,
+        credential: AuthenticationCredential | None,
+    ) -> dict[str, list[Any]]:
+        """Build native HTTPX hooks from the shared transport policy."""
+        catcher = errors.acatch if asynchronous else errors.catch
+        request_logger = debug.arequest if asynchronous else debug.request
+        response_logger = debug.aresponse if asynchronous else debug.response
+        request_hooks: list[Any] = []
+        if not self.uses_runtime_credentials and credential is not None:
+            if isinstance(credential, OIDCCredential):
+                request_hooks.append(
+                    auth.arefresh(self) if asynchronous else auth.refresh(self)
+                )
+            request_hooks.append(
+                expiry.acheck(self) if asynchronous else expiry.check(self)
+            )
+        request_hooks.append(request_logger)
+        response_hooks = [response_logger]
+        if self.raise_http_errors:
+            response_hooks.append(catcher)
+        return {"request": request_hooks, "response": response_hooks}
 
     def _get_ssl_context(self, source: Path) -> ssl.SSLContext:
         """Get SSL context from certificate file.
@@ -432,10 +457,10 @@ class HTTPClient(BaseSettings):
             "User-Agent": f"python-canfar/{__version__}",
         }
 
-        if self.token:
+        if self.token is not None:
             headers["Authorization"] = f"Bearer {self.token.get_secret_value()}"
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-TOKEN"
-        elif self.certificate:
+        elif self.certificate is not None:
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-X509"
         elif isinstance(credential, OIDCCredential):
             if credential.token.access is not None:
@@ -459,7 +484,6 @@ class HTTPClient(BaseSettings):
     # Context Manager Methods
     def __enter__(self) -> Self:
         """Sync context manager entry."""
-        log.debug("Entering synchronous context manager")
         return self
 
     def __exit__(
@@ -469,22 +493,16 @@ class HTTPClient(BaseSettings):
         exc_tb: TracebackType | None,
     ) -> None:
         """Sync context manager exit."""
-        log.debug("Exiting synchronous context manager")
         self._close()
 
     def _close(self) -> None:
         """Close sync client."""
-        if self._client:
-            log.debug("Closing synchronous HTTPx client")
-            self._client.close()
-            self._client = None
-            log.debug("Synchronous HTTPx client closed")
-        else:
-            log.debug("No synchronous client to close")
+        client, self._client = self._client, None
+        if client is not None:
+            client.close()
 
     async def __aenter__(self) -> Self:
         """Async context manager entry."""
-        log.debug("Entering asynchronous context manager")
         return self
 
     async def __aexit__(
@@ -494,15 +512,10 @@ class HTTPClient(BaseSettings):
         exc_tb: TracebackType | None,
     ) -> None:
         """Async context manager exit."""
-        log.debug("Exiting asynchronous context manager")
         await self._aclose()
 
     async def _aclose(self) -> None:
         """Close async client."""
-        if self._asynclient:
-            log.debug("Closing asynchronous HTTPx client")
-            await self._asynclient.aclose()
-            self._asynclient = None
-            log.debug("Asynchronous HTTPx client closed")
-        else:
-            log.debug("No asynchronous client to close")
+        client, self._asynclient = self._asynclient, None
+        if client is not None:
+            await client.aclose()
