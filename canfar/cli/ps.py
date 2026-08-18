@@ -153,7 +153,7 @@ def show(
     everything: Annotated[
         bool,
         typer.Option(
-            "--all", "-a", help="Show all sessions (default shows just running)."
+            "--all", "-a", help="Show all sessions (default shows Pending and Running)."
         ),
     ] = False,
     quiet: Annotated[
