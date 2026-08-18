@@ -69,11 +69,11 @@ def get_value(config: Configuration, path: str) -> Any:
 def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
     """Validate a source-isolated copy of a complete Configuration."""
     data = {**config.model_dump(mode="python"), **updates}
-    candidate = config.__class__.model_validate(data)
-    for field, value in data.items():
-        current = getattr(candidate, field, None)
-        if isinstance(value, dict) and isinstance(current, dict):
-            setattr(candidate, field, {key: current[key] for key in value})
+    candidate = config.__class__.model_construct()
+    config.__class__.__pydantic_validator__.validate_python(
+        data,
+        self_instance=candidate,
+    )
     return candidate
 
 
