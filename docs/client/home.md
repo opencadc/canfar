@@ -1,14 +1,18 @@
 # Python Client
 
-The CANFAR Python client wraps the Science Platform APIs for Sessions,
-Container Images, Authentication-aware HTTP clients, and automation scripts.
+The CANFAR Python client provides authenticated access to Sessions, Container
+Images, VOSpace Services, and Science Platform metadata.
 
 ## Install and authenticate
 
 ```bash
-pip install canfar --upgrade
+pip install --upgrade canfar
 canfar login cadc
 ```
+
+The CLI stores the Authentication Record and Server Selection used by default
+by Python clients. Python OIDC login is also available as `canfar.login()` and
+`canfar.alogin()`; see [Install and set up](get-started.md).
 
 ## Core workflows
 
@@ -17,60 +21,58 @@ canfar login cadc
 -   **Create Sessions**
 
     Launch notebooks, desktops, CARTA, Firefly, contributed apps, or headless
-    jobs.
+    workloads with `Session` or `AsyncSession`.
 
     [:octicons-arrow-right-16: Quickstart](quick-start.md)
 
--   **Automate jobs**
+-   **Read data**
 
-    Use `Session` or `AsyncSession` to create, inspect, log, and destroy
-    Sessions from Python.
+    Address VOSpace Services through explicit Storage Identifiers and standard
+    fsspec methods.
 
-    [:octicons-arrow-right-16: Examples](examples.md)
+    [:octicons-arrow-right-16: Data access](data.md)
 
--   **Choose Servers**
+-   **Inspect platform state**
 
-    Authenticate with an IDP, select a Science Platform Server, and keep scripts
-    noninteractive.
+    Query available resources, Container Images, and Science Platform
+    availability.
 
-    [:octicons-arrow-right-16: Auth and Servers](../cli/authentication-contexts.md)
-
--   **Use references**
-
-    Jump to generated API pages for method signatures and model details.
-
-    [:octicons-arrow-right-16: API reference](session.md)
+    [:octicons-arrow-right-16: Python API reference](session.md)
 
 </div>
 
-## Minimal example
+## Minimal synchronous example
 
 ```python
 from canfar.sessions import Session
 
-session = Session()
-ids = session.create(
-    kind="notebook",
-    image="images.canfar.net/skaha/astroml:latest",
-    name="my-analysis",
-)
-session.connect(ids)
+with Session() as session:
+    ids = session.create(
+        kind="notebook",
+        image="images.canfar.net/skaha/astroml:latest",
+        name="my-analysis",
+    )
+    if ids:
+        session.connect(ids)
 ```
 
-## Async example
+## Minimal asynchronous example
 
 ```python
 from canfar.sessions import AsyncSession
 
-async with AsyncSession() as session:
-    ids = await session.create(
-        kind="headless",
-        image="images.canfar.net/skaha/astroml:latest",
-        name="batch-job",
-        cmd="python",
-        args="/arc/projects/demo/run.py",
-    )
-    await session.events(ids, verbose=True)
+
+async def main() -> None:
+    async with AsyncSession() as session:
+        ids = await session.create(
+            kind="headless",
+            image="images.canfar.net/skaha/astroml:latest",
+            name="batch-job",
+            cmd="python",
+            args="/arc/projects/demo/run.py",
+        )
+        if ids:
+            await session.events(ids)
 ```
 
 ## Main modules
@@ -78,14 +80,17 @@ async with AsyncSession() as session:
 | Module | Use |
 | --- | --- |
 | `canfar.sessions` | Create, fetch, inspect, connect, log, and destroy Sessions. |
-| `canfar.images` | List and inspect available Container Images. |
-| `canfar.authentication` | Noninteractive Authentication helpers. |
-| `canfar.server` | Server discovery, validation, and selection helpers. |
-| `canfar.client` | Lower-level HTTP client composition. |
+| `canfar.images` | List Container Images or fetch parsed image details. |
+| `canfar.storage` | List Storage Identifiers and build explicit fsspec filesystems. |
+| `canfar.context` | Read resource limits advertised by a Science Platform Server. |
+| `canfar.overview` | Check Science Platform availability. |
+| `canfar.authentication` | Login and manage saved Authentication Records. |
+| `canfar.client` | Compose lower-level synchronous or asynchronous HTTP clients. |
 
 ## Read next
 
 - [Install and set up](get-started.md)
 - [Python quickstart](quick-start.md)
 - [Examples](examples.md)
+- [Data access](data.md)
 - [Migration guide](migration.md)

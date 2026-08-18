@@ -1,179 +1,28 @@
 # What's New in CANFAR
 
-Stay up to date with the latest features, improvements, and changes in CANFAR.
+This page highlights the current Python client contracts. For release-by-release
+changes, see the [changelog](../changelog.md) and
+[GitHub Releases](https://github.com/opencadc/canfar/releases).
 
-## Recent Updates
+## Current Python API
 
-!!! tip "New in v1.1+"
+- `Session` and `AsyncSession` are native synchronous and asynchronous clients
+  with equivalent public operations.
+- `Session.create()` and `AsyncSession.create()` return `list[str]`, omitting
+  failed replicas instead of raising for an individual HTTP/network failure.
+- `fetch()` returns the server response as `list[dict[str, str]]`.
+- `destroy_with(prefix, *, kind=..., status=...)` keeps its keyword-only filter
+  contract in both clients.
+- `canfar.login()` and `canfar.alogin()` provide synchronous and asynchronous
+  Python Authentication flows. OIDC device login prints a verification URL and
+  user-facing code to the terminal; browser, QR, and progress presentation stay
+  in the CLI.
+- `config.editor.get()`, `set()`, and `save()` are the supported Configuration
+  editing operations. The persisted Configuration shape remains stable.
+- `canfar.storage.identifiers()` and `canfar.storage.filesystem(identifier)` are
+  the explicit VOSpace Python surface. Storage Identifiers are not dynamic
+  module members or fsspec schemes.
+- `Overview` and `canfar.helpers.distributed` remain supported public APIs.
 
-    ### **🛡️ Improved Session Data Validation**
-
-    The CANFAR CLI now features enhanced resilience when handling session data from the Science Platform API. This update improves the user experience when the API returns incomplete or malformed session information.
-
-    **What Changed:**
-
-    - **Graceful Degradation**: The CLI commands (`canfar info`, `canfar ps`) now continue to work even when the API returns incomplete session data, displaying partial information instead of crashing.
-    - **Better Error Reporting**: Missing or invalid fields are tracked internally and can be viewed with the `--debug` flag for troubleshooting.
-    - **Enhanced Display**: Resource usage metrics for flexible sessions is now reported with better readability.
-    - **Type Safety**: Session type validation has been strengthened using Pydantic's built-in validators.
-
-    **Example:**
-
-    ```bash title="Flexible Session Resource Usage"
-    $ canfar info n2tr1rpf
-
-    CANFAR Session Info for n2tr1rpf
-
-      Session ID    n2tr1rpf
-      Name          spy-panda
-      Status        Running
-      Type          notebook
-      CPU Usage     0.001 core(s)
-      RAM Usage     0.22 GB
-      GPU Usage     Unknown # (GPU not requested)
-    ```
-
-    ```bash title="Debug Mode for Troubleshooting"
-    $ canfar info --debug n2tr1rpf 
-
-    # Shows additional warnings about missing/invalid fields
-    ⚠️  Session Response Warnings:
-        • missing or invalid startTime in response
-        • missing or invalid expiryTime in response
-    ```
-
-!!! success "v1.0"
-
-    :fontawesome-solid-exclamation-triangle: **Breaking Changes**
-
-      - Deprecation of support for Python 3.8 and 3.9.
-      - The Python package has been renamed from `skaha` to `canfar`.
-      - The `skaha.session` API has been deprecated in favor of `canfar.sessions`.
-      - See [Migration guide to migrate from skaha → canfar](migration.md).
-
-    :simple-gnubash: **CLI Support**
-    
-      - Comprehensive CLI support has been added to the client under the `canfar` entry point. See [CLI Reference](../cli/cli-help.md) for more information.
-      - The `canfar` CLI is the recommended way to manage Authentication and Server selection. See [Authentication and Servers](../cli/authentication-contexts.md) for more information.
-    
-    **🌎 SRCnet Support**
-    
-      - CANFAR now supports launching sessions on all the SRCnet CANFAR Science Platform instances worldwide.
-    
-    **:fontawesome-brands-connectdevelop:** OIDC Authentication
-
-      - OpenID Connect (OIDC) authentication is now supported for all SRCnet Science Platform servers where applicable.
-    
-    **:material-book-outline: Documentation**
-    
-      - Complete overhaul to bring all documentation sources under a single roof.
-      - Significant improvements to the Python client and brand new CLI documentation.
-
-!!! info "New in v0.7+"
-
-    ### **🔐 Enhanced Authentication System**
-    Canfar now features a comprehensive authentication system with support for multiple authentication modes and automatic credential management.
-
-    ```python title="Authentication Examples"
-    from canfar.client import HTTPClient
-    from pathlib import Path
-
-    # X.509 certificate authentication
-    client = HTTPClient(certificate=Path("/path/to/cert.pem"))
-
-    # OIDC token authentication (configured)
-    client = HTTPClient()  # Uses auth.mode = "oidc"
-
-    # Bearer token authentication
-    from pydantic import SecretStr
-    client = HTTPClient(token=SecretStr("your-token"))
-    ```
-
-    ### **🚀 Asynchronous Sessions**
-    Canfar now supports asynchronous sessions using the `AsyncSession` class while maintaining 1-to-1 compatibility with the `Session` class.
-
-    ```python title="Asynchronous Session Creation"
-    from canfar.sessions import AsyncSession
-
-    asession = AsyncSession()
-    response = await asession.create(
-        name="test",
-        image="images.canfar.net/skaha/astroml:latest",
-        cores=2,
-        ram=8,
-        gpu=1,
-        kind="headless",
-        cmd="env",
-        env={"KEY": "VALUE"},
-        replicas=3,
-    )
-    ```
-
-    ### **🗄️ Backend Upgrades**
-
-    - 📡 Canfar now uses the `httpx` library for making HTTP requests instead of `requests`. This adds asynchronous support and also to circumvent the `requests` dependence on `urllib3` which was causing SSL issues on MacOS. See [this issue](https://github.com/urllib3/urllib3/issues/3020) for more details.
-    - 🔑 Canfar now supports multiple authentication methods including X.509 certificates, OIDC tokens, and bearer tokens with automatic SSL context management.
-    - 🏎️💨 Added `loglevel` and `concurrency` support to manage the new explosion in functionality!
-    - 🔍 Comprehensive debug logging for authentication flow and client creation troubleshooting.
-
-    ### **🧾 Logs to `stdout`**
-
-    The `[Session|AsyncSession].logs` method now prints colored output to `stdout` instead of returning them as a string with `verbose=True` flag.
-
-    ```python title="Session Logs"
-    from canfar.sessions import AsyncSession
-
-    asession = AsyncSession()
-    await asession.logs(ids=["some-uuid"], verbose=True)
-    ```
-
-    ### **🪰 Firefly Support**
-    Canfar now supports launching `firefly` session on the CANFAR Science Platform.
-
-    ```python title="Firefly Session Creation"
-    session.create(
-        name="firefly",
-        image="images.canfar.net/skaha/firefly:latest",
-        kind="firefly",
-    )
-    ```
-
-!!! info "New in v0.4+"
-
-    ### **🔐 Private Images**
-
-    Starting October 2024, to create a session with a private container image from the [CANFAR Harbor Registry](https://images.canfar.net/), you will need to provide your harbor `username` and the `CLI Secret` through a `ContainerRegistry` object.
-
-    ```python title="Private Image Registry Configuration"
-    from canfar.models import ContainerRegistry
-    from canfar.sessions import Session
-
-    registry = ContainerRegistry(username="username", secret="sUp3rS3cr3t")
-    session = Session(registry=registry)
-    ```
-
-    Alternatively, if you have environment variables, `CANFAR_REGISTRY_USERNAME` and `CANFAR_REGISTRY_SECRET`, you can create a `ContainerRegistry` object without providing the `username` and `secret`.
-
-    ```python title="Private Image Registry with Environment Variables"
-    from canfar.models import ContainerRegistry
-
-    registry = ContainerRegistry()
-    ```
-
-    ### **💣 Destroy Sessions**
-    ```python title="Destroying Sessions"
-    from canfar.sessions import Session
-
-    session = Session()
-    session.destroy_with(prefix="test", kind="headless", status="Running")
-    session.destroy_with(prefix=".*-analysis", kind="headless", status="Pending")
-    ```
-
-## Previous Versions
-
-For a complete history of changes, see the [Changelog](../changelog.md).
-
-## Stay Updated
-
-- 📢 [GitHub Releases](https://github.com/opencadc/canfar/releases)
-- 💬 [Discussions](https://github.com/opencadc/canfar/discussions)
+Start with the [Python quickstart](quick-start.md), then see the [Session API](session.md),
+[Data Access](data.md), and [Migration Guide](migration.md).

@@ -1,167 +1,70 @@
 # Testing
 
-This document provides comprehensive information about testing [opencadc/canfar](https://github.com/opencadc/canfar).
-
-## Overview
-
-Canfar uses [pytest](https://pytest.org/) as its testing framework. The test suite includes unit tests, integration tests, and end-to-end tests that verify the functionality of the client library.
+CANFAR uses [pytest](https://pytest.org/). Tests mirror the `canfar/` module
+layout and include deterministic unit/contract tests plus
+Authentication-dependent integration tests.
 
 ## Prerequisites
 
-To run tests for Canfar, you need:
+Install the project environment with `uv`. Full integration coverage requires a
+valid CANFAR Authentication Record and X.509 certificate/configuration. Do not
+run that suite against a real account unless the test workflow is explicitly
+intended to create or clean up platform resources.
 
-1. **Valid CANFAR Account**: Access to the CANFAR Science Platform
-2. **X.509 Certificate**: For authentication with CANFAR services
-3. **Python Environment**: Set up with uv
+## Local validation
 
-For certificate generation, refer to the [get started](get-started.md) section.
+The default local test gate excludes slow tests and avoids external
+Authentication:
 
-## Running Tests
-
-### Basic Test Execution
-
-Run all tests:
 ```bash
-uv run pytest
+uv run --no-sync pytest tests -m "not slow" --no-cov -q \
+  -o cache_dir=/tmp/canfar-pytest-cache
 ```
 
-Run tests with verbose output:
+Useful focused checks include:
+
 ```bash
-uv run pytest -v
+uv run --no-sync pytest tests/test_sessions_fetch.py tests/test_sessions_lifecycle.py \
+  tests/test_storage.py tests/test_config_editor.py -q
+uv run --no-sync ruff check . --no-cache
+uv run ty check canfar
+uv run --group docs mkdocs build
 ```
 
-Run tests with coverage report:
+The documentation build is the check for broken navigation, Markdown, and
+generated Python API pages.
+
+## Test markers
+
+Use markers to select known test categories:
+
 ```bash
-uv run pytest --cov
+uv run --no-sync pytest -m unit
+uv run --no-sync pytest -m integration
+uv run --no-sync pytest -m slow
 ```
 
-### Test Categories
+Integration and slow tests may contact CANFAR services and require valid
+credentials. `-m "not slow"` is the deterministic default; it is not a claim
+that every test marked `integration` is safe without Authentication.
 
-Canfar tests are organised with markers to help you run specific subsets:
+## Full suite
 
-#### Slow Tests
+Run the full suite only in an environment prepared for the credentialed gate:
 
-Some tests are marked as "slow" because they involve:
-- Network operations with CANFAR services
-- Waiting for session state changes
-- Authentication timeouts
-- Long-running operations
-
-**Skip slow tests for faster development:**
 ```bash
-uv run pytest -m "not slow"
+uv run --no-sync pytest
 ```
 
-**Run only slow tests:**
-```bash
-uv run pytest -m "slow"
-```
+The full run includes Authentication-dependent tests, Session lifecycle work,
+and network operations. A local failure can therefore indicate missing
+credentials or unavailable Science Platform infrastructure rather than a
+library regression.
 
-#### Integration Tests
+## Adding tests
 
-Tests that interact with external services:
-```bash
-uv run pytest -m "integration"
-```
-
-#### Unit Tests
-
-Fast, isolated tests:
-```bash
-uv run pytest -m "unit"
-```
-
-### Test Methodology
-
-Tests are organised in the `tests/` directory and follow a specific naming convention that mirrors the source code structure. This approach ensures that tests are easy to locate and maintain.
-
-The naming convention is as follows:
-
-- If the source file is `canfar/path/to/file.py`, the corresponding test file will be `tests/test_path_to_file.py`.
-- If the source file is `canfar/module.py`, the corresponding test file will be `tests/test_module.py`.
-
-For example:
-
-- The tests for `canfar/client.py` are located in `tests/test_client.py`.
-- The tests for `canfar/auth/oidc.py` are located in `tests/test_auth_oidc.py`.
-
-This structure makes it straightforward to find the tests associated with a particular module or file.
-
-## Development Workflow
-
-For efficient development, follow this testing workflow:
-
-1. **During Development**: Run fast tests only
-   ```bash
-   uv run pytest -m "not slow"
-   ```
-
-2. **Before Committing**: Run the full test suite
-   ```bash
-   uv run pytest
-   ```
-
-3. **Debugging Specific Issues**: Run individual test files
-   ```bash
-   uv run pytest tests/test_session.py
-   ```
-
-## Test Configuration
-
-Test configuration is defined in `pyproject.toml`:
-
-```toml
-[tool.pytest.ini_options]
-markers = [
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-]
-```
-
-## Continuous Integration
-
-In CI environments, all tests (including slow ones) are executed to ensure complete validation. The CI pipeline:
-
-1. Sets up authentication with CANFAR
-2. Runs the complete test suite
-3. Generates coverage reports
-4. Cleans up authentication artifacts
-
-## Writing Tests
-
-When contributing new tests:
-
-1. **Follow the naming convention**: Create a test file that mirrors the source file's path and name.
-2. **Mark slow tests**: Add `@pytest.mark.slow` to any test that involves network operations, interacts with external services, or has long execution times. This allows developers to skip these tests for a faster development cycle.
-3. **Use appropriate markers**: Mark tests as `unit`, `integration`, etc.
-4. **Add docstrings**: Document what each test verifies.
-
-Example of a slow test:
-```python
-import pytest
-
-@pytest.mark.slow
-def test_long_running_operation():
-    """Test that involves waiting or network operations."""
-    # Test implementation
-    pass
-```
-
-
-## Troubleshooting
-
-### Authentication Issues
-- Ensure your X.509 certificate is valid and not expired
-- Check that you have access to the CANFAR Science Platform
-- Verify your certificate is in the correct location (`~/.ssl/`)
-
-### Slow Test Timeouts
-- Slow tests have built-in timeouts (typically 60 seconds)
-- If tests consistently timeout, check your network connection
-- Platform availability may affect test execution times
-
-### Test Failures
-- Check if the CANFAR Science Platform is accessible
-- Verify your authentication credentials
-- Review test logs for specific error messages
+- Mirror the source module path under `tests/`.
+- Mark network or long-running tests with `integration` and/or `slow`.
+- Prefer observable public seams such as `httpx.MockTransport`, `CliRunner`,
+  and the public Configuration editor.
+- Keep sync tests synchronous and async tests on the native async path.
