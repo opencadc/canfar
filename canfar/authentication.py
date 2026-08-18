@@ -104,7 +104,7 @@ def use(idp: str) -> None:
     config = Configuration()  # ty: ignore[missing-argument]
 
     try:
-        config.get_credential(idp)
+        _authentication_record(config, idp)
     except KeyError as exc:
         raise _authentication_error(
             code=ErrorCode.AUTHENTICATION_REQUIRED,
@@ -192,7 +192,7 @@ def show() -> Authentication:
     """
     config = Configuration()  # ty: ignore[missing-argument]
     try:
-        credential = config.get_credential(config.active.authentication)
+        credential = _authentication_record(config, config.active.authentication)
     except KeyError as exc:
         raise _authentication_error(
             code=ErrorCode.AUTHENTICATION_REQUIRED,
@@ -208,6 +208,18 @@ def show() -> Authentication:
 
 def _has_authentication(config: Configuration, idp: str) -> bool:
     return idp in config.authentication
+
+
+def _authentication_record(
+    config: Configuration,
+    idp: str,
+) -> AuthenticationCredential:
+    """Return a saved Authentication Record by its IDP key."""
+    try:
+        return config.authentication[idp]
+    except KeyError as exc:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        raise KeyError(msg) from exc
 
 
 def _remove_authentication(config: Configuration, idp: str) -> None:
@@ -292,7 +304,7 @@ def _authentication_for_credential(
 
     if active and config.active.server is not None:
         try:
-            server = config.get_active_server()
+            server = config.servers[config.active.server]
         except KeyError:
             server_ref = config.active.server
         else:
