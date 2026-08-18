@@ -118,7 +118,7 @@ def callback(
             help="Write JSON Lines logs to this file.",
         ),
     ] = None,
-    ) -> None:
+) -> None:
     """Main callback that handles no subcommand case."""
     activate_cli_root(ctx)
     child_args: list[str] = ctx.meta.get(_ROOT_CHILD_ARGS_META_KEY, [])

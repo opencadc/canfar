@@ -228,6 +228,31 @@ class TestAsyncHook:
 class TestSyncAsyncParity:
     """Characterization tests: sync and async auth hooks share guard behavior."""
 
+    async def test_empty_runtime_token_keeps_saved_oidc_sync_and_async(self) -> None:
+        """An empty runtime token does not bypass either saved OIDC hook."""
+        config = oidc_config(
+            idp="testoidc",
+            access="saved-access-token",
+            access_expiry=time.time() + 3600,
+            refresh_expiry=time.time() + 7200,
+        )
+        client = HTTPClient(
+            config=config,
+            token=SecretStr(""),
+            url="https://platform.example",
+        )
+
+        sync_request = httpx.Request("GET", "https://platform.example/sync")
+        refresh(client)(sync_request)
+        assert sync_request.headers["Authorization"] == "Bearer saved-access-token"
+
+        async with client:
+            async_request = httpx.Request("GET", "https://platform.example/async")
+            await arefresh(client)(async_request)
+
+        assert async_request.headers["Authorization"] == "Bearer saved-access-token"
+        client._close()  # noqa: SLF001
+
     @patch("canfar.auth.oidc.sync_refresh")
     @patch("canfar.auth.oidc.refresh")
     async def test_refresh_and_arefresh_both_skip_non_oidc(
