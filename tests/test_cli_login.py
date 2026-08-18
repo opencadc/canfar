@@ -247,3 +247,22 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
 
     assert result.exit_code == 1
     assert "already exists" in result.stderr
+
+
+def test_login_presents_device_flow_failure_on_terminal(tmp_path: Path) -> None:
+    """CLI login renders terminal device-flow failures on stderr."""
+    config_path = tmp_path / "config.yaml"
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch(
+            "canfar.cli.login.authenticate_for_cli",
+            side_effect=PermissionError("OIDC device authorization was denied"),
+        ),
+    ):
+        result = runner.invoke(cli, ["login", "srcnet"])
+
+    assert result.exit_code == 1
+    assert "OIDC device authorization was denied" in result.stderr
