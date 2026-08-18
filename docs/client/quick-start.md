@@ -23,7 +23,8 @@ The call prints the verification URL and device code, then waits for approval.
 Inside an existing async event loop, use the native async counterpart:
 
 ```python
-await canfar.alogin("srcnet")
+async def authenticate():
+    await canfar.alogin("srcnet")
 ```
 
 Use the CLI when you want browser opening, QR output, or progress presentation.
