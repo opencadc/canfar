@@ -80,9 +80,19 @@ class TestConfigurationDefaults:
             ("arc", "https://ws-uv.canfar.net/arc"),
             ("vault", "https://cadc-west-01.canfar.net/vault"),
         ):
-            resolved, idp = config._resolve_storage(name)  # noqa: SLF001
-            assert resolved.rstrip("/") == endpoint
-            assert idp == "cadc"
+            service = config.servers["canfar"].storage[name]
+            assert str(service.url).rstrip("/") == endpoint
+
+    def test_storage_resolution_belongs_to_storage_module(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Configuration stores VOSpace metadata without resolving it."""
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            config = Configuration()
+
+        assert not hasattr(config, "storage_identifiers")
+        assert not hasattr(config, "_resolve_storage")
 
     def test_legacy_server_named_storage_is_healed(self, tmp_path: Path) -> None:
         """A Storage Identifier saved as the Server Name is restored to its leaf."""
@@ -248,6 +258,21 @@ class TestConfigurationValidation:
     def test_long_storage_name_allowed(self) -> None:
         """Storage Identifiers do not inherit Server field length limits."""
         storage_name = "a" * 257
+        service = {
+            "uri": "ivo://cadc.nrc.ca/arc",
+            "url": "https://ws-cadc.canfar.net/arc",
+        }
+
+        server = Server(storage={storage_name: service})
+
+        assert list(server.storage) == [storage_name]
+
+    @pytest.mark.parametrize("storage_name", ["filesystem", "identifiers", "sources"])
+    def test_storage_name_can_match_storage_module_member(
+        self,
+        storage_name: str,
+    ) -> None:
+        """Module members are not reserved when lookup is explicit."""
         service = {
             "uri": "ivo://cadc.nrc.ca/arc",
             "url": "https://ws-cadc.canfar.net/arc",

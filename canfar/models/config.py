@@ -37,7 +37,7 @@ from canfar.models.auth import (
     AuthenticationCredential,
     X509Credential,
 )
-from canfar.models.http import LOCAL, Server, VOSpaceService
+from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import ContainerRegistry
 
 log = get_logger(__name__)
@@ -386,35 +386,6 @@ class Configuration(BaseSettings):
             msg = f"Server '{name}' not found."
             raise KeyError(msg)
         return self.servers[name]
-
-    def storage_identifiers(self) -> list[str]:
-        """Return every addressable Storage Identifier, ``local`` last.
-
-        Returns:
-            list[str]: Configured Storage Identifiers plus reserved ``local``.
-        """
-        configured = {
-            identifier
-            for server in self.servers.values()
-            for identifier in server.storage
-        }
-        return [*sorted(configured), LOCAL]
-
-    def _resolve_storage(self, identifier: str) -> tuple[str, str]:
-        """Resolve a Storage Identifier to its endpoint and parent server IDP."""
-        for server in self.servers.values():
-            service = server.storage.get(identifier)
-            if service is not None:
-                if server.idp is None:
-                    msg = (
-                        f"Storage Identifier '{identifier}' belongs to a "
-                        "Science Platform "
-                        "Server without an IDP."
-                    )
-                    raise ValueError(msg)
-                return str(service.url), server.idp
-        msg = f"Storage Identifier '{identifier}' is not configured."
-        raise KeyError(msg)
 
     def upsert_credential(self, credential: AuthenticationCredential) -> None:
         """Insert or replace a validated Authentication Record.

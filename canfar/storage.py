@@ -1,4 +1,4 @@
-"""Adapters for the configured VOSpace Services and the local filesystem."""
+"""Explicit access to configured VOSpace Services and the local filesystem."""
 
 from __future__ import annotations
 
@@ -24,15 +24,42 @@ if TYPE_CHECKING:
     from vosfs import VOSpaceFileSystem
 
     from canfar.models.auth import RuntimeCredential
+    from canfar.models.http import Server, VOSpaceService
 
-__all__ = ["LOCAL", "filesystem", "identifiers", "sources"]
-"""Public surface; Storage Identifiers resolve through ``__getattr__``."""
+__all__ = ["filesystem", "identifiers"]
 
 _LISTINGS_EXPIRY_SECONDS = 30
 """Seconds a cached directory listing stays valid on one filesystem."""
 
 _LISTINGS_MAX_PATHS = 1000
 """Maximum directory listings retained by one filesystem."""
+
+
+def _configured(
+    config: Configuration,
+) -> dict[str, tuple[Server, VOSpaceService]]:
+    """Return the private Storage Identifier to service mapping."""
+    return {
+        identifier: (server, service)
+        for server in config.servers.values()
+        for identifier, service in server.storage.items()
+    }
+
+
+def _service(config: Configuration, identifier: str) -> tuple[str, str]:
+    """Return a service endpoint and its parent server's IDP."""
+    try:
+        server, service = _configured(config)[identifier]
+    except KeyError:
+        msg = f"Storage Identifier '{identifier}' is not configured."
+        raise KeyError(msg) from None
+    if server.idp is None:
+        msg = (
+            f"Storage Identifier '{identifier}' belongs to a Science Platform "
+            "Server without an IDP."
+        )
+        raise ValueError(msg)
+    return str(service.url), server.idp
 
 
 async def _resolve(
@@ -54,7 +81,7 @@ async def _resolve(
         AuthContextError: If the credential cannot be materialized.
     """
     config = Configuration()  # ty: ignore[missing-argument]
-    endpoint, idp = config._resolve_storage(identifier)  # noqa: SLF001
+    endpoint, idp = _service(config, identifier)
     try:
         client = HTTPClient.build(
             config=config,
@@ -152,7 +179,7 @@ async def _local() -> AsyncIterator[AbstractFileSystem]:
     )
 
 
-def sources() -> dict[str, AsyncFilesystemSource]:
+def _sources() -> dict[str, AsyncFilesystemSource]:
     """Build the mapped storage sources for one data command invocation.
 
     Every configured VOSpace Service is mapped by its Storage Identifier, plus
@@ -164,8 +191,7 @@ def sources() -> dict[str, AsyncFilesystemSource]:
     config = Configuration()  # ty: ignore[missing-argument]
     mapped: dict[str, AsyncFilesystemSource] = {
         identifier: _vospace(identifier)
-        for identifier in config.storage_identifiers()
-        if identifier != LOCAL
+        for identifier in _configured(config)
     }
     mapped[LOCAL] = _local
     return mapped
@@ -178,7 +204,7 @@ def identifiers() -> list[str]:
         list[str]: Configured Storage Identifiers plus the reserved ``local``.
     """
     config = Configuration()  # ty: ignore[missing-argument]
-    return config.storage_identifiers()
+    return [*sorted(_configured(config)), LOCAL]
 
 
 def filesystem(
@@ -206,46 +232,3 @@ def filesystem(
     # fsspec's background loop, so this works inside a running loop too.
     endpoint, credential = sync(get_loop(), _resolve, identifier, token, certificate)
     return _build(endpoint, credential, asynchronous=False)
-
-
-def __getattr__(identifier: str) -> AbstractFileSystem:
-    """Return a filesystem for a Storage Identifier accessed as an attribute.
-
-    Makes ``from canfar.storage import vault`` resolve to a ready filesystem
-    for the ``vault`` Storage Identifier.
-
-    Args:
-        identifier: Attribute name, treated as a Storage Identifier.
-
-    Returns:
-        AbstractFileSystem: A ready, authenticated filesystem.
-
-    Raises:
-        AttributeError: If ``identifier`` is not a configured Storage
-            Identifier.
-    """
-    if identifier.startswith("_"):
-        message = f"module {__name__!r} has no attribute {identifier!r}"
-        raise AttributeError(message)
-    known = identifiers()
-    if identifier not in known:
-        message = (
-            f"module {__name__!r} has no attribute {identifier!r}; "
-            f"configured Storage Identifiers are: {', '.join(known)}"
-        )
-        raise AttributeError(message)
-    # Built outside the membership check so a failure to authenticate surfaces
-    # as itself rather than as a missing attribute.
-    return filesystem(identifier)
-
-
-def __dir__() -> list[str]:
-    """List the module's own names plus every Storage Identifier.
-
-    Returns:
-        list[str]: Names available on this module, for tab completion.
-    """
-    try:
-        return sorted({*__all__, *identifiers()})
-    except (OSError, ValueError):  # pragma: no cover - unreadable configuration
-        return sorted(__all__)

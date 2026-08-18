@@ -6,6 +6,7 @@ import asyncio
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock, Mock
 
+import fsspec
 import pytest
 import vosfs
 from fsspec.implementations.local import LocalFileSystem
@@ -16,7 +17,7 @@ from canfar.exceptions.context import AuthContextError
 from canfar.models.active import ActiveConfig
 from canfar.models.config import Configuration
 from canfar.models.http import Server, VOSpaceService
-from canfar.storage import _vospace
+from canfar.storage import _sources, _vospace
 from tests.helpers.config import oidc_credential, x509_credential
 
 if TYPE_CHECKING:
@@ -398,17 +399,35 @@ class TestPublicSurface:
 
         assert storage.identifiers() == ["archive", "local"]
 
+    def test_identifiers_discovers_services_on_every_server(self) -> None:
+        """Discovery does not narrow the list to the active Server Selection."""
+        config = _config(credential=x509_credential("inactive"))
+        config.servers["other"] = Server(
+            idp="inactive",
+            uri=AnyUrl("ivo://other.example/skaha"),
+            url=AnyHttpUrl("https://other.example/skaha"),
+            storage={
+                "second": VOSpaceService(
+                    uri=AnyUrl("ivo://other.example/second"),
+                    url=AnyHttpUrl("https://other.example/second"),
+                )
+            },
+        )
+        config.save()
+
+        assert storage.identifiers() == ["archive", "second", "local"]
+
     def test_local_identifier_returns_a_local_filesystem(self) -> None:
         """The reserved local identifier needs no credential."""
         assert isinstance(storage.filesystem("local"), LocalFileSystem)
-        assert isinstance(storage.local, LocalFileSystem)
+        assert fsspec.get_filesystem_class("file") is LocalFileSystem
 
-    def test_attribute_access_builds_a_filesystem(
+    def test_filesystem_builds_a_configured_identifier(
         self,
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
     ) -> None:
-        """A Storage Identifier resolves as a module attribute."""
+        """The explicit filesystem API resolves a configured identifier."""
         certificate = tmp_path / "saved.pem"
         _config(credential=x509_credential("inactive", path=certificate)).save()
         monkeypatch.setattr(
@@ -417,28 +436,28 @@ class TestPublicSurface:
         )
         monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
-        filesystem = storage.archive
+        filesystem = storage.filesystem("archive")
 
         assert filesystem.endpoint == "https://inactive.example/vospace"
         assert filesystem.kwargs["certfile"] == certificate.as_posix()
         assert filesystem.kwargs["use_listings_cache"] is True
 
-    def test_unknown_identifier_raises_attribute_error(self) -> None:
-        """An unconfigured name is an AttributeError naming what is available."""
+    def test_unknown_identifier_raises_key_error(self) -> None:
+        """An unconfigured Storage Identifier fails explicitly."""
         _config(credential=x509_credential("inactive")).save()
 
-        with pytest.raises(AttributeError, match="archive"):
-            _ = storage.missing
+        with pytest.raises(KeyError, match="missing"):
+            storage.filesystem("missing")
 
-    def test_private_names_are_not_treated_as_identifiers(self) -> None:
-        """Dunder lookups must not attempt a filesystem build."""
-        with pytest.raises(AttributeError):
-            _ = storage.__wrapped__
-
-    def test_dir_offers_identifiers_for_completion(self) -> None:
-        """Tab completion exposes identifiers alongside the module functions."""
+    def test_data_source_mapping_is_private(self) -> None:
+        """The fsspec-cli source mapping is not a public storage API."""
         _config(credential=x509_credential("inactive")).save()
 
-        listed = dir(storage)
+        assert not hasattr(storage, "sources")
+        assert set(_sources()) == {"archive", "local"}
 
-        assert {"archive", "local", "filesystem", "identifiers"} <= set(listed)
+    def test_storage_identifiers_are_not_dynamic_module_imports(self) -> None:
+        """Storage Identifiers must be passed to the explicit filesystem API."""
+        _config(credential=x509_credential("inactive")).save()
+
+        assert "archive" not in storage.__dict__

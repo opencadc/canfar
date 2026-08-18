@@ -9,7 +9,7 @@ from fsspec_cli import App
 from typer.core import TyperGroup
 from typer.main import get_group
 
-from canfar.storage import sources
+from canfar.storage import _sources
 
 if TYPE_CHECKING:
     from typer._click.core import Command, Context
@@ -25,7 +25,7 @@ def group() -> TyperGroup:
     """
     return get_group(
         App(
-            sources(),
+            _sources(),
             capabilities={"recursion": {"copy": True, "remove": False}},
         ).typer_app
     )

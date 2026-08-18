@@ -19,12 +19,6 @@ DEFAULT_SERVER_GPUS = 0
 LOCAL = "local"
 """Reserved Storage Identifier for the machine where the code runs."""
 
-RESERVED_IDENTIFIERS = frozenset(
-    {LOCAL, "filesystem", "identifiers", "sources"},
-)
-"""Storage Identifiers that would shadow the ``canfar.storage`` module surface."""
-
-
 class VOSpaceService(BaseModel):
     """VOSpace Service discovered through an IVOA registry."""
 
@@ -150,14 +144,11 @@ class Server(BaseModel):
                 name = None
             else:
                 name = original_name.strip()
-            if name is None or (
-                not name or name in RESERVED_IDENTIFIERS or name.startswith("-")
-            ):
-                reserved = ", ".join(sorted(RESERVED_IDENTIFIERS))
+            if name is None or (not name or name == LOCAL or name.startswith("-")):
                 msg = (
                     f"Invalid Storage Identifier {original_name!r}: after whitespace "
-                    f"normalization it must be non-empty, avoid the reserved names "
-                    f"({reserved}), contain no colon, NUL, or newline, and not start "
+                    "normalization it must be non-empty, differ from reserved "
+                    f"'{LOCAL}', contain no colon, NUL, or newline, and not start "
                     "with '-'."
                 )
                 raise ValueError(msg)
