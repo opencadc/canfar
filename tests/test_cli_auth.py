@@ -255,9 +255,12 @@ def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
-    with _patch_config(config_path), patch(
-        "canfar.models.config.Configuration.remove_authentication",
-        side_effect=AssertionError("authentication must use config.editor"),
+    with (
+        _patch_config(config_path),
+        patch(
+            "canfar.models.config.Configuration.remove_authentication",
+            side_effect=AssertionError("authentication must use config.editor"),
+        ),
     ):
         result = runner.invoke(auth, ["rm", "cadc", "--force"])
 
