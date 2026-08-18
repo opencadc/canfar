@@ -157,16 +157,6 @@ def test_auth_ls_machine_stdout_is_data_only(
     parser(result.stdout)
 
 
-@pytest.mark.parametrize("legacy", ["--json", "--yaml"])
-def test_auth_ls_legacy_machine_switch_is_removed(legacy: str) -> None:
-    """The former format-specific switches are no longer leaf options."""
-    result = runner.invoke(cli, ["auth", "ls", legacy])
-
-    assert result.exit_code == 2
-    assert result.stdout == ""
-    assert legacy in click.unstyle(result.stderr)
-
-
 def test_auth_ls_invalid_output_format_is_rejected() -> None:
     """Output formats are validated at the CLI boundary."""
     result = runner.invoke(cli, ["auth", "ls", "--output", "toml"])

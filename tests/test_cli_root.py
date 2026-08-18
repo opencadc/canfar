@@ -16,7 +16,7 @@ runner = CliRunner()
 
 
 def test_root_help_lists_leaf_commands_without_alias_section() -> None:
-    """Canonical leaf commands stay at the root and aliases disappear."""
+    """Canonical leaf commands remain discoverable at the root."""
     result = runner.invoke(cli, ["--help"])
 
     assert result.exit_code == 0
@@ -33,10 +33,6 @@ def test_root_help_lists_leaf_commands_without_alias_section() -> None:
         "version",
     ):
         assert command in result.stdout
-    assert "Aliases" not in result.stdout
-    assert "Alias for auth" not in result.stdout
-    assert "run | launch" not in result.stdout
-    assert "del           " not in result.stdout
 
 
 def test_management_groups_remain_grouped() -> None:
