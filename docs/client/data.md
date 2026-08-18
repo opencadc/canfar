@@ -16,18 +16,19 @@ from canfar.storage import filesystem, identifiers
 
 available = identifiers()          # e.g. ["arc", "vault", "local"]
 
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     path = "/ALMA/test-data/cutouts/test-4d-cube-cutout.fits"
     print(vault.info(path)["size"])
     raw = vault.cat_file(path)
-
-local = filesystem("local")        # the machine running this code
+finally:
+    vault.close()
 ```
 
-`local` is always available and does not require a credential. Every other
-identifier must be present in the saved Configuration. The returned object is a
-normal synchronous fsspec filesystem; use its standard methods rather than a
-CANFAR-specific wrapper.
+The `local` identifier is always available and does not require a credential.
+Every other identifier must be present in the saved Configuration. The returned
+object is a normal synchronous fsspec filesystem; use its standard methods
+rather than a CANFAR-specific wrapper.
 
 `filesystem()` accepts runtime credentials when a caller must override saved
 state. A non-empty `token` takes precedence over a saved Authentication Record;
@@ -38,7 +39,18 @@ used only for that filesystem and do not rewrite the saved Configuration.
 from canfar.storage import filesystem
 
 vault = filesystem("vault", token="runtime-bearer-token")
+try:
+    # use vault here
+    ...
+finally:
+    vault.close()
+
 archive = filesystem("arc", certificate="/path/to/cadcproxy.pem")
+try:
+    # use archive here
+    ...
+finally:
+    archive.close()
 ```
 
 An unknown Storage Identifier raises `KeyError`. If a saved credential is
@@ -53,7 +65,8 @@ Storage operations use the ordinary fsspec vocabulary:
 ```python
 from canfar.storage import filesystem
 
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     directory = "/ALMA/test-data/cutouts"
     target = f"{directory}/test-4d-cube-cutout.fits"
 
@@ -69,6 +82,8 @@ with filesystem("vault") as vault:
 
     with vault.open(target, "rb") as handle:
         first_bytes = handle.read(80)
+finally:
+    vault.close()
 ```
 
 `cat_file(path, start, end)` returns the requested slice. Whether the VOSpace
@@ -81,9 +96,12 @@ VOSpace writes use the corresponding fsspec methods (`put_file`, `pipe_file`,
 `mkdir`, and `rm`) when the authenticated account has permission:
 
 ```python
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     vault.pipe_file("/tmp/example.txt", b"hello CANFAR\n")
     vault.rm("/tmp/example.txt")
+finally:
+    vault.close()
 ```
 
 Directory listings use an in-memory fsspec listing cache for the lifetime of
@@ -99,11 +117,14 @@ responsibility:
 ```python
 from canfar.storage import filesystem
 
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     vault.get_file(
         "/ALMA/test-data/cutouts/test-4d-cube-cutout.fits",
         "/scratch/cutout.fits",
     )
+finally:
+    vault.close()
 ```
 
 For example, a local path can then be opened by a memory-mapping library:
@@ -129,16 +150,21 @@ from fsspec.implementations.cached import SimpleCacheFileSystem
 from canfar.storage import filesystem
 
 remote = filesystem("vault")
-cached = SimpleCacheFileSystem(
-    fs=remote,
-    cache_storage="/scratch/canfar-vault",
-)
-cached.cat_file("/ALMA/test-data/cutouts/test-4d-cube-cutout.fits")
+try:
+    cached = SimpleCacheFileSystem(
+        fs=remote,
+        cache_storage="/scratch/canfar-vault",
+    )
+    cached.cat_file("/ALMA/test-data/cutouts/test-4d-cube-cutout.fits")
+finally:
+    remote.close()
 ```
 
 One whole-file cache layer is the supported simple choice. Do not stack cache
 wrappers, pass a URL as `cache_storage`, or advertise `blockcache`: the staged
-VOSpace file object does not provide the fsspec block-cache interface.
+VOSpace file object does not provide the fsspec block-cache interface. The
+cache wrapper forwards `close()` only when its wrapped filesystem provides it,
+so close the known VOSpace client (`remote`) explicitly.
 
 ## Python API boundary
 
