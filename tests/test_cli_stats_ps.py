@@ -80,12 +80,6 @@ def test_stats_command_help() -> None:
     assert result.exit_code == 0
 
 
-def test_ps_command_help() -> None:
-    """Test ps command help executes successfully."""
-    result = runner.invoke(cli, ["ps", "--help"])
-    assert result.exit_code == 0
-
-
 def test_ps_help_describes_default_status_filter() -> None:
     """Test ps help names the statuses shown by the default filter."""
     result = runner.invoke(cli, ["ps", "--help"])
