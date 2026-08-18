@@ -7,7 +7,6 @@ import tempfile
 from contextlib import suppress
 from dataclasses import dataclass
 from pathlib import Path
-from types import MappingProxyType
 from typing import TYPE_CHECKING, Any
 
 import yaml
@@ -70,8 +69,13 @@ def get_value(config: Configuration, path: str) -> Any:
 def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
     """Validate a source-isolated copy of a complete Configuration."""
     data = {**config.model_dump(mode="python"), **updates}
-    # Avoid BaseSettings merging the persisted YAML source into this copy.
-    return config.__class__.model_validate(MappingProxyType(data))
+    candidate = config.__class__.model_construct()
+    # Full validation must not re-enter BaseSettings persisted sources.
+    config.__class__.__pydantic_validator__.validate_python(
+        data,
+        self_instance=candidate,
+    )
+    return candidate
 
 
 def set_value(config: Configuration, path: str, value: Any) -> Configuration:

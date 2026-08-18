@@ -89,6 +89,54 @@ def test_editor_replaces_top_level_mapping_without_reloading_saved_state(
     assert set(config.authentication) == {"cadc"}
 
 
+def test_editor_seeds_idp_for_mapping_form_credentials(tmp_path: Path) -> None:
+    """Mapping-form Authentication records inherit their Identity Provider key."""
+    config_path = tmp_path / "config.yaml"
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+        config.editor.set(
+            "authentication.second",
+            {
+                "mode": "x509",
+                "path": str(tmp_path / "second.pem"),
+                "expiry": 0,
+            },
+        )
+
+    assert config.authentication["second"].idp == "second"
+
+
+def test_editor_rejects_auth_replacement_with_active_idp_reference(
+    tmp_path: Path,
+) -> None:
+    """Replacing records cannot invalidate the persisted active IDP reference."""
+    config_path = tmp_path / "config.yaml"
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+        config.editor.set(
+            "authentication.srcnet",
+            {
+                "mode": "x509",
+                "path": str(tmp_path / "srcnet.pem"),
+                "expiry": 0,
+            },
+        )
+        config.editor.set(
+            "active",
+            config.active.model_copy(update={"authentication": "srcnet"}),
+        )
+        config.editor.save()
+
+        with pytest.raises(ValidationError):
+            config.editor.set(
+                "authentication",
+                {"cadc": config.authentication["cadc"]},
+            )
+
+        assert config.active.authentication == "srcnet"
+        assert set(config.authentication) == {"cadc", "srcnet"}
+
+
 def test_editor_rejects_list_indexing(tmp_path: Path) -> None:
     """Dotted paths may retrieve a whole list but cannot address its items."""
     config_path = tmp_path / "config.yaml"
