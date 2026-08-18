@@ -32,7 +32,6 @@ from canfar.storage import filesystem
 local = filesystem("local")
 with local.open("/scratch/result.txt", "w") as handle:
     handle.write("done\n")
-local.close()
 ```
 
 Configured identifiers are resolved when `filesystem()` is called. Saved

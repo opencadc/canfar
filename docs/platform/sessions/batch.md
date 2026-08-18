@@ -151,17 +151,25 @@ with Session() as session:
 For native asynchronous code:
 
 ```python
+import asyncio
+
 from canfar.sessions import AsyncSession
 
-async with AsyncSession() as session:
-    ids = await session.create(
-        name="async-batch",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="headless",
-        cmd="python",
-        args="/arc/projects/myproject/scripts/analyse.py",
-        replicas=10,
-    )
+async def main() -> None:
+    async with AsyncSession() as session:
+        ids = await session.create(
+            name="async-batch",
+            image="images.canfar.net/skaha/astroml:latest",
+            kind="headless",
+            cmd="python",
+            args="/arc/projects/myproject/scripts/analyse.py",
+            replicas=10,
+        )
+        print(ids)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
 
 The `args` value is a command-line string. Keep command arguments after the
