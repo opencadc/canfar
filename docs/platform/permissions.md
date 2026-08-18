@@ -7,7 +7,7 @@ login does not grant access to every server, project, image, or data object.
 
 ## Identity and server access
 
-Authenticate with the identity provider that owns the target server:
+Authenticate with the Identity Provider (IDP) that owns the target Science Platform Server:
 
 ```bash
 canfar login cadc
