@@ -13,7 +13,12 @@ from canfar.models.auth import (
     AuthMode,
     X509Credential,
 )
-from canfar.models.config import Configuration
+from canfar.models.config import (
+    Configuration,
+    default_active,
+    default_authentication,
+    default_servers,
+)
 
 if TYPE_CHECKING:
     import builtins
@@ -78,9 +83,9 @@ def login(idp: str, force: bool = False) -> None:
         return
 
     credential = _authenticate(idp_info)
-    config.upsert_credential(credential)
+    config.editor.set(f"authentication.{credential.idp}", credential)
     server_service.discover(idp, config=config, save=False)
-    config.save()
+    config.editor.save()
 
 
 def use(idp: str) -> None:
@@ -107,8 +112,7 @@ def use(idp: str) -> None:
             hint="Run canfar.login() for this IDP before selecting it.",
         ) from exc
 
-    config.set_active_authentication(idp)
-    config.save()
+    _select_authentication(config, idp)
 
 
 def list() -> builtins.list[Authentication]:  # noqa: A001
@@ -152,8 +156,7 @@ def remove(idp: str, *, force: bool = False) -> None:
             hint="Use --force or switch authentication before removing.",
         )
 
-    config.remove_authentication(idp)
-    config.save()
+    _remove_authentication(config, idp)
 
 
 def purge(*, force: bool = False) -> None:
@@ -175,8 +178,7 @@ def purge(*, force: bool = False) -> None:
         )
 
     config = Configuration()  # ty: ignore[missing-argument]
-    config.purge_authentication()
-    config.save()
+    _purge_authentication(config)
 
 
 def show() -> Authentication:
@@ -206,6 +208,123 @@ def show() -> Authentication:
 
 def _has_authentication(config: Configuration, idp: str) -> bool:
     return idp in config.authentication
+
+
+def _selection_history(config: Configuration) -> dict[str, str]:
+    """Return remembered server selections including the active pair."""
+    selections = dict(config.active.servers)
+    active_name = config.active.server
+    if active_name is None:
+        return selections
+
+    active_server = config.servers.get(active_name)
+    if (
+        active_server is not None
+        and active_server.idp == config.active.authentication
+        and active_server.name is not None
+    ):
+        selections[config.active.authentication] = active_server.name
+    return selections
+
+
+def _select_authentication(config: Configuration, idp: str) -> None:
+    """Select an Authentication Record and its remembered Server, if any."""
+    selections = _selection_history(config)
+    server_name = selections.get(idp)
+    if server_name is not None:
+        remembered = config.servers.get(server_name)
+        if remembered is None or remembered.idp != idp:
+            server_name = None
+
+    if server_name is None:
+        server_name = config.active.server
+        active_server = (
+            config.servers.get(server_name) if server_name is not None else None
+        )
+        if active_server is None or active_server.idp != idp:
+            server_name = None
+
+    active = config.active.model_copy(
+        update={
+            "authentication": idp,
+            "server": server_name,
+            "servers": selections,
+        },
+    )
+    config.editor.set("active", active)
+    config.editor.save()
+
+
+def _remove_authentication(config: Configuration, idp: str) -> None:
+    """Remove one Authentication Record and its associated Server state."""
+    authentication = dict(config.authentication)
+    authentication.pop(idp, None)
+    if not authentication:
+        _purge_authentication(config)
+        return
+
+    servers = {
+        name: server for name, server in config.servers.items() if server.idp != idp
+    }
+    selections = {
+        selected_idp: name
+        for selected_idp, name in config.active.servers.items()
+        if selected_idp != idp and name in servers
+    }
+    active = config.active.model_copy(update={"servers": selections})
+    if active.authentication == idp:
+        active = active.model_copy(
+            update={
+                "authentication": next(iter(authentication)),
+                "server": None,
+            },
+        )
+    elif active.server not in servers:
+        active = active.model_copy(update={"server": None})
+
+    editor = config.editor
+    editor.set("active", active)
+    editor.set("authentication", authentication)
+    editor.set("servers", servers)
+    editor.save()
+
+
+def _purge_authentication(config: Configuration) -> None:
+    """Reset Authentication and Server state while preserving other settings."""
+    authentication = {
+        **config.authentication,
+        **{
+            key: credential.model_copy(deep=True)
+            for key, credential in default_authentication.items()
+        },
+    }
+    servers = {
+        **config.servers,
+        **{
+            name: server.model_copy(deep=True)
+            for name, server in default_servers.items()
+        },
+    }
+    editor = config.editor
+    # Add defaults before switching active references so each editor update validates.
+    editor.set("authentication", authentication)
+    editor.set("servers", servers)
+    editor.set("active", default_active.model_copy(deep=True))
+    editor.set(
+        "authentication",
+        {
+            key: credential.model_copy(deep=True)
+            for key, credential in default_authentication.items()
+        },
+    )
+    editor.set(
+        "servers",
+        {
+            name: server.model_copy(deep=True)
+            for name, server in default_servers.items()
+        },
+    )
+    editor.save()
 
 
 def _authentication_for_credential(

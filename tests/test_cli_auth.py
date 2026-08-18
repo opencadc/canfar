@@ -176,6 +176,10 @@ def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
 
     with (
         _patch_config(config_path),
+        patch(
+            "canfar.models.config.Configuration.set_active_authentication",
+            side_effect=AssertionError("authentication must use config.editor"),
+        ),
         patch("canfar.server._validate_server") as mock_validate,
     ):
         mock_validate.side_effect = lambda server, **_kwargs: server
@@ -251,7 +255,13 @@ def test_auth_remove_force_removes_active_idp(tmp_path: Path) -> None:
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
-    with _patch_config(config_path):
+    with (
+        _patch_config(config_path),
+        patch(
+            "canfar.models.config.Configuration.remove_authentication",
+            side_effect=AssertionError("authentication must use config.editor"),
+        ),
+    ):
         result = runner.invoke(auth, ["rm", "cadc", "--force"])
 
     assert result.exit_code == 0
@@ -281,7 +291,11 @@ def test_auth_purge_force_preserves_registry_and_console(tmp_path: Path) -> None
         before = Configuration()
         before.console = before.console.model_copy(update={"width": 99})
         before.save()
-        result = runner.invoke(auth, ["purge", "--force"])
+        with patch(
+            "canfar.models.config.Configuration.purge_authentication",
+            side_effect=AssertionError("authentication must use config.editor"),
+        ):
+            result = runner.invoke(auth, ["purge", "--force"])
 
     assert result.exit_code == 0
     with _patch_config(config_path):

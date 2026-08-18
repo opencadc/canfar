@@ -42,6 +42,20 @@ def test_editor_set_mutates_validated_configuration(tmp_path: Path) -> None:
         assert config.editor.get("servers.canfar.auths") == ["x509", "oidc"]
 
 
+def test_editor_replaces_top_level_mapping_without_reloading_saved_state(
+    tmp_path: Path,
+) -> None:
+    """Top-level mapping edits remove records instead of resurrecting YAML keys."""
+    config_path = tmp_path / "config.yaml"
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+        config.editor.set("authentication.srcnet", config.authentication["cadc"])
+        config.editor.save()
+        config.editor.set("authentication", {"cadc": config.authentication["cadc"]})
+
+    assert set(config.authentication) == {"cadc"}
+
+
 def test_editor_rejects_list_indexing(tmp_path: Path) -> None:
     """Dotted paths may retrieve a whole list but cannot address its items."""
     config_path = tmp_path / "config.yaml"

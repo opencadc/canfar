@@ -39,7 +39,11 @@ def oidc_client() -> HTTPClient:
 class TestSyncHook:
     """Tests for the synchronous `hook` function."""
 
-    @patch("canfar.models.config.Configuration.save")
+    @patch(
+        "canfar.models.config.Configuration.update_credential",
+        side_effect=AssertionError("refresh must use config.editor"),
+    )
+    @patch("canfar.config.editor.ConfigurationEditor.save")
     @patch(
         "canfar.auth.oidc.sync_refresh",
         return_value={
@@ -54,6 +58,7 @@ class TestSyncHook:
         self,
         mock_refresh,
         mock_save,
+        mock_update,
         oidc_client,
     ) -> None:
         """Verify a successful token refresh updates state and headers."""
@@ -64,6 +69,7 @@ class TestSyncHook:
 
         mock_refresh.assert_called_once()
         mock_save.assert_called_once()
+        mock_update.assert_not_called()
 
         # Verify the request header was updated
         assert request.headers["Authorization"] == "Bearer new-access-token"
@@ -142,7 +148,11 @@ class TestSyncHook:
 class TestAsyncHook:
     """Tests for the asynchronous `ahook` function."""
 
-    @patch("canfar.models.config.Configuration.save")
+    @patch(
+        "canfar.models.config.Configuration.update_credential",
+        side_effect=AssertionError("refresh must use config.editor"),
+    )
+    @patch("canfar.config.editor.ConfigurationEditor.save")
     @patch(
         "canfar.auth.oidc.refresh",
         return_value={
@@ -157,6 +167,7 @@ class TestAsyncHook:
         self,
         mock_refresh,
         mock_save,
+        mock_update,
         oidc_client,
     ) -> None:
         """Verify a successful async token refresh updates state and headers."""
@@ -167,6 +178,7 @@ class TestAsyncHook:
 
         mock_refresh.assert_called_once()
         mock_save.assert_called_once()
+        mock_update.assert_not_called()
 
         assert request.headers["Authorization"] == "Bearer new-async-token"
         assert (
