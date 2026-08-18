@@ -24,6 +24,7 @@ if TYPE_CHECKING:
 
 log = logging.getLogger(__name__)
 _BASIC_AUTH_METHOD = "client_secret_basic"
+_OIDC_SCOPE = "openid profile email offline_access"
 
 DeviceFlow = Callable[
     [str, str, str, str, "AsyncOAuth2Client"],
@@ -45,7 +46,7 @@ class SlowDownError(Exception):
 
 
 def _validate_discovery_data(data: Any, expected_issuer: str) -> dict[str, Any]:
-    """Validate the provider metadata shared by sync and async discovery."""
+    """Validate OIDC Identity Provider metadata shared by discovery paths."""
     if not isinstance(data, dict) or data.get("issuer") != expected_issuer:
         msg = "OIDC discovery issuer mismatch"
         raise ValueError(msg)
@@ -75,12 +76,17 @@ def _registration_payload() -> dict[str, Any]:
         ],
         "response_types": ["token"],
         "token_endpoint_auth_method": _BASIC_AUTH_METHOD,
-        "scope": "openid profile email offline_access",
+        "scope": _OIDC_SCOPE,
     }
 
 
+def _device_authorization_payload(identity: str) -> dict[str, str]:
+    """Build the device authorization request shared by both transports."""
+    return {"client_id": identity, "scope": _OIDC_SCOPE}
+
+
 def _parse_device_authorization(response: httpx.Response) -> DeviceAuthorization:
-    """Parse one provider challenge without exposing malformed secrets."""
+    """Parse one OIDC Identity Provider challenge without exposing secrets."""
     try:
         return DeviceAuthorization.model_validate(response.json())
     except ValidationError:
@@ -129,7 +135,7 @@ def _install_tokens(credential: OIDCCredential, tokens: dict[str, Any]) -> None:
 
 
 def _client_credentials(device: Any) -> tuple[str, str]:
-    """Extract a valid dynamic client pair without exposing provider data."""
+    """Extract a dynamic client pair without exposing Identity Provider data."""
     if not isinstance(device, dict):
         msg = "OIDC device authorization failed: malformed client response"
         raise TypeError(msg)
@@ -161,7 +167,7 @@ def _set_discovered_endpoints(
     credential: OIDCCredential,
     discovery: dict[str, Any],
 ) -> None:
-    """Install provider endpoints while preserving the credential object."""
+    """Install Identity Provider endpoints while preserving the credential object."""
     credential.endpoints.device = discovery["device_authorization_endpoint"]
     credential.endpoints.registration = discovery["registration_endpoint"]
     credential.endpoints.token = discovery["token_endpoint"]
@@ -173,7 +179,7 @@ async def discover(
     *,
     expected_issuer: str,
 ) -> dict[str, Any]:
-    """Discover OIDC provider configuration.
+    """Discover OIDC Identity Provider configuration.
 
     Args:
         url (str): OIDC Discovery URL.
@@ -182,7 +188,7 @@ async def discover(
         expected_issuer: Exact issuer configured for the Identity Provider.
 
     Returns:
-        dict[str, Any]: OIDC provider configuration.
+        dict[str, Any]: OIDC Identity Provider configuration.
     """
     if client is None:
         async with httpx.AsyncClient() as http_client:
@@ -200,7 +206,7 @@ async def discover(
 
 
 async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[str, Any]:
-    """Register a new client with the OIDC provider.
+    """Register a new client with the OIDC Identity Provider.
 
     Args:
         url (str): OIDC Registration URL.
@@ -487,10 +493,7 @@ async def start_device_authorization(
     """
     response = await client.post(
         url,
-        data={
-            "client_id": identity,
-            "scope": "openid profile email offline_access",
-        },
+        data=_device_authorization_payload(identity),
         auth=(identity, secret),
     )
     response.raise_for_status()
@@ -705,7 +708,7 @@ def sync_discover(
     *,
     expected_issuer: str,
 ) -> dict[str, Any]:
-    """Discover OIDC provider configuration with a synchronous HTTP client."""
+    """Discover OIDC Identity Provider configuration with sync HTTP."""
     response = client.get(url)
     response.raise_for_status()
     data: dict[str, Any] = response.json()
@@ -736,10 +739,7 @@ def sync_start_device_authorization(
     """Request an OIDC device authorization challenge synchronously."""
     response = client.post(
         url,
-        data={
-            "client_id": identity,
-            "scope": "openid profile email offline_access",
-        },
+        data=_device_authorization_payload(identity),
         auth=(identity, secret),
     )
     response.raise_for_status()
