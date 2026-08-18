@@ -104,32 +104,26 @@ verification and residual-state semantics—not portable `mv`.
 
 ### Directory listings
 
-Directory listings are cached automatically. Each command builds and closes its
-own filesystem, so a cached listing only ever serves the command that produced
-it and can never return a listing that outlives it. Repeated lookups while one
-command walks a tree are served without another round trip.
+Each command uses a fresh filesystem with a bounded in-memory directory-listing
+cache. The cache is closed with the command and never persists object contents.
+It is not controlled by environment variables.
 
 ### Files and byte ranges
 
 There is no CLI flag for caching file contents, but `vosfs` is a normal
-[fsspec](https://filesystem-spec.readthedocs.io/) filesystem, so any fsspec
-cache can wrap it from Python. On a CANFAR session, `/scratch` is fast local
-disk and is the right place to point a cache; it is not backed up and is
-cleared when the session ends, which is exactly what a cache wants.
+[fsspec](https://filesystem-spec.readthedocs.io/) filesystem, so an fsspec
+cache can wrap the explicit CANFAR Python filesystem. Caching is always a user
+choice: `/scratch` is a useful Session-local directory when named explicitly,
+but its presence or any `skaha_*` environment variable never enables a cache.
 
-Cache whole files under a named directory. The first read fetches over the
-network, and later reads come from `/scratch`:
+For example, cache whole files under an explicitly named directory. The first
+read fetches over the network, and later reads come from that directory:
 
 ```python
-from pathlib import Path
-
 from fsspec.implementations.cached import WholeFileCacheFileSystem
-from vosfs import VOSpaceFileSystem
+from canfar.storage import filesystem
 
-vault = VOSpaceFileSystem(
-    "https://cadc-west-01.canfar.net/vault",
-    certfile=str(Path.home() / ".ssl" / "cadcproxy.pem"),
-)
+vault = filesystem("vault")
 cached = WholeFileCacheFileSystem(fs=vault, cache_storage="/scratch/vault-cache")
 
 data = cached.cat_file("/ALMA/test-data/cutouts/test-4d-cube-cutout.fits")
@@ -140,60 +134,26 @@ staleness metadata that `WholeFileCacheFileSystem` keeps. Passing
 `cache_storage` a list of directories tries each in order and treats only the
 last as writable, so a shared read-only cache can back your own.
 
-### Cache byte ranges
+### Byte ranges
 
-`vosfs` sends an HTTP `Range` header and uses the response when the byte
-endpoint answers `206`, so a partial read such as `cat_file(path, start, end)`
-transfers only the bytes you asked for. Range support is per-backend:
+For an explicit partial read, `vosfs` sends an HTTP `Range` request and uses a
+validated `206` response. If the byte endpoint returns `200`, it downloads the
+whole object and slices locally. Capability is deployment-specific; do not
+infer it from a Storage Identifier's spelling. The staged file-object path is
+whole-object, even when `cat_file(path, start, end)` can use a range.
 
-| Storage Identifier | Backend | Ranged reads |
-| --- | --- | --- |
-| `vault` | `minoc` | Yes — a partial read returns `206` and transfers only that slice |
-| `arc` | Cavern | No — the whole object is fetched and sliced, which is correct but not cheaper |
-
-Because a range is now a real partial transfer against `vault`, a block cache
-is worth using there. `MMapCache` keeps fetched blocks in a sparse file, so
-only the blocks you touch occupy disk:
-
-```python
-from fsspec.caching import MMapCache
-
-path = "/ALMA/test-data/cutouts/test-4d-cube.fits"
-size = vault.info(path)["size"]
-blocks = MMapCache(
-    blocksize=1 << 20,
-    fetcher=lambda start, end: vault.cat_file(path, start, end),
-    size=size,
-    location="/scratch/vault-cache/test-4d-cube.blocks",
-)
-
-header = blocks._fetch(0, 2880)  # one FITS header block, one 1 MiB range request
-```
-
-Reading a FITS header from a 3.4 MB cube this way issues a single ranged
-request and materialises one block of four; a second read of the same range is
-served from `/scratch`. The saving is in bytes transferred rather than seconds
-on small files, because VOSpace transfer negotiation dominates a short request.
-It grows with file size, and matters most when many reads hit different parts
-of one large cube.
-
-Against `arc` a block cache still costs a whole download per block, so cache
-whole files there instead.
-
-The `blockcache` filesystem remains unavailable over a VOSpace Service. `Range`
-is honoured for byte reads, not through the file-object path, so wrapping
-`CachingFileSystem` still fails:
+The `blockcache` filesystem remains unavailable over a VOSpace Service because
+the opened object is a staged file rather than a ranged buffered reader:
 
 ```text
 AttributeError: 'StagedReadFile' object has no attribute 'blocksize'
 ```
 
-Stacked caches do not help either: chaining them (`filecache::simplecache::`)
-builds the layers, but the inner layer is never filled and never serves, so use
-exactly one cache layer on your fastest local disk.
+Use one explicitly selected cache layer on a local directory you own; do not
+silently stack caches or select one from environment variables.
 
-These caches use the synchronous filesystem interface. Build the filesystem
-without `asynchronous=True`, as above.
+The shown cache wrapper uses the synchronous filesystem returned by
+`canfar.storage.filesystem`.
 
 ## Output and accepted omissions
 
