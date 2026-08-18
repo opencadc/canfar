@@ -133,6 +133,9 @@ def test_editor_rejects_auth_replacement_with_active_idp_reference(
                 {"cadc": config.authentication["cadc"]},
             )
 
+        assert config.active.authentication == "srcnet"
+        assert set(config.authentication) == {"cadc", "srcnet"}
+
 
 def test_editor_rejects_list_indexing(tmp_path: Path) -> None:
     """Dotted paths may retrieve a whole list but cannot address its items."""

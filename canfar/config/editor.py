@@ -70,6 +70,7 @@ def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
     """Validate a source-isolated copy of a complete Configuration."""
     data = {**config.model_dump(mode="python"), **updates}
     candidate = config.__class__.model_construct()
+    # Full validation must not re-enter BaseSettings persisted sources.
     config.__class__.__pydantic_validator__.validate_python(
         data,
         self_instance=candidate,
