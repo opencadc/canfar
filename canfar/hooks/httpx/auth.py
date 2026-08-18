@@ -29,7 +29,7 @@ Note:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Callable
 
 from canfar import get_logger
 from canfar.auth import oidc
@@ -89,25 +89,6 @@ def _apply_access_header(
     request.headers["Authorization"] = header
 
 
-def _apply_refreshed_token(
-    client: HTTPClient,
-    credential: OIDCCredential,
-    refreshed: dict[str, Any],
-    httpx_client_headers: MutableMapping[str, str],
-    request: httpx.Request,
-) -> None:
-    """Atomically persist refreshed OIDC state, then update active headers."""
-    updated = oidc._persist(  # noqa: SLF001
-        client.config, credential, refreshed
-    )
-    log.debug("Authentication refreshed and configuration saved.")
-
-    assert updated.token.access is not None
-    _apply_access_header(updated.token.access, httpx_client_headers, request)
-    log.debug("HTTP request headers updated with new token.")
-    log.info("OIDC Access Token Refreshed.")
-
-
 def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
     """Create an authentication refresh hook for httpx clients.
 
@@ -148,13 +129,15 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 token=refresh_token,
             )
             log.debug("Synchronous OIDC token refresh successful.")
-            _apply_refreshed_token(
-                client,
-                credential,
-                token,
-                client.client.headers,
-                request,
+            updated = oidc._persist(  # noqa: SLF001
+                client.config, credential, token
             )
+            log.debug("Authentication refreshed and configuration saved.")
+
+            assert updated.token.access is not None
+            _apply_access_header(updated.token.access, client.client.headers, request)
+            log.debug("HTTP request headers updated with new token.")
+            log.info("OIDC Access Token Refreshed.")
 
         except (ValueError, OSError):
             msg = "Failed to refresh OIDC token"
