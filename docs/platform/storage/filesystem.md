@@ -3,72 +3,36 @@
 Use a normal `/arc` path inside a Science Platform Session whenever the data is
 already mounted. Use `canfar.storage` when Python is running outside the
 Session, or when the object lives in a configured VOSpace Service. The module
-keeps the CANFAR-owned work—Storage Identifier lookup and Authentication
-Record materialization—at one explicit boundary and returns the upstream
-fsspec filesystem for everything else.
+keeps the CANFAR-owned work at one explicit boundary and returns the upstream
+fsspec filesystem for everything else. The [Python client data
+guide](../../client/data.md) is the canonical contract for Storage Identifier
+lookup, credential selection, fsspec operations, local staging, and
+`SimpleCacheFileSystem`.
 
 ## Construct a filesystem explicitly
 
-```python
-from canfar.storage import filesystem, identifiers
-
-names = identifiers()
-print(names)  # configured Storage Identifiers, plus "local"
-
-remote = filesystem("vault")
-try:
-    print(remote.ls("/project", detail=False))
-finally:
-    remote.close()
-```
-
-`filesystem(identifier)` accepts one configured Storage Identifier. The reserved
-identifier `local` returns the local fsspec filesystem and does not use CANFAR
-credentials:
-
-```python
-from canfar.storage import filesystem
-
-local = filesystem("local")
-with local.open("/scratch/result.txt", "w") as handle:
-    handle.write("done\n")
-```
-
-Configured identifiers are resolved when `filesystem()` is called. Saved
-X.509 credentials are validated and saved OIDC records may be refreshed before
-the literal credential is handed to `vosfs`. A runtime `token=` or
-`certificate=` can be supplied when the application owns the credential:
-
-```python
-remote = filesystem("vault", certificate="/path/to/cadcproxy.pem")
-try:
-    data = remote.cat_file("/project/table.csv")
-finally:
-    remote.close()
-```
-
-The identifier is an argument, not a dynamically imported member. CANFAR does
-not register `vault://`, `arc://`, or arbitrary configured names as process-wide
-fsspec protocols, and there is no `storage.configure()` call. This keeps
-configuration lookup visible and leaves fsspec operations portable to workers.
+See [Find and open a Storage Identifier](../../client/data.md#find-and-open-a-storage-identifier)
+for the construction examples and the complete contract, including the
+reserved `local` identifier, runtime credentials, saved Authentication Records,
+error behavior, and the fact that identifiers are explicit arguments rather
+than dynamic fsspec schemes.
 
 ## Read shape and backend capability
 
-There are two distinct ways to read a remote object:
+The [client data guide](../../client/data.md#standard-fsspec-operations) defines
+the supported read methods and staging behavior. This page adds the
+deployment-specific capability guidance:
 
-1. `cat_file(path, start, end)` or `cat_ranges(...)` requests explicit bytes.
-   `vosfs` validates a ranged `206` response and falls back to a complete
-   response when the service does not provide ranges. A successful call is
-   therefore correct on both kinds of backend, but a fallback still transfers
-   the whole object.
-2. `open(path, "rb")` gives a seekable file-like object backed by a staged local
-   copy. It is convenient for libraries, but it is not a network-efficient
-   random-access reader: opening it stages the complete object.
+- `vosfs` validates a ranged `206` response for explicit byte reads and falls
+  back to a complete response when the service does not provide ranges. A
+  successful call is therefore correct on both kinds of backend, but a fallback
+  still transfers the whole object.
+- The read-only CADC measurements used for this guide saw validated ranges from
+  Vault/minoc and whole-object fallback from ARC/Cavern.
 
 The response capability belongs to the deployment, not the name `vault` or
-`arc`. The read-only CADC measurements used for this guide saw validated ranges
-from Vault/minoc and whole-object fallback from ARC/Cavern. Treat another
-deployment or Storage Identifier as unknown until its responses are observed.
+`arc`. Treat another deployment or Storage Identifier as unknown until its
+responses are observed.
 
 For data already mounted at `/arc`, use the path directly. For remote data used
 once, a single explicit transfer is often clearer:
@@ -79,37 +43,20 @@ canfar data cp vault:/project/cube.fits local:/scratch/cube.fits
 
 ## Ephemeral and persistent caches
 
-`filesystem()` does not enable a content cache. The fsspec directory-listing
-cache used by the constructed VOSpace filesystem is separate from object-byte
-caching. Select one content cache explicitly when repeated reads justify it.
+The [client data guide's content-caching
+contract](../../client/data.md#content-caching) explains the distinction between
+the fsspec directory-listing cache and object-byte caching. Select one content
+cache explicitly when repeated reads justify it.
 
 ### Session-local cache
 
-`SimpleCacheFileSystem` stores complete objects in the directory you choose.
-`/scratch` is a useful default inside a Science Platform Session because it is
-local and is deleted with the Session. Key the directory by Storage Identifier
-so objects from different endpoints cannot collide:
-
-```python
-from fsspec.implementations.cached import SimpleCacheFileSystem
-
-from canfar.storage import filesystem
-
-remote = filesystem("vault")
-cached = SimpleCacheFileSystem(
-    fs=remote,
-    cache_storage="/scratch/canfar-cache/vault",
-)
-try:
-    with cached.open("/project/cube.fits", "rb") as handle:
-        process(handle)
-finally:
-    remote.close()
-```
-
-This is opt-in. It does not make a staged file into a ranged reader, and it
-does not survive Session deletion. Remove the cache when its data is no longer
-needed or when `/scratch` is under pressure.
+See the [client data guide's SimpleCache example](../../client/data.md#content-caching)
+for the supported whole-file composition. `/scratch` is a useful default inside
+a Science Platform Session because it is local and is deleted with the Session.
+Key the directory by Storage Identifier so objects from different endpoints
+cannot collide. This cache is opt-in, does not make a staged file into a ranged
+reader, and does not survive Session deletion; remove it when its data is no
+longer needed or when `/scratch` is under pressure.
 
 ### Persistent cache
 
