@@ -53,9 +53,6 @@ Each replica receives `REPLICA_ID` and `REPLICA_COUNT`. Use those values, or the
 helpers in [Distributed Computing](../../client/helpers.md), to split work
 deterministically.
 
-`canfar run` and `canfar launch` are compatibility aliases for `canfar create`.
-New examples should use `canfar create`.
-
 ## Submit From Python
 
 ```python

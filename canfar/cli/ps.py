@@ -18,11 +18,10 @@ from canfar.cli._run import run
 from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typing import NoReturn
@@ -32,7 +31,6 @@ if TYPE_CHECKING:
 ps = typer.Typer(
     name="ps",
     no_args_is_help=False,
-    cls=AliasGroup,
 )
 
 
@@ -199,6 +197,8 @@ def show(
 ) -> None:
     """Show sessions."""
     mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
 
     if quiet and mode is not output.OutputMode.HUMAN:
         typer.echo(

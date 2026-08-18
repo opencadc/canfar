@@ -1,11 +1,4 @@
-"""Characterization tests guarding the dead-module cleanup (issue #137).
-
-Two empty placeholder modules (``canfar/cli/run.py`` and ``canfar/cli/alias.py``)
-are removed by this cleanup. Neither is imported anywhere; the ``run``/``launch``
-and ``del`` CLI aliases are wired in :mod:`canfar.cli.main` via the
-:class:`~canfar.hooks.typer.aliases.AliasGroup`, not by those files. These tests
-pin both invariants so the deletion cannot silently regress the alias feature.
-"""
+"""Tests for removed CLI placeholder modules and aliases."""
 
 from __future__ import annotations
 
@@ -25,9 +18,16 @@ def test_dead_cli_module_is_absent(module: str) -> None:
     assert importlib.util.find_spec(module) is None
 
 
-@pytest.mark.parametrize("alias", ["run", "launch", "del"])
-def test_cli_aliases_still_resolve(alias: str) -> None:
-    """The ``run``/``launch``/``del`` aliases keep resolving through the app."""
+@pytest.mark.parametrize("alias", ["authentication", "run", "launch", "del"])
+def test_removed_cli_aliases_do_not_resolve(alias: str) -> None:
+    """The old root aliases are no longer accepted by the app."""
     result = runner.invoke(cli, [alias, "--help"])
-    assert result.exit_code == 0
-    assert "Usage" in result.stdout
+    assert result.exit_code == 2
+    assert f"No such command '{alias}'" in result.output
+
+
+def test_removed_auth_login_alias_does_not_resolve() -> None:
+    """Authentication management keeps canonical commands only."""
+    result = runner.invoke(cli, ["auth", "login", "--help"])
+    assert result.exit_code == 2
+    assert "No such command 'login'" in result.output

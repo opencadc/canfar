@@ -388,7 +388,7 @@ def test_invalid_logging_environment_is_one_structured_machine_error(
     flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
-    """Root dispatch preserves parsed leaf args for callback setup failures."""
+    """Machine-capable root groups keep setup diagnostics structured."""
     monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
 
     result = runner.invoke(cli, ["config", "get", "console.width", *flag])

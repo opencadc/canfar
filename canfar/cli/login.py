@@ -18,7 +18,7 @@ from canfar.server import (
     activate,
     discover,
 )
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 
 def _authentication_exists_on_disk(idp: str) -> bool:
@@ -142,6 +142,7 @@ def register_login_command(app: typer.Typer) -> None:
         ] = 10,
     ) -> None:
         """Login to CANFAR Science Platform."""
+        emit_cli_active_server_banner()
         selected_idp = idp or select_idp(list_idps())
         try:
             get_idp(selected_idp)

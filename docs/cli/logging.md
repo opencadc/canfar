@@ -189,8 +189,8 @@ leaf flags have domain-specific meanings and do not select the logging level:
 | `canfar ps --debug` | Show Session response warnings. |
 | `canfar create KIND IMAGE --debug` | Print parsed Session request details. |
 
-Logging-only `--debug` flags were removed from `login`, the deprecated
-`auth login` alias, `delete`, `events`, `logs`, `open`, `prune`, and `stats`.
+Logging-only `--debug` flags were removed from `login`, `delete`, `events`,
+`logs`, `open`, `prune`, and `stats`.
 Use a root control instead:
 
 ```bash

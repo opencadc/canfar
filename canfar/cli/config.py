@@ -13,13 +13,10 @@ from canfar.cli import output
 from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.config import Configuration
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-config: typer.Typer = typer.Typer(
-    cls=AliasGroup,
-)
+config: typer.Typer = typer.Typer()
 
 
 def _configuration_failure(error: Exception) -> StructuredError:
@@ -43,6 +40,8 @@ def show(
 ) -> None:
     """Display client configuration."""
     mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -103,6 +102,8 @@ def get(
     canfar config get servers.canfar.url
     """
     mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -154,6 +155,7 @@ def set_value(
     canfar config set active.authentication cadc
     canfar config set servers.canfar.url https://ws-uv.canfar.net/skaha
     """
+    emit_cli_active_server_banner()
     cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         parsed = yaml.safe_load(value)
@@ -167,4 +169,5 @@ def set_value(
 @config.command("path", help="Local path of config")
 def path() -> None:
     """Local path of config."""
+    emit_cli_active_server_banner()
     get_console().print(f"[green]{CONFIG_PATH}[/green]")

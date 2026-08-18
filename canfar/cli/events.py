@@ -11,7 +11,7 @@ from rich.table import Table
 
 from canfar.cli._run import run
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 events = typer.Typer(
     name="events",
@@ -28,6 +28,7 @@ def get_events(
     ],
 ) -> None:
     """Get events from the science platform server."""
+    emit_cli_active_server_banner()
 
     async def _get_events() -> None:
         """Fetch events for the requested sessions and render them."""

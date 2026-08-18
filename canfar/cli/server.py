@@ -14,7 +14,6 @@ from canfar.cli import output
 from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
@@ -26,7 +25,7 @@ from canfar.server import (
 from canfar.server import (
     use as server_use,
 )
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from canfar.models.http import Server
@@ -35,7 +34,6 @@ server = typer.Typer(
     name="server",
     help="Manage science platform servers.",
     no_args_is_help=True,
-    cls=AliasGroup,
 )
 
 
@@ -63,7 +61,7 @@ def _render_server_list_table(servers: list[Server]) -> None:
     get_console().print(table)
 
 
-@server.command("list, ls")
+@server.command("ls")
 def server_list_command(
     output_format: OutputOption = None,
 ) -> None:
@@ -118,6 +116,7 @@ def server_list_command(
         output.to_stdout(servers, mode)
         return
 
+    emit_cli_active_server_banner()
     _render_server_list_table(servers)
 
 
@@ -126,6 +125,7 @@ def server_use_command(
     selector: Annotated[str, typer.Argument(help="Server name or URI.")],
 ) -> None:
     """Select the active server by name or URI."""
+    emit_cli_active_server_banner()
     try:
         server_use(selector)
     except ServerSelectorError as exc:

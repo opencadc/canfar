@@ -8,6 +8,7 @@ import click
 import httpx
 import typer
 from pydantic import ValidationError
+from typer.core import TyperCommand, TyperGroup
 
 from canfar.cli import output
 from canfar.cli._run import run
@@ -15,12 +16,11 @@ from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import CreateRequest
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Context
@@ -31,15 +31,15 @@ kinds: list[str] = list(get_args(Kind))
 kinds.remove("desktop-app")
 
 
-class CreateUsageMessage(AliasGroup):
-    """Custom usage message for prune command.
+class CreateUsageMessage(TyperGroup):
+    """Custom usage message for create command.
 
     Args:
         typer (TyperGroup): Base class for grouping commands in Typer.
     """
 
     def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
-        """Get the usage message for the prune command.
+        """Get the usage message for the create command.
 
         Args:
             ctx (typer.Context): The Typer context.
@@ -47,6 +47,14 @@ class CreateUsageMessage(AliasGroup):
         Returns:
             str: The usage message.
         """
+        return "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]"
+
+
+class CreateCommandUsageMessage(TyperCommand):
+    """Keep the root create usage text aligned with its delimiter contract."""
+
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
+        """Return the documented create usage line."""
         return "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]"
 
 
@@ -214,6 +222,8 @@ def creation(  # noqa: PLR0917
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
     mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     if dry and mode is not output.OutputMode.HUMAN:
         typer.echo(
             "Incompatible flags: --dry-run cannot be used with --output json or "

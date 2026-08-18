@@ -14,7 +14,7 @@ from rich.table import Table
 from canfar.cli._run import run
 from canfar.models.session import FetchResponse
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 info = typer.Typer(
     name="info",
@@ -183,4 +183,5 @@ def get_info(
     ] = False,
 ) -> None:
     """Get detailed information about one or more sessions."""
+    emit_cli_active_server_banner()
     run(_get_info(session_ids, debug))
