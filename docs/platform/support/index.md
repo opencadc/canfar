@@ -26,7 +26,7 @@ canfar server use SERVER_NAME
 canfar config get active.server -o json
 ```
 
-Use the identity provider and Server Name supplied by your platform operator.
+Use the Identity Provider (IDP) and Server Name supplied by your platform operator.
 Do not paste certificates, tokens, or passwords into a support request.
 
 ### A Session is not ready
@@ -72,7 +72,7 @@ Email [support@canfar.net](mailto:support@canfar.net) for account access,
 project membership, persistent data errors, service outages, or a Session that
 remains Pending after the platform's normal queue interval. Include:
 
-- the Server Name and identity provider;
+- the Server Name and Identity Provider (IDP);
 - the command or UI action, with paths and image references redacted as needed;
 - the Session ID and status, if applicable;
 - the time and timezone;
