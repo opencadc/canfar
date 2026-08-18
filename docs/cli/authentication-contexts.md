@@ -1,41 +1,76 @@
 # Authentication and Servers
 
-CANFAR separates identity from routing:
+CANFAR keeps identity and routing separate:
 
-- **Authentication** answers "who am I?"
-- **Identity Provider (IDP)** names the organization that authenticates you,
-  such as `cadc` or `srcnet`.
-- **Science Platform Server** is the endpoint that runs Sessions.
-- **Server selection** chooses which compatible Server receives new requests.
+- **Authentication** owns the user's identity and credentials.
+- An **Identity Provider (IDP)** issues that identity. The built-in keys are
+  `cadc` (X.509) and `srcnet` (OIDC Device Authorization).
+- A **Science Platform Server** runs Sessions.
+- **Server Selection** chooses the Science Platform Server for new requests.
 
-`canfar login` handles the full interactive path: choose an IDP, authenticate,
-discover compatible Servers, select one, and save the active pair.
+The active Authentication Record and Server Selection are saved together in
+the local Configuration. Existing Sessions remain on the Science Platform
+Server where they were launched.
 
-## Log in
+## Login
 
 ```bash
-canfar login
+canfar login [IDP]
+```
+
+When `IDP` is omitted, the CLI prompts for one. Use these options when needed:
+
+| Option | Effect |
+| --- | --- |
+| `--force`, `-f` | Obtain new credentials and rediscover instead of refusing an existing record. |
+| `--dev` | Include development registries and endpoints during Server Discovery. |
+| `--timeout`, `-t` | HTTP timeout in seconds for login requests; default `10`. |
+
+Login authenticates the selected IDP, discovers compatible Science Platform
+Servers, selects one when necessary, and saves the Authentication Record and
+Server Selection. A saved record causes a repeat login to fail unless
+`--force` is supplied.
+
+### CADC X.509
+
+```bash
 canfar login cadc
+```
+
+The CLI reuses a usable X.509 certificate when possible. Use `--force` to
+obtain a replacement. If the certificate is expired, login reports that and
+continues with certificate acquisition.
+
+### SRCNet OIDC Device Authorization
+
+```bash
 canfar login srcnet
 ```
 
-Useful options:
+The CLI performs OIDC discovery and dynamic client registration, then presents
+the Device Authorization challenge in the terminal:
 
-| Option | Use |
-| --- | --- |
-| `--force`, `-f` | Re-authenticate an IDP that already has saved credentials. |
-| `--dev` | Include development Servers during discovery. |
-| `--timeout`, `-t` | Increase HTTP timeout for login, discovery, and validation. |
+1. It prints a verification URL, user code, and a terminal QR code.
+2. It opens the verification URL in the default browser when possible.
+3. You sign in and approve the request in the browser.
+4. The CLI polls for approval and shows progress until the IDP returns tokens.
 
-Logging controls are root options. Put them before `login` when troubleshooting:
+If the browser cannot be opened, visit the printed URL manually. The device
+challenge has an IDP-provided expiry; `--timeout` controls HTTP requests and
+does not extend that challenge. Denial, expiry, malformed responses, and
+network failures stop login with an error; run the command again after fixing
+the cause.
+
+For troubleshooting, put root logging options before `login`:
 
 ```bash
+canfar --log-level debug login srcnet
 canfar --log-level debug login cadc --force
 ```
 
-See [Logging](logging.md) for level precedence and stream separation.
+See [Logging](logging.md) for precedence and stream routing.
 
-## Inspect authentication
+## Inspect Authentication
 
 ```bash
 canfar auth
@@ -43,73 +78,77 @@ canfar auth show
 canfar auth ls
 ```
 
-`canfar auth` defaults to `canfar auth show`.
-
-Use machine output when a script needs stable stdout:
+Bare `canfar auth` defaults to `auth show`. Human output includes the active
+Server Selection when one is available. For scripts, use machine output on the
+data-producing form:
 
 ```bash
 canfar auth show -o json
 canfar auth ls --output yaml
 ```
 
-## Switch IDP
+The machine payload is an Authentication object or list of Authentication
+objects. It contains the canonical IDP key, display name, Authentication Mode,
+expiry, active state, and associated Server Name; it does not contain raw
+credential material.
+
+## Change or remove state
+
+Switch to a saved Authentication Record by canonical IDP key:
 
 ```bash
 canfar auth use srcnet
 canfar auth use cadc
 ```
 
-When you switch IDP, CANFAR tries to keep routing usable:
+When switching, CANFAR reuses a compatible remembered Server Selection when
+one exists. If several compatible Servers need a choice, the CLI prompts for a
+Server URI or list number.
 
-1. Reuse the current Server when it belongs to the target IDP.
-2. Reuse the remembered Server for that IDP when it is still valid.
-3. Auto-select the only compatible Server.
-4. Prompt when multiple compatible Servers exist.
+Remove one Authentication Record and its associated Servers with:
 
-## Manage Servers
+```bash
+canfar auth rm srcnet
+canfar auth rm srcnet --force
+```
+
+Removing the active Authentication asks for confirmation unless `--force` is
+used. To reset all Authentication and Server state, use the required force
+flag:
+
+```bash
+canfar auth purge --force
+```
+
+The purge restores built-in defaults and preserves unrelated registry and
+console settings.
+
+## Server Selection
 
 ```bash
 canfar server ls
+canfar server ls -o json
+canfar server use SELECTOR
+```
+
+`server ls` lists the saved Servers for the active IDP. If none are saved, it
+runs discovery and persists the result. Its machine payload is a list of
+Server records and is data-only on stdout.
+
+`server use` accepts either a Server Name or an IVOA URI:
+
+```bash
 canfar server use canfar
 canfar server use ivo://cadc.nrc.ca/skaha
 ```
 
-Server names are convenient for humans. Server URIs are stable for scripts.
+The persisted `active.server` value is the Server Name. The IVOA URI is
+discovery metadata and can still be used as a selector.
 
-`canfar server ls` shows Servers for the active IDP. If no saved Servers exist
-for that IDP, the command runs discovery and stores the results.
+## Configuration shape
 
-## Remove saved auth state
-
-```bash
-canfar auth rm srcnet
-canfar auth purge --force
-```
-
-`auth rm <idp>` removes the Authentication record and Servers associated with
-that IDP. Removing the active IDP asks for confirmation unless `--force` is
-passed.
-
-`auth purge --force` resets Authentication and Server state while preserving
-unrelated configuration such as console and Container Registry settings.
-
-## Python equivalents
-
-```python
-import canfar
-
-canfar.login("cadc")
-canfar.server.use("ivo://cadc.nrc.ca/skaha")
-canfar.authentication.use("srcnet")
-```
-
-Python helpers are noninteractive. CLI commands own prompts and human rendering.
-
-## Configuration
-
-The current config shape is versioned with `version: 1`. Authentication
-records are keyed by IDP and Servers are keyed by Server Name; `active.server`
-references a Server by name.
+The persisted shape separates Authentication Records and Science Platform
+Servers. `active.server` refers to a Server Name, not an IVOA URI:
 
 ```yaml
 version: 1
@@ -126,33 +165,19 @@ servers:
     url: https://ws-uv.canfar.net/skaha
 ```
 
-Dict keys make every value reachable with dotted paths:
+Use `canfar config get` and `canfar config set` for dotted configuration
+paths. Values passed to `config set` are parsed as YAML:
 
 ```bash
+canfar config get active.server
 canfar config get servers.canfar.url
-canfar config get authentication.cadc.path
+canfar config set console.banner false
 ```
 
-Environment overrides use nested active fields:
+Environment overrides use the same nested names, for example:
 
 ```bash
-CANFAR_ACTIVE__AUTHENTICATION=srcnet
-CANFAR_ACTIVE__SERVER=canfar
+CANFAR_CONSOLE__BANNER=false canfar auth show
 ```
 
-Legacy or unsupported config files are backed up to
-`<config-path>.<timestamp>.back` before a default config is written.
-
-## Machine output rules
-
-| Rule | Behavior |
-| --- | --- |
-| Output option | `-o/--output` with `json` or `yaml` |
-| Placement | Put the option after the command that emits data, for example `canfar auth ls -o json`. |
-| Unsupported placement | `canfar auth -o json ls` exits 2. |
-| stdout | Data only in machine mode. |
-| stderr | Diagnostics and errors. |
-| Unsupported commands | Leaf commands without machine output do not define `-o/--output`; Click rejects the option with exit 2 and a parser error on stderr. |
-
-Lists have no ordering guarantee. Scripts should select by IDP key, Server
-Name, URI, Session ID, or another stable field.
+The complete command and machine-output contract is in the [CLI reference](cli-help.md).

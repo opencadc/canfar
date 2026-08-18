@@ -1,16 +1,12 @@
 # Logging
 
-CANFAR configures logging only at an explicit application entry point. The CLI
-does this once before dispatching a command. Python applications can call
-`canfar.configure_logging(...)` themselves; importing `canfar` does not configure
-handlers or consoles.
+The CLI configures Python standard-library logging once at the root entry
+point. Human logs use Rich on stderr. File logging is opt-in and writes a
+rotating JSON Lines file.
 
-Logging uses Python's standard `logging` library with Rich for human stderr
-output, plus an optional rotating JSON Lines file sink.
+## Controls and precedence
 
-## CLI controls and precedence
-
-Logging controls are root options, so put them before the command:
+Root controls must precede the command:
 
 ```bash
 canfar --log-level debug ps
@@ -18,98 +14,29 @@ canfar -vvv ps
 canfar --log-file ./logs/canfar.jsonl ps
 ```
 
-The supported controls are:
-
-| Control | Effect |
+| Control | Result |
 | --- | --- |
 | No CLI control | Use `CANFAR_LOGLEVEL`, or `critical` when it is unset. |
-| `-v` | `error` |
-| `-vv` | `warning` |
-| `-vvv` | `info` |
-| `-vvvv` or more | `debug` |
+| `-v` | `error`; `-vv` is `warning`; `-vvv` is `info`; `-vvvv` and above are `debug`. |
 | `--log-level LEVEL` | Select `critical`, `error`, `warning`, `info`, or `debug`. |
-| `--log-file PATH` | Add the rotating JSON Lines file sink described below. |
+| `--log-file PATH` | Add the rotating JSON Lines file sink. |
 
-Precedence is:
+Precedence is `--log-level`, repeated `-v`, `CANFAR_LOGLEVEL`, then the
+packaged `critical` default. Level names are case-insensitive. A value in
+`CANFAR_LOGLEVEL` is validated only when it is the effective source; unknown
+`CANFAR_*` variables do not affect logging.
 
-1. `--log-level`
-2. repeated `-v`
-3. `CANFAR_LOGLEVEL`
-4. the packaged default, `critical`
-
-`--log-level` therefore wins when it is combined with `-v`. Level names are
-case-insensitive.
-
-The machine-output option remains a leaf option after the command. For example:
+The machine-output option remains owned by the leaf command:
 
 ```bash
 canfar --log-level debug ps -o json
 ```
 
-The corresponding environment setting is:
+## Streams and machine output
 
-```bash
-CANFAR_LOGLEVEL=info canfar ps
-```
-
-Only the documented CANFAR logging variables affect this policy. Unknown
-CANFAR logging variables are ignored.
-
-## Python applications
-
-Call the same runtime seam explicitly in a Python application:
-
-```python
-from canfar import configure_logging
-
-configure_logging(loglevel="debug")
-```
-
-Calling `configure_logging()` without a level uses `CANFAR_LOGLEVEL`, then the
-packaged `critical` default. A Python process that never calls this function
-retains the logging configuration chosen by its application.
-
-To add a file sink, pass a `pathlib.Path`:
-
-```python
-from pathlib import Path
-
-from canfar import configure_logging
-
-configure_logging(
-    loglevel="info",
-    log_file=Path("logs/canfar.jsonl"),
-)
-```
-
-There is no per-`HTTPClient`, `Session`, or `AsyncSession` log-level setting.
-
-## HTTP request and response debug
-
-At `debug` (for example `--log-level debug` or `-vvvv`), every Science Platform
-HTTP call logs the request method and full URL, then the response status and
-body:
-
-```text
-DEBUG  GET https://ws-uv.canfar.net/skaha/v0/session?status=Running
-DEBUG  HTTP STATUS CODE -> 200
-[{"id":"...","status":"Running",...}]
-```
-
-These lines follow the normal logging policy: stderr (and the optional file
-sink), never mixed into `-o json`/`--output yaml` stdout payloads.
-
-## stdout and stderr
-
-CANFAR keeps command data separate from diagnostics:
-
-| Stream | Content |
-| --- | --- |
-| stdout | Human command results or the selected JSON/YAML data payload. |
-| stderr | Rich-oriented logs, warnings, and errors; structured diagnostics in machine mode. |
-
-JSON and YAML stdout remain data-only at every log level. Redirect the streams
-independently when a script needs both:
+Human command results go to stdout. Logs, warnings, and errors go to stderr.
+With `-o json` or `--output yaml`, stdout contains only the selected command
+payload; logs and structured diagnostics remain on stderr:
 
 ```bash
 canfar --log-level debug ps -o json \
@@ -117,86 +44,64 @@ canfar --log-level debug ps -o json \
   2> diagnostics.log
 ```
 
-In `-o json` or `--output yaml` mode, logging setup failures and file-sink warnings are
-serialized in the selected format on stderr. They never add a banner or log
-line to the command payload on stdout.
+Logging setup warnings use the selected machine format on stderr when a leaf
+output mode is present. They never add a banner or log record to the machine
+payload on stdout.
 
-## Rotating JSON Lines file sink
+At `debug`, Science Platform HTTP hooks log the request method and URL and the
+response status and body. These records follow the same stderr/file routing;
+do not enable debug logging if response bodies must remain private.
 
-File logging is opt-in. Use the root option or the Python `Path` argument shown
-above. Relative paths resolve from the current working directory, and missing
-parent directories are created.
+## JSON Lines file sink
 
-When enabled, events go to both stderr and the file. The file policy is fixed:
+File logging is enabled only with `--log-file PATH`. Relative paths resolve
+from the current working directory and missing parent directories are created.
+There is no default log file and no temporary-file fallback. `-` and an
+existing directory are invalid targets.
 
-- UTF-8 JSON Lines, one object per physical line;
-- size-based rotation at 10 MiB;
-- 10 backup files; and
-- escaped exception and stack text so a record never spans physical lines.
+The sink is UTF-8 JSON Lines with size-based rotation at 10 MiB and ten backup
+files. Each event contains:
 
-There is no default log file, configuration-file log path, or temporary-file
-fallback. In particular, CANFAR does not write `~/.canfar/client.log` unless
-that exact path is explicitly requested.
-
-An existing directory and the pseudo-target `-` are invalid file paths. Other
-initialization, write, or rollover failures disable only the file sink, keep
-stderr logging and command execution active, and emit one
-`logging.file_sink_unavailable` warning.
-
-### JSON Lines schema
-
-Every file event contains:
-
-| Field | Required | Meaning |
-| --- | --- | --- |
-| `timestamp` | Yes | UTC RFC3339 timestamp with `Z` suffix and millisecond precision. |
-| `level` | Yes | Logging level name, such as `INFO` or `ERROR`. |
-| `logger` | Yes | Logger name, such as `canfar.sessions`. |
-| `message` | Yes | Rendered message. |
-| `exception` | No | Escaped exception or stack text. |
-
-Example shape:
-
-```json
-{"timestamp":"2026-07-11T12:34:56.789Z","level":"INFO","logger":"canfar.sessions","message":"Session request accepted"}
-```
-
-Authentication Record secrets use Pydantic `SecretStr` and render as masked
-values in Configuration dumps. Do not log raw token or certificate material.
-
-## Stable logging diagnostics
-
-Logging diagnostics use stable dotted-domain codes:
-
-| Code | Behavior and details |
+| Field | Meaning |
 | --- | --- |
-| `logging.invalid_env_value` | Fatal setup error. Includes `env_var`, `provided_value`, and `expected`. |
-| `logging.invalid_file_path` | Fatal setup error for `-` or an existing directory. Includes the standard `code`, `message`, and `hint` fields. |
-| `logging.file_sink_unavailable` | Non-fatal warning for initialization, write, or rollover failure. The command continues with stderr logging; machine mode emits a structured warning on stderr. |
+| `timestamp` | UTC RFC3339 timestamp with millisecond precision and a `Z` suffix. |
+| `level` | Logging level such as `INFO` or `ERROR`. |
+| `logger` | Logger name such as `canfar.sessions`. |
+| `message` | Rendered message. |
+| `exception` | Escaped exception or stack text when present. |
 
-Fatal logging setup errors exit with status 2 before the command executes.
-The file-sink warning does not replace the command's normal exit status.
+One JSON object occupies one physical line. Authentication Record secrets are
+masked by their secret types; do not treat log output as a place to expose
+credential material.
 
-## Domain `--debug` flags
+## Setup diagnostics
 
-Root logging controls and command diagnostics are separate. These retained
-leaf flags have domain-specific meanings and do not select the logging level:
+| Code | Meaning |
+| --- | --- |
+| `logging.invalid_env_value` | `CANFAR_LOGLEVEL` is invalid. Setup stops before the command. |
+| `logging.invalid_file_path` | `--log-file` is `-` or an existing directory. Setup stops before the command. |
+| `logging.file_sink_unavailable` | The file sink cannot initialize, write, or rotate. The command continues with stderr logging. |
 
-| Command | `--debug` meaning |
+The first two are fatal setup errors and exit with status `2`. A file-sink
+failure is non-fatal and disables only that sink. In machine mode its warning
+is a structured payload on stderr; the command's normal exit status is kept.
+
+## Domain `--debug` options
+
+Root logging controls and command diagnostics are separate. These are the
+retained leaf `--debug` meanings:
+
+| Command | Meaning |
 | --- | --- |
 | `canfar version --debug` | Show environment and dependency details for a bug report. |
 | `canfar info SESSION_ID --debug` | Show Session response warnings. |
 | `canfar ps --debug` | Show Session response warnings. |
 | `canfar create KIND IMAGE --debug` | Print parsed Session request details. |
 
-Logging-only `--debug` flags were removed from `login`, `delete`, `events`,
-`logs`, `open`, `prune`, and `stats`.
-Use a root control instead:
+Other leaves do not use `--debug` as a logging switch. Use a root control,
+for example:
 
 ```bash
-canfar --log-level debug login cadc --force
-canfar --log-level debug info abc123 --debug
+canfar --log-level debug login srcnet
+canfar --log-level debug info SESSION_ID --debug
 ```
-
-The second example requests both debug-level logs and the independent Session
-response-anomaly details.
