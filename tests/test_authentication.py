@@ -177,7 +177,19 @@ class TestAuthenticationUse:
         config_path = tmp_path / "config.yaml"
         _write_config(config_path, config_data)
 
-        with _patch_config(config_path):
+        with (
+            _patch_config(config_path),
+            patch.object(
+                canfar.models.config.Configuration,
+                "set_active_authentication",
+                side_effect=AssertionError("Platform owns Server Selection updates"),
+            ),
+            patch.object(
+                canfar.models.config.Configuration,
+                "save",
+                side_effect=AssertionError("persist through config.editor"),
+            ),
+        ):
             canfar.authentication.use("srcnet")
             config = canfar.models.config.Configuration()
 

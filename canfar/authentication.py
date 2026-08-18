@@ -112,7 +112,7 @@ def use(idp: str) -> None:
             hint="Run canfar.login() for this IDP before selecting it.",
         ) from exc
 
-    _select_authentication(config, idp)
+    server_service.activate_authentication(idp, config=config)
 
 
 def list() -> builtins.list[Authentication]:  # noqa: A001
