@@ -5,7 +5,9 @@ from __future__ import annotations
 from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
 from typing import TYPE_CHECKING, Annotated
 
+import click
 import typer
+from typer.core import TyperGroup
 
 from canfar.cli import output
 from canfar.cli.auth import auth
@@ -38,7 +40,39 @@ if TYPE_CHECKING:
     from canfar.errors import StructuredError
 
 
-_MACHINE_OUTPUT_GROUPS = frozenset({"auth", "config", "create", "ps", "server"})
+_ROOT_CHILD_ARGS_META_KEY = "canfar.root_child_args"
+
+
+def _leaf_output_mode(args: list[str]) -> output.OutputMode:
+    """Infer a leaf output option before root setup has completed."""
+    for index, arg in enumerate(args):
+        if arg == "--":
+            break
+        if arg in {"-o", "--output"} and index + 1 < len(args):
+            value = args[index + 1]
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+        if arg.startswith("--output=") and arg.removeprefix("--output=") in {
+            "json",
+            "yaml",
+        }:
+            return output.OutputMode(arg.removeprefix("--output="))
+        if arg.startswith("-o") and arg not in {"-o", "--output"}:
+            value = arg.removeprefix("-o")
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+    return output.OutputMode.HUMAN
+
+
+class _RootTyperGroup(TyperGroup):
+    """Capture child argv so root setup can infer a leaf output mode."""
+
+    def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
+        """Record unconsumed child arguments without changing dispatch."""
+        child_args = super().parse_args(ctx, args)
+        if ctx.parent is None:
+            ctx.meta[_ROOT_CHILD_ARGS_META_KEY] = list(child_args)
+        return child_args
 
 
 def callback(
@@ -66,17 +100,11 @@ def callback(
             help="Write JSON Lines logs to this file.",
         ),
     ] = None,
-) -> None:
+    ) -> None:
     """Main callback that handles no subcommand case."""
     activate_cli_root(ctx)
-    # Root setup runs before a nested command parses its own options.  Commands
-    # that own machine output therefore use structured setup diagnostics; all
-    # other root commands retain the human diagnostic path.
-    setup_mode = (
-        output.OutputMode.JSON
-        if ctx.invoked_subcommand in _MACHINE_OUTPUT_GROUPS
-        else output.OutputMode.HUMAN
-    )
+    child_args: list[str] = ctx.meta.get(_ROOT_CHILD_ARGS_META_KEY, [])
+    setup_mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:
         if setup_mode is output.OutputMode.HUMAN:
@@ -116,6 +144,7 @@ cli: typer.Typer = typer.Typer(
     rich_help_panel="CANFAR CLI Commands",
     callback=callback,
     invoke_without_command=True,
+    cls=_RootTyperGroup,
 )
 
 register_login_command(cli)
