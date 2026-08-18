@@ -1,37 +1,25 @@
 # Python Client Examples
 
-These examples show the sync and async Session interfaces.
+The examples assume that an Authentication Record exists:
 
-!!! note "Assumption"
-      ```bash title="Authenticated via CLI"
-      canfar login cadc
-      ```
+```bash
+canfar login cadc
+```
+
+They use the public `Session` and `AsyncSession` classes directly. Both clients
+preserve the same result shapes.
 
 ## Create Sessions
 
 ### Notebook
 
-=== "Flexible Mode (Default)"
+Omit `cores` and `ram` for the server's flexible allocation policy, or pass them
+for a fixed resource request:
 
-    ```python
-    from canfar.sessions import Session
+```python
+from canfar.sessions import Session
 
-    session = Session()
-    ids = session.create(
-        name="my-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="notebook",
-    )
-    print(ids)  # ["d1tsqexh"]
-    session.connect(ids)
-    ```
-
-=== "Fixed Mode"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
+with Session() as session:
     ids = session.create(
         name="my-notebook",
         image="images.canfar.net/skaha/astroml:latest",
@@ -39,317 +27,149 @@ These examples show the sync and async Session interfaces.
         cores=2,
         ram=4,
     )
-    print(ids)  # ["d1tsqexh"]
-    session.connect(ids)
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    session = AsyncSession()
-    ids = await session.create(
-        name="my-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="notebook",
-    )
-    print(ids)  # ["d1tsqexh"]
-    await session.connect(ids)
-    ```
+    print(ids)  # list[str]
+    if ids:
+        session.connect(ids)
+```
 
 ### Headless
 
-- Headless Sessions are containers that execute a command and exit when complete without user interaction.
-- They are useful for batch processing and distributed computing.
+Headless Sessions run a command and exit. `cmd`, `args`, and `env` are valid
+for headless Sessions:
 
+```python
+from canfar.sessions import Session
 
-=== "Replicated Headless Sessions"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
+with Session() as session:
     ids = session.create(
         name="my-headless",
-        image="images.canfar.net/skaha/astroml:latest",
+        image="images.canfar.net/skaha/terminal:latest",
         kind="headless",
-        cmd="echo",
-        args="Hello, World!",
+        cmd="python",
+        args="/arc/projects/demo/run.py",
+        env={"DATASET": "example"},
+        replicas=3,
     )
-    print(ids)  # ["d1tsqexh"]
-    ```
+    print(ids)  # successful Session IDs only
+```
 
-=== "`async`"
+If one replica fails, `create()` logs the failure and omits that ID. If all
+replicas fail, it returns `[]`.
 
-    ```python
-    from canfar.sessions import AsyncSession
+## Discover and filter Sessions
 
-    session = AsyncSession()
-    ids = await session.create(
-        name="my-headless",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="headless",
-        cmd="echo",
-        args="Hello, World!",
-    )
-    print(ids)  # ["d1tsqexh"]
-    ```
+`fetch()` returns the server's list of dictionaries as
+`list[dict[str, str]]`:
+
+```python
+from canfar.sessions import Session
+
+with Session() as session:
+    all_sessions = session.fetch()
+    running = session.fetch(kind="notebook", status="Running")
+    print(len(all_sessions), running)
+```
+
+Supported kind values are `desktop`, `notebook`, `carta`, `headless`, `firefly`,
+`desktop-app`, and `contributed`. Status filters include `Pending`, `Running`,
+`Terminating`, `Succeeded`, `Completed`, `Error`, and `Failed`.
+
+## Inspect, events, and logs
+
+```python
+from canfar.sessions import Session
+
+with Session() as session:
+    ids = ["session-id"]
+    details = session.info(ids)       # list[dict[str, Any]]
+    events = session.events(ids)      # list[dict[str, str]]
+    logs = session.logs(ids)          # dict[str, str]
+    print(details, events, logs)
+```
+
+Passing `verbose=True` to `events()` or `logs()` sends the result through the
+`canfar.sessions` logger and returns `None`. Configure logging with
+`canfar.configure_logging()` when an application needs to display it.
+
+## Async workflow
+
+`AsyncSession` uses the native asynchronous transport. Keep the work inside an
+async function and close the client with `async with`:
+
+```python
+from canfar.sessions import AsyncSession
 
 
-!!! example "Replica Environment Variables"
-    All containers receive the following environment variables:
-    - `REPLICA_COUNT` — common total number of replicas
-    - `REPLICA_ID` — 1-based index of the replica (1..N)
-
-    Use these to partition work deterministically. See [Helpers API Reference](helpers.md) for `chunk` and `stripe`.
-
-!!! warning "Private Container Registry Access"
-    Use a private Harbor image by providing registry credentials via configuration.
-    ```python
-    import asyncio
-    from canfar.sessions import AsyncSession
-    from canfar.models.registry import ContainerRegistry
-    from canfar.models.config import Configuration
-
-    async def main():
-        cfg = Configuration(registry=ContainerRegistry(username="username", secret="CLI_SECRET"))
-        session = AsyncSession(config=cfg)
+async def main() -> None:
+    async with AsyncSession() as session:
         ids = await session.create(
-            name="private-job",
-            image="images.canfar.net/your/private-image:latest",
+            name="async-headless",
+            image="images.canfar.net/skaha/terminal:latest",
             kind="headless",
             cmd="python",
-            args="/app/run.py",
+            args="/arc/projects/demo/run.py",
         )
-        print(ids)
+        if ids:
+            running = await session.fetch(kind="headless", status="Running")
+            details = await session.info(ids)
+            events = await session.events(ids)
+            logs = await session.logs(ids)
+            print(running, details, events, logs)
+```
 
-    asyncio.run(main())
-    ```
+## Cleanup
 
-## Resource Allocation Modes
+`destroy()` returns a `dict[str, bool]` keyed by requested Session ID. The
+filters after `prefix` in `destroy_with()` are keyword-only:
 
-CANFAR supports two resource allocation modes for your sessions. See the [resource allocation guide](../platform/concepts.md#resource-allocation-modes) for more information.
+```python
+from canfar.sessions import Session
 
-### Examples
-
-=== "Flexible Mode (Default)"
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    # No cores/ram specification - uses flexible allocation
-    ids = session.create(
-        name="flexible-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="notebook"
+with Session() as session:
+    print(session.destroy("session-id"))
+    print(
+        session.destroy_with(
+            "my-headless-",
+            kind="headless",
+            status="Completed",
+        )
     )
-    ```
+```
 
-=== "Fixed Mode"
-    ```python
-    from canfar.sessions import Session
+The equivalent async call is:
 
-    session = Session()
-    # Specify exact resources for guaranteed allocation
+```python
+from canfar.sessions import AsyncSession
+
+
+async def cleanup() -> None:
+    async with AsyncSession() as session:
+        result = await session.destroy_with(
+            "my-headless-",
+            kind="headless",
+            status="Completed",
+        )
+        print(result)
+```
+
+## Private Container Registry
+
+Use the Configuration data model when an image is private:
+
+```python
+from canfar.models.config import Configuration
+from canfar.models.registry import ContainerRegistry
+from canfar.sessions import Session
+
+config = Configuration(
+    registry=ContainerRegistry(username="username", secret="CLI_SECRET")
+)
+with Session(config=config) as session:
     ids = session.create(
-        name="fixed-notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="notebook",
-        cores=4,
-        ram=8
+        name="private-job",
+        image="images.canfar.net/project/private-image:latest",
+        kind="headless",
+        cmd="python",
+        args="/app/run.py",
     )
-    ```
-
-## Discover and Filter Sessions
-
-=== "Fetch All Sessions"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    all_sessions = session.fetch()
-    print(len(all_sessions))
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        all_sessions = await session.fetch()
-        print(len(all_sessions))
-    ```
-<br>
-
-=== "Fetch Running Notebooks"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    running = session.fetch(kind="notebook", status="Running")
-    print(running)
-    session.connect([item["id"] for item in running])
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        running = await session.fetch(kind="notebook", status="Running")
-        print(running)
-        await session.connect([item["id"] for item in running])
-    ```
-<br>
-
-=== "Fetch Completed Headless Sessions"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    completed = session.fetch(kind="headless", status="Succeeded")
-    print(completed)
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        completed = await session.fetch(kind="headless", status="Succeeded")
-        print(completed)
-    ```
-
-!!! success "Kinds & Status"
-
-    You can use any combination of the following kinds and status to filter sessions:
-
-    - Kinds: `desktop`, `notebook`, `carta`, `headless`, `firefly`, `desktop-app`, `contributed`
-    - Statuses: `Pending`, `Running`, `Terminating`, `Succeeded`, `Error`, `Failed`
-
-
-## Inspect Sessions
-
-Detailed information about the session, including resource usage, user IDs, and more.
-
-=== "Detailed Session Information"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    info = session.info(ids)
-    print(info)
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        info = await session.info(ids)
-        print(info)
-    ```
-
-## Events
-
-Events describe the steps taken by the Science Platform to launch your session
-
-=== "Session Events"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    events = session.events(ids, verbose=True)
-    print(events)
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        events = await session.events(ids, verbose=True)
-        print(events)
-    ```
-
-## Logs
-
-Logs contain the output from your session's containers. 
-
-!!! tip "Log Retention"
-    Logs are retained until your session is deleted. A completed session, i.e., `Succeeded`, `Failed`, or `Error` is kept for 24 hours before being deleted.
-
-=== "Session Logs"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    logs = session.logs(ids, verbose=True)
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        logs = await session.logs(ids, verbose=True)
-    ```
-
-## Cleanup Sessions
-
-!!! warning "Permanent Action"
-
-    Deleted sessions cannot be recovered.
-
-=== "Destroy Session(s)"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    result = session.destroy(ids)
-    print(result)  # {"id": True, ...}
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        result = await session.destroy(ids)
-        print(result)  # {"id": True, ...}
-    ```
-<br>
-=== "Bulk Destroy"
-
-    ```python
-    from canfar.sessions import Session
-
-    session = Session()
-    result = session.destroy_with(prefix="test-", kind="headless", status="Succeeded")
-    print(result)  # {"id": True, ...}
-    ```
-
-=== "`async`"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        result = await session.destroy_with(prefix="test-", kind="headless", status="Succeeded")
-        print(result)  # {"id": True, ...}
-    ```
+```

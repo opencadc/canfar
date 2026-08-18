@@ -1,13 +1,13 @@
 # Install and Set Up
 
-Use the CANFAR Python package when you want to automate Science Platform work:
+Use the CANFAR Python package to automate work on a Science Platform Server:
 launch Sessions, list Container Images, fetch logs, inspect state, and clean up
-resources from Python.
+resources.
 
 ## Install
 
 ```bash
-pip install canfar --upgrade
+pip install --upgrade canfar
 ```
 
 With `uv`:
@@ -16,106 +16,100 @@ With `uv`:
 uv add canfar
 ```
 
-## Log in
+## Authenticate
 
-Authenticate once from the CLI. Python then uses the active Authentication and
-Server selection.
+The simplest path is to authenticate with the CLI. Python then uses the saved
+Authentication Record and Server Selection:
 
 ```bash
 canfar login cadc
 ```
 
-For SRCNet:
+Use `canfar login srcnet` for an OIDC Identity Provider.
 
-```bash
-canfar login srcnet
-```
-
-Python can also start the SRCNet device flow directly:
+Python also exposes native synchronous and asynchronous login functions:
 
 ```python
 import canfar
 
-canfar.login("srcnet")
+canfar.login("srcnet", force=True)
 ```
 
-This prints the verification URL and device code and waits for approval. In an
-existing async event loop, await the native counterpart instead:
+For OIDC, Python login prints only the device-flow presentation data to the
+terminal, then waits for approval. The output has this shape:
+
+```text
+Verification URL: https://example.com/device
+Verification URL (complete): https://example.com/device?user_code=ABC123
+Device code: ABC123
+```
+
+The device code above is the user-facing code; the private OAuth device token is
+never printed. The Python API does not open a browser, render a QR code, or show
+CLI progress. The CLI login command owns those interactive presentation
+features.
+
+Inside an existing event loop, use `alogin()`; it performs native asynchronous
+OIDC I/O and does not call `asyncio.run()`:
 
 ```python
-async def authenticate():
-    await canfar.alogin("srcnet")
+import canfar
+
+
+async def authenticate() -> None:
+    await canfar.alogin("srcnet", force=True)
 ```
 
-Use the CLI for browser opening, QR output, and progress presentation.
-
-Force a fresh login when credentials expire or you want to replace saved state:
-
-```bash
-canfar login cadc --force
-```
-
-Check what Python will use:
-
-```bash
-canfar auth show
-canfar server ls
-```
+Both functions save the Authentication Record and discovered Science Platform
+Servers but do not change the active Authentication or Server Selection. They
+return `None`; an unknown Identity Provider raises `KeyError`, and credential or
+discovery failures raise `canfar.authentication.AuthenticationError`.
 
 ## Create a Session
 
 ```python
 from canfar.sessions import Session
 
-session = Session()
-ids = session.create(
-    kind="notebook",
-    image="images.canfar.net/skaha/astroml:latest",
-    name="my-analysis",
-)
-print(ids)
-```
-
-Open it in your browser:
-
-```python
-session.connect(ids)
-```
-
-## Use fixed resources
-
-Omit resources for flexible allocation. Pass `cores`, `ram`, and `gpus` when
-you need fixed resources.
-
-```python
-ids = session.create(
-    kind="headless",
-    image="images.canfar.net/skaha/astroml:latest",
-    name="batch-job",
-    cmd="python",
-    args="/arc/projects/demo/run.py",
-    cores=4,
-    ram=16,
-)
-```
-
-## Use async workflows
-
-```python
-from canfar.sessions import AsyncSession
-
-async with AsyncSession() as session:
-    ids = await session.create(
+with Session() as session:
+    ids = session.create(
         kind="notebook",
         image="images.canfar.net/skaha/astroml:latest",
-        name="async-analysis",
+        name="my-analysis",
     )
-    await session.connect(ids)
+    print(ids)
 ```
+
+`create()` returns `list[str]`. A failed replica is omitted and a total HTTP or
+network failure returns `[]`; request validation errors still raise.
+
+## Edit and save Configuration
+
+`Configuration` is the persisted data shape. Its top-level fields are
+`version`, `active`, `authentication`, `servers`, `registry`, and `console`.
+Authentication Records are keyed by Identity Provider, Science Platform Servers
+by Server Name, and `active` stores the selected references. The bound
+`config.editor` is the supported editing surface:
+
+```python
+from canfar.models.config import Configuration
+
+config = Configuration()
+width = config.editor.get("console.width")
+config.editor.set("console.width", 132)
+config.editor.set("servers.canfar.auths", ["x509", "oidc"])
+config.editor.save()
+```
+
+`get()` can return a scalar, mapping, or whole list through a dotted path. List
+indices are not supported. `set()` validates before mutating the bound model;
+invalid updates leave it unchanged. `save()` persists the validated
+Configuration atomically. The editor itself is not part of the serialized
+Configuration shape.
 
 ## Private Container Images
 
-Configure Container Registry credentials when you need private images.
+Pass a `ContainerRegistry` in the Configuration when creating a Session from a
+private image:
 
 ```python
 from canfar.models.config import Configuration
@@ -125,18 +119,18 @@ from canfar.sessions import Session
 config = Configuration(
     registry=ContainerRegistry(username="username", secret="CLI_SECRET")
 )
-session = Session(config=config)
-
-ids = session.create(
-    kind="notebook",
-    image="images.canfar.net/my-project/private-image:latest",
-    name="private-image-test",
-)
+with Session(config=config) as session:
+    ids = session.create(
+        kind="notebook",
+        image="images.canfar.net/my-project/private-image:latest",
+        name="private-image-test",
+    )
 ```
 
 ## Read next
 
 - [Python quickstart](quick-start.md)
 - [Examples](examples.md)
+- [Data access](data.md)
 - [Authentication and Servers](../cli/authentication-contexts.md)
 - [Session API](session.md)

@@ -1,83 +1,85 @@
-# skaha → canfar
+# `skaha` to `canfar`
 
-In summer 2025, the CANFAR Python client was moved from [shinybrar/skaha](https://github.com/shinybrar/skaha) to [opencadc/canfar](https://github.com/opencadc/canfar) to be officially supported by the Canadian Astronomy Data Centre (CADC). As part of this move, the Python package was renamed from `skaha` to `canfar` to better reflect a unified naming scheme across the CANFAR Science Platform.
+The supported Python package is now `canfar`, published from
+[opencadc/canfar](https://github.com/opencadc/canfar). The service endpoints
+and the historical `X-Skaha-*` request headers remain server-side contracts.
 
-This guide helps you migrate from the `skaha` Python package to `canfar`.
+## Imports
 
-## Summary of changes
+| Old import | Current import |
+| --- | --- |
+| `from skaha.session import Session` | `from canfar.sessions import Session` |
+| `from skaha.session import AsyncSession` | `from canfar.sessions import AsyncSession` |
+| `from skaha.client import SkahaClient` | `from canfar.client import HTTPClient` |
 
-- Package name: `skaha` → `canfar`.
-- **Breaking Changes**
-  - `skaha.session` → `canfar.sessions`.
-  - `headless` session `kind` parameter is no longer required.
-  - `session.info()` query now returns `Completed` instead of `Succeeded`.
-- Configuration path: `~/.skaha/config.yaml` → `~/.canfar/config.yaml`.
-- Logger name: `canfar`. Current releases write no default log file; file output
-  is explicit through root `--log-file` or a `pathlib.Path` passed to
-  `canfar.configure_logging()`. See
-  [Logging](../cli/logging.md).
-- Environment variables: prefix change `SKAHA_…` → `CANFAR_…`.
-- CLI entry point: `canfar` (single entry point).
-- User-Agent header: `python-canfar/{version}`.
-- Protocol contracts: server URLs and custom headers remain unchanged (see notes below).
+`Session` and `AsyncSession` are separate native clients with equivalent public
+operations. `create()` returns `list[str]`; `fetch()` returns
+`list[dict[str, str]]`. The filters after `destroy_with(prefix)` are
+keyword-only in both clients.
 
-## Code Examples
+```python
+from canfar.sessions import Session
 
-- Python client session
-
-    ```python title="Before"
-    from skaha.session import AsyncSession, Session
-    ```
-    
-    ```python title="After"
-    from canfar.sessions import AsyncSession, Session
-    ```
-
-- Client composition
-
-    ```python title="Before"
-    from skaha.client import SkahaClient
-
-    client = SkahaClient(...)
-    ```
-
-    ```python title="After"
-    from canfar.client import HTTPClient
-
-    client = HTTPClient(...)
-    ```
-
-## Environment variables
-
-```bash title="Before"
-SKAHA_TIMEOUT, SKAHA_CONCURRENCY, SKAHA_TOKEN, SKAHA_URL, SKAHA_LOGLEVEL
+with Session() as session:
+    ids = session.create(
+        name="migrated-job",
+        image="images.canfar.net/skaha/terminal:latest",
+    )
 ```
-```bash title="After"
-CANFAR_TIMEOUT, CANFAR_CONCURRENCY, CANFAR_TOKEN, CANFAR_URL, CANFAR_LOGLEVEL
-```
+
+`kind` defaults to `"headless"` when it is omitted. For headless Sessions,
+`cmd`, `args`, and `env` remain available; interactive kinds do not accept
+headless command fields.
 
 ## Configuration
 
-- The default config file moves from `~/.skaha/config.yaml` to `~/.canfar/config.yaml`.
-- Current config files are versioned with `version: 1`.
-- Authentication records and Science Platform Servers are stored separately.
-- Active routing is stored under `active.authentication` and `active.server`.
-- Legacy or unsupported config files are backed up to
-  `<config-path>.<timestamp>.back` before a default config is written.
+The default file moves from `~/.skaha/config.yaml` to
+`~/.canfar/config.yaml`. The current persisted shape separates:
 
-After a legacy reset, run:
+- `authentication`: Authentication Records keyed by Identity Provider;
+- `servers`: Science Platform Servers keyed by Server Name; and
+- `active.authentication` / `active.server`: the active references.
 
-```bash
-canfar login cadc
+Use the bound `Configuration.editor` for validated dotted updates and atomic
+persistence. Do not call the removed Configuration service methods:
+
+```python
+from canfar.models.config import Configuration
+
+config = Configuration()
+config.editor.set("console.width", 132)
+config.editor.save()
 ```
 
-## Documentation and links
+See [Install and set up](get-started.md#edit-and-save-configuration) for the
+full editor contract.
 
-- Repo: `https://github.com/opencadc/canfar`
-- Docs: `https://opencadc.github.io/canfar/`
-- Changelog: `https://opencadc.github.io/canfar/changelog/`
+## Authentication and data
 
-## Notes on protocol stability
+Use `canfar login` or the Python `canfar.login()` / `canfar.alogin()` helpers to
+create Authentication Records. Python OIDC login prints the verification URL
+and user-facing device code to the terminal; the CLI owns browser, QR, and
+progress presentation. See [Install and set up](get-started.md#authenticate).
 
-- Server base path segments under `/skaha` are server-side contracts and remain unchanged (for example, `https://ws-uv.canfar.net/skaha`).
-- Historical header names remain unchanged (for example, `X-Skaha-Authentication-Type`, `X-Skaha-Registry-Auth`).
+For VOSpace access, replace implicit or package-specific storage helpers with
+explicit Storage Identifiers:
+
+```python
+from canfar.storage import filesystem, identifiers
+
+print(identifiers())
+with filesystem("vault") as vault:
+    data = vault.cat_file("/project/observations/example.fits")
+```
+
+Storage Identifiers are not dynamic module members or fsspec schemes. See
+[Data Access](data.md) for standard fsspec operations.
+
+## Runtime configuration and logging
+
+The package-level `canfar.configure_logging()` function configures application
+logging. `HTTPClient` accepts runtime `token` and `certificate` values, which
+take precedence over saved Authentication Records for that client only.
+
+For CLI command names and output, use the [CLI documentation](../cli/cli-help.md)
+rather than the Python migration guide.
