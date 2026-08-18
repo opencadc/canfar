@@ -19,6 +19,7 @@ DEFAULT_SERVER_GPUS = 0
 LOCAL = "local"
 """Reserved Storage Identifier for the machine where the code runs."""
 
+
 class VOSpaceService(BaseModel):
     """VOSpace Service discovered through an IVOA registry."""
 

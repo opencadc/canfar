@@ -190,8 +190,7 @@ def _sources() -> dict[str, AsyncFilesystemSource]:
     """
     config = Configuration()  # ty: ignore[missing-argument]
     mapped: dict[str, AsyncFilesystemSource] = {
-        identifier: _vospace(identifier)
-        for identifier in _configured(config)
+        identifier: _vospace(identifier) for identifier in _configured(config)
     }
     mapped[LOCAL] = _local
     return mapped
