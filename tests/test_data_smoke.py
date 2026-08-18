@@ -34,7 +34,7 @@ def _require_live_credentials() -> None:
         if server is None or server.idp is None:
             _skip("the named service has no parent Authentication Record")
         idp = server.idp
-        credential = config.get_credential(idp)
+        credential = config.authentication[idp]
     except (KeyError, ValueError):
         _skip("the named service or its Authentication Record is unavailable")
 

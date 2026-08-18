@@ -222,14 +222,14 @@ class TestRequestAuthenticationResolution:
             HTTPClient(config=config) as client,
         ):
             response = client.client.get("probe")
-            persisted = Configuration().get_credential("test")
+            persisted = Configuration().authentication["test"]
 
         assert response.status_code == 200
         assert len(token_requests) == 1
         assert [request.headers["Authorization"] for request in platform_requests] == [
             f"Bearer {_REFRESHED_TOKEN}"
         ]
-        canonical = config.get_credential("test")
+        canonical = config.authentication["test"]
         assert isinstance(canonical, OIDCCredential)
         assert canonical == persisted
         assert canonical.token == expected_token
@@ -417,7 +417,7 @@ class TestRequestAuthenticationResolution:
                     client.asynclient.get("one"),
                     client.asynclient.get("two"),
                 )
-                persisted = Configuration().get_credential("test")
+                persisted = Configuration().authentication["test"]
 
         assert [response.status_code for response in responses] == [200, 200]
         assert len(token_requests) == 1
@@ -425,7 +425,7 @@ class TestRequestAuthenticationResolution:
             f"Bearer {_REFRESHED_TOKEN}",
             f"Bearer {_REFRESHED_TOKEN}",
         ]
-        canonical = config.get_credential("test")
+        canonical = config.authentication["test"]
         assert isinstance(canonical, OIDCCredential)
         assert canonical == persisted
         assert canonical.token == Token(
@@ -493,7 +493,7 @@ class TestRequestAuthenticationResolution:
                 )
 
         assert len(token_requests) == 1
-        credential = config.get_credential("test")
+        credential = config.authentication["test"]
         assert isinstance(credential, OIDCCredential)
         assert credential.token.access == SecretStr(_REFRESHED_TOKEN)
 
@@ -562,14 +562,14 @@ class TestRequestAuthenticationResolution:
                 assert sync.headers["Authorization"] == "Bearer expired"
                 sync_response = sync.get("after-refresh")
                 assert sync.headers["Authorization"] == f"Bearer {_REFRESHED_TOKEN}"
-                persisted = Configuration().get_credential("test")
+                persisted = Configuration().authentication["test"]
 
         assert [async_response.status_code, sync_response.status_code] == [200, 200]
         assert [request.headers["Authorization"] for request in platform_requests] == [
             f"Bearer {_REFRESHED_TOKEN}",
             f"Bearer {_REFRESHED_TOKEN}",
         ]
-        canonical = config.get_credential("test")
+        canonical = config.authentication["test"]
         assert isinstance(canonical, OIDCCredential)
         assert canonical == persisted
 
@@ -593,7 +593,7 @@ class TestRequestAuthenticationResolution:
                 update={"client": Client(identity="client", secret="client-secret")}
             )
         )
-        original = config.get_credential("test").model_copy(deep=True)
+        original = config.authentication["test"].model_copy(deep=True)
         platform_requests: list[httpx.Request] = []
         token_requests: list[httpx.Request] = []
 
@@ -668,7 +668,7 @@ class TestRequestAuthenticationResolution:
         assert exc_info.value.__cause__ is None
         assert sentinel not in str(exc_info.value)
         assert sentinel not in caplog.text
-        assert config.get_credential("test") == original
+        assert config.authentication["test"] == original
         assert len(token_requests) == 1
         assert platform_requests == []
         assert save.call_count == int(failure == "save")
@@ -737,16 +737,17 @@ class TestRequestAuthenticationResolution:
             client = stack.enter_context(HTTPClient(config=config))
             request_client = client.client
             if state == "unrefreshable":
-                credential = config.get_credential("test")
+                credential = config.authentication["test"]
                 assert isinstance(credential, OIDCCredential)
-                config.update_credential(
+                config.editor.set(
+                    "authentication.test",
                     credential.model_copy(
                         update={
                             "endpoints": credential.endpoints.model_copy(
                                 update={"discovery": None}
                             )
                         }
-                    )
+                    ),
                 )
             if succeeds:
                 response = request_client.get("probe")
