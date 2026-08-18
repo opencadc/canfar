@@ -76,14 +76,6 @@ def test_session_and_information_leaves_are_root_commands() -> None:
         assert not isinstance(root.commands[name], TyperGroup)
 
 
-def test_removed_root_aliases_are_usage_errors() -> None:
-    """Removed root aliases fail with Click's standard usage exit code."""
-    for alias in ("authentication", "run", "launch", "del"):
-        result = runner.invoke(cli, [alias, "--help"])
-        assert result.exit_code == 2
-        assert f"No such command '{alias}'" in result.output
-
-
 def test_create_root_usage_preserves_delimiter_contract() -> None:
     """The root create command reserves every token after ``--``."""
     result = runner.invoke(

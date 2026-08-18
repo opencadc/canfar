@@ -11,13 +11,7 @@ from canfar.cli._run import run
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-delete = typer.Typer(
-    name="delete",
-    no_args_is_help=True,
-)
 
-
-@delete.callback(invoke_without_command=True)
 def delete_sessions(
     session_ids: Annotated[
         list[str],

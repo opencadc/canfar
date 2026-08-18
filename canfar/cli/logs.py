@@ -10,14 +10,7 @@ from canfar.cli._run import run
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-logs = typer.Typer(
-    name="logs",
-    help="Get logs for sessions.",
-    no_args_is_help=True,
-)
 
-
-@logs.callback(invoke_without_command=True)
 def get_logs(
     session_ids: Annotated[
         list[str],

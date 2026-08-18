@@ -6,11 +6,12 @@ from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at
 from typing import TYPE_CHECKING, Annotated
 
 import typer
+from typer.core import TyperCommand, TyperGroup
 
 from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
-from canfar.cli.create import CreateCommandUsageMessage, creation
+from canfar.cli.create import creation
 from canfar.cli.data import data
 from canfar.cli.delete import delete_sessions
 from canfar.cli.events import get_events
@@ -19,7 +20,7 @@ from canfar.cli.info import get_info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import get_logs
 from canfar.cli.open import open_sessions
-from canfar.cli.prune import PruneCommandUsageMessage, prune_sessions
+from canfar.cli.prune import prune_sessions
 from canfar.cli.ps import show as show_sessions
 from canfar.cli.server import server
 from canfar.cli.stats import get_stats
@@ -35,10 +36,61 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
+    from typer._click.core import Context as ClickContext
+
     from canfar.errors import StructuredError
 
 
-_MACHINE_OUTPUT_GROUPS = frozenset({"auth", "config", "create", "ps", "server"})
+_ROOT_CHILD_ARGS_META_KEY = "canfar.root_child_args"
+
+
+def _leaf_output_mode(args: list[str]) -> output.OutputMode:
+    """Infer a leaf output option before root setup has completed."""
+    for index, arg in enumerate(args):
+        if arg == "--":
+            break
+        if arg in {"-o", "--output"} and index + 1 < len(args):
+            value = args[index + 1]
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+        if arg.startswith("--output=") and arg.removeprefix("--output=") in {
+            "json",
+            "yaml",
+        }:
+            return output.OutputMode(arg.removeprefix("--output="))
+        if arg.startswith("-o") and arg not in {"-o", "--output"}:
+            value = arg.removeprefix("-o")
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+    return output.OutputMode.HUMAN
+
+
+class _RootTyperGroup(TyperGroup):
+    """Capture child argv so root setup can infer a leaf output mode."""
+
+    def parse_args(self, ctx: ClickContext, args: list[str]) -> list[str]:
+        """Record unconsumed child arguments without changing dispatch."""
+        child_args = super().parse_args(ctx, args)
+        if ctx.parent is None:
+            ctx.meta[_ROOT_CHILD_ARGS_META_KEY] = list(child_args)
+        return child_args
+
+
+_LEAF_USAGE = {
+    "create": "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]",
+    "prune": "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]...",
+}
+
+
+class _LeafUsageCommand(TyperCommand):
+    """Keep root leaf usage text aligned with delimiter-bearing commands."""
+
+    def get_usage(self, ctx: ClickContext) -> str:
+        """Return the canonical usage line for a leaf with custom syntax."""
+        name = self.name or ""
+        if name in _LEAF_USAGE:
+            return _LEAF_USAGE[name]
+        return super().get_usage(ctx)
 
 
 def callback(
@@ -69,14 +121,8 @@ def callback(
 ) -> None:
     """Main callback that handles no subcommand case."""
     activate_cli_root(ctx)
-    # Root setup runs before a nested command parses its own options.  Commands
-    # that own machine output therefore use structured setup diagnostics; all
-    # other root commands retain the human diagnostic path.
-    setup_mode = (
-        output.OutputMode.JSON
-        if ctx.invoked_subcommand in _MACHINE_OUTPUT_GROUPS
-        else output.OutputMode.HUMAN
-    )
+    child_args: list[str] = ctx.meta.get(_ROOT_CHILD_ARGS_META_KEY, [])
+    setup_mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:
         if setup_mode is output.OutputMode.HUMAN:
@@ -116,6 +162,7 @@ cli: typer.Typer = typer.Typer(
     rich_help_panel="CANFAR CLI Commands",
     callback=callback,
     invoke_without_command=True,
+    cls=_RootTyperGroup,
 )
 
 register_login_command(cli)
@@ -144,7 +191,7 @@ cli.add_typer(
 
 cli.command(
     "create",
-    cls=CreateCommandUsageMessage,
+    cls=_LeafUsageCommand,
     context_settings={
         "help_option_names": ["-h", "--help"],
         "allow_interspersed_args": True,
@@ -189,7 +236,7 @@ cli.command(
 )(delete_sessions)
 cli.command(
     "prune",
-    cls=PruneCommandUsageMessage,
+    cls=_LeafUsageCommand,
     context_settings={"help_option_names": ["-h", "--help"]},
     help="Delete sessions by criteria.",
     no_args_is_help=True,

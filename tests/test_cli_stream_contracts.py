@@ -402,6 +402,43 @@ def test_invalid_logging_environment_is_one_structured_machine_error(
     assert error.expected == ["critical", "error", "warning", "info", "debug"]
 
 
+@pytest.mark.parametrize(
+    "command", [["config", "get", "console.width"], ["auth", "ls"]]
+)
+def test_invalid_logging_environment_is_human_without_leaf_output(
+    monkeypatch: pytest.MonkeyPatch,
+    command: list[str],
+) -> None:
+    """Setup failures stay human when a machine-capable leaf has no output flag."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.startswith("logging.invalid_env_value env_var=CANFAR_LOGLEVEL")
+    assert not result.stderr.lstrip().startswith("{")
+
+
+@pytest.mark.parametrize(
+    ("flag", "prefix"),
+    [(["-o", "json"], "{"), (["--output", "yaml"], "code:")],
+)
+def test_invalid_logging_environment_uses_leaf_output_format(
+    monkeypatch: pytest.MonkeyPatch,
+    flag: list[str],
+    prefix: str,
+) -> None:
+    """Setup failures use the selected leaf format, not the owning group."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(cli, ["config", "get", "console.width", *flag])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.lstrip().startswith(prefix)
+
+
 def test_relative_log_file_creates_parents_without_contaminating_stdout(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

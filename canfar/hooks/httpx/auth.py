@@ -179,41 +179,33 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        async with client._get_refresh_lock():  # noqa: SLF001
-            prepared = _refresh(client)
-            if prepared is None:
-                return
-            credential, parameters = prepared
-            if parameters is None:
-                if credential.token.access is not None:
-                    _apply_access_header(
-                        credential.token.access,
-                        client.asynclient.headers,
-                        request,
-                    )
-                log.debug("Skipping auth refresh, access token is not expired.")
-                return
-            token_url, identity, client_secret, refresh_token = parameters
-
-            try:
-                log.debug("Starting asynchronous OIDC token refresh.")
-                token = await oidc.refresh(
-                    url=token_url,
-                    identity=identity,
-                    secret=client_secret,
-                    token=refresh_token,
-                )
-                log.debug("Asynchronous OIDC token refresh successful.")
-                _apply_refreshed_token(
-                    client,
-                    credential,
-                    token,
+        previous = client.authentication_record
+        if isinstance(previous, OIDCCredential) and previous.expired:
+            log.debug("Starting asynchronous OIDC token refresh.")
+        try:
+            credential = await client._refresh_oidc()  # noqa: SLF001
+        except (ValueError, OSError):
+            msg = "Failed to refresh OIDC token"
+            raise AuthenticationError(msg) from None
+        if credential is None:
+            return
+        if credential == previous:
+            if credential.token.access is not None:
+                _apply_access_header(
+                    credential.token.access,
                     client.asynclient.headers,
                     request,
                 )
-
-            except (ValueError, OSError):
-                msg = "Failed to refresh OIDC token"
-                raise AuthenticationError(msg) from None
+            log.debug("Skipping auth refresh, access token is not expired.")
+            return
+        log.debug("Asynchronous OIDC token refresh successful.")
+        if credential.token.access is not None:
+            _apply_access_header(
+                credential.token.access,
+                client.asynclient.headers,
+                request,
+            )
+        log.debug("HTTP request headers updated with new token.")
+        log.info("OIDC Access Token Refreshed.")
 
     return ahook

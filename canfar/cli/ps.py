@@ -28,11 +28,6 @@ if TYPE_CHECKING:
 
     from canfar.errors import StructuredError
 
-ps = typer.Typer(
-    name="ps",
-    no_args_is_help=False,
-)
-
 
 async def _fetch_sessions(
     kind: Kind | None,
@@ -154,7 +149,6 @@ def _render_human_sessions(
             get_console(stderr=True).print(f"[dim]- {message}[/dim]")
 
 
-@ps.callback(invoke_without_command=True)
 def show(
     everything: Annotated[
         bool,
