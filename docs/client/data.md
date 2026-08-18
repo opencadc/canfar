@@ -6,18 +6,15 @@ endpoints and credentials; [`vosfs`](https://github.com/shinybrar/vosfs) is the
 so every tool that already speaks fsspec — astropy, pandas, dask, zarr — works
 without an adapter.
 
-The same Storage Identifiers the CLI uses are importable by name.
+Storage lookup is explicit. `canfar` does not register configured names as
+fsspec protocols and does not turn them into module attributes. This keeps
+fsspec's built-in `local` protocol untouched and makes filesystem ownership and
+cleanup visible to the caller.
 
 ## Open a VOSpace Service
 
-Import a Storage Identifier and you get a ready, authenticated filesystem. Run
-`canfar login` first; the credential resolution is the same one the CLI uses.
-
-```python
-from canfar.storage import arc, vault, local
-```
-
-Any configured Storage Identifier works this way. To see which are available:
+Run `canfar login` first; the credential resolution is the same one the CLI
+uses. To see which Storage Identifiers are available:
 
 ```python
 from canfar.storage import identifiers
@@ -25,9 +22,8 @@ from canfar.storage import identifiers
 identifiers()      # ['arc', 'vault', 'local']
 ```
 
-Import binds the filesystem once, which is what you usually want. To build one
-explicitly — to override a credential, or to name an identifier held in a
-variable — use `filesystem`:
+Build one explicitly — including the reserved local filesystem, overriding a
+credential, or naming an identifier held in a variable — with `filesystem`:
 
 ```python
 from canfar.storage import filesystem
@@ -35,9 +31,11 @@ from canfar.storage import filesystem
 vault = filesystem("vault")
 staging = filesystem("vault", token="...")        # runtime bearer token
 archive = filesystem("arc", certificate="/path/to/proxy.pem")
+local = filesystem("local")
 ```
 
-`local` is reserved for the machine your code runs on and needs no credential.
+`filesystem(identifier)` returns the ordinary upstream fsspec object. Close a
+remote filesystem when the operation is complete; `local` needs no credential.
 
 ## Filesystem operations
 
@@ -72,8 +70,8 @@ vault.tail(target, 100)
 
 Writes use `put_file`, `pipe_file`, `mkdir`, and `rm`. Directory listings are
 cached in memory for the lifetime of the filesystem object, so a long-lived
-object can serve a stale listing; build a fresh one, or pass
-`use_listings_cache=False`, when you need to observe another writer's changes.
+object can serve a stale listing; build a fresh filesystem when you need to
+observe another writer's changes.
 
 ## Get a local path
 
@@ -89,9 +87,16 @@ uploads.
 
 ## Cache
 
-Nothing is cached to disk unless you ask. On a CANFAR session `/scratch` is
-fast local NVMe, is not backed up, and is cleared when the session ends, which
-is exactly what a cache wants. Locally, any directory works.
+`filesystem()` never enables a persistent content cache. Directory-listing
+caching is an in-memory fsspec option on the returned object; it is not a byte
+cache. If you choose to cache object contents, construct one fsspec cache
+wrapper explicitly and own its directory, freshness policy, and cleanup. The
+presence of `/scratch` or any `skaha_*` environment variable does not enable
+caching.
+
+On a CANFAR Session `/scratch` is fast local NVMe, is not backed up, and is
+cleared when the Session ends. It is a useful explicit location for ephemeral
+staging or caching, but it is never selected implicitly.
 
 ### Whole files
 
@@ -104,7 +109,8 @@ cached.cat_file(target)   # cold: fetched over the network
 cached.cat_file(target)   # warm: served from /scratch
 ```
 
-A cold read of the 166 KiB cutout took 2.96 s; the warm read took 0.4 ms.
+The first read fetches the complete object; subsequent reads can come from the
+explicit cache directory.
 
 Use `SimpleCacheFileSystem` when you do not need the expiry and staleness
 metadata `WholeFileCacheFileSystem` keeps. Passing `cache_storage` a list of
@@ -113,74 +119,39 @@ shared read-only cache can back your own.
 
 ### Byte ranges
 
-`vosfs` sends an HTTP `Range` header and uses the response when the byte
-endpoint answers `206`, so a partial read transfers only the bytes you asked
-for. Support is per-backend:
-
-| Storage Identifier | Backend | Ranged reads |
-| --- | --- | --- |
-| `vault` | `minoc` | Yes — a partial read returns `206` and transfers only that slice |
-| `arc` | Cavern | No — the whole object is fetched and sliced, correct but not cheaper |
-
-Against `vault`, cache blocks instead of whole files when you touch small parts
-of a large cube. `MMapCache` keeps fetched blocks in a sparse file:
+For an explicit partial read, `vosfs` sends an HTTP `Range` request and uses a
+validated `206` response. If the byte endpoint returns the whole object with
+`200`, `vosfs` falls back to downloading that object and slicing it locally.
+Range support is therefore deployment-specific; do not infer it from a
+Storage Identifier's spelling or assume that a partial call saves bytes.
 
 ```python
-from fsspec.caching import MMapCache
-
-cube = "/ALMA/test-data/cutouts/test-4d-cube.fits"
-size = vault.info(cube)["size"]
-
-blocks = MMapCache(
-    blocksize=1 << 20,
-    fetcher=lambda start, end: vault.cat_file(cube, start, end),
-    size=size,
-    location="/scratch/vault-cache/cube.blocks",
-)
-
-header = blocks._fetch(0, 2880)   # one ranged request, one block of four
+header = vault.cat_file(target, 0, 2880)
 ```
 
-Reading a FITS header from the 3.4 MB cube materialises one block of four. The
-saving is in bytes transferred rather than seconds on small files, because
-VOSpace transfer negotiation dominates a short request; it grows with file
-size. Against `arc` a block cache still costs a whole download per block, so
-cache whole files there.
-
-### RAM
-
-Omit `location` and `MMapCache` uses an anonymous memory map — a RAM cache that
-never touches disk, for when `/scratch` is absent or you want the data gone
-when the process exits:
-
-```python
-blocks = MMapCache(
-    blocksize=1 << 20,
-    fetcher=lambda start, end: vault.cat_file(cube, start, end),
-    size=size,
-)
-```
-
-A warm re-read of a cached range returned in 18 µs.
+The result is correct in either case. `open()` is a separate path: `vosfs`
+stages the complete object into a seekable local file before returning the
+file-like object. Use an explicit whole-file cache or `get_file()` when a
+scientific tool will read the same object more than once.
 
 ### What does not work
 
-`blockcache` (`CachingFileSystem`) cannot wrap a VOSpace Service. `Range` is
-honoured for byte reads, not through the file-object path:
+`blockcache` (`CachingFileSystem`) cannot wrap a VOSpace Service. Range is
+negotiated for explicit byte reads, not through the staged file-object path:
 
 ```text
 AttributeError: 'StagedReadFile' object has no attribute 'blocksize'
 ```
 
-Stacked caches do not help either: chaining them (`filecache::simplecache::`)
-builds the layers, but the inner layer is never filled and never serves. Use
-exactly one cache layer, on your fastest local disk.
+Use one explicit cache layer, on a local directory you own; do not silently
+stack caches or select one from environment variables.
 
 ## Scientific tools
 
 ### astropy
 
-Read a header without downloading the file, using one ranged request:
+Read a header through the explicit byte-read path. Depending on the negotiated
+backend, this may transfer only the requested slice or the whole object:
 
 ```python
 from astropy.io import fits
@@ -255,34 +226,7 @@ with fits.open("/scratch/cutout.fits", memmap=True) as hdul:
 
 ## Async
 
-Every read has an async twin. Build the filesystem with `asynchronous=True`,
-use the underscore-prefixed coroutines, and close it when done:
-
-```python
-import asyncio
-
-from canfar.models.config import Configuration
-from vosfs import VOSpaceFileSystem
-
-
-async def main() -> None:
-    config = Configuration()
-    service = config.servers["canfar"].storage["vault"]
-    vault = VOSpaceFileSystem(
-        str(service.url),
-        certfile=str(config.get_credential("cadc").path),
-        asynchronous=True,
-    )
-    try:
-        entries = await vault._ls(cutouts, detail=False)
-        header = await vault._cat_file(cube, 0, 2880)
-    finally:
-        await vault.aclose()
-
-
-asyncio.run(main())
-```
-
-Async filesystems cannot open file objects — `open()` is rejected, and the
-fsspec caches are synchronous — so use the synchronous form for caching and for
-libraries that want a file handle.
+`filesystem(identifier)` intentionally returns the synchronous fsspec object.
+The embedded `canfar data` command owns its asynchronous source lifecycle. For
+Python scientific tools, use the synchronous object above; it is also the form
+that composes with fsspec's content caches and file-like readers.

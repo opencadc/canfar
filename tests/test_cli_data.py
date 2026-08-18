@@ -33,7 +33,6 @@ def _configuration(*storage_names: str) -> SimpleNamespace:
     storage = dict.fromkeys(storage_names, object())
     return SimpleNamespace(
         servers={"server": SimpleNamespace(storage=storage)},
-        storage_identifiers=lambda: [*storage_names, "local"],
     )
 
 
@@ -61,7 +60,6 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
                     "first": SimpleNamespace(storage={"arc": object()}),
                     "second": SimpleNamespace(storage={"cavern": object()}),
                 },
-                storage_identifiers=lambda: ["arc", "cavern", "local"],
             ),
             SimpleNamespace(
                 active=SimpleNamespace(server="second"),
@@ -71,7 +69,6 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
                         storage={"cavern": object(), "vault": object()}
                     ),
                 },
-                storage_identifiers=lambda: ["arc", "cavern", "vault", "local"],
             ),
         ]
     )
