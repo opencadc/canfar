@@ -8,7 +8,6 @@ import typer
 
 from canfar.cli import output
 
-
 OutputOption = Annotated[
     Literal["json", "yaml"] | None,
     typer.Option(
