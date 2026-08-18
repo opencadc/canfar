@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.prune import PruneUsageMessage, prune
+from canfar.cli.main import cli
 
 runner = CliRunner()
 
@@ -22,7 +22,7 @@ def test_prune_success_and_usage_message() -> None:
     with patch("canfar.cli.prune.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.destroy_with.return_value = {"abc": True, "def": False}
-        result = runner.invoke(prune, ["batch", "headless", "Succeeded"])
+        result = runner.invoke(cli, ["prune", "batch", "headless", "Succeeded"])
 
     assert result.exit_code == 0
     assert "Deleted 2 sessions" in result.stdout
@@ -30,9 +30,8 @@ def test_prune_success_and_usage_message() -> None:
         prefix="batch", kind="headless", status="Succeeded"
     )
 
-    usage = PruneUsageMessage(name="prune").get_usage(MagicMock())
-    assert "canfar prune" in usage
-
-    help_result = runner.invoke(prune, ["--help"])
+    help_result = runner.invoke(cli, ["prune", "--help"])
     assert help_result.exit_code == 0
-    assert "canfar prune 'session.*' notebook Running" in help_result.output
+    assert "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..." in (
+        help_result.output
+    )

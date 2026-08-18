@@ -8,7 +8,7 @@ import pytest
 import yaml
 from typer.testing import CliRunner
 
-from canfar.cli.create import create
+from canfar.cli.main import cli
 from canfar.errors import ErrorCode, StructuredError
 from canfar.models.session import CreateRequest
 
@@ -26,8 +26,9 @@ class TestCreateCLI:
         mock_session.create.return_value = ["id-1", "id-2"]
 
         result = runner.invoke(
-            create,
+            cli,
             [
+                "create",
                 "headless",
                 "skaha/worker:v1",
                 "--name",
@@ -80,8 +81,8 @@ class TestCreateCLI:
         mock_session.create.return_value = ["session-id"]
 
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--name", "single"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--name", "single"],
         )
 
         assert result.exit_code == 0
@@ -95,8 +96,8 @@ class TestCreateCLI:
         mock_session.create.return_value = ["id-1", "id-2"]
 
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--replicas", "2"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--replicas", "2"],
         )
 
         assert result.exit_code == 0
@@ -112,8 +113,8 @@ class TestCreateCLI:
         mock_session.create.return_value = ["session-id"]
 
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--output", "json"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--output", "json"],
         )
 
         assert result.exit_code == 0
@@ -131,8 +132,9 @@ class TestCreateCLI:
         mock_session.create.return_value = ["session-id"]
 
         result = runner.invoke(
-            create,
+            cli,
             [
+                "create",
                 "headless",
                 "skaha/worker:v1",
                 "--output",
@@ -163,8 +165,8 @@ class TestCreateCLI:
         mock_session.create.return_value = ["session-id"]
 
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--debug", "--output", "json"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--debug", "--output", "json"],
         )
 
         assert result.exit_code == 0
@@ -183,8 +185,9 @@ class TestCreateCLI:
         mock_session.create.return_value = ["id-1"]
 
         result = runner.invoke(
-            create,
+            cli,
             [
+                "create",
                 "headless",
                 "skaha/worker:v1",
                 "--replicas",
@@ -205,10 +208,10 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.return_value = []
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1"])
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1"])
 
         assert result.exit_code == 1
-        assert result.stdout == ""
+        assert result.stdout.startswith("@")
         assert "Failed to create session(s)" in result.stderr
         assert "CANFAR_TIMEOUT" in result.stderr
         assert "canfar --log-level debug create" in result.stderr
@@ -232,7 +235,9 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.return_value = []
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
+        result = runner.invoke(
+            cli, ["create", "headless", "skaha/worker:v1", *flag]
+        )
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -260,8 +265,8 @@ class TestCreateCLI:
     ):
         """Invalid command input fails before the Session boundary opens."""
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", *invalid_args, *flag],
+            cli,
+            ["create", "headless", "skaha/worker:v1", *invalid_args, *flag],
         )
 
         assert result.exit_code == 1
@@ -277,8 +282,8 @@ class TestCreateCLI:
     ):
         """Human validation failure keeps detailed diagnostics and exit one."""
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--cpu", "-1"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--cpu", "-1"],
         )
 
         assert result.exit_code == 1
@@ -294,8 +299,8 @@ class TestCreateCLI:
     ):
         """Human malformed-environment input keeps its existing message."""
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--env", "BROKEN"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--env", "BROKEN"],
         )
 
         assert result.exit_code == 1
@@ -306,8 +311,8 @@ class TestCreateCLI:
     def test_create_command_dry_run(self):
         """Test create command dry run."""
         result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--dry-run"],
+            cli,
+            ["create", "headless", "skaha/worker:v1", "--dry-run"],
         )
 
         assert result.exit_code == 0
@@ -318,8 +323,9 @@ class TestCreateCLI:
     def test_create_command_rejects_dry_run_with_machine_output(self):
         """Dry-run diagnostics cannot contaminate machine stdout."""
         result = runner.invoke(
-            create,
+            cli,
             [
+                "create",
                 "headless",
                 "skaha/worker:v1",
                 "--dry-run",
@@ -339,7 +345,7 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.side_effect = httpx.HTTPError("API Error")
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1"])
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1"])
 
         assert result.exit_code == 1
         assert "Error: API Error" in result.stderr
@@ -372,7 +378,9 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = httpx.HTTPError(secret)
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
+        result = runner.invoke(
+            cli, ["create", "headless", "skaha/worker:v1", *flag]
+        )
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -391,10 +399,10 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.side_effect = KeyboardInterrupt
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1"])
+        result = runner.invoke(cli, ["create", "headless", "skaha/worker:v1"])
 
         assert result.exit_code == 130
-        assert result.stdout == ""
+        assert result.stdout.startswith("@")
         assert "Operation cancelled by user" in result.stderr
 
     @pytest.mark.parametrize(
@@ -425,7 +433,9 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = KeyboardInterrupt(secret)
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
+        result = runner.invoke(
+            cli, ["create", "headless", "skaha/worker:v1", *flag]
+        )
 
         assert result.exit_code == 130
         assert result.stdout == ""

@@ -16,13 +16,6 @@ from canfar.models.session import FetchResponse
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-info = typer.Typer(
-    name="info",
-    help="Get detailed information about sessions.",
-    no_args_is_help=True,
-    context_settings={"allow_interspersed_args": True},
-)
-
 ALL_FIELDS: dict[str, str] = {
     "id": "Session ID",
     "name": "Name",
@@ -168,7 +161,6 @@ async def _get_info(
         _display(response, debug=debug)
 
 
-@info.callback(invoke_without_command=True)
 def get_info(
     session_ids: Annotated[
         list[str],

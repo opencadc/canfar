@@ -2,59 +2,17 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, get_args
+from typing import Annotated, get_args
 
 import click
 import typer
-import typer.core
 
 from canfar.cli._run import run
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-if TYPE_CHECKING:
-    from typer._click.core import Context
 
-
-class PruneUsageMessage(typer.core.TyperGroup):
-    """Custom usage message for prune command.
-
-    Args:
-        typer (TyperGroup): Base class for grouping commands in Typer.
-    """
-
-    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
-        """Get the usage message for the prune command.
-
-        Args:
-            ctx (typer.Context): The Typer context.
-
-        Returns:
-            str: The usage message.
-        """
-        return "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
-
-
-class PruneCommandUsageMessage(typer.core.TyperCommand):
-    """Keep the root leaf usage text aligned with the CLI contract."""
-
-    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
-        """Return the documented prune usage line."""
-        return "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
-
-
-prune = typer.Typer(
-    name="prune",
-    no_args_is_help=True,
-)
-
-
-@prune.callback(
-    invoke_without_command=True,
-    context_settings={"help_option_names": ["-h", "--help"]},
-    cls=PruneUsageMessage,
-)
 def prune_sessions(
     prefix: Annotated[
         str,

@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.open import open_command
+from canfar.cli.main import cli
 
 runner = CliRunner()
 
@@ -37,7 +37,7 @@ def test_open_command_opens_url_and_reports_missing_data() -> None:
             },
             {"id": "missing"},
         ]
-        result = runner.invoke(open_command, ["abc", "stopped", "missing"])
+        result = runner.invoke(cli, ["open", "abc", "stopped", "missing"])
 
     assert result.exit_code == 0
     assert "Opening session abc" in result.stdout
@@ -52,7 +52,7 @@ def test_open_command_no_session_info() -> None:
     with patch("canfar.cli.open.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.info.return_value = []
-        result = runner.invoke(open_command, ["abc"])
+        result = runner.invoke(cli, ["open", "abc"])
 
     assert result.exit_code == 0
     assert "No information found" in result.stderr

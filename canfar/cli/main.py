@@ -5,14 +5,13 @@ from __future__ import annotations
 from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
 from typing import TYPE_CHECKING, Annotated
 
-import click
 import typer
-from typer.core import TyperGroup
+from typer.core import TyperCommand, TyperGroup
 
 from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
-from canfar.cli.create import CreateCommandUsageMessage, creation
+from canfar.cli.create import creation
 from canfar.cli.data import data
 from canfar.cli.delete import delete_sessions
 from canfar.cli.events import get_events
@@ -21,7 +20,7 @@ from canfar.cli.info import get_info
 from canfar.cli.login import register_login_command
 from canfar.cli.logs import get_logs
 from canfar.cli.open import open_sessions
-from canfar.cli.prune import PruneCommandUsageMessage, prune_sessions
+from canfar.cli.prune import prune_sessions
 from canfar.cli.ps import show as show_sessions
 from canfar.cli.server import server
 from canfar.cli.stats import get_stats
@@ -37,6 +36,8 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
+    from click import Context as ClickContext
+
     from canfar.errors import StructuredError
 
 
@@ -67,12 +68,29 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
 class _RootTyperGroup(TyperGroup):
     """Capture child argv so root setup can infer a leaf output mode."""
 
-    def parse_args(self, ctx: click.Context, args: list[str]) -> list[str]:
+    def parse_args(self, ctx: ClickContext, args: list[str]) -> list[str]:
         """Record unconsumed child arguments without changing dispatch."""
         child_args = super().parse_args(ctx, args)
         if ctx.parent is None:
             ctx.meta[_ROOT_CHILD_ARGS_META_KEY] = list(child_args)
         return child_args
+
+
+_LEAF_USAGE = {
+    "create": "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]",
+    "prune": "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]...",
+}
+
+
+class _LeafUsageCommand(TyperCommand):
+    """Keep root leaf usage text aligned with delimiter-bearing commands."""
+
+    def get_usage(self, ctx: ClickContext) -> str:
+        """Return the canonical usage line for a leaf with custom syntax."""
+        name = self.name or ""
+        if name in _LEAF_USAGE:
+            return _LEAF_USAGE[name]
+        return super().get_usage(ctx)
 
 
 def callback(
@@ -173,7 +191,7 @@ cli.add_typer(
 
 cli.command(
     "create",
-    cls=CreateCommandUsageMessage,
+    cls=_LeafUsageCommand,
     context_settings={
         "help_option_names": ["-h", "--help"],
         "allow_interspersed_args": True,
@@ -218,7 +236,7 @@ cli.command(
 )(delete_sessions)
 cli.command(
     "prune",
-    cls=PruneCommandUsageMessage,
+    cls=_LeafUsageCommand,
     context_settings={"help_option_names": ["-h", "--help"]},
     help="Delete sessions by criteria.",
     no_args_is_help=True,

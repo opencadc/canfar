@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.delete import delete
+from canfar.cli.main import cli
 
 runner = CliRunner()
 
@@ -22,7 +22,7 @@ def test_delete_force_success_error_and_cancel() -> None:
     with patch("canfar.cli.delete.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.destroy.return_value = {"abc": True}
-        result = runner.invoke(delete, ["--force", "abc"])
+        result = runner.invoke(cli, ["delete", "--force", "abc"])
 
     assert result.exit_code == 0
     assert "Successfully deleted" in result.stdout
@@ -30,12 +30,12 @@ def test_delete_force_success_error_and_cancel() -> None:
     with patch("canfar.cli.delete.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.destroy.side_effect = RuntimeError("delete failed")
-        result = runner.invoke(delete, ["--force", "abc"])
+        result = runner.invoke(cli, ["delete", "--force", "abc"])
 
     assert result.exit_code == 0
     assert "Error during deletion: delete failed" in result.stderr
 
     with patch("canfar.cli.delete.Confirm.ask", return_value=False):
-        result = runner.invoke(delete, ["abc"])
+        result = runner.invoke(cli, ["delete", "abc"])
 
     assert result.exit_code == 0

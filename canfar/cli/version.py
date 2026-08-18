@@ -90,16 +90,6 @@ def callback(
     raise typer.Exit(0)
 
 
-version = typer.Typer(
-    name="version",
-    help="Show canfar client version information",
-    no_args_is_help=False,
-    rich_help_panel="Information Commands",
-    callback=callback,
-    invoke_without_command=True,
-)
-
-
 def _get_package_version(name: str) -> str:
     """Get version of an installed package.
 
