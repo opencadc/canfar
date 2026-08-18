@@ -11,6 +11,24 @@ canfar login cadc
 
 Use `canfar login srcnet` for SRCNet.
 
+Python callers can run the same device flow without CLI presentation machinery:
+
+```python
+import canfar
+
+canfar.login("srcnet")
+```
+
+The call prints the verification URL and device code, then waits for approval.
+Inside an existing async event loop, use the native async counterpart:
+
+```python
+async def authenticate():
+    await canfar.alogin("srcnet")
+```
+
+Use the CLI when you want browser opening, QR output, or progress presentation.
+
 ## 2. Create a notebook
 
 ```python

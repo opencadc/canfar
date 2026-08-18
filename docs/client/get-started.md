@@ -31,6 +31,24 @@ For SRCNet:
 canfar login srcnet
 ```
 
+Python can also start the SRCNet device flow directly:
+
+```python
+import canfar
+
+canfar.login("srcnet")
+```
+
+This prints the verification URL and device code and waits for approval. In an
+existing async event loop, await the native counterpart instead:
+
+```python
+async def authenticate():
+    await canfar.alogin("srcnet")
+```
+
+Use the CLI for browser opening, QR output, and progress presentation.
+
 Force a fresh login when credentials expire or you want to replace saved state:
 
 ```bash
