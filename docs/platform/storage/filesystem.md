@@ -71,13 +71,13 @@ from fsspec.implementations.cached import WholeFileCacheFileSystem
 from canfar.storage import filesystem
 
 remote = filesystem("vault")
-cached = WholeFileCacheFileSystem(
-    fs=remote,
-    cache_storage="/arc/home/<user>/.cache/canfar/vault",
-    expiry_time=24 * 60 * 60,
-    check_files=True,
-)
 try:
+    cached = WholeFileCacheFileSystem(
+        fs=remote,
+        cache_storage="/arc/home/<user>/.cache/canfar/vault",
+        expiry_time=24 * 60 * 60,
+        check_files=True,
+    )
     with cached.open("/project/catalog.csv", "rb") as handle:
         process(handle)
 finally:
