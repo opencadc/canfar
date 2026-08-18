@@ -67,7 +67,7 @@ async def main() -> None:
         ids = await session.create(
             kind="headless",
             image="images.canfar.net/skaha/astroml:latest",
-            name="batch-job",
+            name="batch-session",
             cmd="python",
             args="/arc/projects/demo/run.py",
         )
