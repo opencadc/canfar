@@ -21,6 +21,7 @@ class TestAuthenticateCredentialFunction:
         *,
         credential: OIDCCredential | None = None,
         userinfo_error: Exception | None = None,
+        authenticated: list[str | None] | None = None,
     ) -> OIDCCredential:
         credential = credential or OIDCCredential(
             idp="test",
@@ -66,6 +67,9 @@ class TestAuthenticateCredentialFunction:
                 credential,
                 expected_issuer="https://example.com",
                 device_flow=AsyncMock(return_value=tokens),
+                on_authenticated=(
+                    authenticated.append if authenticated is not None else None
+                ),
             )
 
     @pytest.mark.asyncio
@@ -131,6 +135,18 @@ class TestAuthenticateCredentialFunction:
         assert result.token.refresh.get_secret_value() == "test_refresh_token"
         assert result.expiry.access == 1234567890
         assert result.expiry.refresh is None
+
+    @pytest.mark.asyncio
+    async def test_authenticate_notifies_authenticated_username(self) -> None:
+        """Authentication reports the same UserInfo username as the sync flow."""
+        authenticated: list[str | None] = []
+
+        await self._authenticate_with_tokens(
+            {"access_token": "test_access_token"},
+            authenticated=authenticated,
+        )
+
+        assert authenticated == ["testuser"]
 
     @pytest.mark.asyncio
     async def test_authenticate_accepts_token_without_refresh_token(self) -> None:

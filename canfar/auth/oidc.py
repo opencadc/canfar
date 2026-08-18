@@ -163,14 +163,39 @@ def _userinfo_username(response: httpx.Response) -> str | None:
     return response.json().get("preferred_username")
 
 
-def _set_discovered_endpoints(
+def _apply_discovery(
     credential: OIDCCredential,
     discovery: dict[str, Any],
 ) -> None:
-    """Install Identity Provider endpoints while preserving the credential object."""
+    """Apply discovered Identity Provider endpoints and log their values."""
     credential.endpoints.device = discovery["device_authorization_endpoint"]
     credential.endpoints.registration = discovery["registration_endpoint"]
     credential.endpoints.token = discovery["token_endpoint"]
+    log.debug("Discovered OIDC configuration:")
+    log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
+    log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
+    log.debug("Token Endpoint: %s", credential.endpoints.token)
+
+
+def _install_client_credentials(
+    credential: OIDCCredential,
+    device: Any,
+) -> tuple[str, str]:
+    """Install registered client credentials and return their values."""
+    identity, secret = _client_credentials(device)
+    credential.client.identity = identity
+    credential.client.secret = SecretStr(secret)
+    return identity, secret
+
+
+def _finalize_authentication(
+    response: httpx.Response,
+    on_authenticated: Callable[[str | None], None] | None,
+) -> None:
+    """Validate UserInfo and notify observers of the authenticated username."""
+    username = _userinfo_username(response)
+    if on_authenticated is not None:
+        on_authenticated(username)
 
 
 async def discover(
@@ -641,19 +666,12 @@ async def authenticate_credential(
             client,
             expected_issuer=expected_issuer,
         )
-        _set_discovered_endpoints(credential, response)
-
-        log.debug("Discovered OIDC configuration:")
-        log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
-        log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
-        log.debug("Token Endpoint: %s", credential.endpoints.token)
+        _apply_discovery(credential, response)
 
         device: dict[str, Any] = await register(
             str(credential.endpoints.registration), client
         )
-        identity, client_secret = _client_credentials(device)
-        credential.client.identity = identity
-        credential.client.secret = SecretStr(client_secret)
+        identity, client_secret = _install_client_credentials(credential, device)
 
         from authlib.integrations.httpx_client import (  # noqa: PLC0415
             AsyncOAuth2Client,
@@ -696,9 +714,7 @@ async def authenticate_credential(
 
         url: str = response["userinfo_endpoint"]
         user = await client.get(url, headers=_userinfo_headers(credential))
-        username = _userinfo_username(user)
-        if on_authenticated is not None:
-            on_authenticated(username)
+        _finalize_authentication(user, on_authenticated)
         return credential
 
 
@@ -860,17 +876,10 @@ def sync_authenticate_credential(
             client,
             expected_issuer=expected_issuer,
         )
-        _set_discovered_endpoints(credential, response)
-
-        log.debug("Discovered OIDC configuration:")
-        log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
-        log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
-        log.debug("Token Endpoint: %s", credential.endpoints.token)
+        _apply_discovery(credential, response)
 
         device = sync_register(str(credential.endpoints.registration), client)
-        identity, client_secret = _client_credentials(device)
-        credential.client.identity = identity
-        credential.client.secret = SecretStr(client_secret)
+        identity, client_secret = _install_client_credentials(credential, device)
 
         if request_timeout is None:
             oauth_context = OAuth2Client(
@@ -908,7 +917,5 @@ def sync_authenticate_credential(
 
         url: str = response["userinfo_endpoint"]
         user = client.get(url, headers=_userinfo_headers(credential))
-        username = _userinfo_username(user)
-        if on_authenticated is not None:
-            on_authenticated(username)
+        _finalize_authentication(user, on_authenticated)
         return credential
