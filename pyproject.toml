@@ -222,8 +222,6 @@ max-args = 8
 docstring-code-format = true
 
 # ty configuration (replaces mypy)
-[tool.ty]
-
 [tool.ty.rules]
 unused-ignore-comment = "ignore"
 
@@ -289,7 +287,6 @@ exclude_lines = [
     "if False:",
 ]
 show_missing = true
-skip_covered = false
 precision = 2
 
 [tool.interrogate]
