@@ -93,6 +93,14 @@ plugins:
       branch: main
   - termynal
 
+# Dated engineering records stay in the repository for maintainers but are not
+# user-facing site pages. Excluding them also keeps MkDocs' unlisted-page
+# warning focused on accidental navigation omissions.
+exclude_docs: |
+  agents/adrs/**
+  agents/research/**
+  agents/reviews/**
+
 extra_css:
   - stylesheets/extra.css
 

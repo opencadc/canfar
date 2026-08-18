@@ -38,15 +38,16 @@ the available images before creating a Session:
 
 ```bash
 canfar image ls --kind desktop
-canfar create desktop skaha/desktop:1.2.1 --name alma-reduction
+canfar create desktop IMAGE_NAME --name alma-reduction
 canfar ps --kind desktop
 canfar open [session-id]
 ```
 
 Replace bracketed values with the Session ID, username, and project name used
-by your account. Replace `skaha/desktop:1.2.1` if `canfar image ls --kind desktop`
-shows a different current Desktop image. The image listing is the source of
-truth; do not assume that a CASA tag remains unchanged.
+by your account. Replace `IMAGE_NAME` with an image returned by
+`canfar image ls --kind desktop` that includes the CASA version required by the
+reduction. The image listing is the source of truth; do not assume that a CASA
+tag remains unchanged.
 
 ### 2. Stage the archive data
 
@@ -151,11 +152,11 @@ At the end of the workflow:
 | Login fails or credentials are stale | Run `canfar --log-level debug login cadc --force`, then `canfar auth show`. |
 | No suitable image appears | Run `canfar image ls --kind desktop` (or `--kind notebook`/`--kind carta`) and choose an image that includes the required software. |
 | Session remains pending | Run `canfar ps --all`, `canfar events [session-id]`, and `canfar stats`; reduce requested resources if the Science Platform Server has no capacity. |
-| A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls`; check that the active Authentication can access the target. |
+| A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls -lh IDENTIFIER:/path`; check that the active Authentication Record can access the target. |
 | Files disappear after the Session ends | Move them from `/scratch` to `/arc/home/[username]` or `/arc/projects/[project]` before deleting the Session. |
 | A shared project path is denied | Ask the project administrator to add your CADC account to the project group; see [Permissions](../../permissions.md). |
 | CASA is missing or incompatible | Select a Desktop image that lists the required CASA version and match the version to the archive scripts. If CASA 6.5.0–6.5.2 opens with display errors, exit CASA and start it again. |
-| VOS Tools or direct URL downloads report an expired certificate | Renew the certificate with `cadc-get-cert -u [username]`, then retry the transfer. This applies to VOS Tools/direct downloads; the `canfar` CLI uses its saved Authentication. |
+| A transfer reports expired credentials | Renew or select the Authentication Record used by the active server, then retry. See [support](../../support/index.md) if the record or certificate cannot be refreshed. |
 | The browser cannot connect to a new Session | Wait for the Session to reach `Running`, then retry `canfar open [session-id]`; inspect `canfar info [session-id]` and `canfar logs [session-id]` if it still fails. |
 
 ## Related documentation

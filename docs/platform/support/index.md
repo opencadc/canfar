@@ -1,240 +1,91 @@
-# Getting Help and Support
+# Support
 
-!!! abstract "🎯 Support Resources Overview"
-    **Find the help you need:**
-    
-    - **Self-service**: Documentation, troubleshooting guides, and FAQs
-    - **Community**: User discussions, office hours, and peer assistance
-    - **Direct support**: Help from CANFAR platform specialists
-    - **Emergency**: Rapid response for critical incidents
+Start with the guide for the component that failed, then contact the service
+operator with a small, reproducible diagnostic set.
 
-The CANFAR Science Platform offers several ways to get assistance. Start with self-service resources, then move to community channels or direct support as needed.
+## Check the documentation first
 
-## 🚀 Quick Start for Support
+- [Getting started](../get-started.md) covers login, server selection, and a
+  first Session.
+- [Storage](../storage/index.md) covers Storage Identifiers, `/arc`,
+  `/scratch`, and Python filesystems.
+- [Batch processing](../sessions/batch.md) explains `Pending`, queueing,
+  creation output, and headless troubleshooting.
+- [Permissions](../permissions.md) explains identity, project groups, images,
+  and access-denied errors.
+- [FAQ](faq.md) collects short answers and command examples.
 
-### New to CANFAR?
+## Fast checks
 
-- **[Get Started Guide](../get-started.md)**: 10-minute overview
-- **[First Login](../permissions.md)**: Account activation and access
-- **[Choose Your Interface](../sessions/index.md)**: Pick the right session type
-
-### Having Problems?
-
-- **[FAQ](faq.md)**: Quick answers to common questions
-- **[Troubleshooting](#troubleshooting)**: Diagnostic steps for common issues
-- **[Contact Support](#contact-support)**: Reach the CANFAR team for help
-
-## 📚 Self-Help Resources
-
-- **Documentation search**: Use the search box or browse by topic
-- **[Concepts](../concepts.md)**: Platform architecture and terminology
-- **[Storage](../storage/index.md)**: Managing data effectively
-- **[Containers](../containers/index.md)**: Using and building software environments
-- **[Interactive Sessions](../sessions/index.md)**: Jupyter, Desktop, CARTA, Firefly
-- **[Batch Jobs](../sessions/batch.md)**: Automated and large-scale processing
-
-## 🔧 Troubleshooting
-
-### Quick Checks
-
-1. Confirm there are no current maintenance announcements
-2. Try Chrome or Firefox and clear the browser cache
-3. Use a private/incognito window to rule out extensions
-4. Verify your network connection is stable
-
-### Frequent Issues
-
-#### Session won't start
-
-- Lower memory or CPU requests and retry
-- Try a different container image or launch time
-- Ensure your account has the required group memberships
-
-#### Cannot access files
+### Login or server selection
 
 ```bash
-# Check locations and permissions
-ls /arc/home/[user]/
-ls /arc/projects/[project]/
-ls -la /arc/projects/[project]/
-getfacl /arc/projects/[project]/
+canfar login cadc
+canfar server ls
+canfar server use SERVER_NAME
+canfar config get active.server -o json
 ```
 
-- Confirm the path and project name
-- Verify you belong to the correct project group
-- Contact the project administrator if permissions are missing
+Use the identity provider and Server Name supplied by your platform operator.
+Do not paste certificates, tokens, or passwords into a support request.
 
-#### Performance feels slow
+### A Session is not ready
 
-- Monitor resource usage with `htop`
-- Close unused applications and tabs
-- Use `/scratch/` for temporary, high-I/O workloads
-- Submit a support request if performance remains degraded
-
-#### Browser quirks
-
-- Stick to Chrome or Firefox and keep them updated
-- Enable JavaScript and cookies for `canfar.net`
-- Disable ad blockers or privacy extensions for the site
-
-### Gather Information Before Asking for Help
-
-Run these commands to capture context for a support request:
+`Pending` means the platform accepted the request but has not made the Session
+ready. It can include admission, resource, image-pull, or initialization work.
+Inspect the Session and its events before changing the request:
 
 ```bash
-# Platform status
-canfar info [session-id]
+canfar ps --all
+canfar info SESSION_ID
+canfar events SESSION_ID
 canfar stats
-
-# Session details
-echo $USER
-groups
-env | grep -E "(CANFAR|SKAHA)"
 ```
 
-## 📧 Contact Support
+`canfar logs SESSION_ID` is useful after the container has started. A Pending
+Session may not have application logs yet. See [batch troubleshooting](../sessions/batch.md#monitor-and-troubleshoot).
 
-### When to Reach Out
+### A data operation fails
 
-Email [support@canfar.net](mailto:support@canfar.net) when you encounter:
+Confirm the identifier and path, then check group membership with the project
+administrator:
 
-- **Account issues**: Login failures, certificate problems, group membership
-- **Technical problems**: Persistent errors, failed sessions, system outages
-- **Data concerns**: Missing files, data corruption, recovery requests
-- **Resource changes**: Requests for additional storage, CPU, or RAM
-- **Software help**: Complex installations or container customization
-
-### What to Include
-
-Provide clear, specific details to speed up triage:
-
-- **Subject**: Short summary of the problem
-- **Contact**: CANFAR username and email
-- **Timeline**: Date and time (with timezone) when the issue occurred
-- **Environment**: Session type, container, operating system, browser
-- **Steps to reproduce**: Numbered list of actions leading to the issue
-- **Observed vs expected**: What happened and what you expected
-- **Error output**: Copy exact error text and attach screenshots when available
-- **What you tried**: Mention any workarounds attempted
-
-### Expected Response Times
-
-| Priority | Response Time | Examples |
-|----------|---------------|----------|
-| **Critical** | Same day | System outages, data loss, security issues |
-| **High** | 1–2 business days | Session failures, access problems |
-| **Normal** | 2–3 business days | General questions, documentation requests |
-| **Low** | 3–5 business days | Feature requests, enhancement suggestions |
-
-### Escalation
-
-If a ticket is not progressing within the expected timeframe:
-
-1. Reply to the original email and add "URGENT" to the subject
-2. Share any new details or screenshots gathered since the initial report
-3. For emergencies, follow the contacts listed in [🚨 Emergency Contacts](#emergency-contacts)
-
-## 👥 Community Support
-
-### Discord
-
-Join the [CANFAR Discord](https://discord.gg/vcCQ8QBvBa) for real-time conversations with other users and staff.
-
-- Search existing threads before posting
-- Use the channel that matches your topic
-- Share concise questions and relevant context
-- Never publish sensitive data or credentials
-
-### GitHub
-
-Use [GitHub Issues](https://github.com/opencadc/canfar/issues) to track bugs, suggest enhancements, or contribute documentation updates.
-
-- Reference related documentation pages or example workflows
-- Tag issues appropriately (e.g., `bug`, `documentation`, `feature-request`)
-- Follow up on discussions to confirm fixes or add clarifications
-
-## 🐛 Helpful Bug Reports
-
-### Before Filing
-
-1. Search the documentation and [FAQ](faq.md) for related answers
-2. Look for existing issues on GitHub to avoid duplicates
-3. Ask quick questions on Discord if you are unsure whether something is a bug
-
-### What Maintainers Need
-
-- Clear, descriptive title
-- Environment details (OS, browser, session type, container)
-- Steps to reproduce, numbered and complete
-- Expected result versus what actually happened
-- Complete error output and supporting screenshots or logs
-- Notes on any temporary workarounds you discovered
-
-This template can help structure a report:
-
-```markdown
-## Bug Description
-[Short summary]
-
-## Environment
-- OS: [...]
-- Browser: [...]
-- Session Type: [...]
-- Container: [...]
-
-## Steps to Reproduce
-1. [...]
-2. [...]
-
-## Expected Behaviour
-[...]
-
-## Actual Behaviour
-[...]
-
-## Error Messages
-```text
-[Paste exact text]
+```bash
+canfar data ls -lh IDENTIFIER:/path
+canfar data info IDENTIFIER:/path/to/file
+canfar data stat IDENTIFIER:/path/to/file
 ```
 
-## Screenshots
-If applicable, add screenshots to help explain the problem.
+Use `/scratch` for temporary staged data and `/arc` or a persistent VOSpace
+Service for outputs that must survive a Session. See [data transfers](../storage/transfers.md).
 
-## Additional Context
-[Anything else that helps]
-```
+### A browser Session does not open
 
-After submitting, monitor the issue for follow-up questions, provide additional details promptly, and test proposed fixes when available.
+Confirm that the Session is ready with `canfar ps --all` and `canfar info
+SESSION_ID`. Then retry the link in a current browser or private window. If
+the Session is Running but the endpoint remains unreachable, report the
+Session ID, Server Name, timestamp, and browser error to support.
 
-## 🚨 Emergency Contacts
+## Contact CANFAR support
 
-### System Outages
+Email [support@canfar.net](mailto:support@canfar.net) for account access,
+project membership, persistent data errors, service outages, or a Session that
+remains Pending after the platform's normal queue interval. Include:
 
-- Planned maintenance notices go out at least 48 hours in advance via email and Discord
-- For unexpected outages, email [support@canfar.net](mailto:support@canfar.net) and request a status update
+- the Server Name and identity provider;
+- the command or UI action, with paths and image references redacted as needed;
+- the Session ID and status, if applicable;
+- the time and timezone;
+- exact error text; and
+- relevant `info`, `events`, or `stats` output.
 
-### Critical Data Issues
+Send security vulnerabilities privately; see the [security policy](../../security.md).
+Do not include passwords, tokens, certificates, or private data in email or
+public issues.
 
-1. Stop affected jobs or sessions immediately
-2. Document what happened and when
-3. Email [support@canfar.net](mailto:support@canfar.net) with **URGENT** in the subject
-4. Preserve files and logs so recovery is possible
+## Community and bug reports
 
-Daily snapshots of `/arc/` storage are retained for 30 days; support can coordinate point-in-time recovery when necessary.
-
-### Security Incidents
-
-1. Revoke and reissue credentials right away
-2. Report the incident to [support@canfar.net](mailto:support@canfar.net)
-3. Describe what you observed, including timestamps and IP addresses if known
-4. Follow instructions from the security team before resuming activity
-
-## 📝 Contributing
-
-Documentation is community-driven. If you spot something to improve:
-
-1. Browse the source on [GitHub](https://github.com/opencadc/canfar)
-2. Follow the contribution guidelines in `CONTRIBUTING.md`
-3. Submit a pull request or open an issue describing the change
-
-For help getting started, ask in Discord or email [support@canfar.net](mailto:support@canfar.net).
+Use the [CANFAR Discord](https://discord.gg/vcCQ8QBvBa) for community
+questions and the [GitHub issue tracker](https://github.com/opencadc/canfar/issues)
+for reproducible bugs or documentation changes. Search existing issues first
+and include a minimal reproduction.
