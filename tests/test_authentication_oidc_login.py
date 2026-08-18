@@ -88,7 +88,7 @@ def test_login_runs_plain_sync_oidc_flow_and_persists_record(
     authenticate_credential.assert_called_once()
     with _patch_config(config_path):
         saved = canfar.models.config.Configuration()
-    credential = saved.get_credential("srcnet")
+    credential = saved.authentication["srcnet"]
     assert isinstance(credential, OIDCCredential)
     assert credential.token.access is not None
     assert credential.token.access.get_secret_value() == "access-token"
@@ -129,7 +129,7 @@ async def test_alogin_uses_native_async_flow_without_asyncio_run(
     authenticate_credential.assert_awaited_once()
     with _patch_config(config_path):
         saved = canfar.models.config.Configuration()
-    credential = saved.get_credential("srcnet")
+    credential = saved.authentication["srcnet"]
     assert isinstance(credential, OIDCCredential)
     assert credential.token.access is not None
     assert credential.token.access.get_secret_value() == "access-token"
