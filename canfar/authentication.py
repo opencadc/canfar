@@ -210,51 +210,6 @@ def _has_authentication(config: Configuration, idp: str) -> bool:
     return idp in config.authentication
 
 
-def _selection_history(config: Configuration) -> dict[str, str]:
-    """Return remembered server selections including the active pair."""
-    selections = dict(config.active.servers)
-    active_name = config.active.server
-    if active_name is None:
-        return selections
-
-    active_server = config.servers.get(active_name)
-    if (
-        active_server is not None
-        and active_server.idp == config.active.authentication
-        and active_server.name is not None
-    ):
-        selections[config.active.authentication] = active_server.name
-    return selections
-
-
-def _select_authentication(config: Configuration, idp: str) -> None:
-    """Select an Authentication Record and its remembered Server, if any."""
-    selections = _selection_history(config)
-    server_name = selections.get(idp)
-    if server_name is not None:
-        remembered = config.servers.get(server_name)
-        if remembered is None or remembered.idp != idp:
-            server_name = None
-
-    if server_name is None:
-        server_name = config.active.server
-        active_server = (
-            config.servers.get(server_name) if server_name is not None else None
-        )
-        if active_server is None or active_server.idp != idp:
-            server_name = None
-
-    active = config.active.model_copy(
-        update={
-            "authentication": idp,
-            "server": server_name,
-            "servers": selections,
-        },
-    )
-    config.editor.set("active", active)
-    config.editor.save()
-
-
 def _remove_authentication(config: Configuration, idp: str) -> None:
     """Remove one Authentication Record and its associated Server state."""
     authentication = dict(config.authentication)
