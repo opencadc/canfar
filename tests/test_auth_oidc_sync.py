@@ -107,7 +107,7 @@ def test_sync_poll_device_token_expires_at_challenge_deadline() -> None:
 
 
 def test_sync_poll_device_token_reports_denial_without_secrets() -> None:
-    """Terminal denial is reported without echoing provider response data."""
+    """Terminal denial omits OIDC Identity Provider response data."""
     client, requests = _oauth_client(
         httpx.Response(
             400,
