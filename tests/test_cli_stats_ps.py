@@ -6,6 +6,7 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import click
 import pytest
 import yaml
 from typer.testing import CliRunner
@@ -90,7 +91,7 @@ def test_ps_help_describes_default_status_filter() -> None:
     result = runner.invoke(cli, ["ps", "--help"])
 
     assert result.exit_code == 0
-    help_text = " ".join(result.stdout.replace("│", " ").split())
+    help_text = " ".join(click.unstyle(result.output).replace("│", " ").split())
     assert "default shows Pending and Running" in help_text
 
 
