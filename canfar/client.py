@@ -38,6 +38,11 @@ if TYPE_CHECKING:
 log = get_logger(__name__)
 
 
+def _has_runtime_token(token: SecretStr | None) -> bool:
+    """Return whether a runtime token contains a non-empty value."""
+    return token is not None and bool(token.get_secret_value())
+
+
 class HTTPClient(BaseSettings):
     """HTTP Client for interacting with CANFAR Science Platform services (V2).
 
@@ -150,7 +155,7 @@ class HTTPClient(BaseSettings):
     @property
     def uses_runtime_credentials(self) -> bool:
         """Return whether runtime token or certificate credentials are active."""
-        return self.token is not None or self.certificate is not None
+        return _has_runtime_token(self.token) or self.certificate is not None
 
     @property
     def authentication_record(self) -> AuthenticationCredential | None:
@@ -178,7 +183,7 @@ class HTTPClient(BaseSettings):
         Returns:
             Self: The configured client.
         """
-        if self.token is not None and self.certificate is not None:
+        if _has_runtime_token(self.token) and self.certificate is not None:
             log.warning("Both runtime token and certificate values provided.")
             log.warning("Runtime token takes precedence over certificate.")
             log.warning("Certificate will be ignored in favor of the token.")
@@ -282,11 +287,9 @@ class HTTPClient(BaseSettings):
         Returns:
             RuntimeCredential: Exactly one of a bearer token or a certificate.
         """
-        if self.token is not None:
-            token = self.token.get_secret_value()
-            if token:
-                return RuntimeCredential(token=token)
-            raise ValueError
+        if _has_runtime_token(self.token):
+            assert self.token is not None
+            return RuntimeCredential(token=self.token.get_secret_value())
         if self.certificate is not None:
             return RuntimeCredential(certificate=x509.valid(self.certificate))
 
@@ -372,7 +375,7 @@ class HTTPClient(BaseSettings):
                 max_connections=self.concurrency,
                 max_keepalive_connections=self.concurrency // 4,
             )
-        if self.token is not None:
+        if _has_runtime_token(self.token):
             return kwargs
 
         if self.certificate is not None:
@@ -408,7 +411,7 @@ class HTTPClient(BaseSettings):
         request_logger = debug.arequest if asynchronous else debug.request
         response_logger = debug.aresponse if asynchronous else debug.response
         request_hooks: list[Any] = []
-        if not self.uses_runtime_credentials and credential is not None:
+        if credential is not None:
             if isinstance(credential, OIDCCredential):
                 request_hooks.append(
                     auth.arefresh(self) if asynchronous else auth.refresh(self)
@@ -457,7 +460,8 @@ class HTTPClient(BaseSettings):
             "User-Agent": f"python-canfar/{__version__}",
         }
 
-        if self.token is not None:
+        if _has_runtime_token(self.token):
+            assert self.token is not None
             headers["Authorization"] = f"Bearer {self.token.get_secret_value()}"
             headers["X-Skaha-Authentication-Type"] = "RUNTIME-TOKEN"
         elif self.certificate is not None:

@@ -145,6 +145,48 @@ class TestInitializationAndConfiguration:
 class TestRuntimeCredentialHandling:
     """Test runtime credential handling including mutual exclusivity and validation."""
 
+    @pytest.mark.parametrize("asynchronous", [False, True])
+    def test_empty_token_is_saved_oidc_authentication(
+        self,
+        canfar_client_fixture,
+        asynchronous: bool,
+    ) -> None:
+        """An empty runtime token does not mask saved OIDC state."""
+        config = oidc_config(idp="oidc")
+        client = canfar_client_fixture(
+            config=config,
+            token=SecretStr(""),
+        )
+
+        assert not client.uses_runtime_credentials
+        credential = client._resolved_authentication_record()
+        assert credential is not None
+        assert credential.mode == "oidc"
+        headers = client._get_http_headers(credential=credential)
+        assert headers["Authorization"] == "Bearer access-token"
+        assert headers["X-Skaha-Authentication-Type"] == "OIDC"
+
+        kwargs = client._get_client_kwargs(
+            asynchronous=asynchronous,
+            credential=credential,
+        )
+        request_hooks = kwargs["event_hooks"]["request"]
+        assert request_hooks[0].__name__ == ("ahook" if asynchronous else "hook")
+
+    async def test_empty_token_materializes_saved_oidc_access_token(
+        self,
+        canfar_client_fixture,
+    ) -> None:
+        """Credential materialization falls through to saved OIDC state."""
+        client = canfar_client_fixture(
+            config=oidc_config(idp="oidc"),
+            token=SecretStr(""),
+        )
+
+        credential = await client._materialize_credentials()
+
+        assert credential.token == "access-token"
+
     def test_token_only(self, canfar_client_fixture) -> None:
         """Test instantiation with token only."""
         client = canfar_client_fixture(
