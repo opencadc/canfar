@@ -43,10 +43,8 @@ def canfar_logger() -> Generator[CanfarLogger]:
     logger = CanfarLogger()
     # Shared stdlib logger may already have handlers from earlier suite tests.
     logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
     yield logger
     logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
 
 
 def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
@@ -59,7 +57,6 @@ def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
     assert rich_handlers
     assert canfar_logger._rich_handler in rich_handlers  # noqa: SLF001
     assert not logger.propagate
-    assert canfar_logger._configured  # noqa: SLF001
 
 
 def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:

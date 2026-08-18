@@ -202,7 +202,6 @@ class CanfarLogger:
 
     def __init__(self) -> None:
         """Initialize per-instance file-handler state."""
-        self._configured = False
         self._rich_handler: RichHandler | None = None
         self._file_handler: logging.handlers.RotatingFileHandler | None = None
 
@@ -249,7 +248,6 @@ class CanfarLogger:
                 )
 
             logger.propagate = False
-            self._configured = True
 
     def _setup_file_logging(
         self,
