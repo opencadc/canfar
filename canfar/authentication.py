@@ -445,7 +445,7 @@ def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
             on_challenge=_print_device_challenge,
         )
     except _OIDC_DEVICE_LOGIN_ERRORS as exc:
-        _raise_oidc_authentication_error(exc)
+        return _raise_oidc_authentication_error(exc)
 
 
 async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
@@ -458,7 +458,7 @@ async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
             on_challenge=_print_device_challenge,
         )
     except _OIDC_DEVICE_LOGIN_ERRORS as exc:
-        _raise_oidc_authentication_error(exc)
+        return _raise_oidc_authentication_error(exc)
 
 
 __all__ = [

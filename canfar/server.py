@@ -7,14 +7,28 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict
 
 from canfar._server_discovery import (
-    ServerDiscoveryError,  # noqa: F401
-    ServerFetchError,  # noqa: F401
+    ServerDiscoveryError,
+    ServerFetchError,
     _validate_server,
     discover,
-    enrich,  # noqa: F401
+    enrich,
 )
 from canfar.models.config import Configuration
 from canfar.models.http import Server  # noqa: TC001
+
+__all__ = [
+    "ServerActivation",
+    "ServerDiscoveryError",
+    "ServerFetchError",
+    "ServerSelectionRequiredError",
+    "ServerSelectorError",
+    "activate",
+    "activate_authentication",
+    "discover",
+    "enrich",
+    "list_servers",
+    "use",
+]
 
 
 class ServerSelectorError(ValueError):
