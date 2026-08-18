@@ -249,10 +249,13 @@ def _persist(
         raise ValueError(msg) from None
 
     updated = credential.model_copy(update={"token": token, "expiry": expiry})
+    if credential.idp not in config.authentication:
+        msg = f"Authentication record for IDP '{credential.idp}' not found."
+        raise KeyError(msg)
     candidate = config.model_copy(deep=True)
-    candidate.update_credential(updated)
-    candidate.save()
-    config.update_credential(updated)
+    candidate.editor.set(f"authentication.{updated.idp}", updated)
+    candidate.editor.save()
+    config.editor.set(f"authentication.{updated.idp}", updated)
     return updated
 
 

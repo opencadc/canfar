@@ -72,7 +72,7 @@ def _login_flow(
         raise typer.Exit(1) from exc
 
     config = Configuration()  # ty: ignore[missing-argument]
-    config.upsert_credential(credential)
+    config.editor.set(f"authentication.{credential.idp}", credential)
 
     try:
         servers = discover(

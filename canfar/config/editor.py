@@ -67,7 +67,7 @@ def set_value(config: Configuration, path: str, value: Any) -> Configuration:
         cursor = _ensure_child_container(cursor, segment)
 
     _set_in_container(cursor, segments[-1], value)
-    return config.__class__.model_validate(data)
+    return config._validated_copy(**data)  # noqa: SLF001
 
 
 @dataclass(slots=True)
