@@ -11,7 +11,7 @@ import typer.core
 from canfar.cli._run import run
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Context
@@ -33,6 +33,14 @@ class PruneUsageMessage(typer.core.TyperGroup):
         Returns:
             str: The usage message.
         """
+        return "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
+
+
+class PruneCommandUsageMessage(typer.core.TyperCommand):
+    """Keep the root leaf usage text aligned with the CLI contract."""
+
+    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
+        """Return the documented prune usage line."""
         return "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
 
 
@@ -82,6 +90,7 @@ def prune_sessions(
     canfar prune session-name headless Succeeded
     canfar prune 'session.*' notebook Running
     """
+    emit_cli_active_server_banner()
 
     async def _prune() -> None:
         """Delete matching sessions from the science platform server."""

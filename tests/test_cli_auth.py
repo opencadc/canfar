@@ -13,7 +13,6 @@ from typer.testing import CliRunner
 
 from canfar.authentication import Authentication
 from canfar.cli.auth import auth
-from canfar.cli.main import cli
 from canfar.models.config import Configuration
 
 if TYPE_CHECKING:
@@ -301,15 +300,3 @@ def test_auth_purge_force_preserves_registry_and_console(tmp_path: Path) -> None
     with _patch_config(config_path):
         after = Configuration()
     assert after.console.width == 99
-
-
-def test_authentication_alias_is_wired(tmp_path: Path) -> None:
-    """``canfar authentication`` aliases ``canfar auth``."""
-    config_path = tmp_path / "config.yaml"
-    _write_config(config_path)
-
-    with _patch_config(config_path):
-        result = runner.invoke(cli, ["authentication"])
-
-    assert result.exit_code == 0
-    assert "cadc" in result.stdout

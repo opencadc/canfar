@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from functools import lru_cache
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 
 from canfar.models.config import Configuration
+
+if TYPE_CHECKING:
+    from typer.models import Context
+
+_CLI_ROOT_ACTIVE: ContextVar[bool] = ContextVar("canfar_cli_root_active", default=False)
 
 
 @lru_cache(maxsize=2)
@@ -33,3 +40,15 @@ def emit_active_server_banner() -> None:
     except KeyError:
         name = "unknown"
     get_console().print(f"@{name}", style="dim underline")
+
+
+def activate_cli_root(ctx: Context) -> None:
+    """Mark callbacks dispatched by the root CLI until their context closes."""
+    token = _CLI_ROOT_ACTIVE.set(True)
+    ctx.call_on_close(lambda: _CLI_ROOT_ACTIVE.reset(token))
+
+
+def emit_cli_active_server_banner() -> None:
+    """Emit the banner only when a command runs through the root CLI."""
+    if _CLI_ROOT_ACTIVE.get():
+        emit_active_server_banner()
