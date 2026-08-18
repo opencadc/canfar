@@ -303,43 +303,24 @@ def _remove_authentication(config: Configuration, idp: str) -> None:
         active = active.model_copy(update={"server": None})
 
     editor = config.editor
-    editor.set("active", active)
-    editor.set("authentication", authentication)
-    editor.set("servers", servers)
+    editor._set_top_level(  # noqa: SLF001
+        active=active,
+        authentication=authentication,
+        servers=servers,
+    )
     editor.save()
 
 
 def _purge_authentication(config: Configuration) -> None:
     """Reset Authentication and Server state while preserving other settings."""
-    authentication = {
-        **config.authentication,
-        **{
-            key: credential.model_copy(deep=True)
-            for key, credential in default_authentication.items()
-        },
-    }
-    servers = {
-        **config.servers,
-        **{
-            name: server.model_copy(deep=True)
-            for name, server in default_servers.items()
-        },
-    }
     editor = config.editor
-    # Add defaults before switching active references so each editor update validates.
-    editor.set("authentication", authentication)
-    editor.set("servers", servers)
-    editor.set("active", default_active.model_copy(deep=True))
-    editor.set(
-        "authentication",
-        {
+    editor._set_top_level(  # noqa: SLF001
+        active=default_active.model_copy(deep=True),
+        authentication={
             key: credential.model_copy(deep=True)
             for key, credential in default_authentication.items()
         },
-    )
-    editor.set(
-        "servers",
-        {
+        servers={
             name: server.model_copy(deep=True)
             for name, server in default_servers.items()
         },

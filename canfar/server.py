@@ -465,8 +465,10 @@ def _store_active_selection(
             "servers": selections,
         },
     )
-    config.editor.set("servers", servers)
-    config.editor.set("active", active)
+    config.editor._set_top_level(  # noqa: SLF001
+        servers=servers,
+        active=active,
+    )
 
 
 def _resolve_selector(

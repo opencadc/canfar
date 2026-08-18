@@ -174,6 +174,25 @@ def test_editor_failed_set_preserves_configuration(tmp_path: Path) -> None:
     assert config.model_dump(mode="python") == original
 
 
+def test_editor_failed_top_level_batch_preserves_configuration(
+    tmp_path: Path,
+) -> None:
+    """Invalid complete-state edits do not partially mutate the bound config."""
+    config_path = tmp_path / "config.yaml"
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+        original = config.model_dump(mode="python")
+
+        with pytest.raises(ValidationError):
+            config.editor._set_top_level(  # noqa: SLF001
+                active=config.active.model_copy(update={"authentication": "missing"}),
+                authentication={},
+                servers={},
+            )
+
+    assert config.model_dump(mode="python") == original
+
+
 def test_editor_save_failure_preserves_existing_file(tmp_path: Path) -> None:
     """A failed editor save leaves the existing YAML untouched."""
     config_path = tmp_path / "config.yaml"
