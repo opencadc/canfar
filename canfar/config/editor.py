@@ -78,8 +78,8 @@ def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
     return candidate
 
 
-def set_value(config: Configuration, path: str, value: Any) -> Configuration:
-    """Return a new validated configuration with a dotted-path value updated."""
+def _updated_data(config: Configuration, path: str, value: Any) -> dict[str, Any]:
+    """Return serialized top-level data with one dotted-path value updated."""
     segments = _parse_dotted_path(path)
     data = config.model_dump(mode="python")
     cursor: Any = data
@@ -88,7 +88,12 @@ def set_value(config: Configuration, path: str, value: Any) -> Configuration:
         cursor = _ensure_child_container(cursor, segment)
 
     _set_in_container(cursor, segments[-1], value)
-    return _validated_copy(config, **data)
+    return data
+
+
+def set_value(config: Configuration, path: str, value: Any) -> Configuration:
+    """Return a new validated configuration with a dotted-path value updated."""
+    return _validated_copy(config, **_updated_data(config, path, value))
 
 
 def _restore_oidc_secrets(config: Configuration, data: dict[str, Any]) -> None:
@@ -160,16 +165,20 @@ class ConfigurationEditor:
 
     _config: Configuration
 
+    def _set_top_level(self, **updates: Any) -> Configuration:
+        """Validate and install one complete top-level configuration update."""
+        updated = _validated_copy(self._config, **updates)
+        self._config.__dict__ = updated.__dict__.copy()
+        self._config.__pydantic_fields_set__ = updated.__pydantic_fields_set__.copy()
+        return self._config
+
     def get(self, key: str) -> Any:
         """Read a scalar, mapping, or whole-list value by dotted path."""
         return get_value(self._config, key)
 
     def set(self, key: str, value: Any) -> Configuration:
         """Validate and install a dotted-path update on the bound config."""
-        updated = set_value(self._config, key, value)
-        self._config.__dict__.update(updated.__dict__)
-        self._config.__pydantic_fields_set__ = updated.__pydantic_fields_set__.copy()
-        return self._config
+        return self._set_top_level(**_updated_data(self._config, key, value))
 
     def save(self) -> None:
         """Atomically persist the bound Configuration."""
