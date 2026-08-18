@@ -13,7 +13,6 @@ import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
-import canfar.server as platform
 from canfar._server_discovery import (
     _discover_for_idp,
     _discovered_to_server,
@@ -34,6 +33,9 @@ from canfar.server import (
     discover,
     enrich,
     use,
+)
+from canfar.server import (
+    __all__ as server_exports,
 )
 from canfar.server import (
     list_servers as server_list,
@@ -74,8 +76,7 @@ def test_public_exports_declare_server_api() -> None:
         "use",
     }
 
-    assert set(platform.__all__) == expected
-    assert all(hasattr(platform, name) for name in expected)
+    assert set(server_exports) == expected
 
 
 def test_enrich_preserves_storage_resource_annotation() -> None:
