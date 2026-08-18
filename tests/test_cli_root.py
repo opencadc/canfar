@@ -148,8 +148,5 @@ def test_root_leaf_help_keeps_canonical_usage() -> None:
     assert create_result.exit_code == 0
     assert "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]" in create_help
     assert prune_result.exit_code == 0
-    prune_usage = (
-        "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS "
-        "COMMAND [ARGS]..."
-    )
+    prune_usage = "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
     assert prune_usage in prune_help
