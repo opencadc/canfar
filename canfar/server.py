@@ -198,9 +198,9 @@ def discover(
         canonical[name]
         for name in sorted(canonical, key=lambda value: (value.casefold(), value))
     ]
-    target_config.upsert_servers(merged)
+    _store_discovered_servers(target_config, merged)
     if save:
-        target_config.save()
+        target_config.editor.save()
     return merged
 
 
@@ -240,8 +240,8 @@ def activate(
     if selector is None:
         active_server = _active_server_for_idp(target_config, idp)
         if active_server is not None:
-            target_config.set_active_selection(idp, active_server)
-            target_config.save()
+            _store_active_selection(target_config, idp, active_server)
+            target_config.editor.save()
             return ServerActivation(server=active_server, reason="active")
 
         servers = _servers_for_idp(target_config, idp)
@@ -255,11 +255,11 @@ def activate(
             )
 
         remembered = _remembered_server_for_idp(target_config, idp, servers)
-        if remembered is not None and remembered.uri is not None:
-            selector = str(remembered.uri)
+        if remembered is not None and remembered.name is not None:
+            selector = remembered.name
             reason = "remembered"
-        elif len(servers) == 1 and servers[0].uri is not None:
-            selector = str(servers[0].uri)
+        elif len(servers) == 1 and servers[0].name is not None:
+            selector = servers[0].name
             reason = "single"
         else:
             raise ServerSelectionRequiredError(idp, servers)
@@ -290,9 +290,34 @@ def activate(
         dev=dev,
         timeout=timeout,
     )
-    target_config.set_active_selection(idp, validated)
-    target_config.save()
+    _store_active_selection(target_config, idp, validated)
+    target_config.editor.save()
     return ServerActivation(server=validated, reason=reason)
+
+
+def activate_authentication(
+    idp: str,
+    *,
+    config: Configuration | None = None,
+) -> None:
+    """Activate an Authentication Record and its remembered Server Selection."""
+    target_config = config or Configuration()  # ty: ignore[missing-argument]
+    target_config.get_credential(idp)
+    servers = _servers_for_idp(target_config, idp)
+    remembered = _remembered_server_for_idp(target_config, idp, servers)
+    if remembered is not None:
+        _store_active_selection(target_config, idp, remembered)
+    else:
+        active_server = _active_server_for_idp(target_config, idp)
+        active = target_config.active.model_copy(
+            update={
+                "authentication": idp,
+                "server": active_server.name if active_server is not None else None,
+                "servers": _server_selection_history(target_config),
+            },
+        )
+        target_config.editor.set("active", active)
+    target_config.editor.save()
 
 
 def list_servers(
@@ -324,7 +349,7 @@ def list_servers(
         return servers
 
     discover(active_idp, config=config, dev=dev, timeout=timeout, save=False)
-    config.save()
+    config.editor.save()
     return [server for server in config.servers.values() if server.idp == active_idp]
 
 
@@ -364,9 +389,8 @@ def _servers_for_idp(config: Configuration, idp: str) -> list[Server]:
 def _active_server_for_idp(config: Configuration, idp: str) -> Server | None:
     if config.active.server is None:
         return None
-    try:
-        active_server = config.get_active_server()
-    except KeyError:
+    active_server = config.servers.get(config.active.server)
+    if active_server is None:
         return None
     if active_server.idp != idp:
         return None
@@ -378,14 +402,69 @@ def _remembered_server_for_idp(
     idp: str,
     servers: list[Server],
 ) -> Server | None:
-    remembered = config.get_remembered_server_for_idp(idp)
-    if remembered is None or remembered.uri is None:
+    name = _server_selection_history(config).get(idp)
+    if name is None:
         return None
-    if remembered.name is None:
+    remembered = config.servers.get(name)
+    if remembered is None or remembered.idp != idp:
         return None
-    if not any(server.name == remembered.name for server in servers):
+    if not any(server.name == name for server in servers):
         return None
     return remembered
+
+
+def _server_selection_history(config: Configuration) -> dict[str, str]:
+    """Return remembered Server Selections seeded by the active pair."""
+    selections = dict(config.active.servers)
+    active_name = config.active.server
+    if active_name is None:
+        return selections
+
+    active_server = config.servers.get(active_name)
+    if (
+        active_server is not None
+        and active_server.idp == config.active.authentication
+        and active_server.name is not None
+    ):
+        selections[config.active.authentication] = active_server.name
+    return selections
+
+
+def _store_discovered_servers(
+    config: Configuration,
+    servers: list[Server],
+) -> None:
+    """Merge discovered Science Platform Servers through the editor boundary."""
+    updated = dict(config.servers)
+    for server in servers:
+        if server.name is not None:
+            updated[server.name] = server
+    config.editor.set("servers", updated)
+
+
+def _store_active_selection(
+    config: Configuration,
+    idp: str,
+    server: Server,
+) -> None:
+    """Store a Server Selection and its history through the editor boundary."""
+    if server.name is None:
+        msg = "Server name is required for active selection."
+        raise ValueError(msg)
+
+    selected = server.model_copy(update={"idp": idp}, deep=True)
+    servers = {**config.servers, server.name: selected}
+    selections = _server_selection_history(config)
+    selections[idp] = server.name
+    active = config.active.model_copy(
+        update={
+            "authentication": idp,
+            "server": server.name,
+            "servers": selections,
+        },
+    )
+    config.editor.set("servers", servers)
+    config.editor.set("active", active)
 
 
 def _resolve_selector(

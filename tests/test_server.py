@@ -145,9 +145,125 @@ class TestServerList:
 
         assert servers == []
 
+    def test_discover_uses_editor_for_server_state_and_persistence(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Discovery updates and persists Servers through the editor boundary."""
+        discovered = _cadc_server(name="Discovered-CADC")
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+        ):
+            config = _anonymous_config()
+            with (
+                patch.object(
+                    Configuration,
+                    "upsert_servers",
+                    side_effect=AssertionError("discovery must use config.editor"),
+                ),
+                patch.object(
+                    Configuration,
+                    "save",
+                    side_effect=AssertionError("discovery must use config.editor"),
+                ),
+            ):
+                discover("cadc", config=config)
+
+            assert config.servers["Discovered-CADC"] == discovered
+            assert Configuration().servers["Discovered-CADC"] == discovered
+
 
 class TestServerUse:
     """Tests for canfar.server.use()."""
+
+    def test_activate_uses_editor_for_active_selection_and_history(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Activation records a Server Name through the editor boundary."""
+        target = _cadc_server(name="Selected-CADC")
+        fetched = target.model_copy(update={"cores": 8}, deep=True)
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config(target)
+            config.save()
+
+            with (
+                patch("canfar.server._validate_server", return_value=fetched),
+                patch.object(
+                    Configuration,
+                    "set_active_selection",
+                    side_effect=AssertionError("activation must use config.editor"),
+                ),
+                patch.object(
+                    Configuration,
+                    "save",
+                    side_effect=AssertionError("activation must use config.editor"),
+                ),
+            ):
+                activation = activate("cadc", "Selected-CADC", config=config)
+
+            assert activation.server == fetched
+            assert config.active.server == "Selected-CADC"
+            assert config.active.servers["cadc"] == "Selected-CADC"
+            saved = Configuration()
+
+        assert saved.active.server == "Selected-CADC"
+        assert saved.active.servers["cadc"] == "Selected-CADC"
+
+    def test_activate_resolves_remembered_selection_by_server_name(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Remembered Server Selection is resolved by Server Name, not URI."""
+        first = _cadc_server(name="First", uri=AnyUrl("ivo://first.example/skaha"))
+        remembered = _cadc_server(
+            name="Remembered",
+            uri=AnyUrl("ivo://remembered.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration(
+                active=ActiveConfig(
+                    authentication="cadc",
+                    server=None,
+                    servers={"cadc": "Remembered"},
+                ),
+                authentication={"cadc": X509Credential(idp="cadc")},
+                servers={first.name: first, remembered.name: remembered},
+            )
+
+            with (
+                patch("canfar.server._validate_server", return_value=remembered),
+                patch.object(
+                    Configuration,
+                    "get_remembered_server_for_idp",
+                    side_effect=AssertionError(
+                        "remembered selection must be owned by Platform"
+                    ),
+                ),
+                patch.object(
+                    Configuration,
+                    "set_active_selection",
+                    side_effect=AssertionError("activation must use config.editor"),
+                ),
+                patch.object(
+                    Configuration,
+                    "save",
+                    side_effect=AssertionError("activation must use config.editor"),
+                ),
+            ):
+                activation = activate("cadc", config=config)
+
+        assert activation.reason == "remembered"
+        assert activation.server.name == "Remembered"
+        assert config.active.server == "Remembered"
+        assert config.active.servers["cadc"] == "Remembered"
 
     def test_use_by_uri_updates_active_server(self, tmp_path: Path) -> None:
         """Selecting by URI fetches, validates, and saves the active server."""
