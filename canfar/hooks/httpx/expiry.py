@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Callable
 
-from canfar import get_logger
 from canfar.auth import x509
 from canfar.exceptions.context import AuthExpiredError
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable

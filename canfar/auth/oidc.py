@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import socket
 import time
 from collections.abc import Awaitable, Callable, Generator
@@ -14,7 +15,6 @@ from authlib.integrations.base_client.errors import OAuthError
 from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
 from pydantic import SecretStr, ValidationError
 
-from canfar import get_logger
 from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Token
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 
     from canfar.models.config import Configuration
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 _BASIC_AUTH_METHOD = "client_secret_basic"
 
 DeviceFlow = Callable[

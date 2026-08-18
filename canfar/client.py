@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import ssl
 from datetime import datetime, timezone
 from email.utils import formatdate
@@ -20,7 +21,7 @@ from pydantic import (
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing_extensions import Self
 
-from canfar import __version__, get_logger
+from canfar import __version__
 from canfar.auth import oidc, x509
 from canfar.exceptions.context import AuthContextError
 from canfar.hooks.httpx import auth, debug, errors, expiry
@@ -35,7 +36,7 @@ from canfar.models.config import Configuration
 if TYPE_CHECKING:
     from types import TracebackType
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _has_runtime_token(token: SecretStr | None) -> bool:

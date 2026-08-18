@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
@@ -28,7 +29,7 @@ from pydantic_settings import (
 )
 from pydantic_settings.sources import EnvSettingsSource
 
-from canfar import CONFIG_PATH, get_logger
+from canfar import CONFIG_PATH
 from canfar.config.editor import ConfigurationEditor as _ConfigurationEditor
 from canfar.config.editor import get_value as _get_value
 from canfar.config.editor import set_value as _set_value
@@ -40,7 +41,7 @@ from canfar.models.auth import (
 from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import ContainerRegistry
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 _CADC_URI = AnyUrl("ivo://cadc.nrc.ca/skaha")
 _CONFIG_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")

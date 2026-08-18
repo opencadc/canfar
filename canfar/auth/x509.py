@@ -6,6 +6,7 @@ using the cadcutils.net.auth library as the backbone for X509 authentication.
 
 from __future__ import annotations
 
+import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -13,12 +14,12 @@ from typing import TYPE_CHECKING, Any
 from cadcutils.net.auth import Subject, get_cert
 from cryptography import x509
 
-from canfar import CERT_PATH, get_logger
+from canfar import CERT_PATH
 
 if TYPE_CHECKING:
     from canfar.models.auth import X509Credential
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class CertificateError(ValueError):

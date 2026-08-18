@@ -29,9 +29,9 @@ Note:
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Callable
 
-from canfar import get_logger
 from canfar.auth import oidc
 from canfar.models.auth import OIDCCredential
 
@@ -43,7 +43,7 @@ if TYPE_CHECKING:
 
     from canfar.client import HTTPClient
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AuthenticationError(Exception):
