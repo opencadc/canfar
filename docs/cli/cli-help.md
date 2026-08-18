@@ -72,8 +72,8 @@ canfar auth purge --force
 Machine output is supported for `auth` / `auth show` and `auth ls`:
 
 ```bash
-canfar auth show --json
-canfar auth ls --yaml
+canfar auth show -o json
+canfar auth ls --output yaml
 ```
 
 ### `canfar server`
@@ -112,10 +112,10 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 | `--replicas` | `-r` | Number of replicas. Default: `1`. |
 | `--debug` | | Print parsed Session request details. |
 | `--dry-run` | | Parse parameters and exit. |
-| `--json` | | Emit created Session IDs as a JSON list. |
-| `--yaml` | | Emit created Session IDs as a YAML list. |
+| `--output FORMAT` | `-o` | Emit created Session IDs as JSON or YAML (`json` or `yaml`). |
 
-`--json` and `--yaml` are mutually exclusive. `--dry-run` is human-output only.
+`--output` is recognized before `--`; tokens after `--` are passed verbatim to
+the container command. `--dry-run` is human-output only.
 
 Examples:
 
@@ -142,8 +142,8 @@ canfar ps [OPTIONS]
 Machine output:
 
 ```bash
-canfar ps --json
-canfar ps --yaml
+canfar ps -o json
+canfar ps --output yaml
 ```
 
 `--quiet` is a human-output shortcut and is incompatible with machine output.
@@ -212,7 +212,7 @@ canfar version --debug
 `config set` parses values as YAML.
 `console.banner` defaults to `true`. Set it to `false` to hide the
 `@<server-name>` prefix from human-readable CLI output. The banner is always
-disabled for `--json` and `--yaml` output.
+disabled for `-o json` and `--output yaml` output.
 `version --debug` shows environment and dependency details for bug reports; it
 does not change the logging level.
 
@@ -220,9 +220,8 @@ does not change the logging level.
 
 | Rule | Behavior |
 | --- | --- |
-| Flags | `--json` or `--yaml`. |
-| Placement | Put the flag after the command, for example `canfar ps --json`. |
-| Conflict | `--json --yaml` exits 2. |
+| Option | `-o/--output` with `json` or `yaml`. |
+| Placement | Put the option after the command, for example `canfar ps -o json`. |
 | stdout | Data payload only. |
 | stderr | Diagnostics and errors. |
 | Unsupported command | Exits 1 with a clear unsupported-machine-output message. |

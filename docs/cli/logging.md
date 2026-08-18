@@ -40,10 +40,10 @@ Precedence is:
 `--log-level` therefore wins when it is combined with `-v`. Level names are
 case-insensitive.
 
-The machine-output flags remain leaf options after the command. For example:
+The machine-output option remains a leaf option after the command. For example:
 
 ```bash
-canfar --log-level debug ps --json
+canfar --log-level debug ps -o json
 ```
 
 The corresponding environment setting is:
@@ -97,7 +97,7 @@ DEBUG  HTTP STATUS CODE -> 200
 ```
 
 These lines follow the normal logging policy: stderr (and the optional file
-sink), never mixed into `--json`/`--yaml` stdout payloads.
+sink), never mixed into `-o json`/`--output yaml` stdout payloads.
 
 ## stdout and stderr
 
@@ -112,12 +112,12 @@ JSON and YAML stdout remain data-only at every log level. Redirect the streams
 independently when a script needs both:
 
 ```bash
-canfar --log-level debug ps --json \
+canfar --log-level debug ps -o json \
   > sessions.json \
   2> diagnostics.log
 ```
 
-In `--json` or `--yaml` mode, logging setup failures and file-sink warnings are
+In `-o json` or `--output yaml` mode, logging setup failures and file-sink warnings are
 serialized in the selected format on stderr. They never add a banner or log
 line to the command payload on stdout.
 

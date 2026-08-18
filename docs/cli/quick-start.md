@@ -70,7 +70,7 @@ canfar info $(canfar ps -q)
 Use machine output in scripts:
 
 ```bash
-canfar ps --json
+canfar ps -o json
 ```
 
 ## 6. Open the notebook
@@ -125,7 +125,7 @@ canfar create headless skaha/terminal:1.1.2 -- python /arc/projects/demo/run.py
 | Need another Server | `canfar server ls` then `canfar server use <name-or-uri>` |
 | Session is pending | `canfar events $(canfar ps -q)` |
 | Need cluster capacity | `canfar stats` |
-| Need structured output | `canfar ps --json` |
+| Need structured output | `canfar ps -o json` |
 
 Logging controls belong before the command. See
 [Logging and observability](logging.md) for the complete policy.

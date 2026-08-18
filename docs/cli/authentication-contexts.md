@@ -51,8 +51,8 @@ canfar auth ls
 Use machine output when a script needs stable stdout:
 
 ```bash
-canfar auth show --json
-canfar auth ls --yaml
+canfar auth show -o json
+canfar auth ls --output yaml
 ```
 
 ## Switch IDP
@@ -150,10 +150,9 @@ Legacy or unsupported config files are backed up to
 
 | Rule | Behavior |
 | --- | --- |
-| Supported flags | `--json` and `--yaml` |
-| Placement | Put the flag after the command that emits data, for example `canfar auth ls --json`. |
-| Unsupported placement | `canfar auth --json ls` exits 2. |
-| Conflicts | `--json --yaml` exits 2. |
+| Output option | `-o/--output` with `json` or `yaml` |
+| Placement | Put the option after the command that emits data, for example `canfar auth ls -o json`. |
+| Unsupported placement | `canfar auth -o json ls` exits 2. |
 | stdout | Data only in machine mode. |
 | stderr | Diagnostics and errors. |
 | Unsupported commands | Exit 1 with `machine output not supported for this command yet` and `use default human output for now`. |
