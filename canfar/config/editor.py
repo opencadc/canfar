@@ -60,10 +60,6 @@ def get_value(config: Configuration, path: str) -> Any:
 def set_value(config: Configuration, path: str, value: Any) -> Configuration:
     """Return a new validated configuration with a dotted-path value updated."""
     segments = _parse_dotted_path(path)
-    if not segments:
-        msg = "Path cannot be empty"
-        raise ValueError(msg)
-
     data = config.model_dump(mode="python")
     cursor: Any = data
 

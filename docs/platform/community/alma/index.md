@@ -14,7 +14,7 @@ Science Portal layout changes.
 - A persistent destination: use `/arc/home/[username]` for personal files or
   `/arc/projects/[project]` for shared work. Treat `/scratch` as temporary;
   it is suitable for fast intermediate files, not final results.
-- A Session type that matches the task: use **Desktop** for CASA and other GUI
+- A Session Kind that matches the task: use **Desktop** for CASA and other GUI
   applications, **Notebook** for Python-based analysis, and **CARTA** for
   inspecting images and spectral cubes.
 - Optional command-line access. Install the shipped client and log in:
@@ -94,7 +94,7 @@ lists version-specific package notes and known issues.
 
 Open calibrated measurement sets or image products from a CARTA Session when
 you need cube navigation, spectra, regions, or moment-map inspection. Use a
-Notebook Session for Python analysis. Both Session types can read files saved
+Notebook Session for Python analysis. Both Session Kinds can read files saved
 under `/arc/home/[username]` and `/arc/projects/[project]`.
 
 For a local or scripted check, list the result before opening it:
@@ -150,7 +150,7 @@ At the end of the workflow:
 | --- | --- |
 | Login fails or credentials are stale | Run `canfar --log-level debug login cadc --force`, then `canfar auth show`. |
 | No suitable image appears | Run `canfar image ls --kind desktop` (or `--kind notebook`/`--kind carta`) and choose an image that includes the required software. |
-| Session remains pending | Run `canfar ps --all`, `canfar events [session-id]`, and `canfar stats`; reduce requested resources if the cluster has no capacity. |
+| Session remains pending | Run `canfar ps --all`, `canfar events [session-id]`, and `canfar stats`; reduce requested resources if the Science Platform Server has no capacity. |
 | A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls`; check that the active Authentication can access the target. |
 | Files disappear after the Session ends | Move them from `/scratch` to `/arc/home/[username]` or `/arc/projects/[project]` before deleting the Session. |
 | A shared project path is denied | Ask the project administrator to add your CADC account to the project group; see [Permissions](../../permissions.md). |

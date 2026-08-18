@@ -22,30 +22,6 @@ def run_commands(workflow: dict) -> list[str]:
     ]
 
 
-def test_fast_and_full_test_workflows_delegate_to_one_explicit_contract():
-    fast = load_workflow("ci.yml")
-    full = load_workflow("full-tests.yml")
-
-    fast_job = fast["jobs"]["tests"]
-    full_job = full["jobs"]["tests"]
-
-    assert fast_job["uses"] == "./.github/workflows/reusable-tests.yml"
-    assert fast_job["with"] == {"full-suite": False}
-    assert fast_job["secrets"] == {
-        "CODECOV_TOKEN": "${{ secrets.CODECOV_TOKEN }}",
-    }
-    assert fast_job["needs"] == "pre-commit-checks"
-
-    assert full_job["uses"] == "./.github/workflows/reusable-tests.yml"
-    assert full_job["with"] == {"full-suite": True}
-    assert full_job["secrets"] == {
-        "CANFAR_BASEURL": "${{ secrets.CANFAR_BASEURL }}",
-        "CANFAR_USERNAME": "${{ secrets.CANFAR_USERNAME }}",
-        "CANFAR_PASSWORD": "${{ secrets.CANFAR_PASSWORD }}",
-        "CODECOV_TOKEN": "${{ secrets.CODECOV_TOKEN }}",
-    }
-
-
 def test_reusable_tests_preserve_fast_and_credentialed_commands():
     workflow = load_workflow("reusable-tests.yml")
     events = workflow_events(workflow)
@@ -183,8 +159,13 @@ def test_pull_requests_use_the_fast_suite_for_maintained_branches():
 
     assert set(events["pull_request"]["branches"]) == {"main", "feat/interfaces"}
     assert "paths-ignore" not in events["pull_request"]
-    assert workflow["jobs"]["tests"]["uses"] == "./.github/workflows/reusable-tests.yml"
-    assert workflow["jobs"]["tests"]["with"] == {"full-suite": False}
+    job = workflow["jobs"]["tests"]
+    assert job["uses"] == "./.github/workflows/reusable-tests.yml"
+    assert job["with"] == {"full-suite": False}
+    assert job["needs"] == "pre-commit-checks"
+    assert job["secrets"] == {
+        "CODECOV_TOKEN": "${{ secrets.CODECOV_TOKEN }}",
+    }
 
 
 def test_full_suite_is_limited_to_merged_code_prs_into_main():
