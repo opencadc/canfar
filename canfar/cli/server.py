@@ -11,7 +11,7 @@ from rich.table import Table
 from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -65,11 +65,10 @@ def _render_server_list_table(servers: list[Server]) -> None:
 
 @server.command("list, ls")
 def server_list_command(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """List servers for the active Identity Provider."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
 
     try:
         auth_show()

@@ -2,46 +2,55 @@
 
 from __future__ import annotations
 
+from enum import Enum
 from typing import Annotated
 
 import typer
 
 from canfar.cli import output
 
-JsonOption = Annotated[
-    bool,
-    typer.Option("--json", help="Emit machine-readable JSON on stdout."),
+
+class OutputFormat(str, Enum):
+    """Machine output formats accepted by leaf commands."""
+
+    JSON = "json"
+    YAML = "yaml"
+
+
+OutputOption = Annotated[
+    OutputFormat | None,
+    typer.Option(
+        "-o",
+        "--output",
+        metavar="json|yaml",
+        help="Emit machine-readable JSON or YAML on stdout.",
+    ),
 ]
-"""Leaf command flag for JSON machine output."""
-
-YamlOption = Annotated[
-    bool,
-    typer.Option("--yaml", help="Emit machine-readable YAML on stdout."),
-]
-"""Leaf command flag for YAML machine output."""
+"""Leaf command option for selecting machine output format."""
 
 
-def resolve_mode(json_output: bool, yaml_output: bool) -> output.OutputMode:
-    """Resolve machine output mode from leaf command flags.
+def resolve_mode(output_format: OutputFormat | str | None) -> output.OutputMode:
+    """Resolve machine output mode from the leaf output option.
 
     Args:
-        json_output: Whether ``--json`` was supplied.
-        yaml_output: Whether ``--yaml`` was supplied.
+        output_format: Requested machine output format, if any.
 
     Returns:
         Effective output mode for the invocation.
 
     Raises:
-        typer.Exit: Exit code 2 when both machine flags are supplied.
+        ValueError: If the format is not supported.
     """
-    if json_output and yaml_output:
-        typer.echo(
-            "Conflicting machine output flags: use only one of --json or --yaml.",
-            err=True,
-        )
-        raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
-    if json_output:
+    if output_format is None:
+        return output.OutputMode.HUMAN
+    value = (
+        output_format.value
+        if isinstance(output_format, OutputFormat)
+        else output_format
+    )
+    if value == "json":
         return output.OutputMode.JSON
-    if yaml_output:
+    if value == "yaml":
         return output.OutputMode.YAML
-    return output.OutputMode.HUMAN
+    message = f"Unsupported output format: {value}"
+    raise ValueError(message)

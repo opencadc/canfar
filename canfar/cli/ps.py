@@ -15,7 +15,7 @@ from rich.table import Table
 
 from canfar.cli import output
 from canfar.cli._run import run
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -195,16 +195,15 @@ def show(
             help="Show Session response warnings.",
         ),
     ] = False,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Show sessions."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
 
     if quiet and mode is not output.OutputMode.HUMAN:
         typer.echo(
             "Incompatible flags: --quiet is human-only and cannot be used with "
-            "--json or --yaml.",
+            "--output json or --output yaml.",
             err=True,
         )
         raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)

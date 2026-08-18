@@ -175,4 +175,4 @@ see the [registry guide](../containers/registry.md).
 | Command exits unexpectedly | `canfar logs SESSION_ID` |
 | Resource request waits too long | Try flexible mode or smaller fixed resources |
 | Image pull fails | Verify the image name and registry credentials |
-| Need structured Session data | `canfar ps --json` |
+| Need structured Session data | `canfar ps -o json` |

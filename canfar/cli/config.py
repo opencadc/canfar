@@ -10,7 +10,7 @@ from pydantic_settings.exceptions import SettingsError
 
 from canfar import CONFIG_PATH
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -39,11 +39,10 @@ def _configuration_failure(error: Exception) -> StructuredError:
 
 @config.command("show", help="Display client configuration")
 def show(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Display client configuration."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -95,8 +94,7 @@ def get(
         ...,
         help="Config key to get in dot notation.",
     ),
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Retrieve a config value.
 
@@ -104,7 +102,7 @@ def get(
     canfar config get active.server
     canfar config get servers.canfar.url
     """
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (

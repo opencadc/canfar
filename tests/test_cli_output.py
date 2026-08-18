@@ -6,7 +6,6 @@ import json
 from io import StringIO
 
 import pytest
-import typer
 import yaml
 from pydantic import BaseModel
 
@@ -31,27 +30,20 @@ def test_output_mode_values() -> None:
 
 
 def test_resolve_mode_defaults_to_human() -> None:
-    """No machine flags resolve to human output mode."""
-    assert machine.resolve_mode(json_output=False, yaml_output=False) == (
-        output.OutputMode.HUMAN
-    )
+    """No output option resolves to human output mode."""
+    assert machine.resolve_mode(None) == output.OutputMode.HUMAN
 
 
 def test_resolve_mode_json_and_yaml() -> None:
-    """Single machine flags select the matching output mode."""
-    assert machine.resolve_mode(json_output=True, yaml_output=False) == (
-        output.OutputMode.JSON
-    )
-    assert machine.resolve_mode(json_output=False, yaml_output=True) == (
-        output.OutputMode.YAML
-    )
+    """The output option selects the matching machine output mode."""
+    assert machine.resolve_mode("json") == output.OutputMode.JSON
+    assert machine.resolve_mode("yaml") == output.OutputMode.YAML
 
 
-def test_resolve_mode_conflict_exits_two() -> None:
-    """Conflicting machine output flags exit with code 2."""
-    with pytest.raises(typer.Exit) as exc_info:
-        machine.resolve_mode(json_output=True, yaml_output=True)
-    assert exc_info.value.exit_code == output.OUTPUT_CONFLICT_EXIT_CODE
+def test_resolve_mode_rejects_unknown_format() -> None:
+    """The resolver rejects formats outside the extensible output contract."""
+    with pytest.raises(ValueError, match="Unsupported output format"):
+        machine.resolve_mode("toml")
 
 
 def test_model_dump_includes_null_fields() -> None:
@@ -94,13 +86,13 @@ def test_render_stderr_error_json_on_stderr_channel() -> None:
     error = StructuredError(
         code="output.conflict",
         message="Conflicting output flags.",
-        hint="Use only one of --json or --yaml.",
+        hint="Use --output json or --output yaml.",
     )
     rendered = output.render_stderr_error(error, output.OutputMode.JSON)
     payload = json.loads(rendered)
     assert payload["code"] == "output.conflict"
     assert payload["message"] == "Conflicting output flags."
-    assert payload["hint"] == "Use only one of --json or --yaml."
+    assert payload["hint"] == "Use --output json or --output yaml."
 
 
 def test_render_stderr_error_yaml_on_stderr_channel() -> None:

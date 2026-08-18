@@ -27,7 +27,7 @@ from canfar.authentication import (
     show as auth_show,
 )
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import StructuredError
 from canfar.hooks.typer.aliases import AliasGroup
@@ -202,40 +202,37 @@ def _auth_show(mode: output.OutputMode) -> None:
 @auth.callback(invoke_without_command=True)
 def auth_default(
     ctx: typer.Context,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Active authentication state."""
     if ctx.invoked_subcommand is not None:
-        if json_output or yaml_output:
+        if output_format is not None:
             typer.echo(
-                "Place --json or --yaml after the subcommand.",
+                "Place --output json or --output yaml after the subcommand.",
                 err=True,
             )
             raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
         return
 
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     _auth_show(mode)
 
 
 @auth.command("show")
 def auth_show_command(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Active authentication state."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     _auth_show(mode)
 
 
 @auth.command("ls")
 def auth_list_command(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Available auth providers."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     try:
         summaries = auth_list()
     except ConfigResetRequiredError as exc:

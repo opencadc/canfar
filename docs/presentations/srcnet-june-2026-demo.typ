@@ -56,11 +56,11 @@ Ubiquitous *front door* to the CANFAR Science Platform.
 ```bash
 canfar server use sweSRC
 canfar create headless skaha/base-notebook:latest -- env
-canfar logs $(canfar ps -a --json | jq -r ".[0].id")
+canfar logs $(canfar ps -a -o json | jq -r ".[0].id")
 
 canfar server use canSRC
 canfar create headless skaha/base-notebook:latest -- env
-canfar logs $(canfar ps -a --json | jq -r ".[0].id")
+canfar logs $(canfar ps -a -o json | jq -r ".[0].id")
 ```
 
 - Pick a node, browse images, launch a headless session, read its logs
@@ -72,11 +72,11 @@ canfar logs $(canfar ps -a --json | jq -r ".[0].id")
 == Machine output you can pipe
 
 ```bash
-canfar config get active.server --json
-canfar open $(canfar ps --json | jq -r ".[0].id")
+canfar config get active.server -o json
+canfar open $(canfar ps -o json | jq -r ".[0].id")
 ```
 
-- `--json` / `--yaml` on `auth`, `server`, `ps`, `config`
+- `-o/--output json|yaml` on `auth`, `server`, `ps`, `config`
 - Data on *stdout*, diagnostics on *stderr* → safe to pipe
 
 The same flow at package level, for notebooks and pipelines:
