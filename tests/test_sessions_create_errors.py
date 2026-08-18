@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import httpx
@@ -12,9 +11,6 @@ from pydantic import SecretStr, ValidationError
 
 from canfar.models.session import CreateRequest
 from canfar.sessions import AsyncSession, Session
-
-if TYPE_CHECKING:
-    from collections.abc import Collection
 
 _BASE_URL = "https://example.test/skaha/v1/"
 _SERIALIZED_REQUEST = [
@@ -44,36 +40,32 @@ _SERIALIZED_REQUEST_REPLICA_TWO = [
     ("env", "REPLICA_COUNT=2"),
 ]
 _FAILURE_CASES = (
-    pytest.param(frozenset({"batch-2"}), ("batch-1-id",), id="partial"),
-    pytest.param(frozenset({"batch-1", "batch-2"}), (), id="total"),
+    pytest.param({"batch-2"}, ["batch-1-id"], id="partial"),
+    pytest.param({"batch-1", "batch-2"}, [], id="total"),
 )
 _INVALID_REQUEST_CASES = (
     pytest.param(
-        (("kind", "invalid"), ("image", "skaha/terminal:latest")),
+        {"kind": "invalid", "image": "skaha/terminal:latest"},
         id="invalid-kind",
     ),
     pytest.param(
-        (
-            ("kind", "notebook"),
-            ("image", "skaha/terminal:latest"),
-            ("cmd", "python"),
-        ),
+        {
+            "kind": "notebook",
+            "image": "skaha/terminal:latest",
+            "cmd": "python",
+        },
         id="notebook-command",
     ),
     pytest.param(
-        (
-            ("kind", "headless"),
-            ("image", "skaha/terminal:latest"),
-            ("replicas", 0),
-        ),
+        {"kind": "headless", "image": "skaha/terminal:latest", "replicas": 0},
         id="zero-replicas",
     ),
     pytest.param(
-        (
-            ("kind", "headless"),
-            ("image", "skaha/terminal:latest"),
-            ("replicas", 513),
-        ),
+        {
+            "kind": "headless",
+            "image": "skaha/terminal:latest",
+            "replicas": 513,
+        },
         id="too-many-replicas",
     ),
 )
@@ -149,7 +141,7 @@ async def test_async_create_serializes_the_public_request_contract() -> None:
     assert sent[1] == _SERIALIZED_REQUEST_REPLICA_TWO
 
 
-def _failure_responder(failed_names: Collection[str]):
+def _failure_responder(failed_names: set[str]):
     """Return a transport handler for partial or total replica failures."""
 
     def respond(request: httpx.Request) -> httpx.Response:
@@ -175,7 +167,7 @@ def _failure_responder(failed_names: Collection[str]):
     _FAILURE_CASES,
 )
 def test_sync_create_omits_failed_replicas(
-    failed_names: frozenset[str], expected: tuple[str, ...]
+    failed_names: set[str], expected: list[str]
 ) -> None:
     """Sync create omits failed replicas and returns an empty total failure."""
     request = CreateRequest(
@@ -192,7 +184,7 @@ def test_sync_create_omits_failed_replicas(
         ),
         Session(token=SecretStr("token"), url=_BASE_URL) as session,
     ):
-        assert session.create(request) == list(expected)
+        assert session.create(request) == expected
 
 
 @pytest.mark.asyncio
@@ -201,7 +193,7 @@ def test_sync_create_omits_failed_replicas(
     _FAILURE_CASES,
 )
 async def test_async_create_omits_failed_replicas(
-    failed_names: frozenset[str], expected: tuple[str, ...]
+    failed_names: set[str], expected: list[str]
 ) -> None:
     """Async create omits failed replicas and returns an empty total failure."""
     request = CreateRequest(
@@ -216,18 +208,17 @@ async def test_async_create_omits_failed_replicas(
         ),
     ):
         async with AsyncSession(token=SecretStr("token"), url=_BASE_URL) as session:
-            assert await session.create(request) == list(expected)
+            assert await session.create(request) == expected
 
 
 @pytest.mark.parametrize(
-    "request_items",
+    "request_kwargs",
     _INVALID_REQUEST_CASES,
 )
 def test_sync_create_rejects_invalid_requests(
-    request_items: tuple[tuple[str, object], ...],
+    request_kwargs: dict[str, object],
 ) -> None:
     """Invalid create requests fail before the synchronous HTTP boundary."""
-    request_kwargs = dict(request_items)
     with (
         Session(token=SecretStr("token"), url="https://example.test") as session,
         pytest.raises(ValidationError),
@@ -237,14 +228,13 @@ def test_sync_create_rejects_invalid_requests(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "request_items",
+    "request_kwargs",
     _INVALID_REQUEST_CASES,
 )
 async def test_async_create_rejects_invalid_requests(
-    request_items: tuple[tuple[str, object], ...],
+    request_kwargs: dict[str, object],
 ) -> None:
     """Invalid create requests fail before the asynchronous HTTP boundary."""
-    request_kwargs = dict(request_items)
     with pytest.raises(ValidationError):
         async with AsyncSession(
             token=SecretStr("token"), url="https://example.test"
