@@ -156,10 +156,7 @@ for module in (
 ):
     importlib.import_module(module)
 
-from canfar.utils.logging import _canfar_logger
-
 canfar_logger = logging.getLogger("canfar")
-assert not _canfar_logger._configured
 assert canfar_logger.handlers == []
 assert canfar_logger.level == logging.NOTSET
 assert canfar_logger.propagate

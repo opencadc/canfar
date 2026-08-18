@@ -51,6 +51,15 @@ class AuthenticationError(Exception):
         super().__init__(self.error.message)
 
 
+_OIDC_DEVICE_LOGIN_ERRORS = (
+    PermissionError,
+    TimeoutError,
+    TypeError,
+    ValueError,
+    httpx.HTTPError,
+)
+
+
 def _authentication_error(
     *,
     code: ErrorCode,
@@ -436,6 +445,15 @@ def _oidc_credential(idp: str, info: IdpInfo) -> OIDCCredential:
     )
 
 
+def _raise_oidc_authentication_error(exc: Exception) -> NoReturn:
+    """Translate an OIDC device-login failure into a structured error."""
+    raise _authentication_error(
+        code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+        message=f"OIDC authentication failed: {exc}",
+        hint="Complete the device authorization before it expires.",
+    ) from exc
+
+
 def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
     """Acquire one OIDC Authentication Record with native sync I/O."""
     credential = _oidc_credential(info.key, info)
@@ -445,18 +463,8 @@ def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
             expected_issuer=str(info.oidc_issuer),
             on_challenge=_print_device_challenge,
         )
-    except (
-        PermissionError,
-        TimeoutError,
-        TypeError,
-        ValueError,
-        httpx.HTTPError,
-    ) as exc:
-        raise _authentication_error(
-            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-            message=f"OIDC authentication failed: {exc}",
-            hint="Complete the device authorization before it expires.",
-        ) from exc
+    except _OIDC_DEVICE_LOGIN_ERRORS as exc:
+        _raise_oidc_authentication_error(exc)
 
 
 async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
@@ -468,18 +476,8 @@ async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
             expected_issuer=str(info.oidc_issuer),
             on_challenge=_print_device_challenge,
         )
-    except (
-        PermissionError,
-        TimeoutError,
-        TypeError,
-        ValueError,
-        httpx.HTTPError,
-    ) as exc:
-        raise _authentication_error(
-            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-            message=f"OIDC authentication failed: {exc}",
-            hint="Complete the device authorization before it expires.",
-        ) from exc
+    except _OIDC_DEVICE_LOGIN_ERRORS as exc:
+        _raise_oidc_authentication_error(exc)
 
 
 __all__ = [
