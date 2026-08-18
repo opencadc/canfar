@@ -35,9 +35,6 @@ canfar --log-level debug login cadc --force
 
 See [Logging](logging.md) for level precedence and stream separation.
 
-`canfar auth login` still exists as a deprecated compatibility alias. New docs
-and scripts should use `canfar login`.
-
 ## Inspect authentication
 
 ```bash

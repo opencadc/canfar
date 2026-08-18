@@ -32,7 +32,7 @@ Ubiquitous *front door* to the CANFAR Science Platform.
   [
     *Before — server-first* (≤ 1.3.5)
     ```bash
-    canfar auth login   # deprecated
+    canfar login
     canfar context      # removed
     ```
     - Auth bound to a Server / context up front

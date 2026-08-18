@@ -48,8 +48,6 @@ canfar login cadc
 canfar login srcnet --force
 ```
 
-`canfar auth login` is a deprecated compatibility alias.
-
 ### `canfar auth`
 
 ```bash
