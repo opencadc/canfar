@@ -1,15 +1,29 @@
-# CLI Reference
+# CLI reference
 
-Use `canfar` for Authentication, Science Platform Server selection, Session
-management, Container Images, and client configuration.
+The `canfar` command manages Authentication, Science Platform Server
+selection, Sessions, Container Images, data sources, and client configuration.
+Run `canfar --help` or append `--help` to any command for the installed
+options.
 
-```bash
-canfar --help
-```
+## Canonical command surface
 
-## Root logging controls
+The root keeps Session and information operations as leaves. Authentication,
+Server, data, image, and configuration operations remain grouped:
 
-Put logging options before the command:
+| Area | Commands |
+| --- | --- |
+| Authentication and Server Selection | `login`, `auth`, `server` |
+| Sessions | `create`, `ps`, `events`, `info`, `open`, `logs`, `delete`, `prune` |
+| Platform information | `stats`, `image ls` |
+| Client configuration | `config show`, `config get`, `config set`, `config path`, `version` |
+| Data | `data` and its embedded file commands |
+
+There are no extra command names between the root and these leaves. In
+particular, Session creation is `canfar create`, and login is `canfar login`.
+
+## Root logging options
+
+Root logging options must come before the command:
 
 ```bash
 canfar --log-level debug ps
@@ -17,38 +31,41 @@ canfar -vvv ps
 canfar --log-file ./logs/canfar.jsonl ps
 ```
 
-| Option | Use |
+| Option | Effect |
 | --- | --- |
-| `--log-level LEVEL` | Select `critical`, `error`, `warning`, `info`, or `debug`. |
-| `-v` | Increase verbosity; repeat through `-vvvv` for `debug`. |
+| `--log-level LEVEL` | `critical`, `error`, `warning`, `info`, or `debug`. |
+| `-v` | Increase verbosity; four or more repetitions select `debug`. |
 | `--log-file PATH` | Add the rotating JSON Lines file sink. |
 
-See [Logging](logging.md) for the exact mapping, precedence, streams, file
-schema, and stable error codes.
+See [Logging](logging.md) for precedence, stream routing, file records, and
+setup errors.
 
 ## Authentication and Servers
 
-### `canfar login`
+### Login
 
 ```bash
 canfar login [IDP] [OPTIONS]
 ```
 
-| Option | Use |
-| --- | --- |
-| `--force`, `-f` | Force re-authentication. |
-| `--dev` | Include development Servers during discovery. |
-| `--timeout`, `-t` | HTTP timeout in seconds during login. Default: `10`. |
+`IDP` is an optional canonical Identity Provider key. Without it, the CLI
+prompts for one. The options are:
 
-Examples:
+| Option | Effect |
+| --- | --- |
+| `--force`, `-f` | Re-authenticate an existing Authentication Record. |
+| `--dev` | Include development registries and endpoints during discovery. |
+| `--timeout`, `-t` | HTTP timeout in seconds; default `10`. |
 
 ```bash
-canfar login
 canfar login cadc
 canfar login srcnet --force
 ```
 
-### `canfar auth`
+The interactive credential flow and Server Selection are described in
+[Authentication and Servers](authentication-contexts.md).
+
+### Authentication
 
 ```bash
 canfar auth
@@ -59,168 +76,155 @@ canfar auth rm IDP [--force]
 canfar auth purge --force
 ```
 
-| Command | Use |
-| --- | --- |
-| `auth` / `auth show` | Show active Authentication state. |
-| `auth ls` | List saved Authentication records. |
-| `auth use IDP` | Switch active Authentication by canonical IDP key. |
-| `auth rm IDP` | Remove one Authentication record and its Servers. |
-| `auth purge --force` | Reset Authentication and Server state. |
+`canfar auth` is the same active-Authentication view as `canfar auth show`.
+`auth use` selects a saved Authentication Record; `auth rm` also removes the
+associated Servers; `auth purge --force` resets Authentication and Server state.
 
-Machine output is supported for `auth` / `auth show` and `auth ls`:
-
-```bash
-canfar auth show -o json
-canfar auth ls --output yaml
-```
-
-### `canfar server`
+### Server Selection
 
 ```bash
 canfar server ls
 canfar server use SELECTOR
 ```
 
-| Command | Use |
-| --- | --- |
-| `server ls` | List Servers for the active IDP, discovering them when needed. |
-| `server use SELECTOR` | Select a Server by name or URI. |
-
-Use URIs in scripts because names can be ambiguous:
-
-```bash
-canfar server use ivo://cadc.nrc.ca/skaha
-```
+`SELECTOR` may be a Server Name or an IVOA URI. `server ls` lists Servers for
+the active IDP and discovers them when no saved Servers are available.
 
 ## Sessions
 
-### `canfar create`
+### Create
 
 ```bash
 canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 ```
 
-| Option | Short | Use |
-| --- | --- | --- |
-| `--name` | `-n` | Session name. Defaults to a generated name. |
-| `--cpu` | `-c` | Fixed CPU cores. Omit for flexible allocation. |
-| `--memory` | `-m` | Fixed RAM in GB. Omit for flexible allocation. |
-| `--gpu` | `-g` | GPU count. |
-| `--env` | `-e` | Environment variable as `KEY=VALUE`. |
-| `--replicas` | `-r` | Number of replicas. Default: `1`. |
-| `--debug` | | Print parsed Session request details. |
-| `--dry-run` | | Parse parameters and exit. |
-| `--output FORMAT` | `-o` | Emit created Session IDs as JSON or YAML (`json` or `yaml`). |
+`KIND` is one of `desktop`, `notebook`, `carta`, `headless`, `firefly`, or
+`contributed`. `IMAGE` is a CANFAR Container Image such as
+`skaha/astroml:latest`; the client adds the CANFAR registry and `:latest` when
+they are omitted.
 
-`--output` is recognized before `--`; tokens after `--` are passed verbatim to
-the container command. `--dry-run` is human-output only.
+| Option | Effect |
+| --- | --- |
+| `--name`, `-n` | Session name; a generated name is used by default. |
+| `--cpu`, `-c` | Requested CPU cores. |
+| `--memory`, `-m` | Requested RAM in GB. |
+| `--gpu`, `-g` | Requested GPU count. |
+| `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
+| `--replicas`, `-r` | Number of Sessions; default `1`. |
+| `--debug` | Print the parsed Session request. |
+| `--dry-run` | Validate and print the request without creating a Session. |
+| `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
 
-Examples:
+Everything after `--` belongs to the container command. The first token is
+the command and the remaining tokens are its arguments, even when they look
+like CANFAR options:
 
 ```bash
-canfar create notebook skaha/astroml:latest
-canfar create --cpu 4 --memory 16 notebook skaha/astroml:latest
 canfar create headless skaha/terminal:1.1.2 -- python /arc/projects/demo/run.py
+canfar create headless skaha/terminal:1.1.2 -- worker --output json -o yaml
 ```
 
-### `canfar ps`
+The `--output` option must appear before `--`. `--dry-run` cannot be combined
+with machine output.
+
+### List Sessions
 
 ```bash
 canfar ps [OPTIONS]
 ```
 
-| Option | Short | Use |
-| --- | --- | --- |
-| `--all` | `-a` | Show all Sessions. Default shows running Sessions. |
-| `--quiet` | `-q` | Print only Session IDs. |
-| `--kind` | `-k` | Filter by Session Kind. |
-| `--status` | `-s` | Filter by status. |
-| `--debug` | | Show Session response warnings. |
+| Option | Effect |
+| --- | --- |
+| `--all`, `-a` | Include all statuses; otherwise show `Pending` and `Running`. |
+| `--quiet`, `-q` | Print matching Session IDs in human mode. |
+| `--kind`, `-k` | Filter by Session Kind. |
+| `--status`, `-s` | Pass a status filter to the Science Platform. |
+| `--debug` | Print Session response warnings. |
+| `--output`, `-o` | Emit the filtered Session response array as `json` or `yaml`. |
 
-Machine output:
-
-```bash
-canfar ps -o json
-canfar ps --output yaml
-```
-
-`--quiet` is a human-output shortcut and is incompatible with machine output.
-
-### Inspect and clean up
-
-```bash
-canfar events SESSION_ID...
-canfar info SESSION_ID...
-canfar logs SESSION_ID...
-canfar open SESSION_ID...
-canfar delete SESSION_ID... [--force]
-canfar prune PREFIX [KIND] [STATUS]
-```
-
-Quote `PREFIX` when it contains shell metacharacters
-(for example `canfar prune 'rabi.*' headless Completed`).
-
-`canfar info SESSION_ID --debug` shows Session response warnings. This is
-a command diagnostic, not a logging-level control.
-
-Common flow:
+`ps` stays a thin operation over `Session.fetch()`: `--kind` and `--status`
+are sent to the fetch call, then the CLI applies the running/default or
+`--all` view to the returned responses. `--quiet` follows that same filter,
+including when combined with `--all`, and is not available with `--output`.
 
 ```bash
 canfar ps
-canfar info $(canfar ps -q)
-canfar open $(canfar ps -q)
-canfar delete $(canfar ps -q)
+canfar ps --all --kind headless
+canfar ps -o json
 ```
 
-## Images and platform state
+### Inspect, open, and remove
+
+These leaves accept one or more Session IDs and produce human-readable output:
+
+| Command | Purpose |
+| --- | --- |
+| `canfar events SESSION_ID...` | List Science Platform events. |
+| `canfar info SESSION_ID...` | Show Session details; `--debug` adds response warnings. |
+| `canfar logs SESSION_ID...` | Show Session logs. |
+| `canfar open SESSION_ID...` | Open ready Sessions in new browser tabs. |
+| `canfar delete SESSION_ID... [--force]` | Delete Sessions, confirming unless `--force` is used. |
+| `canfar prune PREFIX [KIND] [STATUS]` | Delete matching names; defaults to `headless` and `Succeeded`. |
+
+`prune` treats a plain `PREFIX` as a literal prefix. A value containing regex
+metacharacters is treated as a regular expression. Quote such values so the
+shell does not expand them:
 
 ```bash
-canfar image ls
+canfar prune 'notebook.*' notebook Completed
+```
+
+### Platform information
+
+```bash
 canfar stats
-```
-
-Use `canfar image --help` and `canfar stats --help` for command-specific
-options.
-
-## Data
-
-```bash
-canfar data ls -lh arc:/home/[username]
-canfar data cp local:/absolute/path/file.fits arc:/home/[username]/file.fits
-```
-
-Data operands use explicit `storage-identifier:/absolute/path` or
-`local:/absolute/path` syntax. See [Data commands](data.md) for recursive copy,
-cross-source copy and verification, recursive-removal policy, and the exact
-supported boundary.
-
-## Client configuration
-
-```bash
-canfar config show
-canfar config path
-canfar config get console.width
-canfar config get servers.canfar.url
-canfar config set console.width 132
-canfar config set console.banner false
+canfar image ls
+canfar image ls --kind notebook
 canfar version
 canfar version --debug
 ```
 
-`config set` parses values as YAML.
-`console.banner` defaults to `true`. Set it to `false` to hide the
-`@<server-name>` prefix from human-readable CLI output. The banner is always
-disabled for `-o json` and `--output yaml` output.
-`version --debug` shows environment and dependency details for bug reports; it
-does not change the logging level.
+`stats` prints platform usage tables. `image ls` lists Container Images and
+accepts the image-kind filter shown above. `version --debug` prints client,
+Python, operating-system, and dependency details for a bug report; it is not a
+logging control.
 
-## Machine output contract
+## Data and configuration
 
-| Rule | Behavior |
-| --- | --- |
-| Option | `-o/--output` with `json` or `yaml`. |
-| Placement | Put the option after the command, for example `canfar ps -o json`. |
-| stdout | Data payload only. |
-| stderr | Diagnostics and errors. |
-| Unsupported command | Leaf commands without machine output do not define `-o/--output`; Click rejects the option with exit 2 and a parser error on stderr. |
-| Ordering | List ordering is not guaranteed. |
+```bash
+canfar data --help
+canfar config show
+canfar config get console.width
+canfar config set console.width 132
+canfar config path
+```
+
+Data operands use an explicit `Storage Identifier`, for example
+`arc:/home/user/file.fits` or `local:/tmp/file.fits`. See [Data commands](data.md)
+for the embedded command surface. Configuration keys use dotted paths; values
+passed to `config set` are parsed as YAML. See [Authentication and Servers](authentication-contexts.md)
+for the persisted Authentication, Server, and active-selection shape.
+
+## Machine output
+
+The leaf option `-o/--output` accepts only `json` or `yaml`. It is available on
+the data-producing forms `auth` (the default active view), `auth show`,
+`auth ls`, `server ls`, `create`, `ps`, `config show`, and `config get`:
+
+```bash
+canfar auth show -o json
+canfar server ls --output yaml
+canfar create headless skaha/terminal:1.1.2 -o json
+canfar config get active.server -o json
+```
+
+The payload is the same Python result used by that command after its normal
+filtering. For example, `create -o json` is a raw list of Session IDs and
+`ps -o json` is a filtered array of Session response objects; neither is
+wrapped in a command-specific envelope. Human active-Server banners and logs
+never precede the machine payload on stdout. Diagnostics and errors use stderr.
+
+Put `-o/--output` after the command that owns it. Root `-o`, `--json`, and
+`--yaml` are not options, and commands without machine output reject `-o`.
+For `create`, `-o` is parsed only before `--`; after the delimiter it is a
+container-command token.
