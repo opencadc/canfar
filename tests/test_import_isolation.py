@@ -55,7 +55,6 @@ def test_home():
             "-p",
             "tests.conftest",
             "-n2",
-            "--dist=loadfile",
             "--no-cov",
             "-q",
         ],

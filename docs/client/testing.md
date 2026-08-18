@@ -116,7 +116,6 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "order: marks tests that need to run in a specific order",
 ]
 ```
 
