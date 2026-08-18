@@ -12,7 +12,7 @@ Authenticate with the identity provider that owns the target server:
 ```bash
 canfar login cadc
 canfar server ls
-canfar server use canfar
+canfar server use SERVER_NAME
 canfar config get active.server
 ```
 
