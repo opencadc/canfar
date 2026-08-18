@@ -13,27 +13,22 @@ from canfar.sessions import AsyncSession, Session
 
 _BASE_URL = "https://example.test/skaha/v1/"
 
-
-@pytest.fixture
-def ids_and_expected(
-    request: pytest.FixtureRequest,
-) -> tuple[str | list[str], list[dict[str, str]], dict[str, str]]:
-    """Provide zero, one, many, and mixed-failure Session records."""
-    cases = {
-        "empty": ([], [], {}),
-        "one": ("one", [{"id": "one"}], {"one": "log-one"}),
-        "many": (
-            ["one", "two"],
-            [{"id": "one"}, {"id": "two"}],
-            {"one": "log-one", "two": "log-two"},
-        ),
-        "mixed": (
-            ["one", "failed", "three"],
-            [{"id": "one"}, {"id": "three"}],
-            {"one": "log-one", "three": "log-three"},
-        ),
-    }
-    return cases[request.param]
+_INFO_LOG_CASES = (
+    pytest.param([], [], {}, id="empty"),
+    pytest.param("one", [{"id": "one"}], {"one": "log-one"}, id="one"),
+    pytest.param(
+        ["one", "two"],
+        [{"id": "one"}, {"id": "two"}],
+        {"one": "log-one", "two": "log-two"},
+        id="many",
+    ),
+    pytest.param(
+        ["one", "failed", "three"],
+        [{"id": "one"}, {"id": "three"}],
+        {"one": "log-one", "three": "log-three"},
+        id="mixed-failure",
+    ),
+)
 
 
 def _respond(request: httpx.Request) -> httpx.Response:
@@ -57,17 +52,16 @@ def _verbose_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
 
 
 @pytest.mark.parametrize(
-    "ids_and_expected",
-    ["empty", "one", "many", "mixed"],
-    indirect=True,
-    ids=["empty", "one", "many", "mixed"],
+    ("ids", "expected_info", "expected_logs"),
+    _INFO_LOG_CASES,
 )
 def test_sync_info_and_logs_share_public_policy(
-    ids_and_expected: tuple[str | list[str], list[dict[str, str]], dict[str, str]],
+    ids: str | list[str],
+    expected_info: list[dict[str, str]],
+    expected_logs: dict[str, str],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Sync info/logs preserve shape, order, failures, and verbose routing."""
-    ids, expected_info, expected_logs = ids_and_expected
     real_client = httpx.Client
     with (
         patch(
@@ -96,17 +90,16 @@ def test_sync_info_and_logs_share_public_policy(
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
-    "ids_and_expected",
-    ["empty", "one", "many", "mixed"],
-    indirect=True,
-    ids=["empty", "one", "many", "mixed"],
+    ("ids", "expected_info", "expected_logs"),
+    _INFO_LOG_CASES,
 )
 async def test_async_info_and_logs_share_public_policy(
-    ids_and_expected: tuple[str | list[str], list[dict[str, str]], dict[str, str]],
+    ids: str | list[str],
+    expected_info: list[dict[str, str]],
+    expected_logs: dict[str, str],
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Async info/logs preserve shape, order, failures, and verbose routing."""
-    ids, expected_info, expected_logs = ids_and_expected
     real_async_client = httpx.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
