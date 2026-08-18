@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from inspect import Parameter, signature
+from inspect import signature
 from typing import Any
 from unittest.mock import patch
 
@@ -16,48 +16,52 @@ _BASE_URL = "https://example.test/skaha/v1/"
 _CONNECT_IDS = ["missing", "stopped", "running", "terminating", "no-url"]
 _EXPECTED_OPEN_URL = "https://example.test/running"
 
+_EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
+    "fetch": (
+        "(self, kind: 'Kind | None' = None, "
+        "status: 'Status | None' = None, "
+        "view: 'View | None' = None) -> 'list[dict[str, str]]'"
+    ),
+    "stats": "(self) -> 'dict[str, Any]'",
+    "info": "(self, ids: 'list[str] | str') -> 'list[dict[str, Any]]'",
+    "logs": (
+        "(self, ids: 'list[str] | str', verbose: 'bool' = False) "
+        "-> 'dict[str, str] | None'"
+    ),
+    "create": (
+        "(self, name: 'str | CreateRequest', image: 'str | None' = None, "
+        "cores: 'int | None' = None, ram: 'int | None' = None, "
+        "kind: 'Kind' = 'headless', gpu: 'int | None' = None, "
+        "cmd: 'str | None' = None, args: 'str | None' = None, "
+        "env: 'dict[str, Any] | None' = None, replicas: 'int' = 1) "
+        "-> 'list[str]'"
+    ),
+    "events": (
+        "(self, ids: 'str | list[str]', verbose: 'bool' = False) "
+        "-> 'list[dict[str, str]] | None'"
+    ),
+    "destroy": "(self, ids: 'str | list[str]') -> 'dict[str, bool]'",
+    "destroy_with": (
+        "(self, prefix: 'str', *, kind: 'Kind' = 'headless', "
+        "status: 'Status' = 'Completed') -> 'dict[str, bool]'"
+    ),
+    "connect": "(self, ids: 'list[str] | str') -> 'None'",
+}
+
 
 @pytest.mark.parametrize(
     ("method", "expected"),
-    [
-        ("fetch", ["kind", "status", "view"]),
-        ("stats", []),
-        ("info", ["ids"]),
-        ("logs", ["ids", "verbose"]),
-        (
-            "create",
-            [
-                "name",
-                "image",
-                "cores",
-                "ram",
-                "kind",
-                "gpu",
-                "cmd",
-                "args",
-                "env",
-                "replicas",
-            ],
-        ),
-        ("events", ["ids", "verbose"]),
-        ("destroy", ["ids"]),
-        ("destroy_with", ["prefix", "kind", "status"]),
-        ("connect", ["ids"]),
-    ],
+    list(_EXPECTED_SESSION_SIGNATURES.items()),
+    ids=list(_EXPECTED_SESSION_SIGNATURES),
 )
 def test_session_signatures_are_stable_and_parallel(
-    method: str, expected: list[str]
+    method: str,
+    expected: str,
 ) -> None:
-    """Sync and async Session methods keep the released parameter contract."""
-    for client_type in (Session, AsyncSession):
-        parameters = list(signature(getattr(client_type, method)).parameters.values())[
-            1:
-        ]
-        assert [parameter.name for parameter in parameters] == expected
-        if method == "destroy_with":
-            assert all(
-                parameter.kind is Parameter.KEYWORD_ONLY for parameter in parameters[1:]
-            )
+    """Sync and async Session methods keep the complete released contract."""
+    sync_signature = signature(getattr(Session, method))
+    assert str(sync_signature) == expected
+    assert signature(getattr(AsyncSession, method)) == sync_signature
 
 
 @pytest.mark.parametrize(
@@ -284,20 +288,3 @@ async def test_async_destroy_with_passes_kind_and_status_filters() -> None:
         ("type", "headless"),
         ("status", "Running"),
     ]
-
-
-def test_sync_destroy_with_kind_and_status_are_keyword_only() -> None:
-    """Sync destroy_with keeps kind and status keyword-only."""
-    with (
-        Session(token=SecretStr("token"), url=_BASE_URL) as session,
-        pytest.raises(TypeError),
-    ):
-        session.destroy_with("prefix", "headless", "Completed")
-
-
-@pytest.mark.asyncio
-async def test_async_destroy_with_kind_and_status_are_keyword_only() -> None:
-    """Async destroy_with keeps kind and status keyword-only."""
-    async with AsyncSession(token=SecretStr("token"), url=_BASE_URL) as session:
-        with pytest.raises(TypeError):
-            await session.destroy_with("prefix", "headless", "Completed")

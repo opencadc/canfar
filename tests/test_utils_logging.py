@@ -81,7 +81,6 @@ def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
         if isinstance(handler, RichHandler)
     )
     assert second is not first
-    assert second in canfar_logger.logger.handlers
     assert first not in canfar_logger.logger.handlers
 
 
