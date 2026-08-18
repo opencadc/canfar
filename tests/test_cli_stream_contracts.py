@@ -402,7 +402,9 @@ def test_invalid_logging_environment_is_one_structured_machine_error(
     assert error.expected == ["critical", "error", "warning", "info", "debug"]
 
 
-@pytest.mark.parametrize("command", [["config", "get", "console.width"], ["auth", "ls"]])
+@pytest.mark.parametrize(
+    "command", [["config", "get", "console.width"], ["auth", "ls"]]
+)
 def test_invalid_logging_environment_is_human_without_leaf_output(
     monkeypatch: pytest.MonkeyPatch,
     command: list[str],

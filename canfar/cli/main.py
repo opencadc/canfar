@@ -36,7 +36,7 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
-    from click import Context as ClickContext
+    from typer._click.core import Context as ClickContext
 
     from canfar.errors import StructuredError
 
