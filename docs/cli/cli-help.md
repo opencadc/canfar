@@ -224,5 +224,5 @@ does not change the logging level.
 | Placement | Put the option after the command, for example `canfar ps -o json`. |
 | stdout | Data payload only. |
 | stderr | Diagnostics and errors. |
-| Unsupported command | Exits 1 with a clear unsupported-machine-output message. |
+| Unsupported command | Leaf commands without machine output do not define `-o/--output`; Click rejects the option with exit 2 and a parser error on stderr. |
 | Ordering | List ordering is not guaranteed. |

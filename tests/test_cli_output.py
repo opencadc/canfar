@@ -42,7 +42,7 @@ def test_resolve_mode_json_and_yaml() -> None:
 
 def test_resolve_mode_rejects_unknown_format() -> None:
     """The resolver rejects formats outside the extensible output contract."""
-    with pytest.raises(ValueError, match="Unsupported output format"):
+    with pytest.raises(ValueError, match="not a valid OutputMode"):
         machine.resolve_mode("toml")
 
 

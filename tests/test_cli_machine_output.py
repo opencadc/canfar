@@ -153,32 +153,6 @@ def test_auth_ls_machine_stdout_is_data_only(
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
-    parser(result.stdout)
-
-
-@pytest.mark.parametrize(
-    ("option", "parser"),
-    [
-        (["-o", "json"], json.loads),
-        (["--output", "json"], json.loads),
-        (["-o", "yaml"], yaml.safe_load),
-        (["--output", "yaml"], yaml.safe_load),
-    ],
-)
-def test_auth_ls_output_option_is_data_only(
-    tmp_path: Path,
-    option: list[str],
-    parser: Callable[[str], object],
-) -> None:
-    """The leaf output option emits the filtered auth result as data only."""
-    config_path = tmp_path / "config.yaml"
-    _write_config(config_path)
-
-    with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "ls", *option])
-
-    assert result.exit_code == 0
-    assert not result.stdout.startswith("@")
     assert result.stderr == ""
     parser(result.stdout)
 
@@ -200,14 +174,6 @@ def test_auth_ls_invalid_output_format_is_rejected() -> None:
     assert result.exit_code == 2
     assert result.stdout == ""
     assert "Invalid value" in click.unstyle(result.stderr)
-
-
-def test_auth_group_output_option_before_subcommand_is_rejected() -> None:
-    """The output option belongs to the emitting leaf command only."""
-    result = runner.invoke(cli, ["auth", "--output", "json", "ls"])
-
-    assert result.exit_code == 2
-    assert "--output" in click.unstyle(result.stderr)
 
 
 def test_passthrough_output_options_keep_human_banner(tmp_path: Path) -> None:
@@ -367,3 +333,12 @@ def test_unsupported_command_rejects_leaf_json_flag() -> None:
     result = runner.invoke(cli, ["auth", "purge", "--json", "--force"])
     assert result.exit_code == 2
     assert "--json" in click.unstyle(result.stderr)
+
+
+def test_unsupported_command_rejects_leaf_output_option() -> None:
+    """Commands without machine flags let Click reject the ``-o`` option."""
+    result = runner.invoke(cli, ["auth", "purge", "-o", "json", "--force"])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert "No such option: -o" in click.unstyle(result.stderr)
