@@ -245,6 +245,22 @@ class HTTPClient(BaseSettings):
             self._refresh_lock = asyncio.Lock()
         return self._refresh_lock
 
+    async def _refresh_oidc(self) -> OIDCCredential | None:
+        """Resolve and refresh the canonical saved OIDC record under one lock."""
+        async with self._get_refresh_lock():
+            prepared = auth._refresh(self)  # noqa: SLF001
+            if prepared is None:
+                return None
+            credential, parameters = prepared
+            if parameters is None:
+                return credential
+            refreshed = await oidc.refresh(*parameters)
+            return oidc._persist(  # noqa: SLF001
+                self.config,
+                credential,
+                refreshed,
+            )
+
     @classmethod
     def build(
         cls,
@@ -303,22 +319,9 @@ class HTTPClient(BaseSettings):
         if not isinstance(credential, OIDCCredential):
             raise TypeError
 
-        if credential.expired:
-            async with self._get_refresh_lock():
-                current = self.authentication_record
-                if not isinstance(current, OIDCCredential):
-                    raise TypeError
-                credential = current
-                if credential.expired:
-                    parameters = oidc._refresh(credential)  # noqa: SLF001
-                    if parameters is None:
-                        raise ValueError
-                    refreshed = await oidc.refresh(*parameters)
-                    credential = oidc._persist(  # noqa: SLF001
-                        self.config,
-                        credential,
-                        refreshed,
-                    )
+        credential = await self._refresh_oidc()
+        if credential is None:
+            raise ValueError
         if credential.token.access is None:
             raise ValueError
         token = credential.token.access.get_secret_value()
