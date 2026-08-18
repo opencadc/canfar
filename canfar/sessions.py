@@ -68,56 +68,14 @@ def _view_parameters(view: str) -> dict[str, str]:
     return {"view": view}
 
 
-def _create_request(  # noqa: PLR0917
-    name: str | CreateRequest,
-    image: str | None,
-    cores: int | None,
-    ram: int | None,
-    kind: Kind,
-    gpu: int | None,
-    cmd: str | None,
-    args: str | None,
-    env: dict[str, Any] | None,
-    replicas: int,
-) -> CreateRequest:
-    """Normalize scalar create arguments to the domain request model."""
-    if isinstance(name, CreateRequest):
-        return name
-    if image is None:
-        msg = "image is required when creating a Session from scalar arguments"
-        raise TypeError(msg)
-    return CreateRequest(
-        name=name,
-        image=image,
-        cores=cores,
-        ram=ram,
-        kind=kind,
-        gpus=gpu,
-        cmd=cmd,
-        args=args,
-        env=env,
-        replicas=replicas,
-    )
-
-
-def _response_json(response: Response) -> Any:
-    """Interpret a JSON response through the shared Session policy."""
-    return response.json()
-
-
-def _response_text(response: Response) -> str:
-    """Interpret a text response through the shared Session policy."""
-    return response.text
-
-
 def _response_session_id(response: Response) -> str:
     """Interpret a create response as a clean Session identifier."""
-    return _response_text(response).rstrip("\r\n")
+    return response.text.rstrip("\r\n")
 
 
 def _response_event(session_id: str, response: Response) -> dict[str, str]:
     """Interpret an events response with its requested Session identifier."""
-    return {session_id: _response_text(response)}
+    return {session_id: response.text}
 
 
 def _session_name_pattern(selector: str) -> re.Pattern[str]:
@@ -202,7 +160,7 @@ class Session(HTTPClient):
         """
         parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
         response: Response = self.client.get(url="session", params=parameters)
-        data: list[dict[str, str]] = _response_json(response)
+        data: list[dict[str, str]] = response.json()
         return data
 
     def stats(self) -> dict[str, Any]:
@@ -222,7 +180,7 @@ class Session(HTTPClient):
         """
         parameters = _view_parameters("stats")
         response: Response = self.client.get("session", params=parameters)
-        data: dict[str, Any] = _response_json(response)
+        data: dict[str, Any] = response.json()
         return data
 
     def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
@@ -243,7 +201,7 @@ class Session(HTTPClient):
         for value in ids:
             try:
                 response: Response = self.client.get(url=_session_url(value))
-                results.append(_response_json(response))
+                results.append(response.json())
             except HTTPError as err:
                 _task_result("failed to fetch session info for", value, err)
         return results
@@ -276,7 +234,7 @@ class Session(HTTPClient):
                     url=_session_url(value),
                     params=parameters,
                 )
-                results[value] = _response_text(response)
+                results[value] = response.text
             except HTTPError as err:
                 _task_result("failed to fetch logs for session", value, err)
 
@@ -348,7 +306,7 @@ class Session(HTTPClient):
                 )
             >>> ["hjko98yghj", "ikvp1jtp"]
         """
-        request = _create_request(
+        payloads = build.create_parameters(
             name,
             image,
             cores,
@@ -360,9 +318,8 @@ class Session(HTTPClient):
             env,
             replicas,
         )
-        payloads = build.create_parameters(request)
         results: list[str] = []
-        session_kind = request.kind
+        session_kind = name.kind if isinstance(name, CreateRequest) else kind
         log.debug("Creating %d %s session[s].", len(payloads), session_kind)
         for replica, payload in enumerate(payloads, start=1):
             try:
@@ -577,7 +534,7 @@ class AsyncSession(HTTPClient):
         """
         parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
         response: Response = await self.asynclient.get(url="session", params=parameters)
-        data: list[dict[str, str]] = _response_json(response)
+        data: list[dict[str, str]] = response.json()
         return data
 
     async def stats(self) -> dict[str, Any]:
@@ -597,7 +554,7 @@ class AsyncSession(HTTPClient):
         """
         parameters = _view_parameters("stats")
         response: Response = await self.asynclient.get("session", params=parameters)
-        data: dict[str, Any] = _response_json(response)
+        data: dict[str, Any] = response.json()
         return data
 
     async def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
@@ -620,7 +577,7 @@ class AsyncSession(HTTPClient):
 
         async def request(value: str) -> dict[str, Any]:
             response = await self.asynclient.get(url=_session_url(value))
-            data: dict[str, Any] = _response_json(response)
+            data: dict[str, Any] = response.json()
             return data
 
         tasks = [request(value) for value in ids]
@@ -661,7 +618,7 @@ class AsyncSession(HTTPClient):
                 url=_session_url(value),
                 params=parameters,
             )
-            return value, _response_text(response)
+            return value, response.text
 
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
@@ -738,7 +695,7 @@ class AsyncSession(HTTPClient):
                 )
             >>> ["hjko98yghj", "ikvp1jtp"]
         """
-        request = _create_request(
+        payloads: list[list[tuple[str, Any]]] = build.create_parameters(
             name,
             image,
             cores,
@@ -750,7 +707,6 @@ class AsyncSession(HTTPClient):
             env,
             replicas,
         )
-        payloads: list[list[tuple[str, Any]]] = build.create_parameters(request)
         results: list[str] = []
 
         async def request_session(parameters: list[tuple[str, Any]]) -> str:
@@ -758,7 +714,7 @@ class AsyncSession(HTTPClient):
             return _response_session_id(response)
 
         tasks = [request_session(payload) for payload in payloads]
-        session_kind = request.kind
+        session_kind = name.kind if isinstance(name, CreateRequest) else kind
         msg = f"Creating {len(payloads)} {session_kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
