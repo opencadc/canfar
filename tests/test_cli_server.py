@@ -130,12 +130,12 @@ def test_server_use_selects_by_name(tmp_path: Path) -> None:
 
 
 def test_server_ls_json_output(tmp_path: Path) -> None:
-    """``server ls --json`` emits a JSON array of Server objects on stdout."""
+    """``server ls -o json`` emits a JSON array of Server objects on stdout."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["server", "ls", "--json"])
+        result = runner.invoke(cli, ["server", "ls", "-o", "json"])
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
@@ -165,8 +165,8 @@ def test_server_ls_machine_output_includes_server_name(tmp_path: Path) -> None:
     _write_config(config_path)
 
     with _patch_config(config_path):
-        json_result = runner.invoke(cli, ["server", "ls", "--json"])
-        yaml_result = runner.invoke(cli, ["server", "ls", "--yaml"])
+        json_result = runner.invoke(cli, ["server", "ls", "--output", "json"])
+        yaml_result = runner.invoke(cli, ["server", "ls", "--output", "yaml"])
 
     assert json_result.exit_code == 0
     assert json.loads(json_result.stdout)[0]["name"] == "CADC-CANFAR"

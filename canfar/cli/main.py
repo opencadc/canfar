@@ -46,17 +46,29 @@ if TYPE_CHECKING:
 
 
 def _leaf_output_mode(args: list[str]) -> output.OutputMode:
-    """Infer an already-parsed leaf machine flag for root setup failures."""
-    if "--json" in args:
-        return output.OutputMode.JSON
-    if "--yaml" in args:
-        return output.OutputMode.YAML
+    """Infer an already-parsed leaf output option for root setup failures."""
+    for index, arg in enumerate(args):
+        if arg == "--":
+            break
+        if arg in {"-o", "--output"} and index + 1 < len(args):
+            value = args[index + 1]
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+        if arg.startswith("--output=") and arg.removeprefix("--output=") in {
+            "json",
+            "yaml",
+        }:
+            return output.OutputMode(arg.removeprefix("--output="))
+        if arg.startswith("-o") and arg not in {"-o", "--output"}:
+            value = arg.removeprefix("-o")
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
     return output.OutputMode.HUMAN
 
 
 def _emit_banner_for_command(params: Mapping[str, object]) -> None:
     """Emit the active-server banner for a parsed human-output command."""
-    if params.get("json_output") or params.get("yaml_output"):
+    if params.get("output_format"):
         return
     emit_active_server_banner()
 

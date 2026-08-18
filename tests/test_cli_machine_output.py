@@ -130,12 +130,17 @@ def test_invalid_console_banner_value_fails_validation(tmp_path: Path) -> None:
 
 @pytest.mark.parametrize(
     ("flag", "parser"),
-    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+    [
+        (["-o", "json"], json.loads),
+        (["--output", "json"], json.loads),
+        (["-o", "yaml"], yaml.safe_load),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
 )
 @pytest.mark.parametrize("banner", [True, False])
 def test_auth_ls_machine_stdout_is_data_only(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     parser: Callable[[str], object],
     banner: bool,
 ) -> None:
@@ -144,15 +149,69 @@ def test_auth_ls_machine_stdout_is_data_only(
     _write_config(config_path, banner=banner)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "ls", flag])
+        result = runner.invoke(cli, ["auth", "ls", *flag])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
     parser(result.stdout)
 
 
-def test_passthrough_json_argument_keeps_human_banner(tmp_path: Path) -> None:
-    """A container argument named ``--json`` does not select machine output."""
+@pytest.mark.parametrize(
+    ("option", "parser"),
+    [
+        (["-o", "json"], json.loads),
+        (["--output", "json"], json.loads),
+        (["-o", "yaml"], yaml.safe_load),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
+)
+def test_auth_ls_output_option_is_data_only(
+    tmp_path: Path,
+    option: list[str],
+    parser: Callable[[str], object],
+) -> None:
+    """The leaf output option emits the filtered auth result as data only."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+
+    with _patch_config(config_path):
+        result = runner.invoke(cli, ["auth", "ls", *option])
+
+    assert result.exit_code == 0
+    assert not result.stdout.startswith("@")
+    assert result.stderr == ""
+    parser(result.stdout)
+
+
+@pytest.mark.parametrize("legacy", ["--json", "--yaml"])
+def test_auth_ls_legacy_machine_switch_is_removed(legacy: str) -> None:
+    """The former format-specific switches are no longer leaf options."""
+    result = runner.invoke(cli, ["auth", "ls", legacy])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert legacy in click.unstyle(result.stderr)
+
+
+def test_auth_ls_invalid_output_format_is_rejected() -> None:
+    """Output formats are validated at the CLI boundary."""
+    result = runner.invoke(cli, ["auth", "ls", "--output", "toml"])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert "Invalid value" in click.unstyle(result.stderr)
+
+
+def test_auth_group_output_option_before_subcommand_is_rejected() -> None:
+    """The output option belongs to the emitting leaf command only."""
+    result = runner.invoke(cli, ["auth", "--output", "json", "ls"])
+
+    assert result.exit_code == 2
+    assert "--output" in click.unstyle(result.stderr)
+
+
+def test_passthrough_output_options_keep_human_banner(tmp_path: Path) -> None:
+    """Output-looking container arguments remain verbatim after ``--``."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
@@ -166,16 +225,19 @@ def test_passthrough_json_argument_keeps_human_banner(tmp_path: Path) -> None:
                 "example.invalid/image",
                 "--",
                 "echo",
-                "--json",
+                "-o",
+                "yaml",
+                "--output",
+                "json",
             ],
         )
 
     assert result.exit_code == 0
     assert result.stdout.startswith("@CADC-CANFAR")
-    assert "Arguments: --json" in result.stdout
+    assert "Arguments: -o yaml --output json" in result.stdout
 
 
-@pytest.mark.parametrize("name", ["--json", "--yaml"])
+@pytest.mark.parametrize("name", ["--output", "--json"])
 def test_machine_flag_spelling_as_option_value_keeps_human_banner(
     tmp_path: Path,
     name: str,
@@ -203,18 +265,22 @@ def test_machine_flag_spelling_as_option_value_keeps_human_banner(
 
 
 def test_auth_group_flag_before_subcommand_is_rejected(tmp_path: Path) -> None:
-    """Group-level ``--json``/``--yaml`` placement exits 2 with guidance."""
+    """Group-level output placement exits 2 with guidance."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        json_result = runner.invoke(cli, ["auth", "--json", "ls"])
-        yaml_result = runner.invoke(cli, ["auth", "--yaml", "show"])
+        json_result = runner.invoke(cli, ["auth", "-o", "json", "ls"])
+        yaml_result = runner.invoke(cli, ["auth", "--output", "yaml", "show"])
 
     assert json_result.exit_code == 2
-    assert "Place --json or --yaml after the subcommand." in json_result.stderr
+    assert "Place --output json or --output yaml after the subcommand." in (
+        json_result.stderr
+    )
     assert yaml_result.exit_code == 2
-    assert "Place --json or --yaml after the subcommand." in yaml_result.stderr
+    assert "Place --output json or --output yaml after the subcommand." in (
+        yaml_result.stderr
+    )
 
 
 def test_ps_human_mode_emits_banner(tmp_path: Path) -> None:
@@ -236,13 +302,13 @@ def test_ps_human_mode_emits_banner(tmp_path: Path) -> None:
 
 
 def test_auth_default_json_matches_show(tmp_path: Path) -> None:
-    """Default ``auth`` emits the same payload as ``auth show --json``."""
+    """Default ``auth`` emits the same payload as ``auth show -o json``."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        default_result = runner.invoke(cli, ["auth", "--json"])
-        show_result = runner.invoke(cli, ["auth", "show", "--json"])
+        default_result = runner.invoke(cli, ["auth", "-o", "json"])
+        show_result = runner.invoke(cli, ["auth", "show", "-o", "json"])
 
     assert default_result.exit_code == 0
     assert show_result.exit_code == 0
@@ -250,12 +316,12 @@ def test_auth_default_json_matches_show(tmp_path: Path) -> None:
 
 
 def test_auth_show_json_payload_shape(tmp_path: Path) -> None:
-    """``auth show --json`` emits a domain Authentication object without envelopes."""
+    """``auth show -o json`` emits a domain Authentication object without envelopes."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "show", "--json"])
+        result = runner.invoke(cli, ["auth", "show", "-o", "json"])
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
@@ -265,12 +331,12 @@ def test_auth_show_json_payload_shape(tmp_path: Path) -> None:
 
 
 def test_auth_ls_json_payload_shape(tmp_path: Path) -> None:
-    """``auth ls --json`` emits a JSON array of Authentication objects."""
+    """``auth ls -o json`` emits a JSON array of Authentication objects."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["auth", "ls", "--json"])
+        result = runner.invoke(cli, ["auth", "ls", "-o", "json"])
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
@@ -282,25 +348,18 @@ def test_auth_ls_json_payload_shape(tmp_path: Path) -> None:
     assert srcnet["server"] is None
 
 
-def test_root_json_flag_before_command_path_is_not_supported(
+def test_root_output_option_before_command_path_is_not_supported(
     tmp_path: Path,
 ) -> None:
-    """Root ``--json`` is rejected; supported commands own machine output."""
+    """Root output options are rejected; supported commands own machine output."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path)
 
     with _patch_config(config_path):
-        result = runner.invoke(cli, ["--json", "auth", "ls"])
+        result = runner.invoke(cli, ["-o", "json", "auth", "ls"])
 
     assert result.exit_code == 2
-    assert "--json" in click.unstyle(result.stderr)
-
-
-def test_conflicting_output_flags_exit_two() -> None:
-    """Conflicting machine output flags exit with code 2."""
-    result = runner.invoke(cli, ["auth", "ls", "--json", "--yaml"])
-    assert result.exit_code == 2
-    assert "Conflicting machine output flags" in result.stderr
+    assert "-o" in click.unstyle(result.stderr)
 
 
 def test_unsupported_command_rejects_leaf_json_flag() -> None:

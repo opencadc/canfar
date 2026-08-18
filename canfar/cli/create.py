@@ -11,11 +11,7 @@ from pydantic import ValidationError
 
 from canfar.cli import output
 from canfar.cli._run import run
-from canfar.cli.machine import (
-    JsonOption,
-    YamlOption,
-    resolve_mode,
-)
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
@@ -208,8 +204,7 @@ def creation(  # noqa: PLR0917
             help="Dry run. Parse parameters and exit.",
         ),
     ] = False,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Launch a new session.
 
@@ -218,10 +213,11 @@ def creation(  # noqa: PLR0917
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
     if dry and mode is not output.OutputMode.HUMAN:
         typer.echo(
-            "Incompatible flags: --dry-run cannot be used with --json or --yaml.",
+            "Incompatible flags: --dry-run cannot be used with --output json or "
+            "--output yaml.",
             err=True,
         )
         raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)

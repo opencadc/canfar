@@ -111,11 +111,46 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.return_value = ["session-id"]
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", "--json"])
+        result = runner.invoke(
+            create,
+            ["headless", "skaha/worker:v1", "--output", "json"],
+        )
 
         assert result.exit_code == 0
         assert json.loads(result.stdout) == ["session-id"]
         assert result.stderr == ""
+
+    @patch("canfar.cli.create.AsyncSession")
+    def test_create_output_option_stops_at_command_delimiter(
+        self,
+        mock_session_cls,
+    ):
+        """Only the output option before ``--`` is parsed by ``create``."""
+        mock_session = AsyncMock()
+        mock_session_cls.return_value.__aenter__.return_value = mock_session
+        mock_session.create.return_value = ["session-id"]
+
+        result = runner.invoke(
+            create,
+            [
+                "headless",
+                "skaha/worker:v1",
+                "--output",
+                "json",
+                "--",
+                "echo",
+                "-o",
+                "yaml",
+                "--output",
+                "json",
+            ],
+        )
+
+        assert result.exit_code == 0
+        assert json.loads(result.stdout) == ["session-id"]
+        request = mock_session.create.await_args.args[0]
+        assert request.cmd == "echo"
+        assert request.args == "-o yaml --output json"
 
     @patch("canfar.cli.create.AsyncSession")
     def test_create_command_debug_keeps_machine_stdout_data_only(
@@ -129,7 +164,7 @@ class TestCreateCLI:
 
         result = runner.invoke(
             create,
-            ["headless", "skaha/worker:v1", "--debug", "--json"],
+            ["headless", "skaha/worker:v1", "--debug", "--output", "json"],
         )
 
         assert result.exit_code == 0
@@ -149,7 +184,14 @@ class TestCreateCLI:
 
         result = runner.invoke(
             create,
-            ["headless", "skaha/worker:v1", "--replicas", "2", "--yaml"],
+            [
+                "headless",
+                "skaha/worker:v1",
+                "--replicas",
+                "2",
+                "--output",
+                "yaml",
+            ],
         )
 
         assert result.exit_code == 0
@@ -173,7 +215,10 @@ class TestCreateCLI:
 
     @pytest.mark.parametrize(
         ("flag", "load"),
-        [("--json", json.loads), ("--yaml", yaml.safe_load)],
+        [
+            (["--output", "json"], json.loads),
+            (["--output", "yaml"], yaml.safe_load),
+        ],
     )
     @patch("canfar.cli.create.AsyncSession")
     def test_create_command_machine_empty_is_transport_failure(
@@ -187,7 +232,7 @@ class TestCreateCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.create.return_value = []
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", flag])
+        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -196,7 +241,10 @@ class TestCreateCLI:
 
     @pytest.mark.parametrize(
         ("flag", "load"),
-        [("--json", json.loads), ("--yaml", yaml.safe_load)],
+        [
+            (["--output", "json"], json.loads),
+            (["--output", "yaml"], yaml.safe_load),
+        ],
     )
     @pytest.mark.parametrize(
         "invalid_args",
@@ -213,7 +261,7 @@ class TestCreateCLI:
         """Invalid command input fails before the Session boundary opens."""
         result = runner.invoke(
             create,
-            ["headless", "skaha/worker:v1", *invalid_args, flag],
+            ["headless", "skaha/worker:v1", *invalid_args, *flag],
         )
 
         assert result.exit_code == 1
@@ -271,23 +319,18 @@ class TestCreateCLI:
         """Dry-run diagnostics cannot contaminate machine stdout."""
         result = runner.invoke(
             create,
-            ["headless", "skaha/worker:v1", "--dry-run", "--json"],
+            [
+                "headless",
+                "skaha/worker:v1",
+                "--dry-run",
+                "--output",
+                "json",
+            ],
         )
 
         assert result.exit_code == 2
         assert result.stdout == ""
         assert "--dry-run" in result.stderr
-
-    def test_create_command_rejects_conflicting_machine_formats(self):
-        """The shared resolver rejects simultaneous JSON and YAML output."""
-        result = runner.invoke(
-            create,
-            ["headless", "skaha/worker:v1", "--json", "--yaml"],
-        )
-
-        assert result.exit_code == 2
-        assert result.stdout == ""
-        assert "Conflicting machine output flags" in result.stderr
 
     @patch("canfar.cli.create.AsyncSession")
     def test_create_command_exception(self, mock_session_cls):
@@ -303,7 +346,10 @@ class TestCreateCLI:
 
     @pytest.mark.parametrize(
         ("flag", "load"),
-        [("--json", json.loads), ("--yaml", yaml.safe_load)],
+        [
+            (["--output", "json"], json.loads),
+            (["--output", "yaml"], yaml.safe_load),
+        ],
     )
     @pytest.mark.parametrize("phase", ["enter", "body", "exit"])
     @patch("canfar.cli.create.AsyncSession")
@@ -326,7 +372,7 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = httpx.HTTPError(secret)
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", flag])
+        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 1
         assert result.stdout == ""
@@ -353,7 +399,10 @@ class TestCreateCLI:
 
     @pytest.mark.parametrize(
         ("flag", "load"),
-        [("--json", json.loads), ("--yaml", yaml.safe_load)],
+        [
+            (["--output", "json"], json.loads),
+            (["--output", "yaml"], yaml.safe_load),
+        ],
     )
     @pytest.mark.parametrize("phase", ["enter", "body", "exit"])
     @patch("canfar.cli.create.AsyncSession")
@@ -376,7 +425,7 @@ class TestCreateCLI:
         }[phase]
         failing_call.side_effect = KeyboardInterrupt(secret)
 
-        result = runner.invoke(create, ["headless", "skaha/worker:v1", flag])
+        result = runner.invoke(create, ["headless", "skaha/worker:v1", *flag])
 
         assert result.exit_code == 130
         assert result.stdout == ""

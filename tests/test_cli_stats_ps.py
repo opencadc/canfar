@@ -168,11 +168,14 @@ def test_ps_quiet_prints_all_matching_session_ids() -> None:
 
 @pytest.mark.parametrize(
     ("flag", "load"),
-    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+    [
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
 )
 def test_ps_machine_emits_filtered_session_array(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], object],
 ) -> None:
     """Machine ``ps`` emits validated session models with running-only filtering."""
@@ -188,7 +191,7 @@ def test_ps_machine_emits_filtered_session_array(
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, [flag])
+        result = runner.invoke(ps, flag)
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
@@ -212,7 +215,7 @@ def test_ps_json_kind_filter_parity(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = [payloads[0]]
-        result = runner.invoke(ps, ["--kind", "headless", "--json"])
+        result = runner.invoke(ps, ["--kind", "headless", "--output", "json"])
 
     assert result.exit_code == 0
     session.fetch.assert_awaited_once_with(kind="headless", status=None)
@@ -235,7 +238,7 @@ def test_ps_json_malformed_payload_keeps_stdout_pure(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--json"])
+        result = runner.invoke(ps, ["--output", "json"])
 
     assert result.exit_code == 0
     data = json.loads(result.stdout)
@@ -244,9 +247,9 @@ def test_ps_json_malformed_payload_keeps_stdout_pure(tmp_path: Path) -> None:
     assert "validation error" in result.stderr.lower()
 
 
-def test_ps_quiet_with_json_exits_two() -> None:
-    """``ps --quiet`` is incompatible with machine output flags."""
-    result = runner.invoke(ps, ["--quiet", "--json"])
+def test_ps_quiet_with_machine_output_exits_two() -> None:
+    """``ps --quiet`` is incompatible with machine output."""
+    result = runner.invoke(ps, ["--quiet", "--output", "json"])
     assert result.exit_code == 2
     assert "quiet" in result.stderr.lower()
 
