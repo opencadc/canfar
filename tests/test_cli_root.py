@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 from unittest.mock import AsyncMock, patch
 
+import click
 from typer.core import TyperGroup
 from typer.main import get_command
 from typer.testing import CliRunner
@@ -141,12 +142,14 @@ def test_root_leaf_help_keeps_canonical_usage() -> None:
     """Direct leaf commands retain their documented usage lines."""
     create_result = runner.invoke(cli, ["create", "--help"])
     prune_result = runner.invoke(cli, ["prune", "--help"])
+    create_help = " ".join(click.unstyle(create_result.stdout).split())
+    prune_help = " ".join(click.unstyle(prune_result.stdout).split())
 
     assert create_result.exit_code == 0
-    assert "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]" in (
-        create_result.stdout
-    )
+    assert "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]" in create_help
     assert prune_result.exit_code == 0
-    assert "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..." in (
-        prune_result.stdout
+    prune_usage = (
+        "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS "
+        "COMMAND [ARGS]..."
     )
+    assert prune_usage in prune_help
