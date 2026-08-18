@@ -89,6 +89,23 @@ def test_editor_replaces_top_level_mapping_without_reloading_saved_state(
     assert set(config.authentication) == {"cadc"}
 
 
+def test_editor_seeds_idp_for_mapping_form_credentials(tmp_path: Path) -> None:
+    """Mapping-form Authentication records inherit their Identity Provider key."""
+    config_path = tmp_path / "config.yaml"
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        config = Configuration()
+        config.editor.set(
+            "authentication.second",
+            {
+                "mode": "x509",
+                "path": str(tmp_path / "second.pem"),
+                "expiry": 0,
+            },
+        )
+
+    assert config.authentication["second"].idp == "second"
+
+
 def test_editor_rejects_list_indexing(tmp_path: Path) -> None:
     """Dotted paths may retrieve a whole list but cannot address its items."""
     config_path = tmp_path / "config.yaml"
