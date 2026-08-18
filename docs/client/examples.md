@@ -166,7 +166,7 @@ config = Configuration(
 )
 with Session(config=config) as session:
     ids = session.create(
-        name="private-job",
+        name="private-session",
         image="images.canfar.net/project/private-image:latest",
         kind="headless",
         cmd="python",

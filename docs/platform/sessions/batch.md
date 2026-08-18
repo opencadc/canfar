@@ -6,7 +6,7 @@ container and mounted-storage environment as an interactive Session; only the
 entrypoint and lifecycle differ.
 
 This page keeps the guidance requested in [#209](https://github.com/opencadc/canfar/issues/209):
-creation output, `Pending` status, queue expectations, and checks for a job that
+creation output, `Pending` status, queue expectations, and checks for a Session that
 does not start.
 
 ## Submit a headless Session
@@ -87,7 +87,7 @@ opens a Session once it is ready.
 
 The client does not promise a relative priority between `headless` and
 interactive Sessions. Queue order and admission policy are deployment-owned;
-do not assume that a headless job will outrank an interactive Session, or that
+do not assume that a headless Session will outrank an interactive Session, or that
 increasing a request will make it run sooner. If queue policy matters for a
 project, ask the platform operator for the current policy.
 

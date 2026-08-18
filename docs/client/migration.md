@@ -22,7 +22,7 @@ from canfar.sessions import Session
 
 with Session() as session:
     ids = session.create(
-        name="migrated-job",
+        name="migrated-session",
         image="images.canfar.net/skaha/terminal:latest",
     )
 ```

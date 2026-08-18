@@ -25,25 +25,9 @@ async def launch_batch() -> list[str]:
         )
 ```
 
-Pass `cores` and `ram` when every replica needs fixed resources:
-
-```python
-from canfar.sessions import AsyncSession
-
-
-async def launch_fixed_batch() -> list[str]:
-    async with AsyncSession() as session:
-        return await session.create(
-            name="fits-processing",
-            image="images.canfar.net/project/analysis:latest",
-            kind="headless",
-            cores=8,
-            ram=32,
-            cmd="python",
-            args="/app/process_observations.py",
-            replicas=100,
-        )
-```
+Omitting `cores` and `ram` keeps each replica on the platform's flexible
+allocation policy. Add both arguments to the same `create()` call (for example,
+`cores=8, ram=32`) when every replica needs a fixed resource allocation.
 
 The return value contains only successfully launched Session IDs. Check for an
 empty list before treating the batch as submitted.

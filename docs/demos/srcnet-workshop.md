@@ -5,7 +5,7 @@
 
     - **Run code on the cloud** without complex setup.
     - Use familiar tools like **Jupyter Notebooks**.
-    - Scale their analysis from a single interactive session to **hundreds of parallel jobs**.
+    - Scale their analysis from a single interactive Session to **hundreds of parallel Sessions**.
     - **Process large datasets** efficiently.
 
     **Whether you're new to coding or a seasoned power-user, these tools are designed to be intuitive and powerful.**
@@ -147,7 +147,7 @@ canfar create headless IMAGE_NAME -- python echo.py
 !!! tip "Interactive to Batch, Seamlessly"
     You can develop your analysis interactively in a **notebook** session, save your code to a python script, and then run it at scale using a **headless** session. **No changes to your environment are needed.**
 
-To check the output of your headless job, you can use the `logs` command.
+To check the output of your headless Session, you can use the `logs` command.
 
 ```bash
 canfar logs <SESSION_ID>
@@ -157,7 +157,7 @@ canfar logs <SESSION_ID>
 
 ## Scaling Up: From One to Many
 
-Need to process hundreds of files? You can launch multiple copies (replicas) of your headless job with a single command.
+Need to process hundreds of files? You can launch multiple copies (replicas) of your headless Session with a single command.
 
 ```bash
 canfar create --replicas 10 headless IMAGE_NAME -- python echo.py
@@ -169,7 +169,7 @@ You now have 10 containers in parallel. But how do you divide the work?
 
 ## The Python Client: Distributing Your Workload
 
-For complex logic like distributing data across many jobs, we switch to the `canfar` Python Client.
+For complex logic like distributing data across many Sessions, we switch to the `canfar` Python Client.
 
 ### The Problem
 
@@ -208,9 +208,9 @@ print("Done!")
 
 ## Putting It All Together: A Complete Workflow
 
-Here is the complete workflow, from launching jobs programmatically to processing data in parallel.
+Here is the complete workflow, from launching Sessions programmatically to processing data in parallel.
 
-```python title="Launching Jobs Programmatically"
+```python title="Launching Sessions Programmatically"
 from canfar.sessions import Session
 
 # This uses the same Authentication from `canfar login`
@@ -225,5 +225,5 @@ with Session() as session:
         replicas=100,
     )
 
-print(f"Successfully launched {len(ids)} processing jobs!")
+print(f"Successfully launched {len(ids)} processing Sessions!")
 ```
