@@ -13,6 +13,7 @@ import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
+import canfar.server as platform
 from canfar._server_discovery import (
     _discover_for_idp,
     _discovered_to_server,
@@ -55,6 +56,26 @@ _VOSPACE_CAPABILITIES = """
       </capability>
     </capabilities>
 """
+
+
+def test_public_exports_declare_server_api() -> None:
+    """The module's public and compatibility exports remain explicit."""
+    expected = {
+        "ServerActivation",
+        "ServerDiscoveryError",
+        "ServerFetchError",
+        "ServerSelectionRequiredError",
+        "ServerSelectorError",
+        "activate",
+        "activate_authentication",
+        "discover",
+        "enrich",
+        "list_servers",
+        "use",
+    }
+
+    assert set(platform.__all__) == expected
+    assert all(hasattr(platform, name) for name in expected)
 
 
 def test_enrich_preserves_storage_resource_annotation() -> None:

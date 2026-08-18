@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 import re
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
@@ -36,8 +35,6 @@ from canfar.models.auth import (
 )
 from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import ContainerRegistry
-
-log = logging.getLogger(__name__)
 
 _CADC_URI = AnyUrl("ivo://cadc.nrc.ca/skaha")
 _CONFIG_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
