@@ -96,10 +96,13 @@ from canfar.helpers import distributed
 
 paths = ["/project/observations/a.fits", "/project/observations/b.fits"]
 
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     for path in distributed.chunk(paths):
         raw = vault.cat_file(path)
         print(path, len(raw))
+finally:
+    vault.close()
 ```
 
 For staged or memory-mapped access, use an explicit fsspec cache or

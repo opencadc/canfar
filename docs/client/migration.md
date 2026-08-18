@@ -68,8 +68,11 @@ explicit Storage Identifiers:
 from canfar.storage import filesystem, identifiers
 
 print(identifiers())
-with filesystem("vault") as vault:
+vault = filesystem("vault")
+try:
     data = vault.cat_file("/project/observations/example.fits")
+finally:
+    vault.close()
 ```
 
 Storage Identifiers are not dynamic module members or fsspec schemes. See

@@ -34,8 +34,8 @@ by Python clients. Python OIDC login is also available as `canfar.login()` and
 
 -   **Inspect platform state**
 
-    Query available resources, Container Images, and Science Platform
-    availability.
+    Query available resources, Container Images, and Science Platform Server
+    capacity.
 
     [:octicons-arrow-right-16: Python API reference](session.md)
 
@@ -83,7 +83,7 @@ async def main() -> None:
 | `canfar.images` | List Container Images or fetch parsed image details. |
 | `canfar.storage` | List Storage Identifiers and build explicit fsspec filesystems. |
 | `canfar.context` | Read resource limits advertised by a Science Platform Server. |
-| `canfar.overview` | Check Science Platform availability. |
+| `canfar.overview` | Check Science Platform Server capacity. |
 | `canfar.authentication` | Login and manage saved Authentication Records. |
 | `canfar.client` | Compose lower-level synchronous or asynchronous HTTP clients. |
 
