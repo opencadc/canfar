@@ -2,8 +2,17 @@
 
 from __future__ import annotations
 
+import os
+import tempfile
+from contextlib import suppress
 from dataclasses import dataclass
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
+
+import yaml
+from pydantic import ValidationError
+
+from canfar.models.auth import OIDCCredential
 
 if TYPE_CHECKING:
     from canfar.models.config import Configuration
@@ -57,6 +66,17 @@ def get_value(config: Configuration, path: str) -> Any:
     return value
 
 
+def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
+    """Validate a source-isolated copy of a complete Configuration."""
+    data = {**config.model_dump(mode="python"), **updates}
+    candidate = config.__class__.model_construct()
+    config.__class__.__pydantic_validator__.validate_python(
+        data,
+        self_instance=candidate,
+    )
+    return candidate
+
+
 def set_value(config: Configuration, path: str, value: Any) -> Configuration:
     """Return a new validated configuration with a dotted-path value updated."""
     segments = _parse_dotted_path(path)
@@ -67,7 +87,70 @@ def set_value(config: Configuration, path: str, value: Any) -> Configuration:
         cursor = _ensure_child_container(cursor, segment)
 
     _set_in_container(cursor, segments[-1], value)
-    return config._validated_copy(**data)  # noqa: SLF001
+    return _validated_copy(config, **data)
+
+
+def _restore_oidc_secrets(config: Configuration, data: dict[str, Any]) -> None:
+    """Replace masked ``SecretStr`` placeholders with values for YAML persistence."""
+    authentication = data.get("authentication")
+    if not isinstance(authentication, dict):
+        return
+
+    for idp, credential_data in authentication.items():
+        credential = config.authentication.get(idp)
+        if not isinstance(credential, OIDCCredential) or not isinstance(
+            credential_data, dict
+        ):
+            continue
+
+        client = credential_data.get("client")
+        if isinstance(client, dict) and credential.client.secret is not None:
+            client["secret"] = credential.client.secret.get_secret_value()
+
+        token = credential_data.get("token")
+        if not isinstance(token, dict):
+            continue
+        if credential.token.access is not None:
+            token["access"] = credential.token.access.get_secret_value()
+        if credential.token.refresh is not None:
+            token["refresh"] = credential.token.refresh.get_secret_value()
+
+
+def _default_config_path() -> Path:
+    """Resolve the configured YAML path lazily to preserve test isolation."""
+    from canfar.models.config import CONFIG_PATH  # noqa: PLC0415
+
+    return CONFIG_PATH
+
+
+def _save_config(config: Configuration, path: Path | None = None) -> None:
+    """Atomically save a validated Configuration to YAML."""
+    target = path or _default_config_path()
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary: Path | None = None
+    try:
+        candidate = _validated_copy(config)
+        data = candidate.model_dump(mode="json", exclude_none=True)
+        _restore_oidc_secrets(candidate, data)
+        serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=target.parent,
+            prefix=f".{target.name}.",
+            delete=False,
+        ) as handle:
+            temporary = Path(handle.name)
+            handle.write(serialized)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(target)
+    except (OSError, TypeError, ValidationError) as exc:
+        if temporary is not None:
+            with suppress(OSError):
+                temporary.unlink(missing_ok=True)
+        msg = f"Failed to save configuration to {target}: {exc}"
+        raise OSError(msg) from exc
 
 
 @dataclass(slots=True)
@@ -89,6 +172,4 @@ class ConfigurationEditor:
 
     def save(self) -> None:
         """Atomically persist the bound Configuration."""
-        from canfar.config.store import save_config  # noqa: PLC0415
-
-        save_config(self._config)
+        _save_config(self._config)
