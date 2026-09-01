@@ -79,7 +79,7 @@ Interactive sessions provide on-demand access to pre-configured computing enviro
 
 **Advantages:**
 - Faster session startup
-- Can burst to higher resource usage when available
+- Can burst to higher resource usage (up to 16 cores and 32GB of memory) when available
 - Optimal for interactive work and development
 
 **Best For:**
