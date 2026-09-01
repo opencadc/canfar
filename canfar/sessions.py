@@ -235,7 +235,7 @@ class Session(HTTPClient):
 
         Notes:
             - If cores and ram are not specified, the session will be created with
-              flexible resource allocation of upto 8 cores and 32GB of RAM.
+              flexible resource allocation of up to 16 cores and 32GB of RAM.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
