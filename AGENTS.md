@@ -29,6 +29,7 @@ Use these project commands with the `rtk` prefix. Set `UV_CACHE_DIR=/tmp/canfar-
 - Deterministic non-slow tests: `rtk proxy uv run --no-sync pytest tests -m "not slow" --no-cov -q -o cache_dir=/tmp/canfar-pytest-cache`
 - Docs build: `rtk proxy uv run --group docs mkdocs build`
 - Full test suite: `rtk proxy uv run --no-sync pytest`
+- Agent skills: `rtk proxy python3 scripts/validate_skills.py`
 
 Run focused tests for changed behavior before broader validation. Use the deterministic suite for work without live credentials. The full suite contacts CANFAR and creates/deletes test Sessions; run it only with a valid account, usable Authentication Record, and certificate.
 
@@ -37,6 +38,9 @@ Pytest creates an empty temporary home by default, so a certificate in your norm
 Tests constructing `Configuration` must isolate `CONFIG_PATH`, even when using `model_validate`: settings sources can merge a populated configuration into explicit input. Report deterministic results separately from live service failures; a docs build or local test pass does not establish live workflow success.
 
 ## Agent skills
+
+Platform skills for coding agents live in `skills/`. Install with
+`npx skills add opencadc/canfar`. See `docs/agents/platform-skills.md`.
 
 ### Issue tracker
 

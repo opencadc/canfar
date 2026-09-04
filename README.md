@@ -28,6 +28,13 @@ ids = session.create(
 session.connect(ids)
 ```
 
+## Agent skills
+
+```bash
+npx skills add opencadc/canfar
+python3 scripts/validate_skills.py
+```
+
 ---
 <p align="center">
     <a href="https://www.opencadc.org/canfar/latest/">
