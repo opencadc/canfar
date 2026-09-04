@@ -1,0 +1,192 @@
+{
+  "description": "CANFAR Science Platform skills for agents \u2014 all deployments, plain-language routing.",
+  "name": "canfar-skills",
+  "skills": [
+    {
+      "category": "platform",
+      "id": "canfar-platform",
+      "path": "skills/canfar-platform",
+      "summary": "Plain-language intent router for all CANFAR topics.",
+      "title": "CANFAR platform router"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-getting-started",
+      "path": "skills/canfar-getting-started",
+      "summary": "Account, CADC/SRCNet access, first session, support.",
+      "title": "Getting started"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-architecture",
+      "path": "skills/canfar-architecture",
+      "summary": "Code-backed map of Portal, Skaha, storage, APIs, and deployments.",
+      "title": "Architecture"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-sessions",
+      "path": "skills/canfar-sessions",
+      "summary": "Notebook, desktop, CARTA, Firefly, contributed, lifecycle.",
+      "title": "Sessions"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-storage",
+      "path": "skills/canfar-storage",
+      "summary": "Scratch and deployment-specific persistent storage.",
+      "title": "Storage"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-vospace",
+      "path": "skills/canfar-vospace",
+      "summary": "Vault, vos URIs, vcp/vls, sharing, publication.",
+      "title": "VOSpace"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-transfers",
+      "path": "skills/canfar-transfers",
+      "summary": "SSHFS, rsync, canfar data cp, large uploads.",
+      "title": "Transfers"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-quotas",
+      "path": "skills/canfar-quotas",
+      "summary": "Home, project, scratch, vault quotas.",
+      "title": "Quotas"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-groups",
+      "path": "skills/canfar-groups",
+      "summary": "CADC group management, membership, teams.",
+      "title": "Groups"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-permissions",
+      "path": "skills/canfar-permissions",
+      "summary": "Allocations, POSIX ACLs, Harbor, VOSpace ACLs.",
+      "title": "Permissions"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-batch",
+      "path": "skills/canfar-batch",
+      "summary": "Headless sessions, replicas up to 512, parallel jobs.",
+      "title": "Batch"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-containers",
+      "path": "skills/canfar-containers",
+      "summary": "Harbor, astroml, custom images, contributed port 5000.",
+      "title": "Containers"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-auth",
+      "path": "skills/canfar-auth",
+      "summary": "Login, CADC/SRCNet IDP, certificates, servers.",
+      "title": "Authentication"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-cli",
+      "path": "skills/canfar-cli",
+      "summary": "canfar login/create/ps/data automation.",
+      "title": "CANFAR CLI"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-python-client",
+      "path": "skills/canfar-python-client",
+      "summary": "Session, AsyncSession, Context, Images, and storage APIs.",
+      "title": "Python client"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-doi",
+      "path": "skills/canfar-doi",
+      "summary": "CADC Data Publication Service and Vault releases.",
+      "title": "DOI publication"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-cadc-data",
+      "path": "skills/canfar-cadc-data",
+      "summary": "cadcget, TAP, archive download vs VOSpace.",
+      "title": "CADC archives"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-limits",
+      "path": "skills/canfar-limits",
+      "summary": "cgroup, CPU/RAM/GPU, scratch, session caps.",
+      "title": "Limits"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-cvmfs",
+      "path": "skills/canfar-cvmfs",
+      "summary": "Alliance software at /cvmfs when cluster mounts it.",
+      "title": "CVMFS"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-best-practices",
+      "path": "skills/canfar-best-practices",
+      "summary": "Scale-out pipelines, batch-friendly code.",
+      "title": "Best practices"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-concurrency",
+      "path": "skills/canfar-concurrency",
+      "summary": "Shared persistent homes, locks, filesystem cautions.",
+      "title": "Concurrency"
+    },
+    {
+      "category": "platform",
+      "id": "canfar-troubleshooting",
+      "path": "skills/canfar-troubleshooting",
+      "summary": "Common failures and diagnostics.",
+      "title": "Troubleshooting"
+    }
+  ],
+  "version": "0.4.0",
+  "workflows": [
+    {
+      "id": "canfar-platform",
+      "includes": [
+        "canfar-platform",
+        "canfar-getting-started",
+        "canfar-architecture",
+        "canfar-sessions",
+        "canfar-storage",
+        "canfar-vospace",
+        "canfar-transfers",
+        "canfar-quotas",
+        "canfar-groups",
+        "canfar-permissions",
+        "canfar-batch",
+        "canfar-containers",
+        "canfar-auth",
+        "canfar-cli",
+        "canfar-python-client",
+        "canfar-doi",
+        "canfar-cadc-data",
+        "canfar-limits",
+        "canfar-cvmfs",
+        "canfar-best-practices",
+        "canfar-concurrency",
+        "canfar-troubleshooting"
+      ],
+      "summary": "Sessions, storage, groups, transfers, permissions \u2014 ask in plain language.",
+      "title": "CANFAR Platform Companion"
+    }
+  ]
+}

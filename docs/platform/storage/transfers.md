@@ -28,7 +28,7 @@ Efficient data transfer is essential for astronomy workflows. CANFAR provides mu
 
 | Source → Destination | Method | Command Example |
 |---------------------|--------|-----------------|
-| **Local → ARC Projects** | SSHFS, Direct URL, VOSpace | `vcp file.fits vos:/arc:projects/[project]/` |
+| **Local → ARC Projects** | SSHFS, Direct URL, VOSpace | `vcp file.fits arc:projects/[project]/` |
 | **Local → Vault** | VOSpace CLI, Web | `vcp file.fits vos:[user]/` |
 | **Local → Scratch** | Only during sessions | `cp file.fits /scratch/` (within session) |
 | **ARC → Vault** | VOSpace CLI | `vcp /arc/projects/[project]/file.fits vos:[user]/` |

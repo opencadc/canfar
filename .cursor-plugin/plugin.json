@@ -1,0 +1,21 @@
+{
+  "author": {
+    "name": "OpenCADC"
+  },
+  "description": "CANFAR Science Platform skills for agents \u2014 CADC, SRCNet, self-hosted; plain-language routing.",
+  "homepage": "https://github.com/opencadc/canfar",
+  "keywords": [
+    "canfar",
+    "cadc",
+    "srcnet",
+    "science-platform",
+    "storage",
+    "sessions",
+    "vospace",
+    "groups"
+  ],
+  "license": "AGPL-3.0",
+  "name": "canfar-skills",
+  "repository": "https://github.com/opencadc/canfar",
+  "version": "0.4.0"
+}
