@@ -55,7 +55,11 @@ ids = session.create(
 
 The current client validates 1–512 replicas. The live platform/queue can impose
 lower practical limits. Each successful replica receives `REPLICA_ID` and
-`REPLICA_COUNT`.
+`REPLICA_COUNT` (1-based). Shard work with `canfar.helpers.distributed.chunk`
+or `.stripe`, which default to those variables.
+
+GPU count is `Session.create(..., gpu=n)`. The REST/`CreateRequest` field is
+`gpus`; the CLI flag is `--gpu`. `create(..., gpus=1)` is a `TypeError`.
 
 ## AsyncSession
 
@@ -108,6 +112,7 @@ extensions or when the backend cannot serve byte ranges efficiently.
 | Module | Purpose |
 | --- | --- |
 | `canfar.sessions` | Fetch, create, inspect, logs/events, connect, destroy |
+| `canfar.helpers.distributed` | 1-based `chunk` / `stripe` from `REPLICA_ID` / `REPLICA_COUNT` |
 | `canfar.context` | Live resource options/defaults |
 | `canfar.images` | Images allowed for Session kinds |
 | `canfar.overview` | Platform availability |

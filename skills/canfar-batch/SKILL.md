@@ -36,9 +36,18 @@ canfar create headless skaha/astroml:latest --name study --replicas 10 \
   -- python /arc/projects/mygroup/analyze.py
 ```
 
-Each replica gets `REPLICA_ID` and `REPLICA_COUNT` — use them for deterministic
-splits. This behavior is defined by the current `canfar` client and Skaha Session
-templates; do not infer it from an older documentation example.
+Each replica gets `REPLICA_ID` and `REPLICA_COUNT` (1-based). Use
+`canfar.helpers.distributed.chunk` or `.stripe` — they read those env vars:
+
+```python
+from canfar.helpers import distributed
+
+for path in distributed.chunk(paths):
+    process(path)
+```
+
+This behavior is defined by the current `canfar` client and Skaha Session
+templates; do not invent 0-based replica indexes.
 
 `canfar run` and `canfar launch` are aliases for `canfar create`.
 

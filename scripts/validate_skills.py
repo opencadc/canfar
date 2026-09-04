@@ -15,11 +15,13 @@ PLUGIN = ROOT / ".cursor-plugin" / "plugin.json"
 
 # Reject AstroAI product CLI/images/skills. Install path is opencadc/canfar.
 _PRODUCT_LEAK = re.compile(
-    r"astroai-ray|astroai-lab|/opt/astroai|`astroai`|AstroAI|"
+    r"astroai-ray|astroai-lab|canfar-lab|/opt/astroai|`astroai`|AstroAI|"
     r"(?<![/\w.])astroai|"
-    r"\bRay\b|\$WORK",
+    r"\$WORK",
     re.IGNORECASE,
 )
+# Capital-R Ray only. IGNORECASE \bRay\b also matches "X-ray".
+_RAY_LEAK = re.compile(r"\bRay\b")
 
 
 def fail(message: str) -> None:
@@ -27,7 +29,10 @@ def fail(message: str) -> None:
 
 
 def _leak_spans(text: str) -> list[str]:
-    return [match.group(0) for match in _PRODUCT_LEAK.finditer(text)]
+    hits = [(match.start(), match.group(0)) for match in _PRODUCT_LEAK.finditer(text)]
+    hits.extend((match.start(), match.group(0)) for match in _RAY_LEAK.finditer(text))
+    hits.sort(key=lambda item: item[0])
+    return [span for _, span in hits]
 
 
 def main() -> int:
@@ -143,7 +148,10 @@ def _self_check() -> None:
     assert _leak_spans("AstroAI images") == ["AstroAI"]
     assert _leak_spans("see astroai-ray") == ["astroai-ray"]
     assert _leak_spans("Ray cluster") == ["Ray"]
+    assert _leak_spans("X-ray observations") == []
+    assert _leak_spans("canfar-lab doctor") == ["canfar-lab"]
     assert _leak_spans("cd $WORK/mylab") == ["$WORK"]
+    assert _leak_spans("less /opt/astroai/USAGE.md") == ["/opt/astroai"]
 
 
 if __name__ == "__main__":

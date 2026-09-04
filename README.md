@@ -32,8 +32,9 @@ session.connect(ids)
 
 ```bash
 npx skills add opencadc/canfar
-python3 scripts/validate_skills.py
 ```
+
+Skill authoring: [Platform agent skills](docs/agents/platform-skills.md).
 
 ---
 <p align="center">
