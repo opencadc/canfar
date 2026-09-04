@@ -114,11 +114,18 @@ def main() -> int:
             fail(f"catalog and plugin {key!r} values differ")
             errors += 1
 
-    readme = ROOT / "README.md"
-    if readme.is_file():
-        leaks = _leak_spans(readme.read_text())
+    extra_paths = (
+        CATALOG,
+        PLUGIN,
+        ROOT / "README.md",
+        ROOT / "docs" / "agents" / "platform-skills.md",
+    )
+    for path in extra_paths:
+        if not path.is_file():
+            continue
+        leaks = _leak_spans(path.read_text())
         if leaks:
-            fail(f"README.md: AstroAI product leak {leaks!r}")
+            fail(f"{path.relative_to(ROOT)}: AstroAI product leak {leaks!r}")
             errors += 1
 
     if errors:

@@ -73,5 +73,6 @@ in scripts; human-readable Server Names can differ by deployment.
 
 1. Check `canfar auth show` and `canfar server ls` before blaming a Session API.
 2. Never ask users to paste passwords, tokens, or certificates into scripts/chat.
-3. `canfar auth login` is a deprecated compatibility alias; use `canfar login`.
-4. A valid identity can still lack platform entitlement, group membership, or data access.
+3. Keep `canfar --log-level debug login` output off shared logs and chat.
+4. `canfar auth login` is a deprecated compatibility alias; use `canfar login`.
+5. A valid identity can still lack platform entitlement, group membership, or data access.
