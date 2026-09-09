@@ -5,8 +5,11 @@ Images, VOSpace Services, and Science Platform metadata.
 
 ## Install and authenticate
 
+[Install the client](get-started.md#install) first. These examples describe the unreleased
+`feat/interfaces` interface; follow the installation guide to choose a
+compatible environment.
+
 ```bash
-pip install --upgrade canfar
 canfar login cadc
 ```
 
@@ -56,6 +59,9 @@ with Session() as session:
         session.connect(ids)
 ```
 
+If the notebook is still starting, `connect()` skips it. Inspect the returned
+IDs and retry after readiness, as shown in the [Python tutorial](quick-start.md).
+
 ## Minimal asynchronous example
 
 ```python
@@ -83,7 +89,7 @@ async def main() -> None:
 | `canfar.images` | List Container Images or fetch parsed image details. |
 | `canfar.storage` | List Storage Identifiers and build explicit fsspec filesystems. |
 | `canfar.context` | Read resource limits advertised by a Science Platform Server. |
-| `canfar.overview` | Check Science Platform Server capacity. |
+| `canfar.overview` | Check Science Platform Server availability. |
 | `canfar.authentication` | Login and manage saved Authentication Records. |
 | `canfar.client` | Compose lower-level synchronous or asynchronous HTTP clients. |
 
@@ -94,3 +100,4 @@ async def main() -> None:
 - [Examples](examples.md)
 - [Data access](data.md)
 - [Migration guide](migration.md)
+- [Use CANFAR with a coding agent](agents.md)

@@ -1,7 +1,8 @@
 # VOSpace Services
 
-[VOSpace](https://www.ivoa.net/documents/VOSpace/) is the IVOA protocol for
-remote astronomical storage. A CANFAR Science Platform Server can expose one or
+VOSpace lets you store and transfer astronomical files remotely. Its
+[protocol](https://www.ivoa.net/documents/VOSpace/) is defined by the
+International Virtual Observatory Alliance (IVOA). A CANFAR Science Platform Server can expose one or
 more VOSpace Services. Each service has a user-facing **Storage Identifier** in
 the CANFAR configuration and an endpoint discovered from the platform.
 
@@ -14,6 +15,7 @@ writes, sharing, and transfer between machines.
 
 | Need | Recommended path |
 | --- | --- |
+| Upload or download files in your browser | [Storage Management](transfers.md#transfer-files-in-your-browser) |
 | Work with data already mounted in a Session | `/arc/home/<user>` or `/arc/projects/<project>` |
 | Copy one object or directory from a remote service | `canfar data cp` |
 | List or inspect a remote service from a shell | `canfar data ls`, `info`, `stat`, or `find` |

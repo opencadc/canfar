@@ -10,7 +10,8 @@ not imply that every deployment exposes every feature.
 - [2025.2 — November 25, 2025](2025-2.md)
 - [2025.1 — September 9, 2025](2025-1.md)
 
-For package-level changes after the latest platform release, see the
+For development client changes, see [What's new (unreleased)](../client/updates.md)
+and the [upgrade guide](../client/migration.md). For published package history, see the
 [`canfar` package history](https://pypi.org/project/canfar/) and the
 repository [CHANGELOG](https://github.com/opencadc/canfar/blob/main/CHANGELOG.md).
 Deployment operators should use the [OpenCADC deployments

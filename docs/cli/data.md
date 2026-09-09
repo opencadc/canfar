@@ -1,13 +1,21 @@
 # Data commands
 
-`canfar data` delegates to the embedded `fsspec-cli` command application. It
-maps every configured VOSpace Service by its Storage Identifier and always
-adds the reserved `local` source for the machine running the command.
+Use `canfar data` to copy files between your computer and CANFAR storage,
+inspect remote files, and manage directories. Each path starts with a storage
+name: `local` means the computer running the command; configured names such as
+`arc` and `vault` refer to remote services.
+
+These commands were added after v1.4.1. Check the
+[installation guide](../client/get-started.md#install) before following the
+examples. For transfers without installing Python, use
+[Storage Management in your browser](../platform/storage/transfers.md#transfer-files-in-your-browser).
 
 ## Sources and operands
 
-Run `canfar login` for the IDP that owns a remote VOSpace Service, then use an
-explicit source-qualified operand:
+Run `canfar login` for the identity provider (IDP) that owns the remote service.
+Default `arc` and `vault` storage uses CADC credentials (`canfar login cadc`),
+even if your active compute server belongs to SRCNet. Then use a storage name
+followed by an absolute path:
 
 ```text
 storage-identifier:/absolute/path

@@ -1,15 +1,19 @@
 # Data Access
 
-The Python data API gives explicit access to configured VOSpace Services through
-standard [fsspec](https://filesystem-spec.readthedocs.io/) filesystems. A
+Read and write files on CANFAR remote storage from Python using
+[fsspec](https://filesystem-spec.readthedocs.io/), a common filesystem interface. A
 **Storage Identifier** names one VOSpace Service; a path is the path inside that
 service. `canfar` does not register Storage Identifiers as fsspec protocols,
 module attributes, or dynamic schemes.
 
 ## Find and open a Storage Identifier
 
-Authenticate first, for example with `canfar login cadc`. Then pass the
-Storage Identifier to `identifiers()` or `filesystem()`:
+[Install the client](get-started.md#install) and authenticate first. The default
+`arc` and `vault` services use Canadian Astronomy Data Centre (CADC) credentials:
+run `canfar login cadc` even if you use SRCNet for compute. Storage uses the
+identity provider of its owning server independently of your active selection.
+
+Call `identifiers()` to list available names, then pass one to `filesystem()`:
 
 ```python
 from canfar.storage import filesystem, identifiers

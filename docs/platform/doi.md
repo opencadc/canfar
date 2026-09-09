@@ -48,8 +48,8 @@ Keep the package self-describing and reproducible:
 - verify that the package can be read from the published data directory before
   selecting **Publish**.
 
-Use `/scratch` only for staging during a Session. Store the package and any
-checkpoint that must survive outside `/arc` or the DPS data directory. The
+Save the package and checkpoints in `/arc` or the data directory shown by
+DPS. Use `/scratch` only for temporary staging. The
 [storage guide](storage/index.md) explains the distinction between mounted
 storage, staged files, and persistent remote data.
 

@@ -6,7 +6,45 @@ command for a [headless Session](batch.md).
 
 ## Launch a Notebook
 
-List the images available on the active server before choosing one:
+1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
+2. Under **Launch New Session**, choose **Notebook** and an image that contains
+   your analysis software. Complete the resource choices offered by the form
+   and launch the Session.
+3. Find the new entry under **Active Sessions**. Wait for it to start, then
+   open its notebook link to enter Jupyter.
+
+Available packages, graphics processors (GPUs), and resource limits depend on
+the selected image and server. If the Session does not start, check its status
+in the portal and consult [Support](../support/index.md).
+
+## Create, run, and save a notebook
+
+1. In Jupyter's file browser, navigate to `/arc/home/USER`, replacing `USER`
+   with your CADC username. You can use `/arc/projects/PROJECT` instead if
+   your project has given you write access.
+2. Open a launcher and choose a Python notebook, or use **New** and select a
+   Python kernel if your image provides the classic notebook interface.
+3. Enter the following code in the first cell, then press **Shift+Enter**:
+
+    ```python
+    print("Ready to analyse your data")
+    ```
+
+4. Confirm that the message appears below the cell. Rename the notebook to
+   `first-analysis.ipynb` and use **File → Save Notebook** (or **Save and
+   Checkpoint** in the classic interface).
+5. Confirm that the saved file appears under your chosen `/arc` directory.
+   Use [Storage Management](../storage/transfers.md#transfer-files-in-your-browser)
+   to upload inputs or download a copy of the notebook.
+
+Save your results before you finish. Return to **Active Sessions** in the
+Science Portal, use the delete control for this Session, and confirm the
+deletion. Files saved under `/arc` remain; `/scratch` and unsaved kernel state
+do not. Closing Jupyter's browser tab does not delete the Session.
+
+## Launch from the command line (optional)
+
+After [installing the client](../../client/get-started.md#install), list the images available on the active server before choosing one:
 
 ```bash
 canfar login cadc
@@ -14,10 +52,8 @@ canfar image ls --kind notebook
 canfar create notebook IMAGE_NAME --name analysis
 ```
 
-You can also create a Notebook from the Science Portal. Image names, package
-versions, GPU availability, and resource limits are deployment-specific. Use
-the image description and the current `canfar create --help` output as the
-source of truth.
+Use `canfar create --help` to check the resource options supported by your
+installed client.
 
 Monitor the Session and open it when it is ready:
 

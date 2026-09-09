@@ -6,6 +6,19 @@ are deployment-specific.
 
 ## Launch an application
 
+1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
+2. In **Launch New Session**, choose **Contributed**, select an image containing
+   the software you need, and launch the Session.
+3. Wait for it to start under **Active Sessions**, then open its application link.
+
+Save your work under `/arc` before using the Session's delete control in the
+portal. Closing the browser tab does not stop the Session. See
+[Get started](../get-started.md) for account, storage, and cleanup steps.
+
+### Launch from the command line (optional)
+
+[Install the client](../../client/get-started.md#install) before using these commands.
+
 List the images currently available for this Session Kind:
 
 ```bash

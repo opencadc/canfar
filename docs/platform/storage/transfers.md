@@ -1,10 +1,50 @@
 # Data transfers
 
-Use `canfar data` for authenticated transfers between configured VOSpace
-Services and the local filesystem. The command is the shell front door for the
-same Storage Identifier mapping used by `canfar.storage`.
+Copy files between your computer and CANFAR storage in your browser, or use
+`canfar data` for repeatable command-line transfers.
 
-## Operand syntax
+## Transfer files in your browser
+
+Sign in to [Storage Management](https://www.canfar.net/storage/arc/list) with
+your Canadian Astronomy Data Centre (CADC) account. You can also follow the
+storage link from the Science Portal. Your personal directory is under
+`home/USER`; shared data is under `projects/PROJECT`. Replace `USER` and
+`PROJECT` with the names used by your account and project.
+
+### Upload inputs
+
+1. Navigate to the directory where you want the files to remain, such as your
+   personal directory or a project directory where you have write access.
+2. Select **Add**, choose the file or folder upload option, and select the
+   items from your computer. Follow the upload dialog to start the transfer.
+3. Wait for completion, refresh the directory listing, and check that the
+   expected filenames and sizes appear before opening them in a Session.
+
+A file uploaded to `home/USER/input.fits` is available inside a Session as
+`/arc/home/USER/input.fits`. For shared directories, ask your project
+administrator for access; see [Permissions](../permissions.md).
+
+### Download results
+
+1. Navigate to the directory containing the results and select the files or
+   folders you need.
+2. Open the download action. Choose **Zip** to download the selected data as
+   an archive. **URL List** and **HTML List** produce lists of links, rather
+   than an archive containing the data.
+3. Save the download to your computer. Open the archive or a downloaded file
+   to confirm that you have the expected results.
+
+Links to private data still require authentication. For scripted transfers,
+use the authenticated CLI workflow below.
+
+## Transfer files from a terminal
+
+[Install the client](../../client/get-started.md#install) and log in to the
+identity provider that owns the storage service. The default `arc` and `vault`
+services use CADC credentials (`canfar login cadc`), independently of which
+server you selected for compute.
+
+### Operand syntax
 
 Every operand is an explicit Storage Identifier followed by an absolute path:
 
@@ -14,13 +54,12 @@ identifier:/absolute/path
 
 `local` is always available and means the machine where `canfar` is running.
 Configured names such as `arc` or `vault` are deployment data; list the names
-with the configuration tools or use the names shown in your setup. The embedded
-application does not register those names as Python or fsspec protocols.
+with the configuration tools or use the names shown in your setup. These names identify storage locations in your CANFAR configuration.
 
 ```bash
 canfar data ls -lh local:/tmp
 canfar data ls -lh vault:/project
-canfar data ls -lh arc:/projects/<project>
+canfar data ls -lh arc:/projects/PROJECT
 ```
 
 Authentication and endpoint resolution happen when the command opens a
@@ -67,8 +106,8 @@ For a transfer between two remote VOSpace Services, use an explicit copy and
 verify the destination. Do not assume that a cross-source `mv` is supported:
 
 ```bash
-canfar data cp vault:/project/input.fits arc:/projects/<project>/input.fits
-canfar data info arc:/projects/<project>/input.fits
+canfar data cp vault:/project/input.fits arc:/projects/PROJECT/input.fits
+canfar data info arc:/projects/PROJECT/input.fits
 ```
 
 The CLI keeps recursive removal disabled. Delete individual files with `rm` or
@@ -89,7 +128,7 @@ destination:
 ```bash
 canfar data cp vault:/project/cube.fits local:/scratch/cube.fits
 python reduce.py /scratch/cube.fits /scratch/result.fits
-canfar data cp local:/scratch/result.fits arc:/projects/<project>/result.fits
+canfar data cp local:/scratch/result.fits arc:/projects/PROJECT/result.fits
 ```
 
 `/scratch` is Session-local and is deleted when the Session ends. It is a good

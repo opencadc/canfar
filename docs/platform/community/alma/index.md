@@ -1,9 +1,8 @@
 # ALMA analysis workflow
 
 Use this workflow to move ALMA data into a CANFAR Session, reduce it with
-CASA, inspect the products, and keep the results in persistent storage. It is
-text-first so commands can be copied and the workflow remains useful when the
-Science Portal layout changes.
+CASA, inspect the products, and keep the results in persistent storage. You can use the browser for Session management and file transfers, with
+optional command-line steps for repeatable work.
 
 ## Prerequisites
 
@@ -17,14 +16,9 @@ Science Portal layout changes.
 - A Session Kind that matches the task: use **Desktop** for CASA and other GUI
   applications, **Notebook** for Python-based analysis, and **CARTA** for
   inspecting images and spectral cubes.
-- Optional command-line access. Install the shipped client and log in:
-
-    ```bash
-    pip install canfar --upgrade
-    canfar login cadc
-    canfar auth show
-    canfar server ls
-    ```
+- Optional command-line access: follow [Install and set up](../../../client/get-started.md#install)
+  before using the CLI examples below. Run `canfar login cadc` to authenticate
+  and `canfar auth show` to check your selection.
 
 See [Getting Started](../../get-started.md) for account and portal setup.
 
@@ -52,8 +46,9 @@ tag remains unchanged.
 ### 2. Stage the archive data
 
 Download the requested data from the [ALMA Science Archive](https://almascience.nrao.edu/)
-to your local machine, or use a configured CANFAR data source. Create a
-destination and verify the copy with the CANFAR data commands:
+to your local machine, then [upload them in your browser](../../storage/transfers.md#transfer-files-in-your-browser).
+For a scripted transfer, create a destination and verify the copy with the
+CANFAR data commands:
 
 ```bash
 canfar data mkdir -p arc:/home/[username]/alma/raw
@@ -85,17 +80,31 @@ casa
 casa --pipeline
 ```
 
-Run the archive's supplied calibration and imaging scripts using the command
-form documented for that CASA release. Keep the scripts, measurement sets,
+Follow the README delivered with your archive data and use its required CASA
+version. For deliveries that include these scripts:
+
+1. Run `scriptForPI.py` using the invocation in the archive README to calibrate
+   the observations.
+2. Check that calibration completed and locate the calibrated measurement
+   sets, usually in the delivery's `calibrated` directory. A measurement set
+   contains radio observations ready for imaging; it is not an image.
+3. Follow the supplied `scriptForImaging.py` instructions to produce CASA
+   images, or use the version-appropriate imaging procedure in the README.
+4. Check the imaging output before proceeding to visual inspection.
+
+ Keep the scripts, measurement sets,
 and intermediate products under a persistent project directory or copy them
 back to `/arc` when the reduction finishes. The [CASA containers guide](../CASA_and_more.md)
 lists version-specific package notes and known issues.
 
 ### 4. Inspect and analyse the products
 
-Open calibrated measurement sets or image products from a CARTA Session when
-you need cube navigation, spectra, regions, or moment-map inspection. Use a
-Notebook Session for Python analysis. Both Session Kinds can read files saved
+Open the **image products** from CASA imaging in a CARTA Session for cube
+navigation, spectra, regions, or moment maps. In CARTA, use **File → Open Image**
+and choose a CASA image or an exported FITS image. CARTA's
+[file browser](https://carta.readthedocs.io/en/latest/file_browser.html) accepts
+image formats; use CASA to work with measurement sets. Use a Notebook Session
+for Python analysis. Both Session Kinds can read files saved
 under `/arc/home/[username]` and `/arc/projects/[project]`.
 
 For a local or scripted check, list the result before opening it:
@@ -136,9 +145,9 @@ canfar delete [session-id] --force
 
 At the end of the workflow:
 
-1. `canfar auth show` reports the active Authentication and
-   `canfar server ls` lists an available Science Platform Server.
-2. The selected Session reaches `Running` and opens in the Science Portal.
+1. You can sign in to the Science Portal and access your project storage.
+   If you use the CLI, `canfar auth show` and `canfar server ls` confirm your setup.
+2. The selected Session starts and its application opens from the Science Portal.
 3. Raw data and final products are visible under the chosen `/arc` path from
    the Desktop, Notebook, or CARTA Session.
 4. CASA scripts complete using a compatible image, and the reduction products

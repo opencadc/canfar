@@ -1,10 +1,8 @@
+# Client changelog
+
+This page includes the published Python client history from the repository's
+`CHANGELOG.md`. For changes on the current development branch, see
+[What's new (unreleased)](client/updates.md) and the [upgrade guide](client/migration.md).
+[Platform release history](releases/releases.md) is maintained separately.
+
 --8<-- "CHANGELOG.md"
-# Changelog
-
-Release notes are published on the [CANFAR releases](releases/releases.md)
-page. The complete version history, including changes that predate this site,
-is maintained in the repository's
-[`CHANGELOG.md`](https://github.com/opencadc/canfar/blob/main/CHANGELOG.md).
-
-For the current package version and upgrade notes, see the release page for
-your version before updating a client or deployment.

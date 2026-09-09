@@ -1,9 +1,57 @@
 # Accounts, groups, and permissions
 
-CANFAR access is evaluated at several boundaries: your CADC identity, the
-active Science Platform Server, the Storage Identifier you use, the project
-groups that grant access, and the Container Image you request. A successful
-login does not grant access to every server, project, image, or data object.
+Your Canadian Astronomy Data Centre (CADC) account identifies you to CANFAR.
+A group lets a project share access with several accounts. Signing in confirms
+who you are; access to a directory or private image depends on the permissions
+its owner grants you.
+
+## Create a project group
+
+You need a CADC account to create a group. If your project already has one,
+ask one of its administrators to add you instead.
+
+1. Sign in to [CADC Group Management](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/).
+2. Select **New Group** and enter a descriptive **Name** and **Description**.
+3. Select **Create** and find the new group in the list.
+
+Creating a group does not allocate project storage, set a quota, or create a
+container registry project. Contact [CANFAR support](support/index.md) to
+request a shared storage allocation and provide your group name.
+
+## Add members and administrators
+
+You must be an administrator of the group to change its membership.
+
+1. Open the group's membership editor and find the **Members** section.
+2. Search for your colleague by name, check the account in the results, and
+   select **Add member**.
+3. To let a colleague manage membership too, use **Add administrator** in the
+   **Administrators** section.
+4. Select **Update** to save changes. Reopen the group and confirm that the
+   intended accounts appear in the member or administrator list.
+
+Administrator status allows group management. It does not grant authority to
+allocate platform resources or edit data owned by someone else.
+
+## Grant the group access to data
+
+The directory owner or a person allowed to change its permissions must grant
+access separately from adding group members.
+
+1. Open [Storage Management](https://www.canfar.net/storage/arc/list) and
+   navigate to the directory you want to share.
+2. Open its permissions editor and assign your group to **Read** for access
+   without edits, or **Read/Write** if collaborators need to change the data.
+3. Save the change. Check the permissions on the files and subdirectories you
+   intend to share; do not assume that changing one directory updates every
+   existing child.
+4. Ask a group member to sign in with their own account and open a sample
+   file. For write access, have them create and remove a small test file in
+   the agreed directory.
+
+If you cannot edit permissions, ask the directory owner or CANFAR support.
+Use the path supplied for your allocation rather than assuming it matches the
+group name.
 
 ## Identity and server access
 
@@ -18,22 +66,15 @@ canfar config get active.server
 
 The names and capabilities in `canfar server ls` are deployment data. If the
 server is missing or login succeeds but a request is forbidden, contact the
-operator for that Science Platform deployment. See the [client
-overview](../client/overview.md) for credential and server selection details.
+operator for that Science Platform deployment. See the [authentication guide](../cli/authentication-contexts.md) for credential and server selection details.
 
-## Groups and project data
-
-Project storage is intended for collaboration. A project administrator grants
-membership through the [CADC group management portal](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/);
-the resulting permissions are enforced by the storage service. Use the paths
-and Storage Identifiers supplied by your project rather than assuming that a
-project name, quota, or sharing policy is the same on every deployment.
+## Check access from the command line
 
 For data operations, start by listing the identifiers and paths you can use:
 
 ```bash
-canfar data ls -lh arc:/projects/<project>
-canfar data info arc:/projects/<project>/catalog.csv
+canfar data ls -lh arc:/projects/PROJECT
+canfar data info arc:/projects/PROJECT/catalog.csv
 ```
 
 `local:` refers to the machine running the command. `arc:` and `vault:` are
@@ -46,7 +87,7 @@ match the service.
 
 Do not put credentials in a path, a notebook, an image, or a Session command.
 Use the configured Authentication Record or an explicitly supplied runtime
-credential as described in the [client overview](../client/overview.md) and
+credential as described in the [HTTP client guide](../client/client.md) and
 [storage guide](storage/index.md).
 
 ## Container images

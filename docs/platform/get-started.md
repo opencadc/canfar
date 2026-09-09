@@ -1,65 +1,62 @@
 # Get started
 
-The CANFAR Science Platform combines authenticated compute, Container Images,
-and research storage. Start with the portal for interactive work, or install
-the Python client and CLI for repeatable workflows.
+Use the CANFAR Science Platform to analyse astronomical data in your browser.
+You can run notebooks and astronomy applications near your data, save results,
+and share them with your project. You do not need to install the Python client
+to follow this guide.
 
 ## 1. Get an account and access
 
-Request a [CADC account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-and join the project or group that owns the data you need. Group membership
-controls access to shared project paths and private Container Images. If you
-need help, contact [CANFAR support](support/index.md).
+Request a [Canadian Astronomy Data Centre (CADC) account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
+Ask your project administrator to add you to the group that owns the data you
+need. If you need help, contact [CANFAR support](support/index.md).
 
-## 2. Launch a first Session
+## 2. Run your first notebook
 
-From the [Science Portal](https://www.canfar.net/), select a Session Kind and
-Container Image, then launch the Session. Start with a Notebook for Python
-exploration; choose Desktop, CARTA, or Firefly when the workflow needs a
-specialized interface. Use `headless` for a command that should run without an
-interactive interface.
+1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
+2. In **Launch New Session**, choose **Notebook**, select an image containing
+   the software you need, and submit the form. An image is a packaged software
+   environment; a Session is your running instance of it.
+3. Find your Session under **Active Sessions**. Wait for it to start, then open
+   its notebook link.
+4. Follow [Create, run, and save a notebook](sessions/notebook.md#create-run-and-save-a-notebook)
+   to run your first Python cell and save the notebook in persistent storage.
 
-The portal's image list is authoritative for available images. Do not assume
-that an example tag in this guide is published by every deployment.
+Choose an image from the portal's current list. Available software and
+resource choices depend on the image and server.
 
-## 3. Install the client (optional)
+## 3. Upload data and save your work
 
-Install the released package on the machine from which you want to manage
-Sessions or transfer data:
-
-```bash
-python -m pip install --upgrade canfar
-canfar login cadc
-canfar auth show
-canfar server ls
-```
-
-The CLI stores Authentication Records and discovered Science Platform Servers
-in its local configuration. See the [CLI reference](../cli/cli-help.md) and
-[Python client guide](../client/get-started.md).
-
-## 4. Put data in the right place
-
-Inside a Session, use mounted paths when they are available:
+Inside a Session, use these mounted paths when they are available:
 
 | Location | Use |
 | --- | --- |
-| `/arc/home/<user>` | Personal scripts and results |
-| `/arc/projects/<project>` | Shared project data and outputs |
-| `/scratch` | Temporary staging and intermediates; deleted with the Session |
+| `/arc/home/USER` | Personal scripts, notebooks, and results; replace `USER` with your username |
+| `/arc/projects/PROJECT` | Shared project data and outputs; replace `PROJECT` with your project's directory |
+| `/scratch` | Temporary files; deleted with the Session |
 
-For remote data, use [canfar data](storage/transfers.md) or
-`canfar.storage.filesystem(identifier)` in Python. Storage Identifiers are
-explicit configuration names; do not invent a `vault://` URL or import a
-configured identifier as a Python attribute.
+Use [browser file transfers](storage/transfers.md#transfer-files-in-your-browser)
+to upload inputs or download results. Save and verify your notebook and results
+under `/arc` before using the Session's delete control in **Active Sessions**.
+Files under `/arc` remain available after deletion. Closing a browser tab alone
+does not stop the Session.
 
-## 5. Run and preserve a workflow
+Choose [Desktop](sessions/desktop.md), [CARTA](sessions/carta.md), or
+[Firefly](sessions/firefly.md) when you need a different analysis interface.
 
-1. Test the command on a small input in an interactive Session.
-2. Write a durable input/output path into the command or environment.
-3. Submit a [headless Session](sessions/batch.md) for unattended work.
-4. Inspect `Pending` Sessions with `canfar ps --all`, `canfar info`, and
-   `canfar events`.
+## 4. Automate your analysis (optional)
+
+For repeated work, [install the client](../client/get-started.md#install) and
+follow the [command-line tutorial](../cli/quick-start.md) or
+[Python tutorial](../client/quick-start.md). Check the installation guide's
+release note before using examples from this branch.
+
+To run an unattended workflow:
+
+1. Test your command on a small input in an interactive Session.
+2. Set explicit input and output paths in the command or environment.
+3. Submit a [headless Session](sessions/batch.md), which runs without a browser interface.
+4. Inspect its progress with `canfar ps --all`, `canfar info`, and `canfar events`.
 5. Copy final results out of `/scratch` before deleting the Session.
 
 ## Next steps
