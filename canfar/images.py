@@ -2,16 +2,16 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING
 
-from canfar import get_logger
 from canfar.client import HTTPClient
 from canfar.models.containers import Image
 
 if TYPE_CHECKING:
     from httpx import Response
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class Images(HTTPClient):

@@ -10,16 +10,13 @@ from pydantic_settings.exceptions import SettingsError
 
 from canfar import CONFIG_PATH
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.config import Configuration
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-config: typer.Typer = typer.Typer(
-    cls=AliasGroup,
-)
+config: typer.Typer = typer.Typer()
 
 
 def _configuration_failure(error: Exception) -> StructuredError:
@@ -39,11 +36,12 @@ def _configuration_failure(error: Exception) -> StructuredError:
 
 @config.command("show", help="Display client configuration")
 def show(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Display client configuration."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -95,8 +93,7 @@ def get(
         ...,
         help="Config key to get in dot notation.",
     ),
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Retrieve a config value.
 
@@ -104,7 +101,9 @@ def get(
     canfar config get active.server
     canfar config get servers.canfar.url
     """
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     try:
         cfg = Configuration()  # ty: ignore[missing-argument]
     except (
@@ -124,7 +123,7 @@ def get(
         raise typer.Exit(1) from err
 
     try:
-        value = cfg.get_value(key)
+        value = cfg.editor.get(key)
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
         failure = StructuredError(
             code=ErrorCode.COMMAND_VALIDATION_FAILED,
@@ -156,11 +155,12 @@ def set_value(
     canfar config set active.authentication cadc
     canfar config set servers.canfar.url https://ws-uv.canfar.net/skaha
     """
+    emit_cli_active_server_banner()
     cfg = Configuration()  # ty: ignore[missing-argument]
     try:
         parsed = yaml.safe_load(value)
-        updated = cfg.set_value(key, parsed)
-        updated.save()
+        cfg.editor.set(key, parsed)
+        cfg.editor.save()
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
         get_console(stderr=True).print(f"[bold red]Error:[/bold red] {err}")
         raise typer.Exit(1) from err
@@ -169,4 +169,5 @@ def set_value(
 @config.command("path", help="Local path of config")
 def path() -> None:
     """Local path of config."""
+    emit_cli_active_server_banner()
     get_console().print(f"[green]{CONFIG_PATH}[/green]")

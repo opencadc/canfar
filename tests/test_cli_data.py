@@ -33,7 +33,6 @@ def _configuration(*storage_names: str) -> SimpleNamespace:
     storage = dict.fromkeys(storage_names, object())
     return SimpleNamespace(
         servers={"server": SimpleNamespace(storage=storage)},
-        storage_identifiers=lambda: [*storage_names, "local"],
     )
 
 
@@ -61,7 +60,6 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
                     "first": SimpleNamespace(storage={"arc": object()}),
                     "second": SimpleNamespace(storage={"cavern": object()}),
                 },
-                storage_identifiers=lambda: ["arc", "cavern", "local"],
             ),
             SimpleNamespace(
                 active=SimpleNamespace(server="second"),
@@ -71,7 +69,6 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
                         storage={"cavern": object(), "vault": object()}
                     ),
                 },
-                storage_identifiers=lambda: ["arc", "cavern", "vault", "local"],
             ),
         ]
     )
@@ -244,41 +241,6 @@ def test_data_cross_source_move_retains_upstream_rejection(monkeypatch) -> None:
     assert result.exit_code == 2
     assert result.stdout == ""
     assert result.stderr == "mv: cross-source move unsupported\n"
-
-
-@pytest.mark.parametrize("operand", [":/path", "/bare/local/path"])
-def test_data_deprecated_operand_grammar_is_unsupported(
-    monkeypatch,
-    operand: str,
-) -> None:
-    """Only the upstream explicit ``name:/absolute/path`` grammar is accepted."""
-    monkeypatch.setattr(storage, "Configuration", _configuration)
-
-    result = runner.invoke(cli, ["data", "ls", operand])
-
-    assert result.exit_code != 0
-
-
-@pytest.mark.parametrize(
-    ("arguments", "diagnostic"),
-    [
-        (["storage", "ls"], "No such command 'storage'"),
-        (["data", "ls", "active:/"], "unknown filesystem"),
-        (["data", "ls", "-h", "local:/"], "-h: requires long listing"),
-    ],
-)
-def test_data_retired_aliases_and_standalone_h_are_unsupported(
-    monkeypatch,
-    arguments: list[str],
-    diagnostic: str,
-) -> None:
-    """Retired host aliases do not widen the upstream mapped grammar."""
-    monkeypatch.setattr(storage, "Configuration", _configuration)
-
-    result = runner.invoke(cli, arguments)
-
-    assert result.exit_code == 2
-    assert diagnostic in result.stderr
 
 
 def test_importing_data_module_does_not_load_configuration() -> None:

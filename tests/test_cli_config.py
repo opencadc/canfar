@@ -81,7 +81,10 @@ def test_config_get_full_server_record_includes_runtime_name(tmp_path: Path) -> 
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        json_result = runner.invoke(config, ["get", "servers.canfar", "--json"])
+        json_result = runner.invoke(
+            config,
+            ["get", "servers.canfar", "--output", "json"],
+        )
         human_result = runner.invoke(config, ["get", "servers.canfar"])
 
     assert json_result.exit_code == 0
@@ -115,7 +118,10 @@ def test_config_get_full_credential_record_includes_runtime_idp(tmp_path: Path) 
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        json_result = runner.invoke(config, ["get", "authentication.cadc", "--json"])
+        json_result = runner.invoke(
+            config,
+            ["get", "authentication.cadc", "--output", "json"],
+        )
         human_result = runner.invoke(config, ["get", "authentication.cadc"])
 
     assert json_result.exit_code == 0
@@ -190,14 +196,14 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
     assert isinstance(result.exception, RuntimeError)
 
     with patch("canfar.cli.config.Configuration") as cfg:
-        cfg.return_value.get_value.side_effect = KeyError("missing")
+        cfg.return_value.editor.get.side_effect = KeyError("missing")
         result = runner.invoke(config, ["get", "missing"])
 
     assert result.exit_code == 1
     assert "missing" in result.stderr
 
     with patch("canfar.cli.config.Configuration") as cfg:
-        cfg.return_value.set_value.side_effect = TypeError("wrong")
+        cfg.return_value.editor.set.side_effect = TypeError("wrong")
         result = runner.invoke(config, ["set", "console.width", "120"])
 
     assert result.exit_code == 1
@@ -205,14 +211,14 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
 
 
 def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:
-    """``config show --json`` emits the Configuration model with stable keys."""
+    """``config show -o json`` emits the Configuration model with stable keys."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["show", "--json"])
+        result = runner.invoke(config, ["show", "-o", "json"])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
@@ -222,14 +228,14 @@ def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:
 
 
 def test_config_show_yaml_emits_configuration_model(tmp_path: Path) -> None:
-    """``config show --yaml`` emits the Configuration model on stdout."""
+    """``config show -o yaml`` emits the Configuration model on stdout."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["show", "--yaml"])
+        result = runner.invoke(config, ["show", "-o", "yaml"])
 
     assert result.exit_code == 0
     payload = yaml.safe_load(result.stdout)
@@ -237,7 +243,7 @@ def test_config_show_yaml_emits_configuration_model(tmp_path: Path) -> None:
 
 
 def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
-    """``config show --json`` must not emit raw OIDC secrets from saved auth."""
+    """``config show -o json`` must not emit raw OIDC secrets from saved auth."""
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         yaml.dump(
@@ -278,7 +284,7 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["show", "--json"])
+        result = runner.invoke(config, ["show", "-o", "json"])
 
     assert result.exit_code == 0
     rendered = result.stdout
@@ -331,7 +337,7 @@ def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["show", "--json"])
+        result = runner.invoke(config, ["show", "--output", "json"])
 
     assert result.exit_code == 0
     oidc = json.loads(result.stdout)["authentication"]["srcnet"]
@@ -341,14 +347,14 @@ def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
 
 
 def test_config_get_json_emits_scalar_value(tmp_path: Path) -> None:
-    """``config get --json`` emits the resolved value without human formatting."""
+    """``config get -o json`` emits the resolved value without human formatting."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["get", "console.width", "--json"])
+        result = runner.invoke(config, ["get", "console.width", "-o", "json"])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
@@ -356,21 +362,24 @@ def test_config_get_json_emits_scalar_value(tmp_path: Path) -> None:
 
 
 def test_config_get_yaml_emits_scalar_value(tmp_path: Path) -> None:
-    """``config get --yaml`` emits the resolved scalar value on stdout."""
+    """``config get -o yaml`` emits the resolved scalar value on stdout."""
     config_path = tmp_path / "config.yaml"
     with (
         _patch_config_path(config_path),
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        result = runner.invoke(config, ["get", "console.width", "--yaml"])
+        result = runner.invoke(
+            config,
+            ["get", "console.width", "--output", "yaml"],
+        )
 
     assert result.exit_code == 0
     assert yaml.safe_load(result.stdout) == 120
 
 
 def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
-    """``config get --json`` masks sensitive OIDC credential values."""
+    """``config get -o json`` masks sensitive OIDC credential values."""
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         yaml.dump(
@@ -410,7 +419,12 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
     ):
         result = runner.invoke(
             config,
-            ["get", "authentication.srcnet.client.secret", "--json"],
+            [
+                "get",
+                "authentication.srcnet.client.secret",
+                "--output",
+                "json",
+            ],
         )
 
     assert result.exit_code == 0
@@ -421,7 +435,7 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
 def test_config_get_json_redacts_secrets_inside_credential_record(
     tmp_path: Path,
 ) -> None:
-    """``config get authentication.<idp> --json`` masks nested OIDC secrets."""
+    """``config get authentication.<idp> -o json`` masks nested OIDC secrets."""
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         yaml.dump(
@@ -459,10 +473,13 @@ def test_config_get_json_redacts_secrets_inside_credential_record(
         patch("canfar.cli.config.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
     ):
-        record = runner.invoke(config, ["get", "authentication.srcnet", "--json"])
+        record = runner.invoke(
+            config,
+            ["get", "authentication.srcnet", "-o", "json"],
+        )
         token = runner.invoke(
             config,
-            ["get", "authentication.srcnet.token", "--json"],
+            ["get", "authentication.srcnet.token", "-o", "json"],
         )
 
     assert record.exit_code == 0

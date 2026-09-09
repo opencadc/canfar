@@ -27,8 +27,14 @@ def _require_live_credentials() -> None:
         _skip("configuration is unavailable")
 
     try:
-        _endpoint, idp = config._resolve_storage("arc")  # noqa: SLF001
-        credential = config.get_credential(idp)
+        server = next(
+            (server for server in config.servers.values() if "arc" in server.storage),
+            None,
+        )
+        if server is None or server.idp is None:
+            _skip("the named service has no parent Authentication Record")
+        idp = server.idp
+        credential = config.authentication[idp]
     except (KeyError, ValueError):
         _skip("the named service or its Authentication Record is unavailable")
 

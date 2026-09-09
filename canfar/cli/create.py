@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Annotated, Any, get_args
+from typing import Annotated, Any, get_args
 
 import click
 import httpx
@@ -11,54 +11,20 @@ from pydantic import ValidationError
 
 from canfar.cli import output
 from canfar.cli._run import run
-from canfar.cli.machine import (
-    JsonOption,
-    YamlOption,
-    resolve_mode,
-)
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import CreateRequest
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
-from canfar.utils.console import get_console
-
-if TYPE_CHECKING:
-    from typer._click.core import Context
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 kinds: list[str] = list(get_args(Kind))
 # Remove desktop-app from the list of kinds for usage message since,
 # they can only be created from within a desktop session.
 kinds.remove("desktop-app")
-
-
-class CreateUsageMessage(AliasGroup):
-    """Custom usage message for prune command.
-
-    Args:
-        typer (TyperGroup): Base class for grouping commands in Typer.
-    """
-
-    def get_usage(self, ctx: Context) -> str:  # noqa: ARG002
-        """Get the usage message for the prune command.
-
-        Args:
-            ctx (typer.Context): The Typer context.
-
-        Returns:
-            str: The usage message.
-        """
-        return "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]"
-
-
-create = typer.Typer(
-    name="create",
-    no_args_is_help=True,
-    cls=CreateUsageMessage,
-)
 
 
 def _parse_environment(env: list[str] | None) -> dict[str, Any]:
@@ -136,14 +102,7 @@ def _render_create_result(
     raise typer.Exit(1)
 
 
-@create.callback(
-    invoke_without_command=True,
-    context_settings={
-        "help_option_names": ["-h", "--help"],
-        "allow_interspersed_args": True,
-    },
-)
-def creation(
+def creation(  # noqa: PLR0917
     kind: Annotated[
         Kind,
         typer.Argument(
@@ -208,8 +167,7 @@ def creation(
             help="Dry run. Parse parameters and exit.",
         ),
     ] = False,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Launch a new session.
 
@@ -218,10 +176,13 @@ def creation(
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     """
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     if dry and mode is not output.OutputMode.HUMAN:
         typer.echo(
-            "Incompatible flags: --dry-run cannot be used with --json or --yaml.",
+            "Incompatible flags: --dry-run cannot be used with --output json or "
+            "--output yaml.",
             err=True,
         )
         raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)

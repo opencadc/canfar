@@ -29,10 +29,9 @@ Note:
 
 from __future__ import annotations
 
-import asyncio
-from typing import TYPE_CHECKING, Any, Callable
+import logging
+from typing import TYPE_CHECKING, Callable
 
-from canfar import get_logger
 from canfar.auth import oidc
 from canfar.models.auth import OIDCCredential
 
@@ -44,11 +43,14 @@ if TYPE_CHECKING:
 
     from canfar.client import HTTPClient
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 class AuthenticationError(Exception):
     """Exception raised when authentication refresh fails."""
+
+
+RefreshParameters = tuple[str, str, str, str]
 
 
 def _get_oidc_credential(client: HTTPClient) -> OIDCCredential | None:
@@ -57,6 +59,23 @@ def _get_oidc_credential(client: HTTPClient) -> OIDCCredential | None:
         return None
     credential = client.authentication_record
     return credential if isinstance(credential, OIDCCredential) else None
+
+
+def _refresh(
+    client: HTTPClient,
+) -> tuple[OIDCCredential, RefreshParameters | None] | None:
+    """Resolve one OIDC record and prepare its refresh inputs."""
+    credential = _get_oidc_credential(client)
+    if credential is None:
+        log.debug("Skipping auth refresh without a saved OIDC record.")
+        return None
+    if not credential.expired:
+        return credential, None
+    parameters = oidc._refresh(credential)  # noqa: SLF001
+    if parameters is None:
+        log.warning("OIDC Authentication Record cannot be refreshed.")
+        return None
+    return credential, parameters
 
 
 def _apply_access_header(
@@ -68,25 +87,6 @@ def _apply_access_header(
     header = f"Bearer {token.get_secret_value()}"
     httpx_client_headers["Authorization"] = header
     request.headers["Authorization"] = header
-
-
-def _apply_refreshed_token(
-    client: HTTPClient,
-    credential: OIDCCredential,
-    refreshed: dict[str, Any],
-    httpx_client_headers: MutableMapping[str, str],
-    request: httpx.Request,
-) -> None:
-    """Atomically persist refreshed OIDC state, then update active headers."""
-    updated = oidc._persist(  # noqa: SLF001
-        client.config, credential, refreshed
-    )
-    log.debug("Authentication refreshed and configuration saved.")
-
-    assert updated.token.access is not None
-    _apply_access_header(updated.token.access, httpx_client_headers, request)
-    log.debug("HTTP request headers updated with new token.")
-    log.info("OIDC Access Token Refreshed.")
 
 
 def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
@@ -105,12 +105,11 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        credential = _get_oidc_credential(client)
-        if credential is None:
-            log.debug("Skipping auth refresh without a saved OIDC record.")
+        prepared = _refresh(client)
+        if prepared is None:
             return
-
-        if not credential.expired:
+        credential, parameters = prepared
+        if parameters is None:
             if credential.token.access is not None:
                 _apply_access_header(
                     credential.token.access,
@@ -118,11 +117,6 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                     request,
                 )
             log.debug("Skipping auth refresh, access token is not expired.")
-            return
-
-        parameters = oidc._refresh(credential)  # noqa: SLF001
-        if parameters is None:
-            log.warning("OIDC Authentication Record cannot be refreshed.")
             return
         token_url, identity, client_secret, refresh_token = parameters
 
@@ -135,13 +129,15 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
                 token=refresh_token,
             )
             log.debug("Synchronous OIDC token refresh successful.")
-            _apply_refreshed_token(
-                client,
-                credential,
-                token,
-                client.client.headers,
-                request,
+            updated = oidc._persist(  # noqa: SLF001
+                client.config, credential, token
             )
+            log.debug("Authentication refreshed and configuration saved.")
+
+            assert updated.token.access is not None
+            _apply_access_header(updated.token.access, client.client.headers, request)
+            log.debug("HTTP request headers updated with new token.")
+            log.info("OIDC Access Token Refreshed.")
 
         except (ValueError, OSError):
             msg = "Failed to refresh OIDC token"
@@ -159,7 +155,6 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
     Returns:
         Callable[[httpx.Request], Awaitable[None]]: The async auth hook.
     """
-    lock = asyncio.Lock()
 
     async def ahook(request: httpx.Request) -> None:
         """Asynchronous refresh hook for httpx clients.
@@ -167,46 +162,33 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         Args:
             request (httpx.Request): The outgoing HTTP request.
         """
-        async with lock:
-            credential = _get_oidc_credential(client)
-            if credential is None:
-                log.debug("Skipping auth refresh without a saved OIDC record.")
-                return
-
-            if not credential.expired:
-                if credential.token.access is not None:
-                    _apply_access_header(
-                        credential.token.access,
-                        client.asynclient.headers,
-                        request,
-                    )
-                return
-
-            parameters = oidc._refresh(credential)  # noqa: SLF001
-            if parameters is None:
-                log.warning("OIDC Authentication Record cannot be refreshed.")
-                return
-            token_url, identity, client_secret, refresh_token = parameters
-
-            try:
-                log.debug("Starting asynchronous OIDC token refresh.")
-                token = await oidc.refresh(
-                    url=token_url,
-                    identity=identity,
-                    secret=client_secret,
-                    token=refresh_token,
-                )
-                log.debug("Asynchronous OIDC token refresh successful.")
-                _apply_refreshed_token(
-                    client,
-                    credential,
-                    token,
+        previous = client.authentication_record
+        if isinstance(previous, OIDCCredential) and previous.expired:
+            log.debug("Starting asynchronous OIDC token refresh.")
+        try:
+            credential = await client._refresh_oidc()  # noqa: SLF001
+        except (ValueError, OSError):
+            msg = "Failed to refresh OIDC token"
+            raise AuthenticationError(msg) from None
+        if credential is None:
+            return
+        if credential == previous:
+            if credential.token.access is not None:
+                _apply_access_header(
+                    credential.token.access,
                     client.asynclient.headers,
                     request,
                 )
-
-            except (ValueError, OSError):
-                msg = "Failed to refresh OIDC token"
-                raise AuthenticationError(msg) from None
+            log.debug("Skipping auth refresh, access token is not expired.")
+            return
+        log.debug("Asynchronous OIDC token refresh successful.")
+        if credential.token.access is not None:
+            _apply_access_header(
+                credential.token.access,
+                client.asynclient.headers,
+                request,
+            )
+        log.debug("HTTP request headers updated with new token.")
+        log.info("OIDC Access Token Refreshed.")
 
     return ahook

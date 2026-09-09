@@ -33,7 +33,7 @@ def fetch_parameters(
     )
 
 
-def create_parameters(
+def create_parameters(  # noqa: PLR0917
     name: str | CreateRequest,
     image: str | None = None,
     cores: int | None = None,

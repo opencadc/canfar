@@ -12,7 +12,7 @@ from rich.text import Text
 
 from canfar.images import Images
 from canfar.models.types import Kind
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from canfar.models.containers import Image
@@ -80,6 +80,7 @@ def ls(
     ] = None,
 ) -> None:
     """List available images."""
+    emit_cli_active_server_banner()
     payload: list[Image] = Images().details()
     images = [image for image in payload if not kind or kind in image.types]
     if not images:

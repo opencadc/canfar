@@ -29,9 +29,13 @@ def _merge_servers(
     config: canfar.models.config.Configuration,
     discovered: list,
 ) -> None:
-    for server in discovered:
-        if server.name is not None:
-            config.servers[server.name] = server
+    config.editor.set(
+        "servers",
+        {
+            **config.servers,
+            **{server.name: server for server in discovered if server.name is not None},
+        },
+    )
 
 
 class TestAuthenticationList:
@@ -436,8 +440,8 @@ class TestAuthenticationLogin:
 
         assert config.active.authentication == "cadc"
         assert config.active.server == "canfar"
-        assert config.get_credential("cadc").path == Path("/new/cert.pem")
-        assert str(config.get_server_by_uri("ivo://cadc.nrc.ca/skaha").url) == (
+        assert config.authentication["cadc"].path == Path("/new/cert.pem")
+        assert str(config.servers["CADC-CANFAR"].url) == (
             "https://ws-uv.canfar.net/skaha"
         )
 
@@ -492,8 +496,8 @@ class TestAuthenticationLogin:
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
 
-        assert config.get_credential("cadc").path == Path("/new/cert.pem")
-        assert config.get_credential("cadc").expiry == 888.0
+        assert config.authentication["cadc"].path == Path("/new/cert.pem")
+        assert config.authentication["cadc"].expiry == 888.0
 
 
 class TestAuthenticationModuleExports:

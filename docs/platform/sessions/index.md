@@ -1,183 +1,96 @@
-# Interactive Sessions
+# Sessions
 
-**CANFAR computing environments for astronomical research - Jupyter notebooks, and non-interactive applications.**
+A Session is a user-owned compute environment launched from a Container Image
+on a Science Platform Server. Choose the Session Kind that matches the way you
+want to work:
 
-!!! abstract "🎯 Session Types Overview"
-    **Choose the right interface for your research:**
-    
-    - **[Jupyter Notebooks](notebook.md)**: Interactive data analysis and visualisation
-    - **[Desktop Environment](desktop.md)**: Full Linux desktop with GUI applications  
-    - **[CARTA Viewer](carta.md)**: Radio astronomy visualisation and analysis
-    - **[Firefly Viewer](firefly.md)**: Table and image viewing for surveys
-    - **[Contributed Apps](contributed.md)**: Specialised community applications
-    - **[Batch Processing](batch.md)**: Automated and large-scale workflows
+| Kind | Interface | Typical use |
+| --- | --- | --- |
+| `notebook` | JupyterLab | Python analysis and interactive notebooks |
+| `desktop` | Browser desktop | CASA and other graphical applications |
+| `carta` | CARTA | Image and spectral-cube exploration |
+| `firefly` | Firefly | Tables and image visualization |
+| `contributed` | Application-specific | Community-maintained tools |
+| `headless` | No interactive interface | Batch commands and pipelines |
 
-## 🚀 Session Fundamentals
+See the individual guides for [Notebook](notebook.md), [Desktop](desktop.md),
+[CARTA](carta.md), [Firefly](firefly.md), [Contributed](contributed.md), and
+[Batch](batch.md) workflows.
 
-### What are Interactive Sessions?
+## Start a Session
 
-Interactive sessions provide on-demand access to pre-configured computing environments running in containers. Each session type offers different interfaces optimized for specific astronomical workflows.
+You can launch a Session from the [Science Portal](https://www.canfar.net/),
+from the CLI, or with the Python client. The CLI uses a Container Image and
+Session Kind as positional arguments:
 
-### Key Benefits
+```bash
+canfar login cadc
+canfar image ls --kind notebook
+canfar create notebook IMAGE_NAME --name analysis
+canfar ps --all
+```
 
-**No Installation Required**
-:   Access complex astronomy software through your web browser without local installation or configuration.
+Use `canfar server ls` and `canfar server use NAME` when more than one Science
+Platform Server is available for the active Identity Provider. The image list
+is the source of truth for image names and supported kinds; examples are
+illustrative tags, not a guarantee that every deployment publishes them.
 
-**Pre-Configured Environments**
-:   Containers include popular astronomy packages like AstroPy, CASA, and scientific Python libraries ready to use.
+## Lifecycle and status
 
-**Persistent Data Access**
-:   All sessions automatically connect to your ARC storage and can access VOSpace for long-term data management.
+Creation returns Session IDs before the Session is necessarily ready. A Session
+can be `Pending` while it waits for admission, resources, image pulls, or
+initialization, then become `Running` or a terminal state. Queue order and
+resource policy are deployment-owned.
 
-**Scalable Resources**
-:   Choose flexible or fixed resource allocation based on your computational requirements.
+```bash
+canfar ps --all
+canfar info SESSION_ID
+canfar events SESSION_ID
+canfar logs SESSION_ID
+```
 
-## 📊 Session Type Comparison
+The default `canfar ps` view shows `Pending` and `Running` Sessions; use
+`--all` to include terminal states as well. `canfar open` only opens a ready
+Session. Delete a Session when its work is complete:
 
-| Session Type | Interface | Best For | GUI Support |
-|--------------|-----------|----------|-------------|
-| **[Notebook](notebook.md)** | JupyterLab | Data analysis, prototyping, documentation | ✅ Web-based |
-| **[Desktop](desktop.md)** | Full Linux desktop | CASA, image viewers, traditional software | ✅ Desktop GUI |
-| **[CARTA](carta.md)** | CARTA interface | Radio astronomy visualisation | ✅ Specialised |
-| **[Firefly](firefly.md)** | Firefly viewer | Catalogue analysis, image display |  ✅ Web-based |
-| **[Contributed](contributed.md)** | Various | Specialised applications | ⚠️ Varies |
-| **[Batch](batch.md)** | None (headless) | Large-scale processing | ❌ Headless |
+```bash
+canfar delete SESSION_ID
+```
 
-## 🔧 Session Management
+## Storage boundary
 
-### Creating Sessions
+Sessions are temporary compute environments. A Session can use mounted
+`/arc/home/<user>` and `/arc/projects/<project>` paths when the deployment
+provides them, plus `/scratch` for fast Session-local work. `/scratch` is
+deleted with the Session. Save scripts, inputs, and results under `/arc` or a
+persistent VOSpace Service before stopping or deleting the Session.
 
-**Via Science Portal:**
-:   Launch sessions through the [CANFAR Science Portal](https://www.canfar.net/science-portal/) web interface with point-and-click simplicity.
+For remote VOSpace data, use [canfar data](../storage/transfers.md) or the
+explicit Python [storage helper](../storage/filesystem.md). Do not assume that
+opening a remote object provides server-side random access; stage once when a
+path-oriented tool needs a local filename.
 
-**Via Command Line:**
-:   Use the [CANFAR CLI](../../cli/cli-help.md) for scripted session creation and automation.
+## Resource requests
 
-**Via Python API:**
-:   Integrate session management into custom workflows using the [CANFAR Python Client](../../client/home.md).
+Omit `--cpu` and `--memory` for the platform's flexible request, or set values
+based on measured workload needs. Fixed requests can wait longer when matching
+capacity is unavailable. For headless workloads, see the [batch queue and
+troubleshooting guide](batch.md).
 
-### Session Lifecycle
+## Session APIs
 
-**Creation** (30 seconds - 3 minutes)
-:   Container download (first time) and startup with storage mounting
+The Python client exposes synchronous and asynchronous Session operations. The
+public library returns ordinary Python values; it does not replace the mounted
+filesystem or add a second storage adapter. Start with the [Python client
+guide](../../client/get-started.md) and [Session reference](../../client/session.md).
 
-**Active Use**
-:   Full access to computing resources and storage systems
+Some interactive applications expose their own API after the Session reaches
+`Running`. Consult the application documentation linked from its individual
+guide rather than assuming that every Session has an HTTP API.
 
-**Idle Management**
-:   Sessions automatically suspend after periods of inactivity to conserve resources
+## Related guides
 
-**Termination**
-:   Container deletion with data preserved in persistent storage
-
-!!! warning "Data Persistence"
-    **Important**: Session containers are temporary. Always save important work to `/arc/` storage or VOSpace before ending sessions.
-
-## 📈 Resource Allocation
-
-### Flexible Allocation (Default)
-
-**Advantages:**
-- Faster session startup
-- Can burst to higher resource usage when available
-- Optimal for interactive work and development
-
-**Best For:**
-- Data exploration and analysis
-- Development and testing
-- Educational workshops
-
-### Fixed Allocation
-
-**Advantages:**
-- Guaranteed consistent performance
-- Predictable resource availability
-- Better for production workloads
-
-**Best For:**
-- Large-scale processing
-- Performance-critical analysis
-- Time-sensitive computations
-
-### Resource Selection Guide
-
-| Workflow Type | Recommended Mode | CPU/Memory | Duration |
-|---------------|------------------|------------|----------|
-| **Interactive Analysis** | Flexible | 2-4 CPU, 4-8GB | Hours |
-| **Large Dataset Processing** | Fixed | 4-8 CPU, 16-32GB | Hours-Days |
-| **Development & Testing** | Flexible | 1-2 CPU, 2-4GB | Hours |
-| **Production Pipelines** | Fixed | Varies by workload | Days |
-
-## 🔗 Integration with Platform Services
-
-### Storage Integration
-
-All interactive sessions automatically mount:
-
-- **ARC Home** (`/arc/home/[user]/`): Personal configurations and scripts
-- **ARC Projects** (`/arc/projects/[project]/`): Shared research data and results
-- **Scratch** (`/scratch/`): High-speed temporary storage for processing
-
-Additional storage accessible via API:
-- **VOSpace** (`vos:`): Long-term archives and data sharing
-
-### Container Environments
-
-Sessions run in [container environments](../containers/index.md) that include:
-
-- Operating system (typically Ubuntu Linux)
-- Astronomy software packages (AstroPy, CASA, etc.)
-- Scientific computing libraries (NumPy, SciPy, Matplotlib)
-- Development tools and utilities
-
-### CVMFS Software Repositories
-
-All CANFAR sessions provide access to read-only **CVMFS** (CernVM File System) software repositories. This feature provides instant access to the vast collections of pre-built scientific software maintained by the **Digital Research Alliance of Canada (Alliance)**.
-
-See the **[Software Repositories (CVMFS)](../cvmfs.md)** guide for more information and examples.
-
-### Authentication & Permissions
-
-Sessions inherit your [CANFAR permissions](../permissions.md):
-
-- Automatic access to your group projects
-- Secure integration with CADC services
-- API access for automated workflows
-
-## 🎯 Choosing Your Session Type
-
-### For Data Analysis
-
-**New to CANFAR?** → Start with **[Jupyter Notebooks](notebook.md)**
-:   Familiar interface combining code, documentation, and visualisation
-
-**Need GUI Applications?** → Use **[Desktop Sessions](desktop.md)**
-:   Full Linux desktop for CASA, image viewers, and traditional software
-
-### For Astronomy Specialisations
-
-**Radio Astronomy** → **[CARTA Viewer](carta.md)**
-:   Optimized for radio interferometry data visualisation and analysis
-
-**Survey Data** → **[Firefly Viewer](firefly.md)**
-:   Efficient table and image viewing for large astronomical catalogues
-
-**Specialised Tools** → **[Contributed Applications](contributed.md)**
-:   Community-maintained applications for specific research domains
-
-### For Production Work
-
-**Large-Scale Processing** → **[Batch Sessions](batch.md)**
-:   Automated workflows for processing large datasets without interactive interfaces
-
-### API Access to Sessions
-
-If you have a session running and it exposes an API, you can programatically
-interact with it remotely, either from another session or from your laptop.
-
-The base of the session API will be available at the session URL.  For more
-details, consult the API docs for each of the session types:
-- [CARTA API Docs](https://carta-python.readthedocs.io/en/latest/quickstart.html#opening-and-appending-images)
-- [Firefly API Docs](https://caltech-ipac.github.io/firefly_client/)
-- [JupyterLab API Docs](https://jupyterlab-server.readthedocs.io/en/latest/api/rest.html)
-
+- [Storage](../storage/index.md)
+- [Containers](../containers/index.md)
+- [Permissions](../permissions.md)
+- [Support](../support/index.md)

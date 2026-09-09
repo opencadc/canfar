@@ -1,1 +1,1 @@
-"""Configuration loading, storage, and compatibility helpers."""
+"""Configuration editing and compatibility helpers."""

@@ -1,116 +1,69 @@
-# 🚀 Getting Started with CANFAR
+# Get started
 
-**Guide to setting up and using the CANFAR Science Platform for astronomical research.**
+Use the CANFAR Science Platform to analyse astronomical data in your browser.
+You can run notebooks and astronomy applications near your data, save results,
+and share them with your project. You do not need to install the Python client
+to follow this guide.
 
-   **Essential Resources:**
-    
-   - [Permissions Guide](permissions.md): Account set-up and group management
-   - [Sessions Overview](sessions/index.md): Interactive computing environments
-   - [Storage Guide](storage/index.md): Data management and file systems
-   - [Container Guide](containers/index.md): Software environments and registries
-   - [Support Centre](support/index.md): Help resources and FAQ
+## 1. Get an account and access
 
+Request a [Canadian Astronomy Data Centre (CADC) account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
+Ask your project administrator to add you to the group that owns the data you
+need. If you need help, contact [CANFAR support](support/index.md).
 
-## 1️⃣ Get Your CADC Account
+## 2. Run your first notebook
 
-If you are a first-time user, request a Canadian Astronomy Data Centre (CADC) account:
+1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
+2. In **Launch New Session**, choose **Notebook**, select an image containing
+   the software you need, and submit the form. An image is a packaged software
+   environment; a Session is your running instance of it.
+3. Find your Session under **Active Sessions**. Wait for it to start, then open
+   its notebook link.
+4. Follow [Create, run, and save a notebook](sessions/notebook.md#create-run-and-save-a-notebook)
+   to run your first Python cell and save the notebook in persistent storage.
 
-[🔗 Request CADC Account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html){ .md-button .md-button--primary }
+Choose an image from the portal's current list. Available software and
+resource choices depend on the image and server.
 
-See [Accounts & Permissions](permissions.md) for more details.
+## 3. Upload data and save your work
 
+Inside a Session, use these mounted paths when they are available:
 
-!!! info "Account Processing Time"
-    CADC accounts are typically approved within 1–2 business days.
-    For troubleshooting account issues, see [FAQ](support/faq.md) or [Contact Support](support/index.md).
+| Location | Use |
+| --- | --- |
+| `/arc/home/USER` | Personal scripts, notebooks, and results; replace `USER` with your username |
+| `/arc/projects/PROJECT` | Shared project data and outputs; replace `PROJECT` with your project's directory |
+| `/scratch` | Temporary files; deleted with the Session |
 
+Use [browser file transfers](storage/transfers.md#transfer-files-in-your-browser)
+to upload inputs or download results. Save and verify your notebook and results
+under `/arc` before using the Session's delete control in **Active Sessions**.
+Files under `/arc` remain available after deletion. Closing a browser tab alone
+does not stop the Session.
 
+Choose [Desktop](sessions/desktop.md), [CARTA](sessions/carta.md), or
+[Firefly](sessions/firefly.md) when you need a different analysis interface.
 
-## 2️⃣ Join or Create Your Research Group
+## 4. Automate your analysis (optional)
 
-Once you have a CADC account:
+For repeated work, [install the client](../client/get-started.md#install) and
+follow the [command-line tutorial](../cli/quick-start.md) or
+[Python tutorial](../client/quick-start.md). Check the installation guide's
+release note before using examples from this branch.
 
-=== "Joining an Existing Group"
-    Ask your collaboration administrator to add you via the [CADC Group Management Interface](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/).
+To run an unattended workflow:
 
-=== "New Collaboration"
-    Email [support@canfar.net](mailto:support@canfar.net) with:
-    
-    - Your project description
-    - Expected team size
-    - Storage requirements
-    - Timeline
+1. Test your command on a small input in an interactive Session.
+2. Set explicit input and output paths in the command or environment.
+3. Submit a [headless Session](sessions/batch.md), which runs without a browser interface.
+4. Inspect its progress with `canfar ps --all`, `canfar info`, and `canfar events`.
+5. Copy final results out of `/scratch` before deleting the Session.
 
+## Next steps
 
-See [Permissions Guide](permissions.md) for group management details. For advanced collaboration, see [Storage Guide](storage/index.md).
-
-
-## 3️⃣ First Login and Set-up
-
-1. Login to [canfar.net](https://www.canfar.net) with your CADC credentials.
-2. Accept Terms of Service to complete set-up.
-3. Optional (for private containers): Access the [Image Registry](https://images.canfar.net)
-
-See [Container Guide](containers/index.md) for more about images and custom software. For building your own containers, see [Building Containers](containers/build.md).
-
-
-## 4️⃣ Launch Your First Session
-
-To start analyzing data, launch a Jupyter notebook:
-
-1. Click **Science Portal** from the main menu.
-2. Use the default settings.
-3. Click **Launch**.
-4. Wait about 30 seconds, then open your session.
-
-🎉 You're ready to go! Your session includes Python, common astronomy packages, and access to shared storage.
-
-
-See [Sessions Overview](sessions/index.md) for more session types and workflows. For automation, see [CANFAR Python Client](../client/home.md).
-
-
-!!! tip "Recommended Starting Point"
-    Start with the default `astroml` container – it includes most common astronomy packages and is regularly updated. If you need thousands of pre-built software packages, see [Accessing CVMFS](cvmfs.md).
-
-!!! tip "Advanced: Custom Containers"
-    - Build your own containers for specialised workflows. See [Building Containers](containers/build.md).
-    - Use [Harbor Registry](containers/registry.md) at [images.canfar.net](https://images.canfar.net/) to browse and manage images.
-
-
-
-## 📁 Understanding Your Workspace
-
-
-See the [Storage Guide](storage/index.md) for full details. For VOSpace scripting, see [VOSpace API](storage/vospace.md).
-
-| Location | Purpose | Persistence | Best For |
-|----------|---------|-------------|----------|
-| `/arc/projects/[project]/` | Shared research data | ✅ Permanent, backed up | Datasets, results, shared code |
-| `/arc/home/[user]/` | Personal files | ✅ Permanent, backed up | Personal configs, small files |
-| `/scratch/` | Fast temporary space | ❌ Wiped at session end | Large computations, temporary files |
-
-
-
-## 🤝 Collaboration Features
-
-
-See [Permissions Guide](permissions.md) and [Storage Guide](storage/index.md) for collaboration details. For team onboarding, see [Getting Started](get-started.md).
-
-### Storage Sharing
-
-All group members have access to `/arc/projects/[project]/` – perfect for:
-
-- Sharing datasets and results
-- Collaborative analysis scripts
-- Common software environments
-- Project documentation
-
-
-## 💬 Need Help?
-
-- **[💬 Discord Community](https://discord.gg/vcCQ8QBvBa)** – Chat with other users
-- **[🆘 Support Centre](support/index.md)** – Help resources and contact information
-
----
-
-
+- [Platform concepts](concepts.md)
+- [Sessions](sessions/index.md)
+- [Storage](storage/index.md)
+- [Containers](containers/index.md)
+- [Permissions](permissions.md)
+- [Support](support/index.md)

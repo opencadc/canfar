@@ -13,11 +13,7 @@ from rich import progress as rich_progress
 from canfar.auth import oidc, x509
 from canfar.models.auth import (
     AuthenticationCredential,
-    Client,
-    Endpoint,
-    Expiry,
     OIDCCredential,
-    Token,
     X509Credential,
 )
 from canfar.utils import console as console_utils
@@ -168,20 +164,7 @@ def _authenticate_oidc(
     Raises:
         RuntimeError: If the IDP has no configured OIDC discovery URL.
     """
-    if idp_info.oidc_discovery_url is None:
-        msg = f"OIDC discovery URL is not configured for IDP '{idp_info.key}'."
-        raise RuntimeError(msg)
-    if idp_info.oidc_issuer is None:
-        msg = f"OIDC issuer is not configured for IDP '{idp_info.key}'."
-        raise RuntimeError(msg)
-
-    credential = OIDCCredential(
-        idp=idp_info.key,
-        endpoints=Endpoint(discovery=str(idp_info.oidc_discovery_url)),
-        client=Client(),
-        token=Token(),
-        expiry=Expiry(),
-    )
+    credential = oidc.credential_from_idp(idp_info)
     console = console_utils.get_console()
     console.print("[bold blue]Starting OIDC Device Authentication[/bold blue]")
     return asyncio.run(

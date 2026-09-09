@@ -27,10 +27,9 @@ from canfar.authentication import (
     show as auth_show,
 )
 from canfar.cli import output
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import StructuredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.idp import get_idp
 from canfar.models.config import Configuration
 from canfar.server import (
@@ -42,7 +41,7 @@ from canfar.server import (
 from canfar.server import (
     activate as activate_server,
 )
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typing import NoReturn
@@ -55,7 +54,6 @@ auth = typer.Typer(
     no_args_is_help=False,
     invoke_without_command=True,
     rich_markup_mode="rich",
-    cls=AliasGroup,
 )
 
 
@@ -202,40 +200,43 @@ def _auth_show(mode: output.OutputMode) -> None:
 @auth.callback(invoke_without_command=True)
 def auth_default(
     ctx: typer.Context,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Active authentication state."""
     if ctx.invoked_subcommand is not None:
-        if json_output or yaml_output:
+        if output_format is not None:
             typer.echo(
-                "Place --json or --yaml after the subcommand.",
+                "Place --output json or --output yaml after the subcommand.",
                 err=True,
             )
             raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)
         return
 
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     _auth_show(mode)
 
 
 @auth.command("show")
 def auth_show_command(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Active authentication state."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     _auth_show(mode)
 
 
 @auth.command("ls")
 def auth_list_command(
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Available auth providers."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
     try:
         summaries = auth_list()
     except ConfigResetRequiredError as exc:
@@ -246,57 +247,23 @@ def auth_list_command(
     _render_auth_list_table()
 
 
-@auth.command("login")
-def auth_login_command(
-    idp: Annotated[
-        str | None,
-        typer.Argument(help="Canonical Identity Provider key."),
-    ] = None,
-    force: Annotated[
-        bool,
-        typer.Option("-f", "--force", help="Force re-authentication."),
-    ] = False,
-    dev: Annotated[
-        bool,
-        typer.Option("--dev", help="Include dev servers in discovery."),
-    ] = False,
-    timeout: Annotated[
-        int,
-        typer.Option(
-            "-t",
-            "--timeout",
-            help="Timeout for HTTP requests during login.",
-            min=1,
-        ),
-    ] = 10,
-) -> None:
-    """Alias for canfar login."""
-    from canfar.cli.login import _login_flow  # noqa: PLC0415
-    from canfar.cli.prompts import select_idp  # noqa: PLC0415
-    from canfar.idp import list_idps  # noqa: PLC0415
-
-    get_console(stderr=True).print(
-        "\n[red]Deprecation Notice:[/red]"
-        "\n[yellow]canfar auth login[/yellow] will be removed soon."
-        " Use [green][bold]canfar login[/bold][/green] instead.\n"
-    )
-    selected_idp = idp or select_idp(list_idps())
-    _login_flow(selected_idp, force=force, dev=dev, timeout=timeout)
-
-
 @auth.command("use")
 def auth_use_command(
     idp: Annotated[str, typer.Argument(help="Canonical Identity Provider key.")],
 ) -> None:
     """Switch auth provider."""
+    emit_cli_active_server_banner()
     config = Configuration()  # ty: ignore[missing-argument]
 
     try:
         get_idp(idp)
-        config.get_credential(idp)
     except KeyError as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
+    if idp not in config.authentication:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        get_console(stderr=True).print(f"[bold red]{msg}[/bold red]")
+        raise typer.Exit(1)
 
     try:
         activation = activate_server(idp, config=config)
@@ -329,6 +296,7 @@ def auth_remove_command(
     ] = False,
 ) -> None:
     """Remove auth and associated servers."""
+    emit_cli_active_server_banner()
     config = Configuration()  # ty: ignore[missing-argument]
     if config.active.authentication == idp and not force:
         should_remove = Confirm.ask(
@@ -364,6 +332,7 @@ def auth_purge_command(
     ] = False,
 ) -> None:
     """Remove all auths and servers."""
+    emit_cli_active_server_banner()
     if not force:
         get_console(stderr=True).print(
             "[bold red]Authentication purge requires --force.[/bold red]"

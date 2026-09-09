@@ -45,11 +45,11 @@ def test_login_help_is_available() -> None:
 
 @pytest.mark.parametrize(
     "arguments",
-    [["login", "cadc"], ["auth", "login", "cadc"]],
-    ids=["canonical", "compatibility-alias"],
+    [["login", "cadc"]],
+    ids=["canonical"],
 )
 def test_login_defaults_to_ten_second_timeout(arguments: list[str]) -> None:
-    """Canonical and compatibility login commands default to ten seconds."""
+    """The canonical login command defaults to ten seconds."""
     with patch("canfar.cli.login._login_flow") as login_flow:
         result = runner.invoke(cli, arguments)
 
@@ -101,57 +101,6 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
     assert "already exists" not in result.stdout
 
 
-def test_auth_login_alias_delegates_to_login_flow(tmp_path: Path) -> None:
-    """``canfar auth login`` remains a compatibility alias."""
-    config_path = tmp_path / "config.yaml"
-    credential = X509Credential(
-        idp="cadc",
-        path=Path("/new/cert.pem"),
-        expiry=123.0,
-    )
-    discovered = [
-        Server(
-            idp="cadc",
-            name="CADC-CANFAR",
-            uri=AnyUrl(_CADC_URI),
-            url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
-            version="v1",
-            auths=["x509"],
-        )
-    ]
-    validated = discovered[0].model_copy(deep=True)
-
-    with (
-        _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
-        patch("canfar.models.config.CONFIG_PATH", config_path),
-        patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
-        patch("canfar.server._validate_server", return_value=validated),
-        patch(
-            "canfar.cli.login.discover",
-            side_effect=lambda idp, *, config, **_kwargs: (
-                _merge_servers(
-                    config,
-                    discovered,
-                    idp,
-                )
-                or discovered
-            ),
-        ),
-    ):
-        result = runner.invoke(cli, ["auth", "login", "cadc", "--force"])
-
-    assert result.exit_code == 0
-    assert "canfar auth login will be removed soon" in result.stderr
-    assert "canfar login" in result.stderr
-    with (
-        patch("canfar.models.config.CONFIG_PATH", config_path),
-    ):
-        saved = Configuration()
-    assert saved.active.authentication == "cadc"
-    assert saved.active.server == "CADC-CANFAR"
-
-
 def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
     """Login persists active Authentication and Server in one save."""
     config_path = tmp_path / "config.yaml"
@@ -197,7 +146,7 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
         saved = Configuration()
     assert saved.active.authentication == "cadc"
     assert saved.active.server == "CADC-CANFAR"
-    assert saved.get_credential("cadc").path == Path("/new/cert.pem")
+    assert saved.authentication["cadc"].path == Path("/new/cert.pem")
 
 
 def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
@@ -262,18 +211,6 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     assert isinstance(validate.call_args.kwargs["config"], Configuration)
 
 
-def test_auth_login_alias_passes_dev_and_timeout_to_login_flow() -> None:
-    """Compatibility alias keeps the same discovery options as canfar login."""
-    with patch("canfar.cli.login._login_flow") as login_flow:
-        result = runner.invoke(
-            cli,
-            ["auth", "login", "cadc", "--dev", "--timeout", "7"],
-        )
-
-    assert result.exit_code == 0
-    login_flow.assert_called_once_with("cadc", force=False, dev=True, timeout=7)
-
-
 def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
     """Repeated login without --force is rejected."""
     config_path = tmp_path / "config.yaml"
@@ -310,3 +247,22 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
 
     assert result.exit_code == 1
     assert "already exists" in result.stderr
+
+
+def test_login_presents_device_flow_failure_on_terminal(tmp_path: Path) -> None:
+    """CLI login renders terminal device-flow failures on stderr."""
+    config_path = tmp_path / "config.yaml"
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.login.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch(
+            "canfar.cli.login.authenticate_for_cli",
+            side_effect=PermissionError("OIDC device authorization was denied"),
+        ),
+    ):
+        result = runner.invoke(cli, ["login", "srcnet"])
+
+    assert result.exit_code == 1
+    assert "OIDC device authorization was denied" in result.stderr

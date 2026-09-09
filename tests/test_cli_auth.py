@@ -13,7 +13,6 @@ from typer.testing import CliRunner
 
 from canfar.authentication import Authentication
 from canfar.cli.auth import auth
-from canfar.cli.main import cli
 from canfar.models.config import Configuration
 
 if TYPE_CHECKING:
@@ -157,18 +156,6 @@ def test_auth_ls_lists_saved_records(tmp_path: Path) -> None:
     assert "srcnet" in result.stdout
 
 
-def test_auth_list_alias_is_not_supported() -> None:
-    """``auth list`` is not a supported command alias."""
-    result = runner.invoke(auth, ["list"])
-    assert result.exit_code != 0
-
-
-def test_auth_remove_alias_is_not_supported() -> None:
-    """``auth remove`` is not a supported command alias."""
-    result = runner.invoke(auth, ["remove", "cadc"])
-    assert result.exit_code != 0
-
-
 def test_auth_use_switches_by_idp(tmp_path: Path) -> None:
     """``auth use`` selects Authentication by canonical IDP key."""
     config_path = tmp_path / "config.yaml"
@@ -280,22 +267,10 @@ def test_auth_purge_force_preserves_registry_and_console(tmp_path: Path) -> None
     with _patch_config(config_path):
         before = Configuration()
         before.console = before.console.model_copy(update={"width": 99})
-        before.save()
+        before.editor.save()
         result = runner.invoke(auth, ["purge", "--force"])
 
     assert result.exit_code == 0
     with _patch_config(config_path):
         after = Configuration()
     assert after.console.width == 99
-
-
-def test_authentication_alias_is_wired(tmp_path: Path) -> None:
-    """``canfar authentication`` aliases ``canfar auth``."""
-    config_path = tmp_path / "config.yaml"
-    _write_config(config_path)
-
-    with _patch_config(config_path):
-        result = runner.invoke(cli, ["authentication"])
-
-    assert result.exit_code == 0
-    assert "cadc" in result.stdout

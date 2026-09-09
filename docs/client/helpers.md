@@ -40,8 +40,13 @@ for item in distributed.chunk(work):
 ```
 
 ### Validation and errors
-- `replica` must be >= 1 and <= `total`
-- `total` must be > 0
+
+`chunk()` requires `total > 0` and `1 <= replica <= total`, raising
+`ValueError` otherwise. `stripe()` intentionally keeps a looser compatibility
+contract: an out-of-range replica yields no items, while a non-positive `total`
+raises `ValueError`. Both functions use `REPLICA_ID` and `REPLICA_COUNT` when
+their corresponding arguments are omitted, defaulting to one replica when the
+environment is absent.
 
 ## API Reference
 

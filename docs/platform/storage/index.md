@@ -1,112 +1,96 @@
-# CANFAR Storage Systems
+# Storage
 
-**A guide to choosing the right storage, understanding how sessions interact with storage, and optimizing your data workflows on the CANFAR platform.**
+Choose storage by lifetime and by where your code runs. A Science Platform
+Session has mounted POSIX storage for working with files and a separate local
+scratch volume for temporary work. VOSpace Services provide authenticated
+remote access when data is not already mounted.
 
-CANFAR provides four distinct storage systems, each optimized for different stages of the research lifecycle. Understanding how these systems work together with CANFAR sessions is essential for efficient data management and analysis.
+## Storage at a glance
 
-!!! abstract "Storage Guides"
-    - **[Filesystem Access](filesystem.md)**: ARC storage, SSHFS mounting, and permissions.
-    - **[Data Transfers](transfers.md)**: Moving data between systems and external sources.
-    - **[VOSpace Guide](vospace.md)**: Long-term storage, sharing, and archival.
+| Location | Lifetime | Use it for |
+| --- | --- | --- |
+| `/arc/home/<user>` | Persistent | Personal scripts, configuration, and results |
+| `/arc/projects/<project>` | Persistent | Project data and shared results |
+| `/scratch` | Session-local; deleted when the Session ends | Staging, intermediate files, and explicitly selected caches |
+| A configured VOSpace Service | Service-defined | Remote data and transfers through `canfar data` or fsspec |
+| `local` | The machine running the command | Local input and output in `canfar data` and the Python helper |
 
-## Storage Options Overview
+The exact mounts, quotas, and retention policy belong to the deployment and
+your project. Do not treat `/scratch` as a backup. Copy anything you need after
+the Session to `/arc` or another persistent destination.
 
-| Storage         | Path/URI                  | Access (Session/External)      | Speed               | Persistence & Backup      | Default Quota                 | Best For                                       |
-|-----------------|---------------------------|--------------------------------|---------------------|---------------------------|-------------------------------|------------------------------------------------|
-| **Scratch**     | `/scratch`                | Direct FS / N/A                | Fastest (local SSD) | Ephemeral (no backup)     | ~200GB (per session)          | High-speed temporary processing, staging I/O.  |
-| **ARC Home**    | `/arc/home/[user]`        | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 10GB                          | Personal configs, scripts, small files.        |
-| **ARC Projects**| `/arc/projects/[project]` | Direct FS / SSHFS              | Fast (CephFS)       | Permanent (daily snapshots) | 200GB                         | Active collaborative research data and results.|
-| **Vault**       | `vos:[project|user]`      | API / Web UI                   | Medium              | Permanent (geo-redundant) | Project-dependent             | Long-term archives, sharing, publication.      |
+## Use the mounted filesystem first
 
-### Checking Quotas and Requesting More Space
+If data is already under `/arc` in a Science Platform Session, use its normal
+POSIX path. This avoids an unnecessary VOSpace request and is the simplest
+path for CASA, FITS tools, NumPy, pandas, and other software that expects a
+filename.
 
-You can monitor your storage usage with the following commands:
+For data outside the Session, stage one copy into `/scratch` when the workflow
+will read it more than once, then write final products to `/arc`:
+
+```text
+remote VOSpace Service -> /scratch/input.fits -> analysis -> /arc/projects/<project>/results/
+```
+
+## Address a VOSpace Service explicitly
+
+CANFAR calls the configured handle for a VOSpace Service a **Storage
+Identifier**. The identifier is configuration data, not a Python module member
+or a new fsspec protocol. List identifiers and construct a filesystem explicitly:
+
+```python
+from canfar.storage import filesystem, identifiers
+
+print(identifiers())  # configured identifiers, plus the reserved "local"
+remote = filesystem("vault")
+try:
+    entries = remote.ls("/project", detail=False)
+finally:
+    remote.close()
+```
+
+`filesystem("local")` returns a filesystem for the machine where Python is
+running. It does not require a CANFAR Authentication Record. A configured
+identifier resolves its endpoint and parent Identity Provider through the saved
+CANFAR configuration; runtime credentials can be supplied to `filesystem()`
+when needed. See [Filesystem and Python tools](filesystem.md).
+
+For shell workflows, use the embedded `canfar data` command application:
 
 ```bash
-# Check ARC storage usage
-df -h /arc/home/[user]/
-df -h /arc/projects/[project]/
-
-# For a detailed breakdown of a project directory
-du -sh /arc/projects/[project]/*
+canfar data ls -lh vault:/project
+canfar data cp vault:/project/input.fits local:/scratch/input.fits
+canfar data cp local:/scratch/result.fits arc:/projects/<project>/result.fits
 ```
 
-Vault usage can be monitored via the [web interface](https://www.canfar.net/storage/vault/list/).
+The `local:` operand is always the machine running `canfar`. `vault:` and
+`arc:` are examples of Storage Identifiers; use the names returned by your
+configuration rather than assuming that every deployment has those identifiers.
+See [Data transfers](transfers.md) for command details.
 
-To request a quota increase, email `support@canfar.net` with the project name, current usage, requested space, and a brief justification.
+## Remote-read performance
 
-## Storage in a Session
+`vosfs` and fsspec provide two different read shapes:
 
-When you start a CANFAR session (like a Notebook or Desktop), the storage systems are integrated seamlessly.
+- `cat_file(path, start, end)` and `cat_ranges(...)` can request explicit byte
+  ranges. The response is validated; a backend that returns a complete `200`
+  response is read and sliced correctly, but it still transferred the whole
+  object.
+- `open(path, "rb")` provides a convenient seekable file object by staging the
+  complete object. Passing that handle to Astropy, NumPy, pandas, or h5py does
+  not make random access network-efficient.
 
-- **ARC Home and Projects** are automatically mounted as standard directories. You can interact with them just like any other folder on a Linux system.
-- **Scratch space** is provided as a temporary, high-speed directory at `/scratch`.
+The capability is deployment-specific. In the measured CADC deployment, the
+Vault/minoc service accepts validated `206` responses while ARC/Cavern falls
+back to a whole-object response. Do not infer capability from the spelling of a
+Storage Identifier. See [Filesystem and Python tools](filesystem.md) for the
+backend boundary and scientific-library recipes.
 
-This setup allows for a simple and powerful workflow:
+## Related guides
 
-```mermaid
-graph TD
-    Start([Session Starts]) --> Mounts["/arc/home & /arc/projects mounted"]
-    Mounts --> Scratch["Empty /scratch created"]
-    Scratch --> DataWork["Analyze data, using /scratch for temporary files"]
-    DataWork --> Save["Save results to /arc/projects"]
-    Save --> End([Session Ends])
-    End --> Cleanup["/scratch is wiped clean"]
-```
-
-!!! warning "Scratch is Temporary"
-    Any data left in `/scratch` is **permanently deleted** when your session ends. Always copy important files to `/arc` or `vos:` before stopping a session.
-
-## Storage Strategy and Performance
-
-Choosing the right storage for each task is key to an efficient workflow. The general principle is to **move data to the fastest storage for processing**.
-
-**Storage Speed Hierarchy:**
-1. Fastest: `/scratch` (local SSD)
-2. Medium: `/arc/projects` & `/arc/home` (Shared network filesystem)
-3. Slower: `vos:` (Vault) (optimized for archival)
-
-### Common Workflows
-
-#### Interactive Analysis
-- **Your data source:** `/arc/projects/[project]`
-- **For large files:** Copy them to `/scratch` before processing.
-- **Save results to:** `/arc/projects/[project]/results`
-
-*Example:*
-```bash
-# 1. Copy data to fast, temporary storage
-cp /arc/projects/my_project/large_dataset.fits /scratch/
-
-# 2. Process the data in /scratch
-run_analysis.py /scratch/large_dataset.fits
-
-# 3. Save the results back to permanent project storage
-mv /scratch/results.csv /arc/projects/my_project/
-```
-
-#### Batch Processing
-- **Input:** Stage data from Vault (`vos:`), ARC, or the internet into `/scratch`.
-- **Processing:** Run your code on the data in `/scratch`.
-- **Output:** Save results to ARC for collaboration or to Vault for long-term archival.
-
-#### Data Sharing and Collaboration
-- **Active collaboration:** Use `/arc/projects` for shared data and code among team members.
-- **External sharing:** Use Vault (`vos:`) to share data with collaborators outside of CANFAR, or for public data releases.
-
-## Troubleshooting Common Issues
-
-**"No space left on device"**
-- This usually means your `/arc/home` or `/arc/projects` quota is full.
-- Use `du -sh /path/to/storage/*` to find large files and clean up anything you don't need.
-
-**"Can't access project directory"**
-- You may not be a member of the project's group. Contact the project PI to be added.
-
-**"Session is slow or unresponsive"**
-- If you are performing I/O-intensive operations directly in `/arc`, it can slow down your session.
-- For better performance, move large files to `/scratch` for processing.
-
-**"My files are gone!"**
-- You likely saved them to `/scratch` and the session ended. This data is not recoverable.
-- Always save important results to `/arc` or `vos:` before your session ends.
+- [Filesystem and Python tools](filesystem.md)
+- [Data transfers](transfers.md)
+- [VOSpace](vospace.md)
+- [Session storage](../sessions/index.md)
+- [Permissions](../permissions.md)

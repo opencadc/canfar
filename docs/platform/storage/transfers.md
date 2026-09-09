@@ -1,470 +1,157 @@
-# Data Transfers
+# Data transfers
 
-**Moving data between CANFAR storage systems, external sources, and your local computer.**
+Copy files between your computer and CANFAR storage in your browser, or use
+`canfar data` for repeatable command-line transfers.
 
-!!! abstract "🎯 Transfer Methods Overview"
-    **Efficient data movement strategies:**
-    
-    - **Web Interfaces**: Simple uploads and downloads for small files
-    - **Command-Line Tools**: Efficient transfers for large datasets
-    - **Automated Workflows**: Scripted transfers and synchronisation
-    - **Performance Optimisation**: Choosing the right method for your data size
+## Transfer files in your browser
 
-Efficient data transfer is essential for astronomy workflows. CANFAR provides multiple transfer methods optimized for different scenarios, from small file uploads to large dataset synchronisation.
+Sign in to [Storage Management](https://www.canfar.net/storage/arc/list) with
+your Canadian Astronomy Data Centre (CADC) account. You can also follow the
+storage link from the Science Portal. Your personal directory is under
+`home/USER`; shared data is under `projects/PROJECT`. Replace `USER` and
+`PROJECT` with the names used by your account and project.
 
-## 🔄 Transfer Overview
+### Upload inputs
 
-### Transfer Types by Method
+1. Navigate to the directory where you want the files to remain, such as your
+   personal directory or a project directory where you have write access.
+2. Select **Add**, choose the file or folder upload option, and select the
+   items from your computer. Follow the upload dialog to start the transfer.
+3. Wait for completion, refresh the directory listing, and check that the
+   expected filenames and sizes appear before opening them in a Session.
 
-| Method | Best For | Speed | Complexity | Interactive | Automated |
-|--------|----------|-------|------------|-------------|-----------|
-| **Web Upload/Download** | Small files (<1GB) | Slow | Simple | ✅ | ❌ |
-| **Direct URLs** | Medium files, scripting | Medium | Simple | ⚠️ | ✅ |
-| **VOSpace CLI** | All sizes, Vault access | Medium | Medium | ✅ | ✅ |
-| **SSHFS Mount** | Local file operations | Medium | Medium | ✅ | ⚠️ |
-| **rsync via SSHFS** | Large datasets, sync | Fast | Advanced | ⚠️ | ✅ |
+A file uploaded to `home/USER/input.fits` is available inside a Session as
+`/arc/home/USER/input.fits`. For shared directories, ask your project
+administrator for access; see [Permissions](../permissions.md).
 
-### Storage System Access
+### Download results
 
-| Source → Destination | Method | Command Example |
-|---------------------|--------|-----------------|
-| **Local → ARC Projects** | SSHFS, Direct URL, VOSpace | `vcp file.fits vos:/arc:projects/[project]/` |
-| **Local → Vault** | VOSpace CLI, Web | `vcp file.fits vos:[user]/` |
-| **Local → Scratch** | Only during sessions | `cp file.fits /scratch/` (within session) |
-| **ARC → Vault** | VOSpace CLI | `vcp /arc/projects/[project]/file.fits vos:[user]/` |
-| **Vault → ARC** | VOSpace CLI | `vcp vos:[user]/file.fits /arc/projects/[project]/` |
-| **Scratch ↔ ARC** | Direct copy | `cp /scratch/file.fits /arc/projects/[project]/` |
+1. Navigate to the directory containing the results and select the files or
+   folders you need.
+2. Open the download action. Choose **Zip** to download the selected data as
+   an archive. **URL List** and **HTML List** produce lists of links, rather
+   than an archive containing the data.
+3. Save the download to your computer. Open the archive or a downloaded file
+   to confirm that you have the expected results.
 
-## 📤 Upload Methods
+Links to private data still require authentication. For scripted transfers,
+use the authenticated CLI workflow below.
 
-### Small Files (<1GB): Web Interface
+## Transfer files from a terminal
 
-#### ARC Projects and Home
+[Install the client](../../client/get-started.md#install) and log in to the
+identity provider that owns the storage service. The default `arc` and `vault`
+services use CADC credentials (`canfar login cadc`), independently of which
+server you selected for compute.
 
-1. **Navigate to storage**: [ARC File Manager](https://www.canfar.net/storage/arc/list/)
-2. **Select destination**: Choose your home or project directory
-3. **Upload files**: Click "Add" → "Upload Files" 
-4. **Select files**: Choose files from your computer
-5. **Confirm upload**: Click "Upload" then "OK"
+### Operand syntax
 
-Note on a notebook session you can also use the JupyterLab **Upload** button.
+Every operand is an explicit Storage Identifier followed by an absolute path:
 
-#### Vault (VOSpace)
+```text
+identifier:/absolute/path
+```
 
-1. **Navigate to Vault**: [VOSpace File Manager](https://www.canfar.net/storage/vault/list/)
-2. **Select destination**: Browse to your space
-3. **Upload files**: Same process as ARC storage
-4. **Set permissions**: Right-click → Properties to set sharing permissions
-
-### Medium Files (1-100GB): Command Line
-
-#### Using Direct URLs (ARC only)
+`local` is always available and means the machine where `canfar` is running.
+Configured names such as `arc` or `vault` are deployment data; list the names
+with the configuration tools or use the names shown in your setup. These names identify storage locations in your CANFAR configuration.
 
 ```bash
-# Authenticate first
-cadc-get-cert --user [user]
-
-# Upload to ARC Home
-curl --cert ~/.ssl/cadcproxy.pem \
-     --upload-file myfile.fits \
-     https://ws-uv.canfar.net/arc/files/home/[user]/myfile.fits
-
-# Upload to ARC Projects  
-curl --cert ~/.ssl/cadcproxy.pem \
-     --upload-file myfile.fits \
-     https://ws-uv.canfar.net/arc/files/projects/[project]/myfile.fits
+canfar data ls -lh local:/tmp
+canfar data ls -lh vault:/project
+canfar data ls -lh arc:/projects/PROJECT
 ```
 
-#### Using VOSpace CLI
+Authentication and endpoint resolution happen when the command opens a
+configured source. If a credential is missing or expired, log in to the
+corresponding Identity Provider and retry.
+
+## Inspect data
 
 ```bash
-# Install VOS tools (if not already available)
-pip install vos
-
-# Authenticate
-cadc-get-cert --user [user]
-
-# Upload to Vault
-vcp myfile.fits vos:[user]/data/
-
-# Upload to ARC via VOSpace API
-vcp myfile.fits arc:projects/[project]/data/
-
-# Upload with progress monitoring
-vcp --verbose myfile.fits vos:[user]/large_files/
+canfar data ls -lh vault:/project
+canfar data info vault:/project/catalog.csv
+canfar data size vault:/project/catalog.csv
+canfar data stat vault:/project/catalog.csv
+canfar data find vault:/project --type f
 ```
 
-### Large Files (>100GB): Advanced Methods
+Use `canfar data --help` and the individual command help for the complete
+upstream fsspec-cli surface. The command output is intentionally owned by that
+application; CANFAR does not add an active-server banner to it.
 
-#### SSHFS Mount + rsync
+## Copy files and directories
+
+Copy one file in either direction:
 
 ```bash
-# 1. Mount CANFAR storage locally
-mkdir ~/canfar_mount
-sshfs -p 64022 [user]@ws-uv.canfar.net:/ ~/canfar_mount
-
-# 2. Sync large datasets with rsync
-rsync --archive --verbose --compress --progress --partial \
-      ./large_dataset/ \
-      ~/canfar_mount/arc/projects/[project]/data/
-
-# 3. Unmount when complete
-umount ~/canfar_mount
+canfar data cp local:/data/result.fits vault:/project/results/result.fits
+canfar data cp vault:/project/input.fits local:/scratch/input.fits
 ```
 
-#### VOSpace Bulk Transfer
+Use `-R` (or `-r`) for a directory copy:
 
 ```bash
-# Sync entire directories
-vsync ./local_data/ vos:[user]/backup/
-
-# Parallel transfers (faster for many files)
-vsync --nstreams=4 large_file.tar vos:[user]/archives/
+canfar data cp -R local:/data/run-42 vault:/project/runs/run-42
 ```
 
-## 📥 Download Methods
-
-### From ARC Storage
-
-#### Web Interface
-
-1. **Navigate**: [ARC File Manager](https://www.canfar.net/storage/arc/list/)
-2. **Select files**: Check boxes next to desired files
-3. **Download options**:
-   - **ZIP**: Single archive (recommended for multiple files)
-   - **URL List**: Generate download links for scripting
-   - **HTML List**: Individual download links
-
-#### Command Line
+Create a destination first when that makes the workflow clearer:
 
 ```bash
-# Direct URL download
-curl --cert ~/.ssl/cadcproxy.pem \
-     https://ws-uv.canfar.net/arc/files/home/[user]/myfile.fits \
-     --output myfile.fits
-
-# Via VOSpace API
-vcp arc:home/[user]/myfile.fits ./
-
-# Multiple files with wildcards
-vcp "arc:projects/[project]/data/*.fits" ./local_data/
+canfar data mkdir -p vault:/project/results
+canfar data cp local:/scratch/result.fits vault:/project/results/result.fits
 ```
 
-### From Vault (VOSpace)
-
-#### Command Line
+For a transfer between two remote VOSpace Services, use an explicit copy and
+verify the destination. Do not assume that a cross-source `mv` is supported:
 
 ```bash
-# Single file
-vcp vos:[user]/data.fits ./
-
-# Directory with all contents
-vcp vos:[user]/survey_data/ ./local_survey/
+canfar data cp vault:/project/input.fits arc:/projects/PROJECT/input.fits
+canfar data info arc:/projects/PROJECT/input.fits
 ```
 
-#### Python API
-
-```python
-import vos
-
-client = vos.Client()
-
-# Download single file
-client.copy("vos:[user]/data.fits", "./local_data.fits")
-
-# Download with progress callback
-def progress_callback(bytes_transferred, total_bytes):
-    percent = (bytes_transferred / total_bytes) * 100
-    print(f"Progress: {percent:.1f}%")
-
-client.copy("vos:[user]/large_file.fits", 
-           "./large_file.fits", 
-           callback=progress_callback)
-```
-
-## 🔄 Inter-Storage Transfers
-
-### Moving Data Between Storage Systems
-
-#### Scratch to ARC (Within Sessions)
+The CLI keeps recursive removal disabled. Delete individual files with `rm` or
+empty directories with `rmdir` only after checking the path:
 
 ```bash
-# Process data in scratch for speed
-cp /arc/projects/[project]/raw_data.fits /scratch/
-python reduce_data.py /scratch/raw_data.fits
-
-# Save results to permanent storage
-cp /scratch/processed_data.fits /arc/projects/[project]/results/
-cp /scratch/analysis_plots/ /arc/projects/[project]/figures/
+canfar data rm vault:/project/results/old.fits
+canfar data rmdir vault:/project/results/empty-directory
 ```
 
-#### ARC to Vault (Archival)
+## Session workflow
+
+Inside a Science Platform Session, prefer a mounted `/arc` path for data that is
+already present there. For one remote input, copy directly to `/scratch`, run
+the analysis locally, and copy final products to `/arc` or a persistent VOSpace
+destination:
 
 ```bash
-# Archive completed project results
-vcp /arc/projects/[project]/final_results/ vos:[user]/archives/project2024/
+canfar data cp vault:/project/cube.fits local:/scratch/cube.fits
+python reduce.py /scratch/cube.fits /scratch/result.fits
+canfar data cp local:/scratch/result.fits arc:/projects/PROJECT/result.fits
 ```
 
-#### Vault to ARC (Project Setup)
-
-```bash
-# Import archived data for new analysis
-vcp vos:shared_project/calibrated_data/ /arc/projects/[project]/data/
-
-# Import specific datasets
-vcp "vos:public_surveys/gaia_dr3/*.fits" /arc/projects/[project]/catalogues/
-```
-
-### Automated Workflow Example
-
-```bash
-#!/bin/bash
-# Complete data processing workflow
-
-set -e  # Exit on error
-
-PROJECT_DIR="/arc/projects/[project]"
-SCRATCH_DIR="/scratch"
-
-echo "Starting data processing pipeline..."
-
-# 1. Download raw data from Vault to scratch
-echo "Downloading raw data..."
-vcp vos:[user]/raw_observations/obs_*.fits ${SCRATCH_DIR}/
-
-# 2. Process data in scratch (fastest storage)
-echo "Processing data..."
-cd ${SCRATCH_DIR}
-for file in obs_*.fits; do
-    python calibrate.py "$file" "cal_${file}"
-done
-
-# 3. Save intermediate results to ARC
-echo "Saving calibrated data..."
-mkdir --parents ${PROJECT_DIR}/calibrated/
-cp cal_*.fits ${PROJECT_DIR}/calibrated/
-
-# 4. Further analysis
-echo "Running analysis..."
-python analyze_all.py ${PROJECT_DIR}/calibrated/ > analysis_results.txt
-
-# 5. Save final results to ARC and archive to Vault
-echo "Saving final results..."
-cp analysis_results.txt ${PROJECT_DIR}/results/
-cp final_plots/*.png ${PROJECT_DIR}/figures/
-
-# Archive to Vault
-vcp ${PROJECT_DIR}/results/ vos:[user]/completed_projects/$(date +%Y%m%d)/
-
-echo "Pipeline completed successfully!"
-```
-
-## 📊 Performance Optimization
-
-### Transfer Speed Optimization
-
-#### For Many Small Files
-
-```bash
-# Bundle small files into archives
-tar --create --gzip --file analysis_scripts.tar.gz scripts/
-vcp analysis_scripts.tar.gz vos:[user]/code/
-
-# Use directory sync instead of individual copies
-vsync --nstreams=4 ./many_small_files/ vos:[user]/collection/
-```
-
-### Network Performance Tips
-
-#### Optimal Transfer Times
-
-- **Best performance**: Off-peak hours (evenings, weekends)
-- **Avoid**: Peak research hours (9 AM - 5 PM Pacific)
-
-#### Connection Optimization
-
-```bash
-# Check network speed to CANFAR
-ping ws-uv.canfar.net
-
-# Test transfer speed with small file
-time vcp test_file.fits vos:[user]/speed_test/
-```
-
-## 🚨 Error Handling and Recovery
-
-### Common Transfer Issues
-
-#### Authentication Errors
-
-```bash
-# Certificate expired
-ERROR:: Expired cert. Update by running cadc-get-cert
-
-# Solution: Refresh certificate
-cadc-get-cert --user [user]
-
-# Check certificate validity
-cadc-get-cert --days-valid
-```
-
-#### Network Timeouts
-
-```bash
-# Retry with exponential backoff
-for i in {1..3}; do
-    vcp file.fits vos:[user]/ && break
-    sleep $((2**i))
-done
-```
-
-### Robust Transfer Script
-
-```python
-#!/usr/bin/env python
-"""
-Robust file transfer with retry logic
-"""
-import vos
-import time
-import sys
-from pathlib import Path
-
-def robust_transfer(source, destination, max_retries=3):
-    """Transfer file with retry logic"""
-    client = vos.Client()
-    
-    for attempt in range(max_retries):
-        try:
-            print(f"Transfer attempt {attempt + 1}: {source} → {destination}")
-            client.copy(source, destination)
-            print(f"✓ Transfer successful")
-            return True
-            
-        except Exception as e:
-            print(f"✗ Attempt {attempt + 1} failed: {e}")
-            if attempt < max_retries - 1:
-                wait_time = 2 ** attempt  # Exponential backoff
-                print(f"Waiting {wait_time} seconds before retry...")
-                time.sleep(wait_time)
-            else:
-                print(f"Transfer failed after {max_retries} attempts")
-                return False
-
-# Usage
-if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("Usage: python robust_transfer.py <source> <destination>")
-        sys.exit(1)
-    
-    source, destination = sys.argv[1], sys.argv[2]
-    success = robust_transfer(source, destination)
-    sys.exit(0 if success else 1)
-```
-
-## 📋 Transfer Checklists
-
-### Pre-Transfer Checklist
-
-- [ ] **Authentication**: Valid CADC certificate (`cadc-get-cert`)
-- [ ] **Permissions**: Write access to destination directory
-- [ ] **Space**: Sufficient quota in destination storage
-- [ ] **Network**: Stable connection for large transfers
-- [ ] **Backup**: Important data backed up before moving
-
-### Post-Transfer Verification
-
-```bash
-# Verify file integrity
-vls --long vos:[user]/transferred_file.fits  # Check size and timestamp
-
-# Compare checksums (if available)
-vcp --head vos:[user]/data.fits | grep MD5
-
-# Test file readability
-python -c "from astropy.io import fits; fits.open('test_file.fits')"
-```
-
-### Transfer Planning Template
-
-```markdown
-## Transfer Plan: [Project Name]
-
-**Data Description**: 
-- Size: ___GB
-- File count: ___
-- Type: Raw/Processed/Results
-
-**Source**: _______________
-**Destination**: ___________
-**Method**: _______________
-
-**Timeline**:
-- Start: ____________
-- Estimated completion: ___________
-
-**Verification**:
-- [ ] File count matches
-- [ ] Total size matches  
-- [ ] Sample files readable
-- [ ] Permissions set correctly
-
-**Backup**: _______________
-```
-
-## 🔗 Integration Examples
-
-### Jupyter Notebook Upload
-
-Within a CANFAR Jupyter session:
-
-```python
-# Upload files using the Jupyter interface
-# 1. Click the "Upload" button in file browser
-# 2. Select files from your computer
-# 3. Files appear in current directory
-
-# Move uploaded files to appropriate storage
-import shutil
-shutil.move('uploaded_data.fits', '/arc/projects/[project]/data/')
-
-# Or copy to scratch for processing
-shutil.copy('/arc/projects/[project]/data.fits', '/scratch/')
-```
-
-### Batch Job Data Staging
-
-```bash
-#!/bin/bash
-# Batch job with data staging
-
-# Download input data
-vcp vos:project/input_data.tar.gz /scratch/
-cd /scratch
-tar --extract --gzip --file input_data.tar.gz
-
-# Process data
-python analysis.py input_data/
-
-# Upload results
-tar --create --gzip --file results_$(date +%Y%m%d).tar.gz results/
-vcp results_*.tar.gz vos:[user]/job_outputs/
-
-# Cleanup
-rm --recursive --force /scratch/*
-```
-
-### External Data Import
-
-```bash
-# Download from astronomical archives
-wget --output-document=survey_data.fits "https://archive.eso.org/..."
-
-# Upload to CANFAR
-vcp survey_data.fits vos:[user]/external_data/
-
-# Or direct to project space
-curl --cert ~/.ssl/cadcproxy.pem \
-     --upload-file survey_data.fits \
-     https://ws-uv.canfar.net/arc/files/projects/[project]/survey_data.fits
-```
+`/scratch` is Session-local and is deleted when the Session ends. It is a good
+staging location, not a backup. For repeated Python reads, select an explicit
+fsspec whole-file cache under `/scratch`; see [Filesystem and Python tools](filesystem.md).
+
+## Transfer failures
+
+| Symptom | What to check |
+| --- | --- |
+| Unknown Storage Identifier | Use the configured identifier exactly; `local` is the only reserved name. |
+| Authentication failure | Run the appropriate `canfar login <idp>` and confirm the saved Authentication Record. |
+| Permission denied | Confirm the VOSpace path and project/group membership. |
+| Destination is missing | Create parent directories with `canfar data mkdir -p`. |
+| Copy is slow | Avoid many small remote reads; stage once to `/scratch` or use one explicit cache. |
+| Files disappear after a Session | Move results from `/scratch` to `/arc` or a persistent VOSpace Service before deletion. |
+
+For a service outage or persistent authorization issue, contact [CANFAR
+support](../support/index.md).
+
+## Related guides
+
+- [Storage overview](index.md)
+- [Filesystem and Python tools](filesystem.md)
+- [VOSpace](vospace.md)
+- [Permissions](../permissions.md)

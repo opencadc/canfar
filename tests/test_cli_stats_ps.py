@@ -6,13 +6,12 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import click
 import pytest
 import yaml
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
-from canfar.cli.ps import ps
-from canfar.cli.stats import stats
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -81,10 +80,13 @@ def test_stats_command_help() -> None:
     assert result.exit_code == 0
 
 
-def test_ps_command_help() -> None:
-    """Test ps command help executes successfully."""
+def test_ps_help_describes_default_status_filter() -> None:
+    """Test ps help names the statuses shown by the default filter."""
     result = runner.invoke(cli, ["ps", "--help"])
+
     assert result.exit_code == 0
+    help_text = " ".join(click.unstyle(result.output).replace("│", " ").split())
+    assert "default shows Pending and Running" in help_text
 
 
 def test_ps_outputs_running_table_and_debug_anomalies() -> None:
@@ -114,7 +116,7 @@ def test_ps_outputs_running_table_and_debug_anomalies() -> None:
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--debug"])
+        result = runner.invoke(cli, ["ps", "--debug"])
 
     assert result.exit_code == 0
     assert "running-1" in result.stdout
@@ -152,27 +154,34 @@ def test_ps_quiet_prints_all_matching_session_ids() -> None:
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--quiet"])
+        result = runner.invoke(cli, ["ps", "--quiet"])
 
     assert result.exit_code == 0
-    assert result.stdout.splitlines() == ["running-1", "running-2"]
+    lines = result.stdout.splitlines()
+    assert lines[0].startswith("@")
+    assert lines[1:] == ["running-1", "running-2"]
 
     with patch("canfar.cli.ps.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--quiet", "--all"])
+        result = runner.invoke(cli, ["ps", "--quiet", "--all"])
 
     assert result.exit_code == 0
-    assert result.stdout.splitlines() == ["running-1", "done-1", "running-2"]
+    lines = result.stdout.splitlines()
+    assert lines[0].startswith("@")
+    assert lines[1:] == ["running-1", "done-1", "running-2"]
 
 
 @pytest.mark.parametrize(
     ("flag", "load"),
-    [("--json", json.loads), ("--yaml", yaml.safe_load)],
+    [
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
 )
 def test_ps_machine_emits_filtered_session_array(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], object],
 ) -> None:
     """Machine ``ps`` emits validated session models with running-only filtering."""
@@ -188,7 +197,7 @@ def test_ps_machine_emits_filtered_session_array(
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, [flag])
+        result = runner.invoke(cli, ["ps", *flag])
 
     assert result.exit_code == 0
     assert not result.stdout.startswith("@")
@@ -212,7 +221,7 @@ def test_ps_json_kind_filter_parity(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = [payloads[0]]
-        result = runner.invoke(ps, ["--kind", "headless", "--json"])
+        result = runner.invoke(cli, ["ps", "--kind", "headless", "--output", "json"])
 
     assert result.exit_code == 0
     session.fetch.assert_awaited_once_with(kind="headless", status=None)
@@ -235,7 +244,7 @@ def test_ps_json_malformed_payload_keeps_stdout_pure(tmp_path: Path) -> None:
     ):
         session = _mock_async_session(session_cls)
         session.fetch.return_value = payloads
-        result = runner.invoke(ps, ["--json"])
+        result = runner.invoke(cli, ["ps", "--output", "json"])
 
     assert result.exit_code == 0
     data = json.loads(result.stdout)
@@ -244,9 +253,9 @@ def test_ps_json_malformed_payload_keeps_stdout_pure(tmp_path: Path) -> None:
     assert "validation error" in result.stderr.lower()
 
 
-def test_ps_quiet_with_json_exits_two() -> None:
-    """``ps --quiet`` is incompatible with machine output flags."""
-    result = runner.invoke(ps, ["--quiet", "--json"])
+def test_ps_quiet_with_machine_output_exits_two() -> None:
+    """``ps --quiet`` is incompatible with machine output."""
+    result = runner.invoke(cli, ["ps", "--quiet", "--output", "json"])
     assert result.exit_code == 2
     assert "quiet" in result.stderr.lower()
 
@@ -264,7 +273,7 @@ def test_ps_allows_empty_running_view() -> None:
                 "isFixedResources": True,
             },
         ]
-        result = runner.invoke(ps, [])
+        result = runner.invoke(cli, ["ps"])
 
     assert result.exit_code == 0
     assert "No pending or running sessions found" in result.stderr
@@ -279,7 +288,7 @@ def test_stats_outputs_cluster_tables() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, [])
+        result = runner.invoke(cli, ["stats"])
 
     assert result.exit_code == 0
     assert "CANFAR Platform Load" in result.stdout
@@ -301,7 +310,7 @@ def test_stats_renders_only_cpu_and_ram_columns() -> None:
             "cores": {"requestedCPUCores": 4, "cpuCoresAvailable": 64},
             "ram": {"requestedRAM": "8Gi", "ramAvailable": "128Gi"},
         }
-        result = runner.invoke(stats, [])
+        result = runner.invoke(cli, ["stats"])
 
     assert result.exit_code == 0
     # The CPU/RAM table and its values are rendered.

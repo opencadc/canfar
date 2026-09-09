@@ -1,8 +1,8 @@
 """Test Canfar Context API."""
 
-from unittest.mock import MagicMock
-
+import httpx
 import pytest
+from pydantic import SecretStr
 
 from canfar.context import Context
 
@@ -11,8 +11,10 @@ from canfar.context import Context
 def context():
     """Test Context."""
     context = Context()
-    yield context
-    del context
+    try:
+        yield context
+    finally:
+        context.__exit__(None, None, None)
 
 
 @pytest.mark.integration
@@ -24,10 +26,30 @@ def test_context(context) -> None:
 
 def test_context_resources_use_http_client() -> None:
     """Resources returns decoded context payload."""
-    context = Context(token="token", url="https://example.test/skaha/v1")
-    mock_client = MagicMock()
-    mock_client.get.return_value.json.return_value = {"cores": {"default": 1}}
-    context._client = mock_client  # noqa: SLF001
+    requests: list[httpx.Request] = []
 
-    assert context.resources() == {"cores": {"default": 1}}
-    mock_client.get.assert_called_once_with(url="context")
+    def respond(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json={"cores": {"default": 1}},
+            request=request,
+        )
+
+    with (
+        pytest.MonkeyPatch.context() as monkeypatch,
+        Context(
+            token=SecretStr("token"), url="https://example.test/skaha/v1"
+        ) as context,
+    ):
+        monkeypatch.setattr(
+            "canfar.client.Client",
+            lambda **kwargs: httpx.Client(
+                transport=httpx.MockTransport(respond), **kwargs
+            ),
+        )
+        # The client is lazy, so the transport is installed before the request.
+        assert context.resources() == {"cores": {"default": 1}}
+
+    assert len(requests) == 1
+    assert requests[0].url.path.endswith("/context")

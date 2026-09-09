@@ -14,7 +14,7 @@ hide:
     <h3>
     **Canadian Advanced Network for Astronomical Research is a scalable, cloud-native workspace for astronomy research.**
  
-    *Spin up JupyterLab, submit batch jobs, and collaborate in shared project spaces. <br> The CANFAR Science Platform gives researchers the tools they need with minimal setup.*
+    *Spin up JupyterLab, submit batch Sessions, and collaborate in shared project spaces. <br> The CANFAR Science Platform gives researchers the tools they need with minimal setup.*
     </h3>
     </center>
     
@@ -35,7 +35,7 @@ hide:
     - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
     - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
     - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
-    - [:material-kubernetes: __Platform Operations__ <small>Deployments and infrastructure</small>](https://www.opencadc.org/deployments/)
+    - [:material-cog: __Platform Operations__ <small>Deployments and infrastructure</small>](https://www.opencadc.org/deployments/)
     - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](releases/releases.md)
     - [:simple-rocket: __Try out__ <small>CANFAR Science Platform</small>](https://www.canfar.net)
     - [:octicons-telescope-fill-16: and much more...](platform/concepts.md)
@@ -53,5 +53,3 @@ hide:
     <span style="font-family: 'Roboto Mono', monospace; font-size: 12px; font-style: italic;">
     The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform operated by the Canadian Astronomy Data Centre (CADC) and the Digital Research Alliance of Canada, with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canadian Foundation for Innovation (CFI).
     </span>
-
-
