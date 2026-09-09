@@ -40,15 +40,15 @@ Tests constructing `Configuration` must isolate `CONFIG_PATH`, even when using `
 
 ### Issue tracker
 
-Issues and PRDs are tracked in Jira for the CADC project on `herzberg.atlassian.net`. Use the `CANFAR` label for canfar work. See `docs/agents/issue-tracker.md`.
+Issues, PRDs, and implementation decisions can be tracked in Jira on `herzberg.atlassian.net` (project `CADC`, label `CANFAR`) or GitHub Issues in `opencadc/canfar`. Follow the user's choice or the existing work item's tracker; ask which to use when neither resolves the destination. See `docs/agents/issue-tracker.md`.
 
 ### Triage labels
 
-Use the canonical triage status mapping in Jira. See `docs/agents/triage-labels.md`.
+Map the five canonical skill roles to Jira statuses or GitHub issue labels according to the work item's tracker. Keep the `CANFAR` label on Jira work. See `docs/agents/triage-labels.md`.
 
 ### Domain docs
 
-This repo uses root `CONTEXT.md` as the current domain glossary. Specs and decisions are Jira-first, not ADR/RFC-first. See `docs/agents/domain.md`.
+Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant existing records under `docs/agents/adrs/`; the selected Jira or GitHub work item holds the authoritative spec and decisions for that work. See `docs/agents/domain.md`.
 
 ## Working Preferences
 
