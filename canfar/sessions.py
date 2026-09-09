@@ -63,19 +63,9 @@ def _session_url(session_id: str) -> str:
     return f"session/{session_id}"
 
 
-def _view_parameters(view: str) -> dict[str, str]:
-    """Build the query parameters for a Session detail view."""
-    return {"view": view}
-
-
 def _response_session_id(response: Response) -> str:
     """Interpret a create response as a clean Session identifier."""
     return response.text.rstrip("\r\n")
-
-
-def _response_event(session_id: str, response: Response) -> dict[str, str]:
-    """Interpret an events response with its requested Session identifier."""
-    return {session_id: response.text}
 
 
 def _session_name_pattern(selector: str) -> re.Pattern[str]:
@@ -178,7 +168,7 @@ class Session(HTTPClient):
              'maxCores': {'cores': 32, 'withRam': '147Gi'}},
              'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}
         """
-        parameters = _view_parameters("stats")
+        parameters = {"view": "stats"}
         response: Response = self.client.get("session", params=parameters)
         data: dict[str, Any] = response.json()
         return data
@@ -215,7 +205,8 @@ class Session(HTTPClient):
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
-            verbose (bool, optional): Print logs to stdout. Defaults to False.
+            verbose: Send logs to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected logs.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
@@ -225,7 +216,7 @@ class Session(HTTPClient):
             >>> session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
         ids = _ids(ids)
-        parameters: dict[str, str] = _view_parameters("logs")
+        parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
 
         for value in ids:
@@ -277,8 +268,8 @@ class Session(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            - If cores and ram are not specified, the session will be created with
-              flexible resource allocation of upto 8 cores and 32GB of RAM.
+            - If cores and ram are not specified, the Session uses the Server's
+              flexible resource allocation policy. Limits depend on the Server.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
@@ -342,13 +333,15 @@ class Session(HTTPClient):
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
-            verbose (bool, optional): Print events to stdout. Defaults to False.
+            verbose: Send events to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected events.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
 
         Notes:
-            When verbose is True, the events will be printed to stdout only.
+            Configure application logging to display verbose events. Their output
+            follows the configured handlers, rather than printing to stdout.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -358,14 +351,14 @@ class Session(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, str]] = []
-        parameters: dict[str, str] = _view_parameters("events")
+        parameters: dict[str, str] = {"view": "events"}
         for value in ids:
             try:
                 response: Response = self.client.get(
                     url=_session_url(value),
                     params=parameters,
                 )
-                results.append(_response_event(value, response))
+                results.append({value: response.text})
             except HTTPError as err:
                 _task_result("Failed to fetch events for session", value, err)
         if verbose and results:
@@ -552,7 +545,7 @@ class AsyncSession(HTTPClient):
              'maxCores': {'cores': 32, 'withRam': '147Gi'}},
              'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}
         """
-        parameters = _view_parameters("stats")
+        parameters = {"view": "stats"}
         response: Response = await self.asynclient.get("session", params=parameters)
         data: dict[str, Any] = response.json()
         return data
@@ -598,7 +591,8 @@ class AsyncSession(HTTPClient):
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
-            verbose (bool, optional): Print logs to stdout. Defaults to False.
+            verbose: Send logs to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected logs.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
@@ -610,7 +604,7 @@ class AsyncSession(HTTPClient):
             >>> await session.logs(ids=["hjko98yghj", "ikvp1jtp"])
         """
         ids = _ids(ids)
-        parameters: dict[str, str] = _view_parameters("logs")
+        parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
 
         async def request(value: str) -> tuple[str, str]:
@@ -627,7 +621,6 @@ class AsyncSession(HTTPClient):
             if isinstance(result, tuple):
                 results[result[0]] = result[1]
 
-        # Print logs to stdout if verbose is set to True
         if verbose:
             for key, value in results.items():
                 log.info("Session ID: %s\n", key)
@@ -666,8 +659,8 @@ class AsyncSession(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            - If cores and ram are not specified, the session will be created with
-              flexible resource allocation of upto 8 cores and 32GB of RAM.
+            - If cores and ram are not specified, the Session uses the Server's
+              flexible resource allocation policy. Limits depend on the Server.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
@@ -738,13 +731,15 @@ class AsyncSession(HTTPClient):
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
-            verbose (bool, optional): Print events to stdout. Defaults to False.
+            verbose: Send events to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected events.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
 
         Notes:
-            When verbose is True, the events will be printed to stdout only.
+            Configure application logging to display verbose events. Their output
+            follows the configured handlers, rather than printing to stdout.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -754,14 +749,14 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, str]] = []
-        parameters: dict[str, str] = _view_parameters("events")
+        parameters: dict[str, str] = {"view": "events"}
 
         async def request(value: str) -> dict[str, str]:
             response = await self.asynclient.get(
                 url=_session_url(value),
                 params=parameters,
             )
-            return _response_event(value, response)
+            return {value: response.text}
 
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)

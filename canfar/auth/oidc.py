@@ -15,11 +15,19 @@ from authlib.integrations.base_client.errors import OAuthError
 from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
 from pydantic import SecretStr, ValidationError
 
-from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Token
+from canfar.models.auth import (
+    Client,
+    DeviceAuthorization,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
+)
 
 if TYPE_CHECKING:
     from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 
+    from canfar.idp import IdpInfo
     from canfar.models.config import Configuration
 
 log = logging.getLogger(__name__)
@@ -43,6 +51,23 @@ class AuthPendingError(Exception):
 
 class SlowDownError(Exception):
     """Exception raised when the client should slow down its requests."""
+
+
+def credential_from_idp(info: IdpInfo) -> OIDCCredential:
+    """Initialize an OIDC Authentication Record from trusted IDP metadata."""
+    if info.oidc_discovery_url is None:
+        msg = f"OIDC discovery URL is not configured for IDP '{info.key}'."
+        raise RuntimeError(msg)
+    if info.oidc_issuer is None:
+        msg = f"OIDC issuer is not configured for IDP '{info.key}'."
+        raise RuntimeError(msg)
+    return OIDCCredential(
+        idp=info.key,
+        endpoints=Endpoint(discovery=str(info.oidc_discovery_url)),
+        client=Client(),
+        token=Token(),
+        expiry=Expiry(),
+    )
 
 
 def _validate_discovery_data(data: Any, expected_issuer: str) -> dict[str, Any]:

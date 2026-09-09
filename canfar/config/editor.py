@@ -91,11 +91,6 @@ def _updated_data(config: Configuration, path: str, value: Any) -> dict[str, Any
     return data
 
 
-def set_value(config: Configuration, path: str, value: Any) -> Configuration:
-    """Return a new validated configuration with a dotted-path value updated."""
-    return _validated_copy(config, **_updated_data(config, path, value))
-
-
 def _restore_oidc_secrets(config: Configuration, data: dict[str, Any]) -> None:
     """Replace masked ``SecretStr`` placeholders with values for YAML persistence."""
     authentication = data.get("authentication")

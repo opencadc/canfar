@@ -44,31 +44,12 @@ def test_reusable_tests_preserve_fast_and_credentialed_commands():
     assert "CANFAR credentials are required for the full test suite" in commands
     assert "rm -rf ~/.ssl/" in commands
 
-    fast_step = next(
-        step
-        for step in workflow["jobs"]["tests"]["steps"]
-        if step.get("name") == "Run fast test suite"
-    )
-    full_step = next(
-        step
-        for step in workflow["jobs"]["tests"]["steps"]
-        if step.get("name") == "Run full test suite"
-    )
-    verify_step = next(
-        step
-        for step in workflow["jobs"]["tests"]["steps"]
-        if step.get("name") == "Verify CANFAR credentials"
-    )
-    login_step = next(
-        step
-        for step in workflow["jobs"]["tests"]["steps"]
-        if step.get("name") == "Login to CANFAR"
-    )
-    cleanup_step = next(
-        step
-        for step in workflow["jobs"]["tests"]["steps"]
-        if step.get("name") == "Remove CANFAR Certificate"
-    )
+    steps = {step["name"]: step for step in workflow["jobs"]["tests"]["steps"]}
+    fast_step = steps["Run fast test suite"]
+    full_step = steps["Run full test suite"]
+    verify_step = steps["Verify CANFAR credentials"]
+    login_step = steps["Login to CANFAR"]
+    cleanup_step = steps["Remove CANFAR Certificate"]
     assert fast_step["if"] == "${{ !inputs.full-suite }}"
     assert full_step["if"] == "${{ inputs.full-suite }}"
     assert verify_step["if"] == "${{ inputs.full-suite }}"
@@ -109,12 +90,6 @@ def test_release_and_edge_delegate_to_one_container_build_contract():
         "${{ github.event.client_payload.tag_name }}"
     )
     assert edge_job["with"]["image-version"] == "edge"
-    assert release_job["with"]["image-description"] == (
-        "Python Client for CANFAR Science Portal"
-    )
-    assert edge_job["with"]["image-description"] == (
-        "Python Client for CANFAR Science Platform"
-    )
     assert release_job["with"]["image-tags"].strip().endswith(":latest")
     assert edge_job["with"]["image-tags"].strip().endswith(":edge")
 

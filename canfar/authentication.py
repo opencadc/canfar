@@ -16,12 +16,8 @@ from canfar.models.auth import (
     Authentication,
     AuthenticationCredential,
     AuthMode,
-    Client,
     DeviceAuthorization,
-    Endpoint,
-    Expiry,
     OIDCCredential,
-    Token,
     X509Credential,
 )
 from canfar.models.config import (
@@ -409,23 +405,6 @@ def _print_device_challenge(challenge: DeviceAuthorization) -> None:
     sys.stdout.flush()
 
 
-def _oidc_credential(idp: str, info: IdpInfo) -> OIDCCredential:
-    """Build an empty OIDC Authentication Record from IDP metadata."""
-    if info.oidc_discovery_url is None:
-        msg = f"OIDC discovery URL is not configured for IDP '{idp}'."
-        raise RuntimeError(msg)
-    if info.oidc_issuer is None:
-        msg = f"OIDC issuer is not configured for IDP '{idp}'."
-        raise RuntimeError(msg)
-    return OIDCCredential(
-        idp=idp,
-        endpoints=Endpoint(discovery=str(info.oidc_discovery_url)),
-        client=Client(),
-        token=Token(),
-        expiry=Expiry(),
-    )
-
-
 def _raise_oidc_authentication_error(exc: Exception) -> NoReturn:
     """Translate an OIDC device-login failure into a structured error."""
     raise _authentication_error(
@@ -437,7 +416,7 @@ def _raise_oidc_authentication_error(exc: Exception) -> NoReturn:
 
 def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
     """Acquire one OIDC Authentication Record with native sync I/O."""
-    credential = _oidc_credential(info.key, info)
+    credential = oidc.credential_from_idp(info)
     try:
         return oidc.sync_authenticate_credential(
             credential,
@@ -450,7 +429,7 @@ def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
 
 async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
     """Acquire one OIDC Authentication Record with native async I/O."""
-    credential = _oidc_credential(info.key, info)
+    credential = oidc.credential_from_idp(info)
     try:
         return await oidc.authenticate_credential(
             credential,
