@@ -12,9 +12,9 @@
 pip install canfar --upgrade
 canfar login cadc
 canfar create notebook skaha/astroml:26.04
-canfar ps --json
+canfar ps -o json
 # assumes jq is installed
-canfar open $(canfar ps --json | jq -r ".[0].id")
+canfar open $(canfar ps -o json | jq -r ".[0].id")
 ```
 
 ```python

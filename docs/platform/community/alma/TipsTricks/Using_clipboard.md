@@ -1,5 +1,5 @@
 # Using the clipboard
 
-How to copy and paste small text between Desktop and Notebook sessions using built-in clipboard features.
+Follow [Copy and paste text](../../../sessions/desktop.md#copy-and-paste-text) for terminal shortcuts and browser clipboard handling. Use file transfers for datasets and long scripts.
 
-Copy selected text with Ctrl-Shift-C and paste with Ctrl-Shift-V inside Desktop containers. For larger file transfers use VOSpace or file upload/download.
+Return to the [ALMA workflow](../index.md).

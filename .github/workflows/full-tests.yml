@@ -1,0 +1,23 @@
+name: Full Tests
+
+on:
+  pull_request_target:
+    types: [closed]
+    branches: [ main ]
+    paths:
+      - 'canfar/**'
+      - 'tests/**'
+
+permissions: read-all
+
+jobs:
+  tests:
+    if: ${{ github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main' }}
+    uses: ./.github/workflows/reusable-tests.yml
+    with:
+      full-suite: true
+    secrets:
+      CANFAR_BASEURL: ${{ secrets.CANFAR_BASEURL }}
+      CANFAR_USERNAME: ${{ secrets.CANFAR_USERNAME }}
+      CANFAR_PASSWORD: ${{ secrets.CANFAR_PASSWORD }}
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

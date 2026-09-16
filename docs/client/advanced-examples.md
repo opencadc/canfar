@@ -1,274 +1,303 @@
 # Advanced Examples
 
-Complex use cases and power-user examples for CANFAR Science Platform.
+Run a small FITS metadata pipeline, check every output, and recover missing
+work before scaling up. This example writes one JSON summary per input file.
+Replace the header-reading step with your tested reduction when you are ready.
 
-!!! info
-    `canfar` automatically sets these environment variables in each container:
+<span id="advanced-resource-allocation-strategies"></span>
+<span id="mixed-resource-allocation"></span>
+<span id="resource-allocation-guidelines-for-advanced-workflows"></span>
+<span id="best-practices"></span>
 
-    - `REPLICA_ID`: Current container ID (1, 2, 3, ...)
-    - `REPLICA_COUNT`: Total number of containers
+## Before you start
 
-## Massively Parallel Processing
+Run the controller scripts in a Notebook or Desktop Session with access to
+your project under `/arc`. The worker Sessions must be able to read those same
+paths. These examples do not assume that `/arc` is mounted on your laptop.
 
-Let's assume you have a large dataset of 1000 FITS files that you want to process in parallel. You have a Python script that can process a single FITS file, and you want to run this script in parallel on 100 different CANFAR sessions, with each container processing a subset of the files. This is a common pattern for distributed computing on CANFAR, and can be achieved with a few lines of code.
+- Follow [client setup](get-started.md#install) and authenticate in the environment
+  running the controller.
+- Choose a headless image containing Python, `astropy`, and `canfar`. List images
+  with `canfar image ls --kind headless`; a registry listing alone does not
+  establish which Python packages an image contains.
+- Test the worker on one FITS file using that image before a larger run.
+  Use a versioned image tag and record it; avoid a mutable `latest` tag for
+  a reproducible pipeline.
+- Keep the input files, image, worker script, and manifest unchanged within a
+  run. Start a new run directory when any of them changes.
 
-```python title="Batch Processing Script"
-from canfar.helpers import distributed
-from glob import glob
-from your.code import analysis
+!!! note "Start small"
 
-# Find all FITS files to process
-datafiles = glob("/path/to/data/files/*.fits")
+    Submit one worker first. Try two replicas on a small dataset after that
+    succeeds, then choose a larger count based on measured resources and
+    platform capacity. Replicas are requests; they need not start together.
 
-# Each replica processes its assigned chunk of files
-# The chunk function automatically handles 1-based REPLICA_ID values
-for datafile in distributed.chunk(datafiles):
-    analysis(datafile)
+## 1. Record the inputs and run settings
+
+In your Session terminal, choose a new run directory and an available image.
+Replace `PROJECT` and the example image before running these commands:
+
+```bash title="Terminal inside your Session"
+export RUN_DIR=/arc/projects/PROJECT/runs/fits-summary-001
+export CANFAR_WORKFLOW_IMAGE=images.canfar.net/PROJECT/analysis:VERSION
 ```
 
-### Large Scale Parallel Processing
+Save this as `prepare.py`. Replace the input directory and run it once with
+`python prepare.py`. Start with a directory containing one small FITS file.
 
-=== ":material-language-python: Flexible Mode (Recommended)"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        # Flexible resource allocation - adapts to cluster availability
-        sessions = await session.create(
-            name="fits-processing",
-            image="images.canfar.net/your/analysis-container:latest",
-            kind="headless",
-            cmd="python",
-            args="/path/to/batch_processing.py",
-            replicas=100,
-        )
-        return sessions
-    ```
-
-=== ":material-language-python: Fixed Mode"
-
-    ```python
-    from canfar.sessions import AsyncSession
-
-    async with AsyncSession() as session:
-        # Fixed resource allocation - guaranteed resources
-        sessions = await session.create(
-            name="fits-processing",
-            image="images.canfar.net/your/analysis-container:latest",
-            kind="headless",
-            cores=8,
-            ram=32,
-            cmd="python",
-            args="/path/to/batch_processing.py",
-            replicas=100,
-        )
-        return sessions
-    ```
-
-=== ":simple-gnubash: CLI Flexible Mode"
-
-    ```bash
-    # Flexible resource allocation (default)
-    canfar create -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
-    ```
-
-=== ":simple-gnubash: CLI Fixed Mode"
-
-    ```bash
-    # Fixed resource allocation
-    canfar create -c 8 -m 32 -r 100 -n fits-processing headless images.canfar.net/your/analysis-container:latest -- python /path/to/batch_processing.py
-    ```
-
-## Advanced Resource Allocation Strategies
-
-For complex workflows, choosing the right resource allocation mode can significantly impact performance:
-
-### Mixed Resource Allocation
-
-You can combine flexible and fixed modes within the same workflow:
-
-```python
-from canfar.sessions import AsyncSession
-
-async def mixed_workflow():
-    async with AsyncSession() as session:
-        # Use flexible mode for data preprocessing (variable workload)
-        preprocessing_sessions = await session.create(
-            name="preprocess",
-            image="images.canfar.net/your/preprocessing:latest",
-            kind="headless",
-            cmd="python",
-            args="preprocess.py",
-            replicas=50,
-        )
-
-        # Use fixed mode for intensive analysis (predictable workload)
-        analysis_sessions = await session.create(
-            name="analysis",
-            image="images.canfar.net/your/analysis:latest",
-            kind="headless",
-            cores=16,
-            ram=64,
-            cmd="python",
-            args="analyze.py",
-            replicas=10,
-        )
-
-        return preprocessing_sessions + analysis_sessions
-```
-
-### Resource Allocation Guidelines for Advanced Workflows
-
-| Workflow Type | Recommended Mode | Reasoning |
-|---------------|------------------|-----------|
-| **Data Preprocessing** | Flexible | Variable I/O patterns, benefits from burst capacity |
-| **Machine Learning Training** | Fixed | Consistent performance needed for convergence |
-| **Monte Carlo Simulations** | Flexible | Independent tasks, can handle variable performance |
-| **Image Processing Pipelines** | Fixed | Memory-intensive, predictable resource needs |
-| **Interactive Development** | Flexible | Exploratory work, cost-effective |
-| **Production Batch Jobs** | Fixed | Reliable performance for scheduled workflows |
-
-## Distributed Processing Strategies
-
-The `canfar.helpers.distributed` module provides two main strategies for distributing data across replicas:
-
-### Chunking (`distributed.chunk`)
-
-The `chunk` function divides your data into contiguous blocks, with each replica processing a consecutive chunk. The function uses 1-based replica IDs (matching `canfar` `REPLICA_ID` environment variable):
-
-```python title="Chunking Example"
-from canfar.helpers import distributed
-from glob import glob
-
-# With 1000 files and 100 replicas:
-# - Replica 1 processes files 0-9
-# - Replica 2 processes files 10-19  
-# - Replica 3 processes files 20-29
-# - And so on...
-
-datafiles = glob("/path/to/data/*.fits")
-for datafile in distributed.chunk(datafiles):
-    process_datafile(datafile)
-```
-
-### Striping (`distributed.stripe`)
-
-The `stripe` function distributes data in a round-robin fashion, which is useful when file sizes vary significantly:
-
-```python title="Striping Example"
-from canfar.helpers import distributed
-from glob import glob
-
-# With 1000 files and 100 replicas:
-# - Replica 1 processes files 0, 100, 200, 300, ...
-# - Replica 2 processes files 1, 101, 201, 301, ...
-# - Replica 3 processes files 2, 102, 202, 302, ...
-# - And so on...
-
-datafiles = glob("/path/to/data/*.fits")
-for datafile in distributed.stripe(datafiles):
-    process_datafile(datafile)
-```
-
-### When to Use Each Strategy
-
-- **Use `chunk`** when files are similar in size and you want each replica to process a contiguous block of data
-- **Use `stripe`** when file sizes vary significantly, as it distributes the workload more evenly across replicas
-
-## Real-World Example: Processing Astronomical Data
-
-```python
-import os
+```python title="prepare.py" hl_lines="7 11"
 import json
+import os
 from pathlib import Path
+
+run = Path(os.environ["RUN_DIR"])
+inputs = sorted(
+    str(path.resolve())
+    for path in Path("/arc/projects/PROJECT/observations").glob("*.fits")
+)
+if not inputs:
+    raise SystemExit("No FITS inputs found; check the directory.")
+run.mkdir(parents=True, exist_ok=False)
+(run / "results").mkdir()
+(run / "manifest.json").write_text(json.dumps(inputs, indent=2))
+(run / "run.json").write_text(json.dumps({
+    "image": os.environ["CANFAR_WORKFLOW_IMAGE"],
+    "input_count": len(inputs),
+}, indent=2))
+print(f"Recorded {len(inputs)} inputs in {run}")
+```
+
+The ordered manifest gives every replica the same input list. Enumerating a
+directory independently in each worker can produce different orders or include
+files added during the run.
+
+<span id="distributed-processing-strategies"></span>
+<span id="chunking-distributedchunk"></span>
+<span id="striping-distributedstripe"></span>
+<span id="real-world-example-processing-astronomical-data"></span>
+<span id="partition-work-inside-a-container"></span>
+
+<span id="when-to-use-each-strategy"></span>
+
+## 2. Save and test the worker
+
+Save the following script as `$RUN_DIR/summarize_fits.py`. Each replica reads
+its share of the manifest using `chunk()`. Output names use manifest positions,
+so inputs with identical basenames cannot overwrite each other.
+
+```python title="summarize_fits.py" hl_lines="12 24"
+import json
+import os
+from pathlib import Path
+
+from astropy.io import fits
 from canfar.helpers.distributed import chunk
 
-def process_observations():
-    """Process FITS files across multiple containers."""
-
-    # Get all observation files
-    fits_files = list(Path("/data/observations").glob("*.fits"))
-    my_files = list(chunk(fits_files))
-
-    if not my_files:
-        print("No files assigned to this container")
-        return
-
-    replica_id = os.environ.get('REPLICA_ID')
-    print(f"Container {replica_id} processing {len(my_files)} files")
-
-    # Process each file
-    results = []
-    for fits_file in my_files:
-        # Your analysis code here
-        result = {"file": fits_file.name, "stars_detected": analyze_fits(fits_file)}
-        results.append(result)
-
-    # Save results with container ID
-    output_file = f"/results/container_{replica_id}_results.json"
-    with open(output_file, 'w') as f:
-        json.dump(results, f, indent=2)
-
-    print(f"Saved {len(results)} results to {output_file}")
-
-def analyze_fits(fits_path):
-    """Your FITS analysis logic here."""
-    return 42  # Placeholder
+run = Path(os.environ["RUN_DIR"])
+inputs = json.loads((run / "manifest.json").read_text())
+for index, source in chunk(list(enumerate(inputs))):
+    target = run / "results" / f"{index:06d}.json"
+    if target.exists():
+        previous = json.loads(target.read_text())
+        if previous["input"] != source or "axes" not in previous or "object" not in previous:
+            raise RuntimeError(f"Invalid existing result: {target}")
+        continue
+    header = fits.getheader(source)
+    result = {
+        "input": source,
+        "object": str(header.get("OBJECT", "")),
+        "axes": [header.get(f"NAXIS{i}", 0)
+                 for i in range(1, header.get("NAXIS", 0) + 1)],
+    }
+    temporary = target.with_suffix(".tmp")
+    temporary.write_text(json.dumps(result))
+    temporary.replace(target)
+    print(f"Wrote {target}", flush=True)
 ```
 
-## Best Practices
+`REPLICA_ID` is one-based; `REPLICA_COUNT` is the number requested. CANFAR
+supplies both to headless Sessions. The helper defaults to one worker when
+they are absent. For a local smoke check in your interactive Session:
 
-**Choose the right function:**
-- Use `chunk()` when you need contiguous data blocks
-- Use `stripe()` for round-robin distribution
-
-**Handle empty containers:**
-```python
-my_data = list(chunk(data))
-if not my_data:
-    print("No data for this container")
-    return
+```bash title="Terminal inside your Session"
+REPLICA_ID=1 REPLICA_COUNT=1 python "$RUN_DIR/summarize_fits.py"
 ```
 
-**Save results with container ID:**
-```python
-import os
-replica_id = os.environ.get('REPLICA_ID')
-output_file = f"/results/container_{replica_id}_results.json"
-```
+Inspect the JSON result and compare it with the input FITS header. Then prepare
+a **new run directory** for the headless test, copying the tested worker into
+it. Existing results are deliberately skipped when you resume the same run.
 
-**Combine results from all containers:**
-```python
-from pathlib import Path
+`stripe()` is an alternative that distributes every Nth manifest item.
+Both helpers require all workers to see the same ordered inputs. For remote
+inputs, first [stage the files](data.md#materialize-a-local-file) or adapt the
+worker using the documented synchronous filesystem API.
+
+<span id="process-a-vospace-service-in-each-replica"></span>
+
+<span id="massively-parallel-processing"></span>
+<span id="large-scale-parallel-processing"></span>
+<span id="replicated-headless-processing"></span>
+
+## 3. Submit and monitor an attempt
+
+Save this as `submit.py` in your controller's working directory. It records
+accepted IDs before monitoring, checks for partial submission, and saves
+diagnostics. The monitoring budget stops new polling after 30 minutes; an
+in-flight HTTP request can still take its configured timeout.
+
+```python title="submit.py" hl_lines="20 32"
 import json
-
-def combine_results():
-    """Merge results from all containers."""
-    all_results = []
-    for result_file in Path("/results").glob("container_*_results.json"):
-        with open(result_file) as f:
-            all_results.extend(json.load(f))
-
-    with open("/results/final_results.json", 'w') as f:
-        json.dump(all_results, f, indent=2)
-```
-
-## Common Issues
-
-**Some containers get no data**
-This happens when you have more containers than data items. Handle it gracefully:
-```python
-my_data = list(chunk(data))
-if not my_data:
-    print("No data assigned to this container")
-    return
-```
-
-**Debugging distribution**
-```python
 import os
-replica_id = os.environ.get('REPLICA_ID')
-replica_count = os.environ.get('REPLICA_COUNT')
-print(f"Container {replica_id} of {replica_count} processing {len(my_data)} items")
+import sys
+import time
+from pathlib import Path
+
+from canfar.sessions import Session
+
+run = Path(os.environ["RUN_DIR"])
+settings = json.loads((run / "run.json").read_text())
+attempt = sys.argv[1]                 # e.g. attempt-001
+replicas = int(sys.argv[2])            # start with 1
+record = run / f"{attempt}.json"
+name = f"{run.name}-{attempt}"
+terminal = {"Completed", "Succeeded", "Error", "Failed"}
+
+with record.open("x") as saved, Session() as session:
+    ids = session.create(
+        name=name,
+        image=settings["image"],
+        kind="headless",
+        cmd="python",
+        args=str(run / "summarize_fits.py"),
+        env={"RUN_DIR": str(run)},
+        replicas=replicas,
+    )
+    json.dump({"name": name, "ids": ids, "requested": replicas}, saved, indent=2)
+    saved.flush()
+    print(f"Accepted {len(ids)} of {replicas} requested Sessions: {ids}")
+    if len(ids) != replicas:
+        print("Partial submission: verify all outputs before retrying.")
+    if not ids:
+        raise SystemExit("No accepted IDs; inspect the creation errors.")
+
+    deadline = time.monotonic() + 1800
+    while time.monotonic() < deadline:
+        details = session.info(ids)
+        states = {item.get("id"): item.get("status") for item in details}
+        print(states, flush=True)
+        if all(states.get(value) in terminal for value in ids):
+            break
+        time.sleep(10)
+    else:
+        print("Polling budget expired; Sessions may still be running.")
+
+    diagnostics = {
+        "details": session.info(ids),
+        "events": session.events(ids),
+        "logs": session.logs(ids),
+    }
+    (run / f"{attempt}-diagnostics.json").write_text(
+        json.dumps(diagnostics, indent=2)
+    )
 ```
+
+Use paths without whitespace for this example's worker command. Submit a
+single worker, then use a new attempt name when you intentionally retry:
+
+```bash title="Terminal inside your controller Session"
+python submit.py attempt-001 1
+```
+
+An accepted ID is not proof of completion. Missing `info()` records are not
+treated as successful; individual failed requests can be omitted by the client.
+`Pending` may reflect admission, resources, image pulling, or initialization.
+See [batch troubleshooting](../platform/sessions/batch.md#monitor-and-troubleshoot).
+
+!!! warning "Do not blindly resubmit an interrupted attempt"
+
+    The attempt file is created before submission and cannot be overwritten by
+    this script. If the controller stops before saving IDs, inspect
+    `canfar ps --all` and the recorded run/attempt name to find Sessions that
+    may have been accepted. An HTTP failure can also leave acceptance uncertain.
+    Reconcile those Sessions before retrying.
+
+<span id="common-issues"></span>
+
+## 4. Verify outputs and recover missing work
+
+Run this in the controller environment after the attempt has stopped:
+
+```python title="verify_outputs.py"
+import json
+import os
+from pathlib import Path
+
+run = Path(os.environ["RUN_DIR"])
+inputs = json.loads((run / "manifest.json").read_text())
+missing = []
+for index, source in enumerate(inputs):
+    target = run / "results" / f"{index:06d}.json"
+    if not target.exists():
+        missing.append(source)
+        continue
+    result = json.loads(target.read_text())
+    if result["input"] != source or "axes" not in result or "object" not in result:
+        raise RuntimeError(f"Invalid result: {target}")
+(run / "missing.json").write_text(json.dumps(missing, indent=2))
+print(f"Verified {len(inputs) - len(missing)} of {len(inputs)} outputs")
+print(f"Missing inputs: {len(missing)}")
+```
+
+Inspect errors and fix the cause before retrying. Wait until the previous
+attempt's Sessions have stopped, or cancel them explicitly and confirm they
+are gone. Do not run recovery concurrently against the same output directory.
+
+Keep the original manifest unchanged. With a new attempt name, resubmit the
+same run; the worker skips verified existing outputs and processes the missing
+ones. For example, after validating one-worker behavior:
+
+```bash title="Terminal inside your controller Session"
+python submit.py attempt-002 2
+python verify_outputs.py
+```
+
+Malformed output fails visibly instead of being silently replaced. Preserve it
+for diagnosis, then remove only the affected output after checking the input.
+Output existence is only this example's completion check; a scientific
+reduction should also verify its own quality and provenance requirements.
+
+<span id="cleanup-a-batch"></span>
+
+## 5. Save results and clean up
+
+All manifests, outputs, and diagnostics in this example are already under
+persistent `/arc` storage. Record the worker's code revision with the run and
+verify that another Session can read the results before deleting compute.
+
+The following script asks you to name one attempt and deletes only its recorded
+Session IDs. Run it with `python cleanup.py attempt-001`:
+
+```python title="cleanup.py"
+import json
+import os
+import sys
+from pathlib import Path
+
+from canfar.sessions import Session
+
+run = Path(os.environ["RUN_DIR"])
+attempt = json.loads((run / f"{sys.argv[1]}.json").read_text())
+with Session() as session:
+    print(session.destroy(attempt["ids"]))
+```
+
+Each ID maps to a deletion-request result. Investigate `False` results before
+assuming cleanup succeeded. Keep run records and outputs for reproducibility;
+do not use a broad name-prefix cleanup for unrelated Sessions.
+
+## Related guides
+
+- [Common examples](examples.md) for matching sync/async operations.
+- [Distributed helpers](helpers.md) for partitioning behavior and validation.
+- [Data access](data.md) for staging and caching remote inputs.
+- [Container Images](../platform/containers/index.md) for software environments.

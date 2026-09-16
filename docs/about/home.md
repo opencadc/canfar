@@ -1,14 +1,13 @@
 
 # Organization
 
+CANFAR is operated by teams at the Canadian Astronomy Data Centre (CADC) in
+collaboration with research and infrastructure partners. Operations,
+platform engineering, user support, and scientific engagement are coordinated
+through CADC and the Science Platform project.
 
-
-The day-to-day operation of the CANFAR platform is coordinated by the CADC teams. The team management consists of:
-
-| Name | Role |
-|------|---------------------|
-| Sharon Goliath | Operations Lead |
-| Brian Major | Software Development Lead |
-| JJ Kavelaars | CADC Lead |
-
+For help with an installed Science Platform, contact
+[CANFAR support](mailto:support@canfar.net). For project history and
+collaboration, see the [partners](partners.md) and [terms of reference](terms.md)
+pages.
 

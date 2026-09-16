@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
+import httpx
 import typer
 
 from canfar import CONFIG_PATH
@@ -18,7 +19,7 @@ from canfar.server import (
     activate,
     discover,
 )
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 
 def _authentication_exists_on_disk(idp: str) -> bool:
@@ -67,12 +68,18 @@ def _login_flow(
     idp_info = get_idp(idp)
     try:
         credential = authenticate_for_cli(idp_info, timeout=timeout, force=force)
-    except (ValueError, RuntimeError) as exc:
+    except (
+        PermissionError,
+        TimeoutError,
+        ValueError,
+        RuntimeError,
+        httpx.HTTPError,
+    ) as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
 
     config = Configuration()  # ty: ignore[missing-argument]
-    config.upsert_credential(credential)
+    config.editor.set(f"authentication.{credential.idp}", credential)
 
     try:
         servers = discover(
@@ -142,6 +149,7 @@ def register_login_command(app: typer.Typer) -> None:
         ] = 10,
     ) -> None:
         """Login to CANFAR Science Platform."""
+        emit_cli_active_server_banner()
         selected_idp = idp or select_idp(list_idps())
         try:
             get_idp(selected_idp)

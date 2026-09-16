@@ -73,13 +73,13 @@ class TestStructuredErrorSerialization:
         error = StructuredError(
             code=ErrorCode.OUTPUT_CONFLICT,
             message="Conflicting machine output flags.",
-            hint="Use only one of --json or --yaml.",
+            hint="Use --output json or --output yaml.",
         )
         payload = json.loads(structured_error_to_json(error))
         assert payload == {
             "code": "output.conflict",
             "message": "Conflicting machine output flags.",
-            "hint": "Use only one of --json or --yaml.",
+            "hint": "Use --output json or --output yaml.",
         }
 
     def test_structured_error_to_json_includes_null_hint(self) -> None:

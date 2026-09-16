@@ -1,3 +1,7 @@
 # New user overview
 
-Quick-start notes for logging in, launching sessions, and using project spaces.
+The instructions for this task are now maintained in the guide below.
+
+[Start your first analysis](../../../get-started.md).
+
+[Return to the ALMA workflow](../index.md).

@@ -5,7 +5,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.info import _format, _utilization, info
+from canfar.cli.info import _format, _utilization
+from canfar.cli.main import cli
 from canfar.models.session import FetchResponse
 
 runner = CliRunner()
@@ -75,7 +76,7 @@ class TestInfoCLI:
         }
         mock_session.info.return_value = [mock_response]
 
-        result = runner.invoke(info, ["test-id"])
+        result = runner.invoke(cli, ["info", "test-id"])
 
         assert result.exit_code == 0
         assert "test-id" in result.stdout
@@ -88,7 +89,7 @@ class TestInfoCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.info.return_value = []
 
-        result = runner.invoke(info, ["non-existent"])
+        result = runner.invoke(cli, ["info", "non-existent"])
 
         assert result.exit_code == 0
         assert "No information found" in result.stderr
@@ -100,7 +101,7 @@ class TestInfoCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.info.return_value = [{"id": "test-id", "name": "test-name"}]
 
-        result = runner.invoke(info, ["test-id", "--debug"])
+        result = runner.invoke(cli, ["info", "test-id", "--debug"])
 
         assert result.exit_code == 0
         assert "Session Response Warnings" in result.stderr

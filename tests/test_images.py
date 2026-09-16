@@ -1,8 +1,8 @@
 """Test Canfar Images API."""
 
-from unittest.mock import MagicMock, patch
-
+import httpx
 import pytest
+from pydantic import SecretStr
 
 from canfar.images import Images
 from canfar.models.containers import Image
@@ -12,8 +12,10 @@ from canfar.models.containers import Image
 def images():
     """Test images."""
     images = Images()
-    yield images
-    del images
+    try:
+        yield images
+    finally:
+        images.__exit__(None, None, None)
 
 
 @pytest.mark.integration
@@ -41,11 +43,19 @@ def test_images_details_returns_models() -> None:
             "digest": "sha256:deadbeef",
         }
     ]
-    images = Images()
 
-    with patch("canfar.images.HTTPClient.client") as client:
-        client.get.return_value.json.return_value = payload
-        results = images.details()
+    def respond(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json=payload, request=request)
+
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            "canfar.client.Client",
+            lambda **kwargs: httpx.Client(
+                transport=httpx.MockTransport(respond), **kwargs
+            ),
+        )
+        with Images(token=SecretStr("token"), url="https://example.test") as images:
+            results = images.details()
 
     assert isinstance(results[0], Image)
     assert results[0].id == payload[0]["id"]
@@ -55,14 +65,32 @@ def test_images_details_returns_models() -> None:
 
 def test_images_fetch_uses_http_client_params() -> None:
     """Fetch returns image IDs and passes optional kind as request parameter."""
-    images = Images(token="token", url="https://example.test/skaha/v1")
-    mock_client = MagicMock()
-    mock_client.get.return_value.json.return_value = [
-        {"id": "images.canfar.net/skaha/terminal:latest"}
-    ]
-    images._client = mock_client  # noqa: SLF001
+    requests: list[httpx.Request] = []
 
-    assert images.fetch() == ["images.canfar.net/skaha/terminal:latest"]
-    assert images.fetch(kind="headless") == ["images.canfar.net/skaha/terminal:latest"]
-    mock_client.get.assert_any_call("image", params={})
-    mock_client.get.assert_any_call("image", params={"type": "headless"})
+    def respond(request: httpx.Request) -> httpx.Response:
+        requests.append(request)
+        return httpx.Response(
+            200,
+            json=[{"id": "images.canfar.net/skaha/terminal:latest"}],
+            request=request,
+        )
+
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        monkeypatch.setattr(
+            "canfar.client.Client",
+            lambda **kwargs: httpx.Client(
+                transport=httpx.MockTransport(respond), **kwargs
+            ),
+        )
+        with Images(
+            token=SecretStr("token"), url="https://example.test/skaha/v1"
+        ) as images:
+            assert images.fetch() == ["images.canfar.net/skaha/terminal:latest"]
+            assert images.fetch(kind="headless") == [
+                "images.canfar.net/skaha/terminal:latest"
+            ]
+
+    assert [request.url.params.multi_items() for request in requests] == [
+        [],
+        [("type", "headless")],
+    ]

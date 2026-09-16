@@ -6,32 +6,28 @@ from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at
 from typing import TYPE_CHECKING, Annotated
 
 import typer
+from typer.core import TyperCommand, TyperGroup
 
 from canfar.cli import output
 from canfar.cli.auth import auth
 from canfar.cli.config import config
-from canfar.cli.create import create
+from canfar.cli.create import creation
 from canfar.cli.data import data
-from canfar.cli.delete import delete
-from canfar.cli.events import events
+from canfar.cli.delete import delete_sessions
+from canfar.cli.events import get_events
 from canfar.cli.image import image
-from canfar.cli.info import info
+from canfar.cli.info import get_info
 from canfar.cli.login import register_login_command
-from canfar.cli.logs import logs
-from canfar.cli.open import open_command
-from canfar.cli.prune import prune
-from canfar.cli.ps import ps
+from canfar.cli.logs import get_logs
+from canfar.cli.open import open_sessions
+from canfar.cli.prune import prune_sessions
+from canfar.cli.ps import show as show_sessions
 from canfar.cli.server import server
-from canfar.cli.stats import stats
-from canfar.cli.version import version
+from canfar.cli.stats import get_stats
+from canfar.cli.version import callback as version_callback
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import (
-    ROOT_CHILD_ARGS_META_KEY,
-    AliasGroup,
-    set_before_command,
-)
-from canfar.utils.console import emit_active_server_banner, get_console
+from canfar.utils.console import activate_cli_root, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
     InvalidLoggingEnvironmentError,
@@ -40,25 +36,61 @@ from canfar.utils.logging import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
+    from typer._click.core import Context as ClickContext
 
     from canfar.errors import StructuredError
 
 
+_ROOT_CHILD_ARGS_META_KEY = "canfar.root_child_args"
+
+
 def _leaf_output_mode(args: list[str]) -> output.OutputMode:
-    """Infer an already-parsed leaf machine flag for root setup failures."""
-    if "--json" in args:
-        return output.OutputMode.JSON
-    if "--yaml" in args:
-        return output.OutputMode.YAML
+    """Infer a leaf output option before root setup has completed."""
+    for index, arg in enumerate(args):
+        if arg == "--":
+            break
+        if arg in {"-o", "--output"} and index + 1 < len(args):
+            value = args[index + 1]
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
+        if arg.startswith("--output=") and arg.removeprefix("--output=") in {
+            "json",
+            "yaml",
+        }:
+            return output.OutputMode(arg.removeprefix("--output="))
+        if arg.startswith("-o") and arg not in {"-o", "--output"}:
+            value = arg.removeprefix("-o")
+            if value in {"json", "yaml"}:
+                return output.OutputMode(value)
     return output.OutputMode.HUMAN
 
 
-def _emit_banner_for_command(params: Mapping[str, object]) -> None:
-    """Emit the active-server banner for a parsed human-output command."""
-    if params.get("json_output") or params.get("yaml_output"):
-        return
-    emit_active_server_banner()
+class _RootTyperGroup(TyperGroup):
+    """Capture child argv so root setup can infer a leaf output mode."""
+
+    def parse_args(self, ctx: ClickContext, args: list[str]) -> list[str]:
+        """Record unconsumed child arguments without changing dispatch."""
+        child_args = super().parse_args(ctx, args)
+        if ctx.parent is None:
+            ctx.meta[_ROOT_CHILD_ARGS_META_KEY] = list(child_args)
+        return child_args
+
+
+_LEAF_USAGE = {
+    "create": "Usage: canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]",
+    "prune": "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]...",
+}
+
+
+class _LeafUsageCommand(TyperCommand):
+    """Keep root leaf usage text aligned with delimiter-bearing commands."""
+
+    def get_usage(self, ctx: ClickContext) -> str:
+        """Return the canonical usage line for a leaf with custom syntax."""
+        name = self.name or ""
+        if name in _LEAF_USAGE:
+            return _LEAF_USAGE[name]
+        return super().get_usage(ctx)
 
 
 def callback(
@@ -88,9 +120,8 @@ def callback(
     ] = None,
 ) -> None:
     """Main callback that handles no subcommand case."""
-    child_args: list[str] = ctx.meta.get(ROOT_CHILD_ARGS_META_KEY, [])
-    if "--" in child_args:
-        child_args = child_args[: child_args.index("--")]
+    activate_cli_root(ctx)
+    child_args: list[str] = ctx.meta.get(_ROOT_CHILD_ARGS_META_KEY, [])
     setup_mode = _leaf_output_mode(child_args)
 
     def warning_writer(error: StructuredError) -> None:
@@ -116,8 +147,6 @@ def callback(
     if ctx.invoked_subcommand is None:
         get_console().print(ctx.get_help())
         raise typer.Exit(0)
-    if ctx.invoked_subcommand != "data":
-        set_before_command(ctx, _emit_banner_for_command)
 
 
 cli: typer.Typer = typer.Typer(
@@ -133,7 +162,7 @@ cli: typer.Typer = typer.Typer(
     rich_help_panel="CANFAR CLI Commands",
     callback=callback,
     invoke_without_command=True,
-    cls=AliasGroup,
+    cls=_RootTyperGroup,
 )
 
 register_login_command(cli)
@@ -144,15 +173,6 @@ cli.add_typer(
     help="Manage authentication providers.",
     no_args_is_help=False,
     rich_help_panel="Auth Management",
-)
-
-cli.add_typer(
-    auth,
-    name="authentication",
-    help="Alias for auth.",
-    no_args_is_help=False,
-    rich_help_panel="Aliases",
-    hidden=True,
 )
 
 cli.add_typer(
@@ -169,79 +189,64 @@ cli.add_typer(
     rich_help_panel="Data Management",
 )
 
-cli.add_typer(
-    create,
+cli.command(
+    "create",
+    cls=_LeafUsageCommand,
+    context_settings={
+        "help_option_names": ["-h", "--help"],
+        "allow_interspersed_args": True,
+    },
+    help="Launch a new session.",
     no_args_is_help=True,
     rich_help_panel="Session Management",
-)
+)(creation)
 
-cli.add_typer(
-    ps,
-    no_args_is_help=False,
+cli.command(
+    "ps",
+    help="Show sessions.",
     rich_help_panel="Session Management",
-)
-cli.add_typer(
-    events,
-    no_args_is_help=False,
+)(show_sessions)
+cli.command(
+    "events",
+    help="List events for sessions.",
     rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    info,
+)(get_events)
+cli.command(
+    "info",
     help="Show session info",
-    no_args_is_help=False,
     rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    open_command,
-    name="open",
+)(get_info)
+cli.command(
+    "open",
     help="Open sessions in a browser",
+    context_settings={"help_option_names": ["-h", "--help"]},
     no_args_is_help=True,
     rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    logs,
+)(open_sessions)
+cli.command(
+    "logs",
     help="Show session logs",
-    no_args_is_help=False,
     rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    delete,
-    no_args_is_help=True,
-    rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    prune,
+)(get_logs)
+cli.command(
+    "delete",
+    help="Delete sessions by ID.",
     no_args_is_help=True,
     rich_help_panel="Session Management",
-)
-
-cli.add_typer(
-    create,
-    name="run | launch",
-    help="Aliases for create.",
+)(delete_sessions)
+cli.command(
+    "prune",
+    cls=_LeafUsageCommand,
+    context_settings={"help_option_names": ["-h", "--help"]},
+    help="Delete sessions by criteria.",
     no_args_is_help=True,
-    rich_help_panel="Aliases",
-)
-
-cli.add_typer(
-    delete,
-    name="del",
-    help="Aliases for delete.",
-    no_args_is_help=True,
-    rich_help_panel="Aliases",
-)
-
-cli.add_typer(
-    stats,
+    rich_help_panel="Session Management",
+)(prune_sessions)
+cli.command(
+    "stats",
     help="Show cluster stats",
-    no_args_is_help=False,
     rich_help_panel="Cluster Information",
-)
+)(get_stats)
 
 cli.add_typer(
     image,
@@ -258,13 +263,11 @@ cli.add_typer(
     no_args_is_help=True,
     rich_help_panel="Client Info",
 )
-cli.add_typer(
-    version,
-    name="version",
+cli.command(
+    "version",
     help="View client info",
-    no_args_is_help=False,
     rich_help_panel="Client Info",
-)
+)(version_callback)
 
 
 def main() -> None:

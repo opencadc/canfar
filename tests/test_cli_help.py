@@ -14,7 +14,6 @@ COMMANDS = [
     ["login"],
     ["auth"],
     ["auth", "show"],
-    ["auth", "login"],
     ["auth", "ls"],
     ["auth", "use"],
     ["auth", "rm"],

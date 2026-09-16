@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import re
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar
 from webbrowser import open_new_tab
 
 from httpx import HTTPError, Response
 
-from canfar import get_logger
 from canfar.client import HTTPClient
 from canfar.models.session import CreateRequest
 from canfar.utils import build
@@ -18,7 +18,8 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from canfar.models.types import Kind, Status, View
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
+_Result = TypeVar("_Result")
 
 
 def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
@@ -30,9 +31,41 @@ def _log_http_task_failure(operation: str, context: object, exc: BaseException) 
     log.error("%s: %s (%s)", operation, context, type(exc).__name__)
 
 
+def _task_result(
+    operation: str,
+    context: object,
+    result: _Result | Exception,
+) -> _Result | None:
+    """Keep one failure and logging policy for collected transport results."""
+    if isinstance(result, Exception):
+        _log_http_task_failure(operation, context, result)
+        return None
+    return result
+
+
+def _destroy_failure(session_id: str, exc: BaseException | None = None) -> bool:
+    """Log a failed Session deletion and preserve the false result policy."""
+    msg = f"Failed to destroy session {session_id}"
+    if exc is not None:
+        msg += f": {exc}"
+    # Both callers invoke this from their HTTPError handler; keep traceback logging.
+    log.exception(msg)  # noqa: LOG004
+    return False
+
+
 def _ids(value: str | list[str]) -> list[str]:
     """Normalize one or many Session identifiers without changing their order."""
     return [value] if isinstance(value, str) else value
+
+
+def _session_url(session_id: str) -> str:
+    """Build the endpoint path for one Session identifier."""
+    return f"session/{session_id}"
+
+
+def _response_session_id(response: Response) -> str:
+    """Interpret a create response as a clean Session identifier."""
+    return response.text.rstrip("\r\n")
 
 
 def _session_name_pattern(selector: str) -> re.Pattern[str]:
@@ -157,10 +190,10 @@ class Session(HTTPClient):
         results: list[dict[str, Any]] = []
         for value in ids:
             try:
-                response: Response = self.client.get(url=f"session/{value}")
+                response: Response = self.client.get(url=_session_url(value))
                 results.append(response.json())
             except HTTPError as err:
-                _log_http_task_failure("failed to fetch session info for", value, err)
+                _task_result("failed to fetch session info for", value, err)
         return results
 
     def logs(
@@ -172,7 +205,8 @@ class Session(HTTPClient):
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
-            verbose (bool, optional): Print logs to stdout. Defaults to False.
+            verbose: Send logs to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected logs.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
@@ -188,12 +222,12 @@ class Session(HTTPClient):
         for value in ids:
             try:
                 response: Response = self.client.get(
-                    url=f"session/{value}",
+                    url=_session_url(value),
                     params=parameters,
                 )
                 results[value] = response.text
             except HTTPError as err:
-                _log_http_task_failure("failed to fetch logs for session", value, err)
+                _task_result("failed to fetch logs for session", value, err)
 
         if verbose:
             for key, value in results.items():
@@ -203,7 +237,7 @@ class Session(HTTPClient):
 
         return results
 
-    def create(
+    def create(  # noqa: PLR0917
         self,
         name: str | CreateRequest,
         image: str | None = None,
@@ -234,8 +268,8 @@ class Session(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            - If cores and ram are not specified, the session will be created with
-              flexible resource allocation of upto 8 cores and 32GB of RAM.
+            - If cores and ram are not specified, the Session uses the Server's
+              flexible resource allocation policy. Limits depend on the Server.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
@@ -281,9 +315,9 @@ class Session(HTTPClient):
         for replica, payload in enumerate(payloads, start=1):
             try:
                 response: Response = self.client.post(url="session", params=payload)
-                results.append(response.text.rstrip("\r\n"))
+                results.append(_response_session_id(response))
             except HTTPError as err:
-                _log_http_task_failure(
+                _task_result(
                     "Failed to create session",
                     f"replica {replica}/{len(payloads)}",
                     err,
@@ -299,13 +333,15 @@ class Session(HTTPClient):
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
-            verbose (bool, optional): Print events to stdout. Defaults to False.
+            verbose: Send events to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected events.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
 
         Notes:
-            When verbose is True, the events will be printed to stdout only.
+            Configure application logging to display verbose events. Their output
+            follows the configured handlers, rather than printing to stdout.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -319,12 +355,12 @@ class Session(HTTPClient):
         for value in ids:
             try:
                 response: Response = self.client.get(
-                    url=f"session/{value}",
+                    url=_session_url(value),
                     params=parameters,
                 )
                 results.append({value: response.text})
             except HTTPError as err:
-                _log_http_task_failure("Failed to fetch events for session", value, err)
+                _task_result("Failed to fetch events for session", value, err)
         if verbose and results:
             for result in results:
                 for key, value in result.items():
@@ -352,12 +388,10 @@ class Session(HTTPClient):
         results: dict[str, bool] = {}
         for value in ids:
             try:
-                self.client.delete(url=f"session/{value}")
+                self.client.delete(url=_session_url(value))
                 results[value] = True
             except HTTPError:
-                msg = f"Failed to destroy session {value}"
-                log.exception(msg)
-                results[value] = False
+                results[value] = _destroy_failure(value)
         return results
 
     def destroy_with(
@@ -533,21 +567,18 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, Any]] = []
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
-        async def bounded(value: str) -> dict[str, Any]:
-            async with semaphore:
-                response = await self.asynclient.get(url=f"session/{value}")
-                data: dict[str, Any] = response.json()
-                return data
+        async def request(value: str) -> dict[str, Any]:
+            response = await self.asynclient.get(url=_session_url(value))
+            data: dict[str, Any] = response.json()
+            return data
 
-        tasks = [bounded(value) for value in ids]
+        tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
-            if isinstance(reply, Exception):
-                _log_http_task_failure("failed to fetch session info for", value, reply)
-            elif isinstance(reply, dict):
-                results.append(reply)
+            result = _task_result("failed to fetch session info for", value, reply)
+            if isinstance(result, dict):
+                results.append(result)
         log.debug("Session info records collected: %s", results)
         return results
 
@@ -560,7 +591,8 @@ class AsyncSession(HTTPClient):
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
-            verbose (bool, optional): Print logs to stdout. Defaults to False.
+            verbose: Send logs to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected logs.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
@@ -575,25 +607,20 @@ class AsyncSession(HTTPClient):
         parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
 
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
+        async def request(value: str) -> tuple[str, str]:
+            response = await self.asynclient.get(
+                url=_session_url(value),
+                params=parameters,
+            )
+            return value, response.text
 
-        async def bounded(value: str) -> tuple[str, str]:
-            async with semaphore:
-                response = await self.asynclient.get(
-                    url=f"session/{value}",
-                    params=parameters,
-                )
-                return value, response.text
-
-        tasks = [bounded(value) for value in ids]
+        tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
-            if isinstance(reply, Exception):
-                _log_http_task_failure("failed to fetch logs for session", value, reply)
-            elif isinstance(reply, tuple):
-                results[reply[0]] = reply[1]
+            result = _task_result("failed to fetch logs for session", value, reply)
+            if isinstance(result, tuple):
+                results[result[0]] = result[1]
 
-        # Print logs to stdout if verbose is set to True
         if verbose:
             for key, value in results.items():
                 log.info("Session ID: %s\n", key)
@@ -601,7 +628,7 @@ class AsyncSession(HTTPClient):
             return None
         return results
 
-    async def create(
+    async def create(  # noqa: PLR0917
         self,
         name: str | CreateRequest,
         image: str | None = None,
@@ -632,8 +659,8 @@ class AsyncSession(HTTPClient):
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
 
         Notes:
-            - If cores and ram are not specified, the session will be created with
-              flexible resource allocation of upto 8 cores and 32GB of RAM.
+            - If cores and ram are not specified, the Session uses the Server's
+              flexible resource allocation policy. Limits depend on the Server.
             - The name of the session suffixed with the replica number. eg. test-42
               when replicas > 1.
             - Each container will have the following environment variables injected:
@@ -674,27 +701,24 @@ class AsyncSession(HTTPClient):
             replicas,
         )
         results: list[str] = []
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
-        async def bounded(parameters: list[tuple[str, Any]]) -> Any:
-            async with semaphore:
-                response = await self.asynclient.post(url="session", params=parameters)
-                return response.text.rstrip("\r\n")
+        async def request_session(parameters: list[tuple[str, Any]]) -> str:
+            response = await self.asynclient.post(url="session", params=parameters)
+            return _response_session_id(response)
 
-        tasks = [bounded(payload) for payload in payloads]
+        tasks = [request_session(payload) for payload in payloads]
         session_kind = name.kind if isinstance(name, CreateRequest) else kind
         msg = f"Creating {len(payloads)} {session_kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for replica, reply in enumerate(responses, start=1):
-            if isinstance(reply, Exception):
-                _log_http_task_failure(
-                    "Failed to create session",
-                    f"replica {replica}/{len(payloads)}",
-                    reply,
-                )
-            elif isinstance(reply, str):
-                results.append(reply)
+            result = _task_result(
+                "Failed to create session",
+                f"replica {replica}/{len(payloads)}",
+                reply,
+            )
+            if isinstance(result, str):
+                results.append(result)
         log.debug("Session IDs collected from create: %s", results)
         return results
 
@@ -707,13 +731,15 @@ class AsyncSession(HTTPClient):
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
-            verbose (bool, optional): Print events to stdout. Defaults to False.
+            verbose: Send events to the ``canfar.sessions`` logger and return None.
+                Defaults to False, which returns the collected events.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
 
         Notes:
-            When verbose is True, the events will be printed to stdout only.
+            Configure application logging to display verbose events. Their output
+            follows the configured handlers, rather than printing to stdout.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -724,27 +750,24 @@ class AsyncSession(HTTPClient):
         ids = _ids(ids)
         results: list[dict[str, str]] = []
         parameters: dict[str, str] = {"view": "events"}
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
-        async def bounded(value: str) -> dict[str, str]:
-            async with semaphore:
-                response = await self.asynclient.get(
-                    url=f"session/{value}",
-                    params=parameters,
-                )
-                return {value: response.text}
+        async def request(value: str) -> dict[str, str]:
+            response = await self.asynclient.get(
+                url=_session_url(value),
+                params=parameters,
+            )
+            return {value: response.text}
 
-        tasks = [bounded(value) for value in ids]
+        tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
-            if isinstance(reply, Exception):
-                _log_http_task_failure(
-                    "Failed to fetch events for session",
-                    value,
-                    reply,
-                )
-            elif isinstance(reply, dict):
-                results.append(reply)
+            result = _task_result(
+                "Failed to fetch events for session",
+                value,
+                reply,
+            )
+            if isinstance(result, dict):
+                results.append(result)
 
         if verbose and results:
             for result in results:
@@ -772,20 +795,16 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: dict[str, bool] = {}
-        semaphore: asyncio.Semaphore = asyncio.Semaphore(self.concurrency)
 
-        async def bounded(value: str) -> tuple[str, bool]:
-            async with semaphore:
-                try:
-                    await self.asynclient.delete(url=f"session/{value}")
-                except HTTPError as err:
-                    msg = f"Failed to destroy session {value}: {err}"
-                    log.exception(msg)
-                    return value, False
-                else:
-                    return value, True
+        async def request(value: str) -> tuple[str, bool]:
+            try:
+                await self.asynclient.delete(url=_session_url(value))
+            except HTTPError as err:
+                return value, _destroy_failure(value, err)
+            else:
+                return value, True
 
-        tasks = [bounded(value) for value in ids]
+        tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for reply in responses:
             if isinstance(reply, tuple):

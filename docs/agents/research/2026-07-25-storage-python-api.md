@@ -31,10 +31,11 @@ What changed, VERIFIED against the live service on 0.8.0:
   `AttributeError: 'StagedReadFile' object has no attribute 'blocksize'`.
   `Range` is honoured for byte reads, not through the file-object path.
 
-The recommended module has since shipped as `canfar/storage.py`, adding
-attribute access (`from canfar.storage import vault, arc`) on top of the
-`filesystem` / `fetch` / `sources` surface proposed below, so any text quoting
-the old "no public CANFAR storage Python API" wording is historical.
+The shipped module's public surface is now `identifiers()` and `filesystem()`.
+The earlier proposals for dynamic attributes, `fetch()`, and public `sources()`
+were superseded: callers pass Storage Identifiers explicitly, materialize with
+standard fsspec methods, and the fsspec-cli source mapping remains private
+(`_sources()`). No dynamic protocols or module attributes are registered.
 
 Sections 2 and 4 describe the 0.7.0 behaviour and are kept as the historical
 record. The single-cache-layer recommendation in the Verdict stands, but its

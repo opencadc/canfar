@@ -9,15 +9,9 @@ import typer
 
 from canfar.cli._run import run
 from canfar.sessions import AsyncSession, connection_url
-
-open_command = typer.Typer(
-    name="open",
-    help="Open sessions in a browser.",
-    no_args_is_help=True,
-)
+from canfar.utils.console import emit_cli_active_server_banner
 
 
-@open_command.callback(invoke_without_command=True)
 def open_sessions(
     session_ids: Annotated[
         list[str],
@@ -25,6 +19,7 @@ def open_sessions(
     ],
 ) -> None:
     """Open one or more sessions in a web browser."""
+    emit_cli_active_server_banner()
 
     async def _open_sessions() -> None:
         """Look up the requested sessions and open their connect URLs."""

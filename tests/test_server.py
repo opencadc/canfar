@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 from pathlib import Path
 from threading import Barrier
 from typing import TYPE_CHECKING
@@ -12,10 +13,15 @@ import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 
+from canfar._server_discovery import (
+    _discover_for_idp,
+    _discovered_to_server,
+    _select_storage,
+)
 from canfar.errors import ErrorCode
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import OIDCCredential, RuntimeCredential, X509Credential
-from canfar.models.config import Configuration, default_servers
+from canfar.models.config import Configuration
 from canfar.models.http import Server, VOSpaceService
 from canfar.models.registry import IVOARegistry, IVOARegistrySearch
 from canfar.models.registry import Server as DiscoveredServer
@@ -23,13 +29,13 @@ from canfar.server import (
     ServerDiscoveryError,
     ServerFetchError,
     ServerSelectionRequiredError,
-    _discover_for_idp,
-    _discovered_to_server,
-    _select_storage,
     activate,
     discover,
     enrich,
     use,
+)
+from canfar.server import (
+    __all__ as server_exports,
 )
 from canfar.server import (
     list_servers as server_list,
@@ -52,6 +58,32 @@ _VOSPACE_CAPABILITIES = """
       </capability>
     </capabilities>
 """
+
+
+def test_public_exports_declare_server_api() -> None:
+    """The module's public and compatibility exports remain explicit."""
+    expected = {
+        "ServerActivation",
+        "ServerDiscoveryError",
+        "ServerFetchError",
+        "ServerSelectionRequiredError",
+        "ServerSelectorError",
+        "activate",
+        "activate_authentication",
+        "discover",
+        "enrich",
+        "list_servers",
+        "use",
+    }
+
+    assert set(server_exports) == expected
+
+
+def test_enrich_preserves_storage_resource_annotation() -> None:
+    """The public enrichment signature retains its released annotation text."""
+    annotation = inspect.signature(enrich).parameters["storage_resource"].annotation
+
+    assert annotation == "RegistryResource | None | object"
 
 
 def _http_client_factory(
@@ -102,7 +134,7 @@ class TestServerList:
             config = Configuration()
             assign_servers(config, cadc, srcnet)
             config.active = config.active.model_copy(update={"authentication": "cadc"})
-            config.save()
+            config.editor.save()
 
             with patch("canfar.server.Configuration", Configuration):
                 servers = server_list()
@@ -137,9 +169,85 @@ class TestServerList:
 
         assert servers == []
 
+    def test_discover_uses_editor_for_server_state_and_persistence(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Discovery updates and persists Servers through the editor boundary."""
+        discovered = _cadc_server(name="Discovered-CADC")
+        config_path = tmp_path / "config.yaml"
+
+        with (
+            patch("canfar.models.config.CONFIG_PATH", config_path),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
+        ):
+            config = _anonymous_config()
+            discover("cadc", config=config)
+
+            assert config.servers["Discovered-CADC"] == discovered
+            assert Configuration().servers["Discovered-CADC"] == discovered
+
 
 class TestServerUse:
     """Tests for canfar.server.use()."""
+
+    def test_activate_uses_editor_for_active_selection_and_history(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Activation records a Server Name through the editor boundary."""
+        target = _cadc_server(name="Selected-CADC")
+        fetched = target.model_copy(update={"cores": 8}, deep=True)
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = _anonymous_config(target)
+            config.editor.save()
+
+            with patch("canfar.server._validate_server", return_value=fetched):
+                activation = activate("cadc", "Selected-CADC", config=config)
+
+            assert activation.server == fetched
+            assert config.active.server == "Selected-CADC"
+            assert config.active.servers["cadc"] == "Selected-CADC"
+            saved = Configuration()
+
+        assert saved.active.server == "Selected-CADC"
+        assert saved.active.servers["cadc"] == "Selected-CADC"
+
+    def test_activate_resolves_remembered_selection_by_server_name(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Remembered Server Selection is resolved by Server Name, not URI."""
+        first = _cadc_server(name="First", uri=AnyUrl("ivo://first.example/skaha"))
+        remembered = _cadc_server(
+            name="Remembered",
+            uri=AnyUrl("ivo://remembered.example/skaha"),
+        )
+        config_path = tmp_path / "config.yaml"
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration(
+                active=ActiveConfig(
+                    authentication="cadc",
+                    server=None,
+                    servers={"cadc": "Remembered"},
+                ),
+                authentication={"cadc": X509Credential(idp="cadc")},
+                servers={first.name: first, remembered.name: remembered},
+            )
+
+            with patch("canfar.server._validate_server", return_value=remembered):
+                activation = activate("cadc", config=config)
+
+        assert activation.reason == "remembered"
+        assert activation.server.name == "Remembered"
+        assert config.active.server == "Remembered"
+        assert config.active.servers["cadc"] == "Remembered"
 
     def test_use_by_uri_updates_active_server(self, tmp_path: Path) -> None:
         """Selecting by URI fetches, validates, and saves the active server."""
@@ -152,7 +260,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, target)
-            config.save()
+            config.editor.save()
 
             with (
                 patch(
@@ -175,7 +283,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, target)
-            config.save()
+            config.editor.save()
 
             with (
                 patch("canfar.server._validate_server", return_value=fetched),
@@ -195,7 +303,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, target)
-            config.save()
+            config.editor.save()
             previous = Configuration().active.server
 
             with (
@@ -224,7 +332,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, known)
-            config.save()
+            config.editor.save()
 
             def merge_discovered(
                 _idp: str,
@@ -232,7 +340,7 @@ class TestServerUse:
                 config: Configuration,
                 **_kwargs: object,
             ) -> list[Server]:
-                config.upsert_server(discovered)
+                config.editor.set(f"servers.{discovered.name}", discovered)
                 return [discovered]
 
             with (
@@ -258,7 +366,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, target)
-            config.save()
+            config.editor.save()
             previous = Configuration().active.server
 
             with (
@@ -281,7 +389,7 @@ class TestServerUse:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, target)
-            config.save()
+            config.editor.save()
             previous = Configuration().active.server
 
             with (
@@ -325,7 +433,7 @@ class TestServerDiscovery:
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch(
-                "canfar.server._discover_for_idp",
+                "canfar._server_discovery._discover_for_idp",
                 return_value=[winner, alpha, earlier],
             ),
         ):
@@ -348,7 +456,10 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             servers = discover("cadc")
@@ -356,9 +467,13 @@ class TestServerDiscovery:
         assert servers == [discovered]
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             saved = Configuration()
-        assert str(saved.get_server_by_uri("ivo://cadc.example/skaha").url) == (
-            "https://cadc.example/skaha"
-        )
+        assert str(
+            next(
+                server
+                for server in saved.servers.values()
+                if str(server.uri) == "ivo://cadc.example/skaha"
+            ).url
+        ) == ("https://cadc.example/skaha")
 
     @pytest.mark.asyncio
     async def test_registry_retains_only_skaha_and_preferred_storage_records(
@@ -393,12 +508,7 @@ class TestServerDiscovery:
         self,
         tmp_path: Path,
     ) -> None:
-        """Rediscovery updates only the generated Storage Identifier entry.
-
-        A Server Name keyed entry saved by an older client is healed to its
-        registry leaf (``arc``) on load, so rediscovery refreshes that entry in
-        place instead of generating a second one.
-        """
+        """Rediscovery updates only the generated Storage Identifier entry."""
         manual = VOSpaceService(
             uri="ivo://cadc.nrc.ca/custom",
             url="https://manual.example/custom",
@@ -467,8 +577,8 @@ class TestServerDiscovery:
             persisted = Configuration().servers["canfar"]
 
         assert discovered.storage == persisted.storage
-        assert set(discovered.storage) == {"arc", "archive", "vault"}
-        assert discovered.storage["arc"] == VOSpaceService(
+        assert set(discovered.storage) == {"canfar", "archive"}
+        assert discovered.storage["canfar"] == VOSpaceService(
             uri="ivo://cadc.nrc.ca/arc",
             url="https://storage.example/arc",
         )
@@ -642,7 +752,7 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
-            patch("canfar.server.enrich", side_effect=enriched),
+            patch("canfar._server_discovery.enrich", side_effect=enriched),
         ):
             servers = await _discover_for_idp("srcnet")
 
@@ -769,7 +879,10 @@ class TestServerDiscovery:
         materialize = AsyncMock(return_value=RuntimeCredential(token="current-token"))
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
-            patch("canfar.server._discovered_to_server", side_effect=convert),
+            patch(
+                "canfar._server_discovery._discovered_to_server",
+                side_effect=convert,
+            ),
             patch(
                 "canfar.client.HTTPClient._materialize_credentials",
                 new=materialize,
@@ -1048,7 +1161,7 @@ class TestServerDiscovery:
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = _anonymous_config(known)
-            config.save()
+            config.editor.save()
 
             with (
                 patch(
@@ -1066,18 +1179,13 @@ class TestServerDiscovery:
 
             persisted = Configuration().servers["canfar"]
 
-        # A storage-less saved Server gains the default VOSpace Services on load.
-        healed = known.model_copy(
-            update={"storage": default_servers["canfar"].storage},
-            deep=True,
-        )
         expected = (
-            healed.model_copy(
+            known.model_copy(
                 update={"version": "v2.1", "auths": ["oidc"]},
                 deep=True,
             )
             if capabilities_case == "success"
-            else healed
+            else known
         )
         assert discovered == [expected]
         assert config.servers["canfar"] == expected
@@ -1099,7 +1207,7 @@ class TestServerDiscovery:
             config = Configuration()
             assign_servers(config, first, second)
             config.active = config.active.model_copy(update={"server": None})
-            config.save()
+            config.editor.save()
 
             with (
                 patch("canfar.server.Configuration", Configuration),
@@ -1123,7 +1231,10 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[discovered]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[discovered],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             discover("cadc")
@@ -1150,9 +1261,15 @@ class TestServerDiscovery:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.server.Configuration", Configuration),
         ):
-            with patch("canfar.server._discover_for_idp", return_value=[first]):
+            with patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[first],
+            ):
                 discover("cadc")
-            with patch("canfar.server._discover_for_idp", return_value=[moved]):
+            with patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[moved],
+            ):
                 discover("cadc")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
@@ -1179,11 +1296,14 @@ class TestServerDiscovery:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             assign_servers(config, original)
-            config.save()
+            config.editor.save()
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.server._discover_for_idp", return_value=[renamed]),
+            patch(
+                "canfar._server_discovery._discover_for_idp",
+                return_value=[renamed],
+            ),
             patch("canfar.server.Configuration", Configuration),
         ):
             discover("cadc")
@@ -1216,7 +1336,7 @@ class TestServerDiscovery:
             patch("canfar.models.config.CONFIG_PATH", config_path),
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server.enrich",
+                "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
                     update={"version": "v1", "auths": ["oidc"]},
                     deep=True,
@@ -1254,7 +1374,7 @@ class TestServerDiscovery:
         with (
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
             patch(
-                "canfar.server.enrich",
+                "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
                     update={"version": "v1", "auths": ["x509"]},
                     deep=True,

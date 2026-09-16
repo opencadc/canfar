@@ -1,5 +1,15 @@
-# CANFAR Community Resources
+<span id="canfar-community-resources"></span>
 
-As teams and projects grow, it's important to share knowledge and best practices. This section provides resources and tutorials for specific communities and their use cases within the CANFAR ecosystem.
+# Community workflows
 
-If you have a specific use case or community you'd like to see represented here, please contribute to the [documentation](https://github.com/opencadc/canfar) or [contact us](mailto:support@canfar.net).
+These pages collect domain-specific workflows that build on the general
+[Sessions](../sessions/index.md), [Storage](../storage/index.md), and
+[Container Images](../containers/index.md) guides.
+
+- [ALMA analysis workflow](alma/index.md) — a text-first reduction and
+  inspection path.
+- [CASA and adjacent software](CASA_and_more.md) — image selection and links
+  to upstream package documentation.
+
+Suggest a workflow through the [CANFAR repository](https://github.com/opencadc/canfar)
+or contact [support@canfar.net](mailto:support@canfar.net).

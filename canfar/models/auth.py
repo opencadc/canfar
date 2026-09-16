@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import math
 import time
 from pathlib import Path  # noqa: TC003
@@ -9,10 +10,9 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
-from canfar import get_logger
 from canfar.auth import x509
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def _secret_present(value: SecretStr | str | None) -> bool:

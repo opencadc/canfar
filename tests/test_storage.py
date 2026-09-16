@@ -6,6 +6,7 @@ import asyncio
 from typing import TYPE_CHECKING, Any
 from unittest.mock import AsyncMock, Mock
 
+import fsspec
 import pytest
 import vosfs
 from fsspec.implementations.local import LocalFileSystem
@@ -16,7 +17,7 @@ from canfar.exceptions.context import AuthContextError
 from canfar.models.active import ActiveConfig
 from canfar.models.config import Configuration
 from canfar.models.http import Server, VOSpaceService
-from canfar.storage import _vospace
+from canfar.storage import _sources, _vospace
 from tests.helpers.config import oidc_credential, x509_credential
 
 if TYPE_CHECKING:
@@ -84,7 +85,7 @@ async def test_source_reloads_config_and_runtime_token_wins(
 ) -> None:
     """Entry reloads endpoint state and keeps token-over-certificate precedence."""
     config = _config(credential=oidc_credential("inactive"))
-    config.save()
+    config.editor.save()
     source = _vospace(
         "archive",
         token="runtime-token",
@@ -94,7 +95,7 @@ async def test_source_reloads_config_and_runtime_token_wins(
     config.servers["inactive"].storage["archive"].url = AnyHttpUrl(
         "https://changed.example/vospace"
     )
-    config.save()
+    config.editor.save()
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
     async with source() as filesystem:
@@ -116,7 +117,9 @@ async def test_source_factory_constructs_fresh_filesystem_per_acquisition(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Repeated acquisition constructs and closes distinct VOSpace filesystems."""
-    _config(credential=oidc_credential("inactive", access="current-token")).save()
+    _config(
+        credential=oidc_credential("inactive", access="current-token")
+    ).editor.save()
     filesystems: list[_Filesystem] = []
 
     def build(endpoint: str, **kwargs: Any) -> _Filesystem:
@@ -144,7 +147,7 @@ async def test_environment_token_preserves_runtime_precedence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """The source leaves an omitted token open to HTTPClient environment settings."""
-    _config(credential=x509_credential("inactive")).save()
+    _config(credential=x509_credential("inactive")).editor.save()
     monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
     monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
@@ -165,7 +168,7 @@ async def test_environment_certificate_preserves_runtime_precedence(
 ) -> None:
     """The source leaves an omitted certificate open to settings sources."""
     certificate = tmp_path / "environment.pem"
-    _config(credential=oidc_credential("inactive")).save()
+    _config(credential=oidc_credential("inactive")).editor.save()
     monkeypatch.delenv("CANFAR_TOKEN", raising=False)
     monkeypatch.setenv("CANFAR_CERTIFICATE", certificate.as_posix())
     monkeypatch.setattr(
@@ -200,7 +203,7 @@ async def test_expired_inactive_oidc_refreshes_once_and_persists(
             access_expiry=1.0,
         )
     )
-    config.save()
+    config.editor.save()
     refresh = AsyncMock(
         return_value={
             "access_token": "new-access-secret",
@@ -220,7 +223,7 @@ async def test_expired_inactive_oidc_refreshes_once_and_persists(
         "refresh-secret",
     )
     persisted = Configuration()  # ty: ignore[missing-argument]
-    saved = persisted.get_credential("inactive")
+    saved = persisted.authentication["inactive"]
     assert saved.mode == "oidc"
     assert saved.token.access is not None
     assert saved.token.access.get_secret_value() == "new-access-secret"
@@ -231,7 +234,9 @@ async def test_valid_saved_oidc_access_token_is_reused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """A current saved OIDC Authentication Record needs no refresh."""
-    _config(credential=oidc_credential("inactive", access="current-token")).save()
+    _config(
+        credential=oidc_credential("inactive", access="current-token")
+    ).editor.save()
     refresh = AsyncMock()
     monkeypatch.setattr("canfar.client.oidc.refresh", refresh)
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
@@ -249,7 +254,7 @@ async def test_saved_x509_is_validated_before_construction(
 ) -> None:
     """Saved X.509 material becomes only an inspected literal certfile path."""
     certificate = tmp_path / "saved.pem"
-    _config(credential=x509_credential("inactive", path=certificate)).save()
+    _config(credential=x509_credential("inactive", path=certificate)).editor.save()
     inspect = Mock()
 
     def inspect_certificate(path: Path) -> dict[str, object]:
@@ -272,7 +277,7 @@ async def test_runtime_x509_overrides_saved_authentication_record(
 ) -> None:
     """A validated runtime certificate wins over the saved Authentication Record."""
     certificate = tmp_path / "runtime.pem"
-    _config(credential=oidc_credential("inactive")).save()
+    _config(credential=oidc_credential("inactive")).editor.save()
     monkeypatch.setattr(
         "canfar.client.x509.inspect",
         lambda path: {"path": path.as_posix(), "expiry": 9_999_999_999.0},
@@ -294,7 +299,7 @@ async def test_invalid_saved_x509_fails_before_vospace(
 ) -> None:
     """An invalid X.509 Authentication Record fails with a clean login hint."""
     certificate = tmp_path / "invalid.pem"
-    _config(credential=x509_credential("inactive", path=certificate)).save()
+    _config(credential=x509_credential("inactive", path=certificate)).editor.save()
     monkeypatch.setattr(
         "canfar.client.x509.inspect",
         Mock(side_effect=ValueError("certificate parse detail")),
@@ -317,7 +322,7 @@ async def test_source_closes_on_failure_and_cancellation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Context exit always closes a yielded filesystem."""
-    _config(credential=oidc_credential("inactive")).save()
+    _config(credential=oidc_credential("inactive")).editor.save()
     filesystems: list[_Filesystem] = []
 
     def build(endpoint: str, **kwargs: Any) -> _Filesystem:
@@ -359,7 +364,7 @@ async def test_unrefreshable_oidc_fails_secret_safe_before_vospace(
             access_expiry=1.0,
             refresh_expiry=1.0,
         )
-    ).save()
+    ).editor.save()
     constructor = AsyncMock()
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
 
@@ -378,7 +383,7 @@ async def test_empty_saved_oidc_token_fails_cleanly(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """An empty saved token cannot fall through to certificate construction."""
-    _config(credential=oidc_credential("inactive", access="")).save()
+    _config(credential=oidc_credential("inactive", access="")).editor.save()
     constructor = Mock()
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
 
@@ -394,51 +399,69 @@ class TestPublicSurface:
 
     def test_identifiers_lists_configured_services_and_local(self) -> None:
         """Every configured Storage Identifier is listed, with local last."""
-        _config(credential=x509_credential("inactive")).save()
+        _config(credential=x509_credential("inactive")).editor.save()
 
         assert storage.identifiers() == ["archive", "local"]
+
+    def test_identifiers_discovers_services_on_every_server(self) -> None:
+        """Discovery does not narrow the list to the active Server Selection."""
+        config = _config(credential=x509_credential("inactive"))
+        config.servers["other"] = Server(
+            idp="inactive",
+            uri=AnyUrl("ivo://other.example/skaha"),
+            url=AnyHttpUrl("https://other.example/skaha"),
+            storage={
+                "second": VOSpaceService(
+                    uri=AnyUrl("ivo://other.example/second"),
+                    url=AnyHttpUrl("https://other.example/second"),
+                )
+            },
+        )
+        config.editor.save()
+
+        assert storage.identifiers() == ["archive", "second", "local"]
 
     def test_local_identifier_returns_a_local_filesystem(self) -> None:
         """The reserved local identifier needs no credential."""
         assert isinstance(storage.filesystem("local"), LocalFileSystem)
-        assert isinstance(storage.local, LocalFileSystem)
+        assert fsspec.get_filesystem_class("file") is LocalFileSystem
 
-    def test_attribute_access_builds_a_filesystem(
+    def test_filesystem_builds_a_configured_identifier(
         self,
         monkeypatch: pytest.MonkeyPatch,
         tmp_path: Path,
     ) -> None:
-        """A Storage Identifier resolves as a module attribute."""
+        """The explicit filesystem API resolves a configured identifier."""
         certificate = tmp_path / "saved.pem"
-        _config(credential=x509_credential("inactive", path=certificate)).save()
+        _config(credential=x509_credential("inactive", path=certificate)).editor.save()
         monkeypatch.setattr(
             "canfar.client.x509.inspect",
             lambda path: {"path": path.as_posix(), "expiry": 9_999_999_999.0},
         )
         monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
-        filesystem = storage.archive
+        filesystem = storage.filesystem("archive")
 
         assert filesystem.endpoint == "https://inactive.example/vospace"
         assert filesystem.kwargs["certfile"] == certificate.as_posix()
         assert filesystem.kwargs["use_listings_cache"] is True
 
-    def test_unknown_identifier_raises_attribute_error(self) -> None:
-        """An unconfigured name is an AttributeError naming what is available."""
-        _config(credential=x509_credential("inactive")).save()
+    def test_unknown_identifier_raises_key_error(self) -> None:
+        """An unconfigured Storage Identifier fails explicitly."""
+        _config(credential=x509_credential("inactive")).editor.save()
 
-        with pytest.raises(AttributeError, match="archive"):
-            _ = storage.missing
+        with pytest.raises(KeyError, match="missing"):
+            storage.filesystem("missing")
 
-    def test_private_names_are_not_treated_as_identifiers(self) -> None:
-        """Dunder lookups must not attempt a filesystem build."""
-        with pytest.raises(AttributeError):
-            _ = storage.__wrapped__
+    def test_data_source_mapping_is_private(self) -> None:
+        """The fsspec-cli source mapping is not a public storage API."""
+        _config(credential=x509_credential("inactive")).editor.save()
 
-    def test_dir_offers_identifiers_for_completion(self) -> None:
-        """Tab completion exposes identifiers alongside the module functions."""
-        _config(credential=x509_credential("inactive")).save()
+        assert not hasattr(storage, "sources")
+        assert set(_sources()) == {"archive", "local"}
 
-        listed = dir(storage)
+    def test_storage_identifiers_are_not_dynamic_module_imports(self) -> None:
+        """Storage Identifiers must be passed to the explicit filesystem API."""
+        _config(credential=x509_credential("inactive")).editor.save()
 
-        assert {"archive", "local", "filesystem", "identifiers"} <= set(listed)
+        assert "archive" not in storage.__dict__

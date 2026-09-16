@@ -10,7 +10,7 @@ import typer
 from rich.table import Table
 
 from canfar import __version__
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 
 def callback(
@@ -22,6 +22,7 @@ def callback(
     ),
 ) -> None:
     """CANFAR Python Client version information."""
+    emit_cli_active_server_banner()
     if not debug:
         # Simple version output
         get_console().print(f"CANFAR Python Client {__version__}")
@@ -87,16 +88,6 @@ def callback(
         "\n[dim]Please include this information when reporting bugs.[/dim]"
     )
     raise typer.Exit(0)
-
-
-version = typer.Typer(
-    name="version",
-    help="Show canfar client version information",
-    no_args_is_help=False,
-    rich_help_panel="Information Commands",
-    callback=callback,
-    invoke_without_command=True,
-)
 
 
 def _get_package_version(name: str) -> str:

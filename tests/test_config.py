@@ -9,12 +9,11 @@ import pytest
 import yaml
 from pydantic import ValidationError
 
-from canfar.config.editor import set_value as set_config_value
+import canfar.authentication as authentication_service
 from canfar.config.migration import (
     ConfigResetRequiredError,
     ensure_current_config,
 )
-from canfar.config.store import save_config
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
@@ -126,36 +125,36 @@ class TestConfigServersPaths:
     """Test dotted-path access to name-keyed servers."""
 
     def test_get_and_set_servers_canfar_url(self, tmp_path: Path) -> None:
-        """servers.<name>.<field> paths round-trip through get_value/set_value."""
+        """servers.<name>.<field> paths round-trip through the editor."""
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert str(config.get_value("servers.canfar.url")) == (
+        assert str(config.editor.get("servers.canfar.url")) == (
             "https://ws-uv.canfar.net/skaha"
         )
 
-        updated = config.set_value(
+        config.editor.set(
             "servers.canfar.url",
             "https://example.test/skaha",
         )
-        assert str(updated.get_value("servers.canfar.url")) == (
+        assert str(config.editor.get("servers.canfar.url")) == (
             "https://example.test/skaha"
         )
 
 
-class TestConfigServices:
-    """Test configuration storage and action helpers."""
+class TestConfigEditing:
+    """Test validated configuration edits and domain-owned persistence."""
 
     def test_invalid_server_selection_preserves_configuration(
         self,
         tmp_path: Path,
     ) -> None:
-        """An invalid Server Selection changes neither memory nor persisted YAML."""
+        """An invalid server mapping changes neither memory nor persisted YAML."""
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.save()
+            config.editor.save()
             persisted = config_path.read_bytes()
 
             invalid = Server(
@@ -167,13 +166,13 @@ class TestConfigServices:
                 auths=["x509"],
             )
             with pytest.raises(ValidationError, match="Invalid server name"):
-                config.set_active_selection("cadc", invalid)
+                config.editor.set("servers", {"invalid.name": invalid})
 
         assert config.active.server == "canfar"
         assert set(config.servers) == {"canfar"}
         assert config_path.read_bytes() == persisted
 
-    def test_upsert_credential_preserves_other_authentication_records(
+    def test_editor_credential_update_preserves_other_authentication_records(
         self,
         tmp_path: Path,
     ) -> None:
@@ -182,46 +181,20 @@ class TestConfigServices:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
             cadc_path = config.authentication["cadc"].path
-            config.upsert_credential(
+            config.editor.set(
+                "authentication.srcnet",
                 X509Credential(
                     idp="srcnet",
                     path=Path("/srcnet/cert.pem"),
                     expiry=42.0,
                 ),
             )
-            config.save()
+            config.editor.save()
             loaded = Configuration()
 
         assert set(loaded.authentication) == {"cadc", "srcnet"}
         assert loaded.authentication["cadc"].path == cadc_path
         assert loaded.authentication["srcnet"].path == Path("/srcnet/cert.pem")
-
-    def test_update_unknown_credential_preserves_configuration(
-        self,
-        tmp_path: Path,
-    ) -> None:
-        """Updating an unknown Authentication Record changes no state."""
-        config_path = tmp_path / "config.yaml"
-        with patch("canfar.models.config.CONFIG_PATH", config_path):
-            config = Configuration()
-            config.save()
-            state = config.model_dump(mode="python")
-            persisted = config_path.read_bytes()
-
-            with pytest.raises(
-                KeyError,
-                match="Authentication record for IDP 'srcnet' not found",
-            ):
-                config.update_credential(
-                    X509Credential(
-                        idp="srcnet",
-                        path=Path("/srcnet/cert.pem"),
-                        expiry=42.0,
-                    ),
-                )
-
-        assert config.model_dump(mode="python") == state
-        assert config_path.read_bytes() == persisted
 
     def test_update_known_credential_preserves_unrelated_state(
         self,
@@ -231,7 +204,8 @@ class TestConfigServices:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.upsert_credential(
+            config.editor.set(
+                "authentication.srcnet",
                 X509Credential(
                     idp="srcnet",
                     path=Path("/srcnet/cert.pem"),
@@ -241,14 +215,15 @@ class TestConfigServices:
             active = config.active.model_dump(mode="python")
             servers = config.servers
 
-            config.update_credential(
+            config.editor.set(
+                "authentication.cadc",
                 X509Credential(
                     idp="cadc",
                     path=Path("/updated/cadc.pem"),
                     expiry=84.0,
                 ),
             )
-            config.save()
+            config.editor.save()
             loaded = Configuration()
 
         assert loaded.authentication["cadc"].path == Path("/updated/cadc.pem")
@@ -264,7 +239,8 @@ class TestConfigServices:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.upsert_server(
+            config.editor.set(
+                "servers.SRCNet",
                 Server(
                     idp="srcnet",
                     name="SRCNet",
@@ -274,7 +250,7 @@ class TestConfigServices:
                     auths=["oidc"],
                 ),
             )
-            config.save()
+            config.editor.save()
             loaded = Configuration()
 
         assert set(loaded.servers) == {"canfar", "SRCNet"}
@@ -289,14 +265,16 @@ class TestConfigServices:
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
-            config.upsert_credential(
+            config.editor.set(
+                "authentication.srcnet",
                 X509Credential(
                     idp="srcnet",
                     path=Path("/srcnet/cert.pem"),
                     expiry=42.0,
                 ),
             )
-            config.upsert_server(
+            config.editor.set(
+                "servers.SRCNet",
                 Server(
                     idp="srcnet",
                     name="SRCNet",
@@ -306,9 +284,18 @@ class TestConfigServices:
                     auths=["oidc"],
                 ),
             )
-            config.set_active_selection("srcnet", config.servers["SRCNet"])
-            config.remove_authentication("cadc")
-            config.save()
+            config.editor.set(
+                "active",
+                config.active.model_copy(
+                    update={
+                        "authentication": "srcnet",
+                        "server": "SRCNet",
+                        "servers": {"srcnet": "SRCNet"},
+                    }
+                ),
+            )
+            config.editor.save()
+            authentication_service.remove("cadc", force=True)
             loaded = Configuration()
 
         assert set(loaded.authentication) == {"srcnet"}
@@ -316,24 +303,22 @@ class TestConfigServices:
         assert loaded.active.authentication == "srcnet"
         assert loaded.active.server == "SRCNet"
 
-    def test_editor_and_store_update_config_without_model_io(
+    def test_editor_updates_config_without_model_io(
         self,
         tmp_path: Path,
     ) -> None:
         """Config editing and persistence live outside the Pydantic model."""
         config_path = tmp_path / "config.yaml"
-        config = Configuration()
-
-        updated = set_config_value(config, "console.width", 132)
-        save_config(updated, config_path)
-
         with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.editor.set("console.width", 132)
+            config.editor.save()
             loaded = Configuration()
 
         assert loaded.console.width == 132
 
-    def test_selection_service_sets_active_server(self) -> None:
-        """Active server selection is provided as a config action helper."""
+    def test_editor_sets_active_server(self) -> None:
+        """Active server selection remains ordinary validated data."""
         config = Configuration()
         server = Server(
             idp="cadc",
@@ -344,12 +329,19 @@ class TestConfigServices:
             auths=["x509"],
         )
 
-        config.set_active_selection("cadc", server)
+        config.editor.set("servers.CADC-CANFAR", server)
+        config.editor.set(
+            "active",
+            config.active.model_copy(
+                update={
+                    "server": "CADC-CANFAR",
+                    "servers": {"cadc": "CADC-CANFAR"},
+                }
+            ),
+        )
 
         assert config.active.server == "CADC-CANFAR"
-        assert config.get_server_by_uri("ivo://cadc.example/skaha").name == (
-            "CADC-CANFAR"
-        )
+        assert config.servers["CADC-CANFAR"].name == ("CADC-CANFAR")
 
 
 class TestConfigManualReset:

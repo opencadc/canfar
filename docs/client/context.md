@@ -1,37 +1,21 @@
 # Context API
 
-!!! info "Overview"
-
-    The Context API allows the user to get information about the resources available to be requested for a session on the CANFAR Science Platform. This information can be used to configure the session to request the appropriate resources for your session.
-
-```python title="Get context information"
-from canfar.context import Context
-
-context = Context()
-context.resources()
-```
+`Context` reads the resource information advertised by a Science Platform
+Server. The returned mapping can guide `Session.create()` resource requests.
 
 ```python
-{
-    "cores": {
-        "default": 1,
-        "defaultRequest": 1,
-        "defaultLimit": 16,
-        "defaultHeadless": 1,
-        "options": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
-    },
-    "memoryGB": {
-        "default": 2,
-        "defaultRequest": 4,
-        "defaultLimit": 192,
-        "defaultHeadless": 4,
-        "options": [1, 2, ..., 192],
-    },
-    "gpus": {
-        "options": [1, ..., 8],
-    },
-}
+from canfar.context import Context
+
+with Context() as context:
+    resources = context.resources()
+    print(resources["cores"])
+    print(resources.get("memoryGB"))
+    print(resources.get("gpus"))
 ```
+
+The response is a `dict[str, Any]` whose keys and values are supplied by the
+server; common keys include `cores`, `memoryGB`, and `gpus`. Resource limits are
+server metadata, not a second Configuration model.
 
 ::: canfar.context.Context
     handler: python
@@ -42,4 +26,4 @@ context.resources()
       members_order: source
       show_root_heading: true
       show_source: true
-      heading_level: 3
+      heading_level: 2

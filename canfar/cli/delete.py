@@ -8,18 +8,10 @@ import typer
 from rich.prompt import Confirm
 
 from canfar.cli._run import run
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
-
-delete = typer.Typer(
-    name="delete",
-    no_args_is_help=True,
-    cls=AliasGroup,
-)
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 
-@delete.callback(invoke_without_command=True)
 def delete_sessions(
     session_ids: Annotated[
         list[str],
@@ -40,6 +32,7 @@ def delete_sessions(
     canfar delete abc123
     canfar delete abc123 def456
     """
+    emit_cli_active_server_banner()
     if force:
         proceed: bool = True
     else:

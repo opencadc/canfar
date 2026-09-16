@@ -14,6 +14,86 @@ def test_conftest_isolates_home() -> None:
     assert Path(os.environ["HOME"]) == Path(os.environ["CANFAR_TEST_HOME"])
 
 
+def _run_home_probe(
+    tmp_path: Path,
+    *,
+    test_home: str | None = None,
+) -> list[tuple[str, str]]:
+    """Run isolated probe tests and return each worker's HOME values."""
+    probe_dir = tmp_path / "probe"
+    probe_dir.mkdir(parents=True)
+    output_dir = tmp_path / "output"
+    output_dir.mkdir()
+    probe = """
+import os
+from pathlib import Path
+
+
+def test_home():
+    worker = os.environ.get("PYTEST_XDIST_WORKER", "master")
+    output_dir = Path(os.environ["PROBE_OUTPUT_DIR"])
+    (output_dir / f"{Path(__file__).stem}-{worker}").write_text(
+        f"{os.environ['HOME']}\\n{os.environ['CANFAR_TEST_HOME']}",
+        encoding="utf-8",
+    )
+"""
+    for name in ("one", "two"):
+        (probe_dir / f"test_probe_{name}.py").write_text(probe, encoding="utf-8")
+
+    environment = os.environ.copy()
+    environment.pop("CANFAR_TEST_HOME", None)
+    environment["PROBE_OUTPUT_DIR"] = str(output_dir)
+    if test_home is not None:
+        environment["CANFAR_TEST_HOME"] = test_home
+
+    result = subprocess.run(  # noqa: S603
+        [
+            sys.executable,
+            "-m",
+            "pytest",
+            str(probe_dir),
+            "-p",
+            "tests.conftest",
+            "-n2",
+            "--no-cov",
+            "-q",
+        ],
+        capture_output=True,
+        check=False,
+        cwd=Path.cwd(),
+        env=environment,
+        text=True,
+    )
+    assert result.returncode == 0, result.stderr
+    return [
+        tuple(path.read_text(encoding="utf-8").splitlines())
+        for path in sorted(output_dir.iterdir())
+    ]
+
+
+def test_default_home_is_fresh_per_run_and_shared_by_workers(tmp_path: Path) -> None:
+    """Default test HOME must not retain state between pytest invocations."""
+    first = _run_home_probe(tmp_path / "first")
+    second = _run_home_probe(tmp_path / "second")
+
+    assert len(first) == len(second) == 2
+    assert len({home for home, _ in first}) == 1
+    assert len({test_home for _, test_home in first}) == 1
+    assert first[0][0] == first[0][1]
+    assert second[0][0] == second[0][1]
+    assert first[0][0] != second[0][0]
+
+
+def test_explicit_home_is_preserved_for_workers(tmp_path: Path) -> None:
+    """An explicit test HOME remains unchanged, including its spelling."""
+    explicit = f"{tmp_path / 'explicit-home'}/"
+
+    values = _run_home_probe(tmp_path / "explicit", test_home=explicit)
+
+    assert len(values) == 2
+    assert values == [(explicit, explicit), (explicit, explicit)]
+
+
 def test_stale_list_config_does_not_break_canfar_or_cli_imports(
     tmp_path: Path,
 ) -> None:
@@ -75,10 +155,7 @@ for module in (
 ):
     importlib.import_module(module)
 
-from canfar.utils.logging import _canfar_logger
-
 canfar_logger = logging.getLogger("canfar")
-assert not _canfar_logger._configured
 assert canfar_logger.handlers == []
 assert canfar_logger.level == logging.NOTSET
 assert canfar_logger.propagate

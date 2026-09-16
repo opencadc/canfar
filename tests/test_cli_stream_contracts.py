@@ -92,8 +92,8 @@ def _client_factory(
     ("flags", "load"),
     [
         ([], None),
-        (["--json"], json.loads),
-        (["--yaml"], yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_config_success_warning_and_failure_keep_stream_contracts(
@@ -157,13 +157,13 @@ def test_config_success_warning_and_failure_keep_stream_contracts(
 @pytest.mark.parametrize(
     ("flag", "load"),
     [
-        ("--json", json.loads),
-        ("--yaml", yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_real_ps_log_and_payload_stay_on_separate_streams(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
     """A real HTTP-backed command emits logs beside one machine payload."""
@@ -181,7 +181,7 @@ def test_real_ps_log_and_payload_stay_on_separate_streams(
             side_effect=_async_client_factory(httpx.MockTransport(response)),
         ),
     ):
-        result = runner.invoke(cli, ["-vvvv", "ps", flag])
+        result = runner.invoke(cli, ["-vvvv", "ps", *flag])
 
     assert result.exit_code == 0
     assert load(result.stdout) == []
@@ -192,13 +192,13 @@ def test_real_ps_log_and_payload_stay_on_separate_streams(
 @pytest.mark.parametrize(
     ("flag", "load"),
     [
-        ("--json", json.loads),
-        ("--yaml", yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_ps_transport_failure_is_one_structured_machine_error(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
     """Expected HTTP transport failure preserves empty stdout and exit one."""
@@ -217,7 +217,7 @@ def test_ps_transport_failure_is_one_structured_machine_error(
             side_effect=_async_client_factory(httpx.MockTransport(unavailable)),
         ),
     ):
-        result = runner.invoke(cli, ["ps", flag])
+        result = runner.invoke(cli, ["ps", *flag])
 
     assert result.exit_code == 1
     assert result.stdout == ""
@@ -228,13 +228,13 @@ def test_ps_transport_failure_is_one_structured_machine_error(
 @pytest.mark.parametrize(
     ("flag", "load"),
     [
-        ("--json", json.loads),
-        ("--yaml", yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
     """Fresh registry discovery emits progress on stderr and data on stdout."""
@@ -279,7 +279,7 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
             side_effect=_client_factory(httpx.MockTransport(capability_response)),
         ),
     ):
-        result = runner.invoke(cli, ["server", "ls", flag])
+        result = runner.invoke(cli, ["server", "ls", *flag])
 
     assert result.exit_code == 0, result.stderr
     payload = load(result.stdout)
@@ -317,13 +317,13 @@ def test_fresh_server_discovery_errors_are_diagnostics(
 @pytest.mark.parametrize(
     ("flag", "load"),
     [
-        ("--json", json.loads),
-        ("--yaml", yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_fresh_server_discovery_failure_is_one_structured_machine_error(
     tmp_path: Path,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
     """Registry transport failure emits one machine-readable boundary error."""
@@ -341,7 +341,7 @@ def test_fresh_server_discovery_failure_is_one_structured_machine_error(
             side_effect=_async_client_factory(httpx.MockTransport(unavailable)),
         ),
     ):
-        result = runner.invoke(cli, ["server", "ls", flag])
+        result = runner.invoke(cli, ["server", "ls", *flag])
 
     assert result.exit_code == 1
     assert result.stdout == ""
@@ -352,11 +352,11 @@ def test_fresh_server_discovery_failure_is_one_structured_machine_error(
 @pytest.mark.parametrize(
     "command",
     [
-        ["config", "get", "console.width", "--json"],
-        ["auth", "show", "--json"],
-        ["auth", "ls", "--json"],
-        ["server", "ls", "--json"],
-        ["ps", "--json"],
+        ["config", "get", "console.width", "--output", "json"],
+        ["auth", "show", "--output", "json"],
+        ["auth", "ls", "--output", "json"],
+        ["server", "ls", "--output", "json"],
+        ["ps", "--output", "json"],
     ],
 )
 def test_malformed_config_is_structured_for_every_machine_command(
@@ -379,19 +379,19 @@ def test_malformed_config_is_structured_for_every_machine_command(
 @pytest.mark.parametrize(
     ("flag", "load"),
     [
-        ("--json", json.loads),
-        ("--yaml", yaml.safe_load),
+        (["-o", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
     ],
 )
 def test_invalid_logging_environment_is_one_structured_machine_error(
     monkeypatch: pytest.MonkeyPatch,
-    flag: str,
+    flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
-    """Root dispatch preserves parsed leaf args for callback setup failures."""
+    """Machine-capable root groups keep setup diagnostics structured."""
     monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
 
-    result = runner.invoke(cli, ["config", "get", "console.width", flag])
+    result = runner.invoke(cli, ["config", "get", "console.width", *flag])
 
     assert result.exit_code == 2
     assert result.stdout == ""
@@ -400,6 +400,68 @@ def test_invalid_logging_environment_is_one_structured_machine_error(
     assert error.env_var == "CANFAR_LOGLEVEL"
     assert error.provided_value == "chatty"
     assert error.expected == ["critical", "error", "warning", "info", "debug"]
+
+
+@pytest.mark.parametrize(
+    "command", [["config", "get", "console.width"], ["auth", "ls"]]
+)
+def test_invalid_logging_environment_is_human_without_leaf_output(
+    monkeypatch: pytest.MonkeyPatch,
+    command: list[str],
+) -> None:
+    """Setup failures stay human when a machine-capable leaf has no output flag."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(cli, command)
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.startswith("logging.invalid_env_value env_var=CANFAR_LOGLEVEL")
+    assert not result.stderr.lstrip().startswith("{")
+
+
+@pytest.mark.parametrize(
+    ("flag", "prefix"),
+    [(["-o", "json"], "{"), (["--output", "yaml"], "code:")],
+)
+def test_invalid_logging_environment_uses_leaf_output_format(
+    monkeypatch: pytest.MonkeyPatch,
+    flag: list[str],
+    prefix: str,
+) -> None:
+    """Setup failures use the selected leaf format, not the owning group."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(cli, ["config", "get", "console.width", *flag])
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.lstrip().startswith(prefix)
+
+
+def test_setup_failure_ignores_machine_option_after_command_delimiter(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Passthrough command arguments cannot change root setup diagnostics."""
+    monkeypatch.setenv("CANFAR_LOGLEVEL", "chatty")
+
+    result = runner.invoke(
+        cli,
+        [
+            "create",
+            "--dry-run",
+            "headless",
+            "example.invalid/image",
+            "--",
+            "echo",
+            "--output",
+            "json",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert result.stdout == ""
+    assert result.stderr.startswith("logging.invalid_env_value env_var=CANFAR_LOGLEVEL")
 
 
 def test_relative_log_file_creates_parents_without_contaminating_stdout(
@@ -417,7 +479,8 @@ def test_relative_log_file_creates_parents_without_contaminating_stdout(
             "config",
             "get",
             "console.width",
-            "--json",
+            "--output",
+            "json",
         ],
     )
 
@@ -430,14 +493,18 @@ def test_relative_log_file_creates_parents_without_contaminating_stdout(
 @pytest.mark.parametrize(("target", "directory"), [("-", False), ("logs", True)])
 @pytest.mark.parametrize(
     ("flag", "load"),
-    [(None, None), ("--json", json.loads), ("--yaml", yaml.safe_load)],
+    [
+        (None, None),
+        (["--output", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
 )
 def test_invalid_log_file_target_is_a_structured_setup_error(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     target: str,
     directory: bool,
-    flag: str | None,
+    flag: list[str] | None,
     load: Callable[[str], Any] | None,
 ) -> None:
     """Directory and pseudo-file targets fail at the existing setup boundary."""
@@ -446,7 +513,7 @@ def test_invalid_log_file_target_is_a_structured_setup_error(
         (tmp_path / target).mkdir()
     args = ["--log-file", target, "config", "get", "console.width"]
     if flag:
-        args.append(flag)
+        args.extend(flag)
 
     result = runner.invoke(cli, args)
 
@@ -461,18 +528,22 @@ def test_invalid_log_file_target_is_a_structured_setup_error(
 
 @pytest.mark.parametrize(
     ("flag", "load"),
-    [(None, None), ("--json", json.loads), ("--yaml", yaml.safe_load)],
+    [
+        (None, None),
+        (["--output", "json"], json.loads),
+        (["--output", "yaml"], yaml.safe_load),
+    ],
 )
 def test_log_file_initialization_failure_keeps_command_running(
     tmp_path: Path,
-    flag: str | None,
+    flag: list[str] | None,
     load: Callable[[str], Any] | None,
 ) -> None:
     """An unavailable sink emits one mode-aware structured warning."""
     log_file = tmp_path / "unavailable.jsonl"
     args = ["--log-file", str(log_file), "config", "get", "console.width"]
     if flag:
-        args.append(flag)
+        args.extend(flag)
 
     with patch(
         "logging.handlers.RotatingFileHandler.__init__",

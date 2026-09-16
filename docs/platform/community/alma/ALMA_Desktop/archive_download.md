@@ -1,4 +1,7 @@
 # Downloading from the ALMA archive (web)
 
-Instructions for downloading ALMA data via the web interface. For large downloads prefer scripted methods or transfer tools.
+The instructions for this task are now maintained in the guide below.
 
+[Stage ALMA archive data](../index.md#2-stage-the-archive-data).
+
+[Return to the ALMA workflow](../index.md).

@@ -6,14 +6,14 @@ ReadTimeout during streaming) are warning-logged alongside status errors.
 """
 
 import contextlib
+import logging
 from collections.abc import Generator
 
 import httpx
 
-from canfar import get_logger
 from canfar.utils.logging import safe_url
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 CONN_ERR_MSG = (
     "Failed to establish connection within the timeout period. "

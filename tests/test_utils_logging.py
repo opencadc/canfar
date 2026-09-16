@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from contextlib import ExitStack
+from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
 from unittest.mock import Mock, patch
 
@@ -29,16 +30,29 @@ if TYPE_CHECKING:
     from pathlib import Path
 
 
+def _emit_exception_log(logger: logging.Logger) -> None:
+    """Emit one exception record for the JSONL formatter contract."""
+    try:
+        json.loads("not-json")
+    except json.JSONDecodeError:
+        logger.exception("operation failed")
+
+
+def _clear_handlers() -> None:
+    """Release handlers through the stdlib logger boundary."""
+    logger = logging.getLogger(LOGGER_NAME)
+    for handler in logger.handlers[:]:
+        handler.close()
+        logger.removeHandler(handler)
+
+
 @pytest.fixture
 def canfar_logger() -> Generator[CanfarLogger]:
     """Fresh CanfarLogger cleaned after each test."""
     logger = CanfarLogger()
-    # Shared stdlib logger may already have handlers from earlier suite tests.
-    logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
+    _clear_handlers()
     yield logger
-    logger._cleanup_handlers()  # noqa: SLF001
-    logger._configured = False  # noqa: SLF001
+    _clear_handlers()
 
 
 def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
@@ -48,21 +62,45 @@ def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
     logger = canfar_logger.logger
     rich_handlers = [h for h in logger.handlers if isinstance(h, RichHandler)]
     assert logger.level == logging.INFO
-    assert rich_handlers
-    assert canfar_logger._rich_handler in rich_handlers  # noqa: SLF001
+    assert len(rich_handlers) == 1
     assert not logger.propagate
-    assert canfar_logger._configured  # noqa: SLF001
 
 
 def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
     """Reconfiguration replaces previous handlers."""
     canfar_logger.configure(loglevel=logging.INFO)
-    first = canfar_logger._rich_handler  # noqa: SLF001
+    first = next(
+        handler
+        for handler in canfar_logger.logger.handlers
+        if isinstance(handler, RichHandler)
+    )
     canfar_logger.configure(loglevel=logging.DEBUG)
-    assert canfar_logger._rich_handler is not None  # noqa: SLF001
-    assert canfar_logger._rich_handler is not first  # noqa: SLF001
-    assert canfar_logger._rich_handler in canfar_logger.logger.handlers  # noqa: SLF001
+    second = next(
+        handler
+        for handler in canfar_logger.logger.handlers
+        if isinstance(handler, RichHandler)
+    )
+    assert second is not first
     assert first not in canfar_logger.logger.handlers
+
+
+def test_separate_logger_lifecycles_do_not_accumulate_handlers(
+    tmp_path: Path,
+) -> None:
+    """Repeated application lifecycles leave one stderr/file sink pair."""
+    first = CanfarLogger()
+    second = CanfarLogger()
+    try:
+        first.configure(loglevel=logging.INFO, log_file=tmp_path / "first.jsonl")
+        second.configure(loglevel=logging.INFO, log_file=tmp_path / "second.jsonl")
+
+        logger = logging.getLogger(LOGGER_NAME)
+        assert len([h for h in logger.handlers if isinstance(h, RichHandler)]) == 1
+        files = [h for h in logger.handlers if isinstance(h, RotatingFileHandler)]
+        assert len(files) == 1
+        assert files[0].baseFilename.endswith("second.jsonl")
+    finally:
+        _clear_handlers()
 
 
 @pytest.mark.parametrize(
@@ -131,9 +169,23 @@ def test_jsonl_file_sink_writes_flat_events(
         assert event["message"] == "hello"
         assert set(event.keys()) == {"timestamp", "level", "logger", "message"}
     finally:
-        for handler in get_logger().handlers[:]:
-            handler.close()
-            get_logger().removeHandler(handler)
+        _clear_handlers()
+
+
+def test_jsonl_file_sink_includes_exception_text(tmp_path: Path) -> None:
+    """Exception diagnostics remain available as one escaped JSONL field."""
+    log_file = tmp_path / "exception.jsonl"
+    try:
+        configure_logging(loglevel="INFO", log_file=log_file)
+        _emit_exception_log(get_logger("jsonl"))
+        for handler in get_logger().handlers:
+            handler.flush()
+
+        event = json.loads(log_file.read_text(encoding="utf-8"))
+        assert "exception" in event
+        assert "JSONDecodeError" in event["exception"]
+    finally:
+        _clear_handlers()
 
 
 def test_jsonl_rotates_with_small_max_size(tmp_path: Path) -> None:
@@ -151,7 +203,7 @@ def test_jsonl_rotates_with_small_max_size(tmp_path: Path) -> None:
         assert log_file in files
         assert tmp_path / "rotating.jsonl.1" in files
     finally:
-        logger._cleanup_handlers()  # noqa: SLF001
+        _clear_handlers()
 
 
 @pytest.mark.parametrize("failure", ["write", "rollover"])
@@ -168,8 +220,13 @@ def test_file_sink_failure_keeps_stderr_and_warns_once(
         log_file=tmp_path / f"{failure}.jsonl",
         warning_writer=warning_writer,
     )
-    handler = logger._file_handler  # noqa: SLF001
-    assert handler is not None
+    handlers = [
+        candidate
+        for candidate in logger.logger.handlers
+        if isinstance(candidate, RotatingFileHandler)
+    ]
+    assert len(handlers) == 1
+    handler = handlers[0]
     try:
         with ExitStack() as stack:
             if failure == "write":
@@ -203,4 +260,4 @@ def test_file_sink_failure_keeps_stderr_and_warns_once(
             == ErrorCode.LOGGING_FILE_SINK_UNAVAILABLE.value
         )
     finally:
-        logger._cleanup_handlers()  # noqa: SLF001
+        _clear_handlers()

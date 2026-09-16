@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.events import events
+from canfar.cli.main import cli
 
 runner = CliRunner()
 
@@ -28,7 +28,7 @@ class TestEventsCLI:
         ]
         mock_session.events.return_value = mock_events
 
-        result = runner.invoke(events, ["session-id"])
+        result = runner.invoke(cli, ["events", "session-id"])
 
         assert result.exit_code == 0
         assert "Server events for session-id" in result.stdout
@@ -42,7 +42,7 @@ class TestEventsCLI:
         mock_session_cls.return_value.__aenter__.return_value = mock_session
         mock_session.events.return_value = []
 
-        result = runner.invoke(events, ["session-id"])
+        result = runner.invoke(cli, ["events", "session-id"])
 
         assert result.exit_code == 0
         assert "No events found" in result.stderr

@@ -1,5 +1,7 @@
 # Launching CARTA
 
-How to open CARTA in a Desktop session to visualize spectral cubes and images.
+The instructions for this task are now maintained in the guide below.
 
-In the Desktop session choose CARTA from the application menu or launch from a terminal if available. Use File -> Open to select files from your project space or VOSpace.
+[Open images and cubes in CARTA](../../../sessions/carta.md).
+
+[Return to the ALMA workflow](../index.md).

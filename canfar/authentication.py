@@ -2,18 +2,30 @@
 
 from __future__ import annotations
 
+import asyncio
+import sys
 from typing import TYPE_CHECKING, NoReturn
 
+import httpx
+
 import canfar.server as server_service
+from canfar.auth import oidc
 from canfar.errors import ErrorCode, StructuredError
 from canfar.idp import IdpInfo, get_idp
 from canfar.models.auth import (
     Authentication,
     AuthenticationCredential,
     AuthMode,
+    DeviceAuthorization,
+    OIDCCredential,
     X509Credential,
 )
-from canfar.models.config import Configuration
+from canfar.models.config import (
+    Configuration,
+    default_active,
+    default_authentication,
+    default_servers,
+)
 
 if TYPE_CHECKING:
     import builtins
@@ -33,6 +45,15 @@ class AuthenticationError(Exception):
         """
         self.error = StructuredError.model_validate(error)
         super().__init__(self.error.message)
+
+
+_OIDC_DEVICE_LOGIN_ERRORS = (
+    PermissionError,
+    TimeoutError,
+    TypeError,
+    ValueError,
+    httpx.HTTPError,
+)
 
 
 def _authentication_error(
@@ -78,9 +99,42 @@ def login(idp: str, force: bool = False) -> None:
         return
 
     credential = _authenticate(idp_info)
-    config.upsert_credential(credential)
+    config.editor.set(f"authentication.{credential.idp}", credential)
     server_service.discover(idp, config=config, save=False)
-    config.save()
+    config.editor.save()
+
+
+async def alogin(idp: str, force: bool = False) -> None:
+    """Authenticate an IDP from an existing asynchronous event loop.
+
+    The OIDC protocol uses native asynchronous HTTP and polling. Synchronous
+    X.509 inspection and Science Platform discovery run in worker threads so
+    this API does not block the caller's event loop.
+
+    Args:
+        idp: Canonical Identity Provider key.
+        force: Re-authenticate and rediscover when true.
+
+    Raises:
+        KeyError: Unknown IDP key.
+        AuthenticationError: Credential or discovery failure.
+    """
+    idp_info = get_idp(idp)
+    config = Configuration()  # ty: ignore[missing-argument]
+
+    if _has_authentication(config, idp) and not force:
+        return
+
+    credential = await _authenticate_async(idp_info)
+    editor = config.editor
+    editor.set(f"authentication.{credential.idp}", credential)
+    await asyncio.to_thread(
+        server_service.discover,
+        idp,
+        config=config,
+        save=False,
+    )
+    await asyncio.to_thread(editor.save)
 
 
 def use(idp: str) -> None:
@@ -99,7 +153,7 @@ def use(idp: str) -> None:
     config = Configuration()  # ty: ignore[missing-argument]
 
     try:
-        config.get_credential(idp)
+        _authentication_record(config, idp)
     except KeyError as exc:
         raise _authentication_error(
             code=ErrorCode.AUTHENTICATION_REQUIRED,
@@ -107,8 +161,7 @@ def use(idp: str) -> None:
             hint="Run canfar.login() for this IDP before selecting it.",
         ) from exc
 
-    config.set_active_authentication(idp)
-    config.save()
+    server_service.activate_authentication(idp, config=config)
 
 
 def list() -> builtins.list[Authentication]:  # noqa: A001
@@ -152,8 +205,7 @@ def remove(idp: str, *, force: bool = False) -> None:
             hint="Use --force or switch authentication before removing.",
         )
 
-    config.remove_authentication(idp)
-    config.save()
+    _remove_authentication(config, idp)
 
 
 def purge(*, force: bool = False) -> None:
@@ -175,8 +227,7 @@ def purge(*, force: bool = False) -> None:
         )
 
     config = Configuration()  # ty: ignore[missing-argument]
-    config.purge_authentication()
-    config.save()
+    _purge_authentication(config)
 
 
 def show() -> Authentication:
@@ -190,7 +241,7 @@ def show() -> Authentication:
     """
     config = Configuration()  # ty: ignore[missing-argument]
     try:
-        credential = config.get_credential(config.active.authentication)
+        credential = _authentication_record(config, config.active.authentication)
     except KeyError as exc:
         raise _authentication_error(
             code=ErrorCode.AUTHENTICATION_REQUIRED,
@@ -208,6 +259,71 @@ def _has_authentication(config: Configuration, idp: str) -> bool:
     return idp in config.authentication
 
 
+def _authentication_record(
+    config: Configuration,
+    idp: str,
+) -> AuthenticationCredential:
+    """Return a saved Authentication Record by its IDP key."""
+    try:
+        return config.authentication[idp]
+    except KeyError as exc:
+        msg = f"Authentication record for IDP '{idp}' not found."
+        raise KeyError(msg) from exc
+
+
+def _remove_authentication(config: Configuration, idp: str) -> None:
+    """Remove one Authentication Record and its associated Server state."""
+    authentication = dict(config.authentication)
+    authentication.pop(idp, None)
+    if not authentication:
+        _purge_authentication(config)
+        return
+
+    servers = {
+        name: server for name, server in config.servers.items() if server.idp != idp
+    }
+    selections = {
+        selected_idp: name
+        for selected_idp, name in config.active.servers.items()
+        if selected_idp != idp and name in servers
+    }
+    active = config.active.model_copy(update={"servers": selections})
+    if active.authentication == idp:
+        active = active.model_copy(
+            update={
+                "authentication": next(iter(authentication)),
+                "server": None,
+            },
+        )
+    elif active.server not in servers:
+        active = active.model_copy(update={"server": None})
+
+    editor = config.editor
+    editor._set_top_level(  # noqa: SLF001
+        active=active,
+        authentication=authentication,
+        servers=servers,
+    )
+    editor.save()
+
+
+def _purge_authentication(config: Configuration) -> None:
+    """Reset Authentication and Server state while preserving other settings."""
+    editor = config.editor
+    editor._set_top_level(  # noqa: SLF001
+        active=default_active.model_copy(deep=True),
+        authentication={
+            key: credential.model_copy(deep=True)
+            for key, credential in default_authentication.items()
+        },
+        servers={
+            name: server.model_copy(deep=True)
+            for name, server in default_servers.items()
+        },
+    )
+    editor.save()
+
+
 def _authentication_for_credential(
     config: Configuration,
     credential: AuthenticationCredential,
@@ -218,7 +334,7 @@ def _authentication_for_credential(
 
     if active and config.active.server is not None:
         try:
-            server = config.get_active_server()
+            server = config.servers[config.active.server]
         except KeyError:
             server_ref = config.active.server
         else:
@@ -245,10 +361,15 @@ def _credential_expiry(credential: AuthenticationCredential) -> float | None:
 
 def _authenticate(idp_info: IdpInfo) -> AuthenticationCredential:
     if idp_info.auth_mode == "x509":
-        credential = _authenticate_x509(idp_info.key)
-    else:
-        _authenticate_oidc(idp_info.key)
-    return credential
+        return _authenticate_x509(idp_info.key)
+    return _authenticate_oidc(idp_info)
+
+
+async def _authenticate_async(idp_info: IdpInfo) -> AuthenticationCredential:
+    """Acquire one Authentication Record without blocking an event loop."""
+    if idp_info.auth_mode == "x509":
+        return await asyncio.to_thread(_authenticate_x509, idp_info.key)
+    return await _authenticate_oidc_async(idp_info)
 
 
 def _authenticate_x509(idp: str) -> X509Credential:
@@ -270,18 +391,60 @@ def _authenticate_x509(idp: str) -> X509Credential:
     )
 
 
-def _authenticate_oidc(idp: str) -> NoReturn:
-    _fail(
-        code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-        message=f"OIDC authentication for IDP '{idp}' requires interactive login.",
-        hint="Use the CLI login flow for first-time OIDC authentication.",
+def _print_device_challenge(challenge: DeviceAuthorization) -> None:
+    """Print only user-facing device authorization data to the terminal."""
+    lines = [f"Verification URL: {challenge.verification_uri}"]
+    if challenge.verification_uri_complete is not None:
+        lines.append(
+            f"Verification URL (complete): {challenge.verification_uri_complete}"
+        )
+    lines.append(f"Device code: {challenge.user_code.get_secret_value()}")
+    sys.stdout.write(
+        "\n".join(lines) + "\n",
     )
+    sys.stdout.flush()
+
+
+def _raise_oidc_authentication_error(exc: Exception) -> NoReturn:
+    """Translate an OIDC device-login failure into a structured error."""
+    raise _authentication_error(
+        code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+        message=f"OIDC authentication failed: {exc}",
+        hint="Complete the device authorization before it expires.",
+    ) from exc
+
+
+def _authenticate_oidc(info: IdpInfo) -> OIDCCredential:
+    """Acquire one OIDC Authentication Record with native sync I/O."""
+    credential = oidc.credential_from_idp(info)
+    try:
+        return oidc.sync_authenticate_credential(
+            credential,
+            expected_issuer=str(info.oidc_issuer),
+            on_challenge=_print_device_challenge,
+        )
+    except _OIDC_DEVICE_LOGIN_ERRORS as exc:
+        return _raise_oidc_authentication_error(exc)
+
+
+async def _authenticate_oidc_async(info: IdpInfo) -> OIDCCredential:
+    """Acquire one OIDC Authentication Record with native async I/O."""
+    credential = oidc.credential_from_idp(info)
+    try:
+        return await oidc.authenticate_credential(
+            credential,
+            expected_issuer=str(info.oidc_issuer),
+            on_challenge=_print_device_challenge,
+        )
+    except _OIDC_DEVICE_LOGIN_ERRORS as exc:
+        return _raise_oidc_authentication_error(exc)
 
 
 __all__ = [
     "AuthMode",
     "Authentication",
     "AuthenticationError",
+    "alogin",
     "list",
     "login",
     "purge",

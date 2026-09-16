@@ -15,25 +15,18 @@ from rich.table import Table
 
 from canfar.cli import output
 from canfar.cli._run import run
-from canfar.cli.machine import JsonOption, YamlOption, resolve_mode
+from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.typer.aliases import AliasGroup
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
-from canfar.utils.console import get_console
+from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typing import NoReturn
 
     from canfar.errors import StructuredError
-
-ps = typer.Typer(
-    name="ps",
-    no_args_is_help=False,
-    cls=AliasGroup,
-)
 
 
 async def _fetch_sessions(
@@ -156,12 +149,11 @@ def _render_human_sessions(
             get_console(stderr=True).print(f"[dim]- {message}[/dim]")
 
 
-@ps.callback(invoke_without_command=True)
 def show(
     everything: Annotated[
         bool,
         typer.Option(
-            "--all", "-a", help="Show all sessions (default shows just running)."
+            "--all", "-a", help="Show all sessions (default shows Pending and Running)."
         ),
     ] = False,
     quiet: Annotated[
@@ -195,16 +187,17 @@ def show(
             help="Show Session response warnings.",
         ),
     ] = False,
-    json_output: JsonOption = False,
-    yaml_output: YamlOption = False,
+    output_format: OutputOption = None,
 ) -> None:
     """Show sessions."""
-    mode = resolve_mode(json_output, yaml_output)
+    mode = resolve_mode(output_format)
+    if mode is output.OutputMode.HUMAN:
+        emit_cli_active_server_banner()
 
     if quiet and mode is not output.OutputMode.HUMAN:
         typer.echo(
             "Incompatible flags: --quiet is human-only and cannot be used with "
-            "--json or --yaml.",
+            "--output json or --output yaml.",
             err=True,
         )
         raise typer.Exit(output.OUTPUT_CONFLICT_EXIT_CODE)

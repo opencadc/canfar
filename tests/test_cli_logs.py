@@ -6,7 +6,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 from typer.testing import CliRunner
 
-from canfar.cli.logs import logs
+from canfar.cli.main import cli
 
 runner = CliRunner()
 
@@ -22,7 +22,7 @@ def test_logs_outputs_logs_and_empty_message() -> None:
     with patch("canfar.cli.logs.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.logs.return_value = {"abc": "hello\nworld"}
-        result = runner.invoke(logs, ["abc"])
+        result = runner.invoke(cli, ["logs", "abc"])
 
     assert result.exit_code == 0
     assert "Logs for session abc" in result.stdout
@@ -31,7 +31,7 @@ def test_logs_outputs_logs_and_empty_message() -> None:
     with patch("canfar.cli.logs.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.logs.return_value = {}
-        result = runner.invoke(logs, ["abc"])
+        result = runner.invoke(cli, ["logs", "abc"])
 
     assert result.exit_code == 0
     assert "No logs found" in result.stderr
@@ -42,7 +42,7 @@ def test_logs_reports_fetch_error() -> None:
     with patch("canfar.cli.logs.AsyncSession") as session_cls:
         session = _mock_async_session(session_cls)
         session.logs.side_effect = RuntimeError("boom")
-        result = runner.invoke(logs, ["abc"])
+        result = runner.invoke(cli, ["logs", "abc"])
 
     assert result.exit_code == 1
     assert "Could not fetch logs" not in result.stdout

@@ -3,9 +3,7 @@
 import pytest
 from typer.testing import CliRunner
 
-from canfar.cli.version import (
-    version,
-)
+from canfar.cli.main import cli
 
 
 class TestVersionCLI:
@@ -18,14 +16,14 @@ class TestVersionCLI:
 
     def test_version_simple_output(self, runner: CliRunner) -> None:
         """Test simple version output without debug flag."""
-        result = runner.invoke(version, [])
+        result = runner.invoke(cli, ["version"])
 
         assert result.exit_code == 0
         assert "CANFAR Python Client" in result.stdout
 
     def test_version_debug_output(self, runner: CliRunner) -> None:
         """Test detailed debug output with --debug flag."""
-        result = runner.invoke(version, ["--debug"])
+        result = runner.invoke(cli, ["version", "--debug"])
         assert result.exit_code == 0
         assert "CANFAR Python Client Debug Information" in result.stdout
         assert "Client Version" in result.stdout

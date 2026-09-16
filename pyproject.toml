@@ -61,20 +61,17 @@ dependencies = [
     "typer>=0.16.0",
     "vosfs @ git+https://github.com/shinybrar/vosfs@v0.8.0",
     "fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.7.0#subdirectory=src/fsspec-cli",
+    "cryptography>=42.0.0",
 ]
 
-[tool.uv]
 [dependency-groups]
 dev = [
-    "ipython>=8.37.0",
     "pre-commit>=4.2.0",
     "pytest>=8.3.5",
     "pytest-asyncio>=1.0.0",
     "pytest-cov>=6.1.1",
-    "pytest-order>=1.3.0",
     "pytest-xdist>=3.7.0",
     "ruff>=0.11.11",
-    "tomli>=2.0.1; python_version < '3.11'",
     "ty>=0.0.51",
 ]
 docs = [
@@ -99,7 +96,6 @@ canfar = "canfar.cli.main:main"
 # Ruff configuration - handles formatting, linting, and import sorting
 [tool.ruff]
 target-version = "py39"
-line-length = 88
 exclude = [
     ".bzr",
     ".direnv",
@@ -223,16 +219,9 @@ convention = "google"
 max-args = 8
 
 [tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
 docstring-code-format = true
-docstring-code-line-length = "dynamic"
 
 # ty configuration (replaces mypy)
-[tool.ty]
-
 [tool.ty.rules]
 unused-ignore-comment = "ignore"
 
@@ -256,7 +245,6 @@ addopts = [
     "--cov-report=xml",
     "--cov-fail-under=75",
     "-n=auto",  # Enable parallel execution with pytest-xdist
-    "--dist=loadfile",  # Use loadfile distribution to ensure tests in same file run in same worker (required for pytest-order)
 ]
 testpaths = ["tests"]
 asyncio_mode = "auto"
@@ -264,7 +252,6 @@ markers = [
     "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
     "unit: marks tests as unit tests",
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "order: marks tests that need to run in a specific order (will run sequentially)",
 ]
 filterwarnings = [
     "error",
@@ -296,37 +283,16 @@ exclude_lines = [
     "pass",
     "@(abc\\.)?abstractmethod",
     "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-    "raise NotImplementedError",
     "if 0:",
     "if False:",
-    "if TYPE_CHECKING:",
 ]
 show_missing = true
-skip_covered = false
 precision = 2
-
-[tool.coverage.html]
-directory = "htmlcov"
-
-[tool.coverage.xml]
-output = "coverage.xml"
 
 [tool.interrogate]
 ignore-init-method = true
-ignore-init-module = false
-ignore-magic = false
-ignore-semiprivate = false
-ignore-private = false
-ignore-property-decorators = false
-ignore-module = false
-ignore-nested-functions = false
 ignore-nested-classes = true
-ignore-setters = false
 fail-under = 80
 exclude = ["setup.py", "docs", "build"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
 verbose = 3
-quiet = false
-whitelist-regex = []
-color = true

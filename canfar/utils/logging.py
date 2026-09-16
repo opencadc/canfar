@@ -200,11 +200,9 @@ def _resolve_log_level(
 class CanfarLogger:
     """Configure stdlib logging for the CANFAR logger name."""
 
-    _configured = False
-    _rich_handler: RichHandler | None = None
-
     def __init__(self) -> None:
         """Initialize per-instance file-handler state."""
+        self._rich_handler: RichHandler | None = None
         self._file_handler: logging.handlers.RotatingFileHandler | None = None
 
     @property
@@ -223,8 +221,7 @@ class CanfarLogger:
         target = _resolve_log_file_path(log_file) if log_file is not None else None
         with _LOCK:
             install_rich_traceback(show_locals=False, suppress=[])
-            if self._configured:
-                self._cleanup_handlers()
+            self._cleanup_handlers()
             if isinstance(loglevel, str):
                 loglevel = getattr(logging, loglevel.upper())
             logger = self.logger
@@ -251,7 +248,6 @@ class CanfarLogger:
                 )
 
             logger.propagate = False
-            self._configured = True
 
     def _setup_file_logging(
         self,

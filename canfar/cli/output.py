@@ -37,20 +37,6 @@ class OutputMode(str, Enum):
     YAML = "yaml"
 
 
-def _serialize_payload(data: Any) -> Any:
-    """Convert supported payload types into JSON-compatible values.
-
-    Args:
-        data: Domain model, model list, or plain serializable value.
-
-    Returns:
-        JSON-compatible structure ready for rendering.
-    """
-    if isinstance(data, list):
-        return [to_jsonable_python(item) for item in data]
-    return to_jsonable_python(data)
-
-
 def render_stdout(data: Any, mode: OutputMode) -> str:
     """Render command data for stdout in the selected output mode.
 
@@ -65,7 +51,7 @@ def render_stdout(data: Any, mode: OutputMode) -> str:
     if mode is OutputMode.HUMAN:
         return ""
 
-    payload = _serialize_payload(data)
+    payload = to_jsonable_python(data)
     if mode is OutputMode.JSON:
         return json.dumps(payload, indent=2) + "\n"
     return yaml.safe_dump(payload, sort_keys=False)

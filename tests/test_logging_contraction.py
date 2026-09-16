@@ -15,7 +15,6 @@ _HELP_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dum
     "command",
     [
         ["login"],
-        ["auth", "login"],
         ["delete"],
         ["events"],
         ["logs"],

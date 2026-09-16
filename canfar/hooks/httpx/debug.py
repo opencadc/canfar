@@ -5,12 +5,10 @@ from __future__ import annotations
 import logging
 from typing import TYPE_CHECKING
 
-from canfar import get_logger
-
 if TYPE_CHECKING:
     import httpx
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 
 
 def request(req: httpx.Request) -> None:

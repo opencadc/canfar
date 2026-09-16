@@ -3,32 +3,46 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import socket
 import time
 from collections.abc import Awaitable, Callable, Generator
 from contextlib import contextmanager
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, NoReturn, cast
 
 import httpx
 from authlib.integrations.base_client.errors import OAuthError
 from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
 from pydantic import SecretStr, ValidationError
 
-from canfar import get_logger
-from canfar.models.auth import DeviceAuthorization, Expiry, OIDCCredential, Token
+from canfar.models.auth import (
+    Client,
+    DeviceAuthorization,
+    Endpoint,
+    Expiry,
+    OIDCCredential,
+    Token,
+)
 
 if TYPE_CHECKING:
-    from authlib.integrations.httpx_client import AsyncOAuth2Client
+    from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 
+    from canfar.idp import IdpInfo
     from canfar.models.config import Configuration
 
-log = get_logger(__name__)
+log = logging.getLogger(__name__)
 _BASIC_AUTH_METHOD = "client_secret_basic"
+_OIDC_SCOPE = "openid profile email offline_access"
 
 DeviceFlow = Callable[
     [str, str, str, str, "AsyncOAuth2Client"],
     Awaitable[dict[str, Any]],
 ]
+SyncDeviceFlow = Callable[
+    [str, str, str, str, "OAuth2Client"],
+    dict[str, Any],
+]
+ChallengePresenter = Callable[[DeviceAuthorization], None]
 
 
 class AuthPendingError(Exception):
@@ -39,34 +53,26 @@ class SlowDownError(Exception):
     """Exception raised when the client should slow down its requests."""
 
 
-async def discover(
-    url: str,
-    client: httpx.AsyncClient | None = None,
-    *,
-    expected_issuer: str,
-) -> dict[str, Any]:
-    """Discover OIDC provider configuration.
+def credential_from_idp(info: IdpInfo) -> OIDCCredential:
+    """Initialize an OIDC Authentication Record from trusted IDP metadata."""
+    if info.oidc_discovery_url is None:
+        msg = f"OIDC discovery URL is not configured for IDP '{info.key}'."
+        raise RuntimeError(msg)
+    if info.oidc_issuer is None:
+        msg = f"OIDC issuer is not configured for IDP '{info.key}'."
+        raise RuntimeError(msg)
+    return OIDCCredential(
+        idp=info.key,
+        endpoints=Endpoint(discovery=str(info.oidc_discovery_url)),
+        client=Client(),
+        token=Token(),
+        expiry=Expiry(),
+    )
 
-    Args:
-        url (str): OIDC Discovery URL.
-        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
-            If None, creates a new one. Defaults to None.
-        expected_issuer: Exact issuer configured for the Identity Provider.
 
-    Returns:
-        dict[str, Any]: OIDC provider configuration.
-    """
-    if client is None:
-        async with httpx.AsyncClient() as http_client:
-            response = await http_client.get(url)
-            response.raise_for_status()
-            data: dict[str, Any] = response.json()
-    else:
-        response = await client.get(url)
-        response.raise_for_status()
-        data = response.json()
-
-    if data.get("issuer") != expected_issuer:
+def _validate_discovery_data(data: Any, expected_issuer: str) -> dict[str, Any]:
+    """Validate OIDC Identity Provider metadata shared by discovery paths."""
+    if not isinstance(data, dict) or data.get("issuer") != expected_issuer:
         msg = "OIDC discovery issuer mismatch"
         raise ValueError(msg)
 
@@ -80,13 +86,177 @@ async def discover(
     if missing:
         msg = f"OIDC discovery missing required metadata: {', '.join(missing)}"
         raise ValueError(msg)
+    return data
 
+
+def _registration_payload() -> dict[str, Any]:
+    """Build the dynamic registration request shared by both transports."""
+    hostname = socket.gethostname()
+    date = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
+    return {
+        "client_name": f"Science Platform CLI @ {hostname} {date}",
+        "grant_types": [
+            "urn:ietf:params:oauth:grant-type:device_code",
+            "refresh_token",
+        ],
+        "response_types": ["token"],
+        "token_endpoint_auth_method": _BASIC_AUTH_METHOD,
+        "scope": _OIDC_SCOPE,
+    }
+
+
+def _device_authorization_payload(identity: str) -> dict[str, str]:
+    """Build the device authorization request shared by both transports."""
+    return {"client_id": identity, "scope": _OIDC_SCOPE}
+
+
+def _parse_device_authorization(response: httpx.Response) -> DeviceAuthorization:
+    """Parse one OIDC Identity Provider challenge without exposing secrets."""
+    try:
+        return DeviceAuthorization.model_validate(response.json())
+    except ValidationError:
+        msg = "Invalid OIDC device authorization response"
+        raise ValueError(msg) from None
+
+
+def _raise_poll_oauth_error(error: OAuthError) -> NoReturn:
+    """Translate an OAuth device-poll error into the public protocol errors."""
+    if error.error == "authorization_pending":
+        raise AuthPendingError from None
+    if error.error == "slow_down":
+        raise SlowDownError from None
+    if error.error == "access_denied":
+        msg = "OIDC device authorization was denied"
+        raise PermissionError(msg) from None
+    if error.error == "expired_token":
+        msg = "OIDC device authorization expired"
+        raise TimeoutError(msg) from None
+    msg = "OIDC device authorization failed"
+    raise ValueError(msg) from None
+
+
+def _validate_poll_token(token: Any) -> dict[str, Any]:
+    """Validate one successful device token response."""
+    if not isinstance(token, dict) or "access_token" not in token:
+        msg = "OIDC device authorization failed: malformed token response"
+        raise ValueError(msg)
+    return token
+
+
+def _install_tokens(credential: OIDCCredential, tokens: dict[str, Any]) -> None:
+    """Install validated token data on a credential for both auth paths."""
+    try:
+        token = Token(
+            access=tokens["access_token"],
+            refresh=tokens.get("refresh_token"),
+            token_type=tokens.get("token_type"),
+            scope=tokens.get("scope"),
+        )
+        expiry = Expiry(access=tokens.get("expires_at"), refresh=None)
+    except (KeyError, TypeError, ValidationError):
+        msg = "OIDC device authorization failed: malformed token response"
+        raise ValueError(msg) from None
+    credential.token, credential.expiry = token, expiry
+
+
+def _client_credentials(device: Any) -> tuple[str, str]:
+    """Extract a dynamic client pair without exposing Identity Provider data."""
+    if not isinstance(device, dict):
+        msg = "OIDC device authorization failed: malformed client response"
+        raise TypeError(msg)
+    try:
+        identity = device["client_id"]
+        secret = device["client_secret"]
+    except KeyError:
+        msg = "OIDC device authorization failed: malformed client response"
+        raise ValueError(msg) from None
+    if not isinstance(identity, str) or not isinstance(secret, str):
+        msg = "OIDC device authorization failed: malformed client response"
+        raise TypeError(msg)
+    return identity, secret
+
+
+def _userinfo_headers(credential: OIDCCredential) -> dict[str, str]:
+    """Build the bearer header for the post-login UserInfo request."""
+    access = credential.token.access
+    return {"Authorization": f"Bearer {access.get_secret_value() if access else ''}"}
+
+
+def _userinfo_username(response: httpx.Response) -> str | None:
+    """Validate UserInfo and return its optional display identifier."""
+    response.raise_for_status()
+    return response.json().get("preferred_username")
+
+
+def _apply_discovery(
+    credential: OIDCCredential,
+    discovery: dict[str, Any],
+) -> None:
+    """Apply discovered Identity Provider endpoints and log their values."""
+    credential.endpoints.device = discovery["device_authorization_endpoint"]
+    credential.endpoints.registration = discovery["registration_endpoint"]
+    credential.endpoints.token = discovery["token_endpoint"]
+    log.debug("Discovered OIDC configuration:")
+    log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
+    log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
+    log.debug("Token Endpoint: %s", credential.endpoints.token)
+
+
+def _install_client_credentials(
+    credential: OIDCCredential,
+    device: Any,
+) -> tuple[str, str]:
+    """Install registered client credentials and return their values."""
+    identity, secret = _client_credentials(device)
+    credential.client.identity = identity
+    credential.client.secret = SecretStr(secret)
+    return identity, secret
+
+
+def _finalize_authentication(
+    response: httpx.Response,
+    on_authenticated: Callable[[str | None], None] | None,
+) -> None:
+    """Validate UserInfo and notify observers of the authenticated username."""
+    username = _userinfo_username(response)
+    if on_authenticated is not None:
+        on_authenticated(username)
+
+
+async def discover(
+    url: str,
+    client: httpx.AsyncClient | None = None,
+    *,
+    expected_issuer: str,
+) -> dict[str, Any]:
+    """Discover OIDC Identity Provider configuration.
+
+    Args:
+        url (str): OIDC Discovery URL.
+        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+            If None, creates a new one. Defaults to None.
+        expected_issuer: Exact issuer configured for the Identity Provider.
+
+    Returns:
+        dict[str, Any]: OIDC Identity Provider configuration.
+    """
+    if client is None:
+        async with httpx.AsyncClient() as http_client:
+            response = await http_client.get(url)
+            response.raise_for_status()
+            data: dict[str, Any] = response.json()
+    else:
+        response = await client.get(url)
+        response.raise_for_status()
+        data = response.json()
+
+    data = _validate_discovery_data(data, expected_issuer)
     log.debug("OIDC Discovery Data: %s", data)
     return data
 
 
 async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[str, Any]:
-    """Register a new client with the OIDC provider.
+    """Register a new client with the OIDC Identity Provider.
 
     Args:
         url (str): OIDC Registration URL.
@@ -96,18 +266,7 @@ async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[st
     Returns:
         dict[str, Any]: Client registration details.
     """
-    hostname = socket.gethostname()
-    date = time.strftime("%Y-%m-%d %H:%M", time.gmtime())
-    payload: dict[str, Any] = {
-        "client_name": f"Science Platform CLI @ {hostname} {date}",
-        "grant_types": [
-            "urn:ietf:params:oauth:grant-type:device_code",
-            "refresh_token",
-        ],
-        "response_types": ["token"],
-        "token_endpoint_auth_method": "client_secret_basic",
-        "scope": "openid profile email offline_access",
-    }
+    payload = _registration_payload()
 
     if client is None:
         async with httpx.AsyncClient() as http:
@@ -146,28 +305,14 @@ async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[st
             device_code=code,
         )
     except OAuthError as error:
-        if error.error == "authorization_pending":
-            raise AuthPendingError from None
-        if error.error == "slow_down":
-            raise SlowDownError from None
-        if error.error == "access_denied":
-            msg = "OIDC device authorization was denied"
-            raise PermissionError(msg) from None
-        if error.error == "expired_token":
-            msg = "OIDC device authorization expired"
-            raise TimeoutError(msg) from None
-        msg = "OIDC device authorization failed"
-        raise ValueError(msg) from None
+        _raise_poll_oauth_error(error)
     except httpx.HTTPStatusError:
         msg = "OIDC device authorization failed"
         raise ValueError(msg) from None
     except ValueError:
         msg = "OIDC device authorization failed: malformed token response"
         raise ValueError(msg) from None
-    if not isinstance(token, dict) or "access_token" not in token:
-        msg = "OIDC device authorization failed: malformed token response"
-        raise ValueError(msg)
-    return token
+    return _validate_poll_token(token)
 
 
 @contextmanager
@@ -249,10 +394,13 @@ def _persist(
         raise ValueError(msg) from None
 
     updated = credential.model_copy(update={"token": token, "expiry": expiry})
+    if credential.idp not in config.authentication:
+        msg = f"Authentication record for IDP '{credential.idp}' not found."
+        raise KeyError(msg)
     candidate = config.model_copy(deep=True)
-    candidate.update_credential(updated)
-    candidate.save()
-    config.update_credential(updated)
+    candidate.editor.set(f"authentication.{updated.idp}", updated)
+    candidate.editor.save()
+    config.editor.set(f"authentication.{updated.idp}", updated)
     return updated
 
 
@@ -330,6 +478,8 @@ async def authflow(
     identity: str,
     secret: str,
     client: AsyncOAuth2Client | None = None,
+    *,
+    on_challenge: ChallengePresenter | None = None,
 ) -> dict[str, Any]:
     """OIDC Authorization Flow.
 
@@ -340,6 +490,7 @@ async def authflow(
         secret (str): Client secret.
         client: Optional Authlib async OAuth client.
             If None, creates a new one. Defaults to None.
+        on_challenge: Optional callback invoked after device authorization.
 
     Returns:
         dict[str, Any]: OIDC tokens including access and refresh tokens.
@@ -355,7 +506,12 @@ async def authflow(
             token_endpoint_auth_method=_BASIC_AUTH_METHOD,
         ) as http_client:
             return await _authflow_impl(
-                device_auth_url, token_url, identity, secret, http_client
+                device_auth_url,
+                token_url,
+                identity,
+                secret,
+                http_client,
+                on_challenge=on_challenge,
             )
     else:
         return await _authflow_impl(
@@ -364,6 +520,7 @@ async def authflow(
             identity,
             secret,
             client,
+            on_challenge=on_challenge,
         )
 
 
@@ -386,18 +543,11 @@ async def start_device_authorization(
     """
     response = await client.post(
         url,
-        data={
-            "client_id": identity,
-            "scope": "openid profile email offline_access",
-        },
+        data=_device_authorization_payload(identity),
         auth=(identity, secret),
     )
     response.raise_for_status()
-    try:
-        challenge = DeviceAuthorization.model_validate(response.json())
-    except ValidationError:
-        msg = "Invalid OIDC device authorization response"
-        raise ValueError(msg) from None
+    challenge = _parse_device_authorization(response)
     log.debug("OIDC device authorization challenge received")
     return challenge
 
@@ -474,6 +624,8 @@ async def _authflow_impl(
     identity: str,
     secret: str,
     client: AsyncOAuth2Client,
+    *,
+    on_challenge: ChallengePresenter | None = None,
 ) -> dict[str, Any]:
     """Implementation of the auth flow with an existing client.
 
@@ -483,6 +635,7 @@ async def _authflow_impl(
         identity (str): Client identity.
         secret (str): Client secret.
         client: Authlib async OAuth client.
+        on_challenge: Optional callback invoked after device authorization.
 
     Returns:
         dict[str, Any]: OIDC tokens including access and refresh tokens.
@@ -496,6 +649,8 @@ async def _authflow_impl(
         secret,
         client,
     )
+    if on_challenge is not None:
+        on_challenge(challenge)
 
     return await poll_device_token(token_url, challenge, client)
 
@@ -506,6 +661,7 @@ async def authenticate_credential(
     expected_issuer: str,
     timeout: int | None = None,
     device_flow: DeviceFlow | None = None,
+    on_challenge: ChallengePresenter | None = None,
     on_authenticated: Callable[[str | None], None] | None = None,
 ) -> OIDCCredential:
     """Authenticate using OIDC Device Authorization Flow.
@@ -516,6 +672,8 @@ async def authenticate_credential(
         timeout: HTTP timeout in seconds for OIDC HTTP requests.
         device_flow: Device authorization coordinator. Defaults to the
             presentation-free protocol flow.
+        on_challenge: Optional callback invoked by the default protocol flow
+            after device authorization.
         on_authenticated: Optional observer for the authenticated username.
 
     Returns:
@@ -533,21 +691,12 @@ async def authenticate_credential(
             client,
             expected_issuer=expected_issuer,
         )
-        credential.endpoints.device = response["device_authorization_endpoint"]
-        credential.endpoints.registration = response["registration_endpoint"]
-        credential.endpoints.token = response["token_endpoint"]
-
-        log.debug("Discovered OIDC configuration:")
-        log.debug("Device Registration Endpoint: %s", credential.endpoints.registration)
-        log.debug("Device Authorization Endpoint: %s", credential.endpoints.device)
-        log.debug("Token Endpoint: %s", credential.endpoints.token)
+        _apply_discovery(credential, response)
 
         device: dict[str, Any] = await register(
             str(credential.endpoints.registration), client
         )
-        credential.client.identity = device["client_id"]
-        client_secret = device["client_secret"]
-        credential.client.secret = SecretStr(client_secret)
+        identity, client_secret = _install_client_credentials(credential, device)
 
         from authlib.integrations.httpx_client import (  # noqa: PLC0415
             AsyncOAuth2Client,
@@ -555,52 +704,243 @@ async def authenticate_credential(
 
         if request_timeout is None:
             oauth_context = AsyncOAuth2Client(
-                credential.client.identity,
+                identity,
                 client_secret,
                 token_endpoint_auth_method=_BASIC_AUTH_METHOD,
             )
         else:
             oauth_context = AsyncOAuth2Client(
-                credential.client.identity,
+                identity,
                 client_secret,
                 token_endpoint_auth_method=_BASIC_AUTH_METHOD,
                 timeout=request_timeout,
             )
 
         async with oauth_context as oauth_client:
-            authorize = device_flow or authflow
-            tokens = await authorize(
-                str(credential.endpoints.device),
-                str(credential.endpoints.token),
-                str(credential.client.identity),
-                client_secret,
-                oauth_client,
-            )
+            if device_flow is None:
+                tokens = await authflow(
+                    str(credential.endpoints.device),
+                    str(credential.endpoints.token),
+                    identity,
+                    client_secret,
+                    oauth_client,
+                    on_challenge=on_challenge,
+                )
+            else:
+                tokens = await device_flow(
+                    str(credential.endpoints.device),
+                    str(credential.endpoints.token),
+                    identity,
+                    client_secret,
+                    oauth_client,
+                )
 
-        try:
-            token = Token(
-                access=tokens["access_token"],
-                refresh=tokens.get("refresh_token"),
-                token_type=tokens.get("token_type"),
-                scope=tokens.get("scope"),
-            )
-            expiry = Expiry(access=tokens.get("expires_at"), refresh=None)
-        except (KeyError, TypeError, ValidationError):
-            msg = "OIDC device authorization failed: malformed token response"
-            raise ValueError(msg) from None
-        credential.token, credential.expiry = token, expiry
+        _install_tokens(credential, tokens)
 
         url: str = response["userinfo_endpoint"]
-        headers = {
-            "Authorization": (
-                f"Bearer {credential.token.access.get_secret_value()}"
-                if credential.token.access
-                else ""
-            ),
-        }
-        user = await client.get(url, headers=headers)
-        user.raise_for_status()
-        username = user.json().get("preferred_username")
-        if on_authenticated is not None:
-            on_authenticated(username)
+        user = await client.get(url, headers=_userinfo_headers(credential))
+        _finalize_authentication(user, on_authenticated)
+        return credential
+
+
+def sync_discover(
+    url: str,
+    client: httpx.Client,
+    *,
+    expected_issuer: str,
+) -> dict[str, Any]:
+    """Discover OIDC Identity Provider configuration with sync HTTP."""
+    response = client.get(url)
+    response.raise_for_status()
+    data: dict[str, Any] = response.json()
+    data = _validate_discovery_data(data, expected_issuer)
+    log.debug("OIDC Discovery Data: %s", data)
+    return data
+
+
+def sync_register(
+    url: str,
+    client: httpx.Client,
+) -> dict[str, Any]:
+    """Register a device-flow client with a synchronous HTTP client."""
+    payload = _registration_payload()
+    response = client.post(url, json=payload)
+    response.raise_for_status()
+    data: dict[str, Any] = response.json()
+    log.debug("OIDC dynamic client registration succeeded.")
+    return data
+
+
+def sync_start_device_authorization(
+    url: str,
+    identity: str,
+    secret: str,
+    client: httpx.Client,
+) -> DeviceAuthorization:
+    """Request an OIDC device authorization challenge synchronously."""
+    response = client.post(
+        url,
+        data=_device_authorization_payload(identity),
+        auth=(identity, secret),
+    )
+    response.raise_for_status()
+    challenge = _parse_device_authorization(response)
+    log.debug("OIDC device authorization challenge received")
+    return challenge
+
+
+def _sync_poll_token(
+    url: str,
+    code: str,
+    client: OAuth2Client,
+) -> dict[str, Any]:
+    """Exchange a device code for tokens with a synchronous OAuth client."""
+    try:
+        token: dict[str, Any] = client.fetch_token(
+            url,
+            grant_type=DEVICE_CODE_GRANT_TYPE,
+            device_code=code,
+        )
+    except OAuthError as error:
+        _raise_poll_oauth_error(error)
+    except httpx.HTTPStatusError:
+        msg = "OIDC device authorization failed"
+        raise ValueError(msg) from None
+    except ValueError:
+        msg = "OIDC device authorization failed: malformed token response"
+        raise ValueError(msg) from None
+    return _validate_poll_token(token)
+
+
+def sync_poll_device_token(
+    token_url: str,
+    challenge: DeviceAuthorization,
+    client: OAuth2Client,
+) -> dict[str, Any]:
+    """Poll for OIDC tokens with the RFC 8628 interval using sync I/O."""
+    interval = challenge.interval
+    deadline = time.monotonic() + challenge.expires_in
+    code = challenge.device_code.get_secret_value()
+
+    while time.monotonic() < deadline:
+        try:
+            return _sync_poll_token(token_url, code, client)
+        except AuthPendingError:
+            pass
+        except SlowDownError:
+            interval += 5
+        except httpx.TransportError:
+            interval *= 2
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(interval, remaining))
+
+    msg = "Device flow timed out"
+    raise TimeoutError(msg)
+
+
+def sync_authflow(
+    device_auth_url: str,
+    token_url: str,
+    identity: str,
+    secret: str,
+    client: OAuth2Client | None = None,
+    *,
+    on_challenge: ChallengePresenter | None = None,
+) -> dict[str, Any]:
+    """Run the presentation-free OIDC device flow with native sync I/O."""
+    if client is None:
+        from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
+
+        with OAuth2Client(
+            identity,
+            secret,
+            token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+        ) as http_client:
+            return sync_authflow(
+                device_auth_url,
+                token_url,
+                identity,
+                secret,
+                http_client,
+                on_challenge=on_challenge,
+            )
+    challenge = sync_start_device_authorization(
+        device_auth_url,
+        identity,
+        secret,
+        client,
+    )
+    if on_challenge is not None:
+        on_challenge(challenge)
+    return sync_poll_device_token(token_url, challenge, client)
+
+
+def sync_authenticate_credential(
+    credential: OIDCCredential,
+    *,
+    expected_issuer: str,
+    timeout: int | None = None,
+    device_flow: SyncDeviceFlow | None = None,
+    on_challenge: ChallengePresenter | None = None,
+    on_authenticated: Callable[[str | None], None] | None = None,
+) -> OIDCCredential:
+    """Authenticate an OIDC record with native synchronous HTTP operations."""
+    request_timeout = None if timeout is None else httpx.Timeout(timeout)
+
+    from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
+
+    if request_timeout is None:
+        client_context = httpx.Client()
+    else:
+        client_context = httpx.Client(timeout=request_timeout)
+
+    with client_context as client:
+        response = sync_discover(
+            str(credential.endpoints.discovery),
+            client,
+            expected_issuer=expected_issuer,
+        )
+        _apply_discovery(credential, response)
+
+        device = sync_register(str(credential.endpoints.registration), client)
+        identity, client_secret = _install_client_credentials(credential, device)
+
+        if request_timeout is None:
+            oauth_context = OAuth2Client(
+                identity,
+                client_secret,
+                token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+            )
+        else:
+            oauth_context = OAuth2Client(
+                identity,
+                client_secret,
+                token_endpoint_auth_method=_BASIC_AUTH_METHOD,
+                timeout=request_timeout,
+            )
+        with oauth_context as oauth_client:
+            if device_flow is None:
+                tokens = sync_authflow(
+                    str(credential.endpoints.device),
+                    str(credential.endpoints.token),
+                    identity,
+                    client_secret,
+                    oauth_client,
+                    on_challenge=on_challenge,
+                )
+            else:
+                tokens = device_flow(
+                    str(credential.endpoints.device),
+                    str(credential.endpoints.token),
+                    identity,
+                    client_secret,
+                    oauth_client,
+                )
+
+        _install_tokens(credential, tokens)
+
+        url: str = response["userinfo_endpoint"]
+        user = client.get(url, headers=_userinfo_headers(credential))
+        _finalize_authentication(user, on_authenticated)
         return credential

@@ -8,19 +8,14 @@ from pathlib import Path
 
 import pytest
 
-ISOLATED_HOME = Path(
-    os.environ.get(
-        "CANFAR_TEST_HOME",
-        str(Path(tempfile.gettempdir()) / "canfar-empty-home"),
-    )
-)
+_REQUESTED_TEST_HOME = os.environ.get("CANFAR_TEST_HOME")
+if _REQUESTED_TEST_HOME is None:
+    _REQUESTED_TEST_HOME = tempfile.mkdtemp(prefix="canfar-test-home-")
 
-
-def pytest_configure(config: pytest.Config) -> None:  # noqa: ARG001
-    """Isolate ``HOME`` so tests never consume developer configuration."""
-    ISOLATED_HOME.mkdir(parents=True, exist_ok=True)
-    os.environ["CANFAR_TEST_HOME"] = str(ISOLATED_HOME)
-    os.environ["HOME"] = str(ISOLATED_HOME)
+ISOLATED_HOME = Path(_REQUESTED_TEST_HOME)
+os.environ["CANFAR_TEST_HOME"] = _REQUESTED_TEST_HOME
+os.environ["HOME"] = _REQUESTED_TEST_HOME
+ISOLATED_HOME.mkdir(parents=True, exist_ok=True)
 
 
 @pytest.fixture(autouse=True)

@@ -14,7 +14,7 @@ from .utils.logging import (  # noqa: E402
 CERT_PATH: Path = Path.home() / ".ssl" / "cadcproxy.pem"
 
 from . import authentication, server  # noqa: E402
-from .authentication import login  # noqa: E402
+from .authentication import alogin, login  # noqa: E402
 
 # Kept in sync with pyproject.toml by release-please
 # DO NOT EDIT MANUALLY
@@ -24,6 +24,7 @@ __all__ = [
     "CONFIG_DIR",
     "CONFIG_PATH",
     "__version__",
+    "alogin",
     "authentication",
     "configure_logging",
     "get_logger",

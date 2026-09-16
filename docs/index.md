@@ -4,54 +4,68 @@ hide:
   - toc
 ---
 
-<h1>CANFAR Science Platform</h1>
+<div class="canfar-home" markdown>
 
-###### Built on **[IVOA standards](https://www.ivoa.net/documents/)** & **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
-    
-!!! note ""
-    
-    <center>
-    <h3>
-    **Canadian Advanced Network for Astronomical Research is a scalable, cloud-native workspace for astronomy research.**
- 
-    *Spin up JupyterLab, submit batch jobs, and collaborate in shared project spaces. <br> The CANFAR Science Platform gives researchers the tools they need with minimal setup.*
-    </h3>
-    </center>
-    
-!!! success ""
+# CANFAR Science Platform
 
-    <h4>Discover what the CANFAR Science Platform can do for you, your team, and your research group.</h4>
+<p class="canfar-standards" id="built-on-ivoa-standards-fair-principles" markdown="span">
+Built on [IVOA standards](https://www.ivoa.net/documents/ "International Virtual Observatory Alliance")
+<span>&amp;</span>
+[FAIR principles](https://www.go-fair.org/fair-principles/ "Findable, Accessible, Interoperable, and Reusable")
+</p>
 
-    <h3>
+<div class="canfar-intro" markdown>
 
-    <div class="grid cards" markdown>
+<div class="canfar-intro-copy" markdown>
 
-    - [:material-monitor-shimmer: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/sessions/index.md)
-    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/sessions/batch.md)
-    - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/storage/index.md)
-    - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers/index.md)
-    - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/permissions.md)
-    - [:material-wrench: __Help & Support__ <small>for research workflows</small>](platform/support/index.md)
-    - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
-    - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
-    - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
-    - [:material-kubernetes: __Platform Operations__ <small>Deployments and infrastructure</small>](https://www.opencadc.org/deployments/)
-    - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](releases/releases.md)
-    - [:simple-rocket: __Try out__ <small>CANFAR Science Platform</small>](https://www.canfar.net)
-    - [:octicons-telescope-fill-16: and much more...](platform/concepts.md)
+<p class="canfar-name">Canadian Advanced Network for Astronomical Research</p>
+<p class="canfar-description">A scalable, cloud-native workspace for astronomy research.</p>
 
-    </div>
-    
-    </h3>
+</div>
 
-!!! quote ""
+<div class="canfar-actions" markdown>
 
-    <font size="3">
-    ##### If you use CANFAR, add an acknowledgement to your papers, theses, and other research outputs.
-    </font>
+[Get Started](platform/get-started.md){ .md-button .md-button--primary }
+[Open Portal](https://www.canfar.net/science-portal/){ .md-button .md-button--primary }
 
-    <span style="font-family: 'Roboto Mono', monospace; font-size: 12px; font-style: italic;">
-    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform operated by the Canadian Astronomy Data Centre (CADC) and the Digital Research Alliance of Canada, with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canadian Foundation for Innovation (CFI).
-    </span>
+</div>
 
+</div>
 
+<span id="what-would-you-like-to-do"></span>
+<span id="explore-the-platform"></span>
+
+## Explore CANFAR
+
+<div class="grid cards canfar-grid" markdown>
+
+- [:material-monitor-shimmer:<span class="canfar-card-copy"><strong>Interactive Sessions</strong><span>Notebooks and astronomy apps</span></span>](platform/sessions/index.md)
+- [:material-lightning-bolt:<span class="canfar-card-copy"><strong>Batch Processing</strong><span>Run scripts and pipelines</span></span>](platform/sessions/batch.md)
+- [:material-database-outline:<span class="canfar-card-copy"><strong>Storage</strong><span>Access, save, and share your data</span></span>](platform/storage/index.md)
+- [:simple-docker:<span class="canfar-card-copy"><strong>Software Containers</strong><span>Choose or build your environment</span></span>](platform/containers/index.md)
+- [:simple-python:<span class="canfar-card-copy"><strong>Python API</strong><span>Automate from Python</span></span>](client/home.md)
+- [:material-console:<span class="canfar-card-copy"><strong>CLI</strong><span>Work from your terminal</span></span>](cli/quick-start.md)
+- [:simple-doi:<span class="canfar-card-copy"><strong>Publications</strong><span>Publish and cite your data</span></span>](platform/doi.md)
+- [:material-history:<span class="canfar-card-copy"><strong>Release Notes</strong><span>See what's new on the platform</span></span>](releases/releases.md)
+- [:material-lifebuoy:<span class="canfar-card-copy"><strong>Help &amp; Support</strong><span>Get help with your research workflow</span></span>](platform/support/index.md)
+
+</div>
+
+<span id="returning-to-canfar"></span>
+
+<div class="canfar-acknowledgement" markdown>
+
+<span id="if-you-use-canfar-add-an-acknowledgement-to-your-papers-theses-and-other-research-outputs"></span>
+<span id="acknowledge-canfar"></span>
+
+## Acknowledgement
+
+If you use CANFAR, include this acknowledgement in your papers, theses, and other research outputs.
+
+```text
+--8<-- "docs/about/acknowledgement.md:acknowledgement"
+```
+
+</div>
+
+</div>
