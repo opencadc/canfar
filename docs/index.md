@@ -4,65 +4,68 @@ hide:
   - toc
 ---
 
+<div class="canfar-home" markdown>
+
 # CANFAR Science Platform
 
-Analyse astronomical data in your browser, work with your team, and run
-repeatable pipelines near your data. A **Session** is your running workspace:
-a notebook, desktop, astronomy application, or unattended script.
+<p class="canfar-standards" id="built-on-ivoa-standards-fair-principles" markdown="span">
+Built on [IVOA standards](https://www.ivoa.net/documents/ "International Virtual Observatory Alliance")
+<span>&amp;</span>
+[FAIR principles](https://www.go-fair.org/fair-principles/ "Findable, Accessible, Interoperable, and Reusable")
+</p>
 
-## What would you like to do?
+<div class="canfar-intro" markdown>
 
-<div class="grid cards" markdown>
+<div class="canfar-intro-copy" markdown>
 
--   :material-monitor-shimmer: **Start a Session**
-
-    Get an account, open your first notebook, and save your work.
-    You can complete this guide in your browser without installing software.
-
-    [Start your first analysis](platform/get-started.md)
-
--   :material-floppy-variant: **Bring and save data**
-
-    Choose a storage location, upload inputs, and keep results for your team.
-
-    [Choose storage](platform/storage/index.md) ·
-    [Transfer files](platform/storage/transfers.md)
-
--   :simple-python: **Automate an analysis**
-
-    Start with the command line or Python, then scale a tested analysis to
-    multiple Sessions.
-
-    [Client setup](client/get-started.md) ·
-    [Run a pipeline](client/advanced-examples.md)
+<p class="canfar-name">Canadian Advanced Network for Astronomical Research</p>
+<p class="canfar-description">A scalable, cloud-native workspace for astronomy research.</p>
 
 </div>
 
-## Explore the platform
+<div class="canfar-actions" markdown>
 
-Choose [Notebook, Desktop, CARTA, or Firefly](platform/sessions/index.md)
-for interactive work, or run an unattended [batch Session](platform/sessions/batch.md).
-Use [Container Images](platform/containers/index.md) to choose your software,
-[project permissions](platform/permissions.md) to share data, and
-[community workflows](platform/community/index.md) for astronomy examples.
+[Get Started](platform/get-started.md){ .md-button .md-button--primary }
+[Open Portal](https://www.canfar.net/science-portal/){ .md-button .md-button--primary }
 
-## Returning to CANFAR?
+</div>
 
-- [Platform releases](releases/releases.md) describe service and application updates.
-- [Client updates](client/updates.md) and the [migration guide](client/migration.md)
-  explain changes to the Python package and command-line interface (CLI).
-- [Support](platform/support/index.md) helps with accounts, Sessions, and data access.
-- [Platform deployments](https://www.opencadc.org/deployments/) is for operators.
+</div>
+
+<span id="what-would-you-like-to-do"></span>
+<span id="explore-the-platform"></span>
+
+## Explore CANFAR
+
+<div class="grid cards canfar-grid" markdown>
+
+- [:material-monitor-shimmer:<span class="canfar-card-copy"><strong>Interactive Sessions</strong><span>Notebooks and astronomy apps</span></span>](platform/sessions/index.md)
+- [:material-lightning-bolt:<span class="canfar-card-copy"><strong>Batch Processing</strong><span>Run scripts and pipelines</span></span>](platform/sessions/batch.md)
+- [:material-database-outline:<span class="canfar-card-copy"><strong>Storage</strong><span>Access, save, and share your data</span></span>](platform/storage/index.md)
+- [:simple-docker:<span class="canfar-card-copy"><strong>Software Containers</strong><span>Choose or build your environment</span></span>](platform/containers/index.md)
+- [:simple-python:<span class="canfar-card-copy"><strong>Python API</strong><span>Automate from Python</span></span>](client/home.md)
+- [:material-console:<span class="canfar-card-copy"><strong>CLI</strong><span>Work from your terminal</span></span>](cli/quick-start.md)
+- [:simple-doi:<span class="canfar-card-copy"><strong>Publications</strong><span>Publish and cite your data</span></span>](platform/doi.md)
+- [:material-history:<span class="canfar-card-copy"><strong>Release Notes</strong><span>See what's new on the platform</span></span>](releases/releases.md)
+- [:material-lifebuoy:<span class="canfar-card-copy"><strong>Help &amp; Support</strong><span>Get help with your research workflow</span></span>](platform/support/index.md)
+
+</div>
+
+<span id="returning-to-canfar"></span>
+
+<div class="canfar-acknowledgement" markdown>
 
 <span id="if-you-use-canfar-add-an-acknowledgement-to-your-papers-theses-and-other-research-outputs"></span>
+<span id="acknowledge-canfar"></span>
 
-<span id="built-on-ivoa-standards-fair-principles"></span>
+## Acknowledgement
 
-## Acknowledge CANFAR
+If you use CANFAR, include this acknowledgement in your papers, theses, and other research outputs.
 
-If you use CANFAR for a paper, thesis, or other research output, include the
-[CANFAR acknowledgement](about/acknowledgement.md). You can also
-[publish a dataset with a digital object identifier (DOI)](platform/doi.md).
+```text
+--8<-- "docs/about/acknowledgement.md:acknowledgement"
+```
 
-CANFAR follows [International Virtual Observatory Alliance (IVOA) standards](https://www.ivoa.net/documents/)
-and the [Findable, Accessible, Interoperable, and Reusable (FAIR) principles](https://www.go-fair.org/fair-principles/).
+</div>
+
+</div>
