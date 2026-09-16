@@ -15,10 +15,10 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/cli/authentication-contexts/">
       
       
-        <link rel="prev" href="../data/">
+        <link rel="prev" href="../../client/home/">
       
       
-        <link rel="next" href="../logging/">
+        <link rel="next" href="../../client/updates/">
       
       
         
@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -690,10 +692,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#log-in" class="md-nav__link">
+  <a href="#login" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Log in
+        Login
       
     </span>
   </a>
@@ -704,7 +706,7 @@
   <a href="#inspect-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspect authentication
+        Inspect Authentication
       
     </span>
   </a>
@@ -712,10 +714,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#switch-idp" class="md-nav__link">
+  <a href="#change-or-remove-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Switch IDP
+        Change or remove state
       
     </span>
   </a>
@@ -723,10 +725,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manage-servers" class="md-nav__link">
+  <a href="#server-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Manage Servers
+        Server Selection
       
     </span>
   </a>
@@ -734,43 +736,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#remove-saved-auth-state" class="md-nav__link">
+  <a href="#configuration-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Remove saved auth state
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-equivalents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Python equivalents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#machine-output-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Machine output rules
+        Configuration shape
       
     </span>
   </a>
@@ -1346,14 +1315,10 @@
                 
   
   
-    
-  
   
   
     
     
-      
-        
       
         
       
@@ -1377,11 +1342,13 @@
     
       
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_8" checked>
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3_8" >
         
           
           <label class="md-nav__link" for="__nav_3_8" id="__nav_3_8_label" tabindex="">
@@ -1402,7 +1369,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_8_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_3_8">
             <span class="md-nav__icon md-icon"></span>
             
@@ -1464,169 +1431,6 @@
   
 
       </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#log-in" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Log in
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspect-authentication" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspect authentication
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#switch-idp" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Switch IDP
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#manage-servers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manage Servers
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#remove-saved-auth-state" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Remove saved auth state
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-equivalents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Python equivalents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#machine-output-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Machine output rules
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -1790,6 +1594,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1989,10 +1821,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#log-in" class="md-nav__link">
+  <a href="#login" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Log in
+        Login
       
     </span>
   </a>
@@ -2003,7 +1835,7 @@
   <a href="#inspect-authentication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspect authentication
+        Inspect Authentication
       
     </span>
   </a>
@@ -2011,10 +1843,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#switch-idp" class="md-nav__link">
+  <a href="#change-or-remove-state" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Switch IDP
+        Change or remove state
       
     </span>
   </a>
@@ -2022,10 +1854,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#manage-servers" class="md-nav__link">
+  <a href="#server-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Manage Servers
+        Server Selection
       
     </span>
   </a>
@@ -2033,43 +1865,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#remove-saved-auth-state" class="md-nav__link">
+  <a href="#configuration-shape" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Remove saved auth state
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#python-equivalents" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Python equivalents
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#machine-output-rules" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Machine output rules
+        Configuration shape
       
     </span>
   </a>
@@ -2109,101 +1908,133 @@
   
 
 
+<p><span id="python-equivalents"></span></p>
 <h1 id="authentication-and-servers">Authentication and Servers<a class="headerlink" href="#authentication-and-servers" title="Permanent link">&para;</a></h1>
-<p>CANFAR separates identity from routing:</p>
+<p>CANFAR keeps identity and routing separate:</p>
 <ul>
-<li><strong>Authentication</strong> answers "who am I?"</li>
-<li><strong>Identity Provider (IDP)</strong> names the organization that authenticates you,
-  such as <code>cadc</code> or <code>srcnet</code>.</li>
-<li><strong>Science Platform Server</strong> is the endpoint that runs Sessions.</li>
-<li><strong>Server selection</strong> chooses which compatible Server receives new requests.</li>
+<li><strong>Authentication</strong> owns the user's identity and credentials.</li>
+<li>An <strong>Identity Provider (IDP)</strong> issues that identity. The built-in keys are
+  <code>cadc</code> (X.509) and <code>srcnet</code> (OIDC Device Authorization).</li>
+<li>A <strong>Science Platform Server</strong> runs Sessions.</li>
+<li><strong>Server Selection</strong> chooses the Science Platform Server for new requests.</li>
 </ul>
-<p><code>canfar login</code> handles the full interactive path: choose an IDP, authenticate,
-discover compatible Servers, select one, and save the active pair.</p>
-<h2 id="log-in">Log in<a class="headerlink" href="#log-in" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login
-canfar<span class="w"> </span>login<span class="w"> </span>cadc
-canfar<span class="w"> </span>login<span class="w"> </span>srcnet
+<p>The active Authentication Record and Server Selection are saved together in
+the local Configuration. Existing Sessions remain on the Science Platform
+Server where they were launched.</p>
+<p><span id="log-in"></span></p>
+<h2 id="login">Login<a class="headerlink" href="#login" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span><span class="o">[</span>IDP<span class="o">]</span>
 </code></pre></div>
-<p>Useful options:</p>
+<p>When <code>IDP</code> is omitted, the CLI prompts for one. Use these options when needed:</p>
 <table>
 <thead>
 <tr>
 <th>Option</th>
-<th>Use</th>
+<th>Effect</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>--force</code>, <code>-f</code></td>
-<td>Re-authenticate an IDP that already has saved credentials.</td>
+<td>Obtain new credentials and rediscover instead of refusing an existing record.</td>
 </tr>
 <tr>
 <td><code>--dev</code></td>
-<td>Include development Servers during discovery.</td>
+<td>Include development registries and endpoints during Server Discovery.</td>
 </tr>
 <tr>
 <td><code>--timeout</code>, <code>-t</code></td>
-<td>Increase HTTP timeout for login, discovery, and validation.</td>
+<td>HTTP timeout in seconds for login requests; default <code>10</code>.</td>
 </tr>
 </tbody>
 </table>
-<p>Logging controls are root options. Put them before <code>login</code> when troubleshooting:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>login<span class="w"> </span>cadc<span class="w"> </span>--force
+<p>Login authenticates the selected IDP, discovers compatible Science Platform
+Servers, selects one when necessary, and saves the Authentication Record and
+Server Selection. A saved record causes a repeat login to fail unless
+<code>--force</code> is supplied.</p>
+<h3 id="cadc-x509">CADC X.509<a class="headerlink" href="#cadc-x509" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
-<p>See <a href="../logging/">Logging</a> for level precedence and stream separation.</p>
-<p><code>canfar auth login</code> still exists as a deprecated compatibility alias. New docs
-and scripts should use <code>canfar login</code>.</p>
-<h2 id="inspect-authentication">Inspect authentication<a class="headerlink" href="#inspect-authentication" title="Permanent link">&para;</a></h2>
+<p>The CLI reuses a usable X.509 certificate when possible. Use <code>--force</code> to
+obtain a replacement. If the certificate is expired, login reports that and
+continues with certificate acquisition.</p>
+<h3 id="srcnet-oidc-device-authorization">SRCNet OIDC Device Authorization<a class="headerlink" href="#srcnet-oidc-device-authorization" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet
+</code></pre></div>
+<p>The CLI performs OIDC discovery and dynamic client registration, then presents
+the Device Authorization challenge in the terminal:</p>
+<ol>
+<li>It prints a verification URL, user code, and a terminal QR code.</li>
+<li>It opens the verification URL in the default browser when possible.</li>
+<li>You sign in and approve the request in the browser.</li>
+<li>The CLI polls for approval and shows progress until the IDP returns tokens.</li>
+</ol>
+<p>If the browser cannot be opened, visit the printed URL manually. The device
+challenge has an IDP-provided expiry; <code>--timeout</code> controls HTTP requests and
+does not extend that challenge. Denial, expiry, malformed responses, and
+network failures stop login with an error; run the command again after fixing
+the cause.</p>
+<p>For troubleshooting, put root logging options before <code>login</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>login<span class="w"> </span>srcnet
+canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>login<span class="w"> </span>cadc<span class="w"> </span>--force
+</code></pre></div>
+<p>See <a href="../logging/">Logging</a> for precedence and stream routing.</p>
+<p><span id="machine-output-rules"></span></p>
+<h2 id="inspect-authentication">Inspect Authentication<a class="headerlink" href="#inspect-authentication" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth
 canfar<span class="w"> </span>auth<span class="w"> </span>show
 canfar<span class="w"> </span>auth<span class="w"> </span>ls
 </code></pre></div>
-<p><code>canfar auth</code> defaults to <code>canfar auth show</code>.</p>
-<p>Use machine output when a script needs stable stdout:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show<span class="w"> </span>--json
-canfar<span class="w"> </span>auth<span class="w"> </span>ls<span class="w"> </span>--yaml
+<p>Bare <code>canfar auth</code> defaults to <code>auth show</code>. Human output includes the active
+Server Selection when one is available. For scripts, use machine output on the
+data-producing form:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show<span class="w"> </span>-o<span class="w"> </span>json
+canfar<span class="w"> </span>auth<span class="w"> </span>ls<span class="w"> </span>--output<span class="w"> </span>yaml
 </code></pre></div>
-<h2 id="switch-idp">Switch IDP<a class="headerlink" href="#switch-idp" title="Permanent link">&para;</a></h2>
+<p>The machine payload is an Authentication object or list of Authentication
+objects. It contains the canonical IDP key, display name, Authentication Mode,
+expiry, active state, and associated Server Name; it does not contain raw
+credential material.</p>
+<p><span id="remove-saved-auth-state"></span></p>
+<p><span id="switch-idp"></span></p>
+<h2 id="change-or-remove-state">Change or remove state<a class="headerlink" href="#change-or-remove-state" title="Permanent link">&para;</a></h2>
+<p>Switch to a saved Authentication Record by canonical IDP key:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>srcnet
 canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>cadc
 </code></pre></div>
-<p>When you switch IDP, CANFAR tries to keep routing usable:</p>
-<ol>
-<li>Reuse the current Server when it belongs to the target IDP.</li>
-<li>Reuse the remembered Server for that IDP when it is still valid.</li>
-<li>Auto-select the only compatible Server.</li>
-<li>Prompt when multiple compatible Servers exist.</li>
-</ol>
-<h2 id="manage-servers">Manage Servers<a class="headerlink" href="#manage-servers" title="Permanent link">&para;</a></h2>
+<p>When switching, CANFAR reuses a compatible remembered Server Selection when
+one exists. If several compatible Servers need a choice, the CLI prompts for a
+Server URI or list number.</p>
+<p>Remove one Authentication Record and its associated Servers with:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet
+canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet<span class="w"> </span>--force
+</code></pre></div>
+<p>Removing the active Authentication asks for confirmation unless <code>--force</code> is
+used. To reset all Authentication and Server state, use the required force
+flag:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--force
+</code></pre></div>
+<p>The purge restores built-in defaults and preserves unrelated registry and
+console settings.</p>
+<p><span id="manage-servers"></span></p>
+<h2 id="server-selection">Server Selection<a class="headerlink" href="#server-selection" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>ls
-canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>canfar
+canfar<span class="w"> </span>server<span class="w"> </span>ls<span class="w"> </span>-o<span class="w"> </span>json
+canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>SELECTOR
+</code></pre></div>
+<p><code>server ls</code> lists the saved Servers for the active IDP. If none are saved, it
+runs discovery and persists the result. Its machine payload is a list of
+Server records and is data-only on stdout.</p>
+<p><code>server use</code> accepts either a Server Name or an IVOA URI:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>canfar
 canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>ivo://cadc.nrc.ca/skaha
 </code></pre></div>
-<p>Server names are convenient for humans. Server URIs are stable for scripts.</p>
-<p><code>canfar server ls</code> shows Servers for the active IDP. If no saved Servers exist
-for that IDP, the command runs discovery and stores the results.</p>
-<h2 id="remove-saved-auth-state">Remove saved auth state<a class="headerlink" href="#remove-saved-auth-state" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet
-canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--force
-</code></pre></div>
-<p><code>auth rm &lt;idp&gt;</code> removes the Authentication record and Servers associated with
-that IDP. Removing the active IDP asks for confirmation unless <code>--force</code> is
-passed.</p>
-<p><code>auth purge --force</code> resets Authentication and Server state while preserving
-unrelated configuration such as console and Container Registry settings.</p>
-<h2 id="python-equivalents">Python equivalents<a class="headerlink" href="#python-equivalents" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
-
-<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;cadc&quot;</span><span class="p">)</span>
-<span class="n">canfar</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;ivo://cadc.nrc.ca/skaha&quot;</span><span class="p">)</span>
-<span class="n">canfar</span><span class="o">.</span><span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>Python helpers are noninteractive. CLI commands own prompts and human rendering.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The current config shape is versioned with <code>version: 1</code>. Authentication
-records are keyed by IDP and Servers are keyed by Server Name; <code>active.server</code>
-references a Server by name.</p>
+<p>The persisted <code>active.server</code> value is the Server Name. The IVOA URI is
+discovery metadata and can still be used as a selector.</p>
+<p><span id="configuration"></span></p>
+<h2 id="configuration-shape">Configuration shape<a class="headerlink" href="#configuration-shape" title="Permanent link">&para;</a></h2>
+<p>The persisted shape separates Authentication Records and Science Platform
+Servers. <code>active.server</code> refers to a Server Name, not an IVOA URI:</p>
 <div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
 <span class="nt">active</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
@@ -2217,57 +2048,16 @@ references a Server by name.</p>
 <span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://ws-uv.canfar.net/skaha</span>
 </code></pre></div>
-<p>Dict keys make every value reachable with dotted paths:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>servers.canfar.url
-canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>authentication.cadc.path
+<p>Use <code>canfar config get</code> and <code>canfar config set</code> for dotted configuration
+paths. Values passed to <code>config set</code> are parsed as YAML:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>active.server
+canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>servers.canfar.url
+canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set</span><span class="w"> </span>console.banner<span class="w"> </span><span class="nb">false</span>
 </code></pre></div>
-<p>Environment overrides use nested active fields:</p>
-<div class="highlight"><pre><span></span><code><span class="nv">CANFAR_ACTIVE__AUTHENTICATION</span><span class="o">=</span>srcnet
-<span class="nv">CANFAR_ACTIVE__SERVER</span><span class="o">=</span>canfar
+<p>Environment overrides use the same nested names, for example:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">CANFAR_CONSOLE__BANNER</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span>canfar<span class="w"> </span>auth<span class="w"> </span>show
 </code></pre></div>
-<p>Legacy or unsupported config files are backed up to
-<code>&lt;config-path&gt;.&lt;timestamp&gt;.back</code> before a default config is written.</p>
-<h2 id="machine-output-rules">Machine output rules<a class="headerlink" href="#machine-output-rules" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Rule</th>
-<th>Behavior</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Supported flags</td>
-<td><code>--json</code> and <code>--yaml</code></td>
-</tr>
-<tr>
-<td>Placement</td>
-<td>Put the flag after the command that emits data, for example <code>canfar auth ls --json</code>.</td>
-</tr>
-<tr>
-<td>Unsupported placement</td>
-<td><code>canfar auth --json ls</code> exits 2.</td>
-</tr>
-<tr>
-<td>Conflicts</td>
-<td><code>--json --yaml</code> exits 2.</td>
-</tr>
-<tr>
-<td>stdout</td>
-<td>Data only in machine mode.</td>
-</tr>
-<tr>
-<td>stderr</td>
-<td>Diagnostics and errors.</td>
-</tr>
-<tr>
-<td>Unsupported commands</td>
-<td>Exit 1 with <code>machine output not supported for this command yet</code> and <code>use default human output for now</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>Lists have no ordering guarantee. Scripts should select by IDP key, Server
-Name, URI, Session ID, or another stable field.</p>
+<p>The complete command and machine-output contract is in the <a href="../cli-help/">CLI reference</a>.</p>
 
 
 
@@ -2290,7 +2080,7 @@ Name, URI, Session ID, or another stable field.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

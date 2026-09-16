@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#images-api" class="md-skip">
+        <a href="#container-images-api" class="md-skip">
           Skip to content
         </a>
       
@@ -524,6 +524,8 @@
   
     
     
+      
+        
       
         
       
@@ -1324,10 +1326,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-image-information" class="md-nav__link">
+  <a href="#image-identifiers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Getting Image Information
+        Image identifiers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsed-image-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsed image details
       
     </span>
   </a>
@@ -1532,8 +1545,6 @@
       
         
       
-        
-      
     
     
     
@@ -1629,34 +1640,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1828,6 +1811,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2027,10 +2038,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-image-information" class="md-nav__link">
+  <a href="#image-identifiers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Getting Image Information
+        Image identifiers
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#parsed-image-details" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Parsed image details
       
     </span>
   </a>
@@ -2114,41 +2136,33 @@
   
 
 
-<h1 id="images-api">Images API<a class="headerlink" href="#images-api" title="Permanent link">&para;</a></h1>
-<div class="admonition info">
-<p class="admonition-title">Overview</p>
-<p>The Image API allows you to get information about the <strong>publicly available</strong> images on the CANFAR Science Platform through the CANFAR Harbor Registry. It can be used to get information about all images, or filter by a specific image kind.</p>
-</div>
-<h2 id="getting-image-information">Getting Image Information<a class="headerlink" href="#getting-image-information" title="Permanent link">&para;</a></h2>
-<div class="highlight"><span class="filename">Get image information</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
+<p><span id="images-api"></span></p>
+<h1 id="container-images-api">Container Images API<a class="headerlink" href="#container-images-api" title="Permanent link">&para;</a></h1>
+<p><code>Images</code> lists the Container Images advertised by a CANFAR Science Platform
+Server. It inherits <code>HTTPClient</code>, so the same saved or runtime credential
+selection applies.</p>
+<p><span id="getting-image-information"></span></p>
+<h2 id="image-identifiers">Image identifiers<a class="headerlink" href="#image-identifiers" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
 
-<span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
-<span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-<span class="p">[</span>
-    <span class="s2">&quot;images.canfar.net/canfar/base-3.12:v0.4.1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/canucs/test:1.2.5&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/canucs/canucs:1.2.9&quot;</span><span class="p">,</span>
-    <span class="o">...</span><span class="p">,</span>
-<span class="p">]</span>
+<span class="k">with</span> <span class="n">Images</span><span class="p">()</span> <span class="k">as</span> <span class="n">images</span><span class="p">:</span>
+    <span class="n">all_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>                 <span class="c1"># list[str]</span>
+    <span class="n">headless</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">)</span>   <span class="c1"># list[str]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">headless</span><span class="p">)</span>
 </code></pre></div>
-<p>But most of the time, you are only interested in images of a particular type. For example, if you want to get all the images that are available for <code>headless</code> sessions, you can do the following:</p>
-<div class="highlight"><span class="filename">Get headless image information</span><pre><span></span><code><span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">)</span>
+<p>Each string is an image identifier such as
+<code>images.canfar.net/skaha/terminal:latest</code>. The optional <code>kind</code> is sent as the
+server's image-type filter.</p>
+<h2 id="parsed-image-details">Parsed image details<a class="headerlink" href="#parsed-image-details" title="Permanent link">&para;</a></h2>
+<p>Use <code>details()</code> when the digest and supported kinds are needed:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
+
+<span class="k">with</span> <span class="n">Images</span><span class="p">()</span> <span class="k">as</span> <span class="n">images</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">images</span><span class="o">.</span><span class="n">details</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">types</span><span class="p">,</span> <span class="n">image</span><span class="o">.</span><span class="n">digest</span><span class="p">)</span>
 </code></pre></div>
-<div class="highlight"><pre><span></span><code><span class="p">[</span>
-    <span class="s2">&quot;images.canfar.net/chimefrb/testing:keep&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/lsst/lsst_v19_0_0:0.1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/lensfit:22.11&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/lensfit:22.10&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/lensingsim:22.07&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/phosim:5.6.11&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/terminal:1.1.2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/skaha/terminal:1.1.1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/uvickbos/pycharm:0.1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/uvickbos/swarp:0.1&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/uvickbos/isis:2.2&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;images.canfar.net/uvickbos/find_moving:0.1&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-</code></pre></div>
+<p><code>details()</code> returns <code>list[canfar.models.containers.Image]</code>; each model has <code>id</code>,
+<code>types</code>, and <code>digest</code> fields.</p>
 <h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 
 
@@ -2511,7 +2525,7 @@ attributes and methods.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 12, 2025 00:57:26 UTC">August 12, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

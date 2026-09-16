@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#canfar-science-platform-release-20251-sept-9-2025" class="md-skip">
+        <a href="#canfar-science-platform-20251" class="md-skip">
           Skip to content
         </a>
       
@@ -1316,6 +1316,8 @@
       
         
       
+        
+      
     
     
     
@@ -1392,6 +1394,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1724,6 +1754,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    2025.1
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1741,6 +1789,58 @@
 
       </a>
       
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-visible-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-visible changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operators
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1769,6 +1869,8 @@
   
     
     
+      
+        
       
         
       
@@ -1988,6 +2090,47 @@
     
   
   
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#user-visible-changes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        User-visible changes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compatibility-notes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Compatibility notes
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Operators
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
 </nav>
                   </div>
                 </div>
@@ -2019,118 +2162,40 @@
   
 
 
-<h1 id="canfar-science-platform-release-20251-sept-9-2025">CANFAR Science Platform Release 2025.1 - Sept 9, 2025<a class="headerlink" href="#canfar-science-platform-release-20251-sept-9-2025" title="Permanent link">&para;</a></h1>
-<div class="admonition success">
-<p class="admonition-title">CanfarSP 2025.1 - Sept 9, 2025</p>
-<p><strong>Dear CANFAR Community,</strong></p>
-<p>We are pleased to announce a major milestone for the CANFAR Science Platform: On September 9, 2025, we completed a transition from a beta system, initially released in 2021, to our first production release, CANFAR Science Platoform 2025.1, marking the beginning of an official production release cycle.</p>
-<p>This latest version is ready for use on <a href="http://www.canfar.net">www.canfar.net</a>, and is also available for deployments to pick up across SRCNet.</p>
-<div class="admonition danger">
-<p>If you use scripts to launch sessions on the science platform via the now deprecated <a href="https://github.com/shinybrar/skaha">skaha python package</a> or with curl, please switch to the new <a href="../../client/home/">CANFAR Python Client or CLI</a>. If you access the API directly, please switch the reference to <code>skaha/v0</code> to <code>skaha/v1</code> as soon as possible.</p>
-</div>
-<h3 id="highlights">✨ Highlights<a class="headerlink" href="#highlights" title="Permanent link">&para;</a></h3>
+<p><span id="canfar-science-platform-release-20251-sept-9-2025"></span></p>
+<h1 id="canfar-science-platform-20251">CANFAR Science Platform 2025.1<a class="headerlink" href="#canfar-science-platform-20251" title="Permanent link">&para;</a></h1>
+<p><strong>September 9, 2025</strong></p>
+<p>This was the first production release in the 2025 platform release cycle.</p>
+<p><span id="highlights"></span>
+<span id="changes-deprecations"></span>
+<span id="fixes"></span>
+<span id="deployment-notes"></span>
+<span id="python-client-cli"></span>
+<span id="contact-support"></span></p>
+<h2 id="user-visible-changes">User-visible changes<a class="headerlink" href="#user-visible-changes" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../../"><strong>New &amp; Improved</strong> User Documentation Hub</a></li>
-<li><strong>Official Release of the CANFAR Python Client &amp; CLI</strong> — see <a href="../../client/home/">clients docs</a></li>
-<li><strong>Smart Session Launching</strong> — choose between <strong>flexible</strong> (auto-scaling) and <strong>fixed</strong> modes</li>
-<li><strong>Science Portal UI Improvements</strong> — added display for home directory &amp; storage quota usage</li>
-<li><strong>CARTA 5.0</strong>: latest radio astronomy visualization tool (<a href="https://docs.google.com/document/d/1kBtYjclOn5bxlvkV5a588DtUKy3UEqPXL78IiTVAMUk/edit?tab=t.0#heading=h.9m3bw7vn40ea">August 2025 Release</a>)</li>
-<li><strong>Firefly</strong>: IVOA-compliant catalog browsing and visualization platform</li>
+<li>The <a href="../../client/home/">CANFAR Python client and CLI</a> became the supported
+  interface for scripts and command-line workflows.</li>
+<li>Session creation exposed flexible and fixed resource requests through the
+  Science Portal and client interfaces.</li>
+<li>The portal added clearer home-directory and storage-quota information.</li>
+<li>CARTA 5 and Firefly workflows were available on deployments that published
+  the corresponding images.</li>
+<li>API users moving from the old <code>skaha/v0</code> endpoint needed to move to the
+  supported v1 endpoint or, preferably, the CANFAR client.</li>
 </ul>
-<h3 id="changes-deprecations">📝 Changes &amp; Deprecations<a class="headerlink" href="#changes-deprecations" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Breaking Changes</strong>:<ul>
-<li>For API users, <code>headless</code> sessions no longer require the <code>type</code> parameter</li>
-<li>For Python Client &amp; CLI users, <code>headless</code> sessions no longer require the <code>kind</code> parameter and the <code>headless</code> session <code>kind</code> will be deprecated in a future release.</li>
-<li><code>Succeeded</code> status is now <code>Completed</code> for all session types, e.g. when performing a <code>session.info()</code> query.</li>
-</ul>
-</li>
-<li><strong>Skaha API <code>v1</code> Released</strong> — <a href="https://ws-uv.canfar.net/skaha/v0"><code>v0</code></a> API will be sunset with the next major release. Portal users are unaffected; API users should plan to migrate to <code>v1</code> as soon as possible.</li>
-<li><strong>Container Image Labels</strong> are no longer required in the <a href="https://images.canfar.net/">Harbor Image Registry</a>. They are only used to populate dropdown menu options in the Science Portal UI.</li>
-<li><strong>Session Types</strong> — launching via API, omit the <code>type</code> parameter for headless mode; interactive sessions require the <code>type</code> parameter.</li>
-<li><strong>Status Changes</strong> — Job status <code>Succeeded</code> is now <code>Completed</code> for all session types.</li>
-</ul>
-<h3 id="fixes">🐛 Fixes<a class="headerlink" href="#fixes" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Resource Monitoring</strong> — RAM and CPU usage for sessions now display correctly in the Science Portal UI.</li>
-</ul>
-<h3 id="technical-changes">⚙️ Technical Changes<a class="headerlink" href="#technical-changes" title="Permanent link">&para;</a></h3>
-<ul>
-<li>CANFAR deployment requires Kubernetes v1.29 or later</li>
-<li><strong>Kueue Scheduling</strong> — optional advanced job scheduling system that can be enabled per namespace to reduce cluster pressure and provide queue management.</li>
-<li><strong>Monitoring Fixes</strong> — Skaha API now uses the the Job API instead of the Pod API internally to provide more accurate resource usage information.</li>
-<li><strong>Flexible</strong> sessions use the <code>Burstable</code> Kubernetes Quality of Service (QoS) class instead of <code>Guaranteed</code>, which provides better resource efficiency on the cluster. Currently, <em>flexible</em> sessions can grow up to 8 cores and 32GB of RAM.</li>
-<li>Internal API's have been updated to use the <code>Job</code> API instead of the <code>Pod</code> API. This provides better resource monitoring and usage information.</li>
-</ul>
-<h3 id="deployment-notes">📦 Deployment Notes<a class="headerlink" href="#deployment-notes" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Use the offically supported helm charts in the <a href="https://github.com/opencadc/deployments/tree/main/helm/applications/skaha">opencadc/deployments</a> for CANFAR 2025.1 deployments.</li>
-<li>To test, profile and setup the Kueue scheduling system, see the <a href="https://github.com/opencadc/deployments/tree/main/configs/kueue">deployment guide</a> for detailed instructions.</li>
-</ul>
-<h4 id="python-client-cli">Python Client &amp; CLI<a class="headerlink" href="#python-client-cli" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Version</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>canfar</td>
-<td><a href="https://pypi.org/project/canfar/">v1.0.2</a></td>
-</tr>
-</tbody>
-</table>
-<h4 id="helm-charts-container-images">Helm Charts &amp; Container Images<a class="headerlink" href="#helm-charts-container-images" title="Permanent link">&para;</a></h4>
-<table>
-<thead>
-<tr>
-<th>Component</th>
-<th>Helm Chart Version</th>
-<th>Container Image</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>base</td>
-<td>0.4.0</td>
-<td>N/A</td>
-</tr>
-<tr>
-<td>cavern</td>
-<td>0.7.0</td>
-<td>images.opencadc.org/platform/cavern:0.9.0</td>
-</tr>
-<tr>
-<td>skaha</td>
-<td>1.0.3</td>
-<td>images.opencadc.org/platform/skaha:1.0.2</td>
-</tr>
-<tr>
-<td>posix-mapper</td>
-<td>0.4.4</td>
-<td>images.opencadc.org/platform/posix-mapper:0.3.2</td>
-</tr>
-<tr>
-<td>science-portal</td>
-<td>1.0.0</td>
-<td>images.opencadc.org/platform/science-portal:1.0.0</td>
-</tr>
-<tr>
-<td>storage-ui</td>
-<td>0.6.0</td>
-<td>images.opencadc.org/client/storage-ui:1.3.0</td>
-</tr>
-</tbody>
-</table>
-<h3 id="contact-support">💬 Contact &amp; Support<a class="headerlink" href="#contact-support" title="Permanent link">&para;</a></h3>
-<p>For any questions about this release, or for information relating to CANFAR issues or deployment support, head over to the <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord Server</a> or please contact us at <a href="mailto:support@canfar.net">support@canfar.net</a>.</p>
-<p><br>
-<div style="text-align: center;">
-Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2764.svg" title=":heart:" /> at CADC
-</div></p>
-</div>
+<h2 id="compatibility-notes">Compatibility notes<a class="headerlink" href="#compatibility-notes" title="Permanent link">&para;</a></h2>
+<p>Use the current <a href="../../platform/sessions/">Session</a>, <a href="../../platform/sessions/batch/">batch</a>,
+and <a href="../../cli/cli-help/">CLI</a> documentation rather than copying historical
+resource or status examples from this release. Image names, status values, and
+deployment endpoints are not global constants.</p>
+<p><span id="technical-changes"></span>
+<span id="helm-charts-container-images"></span></p>
+<h2 id="operators">Operators<a class="headerlink" href="#operators" title="Permanent link">&para;</a></h2>
+<p>Deployment-specific chart and service changes belong in the
+<a href="https://github.com/opencadc/deployments">OpenCADC deployments repository</a>.
+Users with questions about an installed deployment can contact
+<a href="mailto:support@canfar.net">CANFAR support</a>.</p>
 
 
 
@@ -2153,7 +2218,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2025 04:28:50 UTC">September 16, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

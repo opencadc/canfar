@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#issue-tracker-jira" class="md-skip">
+        <a href="#issue-trackers-jira-and-github-issues" class="md-skip">
           Skip to content
         </a>
       
@@ -522,6 +522,8 @@
   
     
     
+      
+        
       
         
       
@@ -1062,10 +1064,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#conventions" class="md-nav__link">
+  <a href="#choose-the-tracker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conventions
+        Choose the tracker
       
     </span>
   </a>
@@ -1073,10 +1075,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#skill-rules" class="md-nav__link">
+  <a href="#read-and-write-work-items" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Skill Rules
+        Read and write work items
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skill-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skill conventions
       
     </span>
   </a>
@@ -1416,10 +1429,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#conventions" class="md-nav__link">
+  <a href="#choose-the-tracker" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Conventions
+        Choose the tracker
       
     </span>
   </a>
@@ -1427,10 +1440,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#skill-rules" class="md-nav__link">
+  <a href="#read-and-write-work-items" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Skill Rules
+        Read and write work items
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#skill-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Skill conventions
       
     </span>
   </a>
@@ -1470,24 +1494,50 @@
   
 
 
-<h1 id="issue-tracker-jira">Issue Tracker: Jira<a class="headerlink" href="#issue-tracker-jira" title="Permanent link">&para;</a></h1>
-<p>Issues and PRDs for this repo live in Jira on <code>herzberg.atlassian.net</code>.
-Use the CADC project and the <code>CANFAR</code> label for canfar work.</p>
-<p>Use the Atlassian/Jira connector when available. If it is not available, ask
-for the ticket text instead of creating a parallel GitHub issue.</p>
-<h2 id="conventions">Conventions<a class="headerlink" href="#conventions" title="Permanent link">&para;</a></h2>
+<h1 id="issue-trackers-jira-and-github-issues">Issue Trackers: Jira and GitHub Issues<a class="headerlink" href="#issue-trackers-jira-and-github-issues" title="Permanent link">&para;</a></h1>
+<p>You can track issues, product requirements documents (PRDs), specifications,
+and implementation decisions through either route:</p>
 <ul>
-<li>Project: CADC</li>
-<li>Required label: <code>CANFAR</code></li>
-<li>Ticket examples use keys such as <code>CADC-15643</code></li>
-<li>Specs, PRDs, and implementation decisions are Jira-first</li>
+<li><strong>Jira:</strong> <code>herzberg.atlassian.net</code>, project <code>CADC</code>. Retain the <code>CANFAR</code> label
+  on CANFAR work. Issue keys look like <code>CADC-15643</code>.</li>
+<li><strong>GitHub Issues:</strong> the <code>opencadc/canfar</code> repository. Reference issues by their
+  repository URL or <code>opencadc/canfar#NUMBER</code>. Use the existing <code>PRD</code> label for PRDs.</li>
 </ul>
-<h2 id="skill-rules">Skill Rules<a class="headerlink" href="#skill-rules" title="Permanent link">&para;</a></h2>
-<p>When a skill says "publish to the issue tracker", create or update a Jira
-ticket in the CADC project with the <code>CANFAR</code> label.</p>
-<p>When a skill says "fetch the relevant ticket", fetch the Jira issue by key.</p>
-<p>Do not create GitHub Issues, local markdown tickets, ADRs, or RFCs as the source
-of truth unless the user explicitly overrides this file.</p>
+<h2 id="choose-the-tracker">Choose the tracker<a class="headerlink" href="#choose-the-tracker" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Follow the user's explicit choice. Otherwise, use the tracker identified by
+  the issue key, issue URL, or existing parent PRD.</li>
+<li>Keep follow-up work in the same tracker unless the user requests otherwise.
+  If the destination is still unclear, ask which tracker to use before publishing.</li>
+<li>Search for existing work before creating an issue. Read linked records in
+  either tracker. If work spans both, cross-link the records and identify which
+  holds the authoritative specification and decisions; avoid duplicate specs
+  that can drift apart.</li>
+</ul>
+<h2 id="read-and-write-work-items">Read and write work items<a class="headerlink" href="#read-and-write-work-items" title="Permanent link">&para;</a></h2>
+<ul>
+<li>For Jira, use an available Atlassian/Jira connector and the full issue key.
+  Create or update CANFAR work in <code>CADC</code>, preserving existing labels when adding
+  <code>CANFAR</code>.</li>
+<li>For GitHub, use an available GitHub connector or <code>gh</code> with the explicit
+  <code>opencadc/canfar</code> repository. Preserve unrelated existing labels.</li>
+<li>Read the description, acceptance criteria, linked work, and relevant decisions
+  before implementing an issue from either tracker.</li>
+<li>Translate canonical triage roles through <a href="../triage-labels/">Triage Labels</a>.
+  Inspect available Jira transitions or GitHub labels before updating triage.</li>
+<li>If access to the selected tracker is unavailable, request the relevant issue
+  text or prepare a clearly marked local draft. Report publication as pending;
+  do not silently switch trackers or claim that a local draft is a published issue.</li>
+</ul>
+<h2 id="skill-conventions">Skill conventions<a class="headerlink" href="#skill-conventions" title="Permanent link">&para;</a></h2>
+<p>"Publish to the issue tracker" means publish to the selected Jira or GitHub
+destination. "Fetch the relevant ticket" means read the issue identified by its
+key or repository reference. Use that tracker's relationships for parent work
+and dependencies when the requested workflow needs them.</p>
+<p>Local review reports and working drafts can support work in either tracker;
+keep them clearly identified as supporting artifacts. Do not introduce local
+Markdown tickets, ADRs, or RFCs as another source of truth unless the user
+explicitly requests that change in convention.</p>
 
 
 
@@ -1510,7 +1560,7 @@ of truth unless the user explicitly overrides this file.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2026 21:33:01 UTC">September 9, 2026</span>
   </span>
 
     

@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#canfar.overview.Overview" class="md-skip">
+        <a href="#overview-api" class="md-skip">
           Skip to content
         </a>
       
@@ -524,6 +524,8 @@
   
     
     
+      
+        
       
         
       
@@ -1326,6 +1328,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
@@ -1367,6 +1371,8 @@
 <nav class="md-nav md-nav--secondary" aria-label="Table of contents">
   
   
+  
+    
   
   
     <label class="md-nav__title" for="__toc">
@@ -1495,8 +1501,6 @@
       
         
       
-        
-      
     
     
     
@@ -1592,34 +1596,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1791,6 +1767,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1980,6 +1984,8 @@
   
   
   
+    
+  
   
     <label class="md-nav__title" for="__toc">
       <span class="md-nav__icon md-icon"></span>
@@ -2042,12 +2048,19 @@
   
 
 
-  <h1>Overview</h1>
+<h1 id="overview-api">Overview API<a class="headerlink" href="#overview-api" title="Permanent link">&para;</a></h1>
+<p><code>Overview</code> checks whether a Science Platform Server reports itself as
+available. It inherits <code>HTTPClient</code> and uses the selected or explicitly supplied
+credentials.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.overview</span><span class="w"> </span><span class="kn">import</span> <span class="n">Overview</span>
 
-<div class="admonition info">
-<p class="admonition-title">Overview API</p>
-<p>The Overview API provides information about the availability of the CANFAR Science Platform.</p>
-</div>
+<span class="k">with</span> <span class="n">Overview</span><span class="p">()</span> <span class="k">as</span> <span class="n">overview</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">overview</span><span class="o">.</span><span class="n">availability</span><span class="p">():</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Science Platform Server is available&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>availability()</code> returns <code>True</code> only when the VOSI availability response says
+the server is available. Empty or malformed availability data returns <code>False</code>
+and is logged.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -2335,7 +2348,7 @@ attributes and methods.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 12, 2025 00:57:26 UTC">August 12, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 07:58:44 UTC">August 18, 2026</span>
   </span>
 
     

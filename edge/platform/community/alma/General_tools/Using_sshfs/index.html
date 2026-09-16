@@ -25,7 +25,7 @@
     
     
       
-        <title>Using SSHFS - CANFAR</title>
+        <title>Using sshfs - CANFAR</title>
       
     
     
@@ -123,7 +123,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using SSHFS
+              Using sshfs
             
           </span>
         </div>
@@ -537,6 +537,8 @@
       
         
       
+        
+      
     
     
     
@@ -735,69 +737,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installation
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#prepare-your-arc-account" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Prepare your Arc account
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#mount-the-remote-file-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Mount the Remote File System
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#synch-local-and-remote-directories-with-rsync" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Synch Local and Remote Directories with rsync
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#unmounting-the-file-system" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Unmounting the File System
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -829,54 +768,15 @@
   
 
 
+<p><span id="installation"></span>
+<span id="prepare-your-arc-account"></span>
+<span id="mount-the-remote-file-system"></span>
+<span id="synch-local-and-remote-directories-with-rsync"></span>
+<span id="unmounting-the-file-system"></span></p>
 <h1 id="using-sshfs">Using SSHFS<a class="headerlink" href="#using-sshfs" title="Permanent link">&para;</a></h1>
-<p>Mount the remote Science Platform file system locally with <code>sshfs</code> to access files directly from your machine.</p>
-<h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<p>Software installation is required to use this tool.</p>
-<p><em>Linux</em>: SSHFS is Linux-based software that needs to be installed on your local computer. On Ubuntu and Debian based systems, it can be installed through apt-get:</p>
-<div class="highlight"><pre><span></span><code>sudo apt-get install sshfs
-</code></pre></div>
-<p><em>Mac OSX</em>: Often SSHFS is already installed; if not, you will need to download FUSE and SSHFS from the <a href="https://osxfuse.github.io">osxfuse site</a></p>
-<h2 id="prepare-your-arc-account">Prepare your Arc account<a class="headerlink" href="#prepare-your-arc-account" title="Permanent link">&para;</a></h2>
-<p>A public SSH key will need to be installed into your Arc home directory. Ensure you have a <code>.ssh</code> folder in your <code>/home/[your_cadc_username]</code> folder.  You can do this through the UI: <a href="https://www.canfar.net/storage/arc/list/home">https://www.canfar.net/storage/arc/list/home</a></p>
-<ol>
-<li>
-<p>Ensure you are logged in using the pulldown in the top right menu.</p>
-</li>
-<li>
-<p>Visit your <code>Home</code> folder.</p>
-</li>
-<li>
-<p>If there is no <code>.ssh</code> folder listed, create one.</p>
-</li>
-<li>
-<p>Ensure you have a file called <code>authorized_keys</code> with your SSH public key in it. This public key should match whichever private key you are using to authenticate with. For example, if your private key on your local machine is <code>${HOME}/.ssh/id_rsa</code>, then your public key is likely <code>${HOME}/.ssh/id_rsa.pub</code>.</p>
-</li>
-</ol>
-<h2 id="mount-the-remote-file-system">Mount the Remote File System<a class="headerlink" href="#mount-the-remote-file-system" title="Permanent link">&para;</a></h2>
-<p>For Ubuntu/Debian Linux or Mac OSX, the instructions are below.</p>
-<p>To start, we will need to create a local directory in which to mount the file system, "arc":</p>
-<div class="highlight"><pre><span></span><code>mkdir $HOME/arc
-</code></pre></div>
-<p>Now we can mount the file system locally using the following command, based on which OS you are running. You will be asked for your CADC password during this step.</p>
-<p><em>On Ubuntu/Debian</em>:</p>
-<div class="highlight"><pre><span></span><code>sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10 -p 64022 [your_cadc_username]@ws-uv.canfar.net:/ $HOME/arc
-</code></pre></div>
-<p><em>On Mac OSX</em>:</p>
-<div class="highlight"><pre><span></span><code>sshfs -o reconnect,ServerAliveInterval=15,ServerAliveCountMax=10,defer_permissions -p 64022 [your_cadc_username]@ws-uv.canfar.net:/ $HOME/arc
-</code></pre></div>
-<p>The extra <code>defer_permissions</code> switch works around issues with OSX permission handling.</p>
-<h2 id="synch-local-and-remote-directories-with-rsync">Synch Local and Remote Directories with rsync<a class="headerlink" href="#synch-local-and-remote-directories-with-rsync" title="Permanent link">&para;</a></h2>
-<p>With the steps above in place, the rsync ("remote synch") command can be used. rsync uses an algorithm that minimizes the amount of data copied by only moving the portions of files that have changed.</p>
-<p>The synch is performed using the following:</p>
-<div class="highlight"><pre><span></span><code>rsync -vrltP source_dir $HOME/arc/destination_dir/
-</code></pre></div>
-<p>Pro tip: including a <code>/</code> after source_dir in the command above will transfer the directory contents without the main directory itself.</p>
-<h2 id="unmounting-the-file-system">Unmounting the File System<a class="headerlink" href="#unmounting-the-file-system" title="Permanent link">&para;</a></h2>
-<p>If you have finished working with your files and want to disconnect from the remote file system, you can do this by:</p>
-<div class="highlight"><pre><span></span><code>umount $HOME/arc
-</code></pre></div>
-<p>NB: If you run into problems with the original sshfs command and need to run it again, you will likely need to unmount first.</p>
+<p>The older SSHFS instructions are retired. Use the browser or authenticated client transfers described in the maintained guide.</p>
+<p><a href="../../../../storage/transfers/">Use supported data-transfer methods</a>.</p>
+<p><a href="../../">Return to the ALMA workflow</a>.</p>
 
 
 
@@ -899,7 +799,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 19:49:16 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     
@@ -914,6 +814,34 @@
 
     
     
+    
+      
+  <span class="md-source-file__fact">
+    
+      
+  <span class="md-icon" title="Contributors">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.87 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33s1.71.11 2.5.33c1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2"/></svg>
+  </span>
+  <span>GitHub</span>
+
+    
+    <nav>
+      
+        <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
+          
+          <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
+        </a>
+      
+      
+      
+    </nav>
+  </span>
+
     
   </aside>
 

@@ -1316,6 +1316,8 @@
       
         
       
+        
+      
     
     
     
@@ -1392,6 +1394,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1780,6 +1810,8 @@
       
         
       
+        
+      
     
     
     
@@ -1985,10 +2017,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#quick-access" class="md-nav__link">
+  <a href="#choose-a-starting-point" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🚀 Quick Access
+        Choose a starting point
       
     </span>
   </a>
@@ -1996,10 +2028,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#platform-documentation" class="md-nav__link">
+  <a href="#typical-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📚 Platform Documentation
+        Typical workflow
       
     </span>
   </a>
@@ -2007,21 +2039,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#support-community" class="md-nav__link">
+  <a href="#community-and-publication" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🆘 Support &amp; Community
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#external-resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔗 External Resources
+        Community and publication
       
     </span>
   </a>
@@ -2061,103 +2082,48 @@
   
 
 
+<p><span id="platform-documentation"></span></p>
 <h1 id="canfar-science-platform">CANFAR Science Platform<a class="headerlink" href="#canfar-science-platform" title="Permanent link">&para;</a></h1>
-<p>The Canadian Advanced Network for Astronomy Research lets you access software environments and large datasets on the cloud designed specifically for astronomical research.</p>
-<div class="admonition abstract">
-<p class="admonition-title">🚀 Platform Overview</p>
+<p>CANFAR provides authenticated compute and storage for astronomical research.
+Launch a Session from a Container Image, work with mounted project storage or
+configured VOSpace Services, and preserve results outside temporary compute.</p>
+<p><span id="quick-access"></span>
+<span id="getting-started-resources"></span></p>
+<p><span id="core-platform-guides"></span>
+<span id="advanced-topics"></span></p>
+<h2 id="choose-a-starting-point">Choose a starting point<a class="headerlink" href="#choose-a-starting-point" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Scalable</strong> cloud compute and storage to analyze very large datasets from anywhere.</li>
-<li><strong>Browser-based</strong> interactive environments for instant, device-independent data exploration.</li>
-<li><strong>Collaborative</strong> tools that make teamwork and data sharing simple.</li>
-<li><strong>Well‑tested</strong> default scientific containers plus customizable images and registries for large-team workflows.</li>
+<li><a href="get-started/">Get started</a> — account, first Session, and first workflow.</li>
+<li><a href="concepts/">Platform concepts</a> — Authentication, Server Selection, Sessions,
+  Container Images, and Storage Identifiers.</li>
+<li><a href="sessions/">Sessions</a> — Notebook, Desktop, CARTA, Firefly, contributed,
+  and headless workflows.</li>
+<li><a href="storage/">Storage</a> — <code>/arc</code>, <code>/scratch</code>, VOSpace, fsspec, and data
+  transfers.</li>
+<li><a href="containers/">Containers</a> — choose or build a software environment.</li>
+<li><a href="permissions/">Permissions</a> — accounts, groups, and access control.</li>
+<li><a href="support/">Support</a> — troubleshooting and contact options.</li>
 </ul>
-</div>
-<h2 id="quick-access">🚀 Quick Access<a class="headerlink" href="#quick-access" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">🆕 New to CANFAR?</label><label for="__tabbed_1_2">👤 Experienced Users</label><label for="__tabbed_1_3">⚙️ Developers &amp; Automation</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<p><strong>Start Your Research Journey</strong></p>
-<dl>
-<dt><strong><a href="get-started/">📖 Getting Started Guide</a></strong></dt>
-<dd>Complete onboarding with tutorials, examples, and first session setup</dd>
-<dt><strong><a href="concepts/">🧩 Platform Concepts</a></strong></dt>
-<dd>Understanding CANFAR architecture, containers, sessions, and storage systems</dd>
-<dt><strong><a href="permissions/">🔑 Account Setup</a></strong></dt>
-<dd>User management, groups, and collaboration access</dd>
-</dl>
-</div>
-<div class="tabbed-block">
-<p><strong>Direct Platform Access</strong></p>
-<dl>
-<dt><strong><a href="https://www.canfar.net/science-portal/">🌐 Science Portal</a></strong></dt>
-<dd>Launch interactive sessions and manage computing resources</dd>
-<dt><strong><a href="https://www.canfar.net/storage/arc/list">📁 File Manager</a></strong></dt>
-<dd>Access and organize your research data and project files</dd>
-<dt><strong><a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/groups/">👥 Group Management</a></strong></dt>
-<dd>Manage research teams and collaborative permissions</dd>
-</dl>
-</div>
-<div class="tabbed-block">
-<p><strong>Programmatic Access</strong></p>
-<dl>
-<dt><strong><a href="../cli/cli-help/">⚙️ CANFAR CLI</a></strong></dt>
-<dd>Command-line tools for session management and automation</dd>
-<dt><strong><a href="../client/home/">🐍 Python Client</a></strong></dt>
-<dd>Programmatic API access for workflows and integration</dd>
-<dt><strong><a href="https://images.canfar.net">🐳 Container Registry</a></strong></dt>
-<dd>Browse and manage software environments</dd>
-</dl>
-</div>
-</div>
-</div>
-<h2 id="platform-documentation">📚 Platform Documentation<a class="headerlink" href="#platform-documentation" title="Permanent link">&para;</a></h2>
-<h3 id="core-platform-guides">Core Platform Guides<a class="headerlink" href="#core-platform-guides" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong><a href="concepts/">🧩 Platform Concepts</a></strong></dt>
-<dd><strong>Comprehensive platform understanding</strong> - Architecture, containers, sessions, storage systems, and browser-based workflows</dd>
-<dt><strong><a href="permissions/">🔑 User Management &amp; Permissions</a></strong></dt>
-<dd><strong>Collaboration and access control</strong> - Accounts, groups, ACLs, container registry, and API authentication</dd>
-<dt><strong><a href="doi/">📄 Data Publication Service</a></strong></dt>
-<dd><strong>DOI management and data preservation</strong> - Request DOIs, referee access, and freeze your data for publication</dd>
-<dt><strong><a href="cloud/">☁️ Legacy Cloud Platform</a></strong></dt>
-<dd><strong>Traditional VM infrastructure</strong> - OpenStack cloud, VM batch processing</dd>
-</dl>
-<h3 id="getting-started-resources">Getting Started Resources<a class="headerlink" href="#getting-started-resources" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong><a href="get-started/">📖 Getting Started Guide</a></strong></dt>
-<dd><strong>Hands-on tutorials</strong> - Account setup, first sessions, data management, and workflow examples</dd>
-<dt><strong><a href="storage/">🗄️ Storage Systems</a></strong></dt>
-<dd><strong>Data management mastery</strong> - ARC storage, VOSpace, quotas, and collaboration workflows</dd>
-<dt><strong><a href="containers/">🐳 Container Environments</a></strong></dt>
-<dd><strong>Software environment usage</strong> - Available containers, custom builds, and workflow integration</dd>
-<dt><strong><a href="sessions/">🖥️ Sessions</a></strong></dt>
-<dd><strong>Computing workflows</strong> - Notebooks, desktops, CARTA, Firefly, specialized browser-based apps</dd>
-</dl>
-<h3 id="advanced-topics">Advanced Topics<a class="headerlink" href="#advanced-topics" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong><a href="sessions/batch/">🏭 Batch Processing</a></strong></dt>
-<dd><strong>Automated workflows</strong> - Large-scale processing, job management, and production pipelines</dd>
-<dt><strong><a href="../cli/cli-help/">⚙️ Command Line Interface</a></strong></dt>
-<dd><strong>Platform automation</strong> - CLI tools, scripting, and workflow management</dd>
-<dt><strong><a href="../client/home/">🐍 Python Client</a></strong></dt>
-<dd><strong>API integration</strong> - Programmatic access, custom applications, and automation</dd>
-</dl>
-<h2 id="support-community">🆘 Support &amp; Community<a class="headerlink" href="#support-community" title="Permanent link">&para;</a></h2>
-<h3 id="getting-help">Getting Help<a class="headerlink" href="#getting-help" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong><a href="support/">🆘 Help &amp; Support</a></strong></dt>
-<dd><strong>Technical assistance</strong> - Support channels, issue reporting, and community resources</dd>
-<dt><strong><a href="support/faq/">❓ Frequently Asked Questions</a></strong></dt>
-<dd><strong>Common questions and solutions</strong> - Platform usage, troubleshooting, and best practices</dd>
-</dl>
-<h2 id="external-resources">🔗 External Resources<a class="headerlink" href="#external-resources" title="Permanent link">&para;</a></h2>
-<h3 id="canfar-ecosystem">CANFAR Ecosystem<a class="headerlink" href="#canfar-ecosystem" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong><a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/">Canadian Astronomy Data Centre (CADC)</a></strong></dt>
-<dd><strong>Data archives and services</strong> - Search observatory data, VO services</dd>
-<dt><strong><a href="https://www.canfar.net/">CANFAR Main Website</a></strong></dt>
-<dd><strong>Project information</strong> - Access various CANFAR services, news, partnerships, and organizational details</dd>
-</dl>
+<h2 id="typical-workflow">Typical workflow<a class="headerlink" href="#typical-workflow" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    Account[Account and group access] --&gt; Login[Authenticate]
+    Login --&gt; Session[Launch a Session]
+    Session --&gt; Data[Read mounted or remote data]
+    Data --&gt; Work[Run analysis]
+    Work --&gt; Result[Save result to persistent storage]</code></pre>
+<p>Use the <a href="../client/get-started/">Python client</a> or <a href="../cli/cli-help/">CLI</a>
+when the workflow should be repeatable from a script. Use the <a href="../demos/srcnet-workshop/">Demos</a>
+for a guided command-line exercise.</p>
+<p><span id="support-community"></span></p>
+<p><span id="getting-help"></span>
+<span id="external-resources"></span>
+<span id="canfar-ecosystem"></span></p>
+<h2 id="community-and-publication">Community and publication<a class="headerlink" href="#community-and-publication" title="Permanent link">&para;</a></h2>
+<p>The <a href="community/">Community</a> pages collect domain workflows such as
+ALMA. The <a href="doi/">DOI guide</a> describes the Data Publication Service. If you
+use CANFAR in a publication, follow the <a href="../about/acknowledgement/">acknowledgement</a>
+wording.</p>
+<p>Deployment and operator material lives in <a href="https://www.opencadc.org/deployments/">OpenCADC Deployments</a>.</p>
 
 
 
@@ -2180,7 +2146,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     
@@ -2208,14 +2174,14 @@
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

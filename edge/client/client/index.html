@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -1408,10 +1410,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#construct-a-client" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Features
+        Construct a client
       
     </span>
   </a>
@@ -1419,10 +1421,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-modes" class="md-nav__link">
+  <a href="#credential-precedence-and-lifecycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Modes
+        Credential precedence and lifecycle
       
     </span>
   </a>
@@ -1430,10 +1432,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#logging" class="md-nav__link">
+  <a href="#errors-and-logging" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Logging
+        Errors and logging
       
     </span>
   </a>
@@ -1441,21 +1443,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#configuration-editing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error Handling
+        Configuration editing
       
     </span>
   </a>
@@ -1534,8 +1525,6 @@
   
     
     
-      
-        
       
         
       
@@ -1640,34 +1629,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1839,6 +1800,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2038,10 +2027,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#features" class="md-nav__link">
+  <a href="#construct-a-client" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Features
+        Construct a client
       
     </span>
   </a>
@@ -2049,10 +2038,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#authentication-modes" class="md-nav__link">
+  <a href="#credential-precedence-and-lifecycle" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Modes
+        Credential precedence and lifecycle
       
     </span>
   </a>
@@ -2060,10 +2049,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#logging" class="md-nav__link">
+  <a href="#errors-and-logging" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Logging
+        Errors and logging
       
     </span>
   </a>
@@ -2071,21 +2060,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#configuration-editing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Configuration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#error-handling" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Error Handling
+        Configuration editing
       
     </span>
   </a>
@@ -2136,60 +2114,98 @@
   
 
 
+<p><span id="features"></span></p>
 <h1 id="httpclient">HTTPClient<a class="headerlink" href="#httpclient" title="Permanent link">&para;</a></h1>
-<p>The <code>canfar.client</code> module provides a comprehensive HTTP client for interacting with CANFAR Science Platform services. Built on the powerful <a href="https://www.python-httpx.org/"><code>httpx</code></a> library, it offers both synchronous and asynchronous interfaces with advanced authentication capabilities.</p>
-<h2 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h2>
-<div class="admonition tip">
-<p class="admonition-title">Key Capabilities</p>
-<ul>
-<li><strong>Multiple Authentication Methods</strong>: X.509 certificates, OIDC tokens, and bearer tokens</li>
-<li><strong>Automatic SSL Configuration</strong>: Seamless certificate-based authentication</li>
-<li><strong>Async/Sync Support</strong>: Both synchronous and asynchronous HTTP clients</li>
-<li><strong>Connection Pooling</strong>: Optimized for concurrent requests</li>
-<li><strong>Application Logging</strong>: Explicit, secret-safe runtime configuration</li>
-<li><strong>Context Managers</strong>: Proper resource management</li>
-</ul>
-</div>
-<p><em>This is a low-level client that is used by all other API clients in CANFAR. It is not intended to be used directly by users, but rather as a building block for other clients and contributors.</em></p>
-<h2 id="authentication-modes">Authentication Modes<a class="headerlink" href="#authentication-modes" title="Permanent link">&para;</a></h2>
-<p>The client supports multiple authentication modes that can be configured through the authentication system:</p>
-<h2 id="logging">Logging<a class="headerlink" href="#logging" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_logging</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
-
-<span class="c1"># Configure the application once, then construct clients normally.</span>
-<span class="n">configure_logging</span><span class="p">(</span><span class="n">loglevel</span><span class="o">=</span><span class="s2">&quot;debug&quot;</span><span class="p">)</span>
-<span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">()</span>
-</code></pre></div>
-<p>Logging is an application concern rather than an <code>HTTPClient</code> constructor
-setting. See <a href="../../cli/logging/">Logging</a> for environment precedence, stream
-separation, and the optional <code>--log-file</code> JSON Lines sink.</p>
-<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
-<p>The client composes a <code>Configuration</code> object through its <code>config</code> field:</p>
+<p><code>canfar.client.HTTPClient</code> is the lower-level transport used by the Session,
+Image, Context, and Overview clients. It composes native synchronous and
+asynchronous <code>httpx</code> clients and is useful when an application needs a CANFAR
+request outside those higher-level modules.</p>
+<h2 id="construct-a-client">Construct a client<a class="headerlink" href="#construct-a-client" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
 
 <span class="n">client</span> <span class="o">=</span> <span class="n">HTTPClient</span><span class="p">(</span>
     <span class="n">config</span><span class="o">=</span><span class="n">Configuration</span><span class="p">(),</span>
-    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>           <span class="c1"># Request timeout in seconds</span>
-    <span class="n">concurrency</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>       <span class="c1"># Max concurrent connections</span>
+    <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="n">concurrency</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
-<p>Runtime <code>token</code> or <code>certificate</code> arguments take precedence over saved
-Authentication Records, including authentication hook selection. Without
-runtime credentials, <code>authentication_idp</code> selects an Authentication Record for
-that client; otherwise the active Authentication Record and Server Selection
-from <code>Configuration</code> are used.</p>
-<h2 id="error-handling">Error Handling<a class="headerlink" href="#error-handling" title="Permanent link">&para;</a></h2>
-<p>The client includes built-in error handling for HTTP responses:</p>
+<p>The main settings are:</p>
+<ul>
+<li><code>url</code>: an explicit Science Platform Server URL.</li>
+<li><code>config</code>: the persisted <code>Configuration</code> to resolve by default.</li>
+<li><code>authentication_idp</code>: a transient Identity Provider selector for this client.</li>
+<li><code>token</code>: a runtime bearer token.</li>
+<li><code>certificate</code>: a runtime X.509 certificate path.</li>
+<li><code>timeout</code>: HTTP request inactivity timeout in seconds (1–300), not a total
+  job deadline.</li>
+<li><code>concurrency</code>: maximum async connection count (1–128).</li>
+</ul>
+<p>When no explicit <code>url</code> is supplied, the active Server Selection in
+<code>Configuration</code> supplies the Science Platform Server. Without a runtime
+credential, <code>authentication_idp</code> selects a saved Authentication Record for this
+client; otherwise the active Authentication Record is used.</p>
+<p><span id="authentication-modes"></span>
+<span id="authentication-expiry"></span></p>
+<h2 id="credential-precedence-and-lifecycle">Credential precedence and lifecycle<a class="headerlink" href="#credential-precedence-and-lifecycle" title="Permanent link">&para;</a></h2>
+<p>Runtime credentials take precedence over saved Authentication Records. A
+non-empty runtime <code>token</code> wins over a saved X.509 or OIDC record; a runtime
+<code>certificate</code> likewise wins. An empty runtime token is treated as absent: a supplied runtime certificate
+still takes precedence, otherwise the client uses the selected saved record. Runtime credentials are not persisted.</p>
+<p>Without runtime credentials, the client resolves the selected saved record when
+its sync or async HTTPX client is first created. An expired OIDC record is
+refreshed through the saved Authentication Record and the refreshed token is
+persisted. If the record cannot refresh or an X.509 certificate is invalid,
+client construction/request setup raises the established authentication error
+instead of silently sending an unauthenticated request.</p>
+<p>Use the native context manager that matches the transport:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
+
+<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">async</span> <span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span>
+        <span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">asynclient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><code>client</code> is the native <code>httpx.Client</code>; <code>asynclient</code> is the native
+<code>httpx.AsyncClient</code>. They are created lazily and closed by their matching
+context manager. Do not use the async client from synchronous code or expect a
+sync client to run through an event loop.</p>
+<p><span id="logging"></span>
+<span id="error-handling"></span>
+<span id="debug-logging"></span></p>
+<h2 id="errors-and-logging">Errors and logging<a class="headerlink" href="#errors-and-logging" title="Permanent link">&para;</a></h2>
+<p>HTTP response hooks raise <code>httpx.HTTPStatusError</code> by default for unsuccessful
+responses. Catch it at the application boundary when a request can fail:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">httpx</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPStatusError</span>
 
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;/invalid-endpoint&quot;</span><span class="p">)</span>
-    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
-<span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTP error: </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
+
+<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;invalid-endpoint&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
 </code></pre></div>
+<p>Authentication and configuration failures use CANFAR's authentication/error
+types. Do not log tokens, certificates, or raw credential records. Configure
+the application logger explicitly when diagnostics are needed:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_logging</span>
+
+<span class="n">configure_logging</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p><span id="configuration"></span></p>
+<h2 id="configuration-editing">Configuration editing<a class="headerlink" href="#configuration-editing" title="Permanent link">&para;</a></h2>
+<p><code>HTTPClient</code> consumes the persisted <code>Configuration</code>; it does not own edits or
+alternate configuration services. Use <code>config.editor.get()</code>, <code>set()</code>, and
+<code>save()</code> to make validated, atomic changes while preserving the stable
+<code>version</code>/<code>active</code>/<code>authentication</code>/<code>servers</code>/<code>registry</code>/<code>console</code> shape. See
+<a href="../get-started/#edit-and-save-configuration">Install and set up</a>.</p>
 <h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 
 
@@ -2341,8 +2357,238 @@ variables, or a configuration file.</p>
 
 </div>
 
+<div class="doc doc-object doc-attribute">
 
 
+
+<h4 id="canfar.client.HTTPClient.uses_runtime_credentials" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">uses_runtime_credentials</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#canfar.client.HTTPClient.uses_runtime_credentials" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">uses_runtime_credentials</span><span class="p">:</span> <span class="nb">bool</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return whether runtime token or certificate credentials are active.</p>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="canfar.client.HTTPClient.authentication_record" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">authentication_record</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#canfar.client.HTTPClient.authentication_record" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">authentication_record</span><span class="p">:</span> <span class="n">AuthenticationCredential</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return this client's selected usable Authentication Record, if any.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="canfar.client.HTTPClient.build" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#canfar.client.HTTPClient.build" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">config</span><span class="p">:</span> <span class="n">Configuration</span><span class="p">,</span>
+    <span class="n">authentication_idp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">url</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">token</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">certificate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HTTPClient</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build a client, omitting runtime credentials that were not supplied.</p>
+<p>Unset credentials are omitted rather than passed as <code>None</code> so the
+settings sources stay free to supply them.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>config</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Configuration backing the client.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="canfar.models.config.Configuration">Configuration</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>authentication_idp</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Canonical Identity Provider key.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="str">str</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>url</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Base URL for the client.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>token</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Runtime bearer token, when overriding the saved record.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>certificate</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Runtime X.509 certificate path, when overriding it.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>None</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>**extra</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>Further client settings passed through unchanged.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="typing.Any">Any</span></code>
+                  </span>
+                  <span class="doc-param-default">
+                    <b>DEFAULT:</b>
+                      <code>{}</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>HTTPClient</code>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>A client bound to the supplied credentials.</p>
+              </div>
+                <p>
+                  <span class="doc-returns-annotation">
+                    <b>TYPE:</b>
+                      <code><a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;canfar.client.HTTPClient&lt;/span&gt;" href="#canfar.client.HTTPClient">HTTPClient</a></code>
+                  </span>
+                </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+    </div>
+
+</div>
 
 
 
@@ -2373,7 +2619,7 @@ variables, or a configuration file.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:10 UTC">September 16, 2026</span>
   </span>
 
     

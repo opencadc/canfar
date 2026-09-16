@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -923,10 +925,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#log-in" class="md-nav__link">
+  <a href="#authenticate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Log in
+        Authenticate
       
     </span>
   </a>
@@ -945,21 +947,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-fixed-resources" class="md-nav__link">
+  <a href="#edit-and-save-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use fixed resources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-async-workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use async workflows
+        Edit and save Configuration
       
     </span>
   </a>
@@ -1348,8 +1339,6 @@
       
         
       
-        
-      
     
     
     
@@ -1445,34 +1434,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1644,6 +1605,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1854,10 +1843,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#log-in" class="md-nav__link">
+  <a href="#authenticate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Log in
+        Authenticate
       
     </span>
   </a>
@@ -1876,21 +1865,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#use-fixed-resources" class="md-nav__link">
+  <a href="#edit-and-save-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Use fixed resources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#use-async-workflows" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Use async workflows
+        Edit and save Configuration
       
     </span>
   </a>
@@ -1953,70 +1931,162 @@
 
 
 <h1 id="install-and-set-up">Install and Set Up<a class="headerlink" href="#install-and-set-up" title="Permanent link">&para;</a></h1>
-<p>Use the CANFAR Python package when you want to automate Science Platform work:
+<p>Use the CANFAR Python package to automate work on a Science Platform Server:
 launch Sessions, list Container Images, fetch logs, inspect state, and clean up
-resources from Python.</p>
+resources.</p>
 <h2 id="install">Install<a class="headerlink" href="#install" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--upgrade
+<div class="admonition note">
+<p class="admonition-title">Development documentation</p>
+<p>The examples in this branch describe unreleased changes since v1.4.1.
+The published package does not yet contain every command and Python API
+shown here. Read <a href="../updates/">What's new</a> and the <a href="../migration/">upgrade guide</a>
+before changing an existing environment.</p>
+</div>
+<h3 id="use-the-published-release">Use the published release<a class="headerlink" href="#use-the-published-release" title="Permanent link">&para;</a></h3>
+<p>Install the released package for regular use, and use the documentation that
+matches that release:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>canfar
 </code></pre></div>
 <p>With <code>uv</code>:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>add<span class="w"> </span>canfar
 </code></pre></div>
-<h2 id="log-in">Log in<a class="headerlink" href="#log-in" title="Permanent link">&para;</a></h2>
-<p>Authenticate once from the CLI. Python then uses the active Authentication and
-Server selection.</p>
+<h3 id="try-this-development-branch">Try this development branch<a class="headerlink" href="#try-this-development-branch" title="Permanent link">&para;</a></h3>
+<p>To test the examples on <code>feat/interfaces</code>, use a separate checkout and Python
+environment. With Git and <code>uv</code> installed, run:</p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span>feat/interfaces<span class="w"> </span>https://github.com/opencadc/canfar.git<span class="w"> </span>canfar-preview
+<span class="nb">cd</span><span class="w"> </span>canfar-preview
+uv<span class="w"> </span>sync
+<span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+canfar<span class="w"> </span>--help
+canfar<span class="w"> </span>ps<span class="w"> </span>--help
+</code></pre></div>
+<p>The activation command above is for a macOS or Linux shell. In another shell,
+use <code>uv run canfar …</code> from the checkout instead. The checkout still reports
+version <code>1.4.1</code>; confirm that <code>canfar ps --help</code> offers <code>-o/--output</code> and that
+<code>canfar data --help</code> works before following these examples.</p>
+<p>The Python environment is separate, but the client still uses your normal
+<code>~/.canfar/config.yaml</code>. Review the <a href="../migration/">migration guide</a> before
+changing saved configuration.</p>
+<p><span id="log-in"></span></p>
+<h2 id="authenticate">Authenticate<a class="headerlink" href="#authenticate" title="Permanent link">&para;</a></h2>
+<p>The simplest path is to authenticate with the CLI. Python then uses the saved
+Authentication Record and Server Selection:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
-<p>For SRCNet:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet
+<p>Use <code>canfar login srcnet</code> if your account belongs to an SRCNet identity provider
+(IDP), the service that manages your login. It uses OpenID Connect (OIDC)
+device authorization: follow the displayed link to approve the login.</p>
+<p><span id="use-async-workflows"></span></p>
+<h3 id="log-in-directly-from-python">Log in directly from Python<a class="headerlink" href="#log-in-directly-from-python" title="Permanent link">&para;</a></h3>
+<p>The following alternatives perform the same OpenID Connect (OIDC) device
+login. Open the displayed verification URL and enter the user-facing code
+when prompted by your identity provider.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sync Python</label><label for="__tabbed_1_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">login.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
+
+<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
 </code></pre></div>
-<p>Force a fresh login when credentials expire or you want to replace saved state:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc<span class="w"> </span>--force
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">login.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
+
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
-<p>Check what Python will use:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show
-canfar<span class="w"> </span>server<span class="w"> </span>ls
+</div>
+</div>
+</div>
+<p>In Jupyter, define <code>main()</code> without the script entrypoint and run
+<code>await main()</code> in another cell. The async login performs native asynchronous
+network requests.</p>
+<p>Python prints the verification URL and user-facing device code, then waits
+for approval. It does not open a browser or render the CLI's QR code.
+The private OAuth device token is never printed.</p>
+<p>Both functions save the Authentication Record and discovered Science Platform
+Servers but do not change the active Authentication or Server Selection. They
+return <code>None</code>; an unknown Identity Provider raises <code>KeyError</code>, and credential or
+discovery failures raise <code>canfar.authentication.AuthenticationError</code>.</p>
+<h3 id="select-the-identity-and-server-in-python">Select the identity and server in Python<a class="headerlink" href="#select-the-identity-and-server-in-python" title="Permanent link">&para;</a></h3>
+<p>After either Python login function completes, select the saved identity and
+list its compatible servers:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">authentication</span><span class="p">,</span> <span class="n">server</span>
+
+<span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">server</span><span class="o">.</span><span class="n">list_servers</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">candidate</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </code></pre></div>
+<p>Choose a name from that output, replace <code>SERVER_NAME</code> below, and select it
+before you construct a Session client:</p>
+<div class="highlight"><pre><span></span><code><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;SERVER_NAME&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>These selection functions are synchronous and save the defaults used by new
+clients. In a notebook or another running event loop, run selection and
+discovery in a worker thread because they can start their own event loop:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">authentication</span><span class="p">,</span> <span class="n">server</span>
+
+<span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="n">candidates</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">list_servers</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">candidate</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+</code></pre></div>
+<p>After choosing a name from that output, run this in the next notebook cell:</p>
+<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">&quot;SERVER_NAME&quot;</span><span class="p">)</span>
+</code></pre></div>
+<p>The CLI <code>canfar login</code> flow includes selection, so you can use that route instead.</p>
+<div class="admonition note">
+<p class="admonition-title">Storage and compute can use different accounts</p>
+<p>The default <code>arc</code> and <code>vault</code> services use your saved CADC Authentication
+Record, even when compute uses SRCNet. Run <code>canfar login cadc</code> for those
+services. Then select SRCNet again for compute with <code>canfar auth use srcnet</code>
+and <code>canfar server use SERVER_NAME</code> if needed.</p>
+</div>
+<p><span id="use-fixed-resources"></span></p>
 <h2 id="create-a-session">Create a Session<a class="headerlink" href="#create-a-session" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<p>Open it in your browser:</p>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="use-fixed-resources">Use fixed resources<a class="headerlink" href="#use-fixed-resources" title="Permanent link">&para;</a></h2>
-<p>Omit resources for flexible allocation. Pass <code>cores</code>, <code>ram</code>, and <code>gpus</code> when
-you need fixed resources.</p>
-<div class="highlight"><pre><span></span><code><span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;batch-job&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span>
-<span class="p">)</span>
-</code></pre></div>
-<h2 id="use-async-workflows">Use async workflows<a class="headerlink" href="#use-async-workflows" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;async-analysis&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
+<p>Choose an image available on your selected server using <code>canfar image ls
+--kind notebook</code>; the image above is an example. Keep the returned IDs to
+inspect and clean up this specific run, as shown in the <a href="../quick-start/">Python tutorial</a>.</p>
+<p><code>create()</code> returns <code>list[str]</code>. A failed replica is omitted and a total HTTP or
+network failure returns <code>[]</code>; request validation errors still raise.</p>
+<h2 id="edit-and-save-configuration">Edit and save Configuration<a class="headerlink" href="#edit-and-save-configuration" title="Permanent link">&para;</a></h2>
+<p><code>Configuration</code> is the persisted data shape. Its top-level fields are
+<code>version</code>, <code>active</code>, <code>authentication</code>, <code>servers</code>, <code>registry</code>, and <code>console</code>.
+Authentication Records are keyed by Identity Provider, Science Platform Servers
+by Server Name, and <code>active</code> stores the selected references. The bound
+<code>config.editor</code> is the supported editing surface:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;console.width&quot;</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;console.width&quot;</span><span class="p">,</span> <span class="mi">132</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+</code></pre></div>
+<p><code>get()</code> can return a scalar, mapping, or whole list through a dotted path. List
+indices are not supported. <code>set()</code> validates before mutating the bound model;
+invalid updates leave it unchanged. <code>save()</code> persists the validated
+Configuration atomically. The editor itself is not part of the serialized
+Configuration shape.</p>
 <h2 id="private-container-images">Private Container Images<a class="headerlink" href="#private-container-images" title="Permanent link">&para;</a></h2>
-<p>Configure Container Registry credentials when you need private images.</p>
+<p>Pass a <code>ContainerRegistry</code> in the Configuration when creating a Session from a
+private image:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
@@ -2024,18 +2094,18 @@ you need fixed resources.</p>
 <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
     <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">)</span>
 <span class="p">)</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
-
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/my-project/private-image:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-image-test&quot;</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="k">with</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/my-project/private-image:latest&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-image-test&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 </code></pre></div>
 <h2 id="read-next">Read next<a class="headerlink" href="#read-next" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../quick-start/">Python quickstart</a></li>
 <li><a href="../examples/">Examples</a></li>
+<li><a href="../data/">Data access</a></li>
 <li><a href="../../cli/authentication-contexts/">Authentication and Servers</a></li>
 <li><a href="../session/">Session API</a></li>
 </ul>
@@ -2061,7 +2131,7 @@ you need fixed resources.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#canfar-storage-systems" class="md-skip">
+        <a href="#storage" class="md-skip">
           Skip to content
         </a>
       
@@ -1316,6 +1316,8 @@
       
         
       
+        
+      
     
     
     
@@ -1392,6 +1394,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1780,6 +1810,8 @@
       
         
       
+        
+      
     
     
     
@@ -1985,10 +2017,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#storage-options-overview" class="md-nav__link">
+  <a href="#storage-at-a-glance" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Options Overview
+        Storage at a glance
       
     </span>
   </a>
@@ -1996,10 +2028,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#storage-in-a-session" class="md-nav__link">
+  <a href="#checking-quotas-and-requesting-more-space" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage in a Session
+        Checking quotas and requesting more space
       
     </span>
   </a>
@@ -2007,10 +2039,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#storage-strategy-and-performance" class="md-nav__link">
+  <a href="#use-the-mounted-filesystem-first" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Strategy and Performance
+        Use the mounted filesystem first
       
     </span>
   </a>
@@ -2018,10 +2050,32 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting-common-issues" class="md-nav__link">
+  <a href="#address-a-vospace-service-explicitly" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting Common Issues
+        Address a VOSpace Service explicitly
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#remote-read-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Remote-read performance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#related-guides" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Related guides
       
     </span>
   </a>
@@ -2061,144 +2115,139 @@
   
 
 
-<h1 id="canfar-storage-systems">CANFAR Storage Systems<a class="headerlink" href="#canfar-storage-systems" title="Permanent link">&para;</a></h1>
-<p><strong>A guide to choosing the right storage, understanding how sessions interact with storage, and optimizing your data workflows on the CANFAR platform.</strong></p>
-<p>CANFAR provides four distinct storage systems, each optimized for different stages of the research lifecycle. Understanding how these systems work together with CANFAR sessions is essential for efficient data management and analysis.</p>
-<div class="admonition abstract">
-<p class="admonition-title">Storage Guides</p>
-<ul>
-<li><strong><a href="filesystem/">Filesystem Access</a></strong>: ARC storage, SSHFS mounting, and permissions.</li>
-<li><strong><a href="transfers/">Data Transfers</a></strong>: Moving data between systems and external sources.</li>
-<li><strong><a href="vospace/">VOSpace Guide</a></strong>: Long-term storage, sharing, and archival.</li>
-</ul>
-</div>
-<h2 id="storage-options-overview">Storage Options Overview<a class="headerlink" href="#storage-options-overview" title="Permanent link">&para;</a></h2>
+<p><span id="canfar-storage-systems"></span></p>
+<h1 id="storage">Storage<a class="headerlink" href="#storage" title="Permanent link">&para;</a></h1>
+<p>Choose storage by lifetime and by where your code runs. A Science Platform
+Session has mounted POSIX storage for working with files and a separate local
+scratch volume for temporary work. VOSpace Services provide authenticated
+remote access when data is not already mounted.</p>
+<p><span id="storage-options-overview"></span>
+<span id="storage-in-a-session"></span>
+<span id="common-workflows"></span>
+<span id="interactive-analysis"></span>
+<span id="batch-processing"></span>
+<span id="data-sharing-and-collaboration"></span>
+<span id="troubleshooting-common-issues"></span></p>
+<h2 id="storage-at-a-glance">Storage at a glance<a class="headerlink" href="#storage-at-a-glance" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>Storage</th>
-<th>Path/URI</th>
-<th>Access (Session/External)</th>
-<th>Speed</th>
-<th>Persistence &amp; Backup</th>
-<th>Default Quota</th>
-<th>Best For</th>
+<th>Location</th>
+<th>Lifetime</th>
+<th>Use it for</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Scratch</strong></td>
+<td><code>/arc/home/&lt;user&gt;</code></td>
+<td>Persistent</td>
+<td>Personal scripts, configuration, and results</td>
+</tr>
+<tr>
+<td><code>/arc/projects/&lt;project&gt;</code></td>
+<td>Persistent</td>
+<td>Project data and shared results</td>
+</tr>
+<tr>
 <td><code>/scratch</code></td>
-<td>Direct FS / N/A</td>
-<td>Fastest (local SSD)</td>
-<td>Ephemeral (no backup)</td>
-<td>~200GB (per session)</td>
-<td>High-speed temporary processing, staging I/O.</td>
+<td>Session-local; deleted when the Session ends</td>
+<td>Staging, intermediate files, and explicitly selected caches</td>
 </tr>
 <tr>
-<td><strong>ARC Home</strong></td>
-<td><code>/arc/home/[user]</code></td>
-<td>Direct FS / SSHFS</td>
-<td>Fast (CephFS)</td>
-<td>Permanent (daily snapshots)</td>
-<td>10GB</td>
-<td>Personal configs, scripts, small files.</td>
+<td>A configured VOSpace Service</td>
+<td>Service-defined</td>
+<td>Remote data and transfers through <code>canfar data</code> or fsspec</td>
 </tr>
 <tr>
-<td><strong>ARC Projects</strong></td>
-<td><code>/arc/projects/[project]</code></td>
-<td>Direct FS / SSHFS</td>
-<td>Fast (CephFS)</td>
-<td>Permanent (daily snapshots)</td>
-<td>200GB</td>
-<td>Active collaborative research data and results.</td>
-</tr>
-<tr>
-<td><strong>Vault</strong></td>
-<td><code>vos:[project|user]</code></td>
-<td>API / Web UI</td>
-<td>Medium</td>
-<td>Permanent (geo-redundant)</td>
-<td>Project-dependent</td>
-<td>Long-term archives, sharing, publication.</td>
+<td><code>local</code></td>
+<td>The machine running the command</td>
+<td>Local input and output in <code>canfar data</code> and the Python helper</td>
 </tr>
 </tbody>
 </table>
-<h3 id="checking-quotas-and-requesting-more-space">Checking Quotas and Requesting More Space<a class="headerlink" href="#checking-quotas-and-requesting-more-space" title="Permanent link">&para;</a></h3>
-<p>You can monitor your storage usage with the following commands:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Check ARC storage usage</span>
-df<span class="w"> </span>-h<span class="w"> </span>/arc/home/<span class="o">[</span>user<span class="o">]</span>/
-df<span class="w"> </span>-h<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
-
-<span class="c1"># For a detailed breakdown of a project directory</span>
-du<span class="w"> </span>-sh<span class="w"> </span>/arc/projects/<span class="o">[</span>project<span class="o">]</span>/*
+<p>The exact mounts, quotas, and retention policy belong to the deployment and
+your project. Do not treat <code>/scratch</code> as a backup. Copy anything you need after
+the Session to <code>/arc</code> or another persistent destination.</p>
+<h2 id="checking-quotas-and-requesting-more-space">Checking quotas and requesting more space<a class="headerlink" href="#checking-quotas-and-requesting-more-space" title="Permanent link">&para;</a></h2>
+<p>In a Session terminal, inspect filesystem capacity and your directory's usage.
+Replace <code>USER</code> and <code>PROJECT</code> with your username and project directory:</p>
+<div class="highlight"><span class="filename">Terminal inside your Session</span><pre><span></span><code>df<span class="w"> </span>-h<span class="w"> </span>/arc/home/USER<span class="w"> </span>/arc/projects/PROJECT
+du<span class="w"> </span>-sh<span class="w"> </span>/arc/projects/PROJECT
 </code></pre></div>
-<p>Vault usage can be monitored via the <a href="https://www.canfar.net/storage/vault/list/">web interface</a>.</p>
-<p>To request a quota increase, email <code>support@canfar.net</code> with the project name, current usage, requested space, and a brief justification.</p>
-<h2 id="storage-in-a-session">Storage in a Session<a class="headerlink" href="#storage-in-a-session" title="Permanent link">&para;</a></h2>
-<p>When you start a CANFAR session (like a Notebook or Desktop), the storage systems are integrated seamlessly.</p>
-<ul>
-<li><strong>ARC Home and Projects</strong> are automatically mounted as standard directories. You can interact with them just like any other folder on a Linux system.</li>
-<li><strong>Scratch space</strong> is provided as a temporary, high-speed directory at <code>/scratch</code>.</li>
-</ul>
-<p>This setup allows for a simple and powerful workflow:</p>
-<pre class="mermaid"><code>graph TD
-    Start([Session Starts]) --&gt; Mounts["/arc/home &amp; /arc/projects mounted"]
-    Mounts --&gt; Scratch["Empty /scratch created"]
-    Scratch --&gt; DataWork["Analyze data, using /scratch for temporary files"]
-    DataWork --&gt; Save["Save results to /arc/projects"]
-    Save --&gt; End([Session Ends])
-    End --&gt; Cleanup["/scratch is wiped clean"]</code></pre>
+<p><code>df</code> reports filesystem capacity, not your personal or project quota.
+<code>du</code> measures accessible files and can take time on a large directory.
+Use the <a href="https://www.canfar.net/storage/vault/list/">Vault web interface</a>
+for Vault data, and ask <a href="../support/">support</a> to confirm the quota
+that applies to your project.</p>
+<p>To request more space, email <a href="mailto:support@canfar.net">support@canfar.net</a>
+with your project name, storage location, current usage, requested capacity,
+and a short explanation of the research need.</p>
 <div class="admonition warning">
-<p class="admonition-title">Scratch is Temporary</p>
-<p>Any data left in <code>/scratch</code> is <strong>permanently deleted</strong> when your session ends. Always copy important files to <code>/arc</code> or <code>vos:</code> before stopping a session.</p>
+<p class="admonition-title">Keep durable results out of /scratch</p>
+<p>Copy and verify final products under <code>/arc</code> or another persistent
+destination before the Session ends. Temporary scratch space is not a backup.</p>
 </div>
-<h2 id="storage-strategy-and-performance">Storage Strategy and Performance<a class="headerlink" href="#storage-strategy-and-performance" title="Permanent link">&para;</a></h2>
-<p>Choosing the right storage for each task is key to an efficient workflow. The general principle is to <strong>move data to the fastest storage for processing</strong>.</p>
-<p><strong>Storage Speed Hierarchy:</strong>
-1. Fastest: <code>/scratch</code> (local SSD)
-2. Medium: <code>/arc/projects</code> &amp; <code>/arc/home</code> (Shared network filesystem)
-3. Slower: <code>vos:</code> (Vault) (optimized for archival)</p>
-<h3 id="common-workflows">Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h3>
-<h4 id="interactive-analysis">Interactive Analysis<a class="headerlink" href="#interactive-analysis" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>Your data source:</strong> <code>/arc/projects/[project]</code></li>
-<li><strong>For large files:</strong> Copy them to <code>/scratch</code> before processing.</li>
-<li><strong>Save results to:</strong> <code>/arc/projects/[project]/results</code></li>
-</ul>
-<p><em>Example:</em>
-<div class="highlight"><pre><span></span><code><span class="c1"># 1. Copy data to fast, temporary storage</span>
-cp<span class="w"> </span>/arc/projects/my_project/large_dataset.fits<span class="w"> </span>/scratch/
+<h2 id="use-the-mounted-filesystem-first">Use the mounted filesystem first<a class="headerlink" href="#use-the-mounted-filesystem-first" title="Permanent link">&para;</a></h2>
+<p>If data is already under <code>/arc</code> in a Science Platform Session, use its normal
+POSIX path. This avoids an unnecessary VOSpace request and is the simplest
+path for CASA, FITS tools, NumPy, pandas, and other software that expects a
+filename.</p>
+<p>For data outside the Session, stage one copy into <code>/scratch</code> when the workflow
+will read it more than once, then write final products to <code>/arc</code>:</p>
+<div class="highlight"><pre><span></span><code>remote VOSpace Service -&gt; /scratch/input.fits -&gt; analysis -&gt; /arc/projects/&lt;project&gt;/results/
+</code></pre></div>
+<h2 id="address-a-vospace-service-explicitly">Address a VOSpace Service explicitly<a class="headerlink" href="#address-a-vospace-service-explicitly" title="Permanent link">&para;</a></h2>
+<p>CANFAR calls the configured handle for a VOSpace Service a <strong>Storage
+Identifier</strong>. The identifier is configuration data, not a Python module member
+or a new fsspec protocol. List identifiers and construct a filesystem explicitly:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">identifiers</span>
 
-<span class="c1"># 2. Process the data in /scratch</span>
-run_analysis.py<span class="w"> </span>/scratch/large_dataset.fits
-
-<span class="c1"># 3. Save the results back to permanent project storage</span>
-mv<span class="w"> </span>/scratch/results.csv<span class="w"> </span>/arc/projects/my_project/
-</code></pre></div></p>
-<h4 id="batch-processing">Batch Processing<a class="headerlink" href="#batch-processing" title="Permanent link">&para;</a></h4>
+<span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>  <span class="c1"># configured identifiers, plus the reserved &quot;local&quot;</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/project&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre></div>
+<p><code>filesystem("local")</code> returns a filesystem for the machine where Python is
+running. It does not require a CANFAR Authentication Record. A configured
+identifier resolves its endpoint and parent Identity Provider through the saved
+CANFAR configuration; runtime credentials can be supplied to <code>filesystem()</code>
+when needed. See <a href="filesystem/">Filesystem and Python tools</a>.</p>
+<p>For shell workflows, use the embedded <code>canfar data</code> command application:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>vault:/project
+canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/project/input.fits<span class="w"> </span>local:/scratch/input.fits
+canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/scratch/result.fits<span class="w"> </span>arc:/projects/&lt;project&gt;/result.fits
+</code></pre></div>
+<p>The <code>local:</code> operand is always the machine running <code>canfar</code>. <code>vault:</code> and
+<code>arc:</code> are examples of Storage Identifiers; use the names returned by your
+configuration rather than assuming that every deployment has those identifiers.
+See <a href="transfers/">Data transfers</a> for command details.</p>
+<p><span id="storage-strategy-and-performance"></span></p>
+<h2 id="remote-read-performance">Remote-read performance<a class="headerlink" href="#remote-read-performance" title="Permanent link">&para;</a></h2>
+<p><code>vosfs</code> and fsspec provide two different read shapes:</p>
 <ul>
-<li><strong>Input:</strong> Stage data from Vault (<code>vos:</code>), ARC, or the internet into <code>/scratch</code>.</li>
-<li><strong>Processing:</strong> Run your code on the data in <code>/scratch</code>.</li>
-<li><strong>Output:</strong> Save results to ARC for collaboration or to Vault for long-term archival.</li>
+<li><code>cat_file(path, start, end)</code> and <code>cat_ranges(...)</code> can request explicit byte
+  ranges. The response is validated; a backend that returns a complete <code>200</code>
+  response is read and sliced correctly, but it still transferred the whole
+  object.</li>
+<li><code>open(path, "rb")</code> provides a convenient seekable file object by staging the
+  complete object. Passing that handle to Astropy, NumPy, pandas, or h5py does
+  not make random access network-efficient.</li>
 </ul>
-<h4 id="data-sharing-and-collaboration">Data Sharing and Collaboration<a class="headerlink" href="#data-sharing-and-collaboration" title="Permanent link">&para;</a></h4>
+<p>The capability is deployment-specific. In the measured CADC deployment, the
+Vault/minoc service accepts validated <code>206</code> responses while ARC/Cavern falls
+back to a whole-object response. Do not infer capability from the spelling of a
+Storage Identifier. See <a href="filesystem/">Filesystem and Python tools</a> for the
+backend boundary and scientific-library recipes.</p>
+<h2 id="related-guides">Related guides<a class="headerlink" href="#related-guides" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Active collaboration:</strong> Use <code>/arc/projects</code> for shared data and code among team members.</li>
-<li><strong>External sharing:</strong> Use Vault (<code>vos:</code>) to share data with collaborators outside of CANFAR, or for public data releases.</li>
+<li><a href="filesystem/">Filesystem and Python tools</a></li>
+<li><a href="transfers/">Data transfers</a></li>
+<li><a href="vospace/">VOSpace</a></li>
+<li><a href="../sessions/">Session storage</a></li>
+<li><a href="../permissions/">Permissions</a></li>
 </ul>
-<h2 id="troubleshooting-common-issues">Troubleshooting Common Issues<a class="headerlink" href="#troubleshooting-common-issues" title="Permanent link">&para;</a></h2>
-<p><strong>"No space left on device"</strong>
-- This usually means your <code>/arc/home</code> or <code>/arc/projects</code> quota is full.
-- Use <code>du -sh /path/to/storage/*</code> to find large files and clean up anything you don't need.</p>
-<p><strong>"Can't access project directory"</strong>
-- You may not be a member of the project's group. Contact the project PI to be added.</p>
-<p><strong>"Session is slow or unresponsive"</strong>
-- If you are performing I/O-intensive operations directly in <code>/arc</code>, it can slow down your session.
-- For better performance, move large files to <code>/scratch</code> for processing.</p>
-<p><strong>"My files are gone!"</strong>
-- You likely saved them to <code>/scratch</code> and the session ended. This data is not recoverable.
-- Always save important results to <code>/arc</code> or <code>vos:</code> before your session ends.</p>
 
 
 
@@ -2221,7 +2270,7 @@ mv<span class="w"> </span>/scratch/results.csv<span class="w"> </span>/arc/proje
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

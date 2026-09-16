@@ -18,7 +18,7 @@
         <link rel="prev" href="../">
       
       
-        <link rel="next" href="../../support/">
+        <link rel="next" href="../alma/">
       
       
         
@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#casa-containers-and-adjacent-software" class="md-skip">
+        <a href="#casa-and-adjacent-astronomy-software" class="md-skip">
           Skip to content
         </a>
       
@@ -1318,6 +1318,8 @@
       
         
       
+        
+      
     
     
     
@@ -1444,32 +1446,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#casa-add-on-tools-and-packages" class="md-nav__link">
+  <a href="#choose-and-inspect-an-image" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CASA add-on tools and packages
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known Issues
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#casa-adjacent-containers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CASA Adjacent Containers
+        Choose and inspect an image
       
     </span>
   </a>
@@ -1480,6 +1460,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1860,6 +1868,8 @@
       
         
       
+        
+      
     
     
     
@@ -2065,32 +2075,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#casa-add-on-tools-and-packages" class="md-nav__link">
+  <a href="#choose-and-inspect-an-image" class="md-nav__link">
     <span class="md-ellipsis">
       
-        CASA add-on tools and packages
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#known-issues" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Known Issues
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#casa-adjacent-containers" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        CASA Adjacent Containers
+        Choose and inspect an image
       
     </span>
   </a>
@@ -2130,48 +2118,42 @@
   
 
 
-<h1 id="casa-containers-and-adjacent-software">CASA containers and adjacent software<a class="headerlink" href="#casa-containers-and-adjacent-software" title="Permanent link">&para;</a></h1>
-<p>This page contains a summary of additional packages included in CASA containers, known issues and work-arounds for specific containers, as well as a brief summary on other radio astronomy tools available.</p>
-<h2 id="casa-add-on-tools-and-packages">CASA add-on tools and packages<a class="headerlink" href="#casa-add-on-tools-and-packages" title="Permanent link">&para;</a></h2>
-<h3 id="astroquery-astropy">Astroquery / Astropy<a class="headerlink" href="#astroquery-astropy" title="Permanent link">&para;</a></h3>
-<p>The <a href="https://astroquery.readthedocs.io/en/latest/">astroquery tool</a> is presently only installed on newer CASA containers (6.4.4 and above).  To use astroquery from an appropriate CASA container, type the following to initiate an astroquery-compatible version of python:
-<div class="highlight"><pre><span></span><code>/opt/casa/bin/python3
+<p><span id="casa-containers-and-adjacent-software"></span></p>
+<h1 id="casa-and-adjacent-astronomy-software">CASA and adjacent astronomy software<a class="headerlink" href="#casa-and-adjacent-astronomy-software" title="Permanent link">&para;</a></h1>
+<p>CASA and related radio-astronomy tools are supplied through selected Container
+Images. Availability and version-specific behavior belong to the image you
+choose; check <code>canfar image ls</code> and the image documentation before writing a
+workflow that depends on a package.</p>
+<p><span id="casa-add-on-tools-and-packages"></span>
+<span id="astroquery-astropy"></span>
+<span id="analysis-utilities"></span>
+<span id="firefox"></span>
+<span id="uvmultifit"></span>
+<span id="known-issues"></span>
+<span id="casa-adjacent-containers"></span>
+<span id="galario"></span>
+<span id="starlink"></span></p>
+<h2 id="choose-and-inspect-an-image">Choose and inspect an image<a class="headerlink" href="#choose-and-inspect-an-image" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>desktop
+canfar<span class="w"> </span>create<span class="w"> </span>desktop<span class="w"> </span>IMAGE_NAME<span class="w"> </span>--name<span class="w"> </span>casa-work
 </code></pre></div>
-As per the <a href="https://astroquery.readthedocs.io/en/latest/">astroquery documentation</a>, the tool can then be used on the command line within the python environment.  For example, the following sequence of commands yield a one-line table listing some basic information about M1.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">astroquery.simbad</span><span class="w"> </span><span class="kn">import</span> <span class="n">Simbad</span>
-<span class="n">result_table</span> <span class="o">=</span> <span class="n">Simbad</span><span class="o">.</span><span class="n">query_object</span><span class="p">(</span><span class="s2">&quot;m1&quot;</span><span class="p">)</span>
-<span class="n">result_table</span><span class="o">.</span><span class="n">pprint</span><span class="p">()</span>
-</code></pre></div>
-<h3 id="analysis-utilities">Analysis Utilities<a class="headerlink" href="#analysis-utilities" title="Permanent link">&para;</a></h3>
-<p>The <a href="https://casaguides.nrao.edu/index.php/Analysis_Utilities">analysisUtils package</a> package is pre-installed on every CASA container, and is ready to use.  You may need to type the following to load the package:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">analysisUtils</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">au</span>
-</code></pre></div>
-<h3 id="firefox">Firefox<a class="headerlink" href="#firefox" title="Permanent link">&para;</a></h3>
-<p>The Firefox web-browser, needed for CASA commands where you are interacting with the weblogs, should available for CASA versions 6.1.0 to 6.4.3.  Error messages will pop up in your terminal window, but minimal testing suggests that it is sufficiently functional.</p>
-<h3 id="uvmultifit">UVMultiFit<a class="headerlink" href="#uvmultifit" title="Permanent link">&para;</a></h3>
-<p>The <a href="https://github.com/onsala-space-observatory/UVMultiFit/blob/master/INSTALL.md">UVMultiFit</a> package is presently installed and working for all CASA 5.X versions except 5.8.  To load the UVMultiFit package, initiate casa and then type</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">NordicARC</span><span class="w"> </span><span class="kn">import</span> <span class="n">uvmultifit</span> <span class="k">as</span> <span class="n">uvm</span>
-</code></pre></div>
-<h2 id="known-issues">Known Issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h2>
-<ol>
-<li>
-<p>CASA versions <code>6.5.0</code> to <code>6.5.2</code> initially launch with some display errors in the logger window.  Exiting casa (but not the container) and re-starting casa fixes the issue, i.e.,</p>
-<div class="highlight"><pre><span></span><code>casa
-<span class="nb">exit</span>
-casa
-</code></pre></div>
-</li>
-<li>
-<p>Running multi-thread pipeline scripts (MPI CASA) may generate error messages, as described <a href="https://casadocs.readthedocs.io/en/latest/notebooks/frequently-asked-questions.html">here</a> under the 'Running pipeline in non-interactive mode' section.  A CANFAR ALMA user reports success initiating MPI CASA in a Desktop container as follows:</p>
-<div class="highlight"><pre><span></span><code>xvfb-run<span class="w"> </span>-a<span class="w"> </span>mpicasa<span class="w"> </span>casa<span class="w"> </span>—nologger<span class="w"> </span>—nogui<span class="w"> </span>-agg<span class="w"> </span>-c<span class="w"> </span>casa_script.py
-</code></pre></div>
-</li>
-</ol>
-<h2 id="casa-adjacent-containers">CASA Adjacent Containers<a class="headerlink" href="#casa-adjacent-containers" title="Permanent link">&para;</a></h2>
-<h3 id="galario">Galario<a class="headerlink" href="#galario" title="Permanent link">&para;</a></h3>
-<p>The UV data analysis package <a href="https://mtazzari.github.io/galario">galario</a> is available under the radio-submm menu.  Note that this container has had minimal testing, and the uvplot package commands in the quickstart.py script are not presently working, although all preceeding commands in the quickstart.py script do work.</p>
-<h3 id="starlink">Starlink<a class="headerlink" href="#starlink" title="Permanent link">&para;</a></h3>
-<p>The JCMT's <a href="https://starlink.eao.hawaii.edu/starlink">Starlink</a> package is available under the radio-submm menu, including image analysis tools and the gaia image viewer.  Note that the <a href="https://starlink-pywrapper.readthedocs.io/en/latest/">starlink-pywrapper</a> add-on package is presently not working.  Minimal testing has been done on the Starlink container.</p>
+<p>Inside the running Session, check the installed CASA version and invoke the
+command documented for that release. Keep the reduction script and measurement
+sets under <code>/arc</code> or copy them from <code>/scratch</code> before the Session ends.</p>
+<p>For package-specific usage, use the upstream documentation:</p>
+<ul>
+<li><a href="https://casadocs.readthedocs.io/">CASA documentation</a></li>
+<li><a href="https://docs.astropy.org/">Astropy</a></li>
+<li><a href="https://astroquery.readthedocs.io/">Astroquery</a></li>
+<li><a href="https://casaguides.nrao.edu/index.php/Analysis_Utilities">Analysis Utilities</a></li>
+<li><a href="https://github.com/onsala-space-observatory/UVMultiFit">UVMultiFit</a></li>
+<li><a href="https://mtazzari.github.io/galario/">Galario</a></li>
+<li><a href="https://starlink.eao.hawaii.edu/starlink/">Starlink</a></li>
+</ul>
+<p>If an application is missing or behaves differently from its upstream
+documentation, record the Container Image name and version, the Session Kind,
+the command, and the error before contacting <a href="../../support/">CANFAR support</a>.</p>
+<p>For an end-to-end ALMA example, see the <a href="../alma/">ALMA analysis workflow</a>.</p>
 
 
 
@@ -2194,7 +2176,7 @@ casa
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 23, 2025 23:43:15 UTC">September 23, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

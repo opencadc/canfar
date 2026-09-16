@@ -1316,6 +1316,8 @@
       
         
       
+        
+      
     
     
     
@@ -1392,6 +1394,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1612,24 +1642,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    CANFAR Releases
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -1646,36 +1658,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#canfar-releases_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎯 CANFAR Releases
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1817,6 +1799,8 @@
   
     
     
+      
+        
       
         
       
@@ -2036,25 +2020,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#canfar-releases_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🎯 CANFAR Releases
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -2086,48 +2051,29 @@
   
 
 
-<h1 id="canfar-releases">CANFAR Releases<a class="headerlink" href="#canfar-releases" title="Permanent link">&para;</a></h1>
-<div class="admonition abstract">
-<p class="admonition-title">CanfarSP Releases</p>
+<p><span id="canfar-releases_1"></span>
+<span id="who-is-this-page-for"></span>
+<span id="release-naming"></span>
+<span id="roadmap"></span>
+<span id="development-contributions"></span></p>
+<h1 id="canfar-releases">CANFAR releases<a class="headerlink" href="#canfar-releases" title="Permanent link">&para;</a></h1>
+<p>These pages summarise user-visible changes to the CANFAR Science Platform and
+the <code>canfar</code> Python client and CLI. Confirm the Server, Container Image, and
+deployment version with the operator of the platform you use; release notes do
+not imply that every deployment exposes every feature.</p>
 <ul>
-<li>Jun 11, 2026 <strong><a href="../2026-2/">2026.2</a></strong></li>
-<li>Feb 26, 2026 <strong><a href="../2026-1/">2026.1</a></strong></li>
-<li>Nov 25, 2025 <strong><a href="../2025-2/">2025.2</a></strong></li>
-<li>Sept 9, 2025 <strong><a href="../2025-1/">2025.1</a></strong></li>
+<li><a href="../2026-2/">2026.2 — June 11, 2026</a></li>
+<li><a href="../2026-1/">2026.1 — February 26, 2026</a></li>
+<li><a href="../2025-2/">2025.2 — November 25, 2025</a></li>
+<li><a href="../2025-1/">2025.1 — September 9, 2025</a></li>
 </ul>
-</div>
-<h2 id="canfar-releases_1">🎯 CANFAR Releases<a class="headerlink" href="#canfar-releases_1" title="Permanent link">&para;</a></h2>
-<p>The CADC team releases the CANFAR Science Platform (CanfarSP) on a fixed, predictable schedule so users and deployers can plan upgrades.</p>
-<h3 id="who-is-this-page-for">Who is this page for?<a class="headerlink" href="#who-is-this-page-for" title="Permanent link">&para;</a></h3>
-<p>If you use the CANFAR Python Client or CLI:</p>
-<ul>
-<li>Use the release notes in this section to see user-visible changes in the client, CLI, and documentation.</li>
-<li>Each release page focuses on what changed and how it might affect your workflows.</li>
-</ul>
-<p>If you deploy the Canfar Science Platform:</p>
-<ul>
-<li>Use these release notes to understand user-facing changes that may drive support or rollout timing.</li>
-<li>Track backend deployment changes in the <a href="https://github.com/opencadc/deployments">opencadc/deployments</a> repository.</li>
-</ul>
-<h3 id="release-naming">Release Naming<a class="headerlink" href="#release-naming" title="Permanent link">&para;</a></h3>
-<p>CanfarSP releases are named using the year and number, in the form <code>CanfarSP YYYY.MM</code>. For example, the first release of 2025 was named <strong>CanfarSP 2025.1</strong>.</p>
-<p>We currently aim for a CanfarSP release every 3 months.</p>
-<p>In the subpages of this section of documentation, detailed notes about each release can be found.</p>
-<p>CanfarSP releases include dedicated integration and regression testing, plus internal user testing. Generally:</p>
-<ul>
-<li>New features can only be added to CanfarSP in a fixed cycle release</li>
-<li>Bug fixes are added to CanfarSP immediately and result in a patch release</li>
-<li>Collaborators can get access to new features prior to their target release, but only as experimental software because the features have not been thoroughly tested.</li>
-</ul>
-<h3 id="roadmap">Roadmap<a class="headerlink" href="#roadmap" title="Permanent link">&para;</a></h3>
-<p>Currently, the CanfarSP Roadmap is managed internally by CADC, though we plan on making it public in the near future. For questions or suggestions about the CanfarSP Roadmap, please reach out to the CADC team.</p>
-<h3 id="development-contributions">Development Contributions<a class="headerlink" href="#development-contributions" title="Permanent link">&para;</a></h3>
-<p>We welcome and encourage contributions to all areas of the CANFAR and OpenCADC code bases! For information on how to start, please see the contributing guidelines in these OpenCADC repositories:</p>
-<ul>
-<li><a href="https://github.com/opencadc/canfar">CANFAR Python Client, CLI, and Documentation</a></li>
-<li><a href="https://github.com/opencadc/science-platform">CANFAR Backend Services</a></li>
-<li><a href="https://github.com/opencadc/deployments">CANFAR Helm Charts</a></li>
-</ul>
+<p>For development client changes, see <a href="../../client/updates/">What's new (unreleased)</a>
+and the <a href="../../client/migration/">upgrade guide</a>. For published package history, see the
+<a href="https://pypi.org/project/canfar/"><code>canfar</code> package history</a> and the
+repository <a href="https://github.com/opencadc/canfar/blob/main/CHANGELOG.md">CHANGELOG</a>.
+Deployment operators should use the <a href="https://github.com/opencadc/deployments">OpenCADC deployments
+repository</a> for chart and service
+upgrade instructions.</p>
 
 
 
@@ -2150,7 +2096,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 11, 2026 18:28:00 UTC">June 11, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

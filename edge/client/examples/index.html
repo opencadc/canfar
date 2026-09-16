@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -1052,21 +1054,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-allocation-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resource Allocation Modes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#discover-and-filter-sessions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Discover and Filter Sessions
+        Discover and filter Sessions
       
     </span>
   </a>
@@ -1074,10 +1065,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inspect-sessions" class="md-nav__link">
+  <a href="#inspect-events-and-logs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspect Sessions
+        Inspect, events, and logs
       
     </span>
   </a>
@@ -1085,10 +1076,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#events" class="md-nav__link">
+  <a href="#cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events
+        Cleanup
       
     </span>
   </a>
@@ -1096,21 +1087,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#logs" class="md-nav__link">
+  <a href="#private-container-registry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Logs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup-sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cleanup Sessions
+        Private Container Registry
       
     </span>
   </a>
@@ -1348,8 +1328,6 @@
       
         
       
-        
-      
     
     
     
@@ -1445,34 +1423,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1644,6 +1594,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1854,21 +1832,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-allocation-modes" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Resource Allocation Modes
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#discover-and-filter-sessions" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Discover and Filter Sessions
+        Discover and filter Sessions
       
     </span>
   </a>
@@ -1876,10 +1843,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inspect-sessions" class="md-nav__link">
+  <a href="#inspect-events-and-logs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspect Sessions
+        Inspect, events, and logs
       
     </span>
   </a>
@@ -1887,10 +1854,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#events" class="md-nav__link">
+  <a href="#cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Events
+        Cleanup
       
     </span>
   </a>
@@ -1898,21 +1865,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#logs" class="md-nav__link">
+  <a href="#private-container-registry" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Logs
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cleanup-sessions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cleanup Sessions
+        Private Container Registry
       
     </span>
   </a>
@@ -1953,346 +1909,255 @@
 
 
 <h1 id="python-client-examples">Python Client Examples<a class="headerlink" href="#python-client-examples" title="Permanent link">&para;</a></h1>
-<p>These examples show the sync and async Session interfaces.</p>
-<div class="admonition note">
-<p class="admonition-title">Assumption</p>
-<div class="highlight"><span class="filename">Authenticated via CLI</span><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
+<p>Follow <a href="../get-started/#install">Install and set up</a> for the client version used
+by these examples, then authenticate:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
+<p>They use the public <code>Session</code> and <code>AsyncSession</code> classes directly. Both clients
+preserve the same result shapes. The tabs show equivalent operations.</p>
+<div class="admonition tip">
+<p class="admonition-title">Async examples in Jupyter</p>
+<p>Define <code>main()</code> without the final <code>if __name__</code> block, then run
+<code>await main()</code> in another cell. In a script, keep <code>asyncio.run(main())</code>.</p>
 </div>
+<p><span id="async-workflow"></span></p>
+<p><span id="examples"></span></p>
 <h2 id="create-sessions">Create Sessions<a class="headerlink" href="#create-sessions" title="Permanent link">&para;</a></h2>
+<p><span id="resource-allocation-modes"></span></p>
 <h3 id="notebook">Notebook<a class="headerlink" href="#notebook" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Flexible Mode (Default)</label><label for="__tabbed_1_2">Fixed Mode</label><label for="__tabbed_1_3"><code>async</code></label></div>
+<p>Omit <code>cores</code> and <code>ram</code> for the server's flexible allocation policy, or pass them
+for a fixed resource request:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sync Python</label><label for="__tabbed_1_2">Async Python</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># [&quot;d1tsqexh&quot;]</span>
-<span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># list[str]</span>
+    <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># [&quot;d1tsqexh&quot;]</span>
-<span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+</span>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># list[str]</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># [&quot;d1tsqexh&quot;]</span>
-<span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
 </div>
 </div>
+<p><code>connect()</code> opens only Sessions that are already Running and have an application
+URL. A newly accepted Session may still be Pending, so the call can do nothing.
+Use the <a href="../quick-start/#3-inspect-and-connect">inspect and connect step</a> once
+your Session is ready.</p>
 <h3 id="headless">Headless<a class="headerlink" href="#headless" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Headless Sessions are containers that execute a command and exit when complete without user interaction.</li>
-<li>They are useful for batch processing and distributed computing.</li>
-</ul>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Replicated Headless Sessions</label><label for="__tabbed_2_2"><code>async</code></label></div>
+<p>Headless Sessions run a command and exit. <code>cmd</code>, <code>args</code>, and <code>env</code> are valid
+for headless Sessions:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Sync Python</label><label for="__tabbed_2_2">Async Python</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># [&quot;d1tsqexh&quot;]</span>
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/terminal:latest&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DATASET&quot;</span><span class="p">:</span> <span class="s2">&quot;example&quot;</span><span class="p">},</span>
+        <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># successful Session IDs only</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="n">session</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;Hello, World!&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># [&quot;d1tsqexh&quot;]</span>
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+</span>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/terminal:latest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DATASET&quot;</span><span class="p">:</span> <span class="s2">&quot;example&quot;</span><span class="p">},</span>
+            <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># successful Session IDs only</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
 </div>
 </div>
-<div class="admonition example">
-<p class="admonition-title">Replica Environment Variables</p>
-<p>All containers receive the following environment variables:
-- <code>REPLICA_COUNT</code> — common total number of replicas
-- <code>REPLICA_ID</code> — 1-based index of the replica (1..N)</p>
-<p>Use these to partition work deterministically. See <a href="../helpers/">Helpers API Reference</a> for <code>chunk</code> and <code>stripe</code>.</p>
+<p>If one replica fails, <code>create()</code> logs the failure and omits that ID. If all
+replicas fail, it returns <code>[]</code>.</p>
+<h2 id="discover-and-filter-sessions">Discover and filter Sessions<a class="headerlink" href="#discover-and-filter-sessions" title="Permanent link">&para;</a></h2>
+<p><code>fetch()</code> returns the server's list of dictionaries as
+<code>list[dict[str, str]]</code>:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Sync Python</label><label for="__tabbed_3_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">all_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+    <span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">),</span> <span class="n">running</span><span class="p">)</span>
+</code></pre></div>
 </div>
-<div class="admonition warning">
-<p class="admonition-title">Private Container Registry Access</p>
-<p>Use a private Harbor image by providing registry credentials via configuration.
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
 
-<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
-    <span class="n">cfg</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span><span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">))</span>
-    <span class="n">session</span> <span class="o">=</span> <span class="n">AsyncSession</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">cfg</span><span class="p">)</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-job&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/your/private-image:latest&quot;</span><span class="p">,</span>
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">all_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
+</span>        <span class="n">running</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">),</span> <span class="n">running</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Supported kind values are <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>,
+<code>desktop-app</code>, and <code>contributed</code>. Status filters include <code>Pending</code>, <code>Running</code>,
+<code>Terminating</code>, <code>Succeeded</code>, <code>Completed</code>, <code>Error</code>, and <code>Failed</code>.</p>
+<p><span id="inspect-sessions"></span>
+<span id="events"></span>
+<span id="logs"></span></p>
+<h2 id="inspect-events-and-logs">Inspect, events, and logs<a class="headerlink" href="#inspect-events-and-logs" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Sync Python</label><label for="__tabbed_4_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;session-id&quot;</span><span class="p">]</span>
+    <span class="n">details</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>       <span class="c1"># list[dict[str, Any]]</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>      <span class="c1"># list[dict[str, str]]</span>
+    <span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>          <span class="c1"># dict[str, str]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">details</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;session-id&quot;</span><span class="p">]</span>
+</span>        <span class="n">details</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>       <span class="c1"># list[dict[str, Any]]</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>      <span class="c1"># list[dict[str, str]]</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>          <span class="c1"># dict[str, str]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">details</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Passing <code>verbose=True</code> to <code>events()</code> or <code>logs()</code> sends the result through the
+<code>canfar.sessions</code> logger and returns <code>None</code>. Configure logging with
+<code>canfar.configure_logging()</code> when an application needs to display it.</p>
+<p><span id="cleanup-sessions"></span></p>
+<h2 id="cleanup">Cleanup<a class="headerlink" href="#cleanup" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Save results before deleting Sessions</p>
+<p>The examples below make real deletion requests. Use only IDs or prefixes
+belonging to your run, after verifying its persistent outputs.</p>
+</div>
+<p><code>destroy()</code> returns a <code>dict[str, bool]</code> keyed by requested Session ID. The
+filters after <code>prefix</code> in <code>destroy_with()</code> are keyword-only:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Sync Python</label><label for="__tabbed_5_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">&quot;session-id&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span>
+            <span class="s2">&quot;my-headless-&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">&quot;session-id&quot;</span><span class="p">))</span>
+</span>        <span class="nb">print</span><span class="p">(</span>
+            <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span>
+                <span class="s2">&quot;my-headless-&quot;</span><span class="p">,</span>
+                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<h2 id="private-container-registry">Private Container Registry<a class="headerlink" href="#private-container-registry" title="Permanent link">&para;</a></h2>
+<p>Use the Configuration data model when an image is private:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
+    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">with</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-session&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/project/private-image:latest&quot;</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
         <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
         <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/app/run.py&quot;</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-
-<span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
-</code></pre></div></p>
-</div>
-<h2 id="resource-allocation-modes">Resource Allocation Modes<a class="headerlink" href="#resource-allocation-modes" title="Permanent link">&para;</a></h2>
-<p>CANFAR supports two resource allocation modes for your sessions. See the <a href="../../platform/concepts/#resource-allocation-modes">resource allocation guide</a> for more information.</p>
-<h3 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h3>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Flexible Mode (Default)</label><label for="__tabbed_3_2">Fixed Mode</label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="c1"># No cores/ram specification - uses flexible allocation</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;flexible-notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span>
-<span class="p">)</span>
 </code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="c1"># Specify exact resources for guaranteed allocation</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;fixed-notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">8</span>
-<span class="p">)</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="discover-and-filter-sessions">Discover and Filter Sessions<a class="headerlink" href="#discover-and-filter-sessions" title="Permanent link">&para;</a></h2>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Fetch All Sessions</label><label for="__tabbed_4_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">all_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">))</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">all_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">))</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<p><br></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Fetch Running Notebooks</label><label for="__tabbed_5_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">running</span><span class="p">)</span>
-<span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">running</span><span class="p">])</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">running</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">running</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">([</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">running</span><span class="p">])</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<p><br></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="6:2"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><input id="__tabbed_6_2" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Fetch Completed Headless Sessions</label><label for="__tabbed_6_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">completed</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Succeeded&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">completed</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">completed</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Succeeded&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">completed</span><span class="p">)</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<div class="admonition success">
-<p class="admonition-title">Kinds &amp; Status</p>
-<p>You can use any combination of the following kinds and status to filter sessions:</p>
-<ul>
-<li>Kinds: <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, <code>desktop-app</code>, <code>contributed</code></li>
-<li>Statuses: <code>Pending</code>, <code>Running</code>, <code>Terminating</code>, <code>Succeeded</code>, <code>Error</code>, <code>Failed</code></li>
-</ul>
-</div>
-<h2 id="inspect-sessions">Inspect Sessions<a class="headerlink" href="#inspect-sessions" title="Permanent link">&para;</a></h2>
-<p>Detailed information about the session, including resource usage, user IDs, and more.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="7:2"><input checked="checked" id="__tabbed_7_1" name="__tabbed_7" type="radio" /><input id="__tabbed_7_2" name="__tabbed_7" type="radio" /><div class="tabbed-labels"><label for="__tabbed_7_1">Detailed Session Information</label><label for="__tabbed_7_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">info</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="events">Events<a class="headerlink" href="#events" title="Permanent link">&para;</a></h2>
-<p>Events describe the steps taken by the Science Platform to launch your session</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="8:2"><input checked="checked" id="__tabbed_8_1" name="__tabbed_8" type="radio" /><input id="__tabbed_8_2" name="__tabbed_8" type="radio" /><div class="tabbed-labels"><label for="__tabbed_8_1">Session Events</label><label for="__tabbed_8_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">events</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">events</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">events</span><span class="p">)</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="logs">Logs<a class="headerlink" href="#logs" title="Permanent link">&para;</a></h2>
-<p>Logs contain the output from your session's containers. </p>
-<div class="admonition tip">
-<p class="admonition-title">Log Retention</p>
-<p>Logs are retained until your session is deleted. A completed session, i.e., <code>Succeeded</code>, <code>Failed</code>, or <code>Error</code> is kept for 24 hours before being deleted.</p>
-</div>
-<div class="tabbed-set tabbed-alternate" data-tabs="9:2"><input checked="checked" id="__tabbed_9_1" name="__tabbed_9" type="radio" /><input id="__tabbed_9_2" name="__tabbed_9" type="radio" /><div class="tabbed-labels"><label for="__tabbed_9_1">Session Logs</label><label for="__tabbed_9_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">logs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<h2 id="cleanup-sessions">Cleanup Sessions<a class="headerlink" href="#cleanup-sessions" title="Permanent link">&para;</a></h2>
-<div class="admonition warning">
-<p class="admonition-title">Permanent Action</p>
-<p>Deleted sessions cannot be recovered.</p>
-</div>
-<div class="tabbed-set tabbed-alternate" data-tabs="10:2"><input checked="checked" id="__tabbed_10_1" name="__tabbed_10" type="radio" /><input id="__tabbed_10_2" name="__tabbed_10" type="radio" /><div class="tabbed-labels"><label for="__tabbed_10_1">Destroy Session(s)</label><label for="__tabbed_10_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># {&quot;id&quot;: True, ...}</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># {&quot;id&quot;: True, ...}</span>
-</code></pre></div>
-</div>
-</div>
-</div>
-<p><br></p>
-<div class="tabbed-set tabbed-alternate" data-tabs="11:2"><input checked="checked" id="__tabbed_11_1" name="__tabbed_11" type="radio" /><input id="__tabbed_11_2" name="__tabbed_11" type="radio" /><div class="tabbed-labels"><label for="__tabbed_11_1">Bulk Destroy</label><label for="__tabbed_11_2"><code>async</code></label></div>
-<div class="tabbed-content">
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test-&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Succeeded&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># {&quot;id&quot;: True, ...}</span>
-</code></pre></div>
-</div>
-<div class="tabbed-block">
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">result</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test-&quot;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Succeeded&quot;</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>  <span class="c1"># {&quot;id&quot;: True, ...}</span>
-</code></pre></div>
-</div>
-</div>
-</div>
 
 
 
@@ -2315,7 +2180,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

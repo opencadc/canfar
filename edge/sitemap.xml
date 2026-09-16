@@ -61,22 +61,6 @@
          <lastmod>2026-09-16</lastmod>
     </url>
     <url>
-         <loc>https://opencadc.github.io/canfar/edge/agents/adrs/0001-server-name-is-config-identity/</loc>
-         <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/agents/research/2026-07-10-authlib-oidc-replacement/</loc>
-         <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/agents/research/2026-07-25-storage-python-api/</loc>
-         <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
-         <loc>https://opencadc.github.io/canfar/edge/agents/reviews/2026-07-09-code-quality-audit/</loc>
-         <lastmod>2026-09-16</lastmod>
-    </url>
-    <url>
          <loc>https://opencadc.github.io/canfar/edge/cli/authentication-contexts/</loc>
          <lastmod>2026-09-16</lastmod>
     </url>
@@ -98,6 +82,10 @@
     </url>
     <url>
          <loc>https://opencadc.github.io/canfar/edge/client/advanced-examples/</loc>
+         <lastmod>2026-09-16</lastmod>
+    </url>
+    <url>
+         <loc>https://opencadc.github.io/canfar/edge/client/agents/</loc>
          <lastmod>2026-09-16</lastmod>
     </url>
     <url>

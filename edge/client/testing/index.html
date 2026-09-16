@@ -543,6 +543,8 @@
       
         
       
+        
+      
     
     
     
@@ -910,17 +912,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -932,10 +923,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
+  <a href="#local-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running Tests
+        Local validation
       
     </span>
   </a>
@@ -943,10 +934,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
+  <a href="#test-markers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Workflow
+        Test markers
       
     </span>
   </a>
@@ -954,10 +945,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#test-configuration" class="md-nav__link">
+  <a href="#full-suite" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test Configuration
+        Full suite
       
     </span>
   </a>
@@ -965,32 +956,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#continuous-integration" class="md-nav__link">
+  <a href="#adding-tests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Continuous Integration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing Tests
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        Adding tests
       
     </span>
   </a>
@@ -1332,17 +1301,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Overview
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#prerequisites" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1354,10 +1312,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-tests" class="md-nav__link">
+  <a href="#local-validation" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Running Tests
+        Local validation
       
     </span>
   </a>
@@ -1365,10 +1323,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#development-workflow" class="md-nav__link">
+  <a href="#test-markers" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Development Workflow
+        Test markers
       
     </span>
   </a>
@@ -1376,10 +1334,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#test-configuration" class="md-nav__link">
+  <a href="#full-suite" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test Configuration
+        Full suite
       
     </span>
   </a>
@@ -1387,32 +1345,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#continuous-integration" class="md-nav__link">
+  <a href="#adding-tests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Continuous Integration
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#writing-tests" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Writing Tests
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        Adding tests
       
     </span>
   </a>
@@ -1452,136 +1388,70 @@
   
 
 
+<p><span id="overview"></span></p>
 <h1 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h1>
-<p>This document provides comprehensive information about testing <a href="https://github.com/opencadc/canfar">opencadc/canfar</a>.</p>
-<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>Canfar uses <a href="https://pytest.org/">pytest</a> as its testing framework. The test suite includes unit tests, integration tests, and end-to-end tests that verify the functionality of the client library.</p>
+<p>CANFAR uses <a href="https://pytest.org/">pytest</a>. Tests mirror the <code>canfar/</code> module
+layout and include deterministic unit/contract tests plus
+Authentication-dependent integration tests.</p>
+<p><span id="test-configuration"></span></p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
-<p>To run tests for Canfar, you need:</p>
-<ol>
-<li><strong>Valid CANFAR Account</strong>: Access to the CANFAR Science Platform</li>
-<li><strong>X.509 Certificate</strong>: For authentication with CANFAR services</li>
-<li><strong>Python Environment</strong>: Set up with uv</li>
-</ol>
-<p>For certificate generation, refer to the <a href="../get-started/">get started</a> section.</p>
-<h2 id="running-tests">Running Tests<a class="headerlink" href="#running-tests" title="Permanent link">&para;</a></h2>
-<h3 id="basic-test-execution">Basic Test Execution<a class="headerlink" href="#basic-test-execution" title="Permanent link">&para;</a></h3>
-<p>Run all tests:
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest
-</code></pre></div></p>
-<p>Run tests with verbose output:
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-v
-</code></pre></div></p>
-<p>Run tests with coverage report:
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>--cov
-</code></pre></div></p>
-<h3 id="test-categories">Test Categories<a class="headerlink" href="#test-categories" title="Permanent link">&para;</a></h3>
-<p>Canfar tests are organised with markers to help you run specific subsets:</p>
-<h4 id="slow-tests">Slow Tests<a class="headerlink" href="#slow-tests" title="Permanent link">&para;</a></h4>
-<p>Some tests are marked as "slow" because they involve:
-- Network operations with CANFAR services
-- Waiting for session state changes
-- Authentication timeouts
-- Long-running operations</p>
-<p><strong>Skip slow tests for faster development:</strong>
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span>
-</code></pre></div></p>
-<p><strong>Run only slow tests:</strong>
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;slow&quot;</span>
-</code></pre></div></p>
-<h4 id="integration-tests">Integration Tests<a class="headerlink" href="#integration-tests" title="Permanent link">&para;</a></h4>
-<p>Tests that interact with external services:
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;integration&quot;</span>
-</code></pre></div></p>
-<h4 id="unit-tests">Unit Tests<a class="headerlink" href="#unit-tests" title="Permanent link">&para;</a></h4>
-<p>Fast, isolated tests:
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;unit&quot;</span>
-</code></pre></div></p>
-<h3 id="test-methodology">Test Methodology<a class="headerlink" href="#test-methodology" title="Permanent link">&para;</a></h3>
-<p>Tests are organised in the <code>tests/</code> directory and follow a specific naming convention that mirrors the source code structure. This approach ensures that tests are easy to locate and maintain.</p>
-<p>The naming convention is as follows:</p>
-<ul>
-<li>If the source file is <code>canfar/path/to/file.py</code>, the corresponding test file will be <code>tests/test_path_to_file.py</code>.</li>
-<li>If the source file is <code>canfar/module.py</code>, the corresponding test file will be <code>tests/test_module.py</code>.</li>
-</ul>
-<p>For example:</p>
-<ul>
-<li>The tests for <code>canfar/client.py</code> are located in <code>tests/test_client.py</code>.</li>
-<li>The tests for <code>canfar/auth/oidc.py</code> are located in <code>tests/test_auth_oidc.py</code>.</li>
-</ul>
-<p>This structure makes it straightforward to find the tests associated with a particular module or file.</p>
-<h2 id="development-workflow">Development Workflow<a class="headerlink" href="#development-workflow" title="Permanent link">&para;</a></h2>
-<p>For efficient development, follow this testing workflow:</p>
-<ol>
-<li>
-<p><strong>During Development</strong>: Run fast tests only
-   <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>Before Committing</strong>: Run the full test suite
-   <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>Debugging Specific Issues</strong>: Run individual test files
-   <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>tests/test_session.py
-</code></pre></div></p>
-</li>
-</ol>
-<h2 id="test-configuration">Test Configuration<a class="headerlink" href="#test-configuration" title="Permanent link">&para;</a></h2>
-<p>Test configuration is defined in <code>pyproject.toml</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="k">[tool.pytest.ini_options]</span>
-<span class="n">markers</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">    </span><span class="s2">&quot;integration: marks tests as integration tests&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;unit: marks tests as unit tests&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;slow: marks tests as slow (deselect with &#39;-m </span><span class="se">\&quot;</span><span class="s2">not slow</span><span class="se">\&quot;</span><span class="s2">&#39;)&quot;</span><span class="p">,</span>
-<span class="w">    </span><span class="s2">&quot;order: marks tests that need to run in a specific order&quot;</span><span class="p">,</span>
-<span class="p">]</span>
+<p>Install the project environment with <code>uv</code>. Full integration coverage requires a
+valid CANFAR Authentication Record and X.509 certificate/configuration. Do not
+run that suite against a real account unless the test workflow is explicitly
+intended to create or clean up platform resources.</p>
+<p><span id="running-tests"></span>
+<span id="basic-test-execution"></span>
+<span id="unit-tests"></span>
+<span id="development-workflow"></span>
+<span id="troubleshooting"></span>
+<span id="test-failures"></span></p>
+<h2 id="local-validation">Local validation<a class="headerlink" href="#local-validation" title="Permanent link">&para;</a></h2>
+<p>The default local test gate excludes slow tests and avoids external
+Authentication:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-o<span class="w"> </span><span class="nv">cache_dir</span><span class="o">=</span>/tmp/canfar-pytest-cache
 </code></pre></div>
-<h2 id="continuous-integration">Continuous Integration<a class="headerlink" href="#continuous-integration" title="Permanent link">&para;</a></h2>
-<p>In CI environments, all tests (including slow ones) are executed to ensure complete validation. The CI pipeline:</p>
-<ol>
-<li>Sets up authentication with CANFAR</li>
-<li>Runs the complete test suite</li>
-<li>Generates coverage reports</li>
-<li>Cleans up authentication artifacts</li>
-</ol>
-<h2 id="writing-tests">Writing Tests<a class="headerlink" href="#writing-tests" title="Permanent link">&para;</a></h2>
-<p>When contributing new tests:</p>
-<ol>
-<li><strong>Follow the naming convention</strong>: Create a test file that mirrors the source file's path and name.</li>
-<li><strong>Mark slow tests</strong>: Add <code>@pytest.mark.slow</code> to any test that involves network operations, interacts with external services, or has long execution times. This allows developers to skip these tests for a faster development cycle.</li>
-<li><strong>Use appropriate markers</strong>: Mark tests as <code>unit</code>, <code>integration</code>, etc.</li>
-<li><strong>Add docstrings</strong>: Document what each test verifies.</li>
-</ol>
-<p>Example of a slow test:
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">pytest</span>
-
-<span class="nd">@pytest</span><span class="o">.</span><span class="n">mark</span><span class="o">.</span><span class="n">slow</span>
-<span class="k">def</span><span class="w"> </span><span class="nf">test_long_running_operation</span><span class="p">():</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Test that involves waiting or network operations.&quot;&quot;&quot;</span>
-    <span class="c1"># Test implementation</span>
-    <span class="k">pass</span>
-</code></pre></div></p>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<h3 id="authentication-issues">Authentication Issues<a class="headerlink" href="#authentication-issues" title="Permanent link">&para;</a></h3>
+<p>Useful focused checks include:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests/test_sessions_fetch.py<span class="w"> </span>tests/test_sessions_lifecycle.py<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>tests/test_storage.py<span class="w"> </span>tests/test_config_editor.py<span class="w"> </span>-q
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>ruff<span class="w"> </span>check<span class="w"> </span>.<span class="w"> </span>--no-cache
+uv<span class="w"> </span>run<span class="w"> </span>ty<span class="w"> </span>check<span class="w"> </span>canfar
+uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>mkdocs<span class="w"> </span>build
+</code></pre></div>
+<p>The documentation build is the check for broken navigation, Markdown, and
+generated Python API pages.</p>
+<p><span id="test-categories"></span></p>
+<h2 id="test-markers">Test markers<a class="headerlink" href="#test-markers" title="Permanent link">&para;</a></h2>
+<p>Use markers to select known test categories:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span>unit
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span>integration
+uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span>slow
+</code></pre></div>
+<p>Integration and slow tests may contact CANFAR services and require valid
+credentials. <code>-m "not slow"</code> is the deterministic default; it is not a claim
+that every test marked <code>integration</code> is safe without Authentication.</p>
+<p><span id="integration-tests"></span>
+<span id="continuous-integration"></span></p>
+<p><span id="slow-tests"></span>
+<span id="authentication-issues"></span>
+<span id="slow-test-timeouts"></span></p>
+<h2 id="full-suite">Full suite<a class="headerlink" href="#full-suite" title="Permanent link">&para;</a></h2>
+<p>Run the full suite only in an environment prepared for the credentialed gate:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest
+</code></pre></div>
+<p>The full run includes Authentication-dependent tests, Session lifecycle work,
+and network operations. A local failure can therefore indicate missing
+credentials or unavailable Science Platform infrastructure rather than a
+library regression.</p>
+<p><span id="writing-tests"></span></p>
+<p><span id="test-methodology"></span></p>
+<h2 id="adding-tests">Adding tests<a class="headerlink" href="#adding-tests" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Ensure your X.509 certificate is valid and not expired</li>
-<li>Check that you have access to the CANFAR Science Platform</li>
-<li>Verify your certificate is in the correct location (<code>~/.ssl/</code>)</li>
-</ul>
-<h3 id="slow-test-timeouts">Slow Test Timeouts<a class="headerlink" href="#slow-test-timeouts" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Slow tests have built-in timeouts (typically 60 seconds)</li>
-<li>If tests consistently timeout, check your network connection</li>
-<li>Platform availability may affect test execution times</li>
-</ul>
-<h3 id="test-failures">Test Failures<a class="headerlink" href="#test-failures" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Check if the CANFAR Science Platform is accessible</li>
-<li>Verify your authentication credentials</li>
-<li>Review test logs for specific error messages</li>
+<li>Mirror the source module path under <code>tests/</code>.</li>
+<li>Mark network or long-running tests with <code>integration</code> and/or <code>slow</code>.</li>
+<li>Prefer observable public seams such as <code>httpx.MockTransport</code>, <code>CliRunner</code>,
+  and the public Configuration editor.</li>
+<li>Keep sync tests synchronous and async tests on the native async path.</li>
 </ul>
 
 
@@ -1605,7 +1475,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 2, 2025 23:21:29 UTC">September 2, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     
@@ -1633,14 +1503,14 @@
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       

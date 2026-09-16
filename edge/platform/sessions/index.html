@@ -88,7 +88,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#interactive-sessions" class="md-skip">
+        <a href="#sessions" class="md-skip">
           Skip to content
         </a>
       
@@ -1316,6 +1316,8 @@
       
         
       
+        
+      
     
     
     
@@ -1392,6 +1394,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1780,6 +1810,8 @@
       
         
       
+        
+      
     
     
     
@@ -1985,10 +2017,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#session-fundamentals" class="md-nav__link">
+  <a href="#start-a-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🚀 Session Fundamentals
+        Start a Session
       
     </span>
   </a>
@@ -1996,10 +2028,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-type-comparison" class="md-nav__link">
+  <a href="#lifecycle-and-status" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📊 Session Type Comparison
+        Lifecycle and status
       
     </span>
   </a>
@@ -2007,10 +2039,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#session-management" class="md-nav__link">
+  <a href="#storage-boundary" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔧 Session Management
+        Storage boundary
       
     </span>
   </a>
@@ -2018,10 +2050,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-allocation" class="md-nav__link">
+  <a href="#resource-requests" class="md-nav__link">
     <span class="md-ellipsis">
       
-        📈 Resource Allocation
+        Resource requests
       
     </span>
   </a>
@@ -2029,10 +2061,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#integration-with-platform-services" class="md-nav__link">
+  <a href="#session-apis" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔗 Integration with Platform Services
+        Session APIs
       
     </span>
   </a>
@@ -2040,10 +2072,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#choosing-your-session-type" class="md-nav__link">
+  <a href="#related-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 Choosing Your Session Type
+        Related guides
       
     </span>
   </a>
@@ -2083,222 +2115,134 @@
   
 
 
-<h1 id="interactive-sessions">Interactive Sessions<a class="headerlink" href="#interactive-sessions" title="Permanent link">&para;</a></h1>
-<p><strong>CANFAR computing environments for astronomical research - Jupyter notebooks, and non-interactive applications.</strong></p>
-<div class="admonition abstract">
-<p class="admonition-title">🎯 Session Types Overview</p>
-<p><strong>Choose the right interface for your research:</strong></p>
-<ul>
-<li><strong><a href="notebook/">Jupyter Notebooks</a></strong>: Interactive data analysis and visualisation</li>
-<li><strong><a href="desktop/">Desktop Environment</a></strong>: Full Linux desktop with GUI applications  </li>
-<li><strong><a href="carta/">CARTA Viewer</a></strong>: Radio astronomy visualisation and analysis</li>
-<li><strong><a href="firefly/">Firefly Viewer</a></strong>: Table and image viewing for surveys</li>
-<li><strong><a href="contributed/">Contributed Apps</a></strong>: Specialised community applications</li>
-<li><strong><a href="batch/">Batch Processing</a></strong>: Automated and large-scale workflows</li>
-</ul>
-</div>
-<h2 id="session-fundamentals">🚀 Session Fundamentals<a class="headerlink" href="#session-fundamentals" title="Permanent link">&para;</a></h2>
-<h3 id="what-are-interactive-sessions">What are Interactive Sessions?<a class="headerlink" href="#what-are-interactive-sessions" title="Permanent link">&para;</a></h3>
-<p>Interactive sessions provide on-demand access to pre-configured computing environments running in containers. Each session type offers different interfaces optimized for specific astronomical workflows.</p>
-<h3 id="key-benefits">Key Benefits<a class="headerlink" href="#key-benefits" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>No Installation Required</strong></dt>
-<dd>Access complex astronomy software through your web browser without local installation or configuration.</dd>
-<dt><strong>Pre-Configured Environments</strong></dt>
-<dd>Containers include popular astronomy packages like AstroPy, CASA, and scientific Python libraries ready to use.</dd>
-<dt><strong>Persistent Data Access</strong></dt>
-<dd>All sessions automatically connect to your ARC storage and can access VOSpace for long-term data management.</dd>
-<dt><strong>Scalable Resources</strong></dt>
-<dd>Choose flexible or fixed resource allocation based on your computational requirements.</dd>
-</dl>
-<h2 id="session-type-comparison">📊 Session Type Comparison<a class="headerlink" href="#session-type-comparison" title="Permanent link">&para;</a></h2>
+<p><span id="interactive-sessions"></span></p>
+<h1 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h1>
+<p>A Session is a user-owned compute environment launched from a Container Image
+on a Science Platform Server. Choose the Session Kind that matches the way you
+want to work:</p>
 <table>
 <thead>
 <tr>
-<th>Session Type</th>
+<th>Kind</th>
 <th>Interface</th>
-<th>Best For</th>
-<th>GUI Support</th>
+<th>Typical use</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong><a href="notebook/">Notebook</a></strong></td>
+<td><code>notebook</code></td>
 <td>JupyterLab</td>
-<td>Data analysis, prototyping, documentation</td>
-<td>✅ Web-based</td>
+<td>Python analysis and interactive notebooks</td>
 </tr>
 <tr>
-<td><strong><a href="desktop/">Desktop</a></strong></td>
-<td>Full Linux desktop</td>
-<td>CASA, image viewers, traditional software</td>
-<td>✅ Desktop GUI</td>
+<td><code>desktop</code></td>
+<td>Browser desktop</td>
+<td>CASA and other graphical applications</td>
 </tr>
 <tr>
-<td><strong><a href="carta/">CARTA</a></strong></td>
-<td>CARTA interface</td>
-<td>Radio astronomy visualisation</td>
-<td>✅ Specialised</td>
+<td><code>carta</code></td>
+<td>CARTA</td>
+<td>Image and spectral-cube exploration</td>
 </tr>
 <tr>
-<td><strong><a href="firefly/">Firefly</a></strong></td>
-<td>Firefly viewer</td>
-<td>Catalogue analysis, image display</td>
-<td>✅ Web-based</td>
+<td><code>firefly</code></td>
+<td>Firefly</td>
+<td>Tables and image visualization</td>
 </tr>
 <tr>
-<td><strong><a href="contributed/">Contributed</a></strong></td>
-<td>Various</td>
-<td>Specialised applications</td>
-<td>⚠️ Varies</td>
+<td><code>contributed</code></td>
+<td>Application-specific</td>
+<td>Community-maintained tools</td>
 </tr>
 <tr>
-<td><strong><a href="batch/">Batch</a></strong></td>
-<td>None (headless)</td>
-<td>Large-scale processing</td>
-<td>❌ Headless</td>
+<td><code>headless</code></td>
+<td>No interactive interface</td>
+<td>Batch commands and pipelines</td>
 </tr>
 </tbody>
 </table>
-<h2 id="session-management">🔧 Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h2>
-<h3 id="creating-sessions">Creating Sessions<a class="headerlink" href="#creating-sessions" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>Via Science Portal:</strong></dt>
-<dd>Launch sessions through the <a href="https://www.canfar.net/science-portal/">CANFAR Science Portal</a> web interface with point-and-click simplicity.</dd>
-<dt><strong>Via Command Line:</strong></dt>
-<dd>Use the <a href="../../cli/cli-help/">CANFAR CLI</a> for scripted session creation and automation.</dd>
-<dt><strong>Via Python API:</strong></dt>
-<dd>Integrate session management into custom workflows using the <a href="../../client/home/">CANFAR Python Client</a>.</dd>
-</dl>
-<h3 id="session-lifecycle">Session Lifecycle<a class="headerlink" href="#session-lifecycle" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>Creation</strong> (30 seconds - 3 minutes)</dt>
-<dd>Container download (first time) and startup with storage mounting</dd>
-<dt><strong>Active Use</strong></dt>
-<dd>Full access to computing resources and storage systems</dd>
-<dt><strong>Idle Management</strong></dt>
-<dd>Sessions automatically suspend after periods of inactivity to conserve resources</dd>
-<dt><strong>Termination</strong></dt>
-<dd>Container deletion with data preserved in persistent storage</dd>
-</dl>
-<div class="admonition warning">
-<p class="admonition-title">Data Persistence</p>
-<p><strong>Important</strong>: Session containers are temporary. Always save important work to <code>/arc/</code> storage or VOSpace before ending sessions.</p>
-</div>
-<h2 id="resource-allocation">📈 Resource Allocation<a class="headerlink" href="#resource-allocation" title="Permanent link">&para;</a></h2>
-<h3 id="flexible-allocation-default">Flexible Allocation (Default)<a class="headerlink" href="#flexible-allocation-default" title="Permanent link">&para;</a></h3>
-<p><strong>Advantages:</strong>
-- Faster session startup
-- Can burst to higher resource usage when available
-- Optimal for interactive work and development</p>
-<p><strong>Best For:</strong>
-- Data exploration and analysis
-- Development and testing
-- Educational workshops</p>
-<h3 id="fixed-allocation">Fixed Allocation<a class="headerlink" href="#fixed-allocation" title="Permanent link">&para;</a></h3>
-<p><strong>Advantages:</strong>
-- Guaranteed consistent performance
-- Predictable resource availability
-- Better for production workloads</p>
-<p><strong>Best For:</strong>
-- Large-scale processing
-- Performance-critical analysis
-- Time-sensitive computations</p>
-<h3 id="resource-selection-guide">Resource Selection Guide<a class="headerlink" href="#resource-selection-guide" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Workflow Type</th>
-<th>Recommended Mode</th>
-<th>CPU/Memory</th>
-<th>Duration</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Interactive Analysis</strong></td>
-<td>Flexible</td>
-<td>2-4 CPU, 4-8GB</td>
-<td>Hours</td>
-</tr>
-<tr>
-<td><strong>Large Dataset Processing</strong></td>
-<td>Fixed</td>
-<td>4-8 CPU, 16-32GB</td>
-<td>Hours-Days</td>
-</tr>
-<tr>
-<td><strong>Development &amp; Testing</strong></td>
-<td>Flexible</td>
-<td>1-2 CPU, 2-4GB</td>
-<td>Hours</td>
-</tr>
-<tr>
-<td><strong>Production Pipelines</strong></td>
-<td>Fixed</td>
-<td>Varies by workload</td>
-<td>Days</td>
-</tr>
-</tbody>
-</table>
-<h2 id="integration-with-platform-services">🔗 Integration with Platform Services<a class="headerlink" href="#integration-with-platform-services" title="Permanent link">&para;</a></h2>
-<h3 id="storage-integration">Storage Integration<a class="headerlink" href="#storage-integration" title="Permanent link">&para;</a></h3>
-<p>All interactive sessions automatically mount:</p>
+<p>See the individual guides for <a href="notebook/">Notebook</a>, <a href="desktop/">Desktop</a>,
+<a href="carta/">CARTA</a>, <a href="firefly/">Firefly</a>, <a href="contributed/">Contributed</a>, and
+<a href="batch/">Batch</a> workflows.</p>
+<p><span id="session-fundamentals"></span>
+<span id="what-are-interactive-sessions"></span>
+<span id="key-benefits"></span>
+<span id="session-type-comparison"></span>
+<span id="session-management"></span>
+<span id="creating-sessions"></span>
+<span id="flexible-allocation-default"></span>
+<span id="fixed-allocation"></span>
+<span id="integration-with-platform-services"></span>
+<span id="container-environments"></span>
+<span id="cvmfs-software-repositories"></span>
+<span id="authentication-permissions"></span>
+<span id="choosing-your-session-type"></span>
+<span id="for-astronomy-specialisations"></span>
+<span id="for-production-work"></span></p>
+<h2 id="start-a-session">Start a Session<a class="headerlink" href="#start-a-session" title="Permanent link">&para;</a></h2>
+<p>You can launch a Session from the <a href="https://www.canfar.net/">Science Portal</a>,
+from the CLI, or with the Python client. The CLI uses a Container Image and
+Session Kind as positional arguments:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>notebook
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>IMAGE_NAME<span class="w"> </span>--name<span class="w"> </span>analysis
+canfar<span class="w"> </span>ps<span class="w"> </span>--all
+</code></pre></div>
+<p>Use <code>canfar server ls</code> and <code>canfar server use NAME</code> when more than one Science
+Platform Server is available for the active Identity Provider. The image list
+is the source of truth for image names and supported kinds; examples are
+illustrative tags, not a guarantee that every deployment publishes them.</p>
+<p><span id="session-lifecycle"></span></p>
+<h2 id="lifecycle-and-status">Lifecycle and status<a class="headerlink" href="#lifecycle-and-status" title="Permanent link">&para;</a></h2>
+<p>Creation returns Session IDs before the Session is necessarily ready. A Session
+can be <code>Pending</code> while it waits for admission, resources, image pulls, or
+initialization, then become <code>Running</code> or a terminal state. Queue order and
+resource policy are deployment-owned.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--all
+canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>logs<span class="w"> </span>SESSION_ID
+</code></pre></div>
+<p>The default <code>canfar ps</code> view shows <code>Pending</code> and <code>Running</code> Sessions; use
+<code>--all</code> to include terminal states as well. <code>canfar open</code> only opens a ready
+Session. Delete a Session when its work is complete:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
+</code></pre></div>
+<p><span id="storage-integration"></span>
+<span id="for-data-analysis"></span></p>
+<h2 id="storage-boundary">Storage boundary<a class="headerlink" href="#storage-boundary" title="Permanent link">&para;</a></h2>
+<p>Sessions are temporary compute environments. A Session can use mounted
+<code>/arc/home/&lt;user&gt;</code> and <code>/arc/projects/&lt;project&gt;</code> paths when the deployment
+provides them, plus <code>/scratch</code> for fast Session-local work. <code>/scratch</code> is
+deleted with the Session. Save scripts, inputs, and results under <code>/arc</code> or a
+persistent VOSpace Service before stopping or deleting the Session.</p>
+<p>For remote VOSpace data, use <a href="../storage/transfers/">canfar data</a> or the
+explicit Python <a href="../storage/filesystem/">storage helper</a>. Do not assume that
+opening a remote object provides server-side random access; stage once when a
+path-oriented tool needs a local filename.</p>
+<p><span id="resource-allocation"></span>
+<span id="resource-selection-guide"></span></p>
+<h2 id="resource-requests">Resource requests<a class="headerlink" href="#resource-requests" title="Permanent link">&para;</a></h2>
+<p>Omit <code>--cpu</code> and <code>--memory</code> for the platform's flexible request, or set values
+based on measured workload needs. Fixed requests can wait longer when matching
+capacity is unavailable. For headless workloads, see the <a href="batch/">batch queue and
+troubleshooting guide</a>.</p>
+<p><span id="api-access-to-sessions"></span></p>
+<h2 id="session-apis">Session APIs<a class="headerlink" href="#session-apis" title="Permanent link">&para;</a></h2>
+<p>The Python client exposes synchronous and asynchronous Session operations. The
+public library returns ordinary Python values; it does not replace the mounted
+filesystem or add a second storage adapter. Start with the <a href="../../client/get-started/">Python client
+guide</a> and <a href="../../client/session/">Session reference</a>.</p>
+<p>Some interactive applications expose their own API after the Session reaches
+<code>Running</code>. Consult the application documentation linked from its individual
+guide rather than assuming that every Session has an HTTP API.</p>
+<h2 id="related-guides">Related guides<a class="headerlink" href="#related-guides" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>ARC Home</strong> (<code>/arc/home/[user]/</code>): Personal configurations and scripts</li>
-<li><strong>ARC Projects</strong> (<code>/arc/projects/[project]/</code>): Shared research data and results</li>
-<li><strong>Scratch</strong> (<code>/scratch/</code>): High-speed temporary storage for processing</li>
+<li><a href="../storage/">Storage</a></li>
+<li><a href="../containers/">Containers</a></li>
+<li><a href="../permissions/">Permissions</a></li>
+<li><a href="../support/">Support</a></li>
 </ul>
-<p>Additional storage accessible via API:
-- <strong>VOSpace</strong> (<code>vos:</code>): Long-term archives and data sharing</p>
-<h3 id="container-environments">Container Environments<a class="headerlink" href="#container-environments" title="Permanent link">&para;</a></h3>
-<p>Sessions run in <a href="../containers/">container environments</a> that include:</p>
-<ul>
-<li>Operating system (typically Ubuntu Linux)</li>
-<li>Astronomy software packages (AstroPy, CASA, etc.)</li>
-<li>Scientific computing libraries (NumPy, SciPy, Matplotlib)</li>
-<li>Development tools and utilities</li>
-</ul>
-<h3 id="cvmfs-software-repositories">CVMFS Software Repositories<a class="headerlink" href="#cvmfs-software-repositories" title="Permanent link">&para;</a></h3>
-<p>All CANFAR sessions provide access to read-only <strong>CVMFS</strong> (CernVM File System) software repositories. This feature provides instant access to the vast collections of pre-built scientific software maintained by the <strong>Digital Research Alliance of Canada (Alliance)</strong>.</p>
-<p>See the <strong><a href="../cvmfs/">Software Repositories (CVMFS)</a></strong> guide for more information and examples.</p>
-<h3 id="authentication-permissions">Authentication &amp; Permissions<a class="headerlink" href="#authentication-permissions" title="Permanent link">&para;</a></h3>
-<p>Sessions inherit your <a href="../permissions/">CANFAR permissions</a>:</p>
-<ul>
-<li>Automatic access to your group projects</li>
-<li>Secure integration with CADC services</li>
-<li>API access for automated workflows</li>
-</ul>
-<h2 id="choosing-your-session-type">🎯 Choosing Your Session Type<a class="headerlink" href="#choosing-your-session-type" title="Permanent link">&para;</a></h2>
-<h3 id="for-data-analysis">For Data Analysis<a class="headerlink" href="#for-data-analysis" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>New to CANFAR?</strong> → Start with <strong><a href="notebook/">Jupyter Notebooks</a></strong></dt>
-<dd>Familiar interface combining code, documentation, and visualisation</dd>
-<dt><strong>Need GUI Applications?</strong> → Use <strong><a href="desktop/">Desktop Sessions</a></strong></dt>
-<dd>Full Linux desktop for CASA, image viewers, and traditional software</dd>
-</dl>
-<h3 id="for-astronomy-specialisations">For Astronomy Specialisations<a class="headerlink" href="#for-astronomy-specialisations" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>Radio Astronomy</strong> → <strong><a href="carta/">CARTA Viewer</a></strong></dt>
-<dd>Optimized for radio interferometry data visualisation and analysis</dd>
-<dt><strong>Survey Data</strong> → <strong><a href="firefly/">Firefly Viewer</a></strong></dt>
-<dd>Efficient table and image viewing for large astronomical catalogues</dd>
-<dt><strong>Specialised Tools</strong> → <strong><a href="contributed/">Contributed Applications</a></strong></dt>
-<dd>Community-maintained applications for specific research domains</dd>
-</dl>
-<h3 id="for-production-work">For Production Work<a class="headerlink" href="#for-production-work" title="Permanent link">&para;</a></h3>
-<dl>
-<dt><strong>Large-Scale Processing</strong> → <strong><a href="batch/">Batch Sessions</a></strong></dt>
-<dd>Automated workflows for processing large datasets without interactive interfaces</dd>
-</dl>
-<h3 id="api-access-to-sessions">API Access to Sessions<a class="headerlink" href="#api-access-to-sessions" title="Permanent link">&para;</a></h3>
-<p>If you have a session running and it exposes an API, you can programatically
-interact with it remotely, either from another session or from your laptop.</p>
-<p>The base of the session API will be available at the session URL.  For more
-details, consult the API docs for each of the session types:
-- <a href="https://carta-python.readthedocs.io/en/latest/quickstart.html#opening-and-appending-images">CARTA API Docs</a>
-- <a href="https://caltech-ipac.github.io/firefly_client/">Firefly API Docs</a>
-- <a href="https://jupyterlab-server.readthedocs.io/en/latest/api/rest.html">JupyterLab API Docs</a></p>
 
 
 
@@ -2321,7 +2265,7 @@ details, consult the API docs for each of the session types:
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

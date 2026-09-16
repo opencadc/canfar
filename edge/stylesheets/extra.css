@@ -58,3 +58,256 @@
   --md-typeset-a-color: #57B7E7; /* Example: light blue for links */
   --md-typeset-a-hl-color: #BEE7F9; /* Example: lighter blue for hover */
 }
+/* Landing page: native Material cards and controls, scoped to this page. */
+.canfar-home {
+  --canfar-home-border: #d7e2ed;
+  --canfar-home-surface: #f5f8fc;
+  --canfar-home-ink: #172b40;
+  --canfar-home-muted: #506277;
+  --canfar-home-accent: #005493;
+}
+
+[data-md-color-scheme="slate"] .canfar-home {
+  --canfar-home-border: #344450;
+  --canfar-home-surface: #232e37;
+  --canfar-home-ink: #edf3f8;
+  --canfar-home-muted: #b5c5d2;
+  --canfar-home-accent: #76c9ee;
+}
+
+.md-typeset .canfar-home h1 {
+  margin: 0 0 .55rem;
+  color: var(--canfar-home-ink);
+  font-size: clamp(1.5rem, 3vw, 1.95rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.md-typeset .canfar-home .canfar-standards {
+  margin: 0 0 1.35rem;
+  color: var(--canfar-home-muted);
+  font-size: .7rem;
+  font-weight: 500;
+}
+
+.canfar-home .canfar-standards a {
+  color: var(--canfar-home-accent);
+  font-weight: 600;
+}
+
+.canfar-home .canfar-standards > span {
+  padding: 0 .25rem;
+}
+
+.canfar-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: .95rem 1.15rem;
+  border: 1px solid var(--canfar-home-border);
+  border-radius: .25rem;
+  background: var(--canfar-home-surface);
+}
+
+.md-typeset .canfar-home .canfar-name {
+  margin: 0 0 .35rem;
+  color: var(--canfar-home-ink);
+  font-size: 1.05rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.md-typeset .canfar-home .canfar-description {
+  margin: 0;
+  color: var(--canfar-home-muted);
+  font-size: .8rem;
+  line-height: 1.6;
+}
+
+.canfar-actions {
+  flex-shrink: 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+.md-typeset .canfar-actions p {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: .5rem;
+  margin: 0;
+}
+
+.md-typeset .canfar-home .md-button {
+  padding: .5rem .8rem;
+  border: 1px solid #005493;
+  border-radius: .2rem;
+  background: #005493;
+  color: #fff;
+  font-size: .75rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.md-typeset .canfar-home .md-button:hover,
+.md-typeset .canfar-home .md-button:focus-visible {
+  border-color: #006bb3;
+  background: #006bb3;
+}
+
+.md-typeset .canfar-home h2 {
+  margin: 1.55rem 0 .7rem;
+  color: var(--canfar-home-ink);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.md-typeset .canfar-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .6rem;
+  margin: 0;
+}
+
+.md-typeset .canfar-grid > ul {
+  display: contents;
+}
+
+.md-typeset .grid.canfar-grid > ul > li {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 1px solid var(--canfar-home-border);
+  border-radius: .25rem;
+  background: var(--md-default-bg-color);
+  transition: border-color 160ms ease;
+}
+
+.md-typeset .grid.canfar-grid > ul > li > a {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  height: 100%;
+  padding: .855rem .9rem;
+  border-radius: inherit;
+  color: var(--canfar-home-ink);
+  line-height: 1.4;
+}
+
+.canfar-grid a > .twemoji {
+  flex: 0 0 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  color: var(--canfar-home-accent);
+}
+
+.canfar-grid a > .twemoji svg {
+  width: 100%;
+  height: 100%;
+}
+
+.canfar-card-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: .25rem;
+  min-width: 0;
+}
+
+.canfar-card-copy strong {
+  font-size: .8rem;
+  font-weight: 600;
+}
+
+.canfar-card-copy > span {
+  color: var(--canfar-home-muted);
+  font-size: .68rem;
+  line-height: 1.45;
+}
+
+@media (hover: hover) {
+  .md-typeset .grid.canfar-grid > ul > li:hover {
+    border-color: var(--canfar-home-accent);
+    box-shadow: none;
+  }
+}
+
+.canfar-home a:focus-visible,
+.canfar-home button:focus-visible {
+  outline: 3px solid var(--canfar-home-accent);
+  outline-offset: 4px;
+}
+
+.md-typeset .canfar-acknowledgement > p {
+  margin: .35rem 0;
+  color: var(--canfar-home-muted);
+  font-size: .72rem;
+  line-height: 1.6;
+}
+
+.md-typeset .canfar-acknowledgement .highlight {
+  margin: .65rem 0 .6rem;
+}
+
+.md-typeset .canfar-acknowledgement pre {
+  margin: 0;
+}
+
+.md-typeset .canfar-acknowledgement pre > code {
+  padding: .75rem 2.15rem .75rem .85rem;
+  border: 1px solid var(--canfar-home-border);
+  border-radius: .25rem;
+  background: var(--md-default-bg-color);
+  color: var(--canfar-home-ink);
+  font-family: var(--md-code-font-family), monospace;
+  font-size: .72rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.md-typeset .canfar-acknowledgement .md-code__button {
+  color: var(--canfar-home-muted);
+}
+
+@media (max-width: 56em) {
+  .canfar-intro {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 50em) {
+  .md-typeset .canfar-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .canfar-grid > ul > li:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 34em) {
+  .canfar-intro {
+    padding: .95rem 1rem;
+  }
+
+  .md-typeset .canfar-home h1 {
+    font-size: 1.4rem;
+  }
+
+  .md-typeset .canfar-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .md-typeset .grid.canfar-grid > ul > li > a {
+    padding: .81rem .85rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canfar-grid > ul > li {
+    transition: none !important;
+  }
+}

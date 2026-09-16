@@ -934,10 +934,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-firefly" class="md-nav__link">
+  <a href="#launch-firefly" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 What is Firefly?
+        Launch Firefly
       
     </span>
   </a>
@@ -945,10 +945,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launching-firefly" class="md-nav__link">
+  <a href="#load-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🚀 Launching Firefly
+        Load data
       
     </span>
   </a>
@@ -956,10 +956,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-firefly" class="md-nav__link">
+  <a href="#typical-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔥 Using Firefly
+        Typical workflow
       
     </span>
   </a>
@@ -967,21 +967,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-workflows" class="md-nav__link">
+  <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🛠️ Common Workflows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integration-with-canfar" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔧 Integration with CANFAR
+        Troubleshooting
       
     </span>
   </a>
@@ -1418,6 +1407,8 @@
       
         
       
+        
+      
     
     
     
@@ -1494,6 +1485,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1882,6 +1901,8 @@
       
         
       
+        
+      
     
     
     
@@ -2087,10 +2108,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#what-is-firefly" class="md-nav__link">
+  <a href="#launch-firefly" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🎯 What is Firefly?
+        Launch Firefly
       
     </span>
   </a>
@@ -2098,10 +2119,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#launching-firefly" class="md-nav__link">
+  <a href="#load-data" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🚀 Launching Firefly
+        Load data
       
     </span>
   </a>
@@ -2109,10 +2130,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#using-firefly" class="md-nav__link">
+  <a href="#typical-workflow" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🔥 Using Firefly
+        Typical workflow
       
     </span>
   </a>
@@ -2120,21 +2141,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#common-workflows" class="md-nav__link">
+  <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        🛠️ Common Workflows
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integration-with-canfar" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        🔧 Integration with CANFAR
+        Troubleshooting
       
     </span>
   </a>
@@ -2175,393 +2185,112 @@
 
 
 <h1 id="firefly-sessions">Firefly Sessions<a class="headerlink" href="#firefly-sessions" title="Permanent link">&para;</a></h1>
-<p><strong>The LSST table and image visualizer for astronomical data exploration</strong></p>
-<div class="admonition abstract">
-<p class="admonition-title">🎯 What You'll Learn</p>
-<ul>
-<li>How to launch a Firefly session and choose the right version</li>
-<li>How to load images, tables, and access CANFAR storage</li>
-<li>How to perform catalogue overlays, plotting, and cutouts</li>
-<li>Performance tips for large surveys and troubleshooting guidance</li>
-</ul>
-</div>
-<p>Firefly is a powerful web-based visualisation tool originally developed for the Rubin Observatory LSST. It provides advanced capabilities for viewing images, overlaying catalogues, and analysing tabular data - making it perfect for survey data analysis and multi-wavelength astronomy.</p>
-<h2 id="what-is-firefly">🎯 What is Firefly?<a class="headerlink" href="#what-is-firefly" title="Permanent link">&para;</a></h2>
-<p>Firefly offers specialised tools for:</p>
-<ul>
-<li><strong>Image visualisation</strong> with advanced stretch and colour controls</li>
-<li><strong>Catalogue overlay</strong> and source analysis tools  </li>
-<li><strong>Table viewer</strong> with filtering, plotting, and statistical tools</li>
-<li><strong>Multi-wavelength data</strong> comparison and analysis</li>
-<li><strong>Large survey datasets</strong> like LSST, HSC, and WISE</li>
-</ul>
-<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Feature</th>
-<th>Capability</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Image Display</strong></td>
-<td>FITS images with WCS support, multiple panels</td>
-</tr>
-<tr>
-<td><strong>Catalogue Overlay</strong></td>
-<td>Plot sources on images, interactive selection</td>
-</tr>
-<tr>
-<td><strong>Table Analysis</strong></td>
-<td>Sort, filter, plot columns, statistical analysis</td>
-</tr>
-<tr>
-<td><strong>Multi-band</strong></td>
-<td>RGB colour composites, band switching</td>
-</tr>
-<tr>
-<td><strong>Cutout Services</strong></td>
-<td>Extract subimages from large surveys</td>
-</tr>
-<tr>
-<td><strong>Coordinate Systems</strong></td>
-<td>Support for all standard astronomical coordinates</td>
-</tr>
-</tbody>
-</table>
-<h2 id="launching-firefly">🚀 Launching Firefly<a class="headerlink" href="#launching-firefly" title="Permanent link">&para;</a></h2>
-<h3 id="step-1-create-new-session">Step 1: Create New Session<a class="headerlink" href="#step-1-create-new-session" title="Permanent link">&para;</a></h3>
+<p><a href="https://github.com/Caltech-IPAC/firefly">Firefly</a> is a browser-based
+astronomy application for viewing images, tables, and supported archive data.
+The available Firefly image and features are deployment-specific.</p>
+<p><span id="launching-firefly"></span>
+<span id="step-4-launch-session"></span>
+<span id="access-canfar-storage"></span>
+<span id="remote-data-access"></span>
+<span id="storage-access"></span></p>
+<h2 id="launch-firefly">Launch Firefly<a class="headerlink" href="#launch-firefly" title="Permanent link">&para;</a></h2>
 <ol>
-<li><strong>Login</strong> to the <a href="https://www.canfar.net/science-portal">CANFAR Science Portal</a></li>
-<li><strong>Click</strong> the plus sign (<strong>+</strong>) to create a new session</li>
-<li><strong>Select</strong> <code>firefly</code> as your session type</li>
+<li>Sign in to the <a href="https://www.canfar.net/science-portal/">Science Portal</a>.</li>
+<li>In <strong>Launch New Session</strong>, choose <strong>Firefly</strong>, select an image containing
+   the software you need, and launch the Session.</li>
+<li>Wait for it to start under <strong>Active Sessions</strong>, then open its application link.</li>
 </ol>
-<h3 id="step-2-choose-container">Step 2: Choose Container<a class="headerlink" href="#step-2-choose-container" title="Permanent link">&para;</a></h3>
-<p>The container selection updates automatically after choosing the session type. Select the Firefly container version you need:</p>
-<h4 id="available-versions">Available Versions<a class="headerlink" href="#available-versions" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>firefly:latest</strong> - Most recent stable version (recommended)</li>
-<li><strong>firefly:X.X</strong> - Specific version for reproducible analysis</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Version Selection</p>
-<p>Use the latest version unless you need a specific version for reproducibility. The latest version includes performance improvements and new features.</p>
-</div>
-<h3 id="step-3-configure-session">Step 3: Configure Session<a class="headerlink" href="#step-3-configure-session" title="Permanent link">&para;</a></h3>
-<h4 id="session-name">Session Name<a class="headerlink" href="#session-name" title="Permanent link">&para;</a></h4>
-<p>Choose a descriptive name that helps identify your work:</p>
-<p><strong>Good session names:</strong>
-- <code>lsst-photometry</code>
-- <code>hsc-catalogue-analysis</code> 
-- <code>multiband-survey</code>
-- <code>gaia-cross-match</code></p>
-<h4 id="memory-requirements">Memory Requirements<a class="headerlink" href="#memory-requirements" title="Permanent link">&para;</a></h4>
-<p>If using a fixed resource session, select RAM based on your data size:</p>
-<ul>
-<li><strong>8GB</strong>: Small catalogues, single images</li>
-<li><strong>16GB</strong>: Default, suitable for most work</li>
-<li><strong>32GB</strong>: Large catalogues, multiple images</li>
-<li><strong>64GB</strong>: Very large survey datasets</li>
-</ul>
-<div class="admonition tip">
-<p class="admonition-title">Memory Planning</p>
-<p>Large tables and multi-image layouts benefit from 32GB+ RAM. Start with 8GB and scale up if needed.</p>
-</div>
-<h4 id="cpu-cores">CPU Cores<a class="headerlink" href="#cpu-cores" title="Permanent link">&para;</a></h4>
-<p>Most Firefly work is I/O bound rather than CPU intensive:</p>
-<ul>
-<li><strong>2 cores</strong>: Default, sufficient for most visualisation tasks</li>
-<li><strong>4 cores</strong>: Large table operations, complex filtering</li>
-</ul>
-<h3 id="step-4-launch-session">Step 4: Launch Session<a class="headerlink" href="#step-4-launch-session" title="Permanent link">&para;</a></h3>
-<ol>
-<li><strong>Click</strong> "Launch" button</li>
-<li><strong>Wait</strong> for container initialisation (~30-60 seconds)</li>
-<li><strong>Session appears</strong> on your portal dashboard</li>
-<li><strong>Click</strong> the session icon to access Firefly</li>
-</ol>
-<h2 id="using-firefly">🔥 Using Firefly<a class="headerlink" href="#using-firefly" title="Permanent link">&para;</a></h2>
-<h3 id="interface-overview">Interface Overview<a class="headerlink" href="#interface-overview" title="Permanent link">&para;</a></h3>
-<p>Firefly's interface consists of several main areas:</p>
-<pre class="mermaid"><code>graph TD
-    Interface[Firefly Interface]
-    Interface --&gt; Upload[File Upload Area]
-    Interface --&gt; Images[Image Display]
-    Interface --&gt; Tables[Table Viewer]
-    Interface --&gt; Tools[Analysis Tools]
-
-    Upload --&gt; Local[Local Files]
-    Upload --&gt; URLs[Remote URLs]
-    Upload --&gt; Storage[CANFAR Storage]
-
-    Images --&gt; Display[Image Canvas]
-    Images --&gt; Controls[Display Controls]
-    Images --&gt; Overlays[Catalogue Overlays]
-
-    Tables --&gt; Browse[Data Browser]
-    Tables --&gt; Filter[Filtering Tools]
-    Tables --&gt; Plot[Plotting Tools]</code></pre>
-<h4 id="main-components">Main Components<a class="headerlink" href="#main-components" title="Permanent link">&para;</a></h4>
-<ul>
-<li><strong>File Upload Area</strong>: Load local files, URLs, or access CANFAR storage</li>
-<li><strong>Image Display</strong>: Multi-panel image viewer with WCS support</li>
-<li><strong>Table Viewer</strong>: Advanced table browser with analysis tools</li>
-<li><strong>Control Panels</strong>: Image display controls, colour maps, overlays</li>
-</ul>
-<h3 id="loading-data">Loading Data<a class="headerlink" href="#loading-data" title="Permanent link">&para;</a></h3>
-<h4 id="upload-local-files">Upload Local Files<a class="headerlink" href="#upload-local-files" title="Permanent link">&para;</a></h4>
-<p><strong>FITS Images:</strong></p>
-<ol>
-<li>Click "Images" tab</li>
-<li>Select "Upload" </li>
-<li>Choose FITS file from your computer</li>
-<li>Image loads automatically with WCS if available</li>
-</ol>
-<p><strong>Catalogue Tables:</strong></p>
-<ol>
-<li>Click "Tables" tab</li>
-<li>Select "Upload"</li>
-<li>Choose CSV, FITS table, or VOTable</li>
-<li>Table opens in browser interface</li>
-</ol>
-<h4 id="access-canfar-storage">Access CANFAR Storage<a class="headerlink" href="#access-canfar-storage" title="Permanent link">&para;</a></h4>
-<p><strong>From ARC Projects:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Files in your project directory are accessible via:</span>
-/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data/image.fits
-/arc/projects/<span class="o">[</span>project<span class="o">]</span>/data/image_sources.csv
+<p>Save your work under <code>/arc</code> before using the Session's delete control in the
+portal. Closing the browser tab does not stop the Session. See
+<a href="../../get-started/">Get started</a> for account, storage, and cleanup steps.</p>
+<h3 id="launch-from-the-command-line-optional">Launch from the command line (optional)<a class="headerlink" href="#launch-from-the-command-line-optional" title="Permanent link">&para;</a></h3>
+<p><a href="../../../client/get-started/#install">Install the client</a> before using these commands.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>firefly
+canfar<span class="w"> </span>create<span class="w"> </span>firefly<span class="w"> </span>IMAGE_NAME<span class="w"> </span>--name<span class="w"> </span>archive-exploration
 </code></pre></div>
-<p><strong>From VOSpace:</strong></p>
-<ol>
-<li>In Firefly, use "File" → "Open"</li>
-<li>Navigate to VOSpace URLs</li>
-<li>Access: <code>vos://cadc.nrc.ca~vault/[user]/</code></li>
-</ol>
-<h4 id="remote-data-access">Remote Data Access<a class="headerlink" href="#remote-data-access" title="Permanent link">&para;</a></h4>
-<p><strong>Survey Archives:</strong></p>
-<div class="highlight"><pre><span></span><code># Example URLs for Firefly
-https://archive.stsci.edu/hlsp/data.fits
-https://irsa.ipac.caltech.edu/data/WISE/cutouts/
+<p>The Science Portal provides the same Session Kind. Monitor the Session and
+open it when ready:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--all
+canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>open<span class="w"> </span>SESSION_ID
 </code></pre></div>
-<p><strong>Supported Formats:</strong></p>
-<ul>
-<li><strong>Images</strong>: FITS, JPEG, PNG</li>
-<li><strong>Tables</strong>: CSV, FITS tables, VOTable, IPAC tables</li>
-<li><strong>Archives</strong>: Gzipped files automatically handled</li>
-</ul>
-<h3 id="image-analysis">Image Analysis<a class="headerlink" href="#image-analysis" title="Permanent link">&para;</a></h3>
-<h4 id="basic-image-display">Basic Image Display<a class="headerlink" href="#basic-image-display" title="Permanent link">&para;</a></h4>
-<p><strong>Display Controls:</strong></p>
-<ol>
-<li>Load FITS image</li>
-<li>Adjust stretch (log, linear, sqrt)</li>
-<li>Set scale limits (min/max values)</li>
-<li>Choose colour table (heat, cool, rainbow)</li>
-</ol>
-<p><strong>Navigation:</strong></p>
-<ul>
-<li><strong>Zoom</strong>: Mouse wheel or zoom controls</li>
-<li><strong>Pan</strong>: Click and drag</li>
-<li><strong>Centre</strong>: Double-click to centre</li>
-<li><strong>Reset</strong>: Reset zoom and pan to default</li>
-</ul>
-<h4 id="multi-band-rgb">Multi-band RGB<a class="headerlink" href="#multi-band-rgb" title="Permanent link">&para;</a></h4>
-<p><strong>Creating RGB Composites:</strong></p>
-<ol>
-<li>Load three images (e.g., g, r, i bands)</li>
-<li>Select "RGB" mode</li>
-<li>Assign each image to R, G, or B channel</li>
-<li>Adjust relative scaling</li>
-<li>Fine-tune colour balance</li>
-</ol>
-<h4 id="coordinate-systems">Coordinate Systems<a class="headerlink" href="#coordinate-systems" title="Permanent link">&para;</a></h4>
-<p>Firefly supports standard coordinate systems:</p>
-<ul>
-<li><strong>Equatorial</strong>: RA/Dec (J2000, B1950)</li>
-<li><strong>Galactic</strong>: Galactic longitude/latitude</li>
-<li><strong>Ecliptic</strong>: Ecliptic coordinates  </li>
-<li><strong>Pixel</strong>: Image pixel coordinates</li>
-</ul>
-<h3 id="catalogue-analysis">Catalogue Analysis<a class="headerlink" href="#catalogue-analysis" title="Permanent link">&para;</a></h3>
-<h4 id="table-operations">Table Operations<a class="headerlink" href="#table-operations" title="Permanent link">&para;</a></h4>
-<p><strong>Basic Navigation:</strong></p>
-<ul>
-<li><strong>Sort columns</strong>: Click headers to sort</li>
-<li><strong>Filter rows</strong>: Use search box for text filtering</li>
-<li><strong>Select rows</strong>: Click rows, Ctrl+click for multiple</li>
-<li><strong>Pagination</strong>: Navigate large tables with page controls</li>
-</ul>
-<p><strong>Advanced Filtering:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1">// Example filters (use in filter box):</span>
-<span class="nx">magnitude</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">20.5</span><span class="w">                         </span><span class="c1">// Bright sources</span>
-<span class="nx">colour_g_r</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.5</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">colour_g_r</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.5</span><span class="w">     </span><span class="c1">// Colour selection</span>
-<span class="nx">distance</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">100</span><span class="w">                           </span><span class="c1">// Distance constraint</span>
-<span class="nx">ra</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">180</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">ra</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">200</span><span class="w">                     </span><span class="c1">// RA range</span>
+<p>If a Session remains <code>Pending</code>, inspect <code>canfar events SESSION_ID</code>; see <a href="../batch/#monitor-and-troubleshoot">batch
+troubleshooting</a>.</p>
+<p><span id="loading-data"></span>
+<span id="upload-local-files"></span></p>
+<h2 id="load-data">Load data<a class="headerlink" href="#load-data" title="Permanent link">&para;</a></h2>
+<p>Use the paths and URLs supported by the selected Firefly image. A common
+workflow is to place data under mounted storage:</p>
+<div class="highlight"><pre><span></span><code>/arc/home/&lt;user&gt;/          personal persistent files
+/arc/projects/&lt;project&gt;/   shared project files, when available
+/scratch/                  temporary staging
 </code></pre></div>
-<h4 id="statistical-analysis">Statistical Analysis<a class="headerlink" href="#statistical-analysis" title="Permanent link">&para;</a></h4>
-<p><strong>Built-in Statistics:</strong></p>
+<p>For a remote object in a configured VOSpace Service, transfer it explicitly
+before opening it in a path-oriented application:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>IDENTIFIER:/path/to/image.fits<span class="w"> </span>local:/scratch/image.fits
+</code></pre></div>
+<p>Use Firefly's own archive or URL features only as documented by the selected
+image. Do not assume that a VOSpace URL, archive endpoint, table format, or
+remote service is enabled on every deployment.</p>
+<p>Save figures, tables, regions, and other products under <code>/arc</code> or a persistent
+VOSpace Service. <code>/scratch</code> is deleted when the Session ends. See <a href="../../storage/">Storage</a>
+and <a href="../../storage/transfers/">Data transfers</a>.</p>
+<p><span id="what-is-firefly"></span>
+<span id="key-features"></span>
+<span id="step-1-create-new-session"></span>
+<span id="step-2-choose-container"></span>
+<span id="available-versions"></span>
+<span id="step-3-configure-session"></span>
+<span id="session-name"></span>
+<span id="memory-requirements"></span>
+<span id="cpu-cores"></span>
+<span id="using-firefly"></span>
+<span id="interface-overview"></span>
+<span id="main-components"></span>
+<span id="image-analysis"></span>
+<span id="basic-image-display"></span>
+<span id="multi-band-rgb"></span>
+<span id="coordinate-systems"></span>
+<span id="catalogue-analysis"></span>
+<span id="table-operations"></span>
+<span id="statistical-analysis"></span>
+<span id="plotting-tools"></span>
+<span id="advanced-features"></span>
+<span id="cutout-services"></span>
+<span id="multi-wavelength-analysis"></span>
+<span id="data-export"></span>
+<span id="common-workflows"></span>
+<span id="survey-photometry"></span>
+<span id="multi-object-analysis"></span>
+<span id="cross-matching-catalogues"></span>
+<span id="time-series-visualisation"></span>
+<span id="integration-with-canfar"></span>
+<span id="collaborative-features"></span>
+<span id="working-with-other-canfar-tools"></span></p>
+<h2 id="typical-workflow">Typical workflow<a class="headerlink" href="#typical-workflow" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Open a FITS image, table, or archive result supported by the image.</li>
+<li>Inspect image metadata and WCS before interpreting the display.</li>
+<li>Use the image, table, and catalogue tools provided by the selected Firefly
+   version.</li>
+<li>Export products and record the source path, image reference, and relevant
+   display settings.</li>
+</ol>
+<p>For analysis that must be rerun, use Python or a headless Session and keep
+Firefly for visual inspection.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Column statistics</strong>: Mean, median, std deviation</li>
-<li><strong>Histogram analysis</strong>: Distribution plots</li>
-<li><strong>Cross-correlation</strong>: Compare columns</li>
-<li><strong>Selection statistics</strong>: Stats on filtered data</li>
+<li>If the image is unavailable, check <code>canfar image ls --kind firefly</code> and ask
+  the platform operator about the deployment's catalogue.</li>
+<li>If a local file does not open, verify its path and permissions or stage it
+  to <code>/scratch</code> with <code>canfar data cp</code>.</li>
+<li>If a remote URL fails, confirm that the image supports that endpoint and
+  that the Session can reach it; do not embed credentials in the URL.</li>
+<li>If the browser disconnects, check <code>canfar ps --all</code> and <code>canfar info</code> before
+  restarting the Session.</li>
 </ul>
-<h4 id="plotting-tools">Plotting Tools<a class="headerlink" href="#plotting-tools" title="Permanent link">&para;</a></h4>
-<p><strong>Column Plots:</strong></p>
-<ol>
-<li>Select table columns for X and Y axes</li>
-<li>Choose plot type (scatter, histogram, line)</li>
-<li>Apply colour coding by third column</li>
-<li>Add error bars if available</li>
-<li>Customize symbols and colours</li>
-</ol>
-<p><strong>Image-Catalogue Overlay:</strong></p>
-<ol>
-<li>Load image and catalogue table</li>
-<li>Match coordinate columns (RA, Dec)</li>
-<li>Select overlay symbol (circle, cross, diamond)</li>
-<li>Adjust symbol size and colour</li>
-<li>Sources appear overlaid on image</li>
-</ol>
-<h3 id="advanced-features">Advanced Features<a class="headerlink" href="#advanced-features" title="Permanent link">&para;</a></h3>
-<h4 id="cutout-services">Cutout Services<a class="headerlink" href="#cutout-services" title="Permanent link">&para;</a></h4>
-<p>Extract subimages from large surveys:</p>
-<p><strong>Manual Cutouts:</strong></p>
-<ol>
-<li>Right-click on image location</li>
-<li>Select "Create Cutout"</li>
-<li>Specify size (arcmin)</li>
-<li>Choose format (FITS, JPEG, PNG)</li>
-<li>Download or save to CANFAR storage</li>
-</ol>
-<p><strong>Programmatic Cutouts:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Example using Python and Firefly</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
-
-<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://irsa.ipac.caltech.edu/cgi-bin/Cutouts/nph-cutouts&quot;</span>
-<span class="n">params</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;mission&#39;</span><span class="p">:</span> <span class="s1">&#39;wise&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;locstr&#39;</span><span class="p">:</span> <span class="s1">&#39;10.68 +41.27&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sizeX&#39;</span><span class="p">:</span> <span class="s1">&#39;300&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;sizeY&#39;</span><span class="p">:</span> <span class="s1">&#39;300&#39;</span>
-<span class="p">}</span>
-<span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
-</code></pre></div>
-<h4 id="multi-wavelength-analysis">Multi-wavelength Analysis<a class="headerlink" href="#multi-wavelength-analysis" title="Permanent link">&para;</a></h4>
-<p><strong>Cross-band Analysis:</strong></p>
-<ol>
-<li>Load images in different bands</li>
-<li>Use "Blink" mode to compare</li>
-<li>Create RGB composite</li>
-<li>Overlay catalogue with colour-magnitude selection</li>
-<li>Identify sources across wavelengths</li>
-</ol>
-<p><strong>Spectral Energy Distributions:</strong></p>
-<ol>
-<li>Load multi-band photometry table</li>
-<li>Select source of interest</li>
-<li>Plot flux vs wavelength</li>
-<li>Fit SED models if available</li>
-</ol>
-<h4 id="data-export">Data Export<a class="headerlink" href="#data-export" title="Permanent link">&para;</a></h4>
-<p><strong>Save Results:</strong></p>
-<ul>
-<li><strong>Modified tables</strong>: CSV, FITS, VOTable formats</li>
-<li><strong>Image displays</strong>: PNG, PDF for publications  </li>
-<li><strong>Analysis plots</strong>: Vector formats for papers</li>
-<li><strong>Session state</strong>: Save/restore workspace</li>
-</ul>
-<p><strong>Export Options:</strong></p>
-<div class="highlight"><pre><span></span><code>File → Export → [Format]
-- Tables: CSV, FITS table, VOTable
-- Images: FITS, PNG, JPEG, PDF
-- Plots: PNG, PDF, SVG
-- Session: Save current state
-</code></pre></div>
-<h2 id="common-workflows">🛠️ Common Workflows<a class="headerlink" href="#common-workflows" title="Permanent link">&para;</a></h2>
-<h3 id="survey-photometry">Survey Photometry<a class="headerlink" href="#survey-photometry" title="Permanent link">&para;</a></h3>
-<p><strong>HSC/LSST Photometry Workflow:</strong></p>
-<ol>
-<li>Load survey image (HSC, LSST, etc.)</li>
-<li>Upload photometric catalogue</li>
-<li>Overlay sources on image</li>
-<li>Filter by magnitude and colour</li>
-<li>Create colour-magnitude diagram</li>
-<li>Export selected sources</li>
-</ol>
-<div class="highlight"><pre><span></span><code><span class="c1">// Example: Filter for main sequence stars</span>
-<span class="c1">// In Firefly filter box:</span>
-<span class="p">(</span><span class="nx">g_mag</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">r_mag</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">0.2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">(</span><span class="nx">g_mag</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">r_mag</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1.0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">r_mag</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">22</span>
-</code></pre></div>
-<h3 id="multi-object-analysis">Multi-object Analysis<a class="headerlink" href="#multi-object-analysis" title="Permanent link">&para;</a></h3>
-<p><strong>Target List Processing:</strong></p>
-<ol>
-<li>Load target list (CSV with coordinates)</li>
-<li>Create cutouts around each target</li>
-<li>Measure properties in each cutout</li>
-<li>Compile results in table</li>
-<li>Plot trends and correlations</li>
-<li>Save analysis products</li>
-</ol>
-<h3 id="cross-matching-catalogues">Cross-matching Catalogues<a class="headerlink" href="#cross-matching-catalogues" title="Permanent link">&para;</a></h3>
-<p><strong>Gaia Cross-match Example:</strong></p>
-<ol>
-<li>Load your source catalogue</li>
-<li>Load Gaia reference catalogue</li>
-<li>Perform spatial cross-match</li>
-<li>Analyze proper motions and parallaxes</li>
-<li>Create clean stellar sample</li>
-<li>Export matched catalogue</li>
-</ol>
-<h3 id="time-series-visualisation">Time Series Visualisation<a class="headerlink" href="#time-series-visualisation" title="Permanent link">&para;</a></h3>
-<p><strong>Light Curve Analysis:</strong></p>
-<ol>
-<li>Load time-series table (time, magnitude, error)</li>
-<li>Create light curve plot</li>
-<li>Apply period folding if needed</li>
-<li>Identify outliers and trends</li>
-<li>Export cleaned data</li>
-</ol>
-<h2 id="integration-with-canfar">🔧 Integration with CANFAR<a class="headerlink" href="#integration-with-canfar" title="Permanent link">&para;</a></h2>
-<h3 id="storage-access">Storage Access<a class="headerlink" href="#storage-access" title="Permanent link">&para;</a></h3>
-<p><strong>ARC Projects:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Your project data appears in Firefly file browser</span>
-/arc/projects/<span class="o">[</span>project<span class="o">]</span>/
-├──<span class="w"> </span>images/<span class="w">           </span><span class="c1"># FITS images</span>
-├──<span class="w"> </span>catalogues/<span class="w">       </span><span class="c1"># Source tables  </span>
-├──<span class="w"> </span>results/<span class="w">          </span><span class="c1"># Analysis products</span>
-└──<span class="w"> </span>plots/<span class="w">            </span><span class="c1"># Exported figures</span>
-</code></pre></div>
-<p><strong>VOSpace Integration:</strong></p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Access archived data</span>
-vos://cadc.nrc.ca~vault/<span class="o">[</span>user<span class="o">]</span>/
-├──<span class="w"> </span>published_data/<span class="w">   </span><span class="c1"># Public datasets</span>
-├──<span class="w"> </span>working_data/<span class="w">     </span><span class="c1"># Analysis in progress</span>
-└──<span class="w"> </span>final_products/<span class="w">   </span><span class="c1"># Paper-ready results</span>
-</code></pre></div>
-<h3 id="collaborative-features">Collaborative Features<a class="headerlink" href="#collaborative-features" title="Permanent link">&para;</a></h3>
-<p><strong>Session Sharing:</strong></p>
-<ol>
-<li>Copy Firefly session URL</li>
-<li>Share with team members (same CANFAR group)</li>
-<li>Collaborate on analysis in real-time</li>
-<li>Each user sees same data and visualisations</li>
-</ol>
-<p><strong>Data Sharing:</strong></p>
-<ol>
-<li>Save analysis results to shared project space</li>
-<li>Export publication-quality figures</li>
-<li>Share VOSpace links for external collaborators</li>
-<li>Version control important datasets</li>
-</ol>
-<h3 id="working-with-other-canfar-tools">Working with Other CANFAR Tools<a class="headerlink" href="#working-with-other-canfar-tools" title="Permanent link">&para;</a></h3>
-<p><strong>Integration Patterns:</strong></p>
-<ul>
-<li><strong>Notebooks → Firefly</strong>: Prepare data in Python, visualize in Firefly</li>
-<li><strong>Firefly → Desktop</strong>: Export results for further analysis in CASA/DS9</li>
-<li><strong>Batch → Firefly</strong>: Process large datasets, visualize results</li>
-<li><strong>CARTA → Firefly</strong>: Radio analysis in CARTA, optical follow-up in Firefly</li>
-</ul>
+<p>See <a href="../../support/">Support</a> when the cause remains unclear.</p>
 
 
 
@@ -2584,7 +2313,7 @@ vos://cadc.nrc.ca~vault/<span class="o">[</span>user<span class="o">]</span>/
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="March 4, 2026 00:43:32 UTC">March 4, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

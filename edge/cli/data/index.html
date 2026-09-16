@@ -18,7 +18,7 @@
         <link rel="prev" href="../quick-start/">
       
       
-        <link rel="next" href="../authentication-contexts/">
+        <link rel="next" href="../logging/">
       
       
         
@@ -524,6 +524,8 @@
   
     
     
+      
+        
       
         
       
@@ -1226,8 +1228,6 @@
       
         
       
-        
-      
     
     
     
@@ -1373,10 +1373,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install-and-authenticate" class="md-nav__link">
+  <a href="#sources-and-operands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install and authenticate
+        Sources and operands
       
     </span>
   </a>
@@ -1384,10 +1384,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#address-mapped-sources" class="md-nav__link">
+  <a href="#command-surface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Address mapped sources
+        Command surface
       
     </span>
   </a>
@@ -1395,54 +1395,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#copy-files-and-directories" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Copy files and directories
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#move-data-between-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Move data between sources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cache-data-locally" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cache data locally
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-and-accepted-omissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output and accepted omissions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#upstream-releases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upstream releases
+        Examples
       
     </span>
   </a>
@@ -1453,34 +1409,6 @@
   
 </nav>
       
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
     </li>
   
 
@@ -1644,6 +1572,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1843,10 +1799,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#install-and-authenticate" class="md-nav__link">
+  <a href="#sources-and-operands" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Install and authenticate
+        Sources and operands
       
     </span>
   </a>
@@ -1854,10 +1810,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#address-mapped-sources" class="md-nav__link">
+  <a href="#command-surface" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Address mapped sources
+        Command surface
       
     </span>
   </a>
@@ -1865,54 +1821,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#copy-files-and-directories" class="md-nav__link">
+  <a href="#examples" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Copy files and directories
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#move-data-between-sources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Move data between sources
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#cache-data-locally" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Cache data locally
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#output-and-accepted-omissions" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Output and accepted omissions
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#upstream-releases" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Upstream releases
+        Examples
       
     </span>
   </a>
@@ -1953,176 +1865,117 @@
 
 
 <h1 id="data-commands">Data commands<a class="headerlink" href="#data-commands" title="Permanent link">&para;</a></h1>
-<p>Use <code>canfar data</code> to work with configured VOSpace Services and the local
-filesystem through the embedded <code>fsspec-cli</code> command application.</p>
-<h2 id="install-and-authenticate">Install and authenticate<a class="headerlink" href="#install-and-authenticate" title="Permanent link">&para;</a></h2>
-<p>Data commands are included in the standard installation:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar
-canfar<span class="w"> </span>login<span class="w"> </span>cadc
-</code></pre></div>
-<h2 id="address-mapped-sources">Address mapped sources<a class="headerlink" href="#address-mapped-sources" title="Permanent link">&para;</a></h2>
-<p>Every operand starts with a Storage Identifier: the handle of a configured
-VOSpace Service, or the reserved <code>local</code> identifier for the machine where the
-command runs. Operands always pair an identifier with an absolute path:</p>
+<p>Use <code>canfar data</code> to copy files between your computer and CANFAR storage,
+inspect remote files, and manage directories. Each path starts with a storage
+name: <code>local</code> means the computer running the command; configured names such as
+<code>arc</code> and <code>vault</code> refer to remote services.</p>
+<p>These commands were added after v1.4.1. Check the
+<a href="../../client/get-started/#install">installation guide</a> before following the
+examples. For transfers without installing Python, use
+<a href="../../platform/storage/transfers/#transfer-files-in-your-browser">Storage Management in your browser</a>.</p>
+<p><span id="install-and-authenticate"></span>
+<span id="address-mapped-sources"></span>
+<span id="move-data-between-sources"></span></p>
+<p><span id="cache-data-locally"></span>
+<span id="cache-byte-ranges"></span></p>
+<h2 id="sources-and-operands">Sources and operands<a class="headerlink" href="#sources-and-operands" title="Permanent link">&para;</a></h2>
+<p>Run <code>canfar login</code> for the identity provider (IDP) that owns the remote service.
+Default <code>arc</code> and <code>vault</code> storage uses CADC credentials (<code>canfar login cadc</code>),
+even if your active compute server belongs to SRCNet. Then use a storage name
+followed by an absolute path:</p>
 <div class="highlight"><pre><span></span><code>storage-identifier:/absolute/path
 local:/absolute/path
 </code></pre></div>
-<p>Every mapped source is available concurrently, regardless of the active Server
-Selection. A default CADC login maps two VOSpace Services, <code>arc</code> and <code>vault</code>,
-plus <code>local</code>:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/
-canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>
+<p>The default CADC configuration provides <code>arc</code>, <code>vault</code>, and <code>local</code> when its
+default Server record is present:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/user
 canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>vault:/
+canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>local:/tmp
 </code></pre></div>
-<p>Use <code>ls -lh</code>, or the <code>ll -h</code> long-form command, for a human-readable listing.
-The <code>-h</code> flag reports human-readable sizes and requires a long listing, so
-<code>ls -h</code> on its own exits with <code>ls: -h: requires long listing</code>.</p>
-<p>Operands must name a mapped source. Empty <code>:/path</code>, bare local paths such as
-<code>/tmp/file</code>, and <code>active:/path</code> are all rejected; there is no <code>active</code> alias
-and no <code>canfar storage</code> command.</p>
-<h2 id="copy-files-and-directories">Copy files and directories<a class="headerlink" href="#copy-files-and-directories" title="Permanent link">&para;</a></h2>
-<p>Copy one file between local and remote sources:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/absolute/path/file.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
-canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits<span class="w"> </span>local:/absolute/path/file.fits
-</code></pre></div>
-<p>Copy between two VOSpace Services, for example a public test cutout from
-<code>vault</code> into your <code>arc</code> home directory:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/ALMA/test-data/cutouts/test-4d-cube-cutout.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/test-4d-cube-cutout.fits
-canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/test-4d-cube-cutout.fits
-</code></pre></div>
-<p>Recursive copy is enabled for admitted local and remote source pairs:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>local:/absolute/path/dataset<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/dataset
-</code></pre></div>
-<p>The tagged upstream implementation builds a bounded manifest, copies files
-through host-local staging when sources differ, and verifies destination
-metadata. Recursive copy is not atomic and does not create a snapshot; inspect
-the destination before removing any source data.</p>
-<h2 id="move-data-between-sources">Move data between sources<a class="headerlink" href="#move-data-between-sources" title="Permanent link">&para;</a></h2>
-<p>Cross-source <code>mv</code> is unsupported and exits with status 2:</p>
-<div class="highlight"><pre><span></span><code>mv: cross-source move unsupported
-</code></pre></div>
-<p>Move a file between sources explicitly by copying it, verifying the
-destination, and only then issuing a separate source removal:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/folder/file.fits<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
-canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/<span class="o">[</span>username<span class="o">]</span>/file.fits
-canfar<span class="w"> </span>data<span class="w"> </span>rm<span class="w"> </span>vault:/folder/file.fits
-</code></pre></div>
-<p>Do not use this sequence as a one-command or atomic move.</p>
-<p>Recursive removal is disabled by application policy, so <code>rm</code> accepts no <code>-R</code> or
-<code>-r</code> flag at all and exits with status 2:</p>
-<div class="highlight"><pre><span></span><code>No such option: -R
-</code></pre></div>
-<p>Because recursive directory removal is disabled, directory movement is not a
-supported workflow in this release. Any future one-command relocation would be a
-separately named, opt-in orchestration feature with stronger destination
-verification and residual-state semantics—not portable <code>mv</code>.</p>
-<h2 id="cache-data-locally">Cache data locally<a class="headerlink" href="#cache-data-locally" title="Permanent link">&para;</a></h2>
-<h3 id="directory-listings">Directory listings<a class="headerlink" href="#directory-listings" title="Permanent link">&para;</a></h3>
-<p>Directory listings are cached automatically. Each command builds and closes its
-own filesystem, so a cached listing only ever serves the command that produced
-it and can never return a listing that outlives it. Repeated lookups while one
-command walks a tree are served without another round trip.</p>
-<h3 id="files-and-byte-ranges">Files and byte ranges<a class="headerlink" href="#files-and-byte-ranges" title="Permanent link">&para;</a></h3>
-<p>There is no CLI flag for caching file contents, but <code>vosfs</code> is a normal
-<a href="https://filesystem-spec.readthedocs.io/">fsspec</a> filesystem, so any fsspec
-cache can wrap it from Python. On a CANFAR session, <code>/scratch</code> is fast local
-disk and is the right place to point a cache; it is not backed up and is
-cleared when the session ends, which is exactly what a cache wants.</p>
-<p>Cache whole files under a named directory. The first read fetches over the
-network, and later reads come from <code>/scratch</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.implementations.cached</span><span class="w"> </span><span class="kn">import</span> <span class="n">WholeFileCacheFileSystem</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">vosfs</span><span class="w"> </span><span class="kn">import</span> <span class="n">VOSpaceFileSystem</span>
-
-<span class="n">vault</span> <span class="o">=</span> <span class="n">VOSpaceFileSystem</span><span class="p">(</span>
-    <span class="s2">&quot;https://cadc-west-01.canfar.net/vault&quot;</span><span class="p">,</span>
-    <span class="n">certfile</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">home</span><span class="p">()</span> <span class="o">/</span> <span class="s2">&quot;.ssl&quot;</span> <span class="o">/</span> <span class="s2">&quot;cadcproxy.pem&quot;</span><span class="p">),</span>
-<span class="p">)</span>
-<span class="n">cached</span> <span class="o">=</span> <span class="n">WholeFileCacheFileSystem</span><span class="p">(</span><span class="n">fs</span><span class="o">=</span><span class="n">vault</span><span class="p">,</span> <span class="n">cache_storage</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache&quot;</span><span class="p">)</span>
-
-<span class="n">data</span> <span class="o">=</span> <span class="n">cached</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="s2">&quot;/ALMA/test-data/cutouts/test-4d-cube-cutout.fits&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>Use <code>SimpleCacheFileSystem</code> instead when you do not need the expiry and
-staleness metadata that <code>WholeFileCacheFileSystem</code> keeps. Passing
-<code>cache_storage</code> a list of directories tries each in order and treats only the
-last as writable, so a shared read-only cache can back your own.</p>
-<h3 id="cache-byte-ranges">Cache byte ranges<a class="headerlink" href="#cache-byte-ranges" title="Permanent link">&para;</a></h3>
-<p><code>vosfs</code> sends an HTTP <code>Range</code> header and uses the response when the byte
-endpoint answers <code>206</code>, so a partial read such as <code>cat_file(path, start, end)</code>
-transfers only the bytes you asked for. Range support is per-backend:</p>
+<p>Storage Identifiers are configuration keys, not protocols. There is no
+<code>active:/</code> source, bare local-path shorthand, empty <code>:/path</code> source, or
+<code>canfar storage</code> command. A data command sees all configured sources, not only
+the active Server Selection.</p>
+<h2 id="command-surface">Command surface<a class="headerlink" href="#command-surface" title="Permanent link">&para;</a></h2>
+<p>Use <code>canfar data --help</code> for the installed upstream options. The available
+commands are:</p>
 <table>
 <thead>
 <tr>
-<th>Storage Identifier</th>
-<th>Backend</th>
-<th>Ranged reads</th>
+<th>Command</th>
+<th>Purpose</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>vault</code></td>
-<td><code>minoc</code></td>
-<td>Yes — a partial read returns <code>206</code> and transfers only that slice</td>
+<td><code>basename</code>, <code>dirname</code></td>
+<td>Transform a path string.</td>
 </tr>
 <tr>
-<td><code>arc</code></td>
-<td>Cavern</td>
-<td>No — the whole object is fetched and sliced, which is correct but not cheaper</td>
+<td><code>info</code>, <code>size</code>, <code>stat</code>, <code>test</code></td>
+<td>Inspect a file or evaluate a predicate.</td>
+</tr>
+<tr>
+<td><code>ls</code>, <code>ll</code></td>
+<td>List directory contents; <code>ls</code> accepts <code>-A</code>, <code>-l</code>, and <code>-h</code>, while <code>ll</code> accepts <code>-A</code> and <code>-h</code>.</td>
+</tr>
+<tr>
+<td><code>du</code></td>
+<td>Estimate file space usage; supports <code>-s</code> and <code>-h</code>.</td>
+</tr>
+<tr>
+<td><code>find</code>, <code>tree</code></td>
+<td>Traverse recursively; <code>find</code> supports <code>--maxdepth</code> and <code>--type f|d</code>, while <code>tree</code> supports <code>--maxdepth</code>.</td>
+</tr>
+<tr>
+<td><code>head</code>, <code>tail</code>, <code>cat</code></td>
+<td>Read leading bytes, trailing bytes, or file contents.</td>
+</tr>
+<tr>
+<td><code>cp</code></td>
+<td>Copy files or one directory; <code>-R</code>/<code>-r</code> enables recursive copy.</td>
+</tr>
+<tr>
+<td><code>mv</code></td>
+<td>Move or rename files on one mapped filesystem.</td>
+</tr>
+<tr>
+<td><code>mkdir</code>, <code>rmdir</code>, <code>unlink</code>, <code>rm</code></td>
+<td>Create directories, remove empty directories, remove one file, or remove files.</td>
 </tr>
 </tbody>
 </table>
-<p>Because a range is now a real partial transfer against <code>vault</code>, a block cache
-is worth using there. <code>MMapCache</code> keeps fetched blocks in a sparse file, so
-only the blocks you touch occupy disk:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">fsspec.caching</span><span class="w"> </span><span class="kn">import</span> <span class="n">MMapCache</span>
-
-<span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;/ALMA/test-data/cutouts/test-4d-cube.fits&quot;</span>
-<span class="n">size</span> <span class="o">=</span> <span class="n">vault</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">path</span><span class="p">)[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span>
-<span class="n">blocks</span> <span class="o">=</span> <span class="n">MMapCache</span><span class="p">(</span>
-    <span class="n">blocksize</span><span class="o">=</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="mi">20</span><span class="p">,</span>
-    <span class="n">fetcher</span><span class="o">=</span><span class="k">lambda</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">:</span> <span class="n">vault</span><span class="o">.</span><span class="n">cat_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">),</span>
-    <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span>
-    <span class="n">location</span><span class="o">=</span><span class="s2">&quot;/scratch/vault-cache/test-4d-cube.blocks&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="n">header</span> <span class="o">=</span> <span class="n">blocks</span><span class="o">.</span><span class="n">_fetch</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2880</span><span class="p">)</span>  <span class="c1"># one FITS header block, one 1 MiB range request</span>
+<p>Recursive removal is disabled by CANFAR policy, so <code>data rm</code> has no <code>-R</code> or
+<code>-r</code> option. <code>data mv</code> does not implement a cross-source move; copy between
+sources and verify the destination before removing the source separately.</p>
+<p><span id="upstream-releases"></span></p>
+<p><span id="copy-files-and-directories"></span>
+<span id="directory-listings"></span>
+<span id="files-and-byte-ranges"></span>
+<span id="output-and-accepted-omissions"></span></p>
+<h2 id="examples">Examples<a class="headerlink" href="#examples" title="Permanent link">&para;</a></h2>
+<p>List and inspect a remote object:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/user
+canfar<span class="w"> </span>data<span class="w"> </span>info<span class="w"> </span>arc:/home/user/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>cat<span class="w"> </span>arc:/home/user/file.fits
 </code></pre></div>
-<p>Reading a FITS header from a 3.4 MB cube this way issues a single ranged
-request and materialises one block of four; a second read of the same range is
-served from <code>/scratch</code>. The saving is in bytes transferred rather than seconds
-on small files, because VOSpace transfer negotiation dominates a short request.
-It grows with file size, and matters most when many reads hit different parts
-of one large cube.</p>
-<p>Against <code>arc</code> a block cache still costs a whole download per block, so cache
-whole files there instead.</p>
-<p>The <code>blockcache</code> filesystem remains unavailable over a VOSpace Service. <code>Range</code>
-is honoured for byte reads, not through the file-object path, so wrapping
-<code>CachingFileSystem</code> still fails:</p>
-<div class="highlight"><pre><span></span><code>AttributeError: &#39;StagedReadFile&#39; object has no attribute &#39;blocksize&#39;
+<p>Copy between local and remote sources:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/tmp/file.fits<span class="w"> </span>arc:/home/user/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>arc:/home/user/file.fits<span class="w"> </span>local:/tmp/file.fits
 </code></pre></div>
-<p>Stacked caches do not help either: chaining them (<code>filecache::simplecache::</code>)
-builds the layers, but the inner layer is never filled and never serves, so use
-exactly one cache layer on your fastest local disk.</p>
-<p>These caches use the synchronous filesystem interface. Build the filesystem
-without <code>asynchronous=True</code>, as above.</p>
-<h2 id="output-and-accepted-omissions">Output and accepted omissions<a class="headerlink" href="#output-and-accepted-omissions" title="Permanent link">&para;</a></h2>
-<p>Data command stdout belongs to the embedded command; CANFAR does not prepend
-the active-Server banner or add JSON/YAML envelopes. Diagnostics are written to
-stderr.</p>
-<p>The Python equivalent of these commands is documented in
-<a href="../../client/data/">Data Access</a>.</p>
-<p>This release intentionally provides no FUSE mount, signed-URL extension,
-progress display, confirmation prompt, <code>:/path</code> or bare-path shorthand,
-<code>active</code> alias, <code>canfar storage</code> alias, recursive removal, or cross-source <code>mv</code>
-workflow.</p>
-<h2 id="upstream-releases">Upstream releases<a class="headerlink" href="#upstream-releases" title="Permanent link">&para;</a></h2>
-<p>CANFAR installs pinned, tagged releases of
-<a href="https://github.com/shinybrar/vosfs/releases/tag/v0.8.0"><code>vosfs</code></a> and
-<a href="https://github.com/shinybrar/vosfs/releases/tag/fsspec-cli-v0.7.0"><code>fsspec-cli</code></a>.
-CANFAR tests its composition, configuration, authentication, and output seams;
-exhaustive filesystem-command and backend matrices remain in the upstream
-project.</p>
+<p>Recursive copy is available for one directory and its descendants:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>local:/tmp/dataset<span class="w"> </span>arc:/home/user/dataset
+</code></pre></div>
+<p>For a cross-source move, make the verification and removal explicit:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>vault:/folder/file.fits<span class="w"> </span>arc:/home/user/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>info<span class="w"> </span>arc:/home/user/file.fits
+canfar<span class="w"> </span>data<span class="w"> </span>rm<span class="w"> </span>vault:/folder/file.fits
+</code></pre></div>
+<p>Data command stdout belongs to the embedded command. CANFAR does not prepend
+the active-Server banner or add a JSON/YAML envelope, and data commands do not
+provide the CANFAR <code>-o/--output</code> option.</p>
+<p>For Python access, explicit <code>Storage Identifier</code> resolution and cache guidance
+are documented in <a href="../../client/data/">Data Access</a>.</p>
 
 
 
@@ -2145,7 +1998,7 @@ project.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 25, 2026 09:39:51 UTC">July 25, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

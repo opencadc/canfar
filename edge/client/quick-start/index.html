@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -962,10 +964,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-the-notebook" class="md-nav__link">
+  <a href="#3-inspect-and-connect" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Open the notebook
+        3. Inspect and connect
       
     </span>
   </a>
@@ -973,10 +975,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-inspect-events-and-logs" class="md-nav__link">
+  <a href="#4-read-events-and-logs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Inspect events and logs
+        4. Read events and logs
       
     </span>
   </a>
@@ -995,21 +997,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#async-version" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Async version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        Next steps
       
     </span>
   </a>
@@ -1348,8 +1339,6 @@
       
         
       
-        
-      
     
     
     
@@ -1445,34 +1434,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1644,6 +1605,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1865,10 +1854,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#3-open-the-notebook" class="md-nav__link">
+  <a href="#3-inspect-and-connect" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Open the notebook
+        3. Inspect and connect
       
     </span>
   </a>
@@ -1876,10 +1865,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#4-inspect-events-and-logs" class="md-nav__link">
+  <a href="#4-read-events-and-logs" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. Inspect events and logs
+        4. Read events and logs
       
     </span>
   </a>
@@ -1898,21 +1887,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#async-version" class="md-nav__link">
+  <a href="#next-steps" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Async version
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Troubleshooting
+        Next steps
       
     </span>
   </a>
@@ -1953,82 +1931,182 @@
 
 
 <h1 id="python-quickstart">Python Quickstart<a class="headerlink" href="#python-quickstart" title="Permanent link">&para;</a></h1>
-<p>This guide creates a notebook Session, inspects it, and deletes it from Python.</p>
+<p>Create a notebook Session, open it, and keep your results before cleaning up.
+Run these examples on the computer where you installed and authenticated the
+client. Each code block can run as a separate script.</p>
+<div class="admonition note">
+<p class="admonition-title">Choose a compatible client</p>
+<p><a href="../get-started/#install">Install and set up</a> first. These examples describe
+unreleased changes since v1.4.1; use the development installation when
+following this version of the documentation.</p>
+</div>
+<p>Use the same tab throughout: <strong>Sync Python</strong> for a normal script, or
+<strong>Async Python</strong> for an application using <code>async</code> and <code>await</code>.</p>
+<div class="admonition tip">
+<p class="admonition-title">Running async examples in a notebook</p>
+<p>Define <code>main()</code> without its final <code>if __name__</code> block. In the next cell,
+run <code>await main()</code> instead of <code>asyncio.run(main())</code>.</p>
+</div>
 <h2 id="1-authenticate">1. Authenticate<a class="headerlink" href="#1-authenticate" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--upgrade
-canfar<span class="w"> </span>login<span class="w"> </span>cadc
+<div class="highlight"><span class="filename">Terminal on your computer</span><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
+canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>notebook
 </code></pre></div>
-<p>Use <code>canfar login srcnet</code> for SRCNet.</p>
+<p>Choose an image from that listing. Replace the example image below if it is
+unavailable on your server. For SRCNet or direct Python login, see
+<a href="../get-started/#authenticate">authentication and server selection</a>.</p>
+<p><span id="async-version"></span></p>
 <h2 id="2-create-a-notebook">2. Create a notebook<a class="headerlink" href="#2-create-a-notebook" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<p><code>create()</code> returns a list of Session IDs.</p>
-<h2 id="3-open-the-notebook">3. Open the notebook<a class="headerlink" href="#3-open-the-notebook" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<p>The notebook can take a minute or two to become reachable. Check status:</p>
-<div class="highlight"><pre><span></span><code><span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">running</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="4-inspect-events-and-logs">4. Inspect events and logs<a class="headerlink" href="#4-inspect-events-and-logs" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="5-clean-up">5. Clean up<a class="headerlink" href="#5-clean-up" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="async-version">Async version<a class="headerlink" href="#async-version" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sync Python</label><label for="__tabbed_1_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">create_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Symptom</th>
-<th>Check</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Authentication fails</td>
-<td>Run <code>canfar --log-level debug login cadc --force</code>.</td>
-</tr>
-<tr>
-<td>Session does not start</td>
-<td>Run <code>canfar stats</code>, then try smaller <code>cores</code> or <code>ram</code>.</td>
-</tr>
-<tr>
-<td>Browser URL fails</td>
-<td>Wait 60-120 seconds and confirm the Session is <code>Running</code>.</td>
-</tr>
-<tr>
-<td>Script needs stable output</td>
-<td>Use CLI machine output such as <code>canfar ps --json</code>.</td>
-</tr>
-</tbody>
-</table>
-<p>See <a href="../../cli/logging/">Logging</a> for the CLI and Python
-logging controls.</p>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">create_notebook.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
+            <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>You receive a list of successfully created Session IDs. Copy the ID and replace
+<code>SESSION_ID</code> in the following examples. If the list is empty, inspect the error
+before continuing. Creation does not mean the application is ready.</p>
+<p><span id="3-open-the-notebook"></span>
+<span id="4-inspect-events-and-logs"></span></p>
+<h2 id="3-inspect-and-connect">3. Inspect and connect<a class="headerlink" href="#3-inspect-and-connect" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Sync Python</label><label for="__tabbed_2_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">open_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+    <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">open_notebook.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+        <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p><code>info()</code> returns a list of dictionaries containing Session details.
+<code>connect()</code> opens a browser link for a ready Session and returns <code>None</code>.
+If it is still <code>Pending</code>, inspect the events below, then repeat this step when
+it reaches <code>Running</code>. Run your analysis in the notebook before cleaning up.</p>
+<h2 id="4-read-events-and-logs">4. Read events and logs<a class="headerlink" href="#4-read-events-and-logs" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Sync Python</label><label for="__tabbed_3_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">inspect_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">inspect_notebook.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Events return a list of dictionaries; logs return a dictionary keyed by Session
+ID. A failed request may be omitted from these results. With <code>verbose=True</code>,
+these methods log their output and return <code>None</code> instead.</p>
+<h2 id="5-clean-up">5. Clean up<a class="headerlink" href="#5-clean-up" title="Permanent link">&para;</a></h2>
+<div class="admonition warning">
+<p class="admonition-title">Save your work first</p>
+<p>Save notebooks and results under <code>/arc</code> or another persistent destination.
+Deleting a Session discards <code>/scratch</code> and unsaved application state.
+Closing a Python client or browser tab does not delete the remote Session.</p>
+</div>
+<p>Delete only the ID you created:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Sync Python</label><label for="__tabbed_4_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">delete_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">delete_notebook.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
+</code></pre></div>
+</div>
+</div>
+</div>
+<p>Each requested ID maps to <code>True</code> or <code>False</code>, indicating whether its deletion
+request succeeded. Keep failed IDs for investigation.</p>
+<p><span id="troubleshooting"></span></p>
+<h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../examples/">Common examples</a> for filtering, replicas, and private images.</li>
+<li><a href="../advanced-examples/">Advanced examples</a> for a complete batch pipeline.</li>
+<li><a href="../../cli/logging/">Logging</a> for diagnostics.</li>
+</ul>
 
 
 
@@ -2051,7 +2129,7 @@ logging controls.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="July 14, 2026 06:11:50 UTC">July 14, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

@@ -990,10 +990,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#submit-from-the-cli" class="md-nav__link">
+  <a href="#submit-a-headless-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Submit From the CLI
+        Submit a headless Session
       
     </span>
   </a>
@@ -1001,10 +1001,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#submit-from-python" class="md-nav__link">
+  <a href="#what-create-prints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Submit From Python
+        What create prints
       
     </span>
   </a>
@@ -1012,10 +1012,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitor-and-clean-up" class="md-nav__link">
+  <a href="#pending-means-waiting-not-running" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitor and Clean Up
+        Pending means waiting, not running
       
     </span>
   </a>
@@ -1023,10 +1023,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-guidance" class="md-nav__link">
+  <a href="#monitor-and-troubleshoot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resource Guidance
+        Monitor and troubleshoot
       
     </span>
   </a>
@@ -1034,10 +1034,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#storage-rules" class="md-nav__link">
+  <a href="#python-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Rules
+        Python API
       
     </span>
   </a>
@@ -1045,10 +1045,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#private-images" class="md-nav__link">
+  <a href="#storage-and-cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Private Images
+        Storage and cleanup
       
     </span>
   </a>
@@ -1056,10 +1056,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#related-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Related guides
       
     </span>
   </a>
@@ -1440,6 +1440,8 @@
       
         
       
+        
+      
     
     
     
@@ -1516,6 +1518,34 @@
     
   
     CASA
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../community/alma/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    ALMA
   
 
     
@@ -1904,6 +1934,8 @@
       
         
       
+        
+      
     
     
     
@@ -2109,10 +2141,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#submit-from-the-cli" class="md-nav__link">
+  <a href="#submit-a-headless-session" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Submit From the CLI
+        Submit a headless Session
       
     </span>
   </a>
@@ -2120,10 +2152,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#submit-from-python" class="md-nav__link">
+  <a href="#what-create-prints" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Submit From Python
+        What create prints
       
     </span>
   </a>
@@ -2131,10 +2163,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitor-and-clean-up" class="md-nav__link">
+  <a href="#pending-means-waiting-not-running" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Monitor and Clean Up
+        Pending means waiting, not running
       
     </span>
   </a>
@@ -2142,10 +2174,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#resource-guidance" class="md-nav__link">
+  <a href="#monitor-and-troubleshoot" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Resource Guidance
+        Monitor and troubleshoot
       
     </span>
   </a>
@@ -2153,10 +2185,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#storage-rules" class="md-nav__link">
+  <a href="#python-api" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Storage Rules
+        Python API
       
     </span>
   </a>
@@ -2164,10 +2196,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#private-images" class="md-nav__link">
+  <a href="#storage-and-cleanup" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Private Images
+        Storage and cleanup
       
     </span>
   </a>
@@ -2175,10 +2207,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#troubleshooting" class="md-nav__link">
+  <a href="#related-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Troubleshooting
+        Related guides
       
     </span>
   </a>
@@ -2218,181 +2250,194 @@
   
 
 
-<h1 id="batch-processing">Batch Processing<a class="headerlink" href="#batch-processing" title="Permanent link">&para;</a></h1>
-<p>Use a <code>headless</code> Session when a container should run a command and exit without
-an interactive notebook, desktop, CARTA, or Firefly interface.</p>
-<p>Batch work uses the same Container Images and storage mounts as interactive
-Sessions. The main difference is that you pass a command after <code>--</code> in the CLI,
-or <code>cmd</code> and <code>args</code> in Python.</p>
-<h2 id="submit-from-the-cli">Submit From the CLI<a class="headerlink" href="#submit-from-the-cli" title="Permanent link">&para;</a></h2>
-<p>Authenticate once, then create a headless Session:</p>
+<h1 id="batch-processing">Batch processing<a class="headerlink" href="#batch-processing" title="Permanent link">&para;</a></h1>
+<p>Use a <code>headless</code> Session when a container should run a command without a
+Notebook, Desktop, CARTA, or Firefly interface. The command runs in the same
+container and mounted-storage environment as an interactive Session; only the
+entrypoint and lifecycle differ.</p>
+<p>Follow <a href="../../../client/get-started/#install">Install and set up</a> before using
+these commands. For a complete run with output verification and recovery, see
+<a href="../../../client/advanced-examples/">Advanced examples</a>.</p>
+<p><span id="submit-from-the-cli"></span>
+<span id="resource-guidance"></span>
+<span id="private-images"></span></p>
+<h2 id="submit-a-headless-session">Submit a headless Session<a class="headerlink" href="#submit-a-headless-session" title="Permanent link">&para;</a></h2>
+<p>Authenticate and put the command after <code>--</code>:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
-canfar<span class="w"> </span>create<span class="w"> </span>--name<span class="w"> </span>data-reduction<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/reduce_data.py
+canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>data-reduction<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/reduce_data.py
 </code></pre></div>
-<p>Omit resource options for flexible allocation. Use fixed resources only when the
-workload has measured requirements:</p>
+<p>The image listing is the source of truth for names and available Session Kinds:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>headless
+</code></pre></div>
+<p>Resource options are optional. Omit them for the platform's flexible request,
+or set measured requirements explicitly:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span>large-simulation<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--name<span class="w"> </span>simulation<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--cpu<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--memory<span class="w"> </span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/simulation.py
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/simulate.py
 </code></pre></div>
-<p>Pass environment variables with repeated <code>--env</code> flags:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span>omp-test<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--env<span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/run.py
-</code></pre></div>
-<p>Create replicas when each container can process an independent slice:</p>
+<p>Repeat <code>--env KEY=VALUE</code> for environment variables and use <code>--replicas</code> when
+each container can process an independent slice:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--name<span class="w"> </span>parameter-study<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--env<span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/analyze.py
+<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/analyse.py
 </code></pre></div>
-<p>Each replica receives <code>REPLICA_ID</code> and <code>REPLICA_COUNT</code>. Use those values, or the
-helpers in <a href="../../../client/helpers/">Distributed Computing</a>, to split work
+<p>Replicas receive <code>REPLICA_ID</code> and <code>REPLICA_COUNT</code>. Use those values or the
+<a href="../../../client/helpers/">distributed helpers</a> to partition work
 deterministically.</p>
-<p><code>canfar run</code> and <code>canfar launch</code> are compatibility aliases for <code>canfar create</code>.
-New examples should use <code>canfar create</code>.</p>
-<h2 id="submit-from-python">Submit From Python<a class="headerlink" href="#submit-from-python" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">datetime</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
-
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="n">project</span> <span class="o">=</span> <span class="s2">&quot;/arc/projects/myproject&quot;</span>
-<span class="n">data_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/data/</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-
-<span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;nightly-reduction-</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y%m</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/casa:6.5&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">project</span><span class="si">}</span><span class="s2">/pipelines/reduce_night.py </span><span class="si">{</span><span class="n">data_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
+<h2 id="what-create-prints">What <code>create</code> prints<a class="headerlink" href="#what-create-prints" title="Permanent link">&para;</a></h2>
+<p>The library returns the Session IDs accepted by the platform. Human CLI output
+reports one successful Session as:</p>
+<div class="highlight"><pre><span></span><code>Successfully created session &#39;data-reduction&#39; (ID: SESSION_ID)
 </code></pre></div>
-<p>Fixed resources use <code>cores</code> and <code>ram</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="n">job_ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;heavy-computation&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/myproject/processor:latest&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
-    <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;/opt/scripts/heavy_process.sh&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/data/input.h5 /arc/projects/myproject/results/&quot;</span><span class="p">,</span>
-    <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PROCESSING_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;8&quot;</span><span class="p">},</span>
-<span class="p">)</span>
+<p>For multiple replicas it reports the count and lists each ID. <code>--output json</code>
+or <code>--output yaml</code> emits the raw list of returned IDs as data-only output; the
+same option must appear before <code>--</code>, because everything after <code>--</code> belongs to
+the container command:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--output<span class="w"> </span>json<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>run.py
 </code></pre></div>
-<p>For async workflows, use <code>AsyncSession</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
-
-<span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-    <span class="n">job_ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;async-batch&quot;</span><span class="p">,</span>
+<p>An empty result is a creation/transport failure, not evidence that a Session is
+queued. A partial replica result returns the IDs that were accepted. Use
+<code>--debug</code> for request diagnostics on stderr. <code>CANFAR_TIMEOUT</code> controls HTTP
+request inactivity; it does not extend queue admission or image-pull time
+after a Session has been accepted.</p>
+<h2 id="pending-means-waiting-not-running">Pending means waiting, not running<a class="headerlink" href="#pending-means-waiting-not-running" title="Permanent link">&para;</a></h2>
+<p>An accepted ID can remain <code>Pending</code> while the Science Platform admits the
+request, waits for requested resources, pulls the image, or completes Session
+initialization. <code>create</code> does not wait for <code>Running</code>, and <code>canfar open</code> only
+opens a Session once it is ready.</p>
+<p>The client does not promise a relative priority between <code>headless</code> and
+interactive Sessions. Queue order and admission policy are deployment-owned;
+do not assume that a headless Session will outrank an interactive Session, or that
+increasing a request will make it run sooner. If queue policy matters for a
+project, ask the platform operator for the current policy.</p>
+<p><span id="monitor-and-clean-up"></span>
+<span id="troubleshooting"></span></p>
+<h2 id="monitor-and-troubleshoot">Monitor and troubleshoot<a class="headerlink" href="#monitor-and-troubleshoot" title="Permanent link">&para;</a></h2>
+<p>The default <code>ps</code> view shows <code>Pending</code> and <code>Running</code> Sessions. Include all
+statuses when checking a new batch request:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps<span class="w"> </span>--all
+canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID
+canfar<span class="w"> </span>stats
+</code></pre></div>
+<p>Use <code>canfar logs SESSION_ID</code> after the container has started. A Pending Session
+may have no application logs yet. Interpret the checks together:</p>
+<table>
+<thead>
+<tr>
+<th>Observation</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID is absent from <code>ps</code></td>
+<td>Use <code>canfar ps --all</code>; confirm the create command returned an ID.</td>
+</tr>
+<tr>
+<td>Status is <code>Pending</code> and events show admission/resource waiting</td>
+<td>Reduce fixed CPU, memory, or GPU requests, or wait for capacity.</td>
+</tr>
+<tr>
+<td>Status is <code>Pending</code> and events show image or initialization work</td>
+<td>Check the image name and registry access; wait for readiness before opening it.</td>
+</tr>
+<tr>
+<td>Status is <code>Running</code> but the command failed</td>
+<td>Read <code>canfar logs SESSION_ID</code> and inspect the command, paths, and environment.</td>
+</tr>
+<tr>
+<td>Status is terminal and output is missing</td>
+<td>Check the command's exit/log output and the persistent destination; container-local paths are temporary.</td>
+</tr>
+<tr>
+<td>Pending persists beyond a reasonable queue interval</td>
+<td>Save the Session ID, <code>info</code>, <code>events</code>, <code>stats</code>, image, and resource request, then contact <a href="../../support/">support</a>.</td>
+</tr>
+</tbody>
+</table>
+<p><code>canfar stats</code> is a Science Platform Server-level capacity signal; it does not
+explain every admission decision. Events are the most useful next check for one
+Session.</p>
+<p>When a request should be cancelled, delete by ID:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
+</code></pre></div>
+<p><span id="submit-from-python"></span></p>
+<h2 id="python-api">Python API<a class="headerlink" href="#python-api" title="Permanent link">&para;</a></h2>
+<p><code>Session.create</code> and <code>AsyncSession.create</code> return <code>list[str]</code> Session IDs. They
+do not wait for <code>Running</code>; inspect status and events separately:</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Sync Python</label><label for="__tabbed_1_2">Async Python</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">submit_batch.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+</span>
+<span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nightly-reduction&quot;</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
         <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/analyze.py&quot;</span><span class="p">,</span>
-        <span class="n">replicas</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/reduce.py&quot;</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">},</span>
     <span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 </code></pre></div>
-<h2 id="monitor-and-clean-up">Monitor and Clean Up<a class="headerlink" href="#monitor-and-clean-up" title="Permanent link">&para;</a></h2>
-<p>Use Session IDs returned by <code>create</code>:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
-canfar<span class="w"> </span>info<span class="w"> </span>SESSION_ID
-canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID
-canfar<span class="w"> </span>logs<span class="w"> </span>SESSION_ID
-canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
+</div>
+<div class="tabbed-block">
+<div class="highlight"><span class="filename">submit_batch.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+
+<span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">AsyncSession</span>
+</span>
+<span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nightly-reduction&quot;</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/reduce.py&quot;</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
-<p><code>canfar stats</code> reports cluster-wide load, not per-Session usage.</p>
-<p>Python equivalents:</p>
-<div class="highlight"><pre><span></span><code><span class="n">info</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
-<span class="n">events</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
-<span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
-<span class="n">deleted</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">job_ids</span><span class="p">)</span>
-</code></pre></div>
-<h2 id="resource-guidance">Resource Guidance<a class="headerlink" href="#resource-guidance" title="Permanent link">&para;</a></h2>
-<p>Start flexible. Fixed requests can be harder to schedule and should be based on
-measured CPU and memory use.</p>
-<table>
-<thead>
-<tr>
-<th>Workload</th>
-<th>First request</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Script smoke test</td>
-<td>Flexible</td>
-</tr>
-<tr>
-<td>Single-file reduction</td>
-<td>Flexible or <code>cores=1</code>, <code>ram=4</code></td>
-</tr>
-<tr>
-<td>Known memory-heavy job</td>
-<td>Fixed <code>cores</code> and <code>ram</code></td>
-</tr>
-<tr>
-<td>Independent parameter sweep</td>
-<td>Replicas plus modest fixed resources</td>
-</tr>
-</tbody>
-</table>
-<p>Tune threaded libraries to match requested cores:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--name<span class="w"> </span>threaded-job<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--env<span class="w"> </span><span class="nv">OMP_NUM_THREADS</span><span class="o">=</span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span><span class="se">\</span>
-<span class="w">  </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/myproject/scripts/threaded.py
-</code></pre></div>
-<h2 id="storage-rules">Storage Rules<a class="headerlink" href="#storage-rules" title="Permanent link">&para;</a></h2>
-<p>Write durable outputs to mounted storage such as <code>/arc/home/&lt;user&gt;/</code> or
-<code>/arc/projects/&lt;project&gt;/</code>. Treat container-local paths as temporary, and treat
-<code>/scratch/</code> as ephemeral high-speed working space.</p>
-<h2 id="private-images">Private Images<a class="headerlink" href="#private-images" title="Permanent link">&para;</a></h2>
-<p>Private images require Container Registry credentials. Configure those through
-the Python <code>Configuration</code> model or the CLI config before submitting the Session;
-see the <a href="../../containers/registry/">registry guide</a>.</p>
-<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Symptom</th>
-<th>Check</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Job does not start</td>
-<td><code>canfar events SESSION_ID</code></td>
-</tr>
-<tr>
-<td>Command exits unexpectedly</td>
-<td><code>canfar logs SESSION_ID</code></td>
-</tr>
-<tr>
-<td>Resource request waits too long</td>
-<td>Try flexible mode or smaller fixed resources</td>
-</tr>
-<tr>
-<td>Image pull fails</td>
-<td>Verify the image name and registry credentials</td>
-</tr>
-<tr>
-<td>Need structured Session data</td>
-<td><code>canfar ps --json</code></td>
-</tr>
-</tbody>
-</table>
+</div>
+</div>
+</div>
+<p>In a notebook, define <code>main()</code> without the final script entrypoint and run
+<code>await main()</code> in another cell.</p>
+<p>The <code>args</code> value is a command-line string. Keep command arguments after the
+CLI's <code>--</code> delimiter so the client does not parse them as Session options.</p>
+<p><span id="storage-rules"></span></p>
+<h2 id="storage-and-cleanup">Storage and cleanup<a class="headerlink" href="#storage-and-cleanup" title="Permanent link">&para;</a></h2>
+<p>Write inputs and durable outputs to <code>/arc/home/&lt;user&gt;/</code>,
+<code>/arc/projects/&lt;project&gt;/</code>, or a configured VOSpace Service. Use <code>/scratch</code>
+for high-speed staging and intermediates only; it is deleted when the Session
+ends. See <a href="../../storage/">Storage</a> and <a href="../../storage/transfers/">Data transfers</a>.</p>
+<h2 id="related-guides">Related guides<a class="headerlink" href="#related-guides" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="../">Interactive Sessions</a></li>
+<li><a href="../../containers/">Container Images</a></li>
+<li><a href="../../../client/helpers/">Distributed helpers</a></li>
+<li><a href="../../../cli/cli-help/">CLI reference</a></li>
+</ul>
 
 
 
@@ -2415,7 +2460,7 @@ see the <a href="../../containers/registry/">registry guide</a>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

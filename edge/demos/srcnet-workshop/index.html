@@ -18,7 +18,7 @@
         <link rel="prev" href="../../cli/cli-help/">
       
       
-        <link rel="next" href="../../client/bug-reports/">
+        <link rel="next" href="../../client/agents/">
       
       
         
@@ -524,6 +524,8 @@
   
     
     
+      
+        
       
         
       
@@ -1224,8 +1226,6 @@
       
         
       
-        
-      
     
     
     
@@ -1321,34 +1321,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1633,6 +1605,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../client/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1937,19 +1937,21 @@
 <ul>
 <li><strong>Run code on the cloud</strong> without complex setup.</li>
 <li>Use familiar tools like <strong>Jupyter Notebooks</strong>.</li>
-<li>Scale their analysis from a single interactive session to <strong>hundreds of parallel jobs</strong>.</li>
+<li>Scale their analysis from a single interactive Session to <strong>hundreds of parallel Sessions</strong>.</li>
 <li><strong>Process large datasets</strong> efficiently.</li>
 </ul>
-<p><strong>Whether you're new to coding or a seasoned power-user, these tools are designed to be intuitive and powerful.</strong></p>
+<p>Start with one small analysis, then add replicas after you verify the results.</p>
 </div>
 <h2 id="cli-your-mission-control">CLI: Your Mission Control<a class="headerlink" href="#cli-your-mission-control" title="Permanent link">&para;</a></h2>
-<p>The <code>canfar</code> CLI is the easiest way to get started. It's your interactive mission control for the CANFAR science platform.</p>
+<p>Use the <code>canfar</code> command-line interface (CLI) for this workshop. If you prefer
+to start in your browser, follow <a href="../../platform/get-started/">Getting Started</a>;
+you do not need to install the client for that route.</p>
 <h3 id="step-0-prerequisites">Step 0: Prerequisites<a class="headerlink" href="#step-0-prerequisites" title="Permanent link">&para;</a></h3>
 <p>Install <code>pipx</code> if you don't have it already. <code>pipx</code> is a tool for installing and running Python applications in isolated environments.</p>
 <div class="highlight"><pre><span></span><code>python3<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--user<span class="w"> </span>pipx
 python3<span class="w"> </span>-m<span class="w"> </span>pipx<span class="w"> </span>ensurepath
 </code></pre></div>
-<p>Alternatively, on you can use OS specific package managers:</p>
+<p>Alternatively, use your operating system’s package manager:</p>
 <div class="tabbed-set tabbed-alternate" data-tabs="1:3"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><input id="__tabbed_1_3" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">macOS</label><label for="__tabbed_1_2">Linux (Ubuntu/Debian)</label><label for="__tabbed_1_3">Windows (scoop)</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
@@ -1971,7 +1973,14 @@ pipx<span class="w"> </span>ensurepath
 </div>
 </div>
 <h3 id="step-1-installation">Step 1: Installation<a class="headerlink" href="#step-1-installation" title="Permanent link">&para;</a></h3>
-<p>It's a single command. Open your terminal and type:</p>
+<div class="admonition warning">
+<p class="admonition-title">Check your client version first</p>
+<p>These examples describe the unreleased interface on this branch.
+<code>pipx install canfar</code> installs the published release, which may differ.
+Follow <a href="../../client/get-started/#try-this-development-branch">installation and capability checks</a>
+before continuing. Older recordings may also show earlier commands.</p>
+</div>
+<p>For a published release, open your terminal and type:</p>
 <div class="highlight"><pre><span></span><code>pipx<span class="w"> </span>install<span class="w"> </span>canfar
 </code></pre></div>
 <details class="info">
@@ -1979,28 +1988,31 @@ pipx<span class="w"> </span>ensurepath
 <p><script src="https://asciinema.org/a/IVLebHvaeWcBrPqlBa3hD2swz.js" id="asciicast-IVLebHvaeWcBrPqlBa3hD2swz" async="true"></script> #pragma: allowlist secret</p>
 </details>
 <h3 id="step-2-first-contact-authentication">Step 2: First Contact (Authentication)<a class="headerlink" href="#step-2-first-contact-authentication" title="Permanent link">&para;</a></h3>
-<p>Tell <code>canfar</code> who you are. This command discovers all available servers worldwide and guides you through a one-time login.</p>
+<p>Tell <code>canfar</code> who you are. This command discovers the servers available to the
+selected identity and guides you through a one-time login.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet<span class="w"> </span>-f
 </code></pre></div>
 <details class="info">
 <summary>Auth Walkthrough</summary>
 <p><script src="https://asciinema.org/a/a0bGaulLPlR2g3Go95I5BYKIz.js" id="asciicast-a0bGaulLPlR2g3Go95I5BYKIz" async="true"></script> #pragma: allowlist secret</p>
 </details>
-<p>You'll be prompted for your credentials, and the CLI handles the rest, saving a secure token for future commands.</p>
+<p>You'll be prompted for your credentials, and the CLI handles the rest, saving
+an Authentication Record for future commands.</p>
 <div class="admonition success">
 <p class="admonition-title">What just happened?</p>
 <ul>
 <li>We installed the <code>canfar</code> python package, which provides the <code>canfar</code> command-line interface (CLI).</li>
 <li>We authenticated with the CANFAR Science Platform.</li>
-<li>All future commands will use this active Authentication and Server selection automatically.</li>
+<li>Future commands use the selected Authentication Record and Server.</li>
 </ul>
 </div>
 <hr />
 <h2 id="your-first-interactive-notebook">Your First Interactive Notebook<a class="headerlink" href="#your-first-interactive-notebook" title="Permanent link">&para;</a></h2>
 <p>Let's launch a Jupyter notebook that comes pre-loaded with common astronomy libraries like <code>AstroPy</code>, <code>SciPy</code>, and <code>Matplotlib</code>.</p>
 <h3 id="step-1-create-the-notebook">Step 1: Create the Notebook<a class="headerlink" href="#step-1-create-the-notebook" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Launch a notebook using a pre-built astronomy image</span>
-canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>skaha/astroml:latest
+<div class="highlight"><pre><span></span><code><span class="c1"># See the images available on this server, then launch one</span>
+canfar<span class="w"> </span>image<span class="w"> </span>ls<span class="w"> </span>--kind<span class="w"> </span>notebook
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>IMAGE_NAME
 </code></pre></div>
 <details>
 <summary>Create Notebook Walkthrough</summary>
@@ -2015,16 +2027,22 @@ canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class=
 <p><script src="https://asciinema.org/a/IXgNpwRGNratcRFnqOKXRh3qA.js" id="asciicast-IXgNpwRGNratcRFnqOKXRh3qA" async="true"></script> #pragma: allowlist secret</p>
 </details>
 <h3 id="step-3-open-in-your-browser">Step 3: Open in Your Browser<a class="headerlink" href="#step-3-open-in-your-browser" title="Permanent link">&para;</a></h3>
-<p>Use the session ID to open the notebook directly in your web browser.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>open<span class="w"> </span>&lt;SESSION_ID&gt;
+<p>Wait for your Session to become ready. Replace <code>SESSION_ID</code> with its returned
+ID to open it in your browser.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>open<span class="w"> </span>SESSION_ID
 </code></pre></div>
 <div class="admonition success">
 <p class="admonition-title">You're in!</p>
 <p>You now have a fully functional JupyterLab environment running on the powerful CANFAR Science Platform. </p>
 </div>
 <h3 id="step-4-clean-up">Step 4: Clean Up<a class="headerlink" href="#step-4-clean-up" title="Permanent link">&para;</a></h3>
-<p>When you're finished, it's important to delete your session to free up resources for others.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>&lt;SESSION_ID&gt;
+<div class="admonition warning">
+<p class="admonition-title">Save your work before deleting compute</p>
+<p>Save notebooks, scripts, and results under persistent <code>/arc</code> storage. Verify
+that a new Session can read them before deleting the old Session.</p>
+</div>
+<p>Delete only the Session you created to free resources for others:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
 </code></pre></div>
 <details>
 <summary>Clean Up Walkthrough</summary>
@@ -2032,45 +2050,54 @@ canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class=
 </details>
 <hr />
 <h2 id="the-power-of-headless-mode-from-interactive-to-batch">The Power of Headless Mode: From Interactive to Batch<a class="headerlink" href="#the-power-of-headless-mode-from-interactive-to-batch" title="Permanent link">&para;</a></h2>
-<p>This is where the magic happens.</p>
 <p>What if you have a Python script that runs your analysis, and you don't need the full interactive notebook? You can run it in <strong>"headless" (batch) mode</strong> using the <em>exact same container image</em>.</p>
-<p>Let's say you have a script named <code>echo.py</code>.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>echo.py
+<p>Save your tested script at <code>/arc/projects/PROJECT/echo.py</code>. Replace <code>PROJECT</code>
+and <code>IMAGE_NAME</code> below; the image must contain Python and your dependencies.
+The headless Session must have permission to read the script and inputs.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>IMAGE_NAME<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/PROJECT/echo.py
 </code></pre></div>
 <div class="admonition tip">
 <p class="admonition-title">Interactive to Batch, Seamlessly</p>
 <p>You can develop your analysis interactively in a <strong>notebook</strong> session, save your code to a python script, and then run it at scale using a <strong>headless</strong> session. <strong>No changes to your environment are needed.</strong></p>
 </div>
-<p>To check the output of your headless job, you can use the <code>logs</code> command.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span>&lt;SESSION_ID&gt;
+<p>To check the output of your headless Session, you can use the <code>logs</code> command.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>logs<span class="w"> </span>SESSION_ID
 </code></pre></div>
 <hr />
 <h2 id="scaling-up-from-one-to-many">Scaling Up: From One to Many<a class="headerlink" href="#scaling-up-from-one-to-many" title="Permanent link">&para;</a></h2>
-<p>Need to process hundreds of files? You can launch multiple copies (replicas) of your headless job with a single command.</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span class="w"> </span><span class="m">10</span><span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>echo.py
+<p>Need to process hundreds of files? You can launch multiple copies (replicas) of your headless Session with a single command.</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>--replicas<span class="w"> </span><span class="m">2</span><span class="w"> </span>headless<span class="w"> </span>IMAGE_NAME<span class="w"> </span>--<span class="w"> </span>python<span class="w"> </span>/arc/projects/PROJECT/echo.py
 </code></pre></div>
-<p>You now have 10 containers in parallel. But how do you divide the work?</p>
+<p>This requests two Sessions; admission and capacity determine when they run.
+Keep the accepted IDs and check their status and outputs. A partial submission
+can leave some inputs unprocessed.</p>
 <hr />
 <h2 id="the-python-client-distributing-your-workload">The Python Client: Distributing Your Workload<a class="headerlink" href="#the-python-client-distributing-your-workload" title="Permanent link">&para;</a></h2>
-<p>For complex logic like distributing data across many jobs, we switch to the <code>canfar</code> Python Client.</p>
+<p>For complex logic like distributing data across many Sessions, we switch to the <code>canfar</code> Python Client.</p>
 <h3 id="the-problem">The Problem<a class="headerlink" href="#the-problem" title="Permanent link">&para;</a></h3>
-<p>You have 1000 FITS files and 100 replicas. How does each replica know which files to process?</p>
+<p>You have several Flexible Image Transport System (FITS) files and two replicas.
+Each replica needs the same ordered input list to choose its own share.</p>
 <h3 id="the-solution">The Solution<a class="headerlink" href="#the-solution" title="Permanent link">&para;</a></h3>
-<p>The <code>canfar.helpers.distributed</code> module provides simple but powerful functions to automatically split up a list of files among your replicas.</p>
+<p>The <code>canfar.helpers.distributed</code> module partitions an ordered list. First save
+an immutable <code>manifest.json</code> of input paths, as shown in the
+<a href="../../client/advanced-examples/#1-record-the-inputs-and-run-settings">complete pipeline example</a>.
+Every worker reads that same file. Adapt this worker fragment with your own
+<code>run_analysis</code> function; it must write a unique persistent output per input.</p>
 <div class="highlight"><span class="filename">Distributing Workloads</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.helpers</span><span class="w"> </span><span class="kn">import</span> <span class="n">distributed</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">glob</span><span class="w"> </span><span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="c1"># Assume your analysis logic is in this function</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">your_code</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_analysis</span> 
 
-<span class="c1"># 1. Get a list of all your data files</span>
-<span class="n">all_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="s2">&quot;/arc/projects/your_project/*.fits&quot;</span><span class="p">)</span>
+<span class="c1"># 1. Read the same saved input list in every worker</span>
+<span class="n">all_files</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/arc/projects/PROJECT/run/manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
 
 <span class="c1"># 2. &#39;chunk&#39; automatically gives each replica its unique subset of files</span>
 <span class="c1">#    It reads environment variables ($REPLICA_ID, $REPLICA_COUNT) set by CANFAR.</span>
-<span class="n">my_files</span> <span class="o">=</span> <span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">all_files</span><span class="p">)</span>
+<span class="n">my_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">all_files</span><span class="p">))</span>
 
 <span class="c1"># 3. Process only your assigned files</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This replica will process </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">my_files</span><span class="p">))</span><span class="si">}</span><span class="s2"> files.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This replica will process </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">my_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> files.&quot;</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">datafile</span> <span class="ow">in</span> <span class="n">my_files</span><span class="p">:</span>
     <span class="n">run_analysis</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
@@ -2085,23 +2112,26 @@ canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class=
 </div>
 <hr />
 <h2 id="putting-it-all-together-a-complete-workflow">Putting It All Together: A Complete Workflow<a class="headerlink" href="#putting-it-all-together-a-complete-workflow" title="Permanent link">&para;</a></h2>
-<p>Here is the complete workflow, from launching jobs programmatically to processing data in parallel.</p>
-<div class="highlight"><span class="filename">Launching Jobs Programmatically</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<p>This submission example starts two workers. Replace the image and script path
+with the ones you tested. For monitoring, result checks, recovery, and scoped
+cleanup, follow the <a href="../../client/advanced-examples/">complete pipeline</a>.</p>
+<div class="highlight"><span class="filename">Launching Sessions Programmatically</span><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
 <span class="c1"># This uses the same Authentication from `canfar login`</span>
-<span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+<span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="c1"># Request two replicas, each running the tested worker script</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;galaxy-processing-batch&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;IMAGE_NAME&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/PROJECT/run/my_script.py&quot;</span><span class="p">,</span>
+        <span class="n">replicas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
 
-<span class="c1"># Launch 100 replicas, each running our processing script</span>
-<span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;galaxy-processing-batch&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">image</span><span class="o">=</span><span class="s2">&quot;skaha/astroml:latest&quot;</span><span class="p">,</span>
-    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="s2">&quot;my_script.py&quot;</span><span class="p">,</span>
-    <span class="n">replicas</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
-<span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully launched </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> processing jobs!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accepted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> of 2 requested Sessions: </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check creation errors and missing outputs before retrying.&quot;</span><span class="p">)</span>
 </code></pre></div>
 
 
@@ -2125,7 +2155,7 @@ canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class=
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="June 9, 2026 22:41:49 UTC">June 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
   </span>
 
     

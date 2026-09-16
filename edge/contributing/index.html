@@ -543,6 +543,8 @@
       
         
       
+        
+      
     
     
     
@@ -1350,7 +1352,13 @@ is installed in the default location (<code>~/.ssl/cadcproxy.pem</code>).</p>
 </code></pre></div>
 <h4 id="running-tests-efficiently">Running Tests Efficiently<a class="headerlink" href="#running-tests-efficiently" title="Permanent link">&para;</a></h4>
 <p>Some tests in the Skaha test suite are marked as "slow" because they involve network operations, waiting for session states, or other time-consuming operations. These tests can take several minutes to complete.</p>
-<p><strong>Run all tests (including slow ones):</strong>
+<p><strong>Run the deterministic pull-request suite:</strong>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>tests
+</code></pre></div></p>
+<p>Pull requests targeting <code>main</code> or <code>feat/interfaces</code> use this non-slow suite in CI.
+The unfiltered suite runs in CI only after a code or test change is merged into
+<code>main</code>; documentation- and workflow-only merges do not trigger it.</p>
+<p><strong>Run all tests (including slow ones) locally:</strong>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>pytest
 </code></pre></div></p>
 <p><strong>Skip slow tests for faster development:</strong>
@@ -1364,7 +1372,7 @@ is installed in the default location (<code>~/.ssl/cadcproxy.pem</code>).</p>
 - Log retrieval tests
 - Authentication timeout tests
 - Session statistics tests</p>
-<p>For rapid development and testing, it's recommended to use <code>-m "not slow"</code> to skip these time-consuming tests during your development cycle, and run the full test suite before submitting your pull request.</p>
+<p>For rapid development and testing, use <code>-m "not slow"</code> to skip these time-consuming tests during your development cycle. Run the full suite locally when you have valid CANFAR credentials and a certificate.</p>
 <h3 id="6-commit-your-changes">6. Commit Your Changes<a class="headerlink" href="#6-commit-your-changes" title="Permanent link">&para;</a></h3>
 <p>Skaha uses the <a href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commit messages</a> standard to ensure the commit history human and machine readable. Skaha ships with a tool called <code>commitizen</code> that helps you craft commit messages in the correct format.</p>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>files/you/changed.py
@@ -1387,6 +1395,33 @@ uv<span class="w"> </span>run<span class="w"> </span>cz<span class="w"> </span>c
 <li><strong>Celebrate with Code</strong>: Write a fun piece of code that does absolutely nothing but prints "I did it!" to the console. Because why not?</li>
 </ul>
 <p>Remember, every contribution counts, and you’ve just made the Skaha project a little better. Now go forth and celebrate like the coding rockstar you are!</p>
+<h1 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h1>
+<p>Contributions to CANFAR include code, tests, documentation, examples, issue
+reports, and improvements to the user experience. Read the
+<a href="../conduct/">Code of Conduct</a> before participating.</p>
+<h2 id="set-up">Set up<a class="headerlink" href="#set-up" title="Permanent link">&para;</a></h2>
+<p>CANFAR uses <a href="https://docs.astral.sh/uv/">uv</a> for development:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras<span class="w"> </span>--dev
+uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install<span class="w"> </span>--hook-type<span class="w"> </span>commit-msg
+</code></pre></div>
+<p>Use a valid CANFAR account and certificate only for integration tests. Most
+pull-request checks are deterministic:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span>-o<span class="w"> </span><span class="nv">cache_dir</span><span class="o">=</span>/tmp/canfar-pytest-cache
+uv<span class="w"> </span>run<span class="w"> </span>--group<span class="w"> </span>docs<span class="w"> </span>mkdocs<span class="w"> </span>build
+</code></pre></div>
+<p>The full test suite contacts the Science Platform and requires valid
+credentials. Run it only when those credentials are available.</p>
+<h2 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h2>
+<p>Keep examples aligned with the installed CLI and Python API. Build the site
+locally with <code>uv run --group docs mkdocs serve</code> and check navigation, links,
+images, and code blocks before opening a pull request.</p>
+<h2 id="submit-a-change">Submit a change<a class="headerlink" href="#submit-a-change" title="Permanent link">&para;</a></h2>
+<p>Open an issue or pull request on <a href="https://github.com/opencadc/canfar">GitHub</a>.
+Use a focused branch and a <a href="https://www.conventionalcommits.org/">Conventional Commit</a>
+message. Include the tests or documentation build you ran in the pull request
+description.</p>
+<p>The repository's <a href="https://github.com/opencadc/canfar/blob/main/CONTRIBUTING.md">contributor guide</a>
+contains the complete project policy.</p>
 
 
 
@@ -1409,7 +1444,7 @@ uv<span class="w"> </span>run<span class="w"> </span>cz<span class="w"> </span>c
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 9, 2025 17:11:40 UTC">September 9, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 08:15:22 UTC">August 18, 2026</span>
   </span>
 
     

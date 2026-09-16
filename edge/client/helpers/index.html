@@ -545,6 +545,8 @@
       
         
       
+        
+      
     
     
     
@@ -1499,8 +1501,6 @@
       
         
       
-        
-      
     
     
     
@@ -1596,34 +1596,6 @@
     
   
     Data Commands
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../../cli/authentication-contexts/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Authentication and Servers
   
 
     
@@ -1795,6 +1767,34 @@
           </ul>
         </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Use a Coding Agent
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2084,10 +2084,13 @@
     <span class="n">process</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="validation-and-errors">Validation and errors<a class="headerlink" href="#validation-and-errors" title="Permanent link">&para;</a></h3>
-<ul>
-<li><code>replica</code> must be &gt;= 1 and &lt;= <code>total</code></li>
-<li><code>total</code> must be &gt; 0</li>
-</ul>
+<p><code>chunk()</code> requires <code>total &gt; 0</code> and <code>1 &lt;= replica &lt;= total</code>, raising
+<code>ValueError</code> otherwise. <code>stripe()</code> intentionally keeps a looser compatibility
+contract: <code>replica &lt; 1</code> yields no items, even when <code>total &lt;= 0</code>. For a positive
+replica, <code>total &lt;= 0</code> raises <code>ValueError</code>; otherwise <code>replica &gt; total</code> yields
+no items. Both functions use <code>REPLICA_ID</code> and <code>REPLICA_COUNT</code> when
+their corresponding arguments are omitted, defaulting to one replica when the
+environment is absent.</p>
 <h2 id="api-reference">API Reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h2>
 
 
@@ -2144,9 +2147,9 @@
 <p>Uses 1-based <code>replica</code> indexing to match <code>REPLICA_ID</code> in CANFAR
 containers. Replica 1 receives indices 0, <code>total</code>, 2 * <code>total</code>, …;
 replica 2 receives indices 1, <code>total</code> + 1, …; and so on.</p>
-<p>Unlike <code>chunk</code>, <code>stripe</code> does not validate <code>replica</code> or <code>total</code>.
-When <code>replica</code> is less than 1, or greater than <code>total</code>, the result is
-empty. When <code>total</code> is zero, <code>ValueError</code> is raised.</p>
+<p>Unlike <code>chunk</code>, <code>stripe</code> returns no items when <code>replica &lt; 1</code>,
+even when <code>total &lt;= 0</code>. For a positive replica, <code>total &lt;= 0</code> raises
+<code>ValueError</code>; otherwise <code>replica &gt; total</code> returns no items.</p>
 
 
 <table>
@@ -2445,7 +2448,7 @@ Defaults to <code>REPLICA_ID</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 21, 2025 00:30:56 UTC">August 21, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:10 UTC">September 16, 2026</span>
   </span>
 
     
