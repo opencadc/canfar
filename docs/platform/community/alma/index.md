@@ -1,8 +1,12 @@
+<span id="alma-resources"></span>
+
 # ALMA analysis workflow
 
 Use this workflow to move ALMA data into a CANFAR Session, reduce it with
 CASA, inspect the products, and keep the results in persistent storage. You can use the browser for Session management and file transfers, with
 optional command-line steps for repeatable work.
+
+<span id="new-users"></span>
 
 ## Prerequisites
 
@@ -23,6 +27,8 @@ optional command-line steps for repeatable work.
 See [Getting Started](../../get-started.md) for account and portal setup.
 
 ## Workflow
+
+<span id="notebook"></span>
 
 ### 1. Choose a Session and storage location
 
@@ -68,6 +74,8 @@ canfar data cp vault:/ALMA/test-data/cutouts/test-4d-cube.fits \
 Inside a Session, the same `/arc` paths are available from the file browser
 and terminal. For a large reduction, copy working data to `/scratch` and keep
 the source and final products under `/arc`.
+
+<span id="desktop"></span>
 
 ### 3. Start CASA in a Desktop Session
 
@@ -161,12 +169,15 @@ At the end of the workflow:
 | Login fails or credentials are stale | Run `canfar --log-level debug login cadc --force`, then `canfar auth show`. |
 | No suitable image appears | Run `canfar image ls --kind desktop` (or `--kind notebook`/`--kind carta`) and choose an image that includes the required software. |
 | Session remains pending | Run `canfar ps --all`, `canfar events [session-id]`, and `canfar stats`; reduce requested resources if the Science Platform Server has no capacity. |
-| A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls -lh IDENTIFIER:/path`; check that the active Authentication Record can access the target. |
+| A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls -lh IDENTIFIER:/path`; check the credentials for the storage identifier's owning server. Default `arc` and `vault` use CADC credentials independently of the active compute server. |
 | Files disappear after the Session ends | Move them from `/scratch` to `/arc/home/[username]` or `/arc/projects/[project]` before deleting the Session. |
 | A shared project path is denied | Ask the project administrator to add your CADC account to the project group; see [Permissions](../../permissions.md). |
 | CASA is missing or incompatible | Select a Desktop image that lists the required CASA version and match the version to the archive scripts. If CASA 6.5.0–6.5.2 opens with display errors, exit CASA and start it again. |
-| A transfer reports expired credentials | Renew or select the Authentication Record used by the active server, then retry. See [support](../../support/index.md) if the record or certificate cannot be refreshed. |
+| A transfer reports expired credentials | Renew the credentials used by the storage identifier's owning server, then retry. See [support](../../support/index.md) if the record or certificate cannot be refreshed. |
 | The browser cannot connect to a new Session | Wait for the Session to reach `Running`, then retry `canfar open [session-id]`; inspect `canfar info [session-id]` and `canfar logs [session-id]` if it still fails. |
+
+<span id="general-tools"></span>
+<span id="tips-tricks"></span>
 
 ## Related documentation
 

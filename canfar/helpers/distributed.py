@@ -23,9 +23,9 @@ def stripe(
     containers. Replica 1 receives indices 0, ``total``, 2 * ``total``, …;
     replica 2 receives indices 1, ``total`` + 1, …; and so on.
 
-    Unlike ``chunk``, ``stripe`` does not validate ``replica`` or ``total``.
-    When ``replica`` is less than 1, or greater than ``total``, the result is
-    empty. When ``total`` is zero, ``ValueError`` is raised.
+    Unlike ``chunk``, ``stripe`` returns no items when ``replica < 1``,
+    even when ``total <= 0``. For a positive replica, ``total <= 0`` raises
+    ``ValueError``; otherwise ``replica > total`` returns no items.
 
     Args:
         iterable: The iterable to stripe across replicas.

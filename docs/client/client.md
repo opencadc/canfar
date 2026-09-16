@@ -1,3 +1,5 @@
+<span id="features"></span>
+
 # HTTPClient
 
 `canfar.client.HTTPClient` is the lower-level transport used by the Session,
@@ -25,7 +27,8 @@ The main settings are:
 - `authentication_idp`: a transient Identity Provider selector for this client.
 - `token`: a runtime bearer token.
 - `certificate`: a runtime X.509 certificate path.
-- `timeout`: request timeout in seconds (1–300).
+- `timeout`: HTTP request inactivity timeout in seconds (1–300), not a total
+  job deadline.
 - `concurrency`: maximum async connection count (1–128).
 
 When no explicit `url` is supplied, the active Server Selection in
@@ -33,12 +36,15 @@ When no explicit `url` is supplied, the active Server Selection in
 credential, `authentication_idp` selects a saved Authentication Record for this
 client; otherwise the active Authentication Record is used.
 
+<span id="authentication-modes"></span>
+<span id="authentication-expiry"></span>
+
 ## Credential precedence and lifecycle
 
 Runtime credentials take precedence over saved Authentication Records. A
 non-empty runtime `token` wins over a saved X.509 or OIDC record; a runtime
-`certificate` likewise wins. An empty runtime token is treated as absent and
-falls back to saved state. Runtime credentials are not persisted.
+`certificate` likewise wins. An empty runtime token is treated as absent: a supplied runtime certificate
+still takes precedence, otherwise the client uses the selected saved record. Runtime credentials are not persisted.
 
 Without runtime credentials, the client resolves the selected saved record when
 its sync or async HTTPX client is first created. An expired OIDC record is
@@ -69,6 +75,10 @@ async def request() -> None:
 context manager. Do not use the async client from synchronous code or expect a
 sync client to run through an event loop.
 
+<span id="logging"></span>
+<span id="error-handling"></span>
+<span id="debug-logging"></span>
+
 ## Errors and logging
 
 HTTP response hooks raise `httpx.HTTPStatusError` by default for unsuccessful
@@ -95,6 +105,8 @@ from canfar import configure_logging
 
 configure_logging("debug")
 ```
+
+<span id="configuration"></span>
 
 ## Configuration editing
 

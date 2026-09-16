@@ -21,6 +21,8 @@ Server, data, image, and configuration operations remain grouped:
 There are no extra command names between the root and these leaves. In
 particular, Session creation is `canfar create`, and login is `canfar login`.
 
+<span id="root-logging-controls"></span>
+
 ## Root logging options
 
 Root logging options must come before the command:
@@ -40,11 +42,15 @@ canfar --log-file ./logs/canfar.jsonl ps
 See [Logging](logging.md) for precedence, stream routing, file records, and
 setup errors.
 
+<span id="canfar-auth"></span>
+
 ## Authentication and Servers
+
+<span id="canfar-login"></span>
 
 ### Login
 
-```bash
+```text title="Command syntax"
 canfar login [IDP] [OPTIONS]
 ```
 
@@ -67,7 +73,7 @@ The interactive credential flow and Server Selection are described in
 
 ### Authentication
 
-```bash
+```text title="Command syntax"
 canfar auth
 canfar auth show
 canfar auth ls
@@ -79,6 +85,8 @@ canfar auth purge --force
 `canfar auth` is the same active-Authentication view as `canfar auth show`.
 `auth use` selects a saved Authentication Record; `auth rm` also removes the
 associated Servers; `auth purge --force` resets Authentication and Server state.
+
+<span id="canfar-server"></span>
 
 ### Server Selection
 
@@ -92,9 +100,11 @@ the active IDP and discovers them when no saved Servers are available.
 
 ## Sessions
 
+<span id="canfar-create"></span>
+
 ### Create
 
-```bash
+```text title="Command syntax"
 canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 ```
 
@@ -127,9 +137,11 @@ canfar create headless skaha/terminal:1.1.2 -- worker --output json -o yaml
 The `--output` option must appear before `--`. `--dry-run` cannot be combined
 with machine output.
 
+<span id="canfar-ps"></span>
+
 ### List Sessions
 
-```bash
+```text title="Command syntax"
 canfar ps [OPTIONS]
 ```
 
@@ -153,6 +165,8 @@ canfar ps --all --kind headless
 canfar ps -o json
 ```
 
+<span id="inspect-and-clean-up"></span>
+
 ### Inspect, open, and remove
 
 These leaves accept one or more Session IDs and produce human-readable output:
@@ -174,6 +188,8 @@ shell does not expand them:
 canfar prune 'notebook.*' notebook Completed
 ```
 
+<span id="images-and-platform-state"></span>
+
 ### Platform information
 
 ```bash
@@ -188,6 +204,9 @@ canfar version --debug
 accepts the image-kind filter shown above. `version --debug` prints client,
 Python, operating-system, and dependency details for a bug report; it is not a
 logging control.
+
+<span id="data"></span>
+<span id="client-configuration"></span>
 
 ## Data and configuration
 
@@ -204,6 +223,8 @@ Data operands use an explicit `Storage Identifier`, for example
 for the embedded command surface. Configuration keys use dotted paths; values
 passed to `config set` are parsed as YAML. See [Authentication and Servers](authentication-contexts.md)
 for the persisted Authentication, Server, and active-selection shape.
+
+<span id="machine-output-contract"></span>
 
 ## Machine output
 

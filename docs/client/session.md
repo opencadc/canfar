@@ -6,12 +6,13 @@ Science Platform Server. It inherits the HTTP and credential behavior of
 
 ## Return shapes and failure behavior
 
-The released Python contracts are:
+The current interface has these return shapes. Check the
+[installation and version guidance](get-started.md) before using branch examples:
 
 | Method | Result |
 | --- | --- |
 | `fetch(kind=None, status=None, view=None)` | `list[dict[str, str]]` |
-| `create(...)` | `list[str]` containing the IDs that launched successfully |
+| `create(...)` | `list[str]` containing the accepted Session IDs |
 | `info(ids)` | `list[dict[str, Any]]` |
 | `logs(ids, verbose=False)` | `dict[str, str]`, or `None` when `verbose=True` |
 | `events(ids, verbose=False)` | `list[dict[str, str]]`, or `None` when `verbose=True` |
@@ -29,6 +30,8 @@ Science Platform Server's aggregate resource statistics as a dictionary.
 `logs(..., verbose=True)` and `events(..., verbose=True)` route their results to
 the `canfar.sessions` logger and return `None`; configure application logging
 with `canfar.configure_logging()` if the output should be visible.
+
+<span id="creating-sessions"></span>
 
 ## Create and manage a Session
 

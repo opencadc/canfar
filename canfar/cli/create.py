@@ -90,8 +90,10 @@ def _render_create_result(
         hint=(
             "No session IDs were returned. Run `canfar --log-level debug create` "
             "for library logs, or set a longer client timeout (environment "
-            "variable CANFAR_TIMEOUT, in seconds) if the image pull or platform "
-            "is slow."
+            "variable CANFAR_TIMEOUT, in seconds) for slow HTTP responses. "
+            "Check `canfar ps --all` before retrying: a request may have been "
+            "accepted even if its response was lost. For accepted IDs, use "
+            "`canfar events SESSION_ID` to inspect image pulls or admission."
         ),
     )
     _render_create_failure(
