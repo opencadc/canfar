@@ -25,11 +25,12 @@ are sent to the `canfar.sessions` logger and return `None`.
 `fetch(view="all")` requests the server's all-Sessions view when authorized,
 and `stats()` returns aggregate Science Platform Server resource statistics.
 
+<span id="creating-sessions"></span>
+
 ## Async workflow
 
 ```python
 from canfar.sessions import AsyncSession
-
 
 async def main() -> None:
     async with AsyncSession() as session:

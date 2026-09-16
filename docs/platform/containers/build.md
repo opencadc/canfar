@@ -1,9 +1,19 @@
+<span id="building-custom-containers"></span>
+<span id="container-development-process"></span>
+
 # Build a Container Image
 
 Build a custom image when the required software is not available in an image
 listed by the Science Portal. Keep the Dockerfile, dependency declarations, and
 entrypoint in a version-controlled repository so another researcher can rebuild
 the same environment.
+
+<span id="when-to-build-custom-containers"></span>
+<span id="scenarios-requiring-custom-containers"></span>
+<span id="alternatives-to-consider-first"></span>
+<span id="development-environment-setup"></span>
+<span id="local-development-prerequisites"></span>
+<span id="development-workflow-setup"></span>
 
 ## Before you build
 
@@ -13,6 +23,17 @@ the same environment.
    contributed application, or `headless`.
 3. Test the smallest useful workflow and identify persistent input/output paths.
 4. Keep credentials, certificates, and research data outside the build context.
+
+<span id="starting-from-canfar-base-images"></span>
+<span id="basic-dockerfile-patterns"></span>
+<span id="package-installation-failures"></span>
+
+<span id="notebook-container-extension"></span>
+<span id="desktop-app-container"></span>
+<span id="advanced-container-features"></span>
+<span id="gpu-enabled-containers"></span>
+<span id="testing-desktop-app-containers"></span>
+<span id="build-arguments-for-flexibility"></span>
 
 ## Minimal Dockerfile
 
@@ -36,6 +57,16 @@ example is a generic Python image, not a promise that it is the best base for a
 particular astronomy application. Follow upstream licensing and installation
 instructions for CASA, GPU libraries, and other system packages.
 
+<span id="version-management-and-tagging"></span>
+
+<span id="multi-stage-builds-for-complex-software"></span>
+<span id="building-and-optimization"></span>
+<span id="efficient-docker-practices"></span>
+<span id="layer-optimization"></span>
+<span id="size-minimization"></span>
+<span id="performance-optimization"></span>
+<span id="parallel-builds"></span>
+
 ## Keep the image reproducible
 
 - Pin important Python and system dependencies where practical.
@@ -51,6 +82,12 @@ Do not bake a CADC certificate, bearer token, private key, or password into an
 image. Supply runtime credentials through the supported authentication flow or
 the deployment's secret mechanism.
 
+<span id="testing-and-debugging"></span>
+<span id="local-testing-strategy"></span>
+<span id="testing-notebook-containers"></span>
+<span id="automated-testing-framework"></span>
+<span id="debugging-common-issues"></span>
+
 ## Test locally
 
 Build and run a small smoke test before pushing:
@@ -64,6 +101,10 @@ For a `headless` image, test the exact command passed after the CLI `--`
 delimiter. For an interactive image, confirm that the expected application
 starts in the chosen Session Kind. The image cannot be validated solely by a
 successful build.
+
+<span id="publishing-to-harbor-registry"></span>
+<span id="registry-authentication"></span>
+<span id="pushing-images"></span>
 
 ## Publish and launch
 
@@ -96,6 +137,8 @@ not assume that a particular user's data, project, or VOSpace path exists.
 For remote VOSpace data, use `canfar data` or the explicit
 `canfar.storage.filesystem(identifier)` helper and stage path-oriented inputs
 to `/scratch`. See [Storage](../storage/index.md).
+
+<span id="container-size-issues"></span>
 
 ## Troubleshooting
 

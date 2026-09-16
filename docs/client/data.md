@@ -6,6 +6,8 @@ Read and write files on CANFAR remote storage from Python using
 service. `canfar` does not register Storage Identifiers as fsspec protocols,
 module attributes, or dynamic schemes.
 
+<span id="open-a-vospace-service"></span>
+
 ## Find and open a Storage Identifier
 
 [Install the client](get-started.md#install) and authenticate first. The default
@@ -62,6 +64,8 @@ missing, expired, invalid, or cannot be materialized, `filesystem()` raises
 `AuthContextError` with a login hint; credential contents are not included in
 the error.
 
+<span id="filesystem-operations"></span>
+
 ## Standard fsspec operations
 
 Storage operations use the ordinary fsspec vocabulary:
@@ -112,6 +116,14 @@ Directory listings use an in-memory fsspec listing cache for the lifetime of
 the filesystem. Create a new filesystem when another writer's changes must be
 observed.
 
+<span id="get-a-local-path"></span>
+
+<span id="scientific-tools"></span>
+<span id="astropy"></span>
+<span id="numpy"></span>
+<span id="pandas"></span>
+<span id="dask"></span>
+
 ## Materialize a local file
 
 Libraries that require a pathname can use the standard fsspec `get_file()`
@@ -139,6 +151,11 @@ from astropy.io import fits
 with fits.open("/scratch/cutout.fits", memmap=True) as hdul:
     data = hdul[0].data
 ```
+
+<span id="cache"></span>
+<span id="whole-files"></span>
+<span id="byte-ranges"></span>
+<span id="ram"></span>
 
 ## Content caching
 
@@ -169,6 +186,9 @@ wrappers, pass a URL as `cache_storage`, or advertise `blockcache`: the staged
 VOSpace file object does not provide the fsspec block-cache interface. The
 cache wrapper forwards `close()` only when its wrapped filesystem provides it,
 so close the known VOSpace client (`remote`) explicitly.
+
+<span id="what-does-not-work"></span>
+<span id="async"></span>
 
 ## Python API boundary
 

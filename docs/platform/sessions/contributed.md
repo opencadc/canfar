@@ -4,6 +4,10 @@ Contributed Sessions expose community-provided web applications through the
 Science Platform. The catalogue, image names, ports, and access requirements
 are deployment-specific.
 
+<span id="getting-started"></span>
+<span id="troubleshooting"></span>
+<span id="whats-next"></span>
+
 ## Launch an application
 
 1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
@@ -42,6 +46,8 @@ application workspace.
 The application may have its own file picker or path conventions. Confirm the
 path with the application documentation rather than assuming that every
 contributed image exposes the same directories.
+
+<span id="contributing-your-app"></span>
 
 ## Contribute an application
 

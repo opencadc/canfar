@@ -4,6 +4,12 @@
 astronomy application for viewing images, tables, and supported archive data.
 The available Firefly image and features are deployment-specific.
 
+<span id="launching-firefly"></span>
+<span id="step-4-launch-session"></span>
+<span id="access-canfar-storage"></span>
+<span id="remote-data-access"></span>
+<span id="storage-access"></span>
+
 ## Launch Firefly
 
 1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
@@ -37,6 +43,9 @@ canfar open SESSION_ID
 If a Session remains `Pending`, inspect `canfar events SESSION_ID`; see [batch
 troubleshooting](batch.md#monitor-and-troubleshoot).
 
+<span id="loading-data"></span>
+<span id="upload-local-files"></span>
+
 ## Load data
 
 Use the paths and URLs supported by the selected Firefly image. A common
@@ -62,6 +71,39 @@ remote service is enabled on every deployment.
 Save figures, tables, regions, and other products under `/arc` or a persistent
 VOSpace Service. `/scratch` is deleted when the Session ends. See [Storage](../storage/index.md)
 and [Data transfers](../storage/transfers.md).
+
+<span id="what-is-firefly"></span>
+<span id="key-features"></span>
+<span id="step-1-create-new-session"></span>
+<span id="step-2-choose-container"></span>
+<span id="available-versions"></span>
+<span id="step-3-configure-session"></span>
+<span id="session-name"></span>
+<span id="memory-requirements"></span>
+<span id="cpu-cores"></span>
+<span id="using-firefly"></span>
+<span id="interface-overview"></span>
+<span id="main-components"></span>
+<span id="image-analysis"></span>
+<span id="basic-image-display"></span>
+<span id="multi-band-rgb"></span>
+<span id="coordinate-systems"></span>
+<span id="catalogue-analysis"></span>
+<span id="table-operations"></span>
+<span id="statistical-analysis"></span>
+<span id="plotting-tools"></span>
+<span id="advanced-features"></span>
+<span id="cutout-services"></span>
+<span id="multi-wavelength-analysis"></span>
+<span id="data-export"></span>
+<span id="common-workflows"></span>
+<span id="survey-photometry"></span>
+<span id="multi-object-analysis"></span>
+<span id="cross-matching-catalogues"></span>
+<span id="time-series-visualisation"></span>
+<span id="integration-with-canfar"></span>
+<span id="collaborative-features"></span>
+<span id="working-with-other-canfar-tools"></span>
 
 ## Typical workflow
 

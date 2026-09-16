@@ -1,3 +1,5 @@
+<span id="filesystem-access"></span>
+
 # Filesystem and Python tools
 
 Use a normal `/arc` path inside a Science Platform Session whenever the data is
@@ -9,6 +11,53 @@ guide](../../client/data.md) is the canonical contract for Storage Identifier
 lookup, credential selection, fsspec operations, local staging, and
 `SimpleCacheFileSystem`.
 
+<span id="arc-storage-as-filesystems"></span>
+<span id="within-canfar-sessions"></span>
+<span id="directory-structure-and-conventions"></span>
+<span id="arc-home-directory-archomeuser"></span>
+<span id="arc-projects-directory-arcprojectsproject"></span>
+<span id="direct-filesystem-access-within-sessions"></span>
+<span id="creating-a-project-allocation"></span>
+<span id="create-the-allocation"></span>
+<span id="check-allocation-status"></span>
+<span id="delete-an-empty-allocation"></span>
+<span id="update-quota-on-an-existing-allocation"></span>
+<span id="working-with-large-datasets"></span>
+<span id="linking-and-shortcuts"></span>
+<span id="sshfs-remote-filesystem-access"></span>
+<span id="prerequisites"></span>
+<span id="local-computer-setup"></span>
+<span id="canfar-side-setup"></span>
+<span id="mounting-arc-storage"></span>
+<span id="basic-mount"></span>
+<span id="advanced-mount-options"></span>
+<span id="connection-configuration"></span>
+<span id="using-mounted-storage"></span>
+<span id="unmounting"></span>
+<span id="access-control-and-permissions"></span>
+<span id="understanding-arc-permissions"></span>
+<span id="permission-types"></span>
+<span id="managing-permissions"></span>
+<span id="setting-file-permissions"></span>
+<span id="group-management"></span>
+<span id="access-control-lists-acls"></span>
+<span id="optimization-and-best-practices"></span>
+<span id="workflow-integration"></span>
+<span id="local-development-with-canfar-data"></span>
+<span id="automated-backup-scripts"></span>
+<span id="troubleshooting"></span>
+<span id="common-issues-and-solutions"></span>
+<span id="sshfs-connection-problems"></span>
+<span id="permission-denied-errors"></span>
+<span id="storage-space-issues"></span>
+<span id="diagnostic-commands"></span>
+<span id="integration-examples"></span>
+<span id="ide-and-editor-integration"></span>
+<span id="vs-code-with-remote-filesystem"></span>
+<span id="jupyter-lab-with-sshfs"></span>
+<span id="automated-workflows"></span>
+<span id="git-repository-sync"></span>
+
 ## Construct a filesystem explicitly
 
 See [Find and open a Storage Identifier](../../client/data.md#find-and-open-a-storage-identifier)
@@ -16,6 +65,9 @@ for the construction examples and the complete contract, including the
 reserved `local` identifier, runtime credentials, saved Authentication Records,
 error behavior, and the fact that identifiers are explicit arguments rather
 than dynamic fsspec schemes.
+
+<span id="basic-operations"></span>
+<span id="local-filesystem-operations"></span>
 
 ## Read shape and backend capability
 
@@ -40,6 +92,10 @@ once, a single explicit transfer is often clearer:
 ```bash
 canfar data cp vault:/project/cube.fits local:/scratch/cube.fits
 ```
+
+<span id="performance-optimization"></span>
+<span id="sshfs-performance-tips"></span>
+<span id="performance-issues"></span>
 
 ## Ephemeral and persistent caches
 
@@ -88,6 +144,8 @@ Do not silently choose `/scratch`, stack cache layers, use a `memory://` cache
 location, or recommend `blockcache` for `vosfs` staged file objects. These
 choices hide lifetime or capability decisions and can turn every block into a
 whole-object transfer.
+
+<span id="user-and-group-information"></span>
 
 ## Scientific Python recipes
 

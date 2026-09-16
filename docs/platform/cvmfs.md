@@ -10,6 +10,15 @@ CVMFS is for shared software and reference data. Keep notebooks, source code,
 intermediate files, and research products in writable [Science Platform
 storage](storage/index.md), not under `/cvmfs`.
 
+<span id="why-use-cvmfs"></span>
+<span id="pros-and-trade-offs-user-perspective"></span>
+<span id="advanced-cvmfs-containers-hybrid-model"></span>
+<span id="platform-evolution"></span>
+<span id="pointers-for-advanced-readers"></span>
+<span id="accessing-the-software"></span>
+<span id="example-before-vs-after-cvmfs"></span>
+<span id="learning-more"></span>
+
 ## Check the repository
 
 If your Session includes the Alliance software tree, the common path is:

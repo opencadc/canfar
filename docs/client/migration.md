@@ -1,3 +1,7 @@
+<span id="skaha-canfar"></span>
+<span id="summary-of-changes"></span>
+<span id="code-examples"></span>
+
 # Upgrade the CANFAR client
 
 ## Upgrade from v1.4.1
@@ -10,6 +14,8 @@ help for each command you automate. The development checkout still reports
 
 See [What's new](updates.md) for new features and the distinction between main
 and this branch. Existing scripts need the following changes.
+
+<span id="documentation-and-links"></span>
 
 ### Update command lines
 
@@ -94,6 +100,8 @@ Default `arc` and `vault` storage uses CADC credentials independently of your
 compute selection. Log in to CADC for those services even if your Session
 uses an SRCNet server.
 
+<span id="notes-on-protocol-stability"></span>
+
 ## Migrate from the older skaha package
 
 The supported package is `canfar`, published from
@@ -125,6 +133,8 @@ with Session() as session:
 Omitting `kind` requests a headless Session. Headless Sessions accept `cmd`,
 `args`, and `env`; interactive kinds do not accept those command fields.
 
+<span id="environment-variables"></span>
+
 ### Rename runtime environment variables
 
 Replace the old `SKAHA_` prefix in shell profiles, notebooks, and job scripts.
@@ -143,6 +153,8 @@ authentication takes precedence over saved credentials for that client;
 when both are supplied, a token takes precedence over a certificate.
 `CANFAR_LOGLEVEL` separately controls the default CLI logging level. See
 [HTTPClient](client.md) and [Logging](../cli/logging.md) for details.
+
+<span id="configuration"></span>
 
 ## Recover a legacy configuration
 

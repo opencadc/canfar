@@ -1,3 +1,11 @@
+<span id="canfar-platform-concepts"></span>
+<span id="canfar-science-platform-overview"></span>
+<span id="platform-design-philosophy"></span>
+<span id="platform-architecture"></span>
+<span id="key-architectural-principles"></span>
+<span id="platform-integration"></span>
+<span id="understanding-platform-connections"></span>
+
 # Platform concepts
 
 CANFAR separates authenticated compute from the storage that holds research
@@ -40,6 +48,9 @@ The Python authentication and platform modules provide noninteractive
 operations for scripts. See the [CLI reference](../cli/cli-help.md) and the
 [Python client guide](../client/get-started.md).
 
+<span id="session-fundamentals"></span>
+<span id="session-types-interfaces"></span>
+
 ## Sessions
 
 A **Session** is a compute environment for one user on one Science Platform
@@ -53,6 +64,13 @@ it is not an application log or a guarantee of a queue position. Use
 `canfar events`, `canfar info`, and `canfar ps --all` to inspect it. See
 [Sessions](sessions/index.md) and [Batch processing](sessions/batch.md).
 
+<span id="container-environments"></span>
+<span id="container-fundamentals"></span>
+<span id="traditional-vs-container-workflows"></span>
+<span id="popular-canfar-containers"></span>
+<span id="container-lifecycle-performance"></span>
+<span id="container-registry-management"></span>
+
 ## Container Images
 
 A **Container Image** is a reusable software environment. The image determines
@@ -65,6 +83,14 @@ project repository. Treat changes made inside a running container as temporary
 unless they are written to persistent storage or rebuilt into an image.
 
 See [Containers](containers/index.md) and [Building Containers](containers/build.md).
+
+<span id="storage-systems-data-management"></span>
+<span id="data-persistence-fundamentals"></span>
+<span id="arc-storage-arc-active-research-storage"></span>
+<span id="vault-vospace-vosuserproject-long-term-object-storage"></span>
+<span id="scratch-storage-scratch-high-performance-temporary"></span>
+<span id="storage-strategy-best-practices"></span>
+<span id="storage-quotas-management"></span>
 
 ## Storage
 
@@ -88,6 +114,11 @@ Use the mounted `/arc` path for data already there, stage remote data once when
 a tool needs a local path, and write durable results outside `/scratch`. See
 [Storage](storage/index.md).
 
+<span id="core-benefits"></span>
+<span id="sessions-computing-resources"></span>
+<span id="resource-selection-guidelines"></span>
+<span id="programmatic-platform-access"></span>
+
 ## Resource allocation modes
 
 CPU, memory, and GPU requests are inputs to platform admission. Omit CPU and
@@ -98,6 +129,12 @@ do not promise an ordering.
 
 Use `canfar stats` as a Science Platform Server-level capacity signal, not as a per-Session
 explanation. For one workload, inspect its events and status.
+
+<span id="storage-integration-automation"></span>
+<span id="browser-based-access-automation"></span>
+<span id="web-based-computing"></span>
+<span id="key-api-services"></span>
+<span id="automation-examples"></span>
 
 ## Scientific workflow
 
@@ -121,6 +158,12 @@ flowchart LR
 For reproducible batch workflows, use `headless` plus the [distributed
 helpers](../client/helpers.md). For visual analysis, choose Notebook,
 Desktop, CARTA, or Firefly as appropriate.
+
+<span id="system-components"></span>
+<span id="architecture-components"></span>
+
+<span id="recommended-learning-path"></span>
+<span id="advanced-platform-usage"></span>
 
 ## Related concepts
 

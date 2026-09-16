@@ -1,8 +1,16 @@
+<span id="platform-documentation"></span>
+
 # CANFAR Science Platform
 
 CANFAR provides authenticated compute and storage for astronomical research.
 Launch a Session from a Container Image, work with mounted project storage or
 configured VOSpace Services, and preserve results outside temporary compute.
+
+<span id="quick-access"></span>
+<span id="getting-started-resources"></span>
+
+<span id="core-platform-guides"></span>
+<span id="advanced-topics"></span>
 
 ## Choose a starting point
 
@@ -31,6 +39,12 @@ flowchart LR
 Use the [Python client](../client/get-started.md) or [CLI](../cli/cli-help.md)
 when the workflow should be repeatable from a script. Use the [Demos](../demos/srcnet-workshop.md)
 for a guided command-line exercise.
+
+<span id="support-community"></span>
+
+<span id="getting-help"></span>
+<span id="external-resources"></span>
+<span id="canfar-ecosystem"></span>
 
 ## Community and publication
 

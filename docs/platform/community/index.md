@@ -1,3 +1,5 @@
+<span id="canfar-community-resources"></span>
+
 # Community workflows
 
 These pages collect domain-specific workflows that build on the general

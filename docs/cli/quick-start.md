@@ -3,6 +3,9 @@
 This walkthrough logs in, launches a Session, checks it, opens it, and removes
 it. Replace `SESSION_ID` with the ID printed by `canfar create` or `canfar ps`.
 
+<span id="1-install"></span>
+<span id="2-log-in"></span>
+
 ## Install and log in
 
 [Install the client](../client/get-started.md#install) first. These examples describe the unreleased
@@ -28,6 +31,8 @@ canfar server ls
 
 For the OIDC Device Authorization steps, see [Authentication and Servers](authentication-contexts.md).
 
+<span id="3-work-with-data"></span>
+
 ## Optional data check
 
 Use a configured Storage Identifier and an absolute path:
@@ -38,6 +43,12 @@ canfar data ls -lh arc:/home/user
 
 See [Data commands](data.md) for copy, recursive-copy, and cross-source
 workflows.
+
+<span id="4-create-a-notebook"></span>
+<span id="3-create-a-notebook"></span>
+
+<span id="fixed-resources"></span>
+<span id="headless-job"></span>
 
 ## Create a notebook Session
 
@@ -58,6 +69,13 @@ command. Every token after `--` belongs to that command:
 ```bash
 canfar create headless skaha/terminal:1.1.2 -- python /arc/projects/demo/run.py
 ```
+
+<span id="5-check-status"></span>
+<span id="6-open-the-notebook"></span>
+<span id="7-inspect-startup-events"></span>
+<span id="4-check-status"></span>
+<span id="5-open-the-notebook"></span>
+<span id="6-inspect-startup-events"></span>
 
 ## Check and open the Session
 
@@ -84,6 +102,9 @@ Inspect startup events or logs when a Session is not ready:
 canfar events SESSION_ID
 canfar logs SESSION_ID
 ```
+
+<span id="8-clean-up"></span>
+<span id="7-clean-up"></span>
 
 ## Remove the Session
 

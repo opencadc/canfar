@@ -1,9 +1,20 @@
+<span id="user-management-permissions"></span>
+<span id="api-integration-examples"></span>
+
 # Accounts, groups, and permissions
 
 Your Canadian Astronomy Data Centre (CADC) account identifies you to CANFAR.
 A group lets a project share access with several accounts. Signing in confirms
 who you are; access to a directory or private image depends on the permissions
 its owner grants you.
+
+<span id="group-management-collaboration"></span>
+<span id="group-based-resource-sharing"></span>
+<span id="group-administration-interface"></span>
+<span id="creating-research-groups"></span>
+<span id="group-resource-access"></span>
+<span id="project-organization"></span>
+<span id="enterprise-integration"></span>
 
 ## Create a project group
 
@@ -17,6 +28,11 @@ ask one of its administrators to add you instead.
 Creating a group does not allocate project storage, set a quota, or create a
 container registry project. Contact [CANFAR support](support/index.md) to
 request a shared storage allocation and provide your group name.
+
+<span id="group-role-hierarchy"></span>
+
+<span id="multi-institutional-collaboration"></span>
+<span id="multi-institutional-collaboration_1"></span>
 
 ## Add members and administrators
 
@@ -32,6 +48,17 @@ You must be an administrator of the group to change its membership.
 
 Administrator status allows group management. It does not grant authority to
 allocate platform resources or edit data owned by someone else.
+
+<span id="canfar-permission-architecture"></span>
+<span id="permission-model-benefits"></span>
+<span id="advanced-permission-management"></span>
+
+<span id="access-control-lists-acls"></span>
+<span id="acl-fundamentals"></span>
+<span id="traditional-posix-vs-acl-permissions"></span>
+<span id="acl-vs-posix-comparison"></span>
+<span id="viewing-acl-permissions"></span>
+<span id="setting-and-managing-acls"></span>
 
 ## Grant the group access to data
 
@@ -52,6 +79,11 @@ access separately from adding group members.
 If you cannot edit permissions, ask the directory owner or CANFAR support.
 Use the path supplied for your allocation rather than assuming it matches the
 group name.
+
+<span id="authentication-authorisation-layers"></span>
+<span id="api-authentication-programmatic-access"></span>
+<span id="authentication-framework"></span>
+<span id="authentication-methods"></span>
 
 ## Identity and server access
 
@@ -90,6 +122,13 @@ Use the configured Authentication Record or an explicitly supplied runtime
 credential as described in the [HTTP client guide](../client/client.md) and
 [storage guide](storage/index.md).
 
+<span id="registry-overview"></span>
+
+<span id="container-registry-access-harbor"></span>
+<span id="harbor-permission-levels"></span>
+<span id="harbor-access-management"></span>
+<span id="working-with-harbor"></span>
+
 ## Container images
 
 Image visibility and push rights are controlled by the registry project. Find
@@ -119,6 +158,8 @@ canfar events SESSION_ID
 
 See [batch troubleshooting](sessions/batch.md#monitor-and-troubleshoot) for
 `Pending` and image-pull checks.
+
+<span id="common-issues-troubleshooting"></span>
 
 ## When access is denied
 

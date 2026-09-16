@@ -10,6 +10,13 @@ These commands were added after v1.4.1. Check the
 examples. For transfers without installing Python, use
 [Storage Management in your browser](../platform/storage/transfers.md#transfer-files-in-your-browser).
 
+<span id="install-and-authenticate"></span>
+<span id="address-mapped-sources"></span>
+<span id="move-data-between-sources"></span>
+
+<span id="cache-data-locally"></span>
+<span id="cache-byte-ranges"></span>
+
 ## Sources and operands
 
 Run `canfar login` for the identity provider (IDP) that owns the remote service.
@@ -56,6 +63,13 @@ commands are:
 Recursive removal is disabled by CANFAR policy, so `data rm` has no `-R` or
 `-r` option. `data mv` does not implement a cross-source move; copy between
 sources and verify the destination before removing the source separately.
+
+<span id="upstream-releases"></span>
+
+<span id="copy-files-and-directories"></span>
+<span id="directory-listings"></span>
+<span id="files-and-byte-ranges"></span>
+<span id="output-and-accepted-omissions"></span>
 
 ## Examples
 

@@ -1,3 +1,9 @@
+<span id="canfar-releases_1"></span>
+<span id="who-is-this-page-for"></span>
+<span id="release-naming"></span>
+<span id="roadmap"></span>
+<span id="development-contributions"></span>
+
 # CANFAR releases
 
 These pages summarise user-visible changes to the CANFAR Science Platform and

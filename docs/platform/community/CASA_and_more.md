@@ -1,9 +1,21 @@
+<span id="casa-containers-and-adjacent-software"></span>
+
 # CASA and adjacent astronomy software
 
 CASA and related radio-astronomy tools are supplied through selected Container
 Images. Availability and version-specific behavior belong to the image you
 choose; check `canfar image ls` and the image documentation before writing a
 workflow that depends on a package.
+
+<span id="casa-add-on-tools-and-packages"></span>
+<span id="astroquery-astropy"></span>
+<span id="analysis-utilities"></span>
+<span id="firefox"></span>
+<span id="uvmultifit"></span>
+<span id="known-issues"></span>
+<span id="casa-adjacent-containers"></span>
+<span id="galario"></span>
+<span id="starlink"></span>
 
 ## Choose and inspect an image
 

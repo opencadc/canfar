@@ -3,6 +3,12 @@
 Copy files between your computer and CANFAR storage in your browser, or use
 `canfar data` for repeatable command-line transfers.
 
+<span id="upload-methods"></span>
+<span id="small-files-1gb-web-interface"></span>
+<span id="download-methods"></span>
+<span id="web-interface"></span>
+<span id="jupyter-notebook-upload"></span>
+
 ## Transfer files in your browser
 
 Sign in to [Storage Management](https://www.canfar.net/storage/arc/list) with
@@ -36,6 +42,41 @@ administrator for access; see [Permissions](../permissions.md).
 
 Links to private data still require authentication. For scripted transfers,
 use the authenticated CLI workflow below.
+
+<span id="transfer-overview"></span>
+<span id="transfer-types-by-method"></span>
+<span id="storage-system-access"></span>
+<span id="arc-projects-and-home"></span>
+<span id="vault-vospace"></span>
+<span id="medium-files-1-100gb-command-line"></span>
+<span id="using-direct-urls-arc-only"></span>
+<span id="using-vospace-cli"></span>
+<span id="large-files-100gb-advanced-methods"></span>
+<span id="sshfs-mount-rsync"></span>
+<span id="vospace-bulk-transfer"></span>
+<span id="from-arc-storage"></span>
+<span id="command-line"></span>
+<span id="from-vault-vospace"></span>
+<span id="command-line_1"></span>
+<span id="python-api"></span>
+<span id="inter-storage-transfers"></span>
+<span id="moving-data-between-storage-systems"></span>
+<span id="arc-to-vault-archival"></span>
+<span id="vault-to-arc-project-setup"></span>
+<span id="automated-workflow-example"></span>
+<span id="transfer-speed-optimization"></span>
+<span id="for-many-small-files"></span>
+<span id="optimal-transfer-times"></span>
+<span id="connection-optimization"></span>
+<span id="network-timeouts"></span>
+<span id="robust-transfer-script"></span>
+<span id="transfer-checklists"></span>
+<span id="pre-transfer-checklist"></span>
+<span id="post-transfer-verification"></span>
+<span id="transfer-planning-template"></span>
+<span id="integration-examples"></span>
+<span id="batch-job-data-staging"></span>
+<span id="external-data-import"></span>
 
 ## Transfer files from a terminal
 
@@ -118,6 +159,27 @@ canfar data rm vault:/project/results/old.fits
 canfar data rmdir vault:/project/results/empty-directory
 ```
 
+<span id="scratch-to-arc-within-sessions"></span>
+
+## Download an archive URL list
+
+If an astronomy archive gives you a text file with one download URL per line,
+you can use `wget` in a Session terminal where it is installed. Replace
+`PROJECT` and the URL-list filename, then save the inputs on persistent storage:
+
+```bash
+mkdir -p /arc/projects/PROJECT/inputs
+wget --input-file=download-urls.txt --directory-prefix=/arc/projects/PROJECT/inputs
+```
+
+For protected data, use the archive's current login instructions or its supplied
+download script. An archive may require its own account; a CANFAR login does
+not automatically authenticate every archive. Check the downloaded file count
+and the archive's checksums before processing.
+
+`canfar data` copies files between configured storage locations. Use the
+archive's download tools for arbitrary HTTP URL lists.
+
 ## Session workflow
 
 Inside a Science Platform Session, prefer a mounted `/arc` path for data that is
@@ -134,6 +196,12 @@ canfar data cp local:/scratch/result.fits arc:/projects/PROJECT/result.fits
 `/scratch` is Session-local and is deleted when the Session ends. It is a good
 staging location, not a backup. For repeated Python reads, select an explicit
 fsspec whole-file cache under `/scratch`; see [Filesystem and Python tools](filesystem.md).
+
+<span id="performance-optimization"></span>
+<span id="network-performance-tips"></span>
+<span id="error-handling-and-recovery"></span>
+<span id="common-transfer-issues"></span>
+<span id="authentication-errors"></span>
 
 ## Transfer failures
 

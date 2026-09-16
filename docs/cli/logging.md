@@ -4,6 +4,10 @@ The CLI configures Python standard-library logging once at the root entry
 point. Human logs use Rich on stderr. File logging is opt-in and writes a
 rotating JSON Lines file.
 
+<span id="cli-controls-and-precedence"></span>
+
+<span id="python-applications"></span>
+
 ## Controls and precedence
 
 Root controls must precede the command:
@@ -32,6 +36,8 @@ The machine-output option remains owned by the leaf command:
 canfar --log-level debug ps -o json
 ```
 
+<span id="stdout-and-stderr"></span>
+
 ## Streams and machine output
 
 Human command results go to stdout. Logs, warnings, and errors go to stderr.
@@ -51,6 +57,9 @@ payload on stdout.
 At `debug`, Science Platform HTTP hooks log the request method and URL and the
 response status and body. These records follow the same stderr/file routing;
 do not enable debug logging if response bodies must remain private.
+
+<span id="rotating-json-lines-file-sink"></span>
+<span id="json-lines-schema"></span>
 
 ## JSON Lines file sink
 
@@ -73,6 +82,10 @@ files. Each event contains:
 One JSON object occupies one physical line. Authentication Record secrets are
 masked by their secret types; do not treat log output as a place to expose
 credential material.
+
+<span id="http-request-and-response-debug"></span>
+<span id="stable-logging-diagnostics"></span>
+<span id="domain-debug-flags"></span>
 
 ## Setup diagnostics
 

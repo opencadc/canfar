@@ -5,6 +5,9 @@ astronomical images and data cubes. Use it for interactive visualisation and
 region or spectral exploration; use a [headless Session](batch.md) for a
 repeatable reduction.
 
+<span id="step-4-launch-session"></span>
+<span id="for-remote-access"></span>
+
 ## Launch CARTA
 
 1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
@@ -43,6 +46,11 @@ canfar open SESSION_ID
 For a Session that remains `Pending`, inspect [events and resource
 troubleshooting](batch.md#monitor-and-troubleshoot).
 
+<span id="data-loading"></span>
+<span id="supported-file-paths"></span>
+<span id="line-profiles"></span>
+<span id="session-wont-load-data"></span>
+
 ## Open data
 
 CARTA can open files that the Session can read. Common workflows use FITS
@@ -65,6 +73,42 @@ Use the Storage Identifier and path supplied by your project. `/scratch` is
 temporary; copy any regions, tables, or derived products that must survive to
 `/arc` or a persistent VOSpace Service. See [Data transfers](../storage/transfers.md).
 
+<span id="overview"></span>
+<span id="key-features"></span>
+<span id="data-format-support"></span>
+<span id="creating-a-carta-session"></span>
+<span id="step-1-select-session-type"></span>
+<span id="step-2-choose-container-version"></span>
+<span id="available-versions"></span>
+<span id="step-3-configure-session"></span>
+<span id="session-name"></span>
+<span id="resource-allocation"></span>
+<span id="using-carta"></span>
+<span id="first-steps"></span>
+<span id="from-canfar-storage"></span>
+<span id="interface-overview"></span>
+<span id="main-components"></span>
+<span id="essential-controls"></span>
+<span id="analysis-features"></span>
+<span id="spectral-analysis"></span>
+<span id="moment-maps"></span>
+<span id="region-analysis"></span>
+<span id="creating-regions"></span>
+<span id="statistical-analysis"></span>
+<span id="animation-and-navigation"></span>
+<span id="data-cube-navigation"></span>
+<span id="multi-panel-views"></span>
+<span id="optimisation-tips"></span>
+<span id="collaboration-features"></span>
+<span id="real-time-sharing"></span>
+<span id="best-practices-for-collaboration"></span>
+<span id="advanced-features"></span>
+<span id="scripting-and-automation"></span>
+<span id="export-capabilities"></span>
+<span id="integration-with-other-tools"></span>
+<span id="custom-colour-maps"></span>
+<span id="display-problems"></span>
+
 ## Interactive analysis
 
 The exact controls depend on the CARTA version, but typical workflows are:
@@ -77,12 +121,21 @@ The exact controls depend on the CARTA version, but typical workflows are:
 Treat exported files as products of the analysis and record the input path,
 image version, and CARTA version with them.
 
+<span id="performance-optimisation"></span>
+<span id="large-dataset-handling"></span>
+<span id="memory-management"></span>
+<span id="network-performance"></span>
+<span id="slow-performance"></span>
+
 ## Performance
 
 Large cubes can require substantial memory, storage, and network traffic. Start
 with a representative sub-cube, close unused views, and stage a remote object
 to `/scratch` when repeated reads are required. Request only measured CPU or
 memory needs; fixed oversized requests may wait for matching capacity.
+
+<span id="common-issues"></span>
+<span id="connection-issues"></span>
 
 ## Troubleshooting
 

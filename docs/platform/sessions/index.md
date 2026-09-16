@@ -1,3 +1,5 @@
+<span id="interactive-sessions"></span>
+
 # Sessions
 
 A Session is a user-owned compute environment launched from a Container Image
@@ -17,6 +19,22 @@ See the individual guides for [Notebook](notebook.md), [Desktop](desktop.md),
 [CARTA](carta.md), [Firefly](firefly.md), [Contributed](contributed.md), and
 [Batch](batch.md) workflows.
 
+<span id="session-fundamentals"></span>
+<span id="what-are-interactive-sessions"></span>
+<span id="key-benefits"></span>
+<span id="session-type-comparison"></span>
+<span id="session-management"></span>
+<span id="creating-sessions"></span>
+<span id="flexible-allocation-default"></span>
+<span id="fixed-allocation"></span>
+<span id="integration-with-platform-services"></span>
+<span id="container-environments"></span>
+<span id="cvmfs-software-repositories"></span>
+<span id="authentication-permissions"></span>
+<span id="choosing-your-session-type"></span>
+<span id="for-astronomy-specialisations"></span>
+<span id="for-production-work"></span>
+
 ## Start a Session
 
 You can launch a Session from the [Science Portal](https://www.canfar.net/),
@@ -34,6 +52,8 @@ Use `canfar server ls` and `canfar server use NAME` when more than one Science
 Platform Server is available for the active Identity Provider. The image list
 is the source of truth for image names and supported kinds; examples are
 illustrative tags, not a guarantee that every deployment publishes them.
+
+<span id="session-lifecycle"></span>
 
 ## Lifecycle and status
 
@@ -57,6 +77,9 @@ Session. Delete a Session when its work is complete:
 canfar delete SESSION_ID
 ```
 
+<span id="storage-integration"></span>
+<span id="for-data-analysis"></span>
+
 ## Storage boundary
 
 Sessions are temporary compute environments. A Session can use mounted
@@ -70,12 +93,17 @@ explicit Python [storage helper](../storage/filesystem.md). Do not assume that
 opening a remote object provides server-side random access; stage once when a
 path-oriented tool needs a local filename.
 
+<span id="resource-allocation"></span>
+<span id="resource-selection-guide"></span>
+
 ## Resource requests
 
 Omit `--cpu` and `--memory` for the platform's flexible request, or set values
 based on measured workload needs. Fixed requests can wait longer when matching
 capacity is unavailable. For headless workloads, see the [batch queue and
 troubleshooting guide](batch.md).
+
+<span id="api-access-to-sessions"></span>
 
 ## Session APIs
 

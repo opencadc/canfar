@@ -1,8 +1,12 @@
+<span id="images-api"></span>
+
 # Container Images API
 
 `Images` lists the Container Images advertised by a CANFAR Science Platform
 Server. It inherits `HTTPClient`, so the same saved or runtime credential
 selection applies.
+
+<span id="getting-image-information"></span>
 
 ## Image identifiers
 

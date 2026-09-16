@@ -1,3 +1,5 @@
+<span id="best-practices-for-astronomy-pipelines-on-canfar-science-platform"></span>
+
 # Best practices for research workflows
 
 Keep the science code independent from the way it is launched. Develop in an
@@ -27,6 +29,10 @@ args = parser.parse_args()
 # Load args.input, perform the analysis, and write args.output.
 ```
 
+<span id="memory-and-io-efficiency"></span>
+
+<span id="scaling-out-vs-scaling-up"></span>
+
 ## Request measured resources
 
 Start with the flexible request while testing. Once a workload is understood,
@@ -46,6 +52,10 @@ canfar create \
 The platform does not promise that many small requests always outrun one large
 request. Measure the workload and account for queue time, startup, data
 movement, and downstream coordination.
+
+<span id="writing-scalable-and-batch-friendly-code"></span>
+
+<span id="headless-processing-vs-gui-tools"></span>
 
 ## Separate interactive and batch work
 
@@ -68,6 +78,10 @@ See [Storage](storage/index.md), [Data transfers](storage/transfers.md), and
 [Filesystem and Python tools](storage/filesystem.md) for the transfer and cache
 boundary.
 
+<span id="managing-dependencies-and-python-environments"></span>
+<span id="container-packaging"></span>
+<span id="keep-containers-lean"></span>
+
 ## Keep environments reproducible
 
 Declare Python dependencies in the Container Image or a versioned environment
@@ -85,6 +99,8 @@ When building a custom image:
 - run the command as a non-root user where the base image supports it.
 
 See [Building Containers](containers/build.md) for the image workflow.
+
+<span id="saving-results"></span>
 
 ## Checkpoint long workflows
 

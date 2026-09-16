@@ -79,6 +79,8 @@ Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant e
 ## Documentation and Presentations
 
 - Write for astronomers, advanced programmers, and coding agents. Address readers as "you", explain acronyms on first use, use descriptive headings, and keep paragraphs focused.
+- Preserve the established Home / Platform / Client / Contribute / About navigation, Platform > Releases, and Client > What's New. Keep existing page paths and heading anchors working when refining docs.
+- Use Material tabs for equivalent sync/async tasks, language-tagged code fences with selective highlighting, and focused admonitions. Keep prerequisites and data-loss warnings outside collapsed content.
 - Keep browser workflows complete and client installation optional for them. Compare user-facing feature coverage with both main and the previous published client release when revising the corpus.
 - Mark unreleased interfaces explicitly and verify installed capabilities as well as version strings. Keep platform release history separate from client upgrade guidance.
 - Update source docstrings as well as Markdown when correcting generated API reference content. Keep the CANFAR operations skill aligned with supported commands and Python APIs.

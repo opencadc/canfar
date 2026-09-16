@@ -1,9 +1,21 @@
+<span id="containers"></span>
+<span id="technical-details"></span>
+
 # Container Images
 
 A Container Image bundles the operating-system libraries, astronomy software,
 and application entrypoint used by a Session. The image is the software
 environment; the Session request supplies the Session Kind, resources, command,
 and mounted storage.
+
+<span id="session-type-integration"></span>
+<span id="notebook-sessions"></span>
+<span id="batchheadless-sessions"></span>
+<span id="contributed-application-sessions"></span>
+<span id="carta-radio-astronomy-visualisation"></span>
+<span id="desktop-ubuntu-environment"></span>
+<span id="notebook-jupyter-environment"></span>
+<span id="version-management"></span>
 
 ## Choose an image
 
@@ -19,6 +31,21 @@ The image list and Science Portal are authoritative for available names,
 versions, and supported kinds. Examples in these docs are illustrative and may
 not exist in every deployment. A private image also requires access to its
 Container Registry project.
+
+<span id="what-are-containers"></span>
+<span id="why-containers-matter-for-astronomy"></span>
+<span id="traditional-software-installation"></span>
+<span id="canfar-containers"></span>
+<span id="container-architecture-on-canfar"></span>
+<span id="runtime"></span>
+<span id="how-containers-relate-to-sessions"></span>
+<span id="desktop-container"></span>
+<span id="desktop-app-containers"></span>
+<span id="canfar-supported-containers"></span>
+<span id="visualisation-containers"></span>
+<span id="development-and-desktop-containers"></span>
+<span id="container-selection-guide"></span>
+<span id="container-updates-and-maintenance"></span>
 
 ## Build time and run time
 
@@ -40,6 +67,12 @@ The base image, packages, and entrypoint must match the Session Kind. A
 Notebook or application image must provide the application expected by its
 Session launcher.
 
+<span id="storage-mounting-and-integration"></span>
+<span id="canfar-storage-integration"></span>
+<span id="storage-hierarchy"></span>
+<span id="storage-best-practices"></span>
+<span id="firefly-catalogue-data-analysis"></span>
+
 ## Runtime storage
 
 When the deployment provides them, Sessions mount persistent `/arc` paths and
@@ -54,6 +87,8 @@ ephemeral `/scratch` storage. The image does not own those data lifetimes:
 Use `/scratch` for fast temporary work and copy results to `/arc` or a
 persistent VOSpace Service before stopping the Session. See [Storage](../storage/index.md).
 
+<span id="user-context-and-permissions"></span>
+
 ## Resource and security considerations
 
 - Keep credentials out of Dockerfiles, image layers, and command arguments.
@@ -61,6 +96,9 @@ persistent VOSpace Service before stopping the Session. See [Storage](../storage
 - Keep images small so pulls and startup do not dominate short workloads.
 - Request only the CPU, memory, and GPU that measurements support.
 - Test the exact image with a small input before launching replicas.
+
+<span id="build-time-vs-runtime"></span>
+<span id="build-time"></span>
 
 ## Build and publish
 

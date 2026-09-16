@@ -1,3 +1,5 @@
+<span id="python-equivalents"></span>
+
 # Authentication and Servers
 
 CANFAR keeps identity and routing separate:
@@ -11,6 +13,8 @@ CANFAR keeps identity and routing separate:
 The active Authentication Record and Server Selection are saved together in
 the local Configuration. Existing Sessions remain on the Science Platform
 Server where they were launched.
+
+<span id="log-in"></span>
 
 ## Login
 
@@ -70,6 +74,8 @@ canfar --log-level debug login cadc --force
 
 See [Logging](logging.md) for precedence and stream routing.
 
+<span id="machine-output-rules"></span>
+
 ## Inspect Authentication
 
 ```bash
@@ -91,6 +97,10 @@ The machine payload is an Authentication object or list of Authentication
 objects. It contains the canonical IDP key, display name, Authentication Mode,
 expiry, active state, and associated Server Name; it does not contain raw
 credential material.
+
+<span id="remove-saved-auth-state"></span>
+
+<span id="switch-idp"></span>
 
 ## Change or remove state
 
@@ -123,6 +133,8 @@ canfar auth purge --force
 The purge restores built-in defaults and preserves unrelated registry and
 console settings.
 
+<span id="manage-servers"></span>
+
 ## Server Selection
 
 ```bash
@@ -144,6 +156,8 @@ canfar server use ivo://cadc.nrc.ca/skaha
 
 The persisted `active.server` value is the Server Name. The IVOA URI is
 discovery metadata and can still be used as a selector.
+
+<span id="configuration"></span>
 
 ## Configuration shape
 

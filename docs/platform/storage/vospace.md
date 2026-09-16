@@ -1,3 +1,5 @@
+<span id="vospace"></span>
+
 # VOSpace Services
 
 VOSpace lets you store and transfer astronomical files remotely. Its
@@ -11,6 +13,52 @@ like a mounted POSIX filesystem. Use a mounted `/arc` path inside a Session when
 the data is already there; use a VOSpace Service for authenticated remote reads,
 writes, sharing, and transfer between machines.
 
+<span id="vospace-overview"></span>
+<span id="what-is-vospace"></span>
+<span id="vault-vospace-vs-arc-vospace-vs-scratch"></span>
+<span id="web-interface"></span>
+<span id="accessing-vospace"></span>
+<span id="web-interface-features"></span>
+<span id="installation"></span>
+<span id="basic-operations"></span>
+<span id="directory-operations"></span>
+<span id="advanced-operations"></span>
+<span id="bulk-operations"></span>
+<span id="data-cutouts-and-processing"></span>
+<span id="basic-setup"></span>
+<span id="batch-processing"></span>
+<span id="metadata-management"></span>
+<span id="progress-monitoring"></span>
+<span id="sharing-and-collaboration"></span>
+<span id="setting-up-sharing"></span>
+<span id="public-urls"></span>
+<span id="collaboration-workflows"></span>
+<span id="multi-institutional-project"></span>
+<span id="data-publication"></span>
+<span id="integration-with-astronomical-tools"></span>
+<span id="integration-with-archives"></span>
+<span id="caching-and-local-mirrors"></span>
+<span id="monitoring-and-logging"></span>
+<span id="troubleshooting"></span>
+<span id="common-issues"></span>
+<span id="debugging-and-diagnostics"></span>
+<span id="related-storage-docs"></span>
+<span id="bulk-operations_1"></span>
+<span id="vault-vospace-api"></span>
+<span id="arc-vospace-api-outside-canfar"></span>
+<span id="basic-usage"></span>
+<span id="advanced-operations_1"></span>
+<span id="automation-workflows"></span>
+<span id="batch-processing-script"></span>
+<span id="monitoring-and-logging_1"></span>
+<span id="error-handling"></span>
+<span id="caching-strategy"></span>
+<span id="integration-examples"></span>
+<span id="with-astropy"></span>
+<span id="with-batch-jobs"></span>
+<span id="troubleshooting_1"></span>
+<span id="common-issues_1"></span>
+
 ## Choose an access path
 
 | Need | Recommended path |
@@ -22,6 +70,9 @@ writes, sharing, and transfer between machines.
 | Use a remote object from Python | `filesystem(identifier)` from `canfar.storage` |
 | Feed a path-only program such as CASA | Stage with `get_file()` or `canfar data cp` to `/scratch` |
 | Reuse an input during one Session | An explicit `SimpleCacheFileSystem` under `/scratch` |
+
+<span id="command-line-interface"></span>
+<span id="command-line-sharing"></span>
 
 ## CLI access
 
@@ -38,6 +89,10 @@ The `vault:` and `arc:` names are examples, not universal protocol names. Use
 the Storage Identifiers configured for the active installation. See [Data
 transfers](transfers.md) for copy, directory, removal, and troubleshooting
 guidance.
+
+<span id="python-api"></span>
+<span id="advanced-python-usage"></span>
+<span id="python-api_1"></span>
 
 ## Python access
 
@@ -61,6 +116,19 @@ normal fsspec filesystem. There is no public `storage.configure()`, dynamic
 registration. The private source factories used by `canfar data` are not part of
 the Python API.
 
+<span id="file-operations"></span>
+<span id="file-operations_1"></span>
+<span id="file-management"></span>
+<span id="file-operations_2"></span>
+<span id="fits-file-handling"></span>
+<span id="performance-and-optimization"></span>
+<span id="transfer-performance"></span>
+<span id="network-and-transfer-issues"></span>
+<span id="file-operations_3"></span>
+<span id="transfer-progress"></span>
+<span id="performance-optimization"></span>
+<span id="parallel-transfers"></span>
+
 ## Files, ranges, and staging
 
 `vosfs` exposes standard fsspec methods. Explicit `cat_file(path, start, end)`
@@ -81,6 +149,16 @@ Measured CADC behaviour is deployment-specific: Vault/minoc accepted validated
 ranges, while ARC/Cavern returned whole objects. A federated or custom Storage
 Identifier can differ. The stable contract is response-driven fallback, not a
 guarantee based on the identifier name.
+
+<span id="sharing-and-permissions"></span>
+<span id="authentication"></span>
+<span id="permission-management"></span>
+<span id="permission-levels"></span>
+<span id="owner-permissions"></span>
+<span id="group-permissions"></span>
+<span id="public-permissions"></span>
+<span id="authentication-problems"></span>
+<span id="permission-errors"></span>
 
 ## Lifetime and permissions
 

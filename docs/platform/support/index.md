@@ -1,3 +1,5 @@
+<span id="getting-help-and-support"></span>
+
 # Support
 
 Start with the guide for the component that failed, then contact the service
@@ -29,6 +31,10 @@ canfar config get active.server -o json
 Use the Identity Provider (IDP) and Server Name supplied by your platform operator.
 Do not paste certificates, tokens, or passwords into a support request.
 
+<span id="self-help-resources"></span>
+<span id="session-wont-start"></span>
+<span id="performance-feels-slow"></span>
+
 ### A Session is not ready
 
 `Pending` means the platform accepted the request but has not made the Session
@@ -45,6 +51,8 @@ canfar stats
 `canfar logs SESSION_ID` is useful after the container has started. A Pending
 Session may not have application logs yet. See [batch troubleshooting](../sessions/batch.md#monitor-and-troubleshoot).
 
+<span id="critical-data-issues"></span>
+
 ### A data operation fails
 
 Confirm the identifier and path, then check group membership with the project
@@ -59,12 +67,37 @@ canfar data stat IDENTIFIER:/path/to/file
 Use `/scratch` for temporary staged data and `/arc` or a persistent VOSpace
 Service for outputs that must survive a Session. See [data transfers](../storage/transfers.md).
 
+<span id="browser-quirks"></span>
+
 ### A browser Session does not open
 
 Confirm that the Session is ready with `canfar ps --all` and `canfar info
 SESSION_ID`. Then retry the link in a current browser or private window. If
 the Session is Running but the endpoint remains unreachable, report the
 Session ID, Server Name, timestamp, and browser error to support.
+
+<span id="quick-start-for-support"></span>
+<span id="new-to-canfar"></span>
+<span id="having-problems"></span>
+<span id="troubleshooting"></span>
+<span id="quick-checks"></span>
+<span id="frequent-issues"></span>
+<span id="cannot-access-files"></span>
+<span id="gather-information-before-asking-for-help"></span>
+<span id="contact-support"></span>
+<span id="when-to-reach-out"></span>
+<span id="what-to-include"></span>
+<span id="expected-response-times"></span>
+<span id="escalation"></span>
+<span id="discord"></span>
+<span id="before-filing"></span>
+<span id="what-maintainers-need"></span>
+<span id="screenshots"></span>
+<span id="additional-context"></span>
+<span id="emergency-contacts"></span>
+<span id="system-outages"></span>
+<span id="security-incidents"></span>
+<span id="contributing"></span>
 
 ## Contact CANFAR support
 
@@ -82,6 +115,10 @@ remains Pending after the platform's normal queue interval. Include:
 Send security vulnerabilities privately; see the [security policy](../../security.md).
 Do not include passwords, tokens, certificates, or private data in email or
 public issues.
+
+<span id="community-support"></span>
+<span id="github"></span>
+<span id="helpful-bug-reports"></span>
 
 ## Community and bug reports
 

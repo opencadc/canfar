@@ -4,6 +4,31 @@ A Notebook Session provides a browser-based Jupyter environment for interactive
 analysis. It is a good place to explore data, test a reduction, and prepare a
 command for a [headless Session](batch.md).
 
+<span id="overview"></span>
+<span id="creating-a-notebook-session"></span>
+<span id="step-1-access-session-creation"></span>
+<span id="step-2-choose-your-container"></span>
+<span id="available-containers"></span>
+<span id="step-3-configure-session-resources"></span>
+<span id="session-name"></span>
+<span id="memory-allocation"></span>
+<span id="cpu-cores"></span>
+<span id="step-4-launch-session"></span>
+<span id="using-jupyter-lab"></span>
+<span id="interface-overview"></span>
+<span id="starting-your-first-notebook"></span>
+<span id="persistent-storage-locations"></span>
+<span id="working-with-casa"></span>
+<span id="advanced-features"></span>
+<span id="terminal-access"></span>
+<span id="jupyter-extensions"></span>
+<span id="collaboration"></span>
+<span id="best-practices-for-collaboration"></span>
+<span id="sharing-notebooks"></span>
+<span id="performance-optimisation"></span>
+<span id="memory-management"></span>
+<span id="storage-performance"></span>
+
 ## Launch a Notebook
 
 1. Sign in to the [Science Portal](https://www.canfar.net/science-portal/).
@@ -68,6 +93,10 @@ If it remains `Pending`, inspect `canfar events SESSION_ID` and the
 that is not ready has no application logs yet; use `canfar logs` after it has
 started.
 
+<span id="file-management"></span>
+<span id="uploading-files"></span>
+<span id="efficient-data-loading"></span>
+
 ## Work with files
 
 Use the mounted paths supplied by your server:
@@ -86,6 +115,10 @@ helpers](../storage/filesystem.md).
 
 The Jupyter file browser and terminal operate inside the Session. Large local
 uploads are often more reliable when copied explicitly with `canfar data cp`.
+
+<span id="accessing-cvmfs-software"></span>
+<span id="python-package-management"></span>
+<span id="installing-additional-packages"></span>
 
 ## Use a specialised image
 
@@ -114,6 +147,12 @@ output_path = Path("/arc/projects/<project>/results/output.fits")
 Then submit the same command as a headless Session, following the
 [batch guide](batch.md). Record the image, resource request, Storage
 Identifiers, and code revision with the run.
+
+<span id="common-issues"></span>
+<span id="kernel-not-starting"></span>
+<span id="out-of-memory-errors"></span>
+<span id="slow-performance"></span>
+<span id="file-upload-issues"></span>
 
 ## Troubleshooting
 

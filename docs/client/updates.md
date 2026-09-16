@@ -1,3 +1,6 @@
+<span id="whats-new-in-canfar"></span>
+<span id="recent-updates"></span>
+
 # What's new in the client
 
 ## Unreleased: changes since v1.4.1
@@ -12,6 +15,8 @@ a released or development installation, and read the
 The branch still reports version `1.4.1` in its package metadata. Check command
 help and Python capabilities as well as the version. Platform releases such
 as [2026.2](../releases/2026-2.md) have separate numbering and deployment scope.
+
+<span id="improved-session-data-validation"></span>
 
 ## Copy and read research data
 
@@ -38,6 +43,8 @@ short-lived directory-listing caches, explicit whole-file caching, and staging
 to `/scratch`. Seeking within an open file does not guarantee a partial
 network transfer.
 
+<span id="enhanced-authentication-system"></span>
+
 ## Log in from Python and choose where to run
 
 `canfar.login()` and `canfar.alogin()` now support OpenID Connect (OIDC) device
@@ -57,6 +64,8 @@ Runtime tokens and certificates passed to an [HTTP client](client.md) take
 precedence over saved credentials, including saved-credential refresh and
 expiry hooks, for that client only.
 
+<span id="logs-to-stdout"></span>
+
 ## Update scripts and configuration
 
 - Use `-o json` or `-o yaml` on supported commands in place of `--json` and
@@ -71,6 +80,12 @@ expiry hooks, for that client only.
   logging and `canfar.configure_logging()`. See [Logging](../cli/logging.md).
 - Set `console.banner` to control the active-server banner in human output.
   Supported machine-output commands omit it automatically.
+
+<span id="asynchronous-sessions"></span>
+<span id="destroy-sessions"></span>
+
+<span id="firefly-support"></span>
+<span id="private-images"></span>
 
 ## Create and inspect Sessions reliably
 
@@ -92,6 +107,10 @@ their contracts:
 
 Start with the [Python tutorial](quick-start.md) or
 [headless workflow](../platform/sessions/batch.md).
+
+<span id="backend-upgrades"></span>
+<span id="previous-versions"></span>
+<span id="stay-updated"></span>
 
 ## Where these changes landed
 
