@@ -51,6 +51,8 @@ The Python environment is separate, but the client still uses your normal
 `~/.canfar/config.yaml`. Review the [migration guide](migration.md) before
 changing saved configuration.
 
+<span id="log-in"></span>
+
 ## Authenticate
 
 The simplest path is to authenticate with the CLI. Python then uses the saved
@@ -64,39 +66,42 @@ Use `canfar login srcnet` if your account belongs to an SRCNet identity provider
 (IDP), the service that manages your login. It uses OpenID Connect (OIDC)
 device authorization: follow the displayed link to approve the login.
 
-Python also exposes native synchronous and asynchronous login functions:
+<span id="use-async-workflows"></span>
 
-```python
-import canfar
-from canfar import authentication, server
+### Log in directly from Python
 
-canfar.login("srcnet")
-```
+The following alternatives perform the same OpenID Connect (OIDC) device
+login. Open the displayed verification URL and enter the user-facing code
+when prompted by your identity provider.
 
-For OIDC, Python login prints only the device-flow presentation data to the
-terminal, then waits for approval. The output has this shape:
+=== "Sync Python"
 
-```text
-Verification URL: https://example.com/device
-Verification URL (complete): https://example.com/device?user_code=ABC123
-Device code: ABC123
-```
+    ```python title="login.py"
+    import canfar
 
-The device code above is the user-facing code; the private OAuth device token is
-never printed. The Python API does not open a browser, render a QR code, or show
-CLI progress. The CLI login command owns those interactive presentation
-features.
+    canfar.login("srcnet")
+    ```
 
-Inside an existing event loop, use `alogin()`; it performs native asynchronous
-OIDC I/O and does not call `asyncio.run()`:
+=== "Async Python"
 
-```python
-import canfar
+    ```python title="login.py" hl_lines="5"
+    import asyncio
+    import canfar
 
+    async def main() -> None:
+        await canfar.alogin("srcnet")
 
-async def authenticate() -> None:
-    await canfar.alogin("srcnet")
-```
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+In Jupyter, define `main()` without the script entrypoint and run
+`await main()` in another cell. The async login performs native asynchronous
+network requests.
+
+Python prints the verification URL and user-facing device code, then waits
+for approval. It does not open a browser or render the CLI's QR code.
+The private OAuth device token is never printed.
 
 Both functions save the Authentication Record and discovered Science Platform
 Servers but do not change the active Authentication or Server Selection. They
@@ -147,11 +152,14 @@ await asyncio.to_thread(server.use, "SERVER_NAME")
 
 The CLI `canfar login` flow includes selection, so you can use that route instead.
 
-Storage has its own credential requirement. The default `arc` and `vault`
-services belong to CADC and use the saved CADC Authentication Record, even
-when your active compute server belongs to SRCNet. Run `canfar login cadc`
-to obtain those credentials, then select SRCNet again for compute with
-`canfar auth use srcnet` and `canfar server use SERVER_NAME` if needed.
+!!! note "Storage and compute can use different accounts"
+
+    The default `arc` and `vault` services use your saved CADC Authentication
+    Record, even when compute uses SRCNet. Run `canfar login cadc` for those
+    services. Then select SRCNet again for compute with `canfar auth use srcnet`
+    and `canfar server use SERVER_NAME` if needed.
+
+<span id="use-fixed-resources"></span>
 
 ## Create a Session
 

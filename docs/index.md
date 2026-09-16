@@ -4,52 +4,65 @@ hide:
   - toc
 ---
 
-<h1>CANFAR Science Platform</h1>
+# CANFAR Science Platform
 
-###### Built on **[IVOA standards](https://www.ivoa.net/documents/)** & **[F.A.I.R. principles](https://www.go-fair.org/fair-principles/)**
-    
-!!! note ""
-    
-    <center>
-    <h3>
-    **Canadian Advanced Network for Astronomical Research is a scalable, cloud-native workspace for astronomy research.**
- 
-    *Spin up JupyterLab, submit batch Sessions, and collaborate in shared project spaces. <br> The CANFAR Science Platform gives researchers the tools they need with minimal setup.*
-    </h3>
-    </center>
-    
-!!! success ""
+Analyse astronomical data in your browser, work with your team, and run
+repeatable pipelines near your data. A **Session** is your running workspace:
+a notebook, desktop, astronomy application, or unattended script.
 
-    <h4>Discover what the CANFAR Science Platform can do for you, your team, and your research group.</h4>
+## What would you like to do?
 
-    <h3>
+<div class="grid cards" markdown>
 
-    <div class="grid cards" markdown>
+-   :material-monitor-shimmer: **Start a Session**
 
-    - [:material-monitor-shimmer: __Interactive Sessions__ <small>e.g. JupyterLab</small>](platform/sessions/index.md)
-    - [:material-lightning-bolt: __Batch Processing__ <small>for large-scale analysis</small>](platform/sessions/batch.md)
-    - [:material-floppy-variant: __Shared Storage__ <small>for collaborative datasets</small>](platform/storage/index.md)
-    - [:material-docker: __Software Containers__ <small>with astronomy tools</small>](platform/containers/index.md)
-    - [:fontawesome-solid-people-roof: __Collaboration Tools__ <small>with group permissions</small>](platform/permissions.md)
-    - [:material-wrench: __Help & Support__ <small>for research workflows</small>](platform/support/index.md)
-    - [:simple-python: __Python API__ <small>for access and automation</small>](client/home.md)
-    - [:simple-gnubash: __CLI__ <small>for terminal users</small>](cli/quick-start.md)
-    - [:simple-doi: __Publications__ <small>of DataCite DOIs</small>](platform/doi.md)
-    - [:material-cog: __Platform Operations__ <small>Deployments and infrastructure</small>](https://www.opencadc.org/deployments/)
-    - [:octicons-sparkles-fill-16: __Release Notes__ <small>for the latest updates</small>](releases/releases.md)
-    - [:simple-rocket: __Try out__ <small>CANFAR Science Platform</small>](https://www.canfar.net)
-    - [:octicons-telescope-fill-16: and much more...](platform/concepts.md)
+    Get an account, open your first notebook, and save your work.
+    You can complete this guide in your browser without installing software.
 
-    </div>
-    
-    </h3>
+    [Start your first analysis](platform/get-started.md)
 
-!!! quote ""
+-   :material-floppy-variant: **Bring and save data**
 
-    <font size="3">
-    ##### If you use CANFAR, add an acknowledgement to your papers, theses, and other research outputs.
-    </font>
+    Choose a storage location, upload inputs, and keep results for your team.
 
-    <span style="font-family: 'Roboto Mono', monospace; font-size: 12px; font-style: italic;">
-    The authors acknowledge the use of the Canadian Advanced Network for Astronomy Research (CANFAR) Science Platform operated by the Canadian Astronomy Data Centre (CADC) and the Digital Research Alliance of Canada, with support from the National Research Council of Canada (NRC), the Canadian Space Agency (CSA), CANARIE, and the Canadian Foundation for Innovation (CFI).
-    </span>
+    [Choose storage](platform/storage/index.md) ·
+    [Transfer files](platform/storage/transfers.md)
+
+-   :simple-python: **Automate an analysis**
+
+    Start with the command line or Python, then scale a tested analysis to
+    multiple Sessions.
+
+    [Client setup](client/get-started.md) ·
+    [Run a pipeline](client/advanced-examples.md)
+
+</div>
+
+## Explore the platform
+
+Choose [Notebook, Desktop, CARTA, or Firefly](platform/sessions/index.md)
+for interactive work, or run an unattended [batch Session](platform/sessions/batch.md).
+Use [Container Images](platform/containers/index.md) to choose your software,
+[project permissions](platform/permissions.md) to share data, and
+[community workflows](platform/community/index.md) for astronomy examples.
+
+## Returning to CANFAR?
+
+- [Platform releases](releases/releases.md) describe service and application updates.
+- [Client updates](client/updates.md) and the [migration guide](client/migration.md)
+  explain changes to the Python package and command-line interface (CLI).
+- [Support](platform/support/index.md) helps with accounts, Sessions, and data access.
+- [Platform deployments](https://www.opencadc.org/deployments/) is for operators.
+
+<span id="if-you-use-canfar-add-an-acknowledgement-to-your-papers-theses-and-other-research-outputs"></span>
+
+<span id="built-on-ivoa-standards-fair-principles"></span>
+
+## Acknowledge CANFAR
+
+If you use CANFAR for a paper, thesis, or other research output, include the
+[CANFAR acknowledgement](about/acknowledgement.md). You can also
+[publish a dataset with a digital object identifier (DOI)](platform/doi.md).
+
+CANFAR follows [International Virtual Observatory Alliance (IVOA) standards](https://www.ivoa.net/documents/)
+and the [Findable, Accessible, Interoperable, and Reusable (FAIR) principles](https://www.go-fair.org/fair-principles/).

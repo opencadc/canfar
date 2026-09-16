@@ -1,9 +1,19 @@
+<span id="canfar-storage-systems"></span>
+
 # Storage
 
 Choose storage by lifetime and by where your code runs. A Science Platform
 Session has mounted POSIX storage for working with files and a separate local
 scratch volume for temporary work. VOSpace Services provide authenticated
 remote access when data is not already mounted.
+
+<span id="storage-options-overview"></span>
+<span id="storage-in-a-session"></span>
+<span id="common-workflows"></span>
+<span id="interactive-analysis"></span>
+<span id="batch-processing"></span>
+<span id="data-sharing-and-collaboration"></span>
+<span id="troubleshooting-common-issues"></span>
 
 ## Storage at a glance
 
@@ -18,6 +28,31 @@ remote access when data is not already mounted.
 The exact mounts, quotas, and retention policy belong to the deployment and
 your project. Do not treat `/scratch` as a backup. Copy anything you need after
 the Session to `/arc` or another persistent destination.
+
+## Checking quotas and requesting more space
+
+In a Session terminal, inspect filesystem capacity and your directory's usage.
+Replace `USER` and `PROJECT` with your username and project directory:
+
+```bash title="Terminal inside your Session"
+df -h /arc/home/USER /arc/projects/PROJECT
+du -sh /arc/projects/PROJECT
+```
+
+`df` reports filesystem capacity, not your personal or project quota.
+`du` measures accessible files and can take time on a large directory.
+Use the [Vault web interface](https://www.canfar.net/storage/vault/list/)
+for Vault data, and ask [support](../support/index.md) to confirm the quota
+that applies to your project.
+
+To request more space, email [support@canfar.net](mailto:support@canfar.net)
+with your project name, storage location, current usage, requested capacity,
+and a short explanation of the research need.
+
+!!! warning "Keep durable results out of /scratch"
+
+    Copy and verify final products under `/arc` or another persistent
+    destination before the Session ends. Temporary scratch space is not a backup.
 
 ## Use the mounted filesystem first
 
@@ -68,6 +103,8 @@ The `local:` operand is always the machine running `canfar`. `vault:` and
 `arc:` are examples of Storage Identifiers; use the names returned by your
 configuration rather than assuming that every deployment has those identifiers.
 See [Data transfers](transfers.md) for command details.
+
+<span id="storage-strategy-and-performance"></span>
 
 ## Remote-read performance
 

@@ -5,9 +5,13 @@ Notebook, Desktop, CARTA, or Firefly interface. The command runs in the same
 container and mounted-storage environment as an interactive Session; only the
 entrypoint and lifecycle differ.
 
-This page keeps the guidance requested in [#209](https://github.com/opencadc/canfar/issues/209):
-creation output, `Pending` status, queue expectations, and checks for a Session that
-does not start.
+Follow [Install and set up](../../client/get-started.md#install) before using
+these commands. For a complete run with output verification and recovery, see
+[Advanced examples](../../client/advanced-examples.md).
+
+<span id="submit-from-the-cli"></span>
+<span id="resource-guidance"></span>
+<span id="private-images"></span>
 
 ## Submit a headless Session
 
@@ -75,8 +79,9 @@ canfar create headless skaha/astroml:latest --output json -- python run.py
 
 An empty result is a creation/transport failure, not evidence that a Session is
 queued. A partial replica result returns the IDs that were accepted. Use
-`--debug` for request diagnostics on stderr or increase `CANFAR_TIMEOUT` when
-image pulls or platform requests need more time.
+`--debug` for request diagnostics on stderr. `CANFAR_TIMEOUT` controls HTTP
+request inactivity; it does not extend queue admission or image-pull time
+after a Session has been accepted.
 
 ## Pending means waiting, not running
 
@@ -90,6 +95,9 @@ interactive Sessions. Queue order and admission policy are deployment-owned;
 do not assume that a headless Session will outrank an interactive Session, or that
 increasing a request will make it run sooner. If queue policy matters for a
 project, ask the platform operator for the current policy.
+
+<span id="monitor-and-clean-up"></span>
+<span id="troubleshooting"></span>
 
 ## Monitor and troubleshoot
 
@@ -125,55 +133,66 @@ When a request should be cancelled, delete by ID:
 canfar delete SESSION_ID
 ```
 
+<span id="submit-from-python"></span>
+
 ## Python API
 
 `Session.create` and `AsyncSession.create` return `list[str]` Session IDs. They
 do not wait for `Running`; inspect status and events separately:
 
-```python
-from canfar.sessions import Session
+=== "Sync Python"
 
-with Session() as session:
-    ids = session.create(
-        name="nightly-reduction",
-        image="images.canfar.net/skaha/astroml:latest",
-        kind="headless",
-        cmd="python",
-        args="/arc/projects/myproject/scripts/reduce.py",
-        env={"OMP_NUM_THREADS": "4"},
-    )
+    ```python title="submit_batch.py" hl_lines="1 3"
+    from canfar.sessions import Session
 
-    print(ids)
-    print(session.fetch(status="Pending"))
-    print(session.events(ids))
-```
-
-For native asynchronous code:
-
-```python
-import asyncio
-
-from canfar.sessions import AsyncSession
-
-async def main() -> None:
-    async with AsyncSession() as session:
-        ids = await session.create(
-            name="async-batch",
+    with Session() as session:
+        ids = session.create(
+            name="nightly-reduction",
             image="images.canfar.net/skaha/astroml:latest",
             kind="headless",
             cmd="python",
-            args="/arc/projects/myproject/scripts/analyse.py",
-            replicas=10,
+            args="/arc/projects/myproject/scripts/reduce.py",
+            env={"OMP_NUM_THREADS": "4"},
         )
         print(ids)
+        if ids:
+            print(session.info(ids))
+            print(session.events(ids))
+    ```
 
+=== "Async Python"
 
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+    ```python title="submit_batch.py" hl_lines="3 6"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = await session.create(
+                name="nightly-reduction",
+                image="images.canfar.net/skaha/astroml:latest",
+                kind="headless",
+                cmd="python",
+                args="/arc/projects/myproject/scripts/reduce.py",
+                env={"OMP_NUM_THREADS": "4"},
+            )
+            print(ids)
+            if ids:
+                print(await session.info(ids))
+                print(await session.events(ids))
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+In a notebook, define `main()` without the final script entrypoint and run
+`await main()` in another cell.
 
 The `args` value is a command-line string. Keep command arguments after the
 CLI's `--` delimiter so the client does not parse them as Session options.
+
+<span id="storage-rules"></span>
 
 ## Storage and cleanup
 

@@ -1,3 +1,5 @@
+<span id="getting-started-with-canfar"></span>
+
 # Get started
 
 Use the CANFAR Science Platform to analyse astronomical data in your browser.
@@ -5,11 +7,17 @@ You can run notebooks and astronomy applications near your data, save results,
 and share them with your project. You do not need to install the Python client
 to follow this guide.
 
+<span id="1-get-your-cadc-account"></span>
+<span id="2-join-or-create-your-research-group"></span>
+<span id="3-first-login-and-set-up"></span>
+
 ## 1. Get an account and access
 
 Request a [Canadian Astronomy Data Centre (CADC) account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
 Ask your project administrator to add you to the group that owns the data you
 need. If you need help, contact [CANFAR support](support/index.md).
+
+<span id="4-launch-your-first-session"></span>
 
 ## 2. Run your first notebook
 
@@ -24,6 +32,10 @@ need. If you need help, contact [CANFAR support](support/index.md).
 
 Choose an image from the portal's current list. Available software and
 resource choices depend on the image and server.
+
+<span id="understanding-your-workspace"></span>
+<span id="collaboration-features"></span>
+<span id="storage-sharing"></span>
 
 ## 3. Upload data and save your work
 
@@ -40,6 +52,11 @@ to upload inputs or download results. Save and verify your notebook and results
 under `/arc` before using the Session's delete control in **Active Sessions**.
 Files under `/arc` remain available after deletion. Closing a browser tab alone
 does not stop the Session.
+
+!!! success "Your first analysis is saved"
+
+    Your notebook and results should appear under your chosen `/arc` directory.
+    You can open them from a new Session after deleting this one.
 
 Choose [Desktop](sessions/desktop.md), [CARTA](sessions/carta.md), or
 [Firefly](sessions/firefly.md) when you need a different analysis interface.
@@ -58,6 +75,8 @@ To run an unattended workflow:
 3. Submit a [headless Session](sessions/batch.md), which runs without a browser interface.
 4. Inspect its progress with `canfar ps --all`, `canfar info`, and `canfar events`.
 5. Copy final results out of `/scratch` before deleting the Session.
+
+<span id="need-help"></span>
 
 ## Next steps
 

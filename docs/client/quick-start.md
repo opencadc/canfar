@@ -1,123 +1,195 @@
 # Python Quickstart
 
-This guide creates a notebook Session, checks its state, and deletes it from
-Python.
+Create a notebook Session, open it, and keep your results before cleaning up.
+Run these examples on the computer where you installed and authenticated the
+client. Each code block can run as a separate script.
+
+!!! note "Choose a compatible client"
+
+    [Install and set up](get-started.md#install) first. These examples describe
+    unreleased changes since v1.4.1; use the development installation when
+    following this version of the documentation.
+
+Use the same tab throughout: **Sync Python** for a normal script, or
+**Async Python** for an application using `async` and `await`.
+
+!!! tip "Running async examples in a notebook"
+
+    Define `main()` without its final `if __name__` block. In the next cell,
+    run `await main()` instead of `asyncio.run(main())`.
 
 ## 1. Authenticate
 
-[Install the client](get-started.md#install) first. These examples describe the unreleased
-`feat/interfaces` interface; follow the installation guide to choose a
-compatible environment.
-
-```bash
+```bash title="Terminal on your computer"
 canfar login cadc
+canfar image ls --kind notebook
 ```
 
-Use `canfar login srcnet` for an SRCNet Identity Provider. For direct Python
-OIDC login, see [login and device flow](get-started.md#authenticate).
+Choose an image from that listing. Replace the example image below if it is
+unavailable on your server. For SRCNet or direct Python login, see
+[authentication and server selection](get-started.md#authenticate).
+
+<span id="async-version"></span>
 
 ## 2. Create a notebook
 
-```python
-from canfar.sessions import Session
+=== "Sync Python"
 
-with Session() as session:
-    ids = session.create(
-        kind="notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        name="quickstart-notebook",
-        cores=2,
-        ram=4,
-    )
-    print(ids)
-```
+    ```python title="create_notebook.py" hl_lines="1 3"
+    from canfar.sessions import Session
 
-`create()` returns `list[str]`; it contains only successfully created Session
-IDs. If it returns `[]`, inspect the error before continuing. Creation does not
-mean the application is ready. Choose an image listed by `canfar image ls
---kind notebook` on your server; the image above is an example.
+    with Session() as session:
+        ids = session.create(
+            kind="notebook",
+            image="images.canfar.net/skaha/astroml:latest",
+            name="quickstart-notebook",
+            cores=2,
+            ram=4,
+        )
+        print(ids)
+    ```
+
+=== "Async Python"
+
+    ```python title="create_notebook.py" hl_lines="3 6"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = await session.create(
+                kind="notebook",
+                image="images.canfar.net/skaha/astroml:latest",
+                name="quickstart-notebook",
+                cores=2,
+                ram=4,
+            )
+            print(ids)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+You receive a list of successfully created Session IDs. Copy the ID and replace
+`SESSION_ID` in the following examples. If the list is empty, inspect the error
+before continuing. Creation does not mean the application is ready.
+
+<span id="3-open-the-notebook"></span>
+<span id="4-inspect-events-and-logs"></span>
 
 ## 3. Inspect and connect
 
-```python
-with Session() as session:
-    details = session.info(ids)
-    print(details)                 # list[dict[str, str]]
-    session.connect(ids)
-```
+=== "Sync Python"
 
-`connect()` opens the `connectURL` for Sessions that are ready. It returns
-`None`; a Session that is not running is logged and skipped. If your Session
-is still `Pending`, read its events below and repeat this step when it reaches
-`Running`. The code uses only the IDs from your creation request.
+    ```python title="open_notebook.py" hl_lines="1 3"
+    from canfar.sessions import Session
+
+    with Session() as session:
+        ids = ["SESSION_ID"]
+        print(session.info(ids))
+        session.connect(ids)
+    ```
+
+=== "Async Python"
+
+    ```python title="open_notebook.py" hl_lines="3 6"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = ["SESSION_ID"]
+            print(await session.info(ids))
+            await session.connect(ids)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+`info()` returns a list of dictionaries containing Session details.
+`connect()` opens a browser link for a ready Session and returns `None`.
+If it is still `Pending`, inspect the events below, then repeat this step when
+it reaches `Running`. Run your analysis in the notebook before cleaning up.
 
 ## 4. Read events and logs
 
-```python
-with Session() as session:
-    events = session.events(ids)
-    logs = session.logs(ids)
-    print(events)
-    print(logs)
-```
+=== "Sync Python"
 
-The default return values are `list[dict[str, str]]` for events and
-`dict[str, str]` for logs. With `verbose=True`, both methods log their output
-through `canfar.sessions` and return `None`.
+    ```python title="inspect_notebook.py" hl_lines="1 3"
+    from canfar.sessions import Session
+
+    with Session() as session:
+        ids = ["SESSION_ID"]
+        print(session.events(ids))
+        print(session.logs(ids))
+    ```
+
+=== "Async Python"
+
+    ```python title="inspect_notebook.py" hl_lines="3 6"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = ["SESSION_ID"]
+            print(await session.events(ids))
+            print(await session.logs(ids))
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+Events return a list of dictionaries; logs return a dictionary keyed by Session
+ID. A failed request may be omitted from these results. With `verbose=True`,
+these methods log their output and return `None` instead.
 
 ## 5. Clean up
 
-When you have finished the analysis, save results under `/arc` or another
-persistent destination and delete the Sessions you created:
+!!! warning "Save your work first"
 
-```python
-with Session() as session:
-    result = session.destroy(ids)
-    print(result)                 # dict[str, bool]
-```
+    Save notebooks and results under `/arc` or another persistent destination.
+    Deleting a Session discards `/scratch` and unsaved application state.
+    Closing a Python client or browser tab does not delete the remote Session.
 
-For bulk cleanup, the filters after `prefix` are keyword-only:
+Delete only the ID you created:
 
-```python
-with Session() as session:
-    result = session.destroy_with(
-        "quickstart-",
-        kind="notebook",
-        status="Completed",
-    )
-```
+=== "Sync Python"
 
-## Async version
+    ```python title="delete_notebook.py" hl_lines="1 3"
+    from canfar.sessions import Session
 
-```python
-from canfar.sessions import AsyncSession
+    with Session() as session:
+        ids = ["SESSION_ID"]
+        print(session.destroy(ids))
+    ```
 
+=== "Async Python"
 
-async def launch() -> list[str]:
-    async with AsyncSession() as session:
-        ids = await session.create(
-            kind="notebook",
-            image="images.canfar.net/skaha/astroml:latest",
-            name="async-notebook",
-        )
-        return ids
-```
+    ```python title="delete_notebook.py" hl_lines="3 6"
+    import asyncio
 
-In a notebook, run `ids = await launch()`. In a script, call
-`ids = asyncio.run(launch())` after importing `asyncio`. Use `AsyncSession`
-methods with `await` to inspect those IDs and connect after they are ready.
-When your analysis is finished and saved, clean up explicitly:
+    from canfar.sessions import AsyncSession
 
-```python
-async def cleanup(ids: list[str]) -> None:
-    async with AsyncSession() as session:
-        print(await session.destroy(ids))
-```
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = ["SESSION_ID"]
+            print(await session.destroy(ids))
 
-Call `await cleanup(ids)` in a notebook, or `asyncio.run(cleanup(ids))` in a
-script. Closing either Python client releases its HTTP connections; it does
-not delete the remote Sessions.
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
 
-For CLI diagnostics, see [Logging](../cli/logging.md). Authentication-dependent
-full integration tests are separate from the deterministic Python examples;
-see [Testing](testing.md).
+Each requested ID maps to `True` or `False`, indicating whether its deletion
+request succeeded. Keep failed IDs for investigation.
+
+<span id="troubleshooting"></span>
+
+## Next steps
+
+- [Common examples](examples.md) for filtering, replicas, and private images.
+- [Advanced examples](advanced-examples.md) for a complete batch pipeline.
+- [Logging](../cli/logging.md) for diagnostics.

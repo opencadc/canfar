@@ -44,42 +44,50 @@ by Python clients. Python OIDC login is also available as `canfar.login()` and
 
 </div>
 
-## Minimal synchronous example
+<span id="minimal-example"></span>
+<span id="async-example"></span>
+<span id="minimal-synchronous-example"></span>
+<span id="minimal-asynchronous-example"></span>
 
-```python
-from canfar.sessions import Session
+## Try the same task in Python
 
-with Session() as session:
-    ids = session.create(
-        kind="notebook",
-        image="images.canfar.net/skaha/astroml:latest",
-        name="my-analysis",
-    )
-    if ids:
-        session.connect(ids)
-```
+Both examples list your running notebooks and print the returned records.
+Choose **Sync Python** for a normal script, or **Async Python** when your
+application already uses `async` and `await`.
 
-If the notebook is still starting, `connect()` skips it. Inspect the returned
-IDs and retry after readiness, as shown in the [Python tutorial](quick-start.md).
+=== "Sync Python"
 
-## Minimal asynchronous example
+    ```python title="list_notebooks.py" hl_lines="1 3"
+    from canfar.sessions import Session
 
-```python
-from canfar.sessions import AsyncSession
+    with Session() as session:
+        notebooks = session.fetch(kind="notebook", status="Running")
+        print(notebooks)
+    ```
 
+=== "Async Python"
 
-async def main() -> None:
-    async with AsyncSession() as session:
-        ids = await session.create(
-            kind="headless",
-            image="images.canfar.net/skaha/astroml:latest",
-            name="batch-session",
-            cmd="python",
-            args="/arc/projects/demo/run.py",
-        )
-        if ids:
-            await session.events(ids)
-```
+    ```python title="list_notebooks.py" hl_lines="3 6"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            notebooks = await session.fetch(kind="notebook", status="Running")
+            print(notebooks)
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
+
+An empty list means no notebooks match those filters. Follow the
+[Python tutorial](quick-start.md) to create, inspect, and clean up a Session.
+
+!!! tip "Using the async example in Jupyter"
+
+    Define `main()` without the final `if __name__` block, then run
+    `await main()` in another cell. Jupyter already has an event loop.
 
 ## Main modules
 
