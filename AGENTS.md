@@ -23,10 +23,14 @@
 - Deterministic non-slow tests: `uv run --no-sync pytest tests -m "not slow" --no-cov -q -o cache_dir=/tmp/canfar-pytest-cache`
 - Docs build: `uv run --group docs mkdocs build`
 - Full test suite: `uv run --no-sync pytest`
+- Agent skills: `python3 scripts/validate_skills.py`
 
 Run the full test suite only when a valid CANFAR Authentication Record and certificate are available. Otherwise use the deterministic non-slow test command.
 
 ## Agent skills
+
+Platform skills for coding agents live in `skills/`. Install with
+`npx skills add opencadc/canfar`. See `docs/agents/platform-skills.md`.
 
 ### Issue tracker
 

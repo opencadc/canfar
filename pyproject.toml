@@ -210,6 +210,14 @@ ignore = [
     "S108",    # Probable insecure usage of temporary file/directory
 ]
 "docs/**/*.py" = ["INP001"]
+"scripts/**/*.py" = [
+    "T201",    # print for CLI status
+    "D103",    # Missing docstring in public function
+    "PLR0912", # Too many branches
+    "PLR0915", # Too many statements
+    "EXE001",  # Shebang without executable bit
+    "S101",    # assert in self-check
+]
 "canfar/models/session.py" = ["N815"]
 
 [tool.ruff.lint.isort]
@@ -324,7 +332,7 @@ ignore-nested-functions = false
 ignore-nested-classes = true
 ignore-setters = false
 fail-under = 80
-exclude = ["setup.py", "docs", "build"]
+exclude = ["setup.py", "docs", "build", "scripts"]
 ignore-regex = ["^get$", "^mock_.*", ".*BaseClass.*"]
 verbose = 3
 quiet = false

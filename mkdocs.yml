@@ -275,6 +275,7 @@ nav:
           - Contributing: contributing.md
           - Testing: client/testing.md
           - Agent Guidance:
+              - Platform Skills: agents/platform-skills.md
               - Architecture: agents/architecture.md
               - Domain Docs: agents/domain.md
               - Issue Tracker: agents/issue-tracker.md

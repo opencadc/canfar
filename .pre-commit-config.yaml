@@ -8,9 +8,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^docs/
+        exclude: ^(docs|skills)/
       - id: end-of-file-fixer
-        exclude: ^docs/
+        exclude: ^(docs|skills)/
       - id: check-case-conflict
       - id: check-json
       - id: check-yaml
@@ -30,7 +30,7 @@ repos:
       verbose: true
       language: python
       additional_dependencies: [radon]
-      args: ["cc", "--min=C","--total-average","--exclude=tests/*.py"]
+      args: ["cc", "--min=C","--total-average","--exclude=tests/*.py,scripts/*.py"]
 
   - repo: https://github.com/gitleaks/gitleaks
     rev: v8.30.0
@@ -58,6 +58,7 @@ repos:
     hooks:
       - id: interrogate
         args: [--config=pyproject.toml]
+        exclude: ^scripts/
 
   # GitHub Actions workflow linting
   - repo: https://github.com/rhysd/actionlint
