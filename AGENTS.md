@@ -29,7 +29,7 @@ Use these project commands with the `rtk` prefix. Set `UV_CACHE_DIR=/tmp/canfar-
 - Deterministic non-slow tests: `rtk proxy uv run --no-sync pytest tests -m "not slow" --no-cov -q -o cache_dir=/tmp/canfar-pytest-cache`
 - Docs build: `rtk proxy uv run --group docs mkdocs build`
 - Full test suite: `rtk proxy uv run --no-sync pytest`
-- Agent skills: `rtk proxy python3 scripts/validate_skills.py`
+- Skill and docs truth: `rtk proxy uv run --no-sync pytest tests/test_skills.py --no-cov -q -n0`
 
 Run focused tests for changed behavior before broader validation. Use the deterministic suite for work without live credentials. The full suite contacts CANFAR and creates/deletes test Sessions; run it only with a valid account, usable Authentication Record, and certificate.
 
@@ -39,8 +39,9 @@ Tests constructing `Configuration` must isolate `CONFIG_PATH`, even when using `
 
 ## Agent skills
 
-Platform skills for coding agents live in `skills/`. Install with
-`npx skills add opencadc/canfar`. See `docs/agents/platform-skills.md`.
+### Published skill
+
+`skills/canfar/` is the one skill users install (`npx skills add opencadc/canfar`). A change to the CLI or Python surface updates `docs/` and the skill in the same change; `tests/test_skills.py` fails on commands, Python examples, API names, and links that drift. Put new platform knowledge in `docs/` and point the skill at it. See `docs/agents/skill.md`.
 
 ### Issue tracker
 

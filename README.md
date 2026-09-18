@@ -34,7 +34,8 @@ session.connect(ids)
 npx skills add opencadc/canfar
 ```
 
-Skill authoring: [Platform agent skills](docs/agents/platform-skills.md).
+Then ask your coding agent, for example `/canfar start a notebook session`.
+See [Use CANFAR with a coding agent](docs/client/agents.md).
 
 ---
 <p align="center">

@@ -1,218 +1,187 @@
 ---
 name: canfar
-description: Use the CANFAR Science Platform CLI and Python client to launch astronomy sessions, run replicated batch jobs, inspect results, and access configured VOSpace storage. Use for operating CANFAR or writing scripts that use it.
+description: Operate the CANFAR Science Platform with the `canfar` CLI and Python client - launch and inspect Sessions (notebook, desktop, CARTA, Firefly, contributed, headless), scale out replicated batch jobs, move data through Storage Identifiers, script workflows in Python, and answer platform questions from the CANFAR docs. Use for any work on CANFAR, CADC, or SRCNet compute.
 ---
 
 # Work on the CANFAR Science Platform
 
-Help the user complete an astronomy workflow with their installed `canfar`
-client. A **Session** is a running application or batch job inside a container
-on a **Science Platform Server**. A **Container Image** packages its software.
+Carry out the user's request with their installed `canfar` client. A
+**Session** is a user-owned compute environment on a **Science Platform
+Server**, started from a **Container Image**. Its **Session Kind** is
+`notebook`, `desktop`, `carta`, `firefly`, `contributed`, or `headless`.
 
-## Establish the installed interface
+Three states mark progress. Claim only the one you observed:
 
-Inspect `canfar version`, `canfar --help`, and the relevant command's `--help`
-before composing commands. These examples target the interface with leaf
-`-o/--output` options and explicit `canfar.storage.filesystem()` access.
-Older releases have different flags and Python APIs; a development checkout
-can retain an older version number. Check capabilities as well as the version.
-Do not upgrade an environment merely to make an example work.
+- **accepted**: `create` returned a Session ID.
+- **Running**: the Session reports `status` `Running` and a nonempty `connectURL`.
+- **verified**: the expected output exists on persistent storage and passed its check.
 
-Use the user's existing environment. When installation is requested, use its
-package manager (`uv add canfar` for a uv project or `pip install canfar` in a
-virtual environment). Confirm the installed release supports the needed
-feature. A release from the package index may lag a development branch.
+## Start every task here
 
-For details, consult the [CANFAR documentation](https://opencadc.github.io/canfar/)
-for the installed version. In a checkout, use `docs/cli/cli-help.md`,
-`docs/cli/authentication-contexts.md`, `docs/client/data.md`, and
-`docs/client/session.md`, checking them against source when they disagree.
+1. **Route the request.**
 
-## Choose identity, server, and data separately
+   | The request is about | Read |
+   | --- | --- |
+   | Launching, opening, inspecting, or deleting a Session | [Launch a Session](#launch-a-session) below |
+   | Headless commands, replicas, pipelines, many Sessions | [references/batch.md](references/batch.md) |
+   | A Python script or notebook that drives CANFAR | [references/python.md](references/python.md) |
+   | Listing, copying, or reading files on `arc`, `vault`, or another Storage Identifier | [references/data.md](references/data.md) |
+   | How the platform works: storage, images, permissions, DOI, CVMFS, support | [Platform questions](#platform-questions) below |
 
-An **Identity Provider (IDP)** verifies who you are. A saved **Authentication
-Record** holds credentials. **Server Selection** chooses where new Session
-requests go; it does not move existing Sessions. A **Storage Identifier** names
-a configured data service and is separate from that Server Selection.
+   A platform question needs only its page. Every other branch runs steps 2
+   and 3, then reads its reference before composing commands.
+2. **Installed interface.** Run `canfar version` and `canfar ps --help`. This
+   skill matches the installed client when that help lists `-o, --output`; the
+   version number alone does not tell, because a development checkout can
+   carry an older one. Without `-o`, the client predates this skill: say so,
+   and compose every command from its own `--help`. With it, read a command's
+   `--help` before adding a flag this skill does not show; that help is the
+   authority for flags. Work in the user's existing environment, and install
+   only on request with its package manager (`uv add canfar`, or
+   `pip install canfar` in a virtual environment).
+3. **Identity and Server.** `canfar auth show -o json` prints the active
+   Authentication Record and `canfar server ls -o json` the Servers. The
+   identity is usable when `canfar ps -o json` exits 0; keep its payload, the
+   user's active Sessions. An `expiry` of `null`, or an `authentication.*`
+   error code on stderr, means login is needed: **hand login to the user**.
+   Ask them to run `canfar login IDP` in their own terminal, with the record's
+   `idp` (`cadc` for a CADC certificate, `srcnet` for the SRCNet OpenID Connect
+   device flow), because credential entry and browser approval are theirs.
+   Tell them what you will do once they are back, and resume when
+   `canfar ps -o json` exits 0. With several Servers, confirm the target before
+   submitting work; `canfar server use SELECTOR` takes a Server Name or IVOA
+   URI.
+4. **Report.** Finish with the Session IDs, the state you observed for each
+   (accepted or Running, and verified for work that writes outputs), any paths
+   you verified, and the command that cleans up this work.
+
+## Launch a Session
+
+1. **Reuse.** When the active Sessions from `canfar ps -o json` already hold
+   one of the requested Kind, offer its `connectURL` before launching another;
+   a Server limits how many interactive Sessions one user runs.
+2. **Image.** Use the image the user named. Otherwise list the Kind's images
+   with `canfar image ls --kind notebook` and choose from that listing:
+   `skaha/astroml` is the general-purpose astronomy image the CANFAR docs use,
+   so pick it when listed and say so. The listing is the source of truth for
+   names and Kinds on the chosen Server; pin a version tag when the work must
+   be repeatable. The client adds `images.canfar.net/` and `:latest` to a short
+   name such as `skaha/astroml`.
+3. **Create.** Name the Session for the work; without `--name` the client
+   generates one. Pass `--cpu` and `--memory` (GB) together only when the user
+   gives sizes or a test run measured them; without them the Server applies
+   its flexible policy, and fixed requests can wait longer for capacity.
+   `--gpu N` requests GPUs.
+
+   ```bash
+   canfar create notebook IMAGE --name analysis -o json
+   ```
+
+   Stdout is a JSON array of Session IDs, such as `["a1b2c3d4"]`. Done when
+   you hold that ID: the Session is **accepted**. On a failure, read the
+   `hint` in the error and check `canfar ps --all -o json` before retrying,
+   because a request whose response was lost can still have been accepted.
+   When the Server refuses the launch for a Session limit, show the user their
+   Sessions and let them choose what to delete. `--dry-run`, used without
+   `-o`, parses a request locally and exits; it checks the arguments, not the
+   image, the login, or capacity.
+4. **Wait for Running.** Poll `canfar ps --all -o json` every 10 seconds for up
+   to 5 minutes. It prints a JSON array of Session objects with `id`, `name`,
+   `type`, `image`, `status`, `connectURL`, `startTime`, and `expiryTime`;
+   find yours by `id`. `--all` matters: without it a Session that fails leaves
+   the listing instead of showing `Failed`. Done when `status` is `Running`
+   and `connectURL` is nonempty. After a minute of `Pending`, run
+   `canfar events SESSION_ID` once and tell the user whether it waits on
+   admission, resources, or an image pull. When the budget ends, or the status
+   turns `Failed` or `Error`, report `canfar events SESSION_ID` and
+   `canfar logs SESSION_ID`, and keep the one Session you launched.
+5. **Hand over.** Give the user the `connectURL`, the Session ID, and its
+   `expiryTime`. On the user's own machine, `canfar open SESSION_ID` opens it
+   in their browser; on a remote machine, print the URL. The Session stays up
+   until the user asks for deletion. Remind them that work saved outside
+   `/arc` ends with the Session.
 
 ```bash
-canfar auth show
-canfar server ls
-canfar config get active.server
-```
-
-`server ls` can discover and save Servers when none are saved. If login is
-needed, use the user's IDP: `canfar login cadc` for CADC certificate login or
-`canfar login srcnet` for SRCNet OpenID Connect (OIDC). Let the user complete
-credential entry and browser approval. OIDC prints a verification URL and user
-code and tries to open a browser; on a remote terminal, the user can open the
-printed URL on their own machine. `--timeout` limits HTTP requests, not the
-time allowed for browser approval.
-
-For saved identities, `canfar auth use IDP` switches identity and
-`canfar server use SELECTOR` selects a Server by name or IVOA resource URI.
-Confirm the target before submitting work if multiple Servers are available.
-Do not erase configuration to recover from an ordinary login failure.
-
-## Launch and inspect Sessions
-
-Find an available image with `canfar image ls --kind notebook` (or the required
-kind). Use an explicit image tag when repeatability matters. Do not assume an
-example image, GPU, resource size, or path exists on the chosen Server.
-
-```bash
-canfar create notebook IMAGE --name analysis -o json
 canfar ps --all -o json
 canfar info SESSION_ID
 canfar events SESSION_ID
 canfar logs SESSION_ID
 canfar open SESSION_ID
+canfar delete SESSION_ID
 ```
 
-Replace `IMAGE` and `SESSION_ID` with the selected image and returned ID.
-`create -o json` returns a list of created IDs; a shorter list means some
-replicas were not created. Preserve those IDs for monitoring and cleanup.
+`ps` shows Pending and Running Sessions; add `--all` to see terminal ones,
+including with `--status`. `desktop` and `firefly` Sessions take one replica
+and the Server's own resource sizes. `cmd`, `args`, and `--env` belong to
+`headless` Sessions.
 
-`ps` shows Pending and Running Sessions by default. Add `--all` when looking
-for completed or failed jobs, including when using `--status`. Creating a
-Session does not mean it is ready: inspect its returned ID until it is Running
-and has a nonempty `connectURL` before opening it. Use bounded polling and
-report timeout or terminal failure; do not launch a duplicate merely because
-the first Session is still Pending.
+## Where data lives
 
-For fixed resources, specify both `--cpu` and `--memory` (GB). Omitting both
-uses the Server's flexible resource policy; query the Server rather than
-assuming fixed limits. `--replicas N` creates N Sessions with per-Session
-resource requests.
+These are the CADC deployment's names; on another Server, discover the mounts
+and Storage Identifiers it provides.
 
-Headless Sessions run a command and exit. Put all CANFAR options before `--`:
+| Location | Lifetime | Use it for |
+| --- | --- | --- |
+| `/arc/home/USER` | Persistent | Personal scripts, configuration, results |
+| `/arc/projects/PROJECT` | Persistent | Project data and shared results |
+| `/scratch` | Deleted with the Session | Staging and intermediate files |
+| `arc:`, `vault:` Storage Identifiers | Service-defined | Remote access from any machine through `canfar data` or Python |
 
-```bash
-canfar create headless IMAGE --name reduction --replicas 4 -o json -- python /arc/projects/PROJECT/reduce.py
-```
+Save every result the user needs under persistent storage before a Session
+ends. A path on the user's laptop exists inside a Session only after it is
+copied to storage that Session mounts, or built into the image.
 
-Every token after `--` belongs to the container command. The script must exist
-inside the image or on storage mounted into the Session; a laptop path is not
-uploaded by `create`. Save outputs in the user's persistent project space.
-Treat `/scratch` as temporary storage that is removed with the Session.
+## Output and cleanup
 
-## Write Python workflows
+- **Machine output** (`-o json` or `-o yaml`, placed on the owning command): `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `config show`, `config get`.
+- **Human text only**: `info`, `logs`, `events`, `open`, `delete`, `prune`, `stats`, `image ls`, `version`.
 
-Use `Session` for synchronous scripts and `AsyncSession` inside an async
-application. Close them with `with` or `async with`. CLI login saves the
-identity and Server Selection these clients use by default.
+With `-o`, stdout carries only the payload, and a failure exits nonzero with
+`code`, `message`, and `hint` as JSON on stderr. Select list items by ID or
+name rather than by position. Human-text commands print an `@SERVER` banner
+first and report problems in plain text, sometimes with exit status 0, so
+judge them by what they print: `canfar image ls` showing no image rows beside
+an authentication message means login, not an empty registry. Root logging options go before the
+command, as in `canfar --log-level debug ps -o json`; debug logs can include
+response bodies, so keep them out of shared reports. `--log-file PATH` adds a
+rotating JSON Lines log.
 
-```python
-from canfar.sessions import Session
+Cleanup scope is the Session IDs this work created, deleted only when the user
+asks: `canfar delete SESSION_ID`, adding `--force` to skip the confirmation
+once the user has authorized that deletion.
 
-with Session() as sessions:
-    ids = sessions.create(
-        name="reduction",
-        image="IMAGE",
-        kind="headless",
-        cmd="python",
-        args="/arc/projects/PROJECT/reduce.py",
-        replicas=4,
-    )
-    if not ids:
-        raise RuntimeError("No Sessions were created")
-    print(ids)
-    print(sessions.info(ids))
-```
+## Platform questions
 
-Replace the image and script path before running. `create()` returns
-`list[str]`, omits failed HTTP/network attempts, and returns `[]` on total
-launch failure. Invalid requests still raise. `info()` and `fetch()` return
-lists of dictionaries; `logs()` returns a dictionary keyed by Session ID and
-`events()` returns a list of such dictionaries. `verbose=True` on logs/events
-uses logging and returns `None`. `connect()` checks readiness once; it does
-not wait for startup.
+Answer from the page, then cite it. Fetch the URL, or in a checkout of
+`opencadc/canfar` read the same path under `docs/` (`.../platform/doi/` is
+`docs/platform/doi.md`).
 
-Python `canfar.login()` / `canfar.alogin()` save credentials and discovered
-Servers but do not select the active identity or Server. For a complete
-selection flow, use the CLI or explicitly select the saved identity with
-`canfar.authentication.use(IDP)` and Server with `canfar.server.use(SELECTOR)`.
-In an existing event loop use `await canfar.alogin(...)`, not `asyncio.run()`.
-Run synchronous selection/discovery in a worker thread in that case, for
-example `await asyncio.to_thread(authentication.use, IDP)`,
-`await asyncio.to_thread(server.list_servers)`, and
-`await asyncio.to_thread(server.use, SELECTOR)` after importing `asyncio` and
-`authentication, server` from `canfar`. Server discovery can start its own
-event loop, so do not call it directly from a notebook's running loop.
-Python OIDC login prints the verification information; it does not open a
-browser. Runtime `token` or `certificate` parameters override saved
-credentials for a client without persisting them.
+Answer for the person asking: lead with the Science Portal
+(https://www.canfar.net/) route for someone working in a browser, and with the
+CLI or Python for someone automating. Live output from the user's Server
+(`canfar info SESSION_ID`, `canfar image ls`, `df -h` inside a Session)
+outranks a documented default, which describes the CADC deployment.
+Irreversible platform actions, such as publishing a DOI or making data public,
+wait for the user's explicit instruction.
 
-Inside replicated jobs, `canfar.helpers.distributed.chunk(items)` assigns
-contiguous work and `stripe(items)` assigns every Nth item. Both use the
-1-based `REPLICA_ID` and `REPLICA_COUNT` environment variables. Give every
-replica the same ordered input list (for example, a shared manifest or sorted
-paths), and write separate output names using the replica ID.
-
-## Access data
-
-Use explicit source-qualified CLI paths:
-
-```bash
-canfar data ls -lh arc:/home/USER
-canfar data cp local:/absolute/input.fits arc:/home/USER/input.fits
-canfar data cp arc:/home/USER/result.fits local:/absolute/result.fits
-```
-
-`arc` and `vault` are configured storage names in the default CADC setup;
-inspect the user's configuration rather than assuming other Servers provide
-them. `local` means the machine executing the command. Data commands can see
-all configured Storage Identifiers, not only the active Server's storage.
-Each remote source uses the credentials of its owning Server's IDP. Inspect
-`servers` in the configuration to identify that owner and authenticate it
-separately when needed: SRCNet login does not authenticate default CADC `arc`
-or `vault`. Python CADC login expects an existing certificate; use CLI CADC
-login with the user to acquire one when absent.
-
-Use `canfar data --help` for installed commands. `cp -R` copies a directory.
-Recursive `rm` is disabled in this interface. `mv` operates within one source;
-cross-source movement requires copy, verification, then separately authorized
-removal. Data commands own their stdout and do not support CANFAR `-o` output.
-
-Python separates the identifier from the path:
-
-```python
-from canfar.storage import filesystem, identifiers
-
-print(identifiers())
-vault = filesystem("vault")
-try:
-    vault.get_file("/REMOTE/PATH/input.fits", "/LOCAL/PATH/input.fits")
-finally:
-    vault.close()
-```
-
-Replace both paths. The filesystem uses standard fsspec methods. There are no
-dynamic `canfar.storage.vault` attributes or identifier-based fsspec protocols.
-Partial reads may transfer or stage the entire object; do not promise reduced
-network traffic. For libraries requiring a local path, use `get_file()` and
-manage that destination's lifetime. Persistent whole-file caching requires an
-explicit fsspec cache and local directory; see the data guide for lifecycle
-and backend limitations.
-
-## Output, diagnostics, and cleanup
-
-Use `-o json` or `-o yaml` only on supported data-producing commands: `auth`
-(the default view), `auth show`, `auth ls`, `server ls`, `create`, `ps`,
-`config show`, and `config get`. Put it on the owning command, not the root.
-Do not parse human tables or assume `ps -q` is banner-free. `info`, `logs`,
-`events`, `image ls`, and `stats` do not expose this output option.
-
-Root logging options go before the command, for example
-`canfar --log-level debug ps -o json`. Diagnostics go to stderr. Debug logs
-can include response bodies; keep credentials and private data out of shared
-reports. `--log-file PATH` is an optional rotating JSON Lines log.
-
-Delete only the Sessions in the user's requested cleanup scope:
-`canfar delete SESSION_ID`. `--force` skips its confirmation and is appropriate
-when that deletion is already authorized. Python `destroy(ids)` returns a
-dictionary of success booleans; check it before reporting success.
-`destroy_with(prefix, *, kind=..., status=...)` supports bulk deletion, but
-names containing regular-expression characters have regex semantics. Prefer
-the known returned IDs for targeted cleanup. Quote regex arguments in the
-shell and pass kind/status explicitly when using `canfar prune`.
+| Topic | Page |
+| --- | --- |
+| Accounts, access, first steps | https://www.opencadc.org/canfar/latest/platform/get-started/ |
+| Concepts and architecture | https://www.opencadc.org/canfar/latest/platform/concepts/ |
+| Session Kinds and lifecycle | https://www.opencadc.org/canfar/latest/platform/sessions/ |
+| Notebook, Desktop, CARTA, Firefly, Contributed | https://www.opencadc.org/canfar/latest/platform/sessions/notebook/ and its sibling pages `desktop/`, `carta/`, `firefly/`, `contributed/` |
+| Batch queueing and Pending diagnosis | https://www.opencadc.org/canfar/latest/platform/sessions/batch/ |
+| Session limits, lifetime, out-of-memory, what a Session was granted | https://www.opencadc.org/canfar/latest/platform/sessions/limits/ |
+| Storage, quotas, requesting space | https://www.opencadc.org/canfar/latest/platform/storage/ |
+| Filesystem access, remote reads, caching | https://www.opencadc.org/canfar/latest/platform/storage/filesystem/ |
+| Transfers | https://www.opencadc.org/canfar/latest/platform/storage/transfers/ |
+| VOSpace, sharing, legacy `vos` tools | https://www.opencadc.org/canfar/latest/platform/storage/vospace/ |
+| Groups, permissions, access denied | https://www.opencadc.org/canfar/latest/platform/permissions/ |
+| Container Images, building, the registry | https://www.opencadc.org/canfar/latest/platform/containers/ and `build/`, `registry/` |
+| Pipeline design and resource sizing | https://www.opencadc.org/canfar/latest/platform/best-practices/ |
+| CVMFS software stacks | https://www.opencadc.org/canfar/latest/platform/cvmfs/ |
+| Publishing data with a DOI | https://www.opencadc.org/canfar/latest/platform/doi/ |
+| FAQ, support, reporting a problem | https://www.opencadc.org/canfar/latest/platform/support/faq/ and https://www.opencadc.org/canfar/latest/platform/support/ |
+| Authentication Records and Server Selection | https://www.opencadc.org/canfar/latest/cli/authentication-contexts/ |
+| CLI reference, logging | https://www.opencadc.org/canfar/latest/cli/cli-help/ and https://www.opencadc.org/canfar/latest/cli/logging/ |
+| Acknowledging CANFAR in a paper | https://www.opencadc.org/canfar/latest/about/acknowledgement/ |
