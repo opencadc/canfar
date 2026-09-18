@@ -15,8 +15,10 @@ laptop with `canfar data cp` is `/arc/projects/PROJECT/x` inside a Session
 results, and the run's records.
 
 Use an image that holds the worker's dependencies, plus `canfar` when the
-worker imports the distributed helpers, and pin a version tag. Confirm it is
-listed by `canfar image ls --kind headless`. A private image needs registry
+worker imports the distributed helpers, and pin a version tag. The platform's
+standard images, such as `skaha/astroml`, ship the client, a release or two
+behind at times. Confirm the image is listed by
+`canfar image ls --kind headless`. A private image needs registry
 credentials in the client configuration, shown under
 [Private Container Images](https://www.opencadc.org/canfar/edge/client/get-started/#private-container-images).
 

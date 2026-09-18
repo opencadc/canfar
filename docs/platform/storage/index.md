@@ -39,8 +39,16 @@ df -h /arc/home/USER /arc/projects/PROJECT
 du -sh /arc/projects/PROJECT
 ```
 
-`df` reports filesystem capacity, not your personal or project quota.
-`du` measures accessible files and can take time on a large directory.
+`df` on any path under `/arc` reports the whole ARC filesystem. It never shows
+your home or project allocation, so use it only to confirm the mount.
+`du` measures the files you can read and can take time on a large directory.
+Usage figures can lag behind a large write or cleanup, so check again after a
+few minutes before concluding that nothing changed.
+
+Keep your home directory small: configuration, keys, and short scripts.
+Datasets, software environments, and download caches belong in project space.
+When home is nearly full, saving files and even logging in to a Session can
+fail, so free space there first when either starts to misbehave.
 Use the [Vault web interface](https://www.canfar.net/storage/vault/list/)
 for Vault data, and ask [support](../support/index.md) to confirm the quota
 that applies to your project.

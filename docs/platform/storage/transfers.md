@@ -80,6 +80,10 @@ use the authenticated CLI workflow below.
 
 ## Transfer files from a terminal
 
+SSHFS and SFTP access to ARC are not supported. Use the commands below, or
+Storage Management in your browser, in place of older instructions that mount
+ARC over SSH.
+
 [Install the client](../../client/get-started.md#install) and log in to the
 identity provider that owns the storage service. The default `arc` and `vault`
 services use CADC credentials (`canfar login cadc`), independently of which

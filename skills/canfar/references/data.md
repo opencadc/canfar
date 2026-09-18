@@ -11,6 +11,9 @@ ordinary tools: on CADC, `arc:/projects/PROJECT/x` is `/arc/projects/PROJECT/x`
 there. Use the commands below from a laptop, or for a service the Session
 does not mount.
 
+From outside a Session, the routes into ARC are these commands and Storage
+Management in the browser; the older SSHFS instructions are retired.
+
 ## Credentials follow the storage, not the compute
 
 Each remote identifier uses the Identity Provider of the Server that owns it,

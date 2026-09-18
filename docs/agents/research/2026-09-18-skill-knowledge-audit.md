@@ -91,22 +91,25 @@ nothing.
 - "Scale out, not up" as a rule. `docs/platform/best-practices.md` already
   declines to promise that many small requests beat one large one.
 
-## Waiting on a maintainer
+## Settled by a maintainer
 
-These are operator facts no repository settles:
+Operator facts no repository settles, answered by Shiny Brar on 2026-09-18 and
+written into the docs:
 
-1. Whether `df -h` on `/arc` reports a quota or the filesystem's capacity.
-2. Whether CADC runs the SFTP or SSHFS service for ARC, and on which host and
-   port.
-3. Whether DOI reviewers get access through the DPS workflow or through
-   support, and whether a published package can be corrected in place.
-4. Eligibility, cost, the access-request steps, and their turnaround.
-5. Storage lore: usage figures lagging after large writes, saves and logins
-   failing near a full home, a suggested project layout.
-6. Group Management lore: search by full name; whether ARC project
-   directories are private by default; public release as other-read on Vault.
-7. Whether platform images ship the `canfar` client.
-8. Whether the Science Portal offers Session renewal.
+| Question | Answer | Now in |
+| --- | --- | --- |
+| Does `df` on `/arc` show a quota? | No. On any path under `/arc` it shows the whole ARC filesystem, never a home or project allocation. | `platform/storage/index.md` |
+| Is SFTP or SSHFS to ARC supported? | No. | `platform/storage/transfers.md`, the skill |
+| DOI reviewer access and corrections | Referees get access before the DOI is minted. Published files never change; a correction adds files. | `platform/doi.md` |
+| Eligibility, cost, requesting access | Canadian astronomers and collaborators, for astronomical research, not a general-purpose free cloud; email support with a CADC username and research description, or join a project's group; larger needs go to an Alliance allocation. The turnaround figure was left out. | `platform/get-started.md`, `platform/support/faq.md` |
+| Storage lore | Usage figures can lag after large writes; saves and logins can fail near a full home; home is for configuration and small scripts. | `platform/storage/index.md` |
+| Sharing defaults | ARC project directories are private to the group; public release is a world-readable Vault node. | `platform/permissions.md` |
+| Group Management search | By username or full name. Administrators manage membership only, as the docs already said. | `platform/permissions.md` |
+| Do platform images ship the client? | Yes, such as `skaha/astroml`, at times a release or two behind. | `client/advanced-examples.md`, the skill |
+| Contributed applications | They must serve on port 5000. | `platform/sessions/contributed.md` |
+
+Still open: whether the Science Portal offers Session renewal. The Server API
+does and the `canfar` client does not, which is what `limits.md` says.
 
 ## Guidance kept in the skill
 

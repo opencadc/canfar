@@ -15,8 +15,22 @@ Identifiers depend on the deployment and your account.
 
 You need a CADC account and access to a Science Platform Server. Request a
 [CADC account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html)
-if needed, then ask the platform or project administrator for CANFAR and group
-access. See [Getting started](../get-started.md).
+if needed. Then either ask your project's administrator to add you to its
+group, or email [support@canfar.net](mailto:support@canfar.net) with your CADC
+username and a short description of your research. See
+[Getting started](../get-started.md).
+
+<span id="who-can-use-it-and-what-does-it-cost"></span>
+
+## Who can use CANFAR and what does it cost?
+
+The CADC deployment serves Canadian astronomers and their collaborators.
+Access is provided for astronomical research, under the site's policies and
+within the storage and compute allocated to your project; it is not a
+general-purpose free cloud. A project that needs more than CANFAR can offer
+should apply for an [Alliance resource allocation](https://docs.alliancecan.ca/).
+An SRCNet Science Platform Server has its own eligibility rules and support
+contacts.
 
 <span id="authentication-options-for-programs"></span>
 <span id="how-do-i-authenticate"></span>
@@ -154,7 +168,6 @@ credentials in an image layer. A pushed image is usable only where the target
 Science Platform Server can pull it.
 
 <span id="platform"></span>
-<span id="who-can-use-it-and-what-does-it-cost"></span>
 <span id="can-i-install-additional-software"></span>
 <span id="collaboration-and-sharing"></span>
 <span id="getting-help-and-community"></span>

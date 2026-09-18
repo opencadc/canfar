@@ -51,8 +51,8 @@ request a shared storage allocation and provide your group name.
 You must be an administrator of the group to change its membership.
 
 1. Open the group's membership editor and find the **Members** section.
-2. Search for your colleague by name, check the account in the results, and
-   select **Add member**.
+2. Search for your colleague by username or full name, check the account in
+   the results, and select **Add member**.
 3. To let a colleague manage membership too, use **Add administrator** in the
    **Administrators** section.
 4. Select **Update** to save changes. Reopen the group and confirm that the
@@ -91,6 +91,12 @@ access separately from adding group members.
 4. Ask a group member to sign in with their own account and open a sample
    file. For write access, have them create and remove a small test file in
    the agreed directory.
+
+A project directory on ARC is private to its group unless someone changes
+that. To release data publicly, place it on Vault and make it world-readable,
+in Storage Management or with
+[`vchmod o+r`](storage/vospace.md#legacy-vostools); for a citable release, use
+[data publication](doi.md).
 
 If you cannot edit permissions, ask the directory owner or CANFAR support.
 Use the path supplied for your allocation rather than assuming it matches the
