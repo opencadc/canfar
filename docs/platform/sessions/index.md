@@ -103,6 +103,9 @@ based on measured workload needs. Fixed requests can wait longer when matching
 capacity is unavailable. For headless workloads, see the [batch queue and
 troubleshooting guide](batch.md).
 
+Request ranges, Session lifetime, the per-user Session limit, and how to see
+what a running Session was granted are in [Session limits and resources](limits.md).
+
 <span id="api-access-to-sessions"></span>
 
 ## Session APIs

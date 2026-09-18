@@ -104,6 +104,34 @@ The `local:` operand is always the machine running `canfar`. `vault:` and
 configuration rather than assuming that every deployment has those identifiers.
 See [Data transfers](transfers.md) for command details.
 
+## Concurrent Sessions and shared storage
+
+Every Session you run mounts the same `/arc/home/<user>` and the same project
+directories, while each Session gets its own `/scratch`. Two Sessions, or the
+replicas of one batch run, can therefore write to the same persistent files at
+the same time.
+
+| State | Location | Shared between Sessions? |
+| --- | --- | --- |
+| Configuration, keys, `~/.canfar` | `/arc/home/<user>` | Yes, all of your Sessions |
+| Project data and results | `/arc/projects/<project>` | Yes, all members' Sessions |
+| Staging and intermediates | `/scratch` | No, one Session only |
+
+- Give each writer its own output file, named from the input or the replica,
+  and keep many writers out of one directory when a run produces thousands of
+  files.
+- Write to a temporary name and rename it into place, so a reader or a
+  restarted job never sees a half-written file.
+- Keep SQLite databases and other lock-heavy state on `/scratch` while they are
+  active, then copy an export or checkpoint to `/arc`. File locking on a shared
+  network filesystem is slow and can corrupt a database opened from two
+  Sessions.
+- Share with collaborators through `/arc/projects/<project>` or a VOSpace
+  Service; another Session cannot see your `/scratch`.
+
+The [advanced batch example](../../client/advanced-examples.md) applies these
+rules to a replicated run.
+
 <span id="storage-strategy-and-performance"></span>
 
 ## Remote-read performance
