@@ -155,7 +155,10 @@ once the user has authorized that deletion.
 
 Answer from the page, then cite it. Fetch the URL, or in a checkout of
 `opencadc/canfar` read the same path under `docs/` (`.../platform/doi/` is
-`docs/platform/doi.md`).
+`docs/platform/doi.md`). The site also publishes each page's Markdown source,
+indexed by [llms.txt](https://www.opencadc.org/canfar/edge/llms.txt); prefer it
+when a fetched page comes back cluttered. These links follow `edge`, the docs
+built from the same branch as this skill.
 
 Answer for the person asking: lead with the Science Portal
 (https://www.canfar.net/) route for someone working in a browser, and with the
@@ -167,22 +170,22 @@ wait for the user's explicit instruction.
 
 | Topic | Page |
 | --- | --- |
-| Accounts, access, first steps | https://www.opencadc.org/canfar/latest/platform/get-started/ |
-| Concepts and architecture | https://www.opencadc.org/canfar/latest/platform/concepts/ |
-| Session Kinds and lifecycle | https://www.opencadc.org/canfar/latest/platform/sessions/ |
-| Notebook, Desktop, CARTA, Firefly, Contributed | https://www.opencadc.org/canfar/latest/platform/sessions/notebook/ and its sibling pages `desktop/`, `carta/`, `firefly/`, `contributed/` |
-| Batch queueing and Pending diagnosis | https://www.opencadc.org/canfar/latest/platform/sessions/batch/ |
-| Session limits, lifetime, out-of-memory, what a Session was granted | https://www.opencadc.org/canfar/latest/platform/sessions/limits/ |
-| Storage, quotas, requesting space | https://www.opencadc.org/canfar/latest/platform/storage/ |
-| Filesystem access, remote reads, caching | https://www.opencadc.org/canfar/latest/platform/storage/filesystem/ |
-| Transfers | https://www.opencadc.org/canfar/latest/platform/storage/transfers/ |
-| VOSpace, sharing, legacy `vos` tools | https://www.opencadc.org/canfar/latest/platform/storage/vospace/ |
-| Groups, permissions, access denied | https://www.opencadc.org/canfar/latest/platform/permissions/ |
-| Container Images, building, the registry | https://www.opencadc.org/canfar/latest/platform/containers/ and `build/`, `registry/` |
-| Pipeline design and resource sizing | https://www.opencadc.org/canfar/latest/platform/best-practices/ |
-| CVMFS software stacks | https://www.opencadc.org/canfar/latest/platform/cvmfs/ |
-| Publishing data with a DOI | https://www.opencadc.org/canfar/latest/platform/doi/ |
-| FAQ, support, reporting a problem | https://www.opencadc.org/canfar/latest/platform/support/faq/ and https://www.opencadc.org/canfar/latest/platform/support/ |
-| Authentication Records and Server Selection | https://www.opencadc.org/canfar/latest/cli/authentication-contexts/ |
-| CLI reference, logging | https://www.opencadc.org/canfar/latest/cli/cli-help/ and https://www.opencadc.org/canfar/latest/cli/logging/ |
-| Acknowledging CANFAR in a paper | https://www.opencadc.org/canfar/latest/about/acknowledgement/ |
+| Accounts, access, first steps | https://www.opencadc.org/canfar/edge/platform/get-started/ |
+| Concepts and architecture | https://www.opencadc.org/canfar/edge/platform/concepts/ |
+| Session Kinds and lifecycle | https://www.opencadc.org/canfar/edge/platform/sessions/ |
+| Notebook, Desktop, CARTA, Firefly, Contributed | https://www.opencadc.org/canfar/edge/platform/sessions/notebook/ and its sibling pages `desktop/`, `carta/`, `firefly/`, `contributed/` |
+| Batch queueing and Pending diagnosis | https://www.opencadc.org/canfar/edge/platform/sessions/batch/ |
+| Session limits, lifetime, out-of-memory, what a Session was granted | https://www.opencadc.org/canfar/edge/platform/sessions/limits/ |
+| Storage, quotas, requesting space | https://www.opencadc.org/canfar/edge/platform/storage/ |
+| Filesystem access, remote reads, caching | https://www.opencadc.org/canfar/edge/platform/storage/filesystem/ |
+| Transfers | https://www.opencadc.org/canfar/edge/platform/storage/transfers/ |
+| VOSpace, sharing, legacy `vos` tools | https://www.opencadc.org/canfar/edge/platform/storage/vospace/ |
+| Groups, permissions, access denied | https://www.opencadc.org/canfar/edge/platform/permissions/ |
+| Container Images, building, the registry | https://www.opencadc.org/canfar/edge/platform/containers/ and `build/`, `registry/` |
+| Pipeline design and resource sizing | https://www.opencadc.org/canfar/edge/platform/best-practices/ |
+| CVMFS software stacks | https://www.opencadc.org/canfar/edge/platform/cvmfs/ |
+| Publishing data with a DOI | https://www.opencadc.org/canfar/edge/platform/doi/ |
+| FAQ, support, reporting a problem | https://www.opencadc.org/canfar/edge/platform/support/faq/ and https://www.opencadc.org/canfar/edge/platform/support/ |
+| Authentication Records and Server Selection | https://www.opencadc.org/canfar/edge/cli/authentication-contexts/ |
+| CLI reference, logging | https://www.opencadc.org/canfar/edge/cli/cli-help/ and https://www.opencadc.org/canfar/edge/cli/logging/ |
+| Acknowledging CANFAR in a paper | https://www.opencadc.org/canfar/edge/about/acknowledgement/ |

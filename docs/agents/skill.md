@@ -29,6 +29,19 @@ of it as possible:
 A change to the CLI or Python surface therefore updates the docs and the skill
 in the same pull request.
 
+## Which docs the skill links
+
+`npx skills add` installs the skill from `main`, so the skill links the `edge`
+docs, which `mike` deploys from `main`. `latest` is the last release and can
+describe an older interface, or lack a page the skill points at.
+
+`docs/hooks/llmstxt.py` runs after every build. It writes `llms.txt`, an index
+of the navigation, and copies each page's Markdown source into the site at its
+source path, so `platform/doi.md` is served beside `platform/doi/`. Agents read
+the text the site was built from, and relative links between pages still work.
+The hook has no dependencies beyond MkDocs; `tests/test_docs_llmstxt.py`
+covers it.
+
 ## Editing the skill
 
 - Put new platform knowledge in `docs/` and add its page to the topic table.

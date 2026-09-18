@@ -18,7 +18,7 @@ Use an image that holds the worker's dependencies, plus `canfar` when the
 worker imports the distributed helpers, and pin a version tag. Confirm it is
 listed by `canfar image ls --kind headless`. A private image needs registry
 credentials in the client configuration, shown under
-[Private Container Images](https://www.opencadc.org/canfar/latest/client/get-started/#private-container-images).
+[Private Container Images](https://www.opencadc.org/canfar/edge/client/get-started/#private-container-images).
 
 ## 2. Write one manifest
 
@@ -161,7 +161,7 @@ save `info`, `events`, and `logs` for the IDs that are not `Succeeded` or
 ask the user whether to keep waiting or cancel; the Sessions stay until they
 answer. A long `Pending` is diagnosed with `canfar events SESSION_ID` and the
 table in the
-[batch guide](https://www.opencadc.org/canfar/latest/platform/sessions/batch/#monitor-and-troubleshoot).
+[batch guide](https://www.opencadc.org/canfar/edge/platform/sessions/batch/#monitor-and-troubleshoot).
 
 ## 7. Verify, then recover
 
@@ -199,8 +199,8 @@ quote it, and a short prefix also matches the user's other runs, so use the
 full request name.
 
 The complete manifest, worker, submit, verify, and cleanup scripts are in
-[Advanced examples](https://www.opencadc.org/canfar/latest/client/advanced-examples/).
-Helper edge cases are in [Helpers](https://www.opencadc.org/canfar/latest/client/helpers/),
-pipeline sizing in [Best practices](https://www.opencadc.org/canfar/latest/platform/best-practices/),
+[Advanced examples](https://www.opencadc.org/canfar/edge/client/advanced-examples/).
+Helper edge cases are in [Helpers](https://www.opencadc.org/canfar/edge/client/helpers/),
+pipeline sizing in [Best practices](https://www.opencadc.org/canfar/edge/platform/best-practices/),
 and lifetime, deadlines, and out-of-memory symptoms in
-[Session limits](https://www.opencadc.org/canfar/latest/platform/sessions/limits/).
+[Session limits](https://www.opencadc.org/canfar/edge/platform/sessions/limits/).

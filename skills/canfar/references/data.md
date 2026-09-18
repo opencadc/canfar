@@ -61,10 +61,10 @@ repeated reads, stage one copy with `get_file()` (to `/scratch` in a Session)
 and work on that.
 
 Staging, caching, and scientific-library recipes are in
-[Data access](https://www.opencadc.org/canfar/latest/client/data/) and
-[Filesystem and Python tools](https://www.opencadc.org/canfar/latest/platform/storage/filesystem/);
-command details in [Data commands](https://www.opencadc.org/canfar/latest/cli/data/);
+[Data access](https://www.opencadc.org/canfar/edge/client/data/) and
+[Filesystem and Python tools](https://www.opencadc.org/canfar/edge/platform/storage/filesystem/);
+command details in [Data commands](https://www.opencadc.org/canfar/edge/cli/data/);
 browser uploads and downloads in
-[Data transfers](https://www.opencadc.org/canfar/latest/platform/storage/transfers/);
+[Data transfers](https://www.opencadc.org/canfar/edge/platform/storage/transfers/);
 sharing and legacy `vos` tools in
-[VOSpace](https://www.opencadc.org/canfar/latest/platform/storage/vospace/).
+[VOSpace](https://www.opencadc.org/canfar/edge/platform/storage/vospace/).

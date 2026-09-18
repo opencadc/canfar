@@ -96,7 +96,12 @@ plugins:
 # Dated engineering records stay in the repository for maintainers but are not
 # user-facing site pages. Excluding them also keeps MkDocs' unlisted-page
 # warning focused on accidental navigation omissions.
+# Publishes llms.txt and each page's Markdown source for coding agents.
+hooks:
+  - docs/hooks/llmstxt.py
+
 exclude_docs: |
+  hooks/**
   agents/adrs/**
   agents/research/**
   agents/reviews/**

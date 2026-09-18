@@ -72,9 +72,9 @@ or `CANFAR_CERTIFICATE`). Runtime credentials override the saved record for
 that client and are never persisted; supply them from the CI secret store.
 
 Setup and selection are in
-[Install and set up](https://www.opencadc.org/canfar/latest/client/get-started/),
+[Install and set up](https://www.opencadc.org/canfar/edge/client/get-started/),
 matching sync and async operations in
-[Examples](https://www.opencadc.org/canfar/latest/client/examples/), and the
-full references in [Session](https://www.opencadc.org/canfar/latest/client/session/),
-[AsyncSession](https://www.opencadc.org/canfar/latest/client/async_session/),
-and [HTTPClient](https://www.opencadc.org/canfar/latest/client/client/).
+[Examples](https://www.opencadc.org/canfar/edge/client/examples/), and the
+full references in [Session](https://www.opencadc.org/canfar/edge/client/session/),
+[AsyncSession](https://www.opencadc.org/canfar/edge/client/async_session/),
+and [HTTPClient](https://www.opencadc.org/canfar/edge/client/client/).

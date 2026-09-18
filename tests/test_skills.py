@@ -427,7 +427,10 @@ def _links(text: str) -> list[str]:
 def test_skill_links_resolve(example: Example) -> None:
     """The skill points only at docs pages, anchors, and files that exist."""
     link = example.text
-    if link.startswith(DOCS_SITES):
+    if link.startswith(DOCS_SITES) and link.endswith("/llms.txt"):
+        # Written into the built site by the docs hook, not kept under docs/.
+        assert "docs/hooks/llmstxt.py" in (ROOT / "mkdocs.yml").read_text()
+    elif link.startswith(DOCS_SITES):
         page, anchor = _doc_page(link)
         assert page is not None, f"{link} has no page under docs/"
         assert not anchor or anchor in _anchors(page), f"{link}: no such anchor"
