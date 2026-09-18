@@ -71,8 +71,8 @@ expiry hooks, for that client only.
 - Use `-o json` or `-o yaml` on supported commands in place of `--json` and
   `--yaml`. Machine output contains only data on stdout; diagnostics use stderr.
 - Use canonical command names such as `auth`, `create`, and `delete`. Several
-  alternative spellings were removed; the [migration table](migration.md#update-command-lines)
-  lists replacements and the retained deprecated login alias.
+  alternative spellings were removed, including the login alias under `auth`;
+  the [migration table](migration.md#update-command-lines) lists replacements.
 - Use `config.editor.get()`, `.set()`, and `.save()` for validated configuration
   edits. The stored schema remains stable; the editing methods moved.
 - Use `--log-level` or repeated `-v` before the command. Add `--log-file PATH`
