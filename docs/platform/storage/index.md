@@ -157,5 +157,6 @@ backend boundary and scientific-library recipes.
 - [Filesystem and Python tools](filesystem.md)
 - [Data transfers](transfers.md)
 - [VOSpace](vospace.md)
+- [CADC archive data](archives.md)
 - [Session storage](../sessions/index.md)
 - [Permissions](../permissions.md)

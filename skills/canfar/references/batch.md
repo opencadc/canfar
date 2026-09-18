@@ -76,6 +76,10 @@ unless the ramp measured a need beyond them, and then pass `--cpu` and
 with its own resources, and replicas start as capacity allows rather than
 together.
 
+The Server sets `OMP_NUM_THREADS` and the matching thread variables to the
+requested cores, which is 1 for a flexible request. For threaded code, pass
+`--cpu N` with `--memory`, or set `--env OMP_NUM_THREADS=N` yourself.
+
 Headless Sessions are exempt from the per-user limit on interactive Sessions,
 so a large request queues as `Pending` until capacity frees up. `canfar stats`
 shows the Server's requested and total cores and memory: check it first, and
@@ -92,8 +96,8 @@ canfar create headless IMAGE --name RUN --replicas 64 --env RUN_DIR=/arc/project
 ```
 
 - Stdout is a JSON array of accepted Session IDs. Replicas are named `RUN-1`
-  to `RUN-64`; a single replica is named `RUN`. Short lowercase names with
-  hyphens are always safe. Repeat `--env KEY=VALUE` per variable.
+  to `RUN-64`; a single replica is named `RUN`. Names take letters, digits,
+  and hyphens. Repeat `--env KEY=VALUE` per variable.
 - The client validates 1 to 512 replicas, 1 to 256 cores, 1 to 512 GB, and 1 to
   28 GPUs per request. `--dry-run`, used without `-o`, checks a request against
   those bounds; the Server's live options come from

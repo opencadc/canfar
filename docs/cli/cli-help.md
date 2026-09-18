@@ -111,7 +111,10 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 `KIND` is one of `desktop`, `notebook`, `carta`, `headless`, `firefly`, or
 `contributed`. `IMAGE` is a CANFAR Container Image such as
 `skaha/astroml:latest`; the client adds the CANFAR registry and `:latest` when
-they are omitted.
+they are omitted. That shorthand always expands to `images.canfar.net`, so on a
+Server that trusts another registry, write the full `REGISTRY/PROJECT/IMAGE:TAG`
+name from `canfar image ls`. Accepted ranges for every option are in
+[Session limits](../platform/sessions/limits.md).
 
 | Option | Effect |
 | --- | --- |
@@ -120,7 +123,7 @@ they are omitted.
 | `--memory`, `-m` | Requested RAM in GB. |
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
-| `--replicas`, `-r` | Number of Sessions; default `1`. |
+| `--replicas`, `-r` | Number of Sessions, 1 to 512; default `1`. |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |

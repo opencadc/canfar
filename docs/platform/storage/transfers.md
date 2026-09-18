@@ -136,6 +136,13 @@ Use `-R` (or `-r`) for a directory copy:
 canfar data cp -R local:/data/run-42 vault:/project/runs/run-42
 ```
 
+`cp` checks each destination file's size against the source after the transfer
+and reports a mismatch as a failure. A recursive copy is a sequence of file
+copies, not a snapshot: files that change during the copy can arrive in mixed
+states, and a copy that stops partway leaves the files already transferred.
+For many files, prefer a workflow you can rerun, then compare the file count
+and, where the archive publishes them, the checksums.
+
 Create a destination first when that makes the workflow clearer:
 
 ```bash
@@ -162,6 +169,9 @@ canfar data rmdir vault:/project/results/empty-directory
 <span id="scratch-to-arc-within-sessions"></span>
 
 ## Download an archive URL list
+
+For CADC archive files, use the identifier-based tools in
+[CADC archive data](archives.md) instead of a URL list.
 
 If an astronomy archive gives you a text file with one download URL per line,
 you can use `wget` in a Session terminal where it is installed. Replace

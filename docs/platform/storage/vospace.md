@@ -173,6 +173,44 @@ filesystem or open handle alive across a Session shutdown or pass an open
 filesystem into a worker process; reconstruct it in the worker with the same
 Storage Identifier and usable credentials.
 
+<span id="legacy-vostools"></span>
+
+## Legacy vostools
+
+The `vos` package provides the older `vls`, `vcp`, `vsync`, `vmkdir`, `vrm`,
+and `vchmod` commands. Use `canfar data` for new work. Keep vostools for an
+existing script, for one-way directory synchronisation with `vsync`, and for
+setting VOSpace permissions with `vchmod`, which `canfar data` does not do.
+
+```bash
+pip install vos
+```
+
+vostools reads the certificate at `~/.ssl/cadcproxy.pem`, the file that
+`canfar login cadc` writes and keeps valid for 30 days. Without the CANFAR
+client, `cadc-get-cert -u USERNAME` writes the same file, valid for 10 days
+unless you pass `--days-valid`. Every command also accepts `--certfile PATH` or
+`--token TOKEN`; with neither, it tries `~/.netrc` and then anonymous access.
+
+`vos:` and `vault:` both name CADC Vault. Any other scheme names the CADC
+service of that name, so ARC is `arc:`. The long forms are
+`vos://cadc.nrc.ca~vault/PATH` and `vos://cadc.nrc.ca~arc/PATH`.
+
+| Command | What it does |
+| --- | --- |
+| `vls -l vos:USER/` | List one node in detail. `-h` prints human-readable sizes; help is `--help`. |
+| `vcp input.fits vos:USER/data/` | Upload. `vcp vos:USER/data/input.fits ./` downloads. |
+| `vcp "vos:USER/data/*.fits" ./` | Download by pattern; quote it so the shell leaves it alone. |
+| `vsync --recursive ./run-42 arc:projects/PROJECT/run-42` | Synchronise a local directory to VOSpace, one way. `--nstreams N` sets parallel streams (5 by default, at most 30). |
+| `vmkdir -p vos:USER/a/b` | Create a directory and its parents. |
+| `vchmod g+r vos:USER/data "GROUP"` | Let a group read. `g+w` grants write, and `g+rw` takes the read group and then the write group. |
+| `vchmod o+r vos:USER/data` | Make a node public; `o-r` reverses it. `-R` applies a mode recursively. |
+
+`vcp` always copies recursively and cannot copy between two VOSpace services;
+download and upload instead, or use `canfar data cp`, which can. To give
+several groups the same permission, pass them as one quoted, space-separated
+argument, such as `"GROUP1 GROUP2"`, up to four groups.
+
 ## Related guides
 
 - [Storage overview](index.md)

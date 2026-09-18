@@ -212,6 +212,7 @@ nav:
           - Filesystem: platform/storage/filesystem.md
           - Data Transfers: platform/storage/transfers.md
           - VOSpace: platform/storage/vospace.md
+          - CADC Archive Data: platform/storage/archives.md
       - Containers:
           - Overview: platform/containers/index.md
           - Building Containers: platform/containers/build.md

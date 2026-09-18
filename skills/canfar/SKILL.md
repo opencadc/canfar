@@ -180,6 +180,7 @@ wait for the user's explicit instruction.
 | Filesystem access, remote reads, caching | https://www.opencadc.org/canfar/edge/platform/storage/filesystem/ |
 | Transfers | https://www.opencadc.org/canfar/edge/platform/storage/transfers/ |
 | VOSpace, sharing, legacy `vos` tools | https://www.opencadc.org/canfar/edge/platform/storage/vospace/ |
+| CADC archive data: `cadcget`, `cadc-tap` | https://www.opencadc.org/canfar/edge/platform/storage/archives/ |
 | Groups, permissions, access denied | https://www.opencadc.org/canfar/edge/platform/permissions/ |
 | Container Images, building, the registry | https://www.opencadc.org/canfar/edge/platform/containers/ and `build/`, `registry/` |
 | Pipeline design and resource sizing | https://www.opencadc.org/canfar/edge/platform/best-practices/ |

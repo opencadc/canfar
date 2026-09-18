@@ -72,6 +72,30 @@ with Session() as session:
     )
 ```
 
+`replicas` accepts 1 to 512; other ranges are in
+[Session limits](../platform/sessions/limits.md). Request GPUs with the `gpu`
+argument. The CLI option is `--gpu` as well, while the request model and the
+Server's API name the field `gpus`:
+
+```python
+from canfar.sessions import Session
+
+with Session() as session:
+    ids = session.create(
+        name="training",
+        image="IMAGE_WITH_GPU_LIBRARIES",
+        kind="headless",
+        cmd="python",
+        args="/arc/projects/demo/train.py",
+        cores=8,
+        ram=32,
+        gpu=1,
+    )
+```
+
+Use an image built for the Server's GPU stack, and confirm the device inside
+the Session with `nvidia-smi`.
+
 ## Select Sessions for cleanup
 
 `destroy_with` has a keyword-only filter contract:

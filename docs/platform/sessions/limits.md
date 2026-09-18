@@ -16,6 +16,7 @@ request.
 | `--gpu` / `gpu` | 1 to 28 GPUs |
 | `--replicas` / `replicas` | 1 to 512; exactly 1 for `desktop` and `firefly` |
 | Command, arguments, `--env` | `headless` Sessions only |
+| `--name` | Letters, digits, and hyphens |
 
 `desktop` and `firefly` Sessions use the Server's own sizes, so CPU and memory
 values are ignored for them. Check a request without creating anything:
@@ -41,9 +42,12 @@ values that matter to your project with [support](../support/index.md).
 
 | Policy | Default | How it shows up |
 | --- | --- | --- |
+| Flexible resources (no `--cpu` or `--memory`) | 1 core and 4 GB guaranteed, bursting to 8 cores and 32 GB | The Session starts on little free capacity and shares the burst with other users |
+| Fixed resources (`--cpu` and `--memory`) | The request is also the limit | The values must be among the Server's offered options |
+| `desktop` and `firefly` sizes | Set by the Server | `--cpu` and `--memory` are ignored |
 | Interactive Session lifetime | 4 days | `canfar info SESSION_ID` shows the expiry time |
 | `headless` Session deadline | 14 days | A failed command is not restarted |
-| Finished `headless` Session record | Kept for 1 hour | The ID then leaves `canfar ps --all`; judge the run by its outputs |
+| Finished Session record | Kept for 1 hour (`headless`) or 1 day (interactive) | The ID then leaves `canfar ps --all`; judge a run by its outputs |
 | Active interactive Sessions per user | 5 | `create` is rejected with "has reached the maximum of N active sessions" |
 | Session-local storage, including `/scratch` | 20 GiB to start, growing to 200 GiB | `No space left on device`; `desktop` Sessions get a smaller amount |
 
@@ -57,9 +61,23 @@ canfar ps
 canfar delete SESSION_ID
 ```
 
+The Server's API can renew an interactive Session, which resets its remaining
+lifetime to the full period. The `canfar` client does not offer that action
+yet, so save your work and start a new Session before the expiry time.
+
 A fixed request can stay `Pending` longer than a flexible one, because it waits
 for a node with that much free capacity. `canfar events SESSION_ID` shows what
 a Pending Session is waiting for; see [Batch processing](batch.md#monitor-and-troubleshoot).
+
+## Threads follow the request
+
+The Server sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`,
+and `JULIA_NUM_THREADS` to the number of cores you requested, so numerical
+libraries do not start more threads than the Session was granted. A flexible
+Session requests one core, so there these variables are `1` even though the
+Session can burst to more. To use the burst, set them yourself: pass
+`--env OMP_NUM_THREADS=4` to a `headless` Session, or export the variable in a
+notebook or terminal before the library is imported.
 
 ## What a running Session really has
 
@@ -72,6 +90,10 @@ cat /sys/fs/cgroup/memory.max
 df -h /scratch
 nvidia-smi
 ```
+
+`/scratch` lasts as long as the Session. It survives an in-place restart of an
+interactive Session's container and is removed when the Session ends; a
+`headless` command is never restarted.
 
 `memory.max` is the memory limit in bytes (`max` means unlimited); on older
 hosts the file is `/sys/fs/cgroup/memory/memory.limit_in_bytes`. `nvidia-smi`

@@ -1,8 +1,10 @@
 # Contributed applications
 
-Contributed Sessions expose community-provided web applications through the
-Science Platform. The catalogue, image names, ports, and access requirements
-are deployment-specific.
+Contributed Sessions expose community-provided web applications, such as
+browser-based editors and reactive notebooks, through the Science Platform.
+The catalogue of images is deployment-specific; the contract an image must
+meet is the same everywhere and is described under
+[Contribute an application](#contribute-an-application).
 
 <span id="getting-started"></span>
 <span id="troubleshooting"></span>
@@ -51,16 +53,33 @@ contributed image exposes the same directories.
 
 ## Contribute an application
 
-Start with a container that can run the application without interactive setup.
-The platform operator must confirm the web endpoint, health check, command,
-resource needs, image registry, and security requirements for the target
-deployment. Do not assume a fixed port or startup path from another
-application.
+A contributed image is a web application that meets this contract:
 
-For the image workflow, see [Container Images](../containers/index.md) and
-[Container Registry](../containers/registry.md). Contact
-[support@canfar.net](mailto:support@canfar.net) before requesting that an image
-be added to the catalogue.
+| Requirement | Detail |
+| --- | --- |
+| Listen on port 5000 | Serve plain HTTP on TCP port 5000, on all interfaces. The Server checks that port to decide the Session is ready and healthy, and routes the browser to it. |
+| Start by itself | The Server sets no command. The image's own `ENTRYPOINT` or `CMD` must start the application without interactive setup. |
+| Run as any user | The container starts as the Session owner's user and group IDs, never as root, with every Linux capability dropped and privilege escalation off. Keep runtime files in locations that user can write, such as the home directory or `/tmp`. |
+| Provide a shell | The Server runs `/bin/sh` and `cp` from the image while it prepares the Session's user and group files. |
+| Tolerate a URL prefix | The browser opens `https://HOST/session/contrib/SESSION_ID/`. The Server strips that prefix, so the application receives requests at `/`. Use relative links, or a configurable base URL, so pages and assets still load from the prefixed address. |
+
+Within those limits the application sees the same environment as other
+Sessions: `HOME` is the user's persistent home directory, `/scratch` and the
+project directories are mounted, and `OMP_NUM_THREADS` and the matching
+thread variables are set to the requested core count.
+
+Test the image as an unprivileged user before publishing it:
+
+```bash
+docker run --rm --user 12345:12345 --cap-drop ALL -p 5000:5000 IMAGE
+```
+
+Then push it to a registry the Server trusts and label it `contributed`, so
+it is listed for this Session Kind; see
+[Container Images](../containers/index.md#what-a-server-requires-of-an-image)
+and [Container Registry](../containers/registry.md). Contact
+[support@canfar.net](mailto:support@canfar.net) to have an application added
+to the shared catalogue.
 
 ## Related guides
 
