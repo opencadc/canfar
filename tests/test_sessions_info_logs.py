@@ -3,13 +3,22 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 from unittest.mock import patch
 
 import httpx
 import pytest
-from pydantic import SecretStr
+from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
+from canfar.exceptions.context import AuthRequiredError
+from canfar.models.active import ActiveConfig
+from canfar.models.auth import X509Credential
+from canfar.models.config import Configuration
+from canfar.models.http import Server
 from canfar.sessions import AsyncSession, Session
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _BASE_URL = "https://example.test/skaha/v1/"
 
@@ -122,3 +131,61 @@ async def test_async_info_and_logs_share_public_policy(
         for session_id, message in expected_logs.items()
         for message in (f"Session ID: {session_id}\n", message)
     ]
+
+
+def _unauthenticated(tmp_path: Path) -> Configuration:
+    """Build a configuration whose saved certificate was never issued."""
+    return Configuration(
+        active=ActiveConfig(authentication="test", server="platform"),
+        authentication={
+            "test": X509Credential(idp="test", path=tmp_path / "absent.pem", expiry=0.0)
+        },
+        servers={
+            "platform": Server(
+                idp="test",
+                name="platform",
+                uri=AnyUrl("ivo://test.example/skaha"),
+                url=AnyHttpUrl("https://platform.example"),
+                version="v1",
+            )
+        },
+    )
+
+
+_UNAUTHENTICATED_CALLS = (
+    pytest.param("info", {"ids": ["one", "two"]}, id="info"),
+    pytest.param("logs", {"ids": ["one", "two"]}, id="logs"),
+    pytest.param("events", {"ids": ["one", "two"]}, id="events"),
+    pytest.param("destroy", {"ids": ["one", "two"]}, id="destroy"),
+    pytest.param(
+        "create",
+        {"name": "probe", "image": "skaha/terminal:1.1.2", "replicas": 2},
+        id="create",
+    ),
+)
+
+
+@pytest.mark.parametrize(("method", "arguments"), _UNAUTHENTICATED_CALLS)
+def test_sync_calls_without_a_credential_ask_for_login(
+    tmp_path: Path,
+    method: str,
+    arguments: dict[str, object],
+) -> None:
+    """A missing credential is one failure of the client, not one per Session."""
+    with (
+        Session(config=_unauthenticated(tmp_path)) as session,
+        pytest.raises(AuthRequiredError),
+    ):
+        getattr(session, method)(**arguments)
+
+
+@pytest.mark.parametrize(("method", "arguments"), _UNAUTHENTICATED_CALLS)
+async def test_async_calls_without_a_credential_ask_for_login(
+    tmp_path: Path,
+    method: str,
+    arguments: dict[str, object],
+) -> None:
+    """The asynchronous client reports it the same way as the synchronous one."""
+    async with AsyncSession(config=_unauthenticated(tmp_path)) as session:
+        with pytest.raises(AuthRequiredError):
+            await getattr(session, method)(**arguments)

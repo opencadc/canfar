@@ -11,6 +11,7 @@ from webbrowser import open_new_tab
 from httpx import HTTPError, Response
 
 from canfar.client import HTTPClient
+from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.models.session import CreateRequest
 from canfar.utils import build
 
@@ -31,12 +32,24 @@ def _log_http_task_failure(operation: str, context: object, exc: BaseException) 
     log.error("%s: %s (%s)", operation, context, type(exc).__name__)
 
 
+def _raise_authentication_failure(result: object) -> None:
+    """Raise a collected Authentication failure, which belongs to the client.
+
+    ``asyncio.gather(..., return_exceptions=True)`` collects one copy per task.
+    Reporting it as a per-Session transport failure would hide that no request
+    was sent, so the asynchronous client raises it as the synchronous one does.
+    """
+    if isinstance(result, AuthContextError | AuthExpiredError):
+        raise result
+
+
 def _task_result(
     operation: str,
     context: object,
     result: _Result | Exception,
 ) -> _Result | None:
     """Keep one failure and logging policy for collected transport results."""
+    _raise_authentication_failure(result)
     if isinstance(result, Exception):
         _log_http_task_failure(operation, context, result)
         return None
@@ -807,6 +820,7 @@ class AsyncSession(HTTPClient):
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for reply in responses:
+            _raise_authentication_failure(reply)
             if isinstance(reply, tuple):
                 results[reply[0]] = reply[1]
         log.debug(results)

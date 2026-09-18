@@ -139,9 +139,10 @@ copied to storage that Session mounts, or built into the image.
 With `-o`, stdout carries only the payload, and a failure exits nonzero with
 `code`, `message`, and `hint` as JSON on stderr. Select list items by ID or
 name rather than by position. Human-text commands print an `@SERVER` banner
-first and report problems in plain text, sometimes with exit status 0, so
-judge them by what they print: `canfar image ls` showing no image rows beside
-an authentication message means login, not an empty registry. Root logging options go before the
+first and report problems in plain text. Releases up to 1.4.1 exit 0 on an
+authentication failure, so judge those commands by what they print:
+`canfar image ls` showing no image rows beside an authentication message
+means login, not an empty registry. Root logging options go before the
 command, as in `canfar --log-level debug ps -o json`; debug logs can include
 response bodies, so keep them out of shared reports. `--log-file PATH` adds a
 rotating JSON Lines log.
