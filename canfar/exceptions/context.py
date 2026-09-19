@@ -10,6 +10,15 @@ class AuthContextError(Exception):
         super().__init__(self.message)
 
 
+class AuthRequiredError(AuthContextError):
+    """Raised when the active Authentication has no credential to present."""
+
+    def __init__(self, context: str, reason: str) -> None:
+        self.message = f"Not authenticated with '{context}'."
+        self.message += f"\nReason: {reason}"
+        Exception.__init__(self, self.message)
+
+
 class AuthExpiredError(Exception):
     """Raised when active Authentication state is expired."""
 

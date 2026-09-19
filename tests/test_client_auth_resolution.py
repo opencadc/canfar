@@ -13,7 +13,11 @@ from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
 from canfar.client import HTTPClient
-from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.context import (
+    AuthContextError,
+    AuthExpiredError,
+    AuthRequiredError,
+)
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
@@ -262,6 +266,18 @@ class TestRequestAuthenticationResolution:
         )
 
         with pytest.raises(AuthContextError, match=r"X\.509 certificate"):
+            _ = HTTPClient(config=config).client
+
+    def test_missing_x509_certificate_means_not_authenticated(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """A saved record whose certificate was never issued asks for login."""
+        config = _configuration(
+            X509Credential(idp="test", path=tmp_path / "absent.pem", expiry=0.0)
+        )
+
+        with pytest.raises(AuthRequiredError, match="Not authenticated"):
             _ = HTTPClient(config=config).client
 
     @pytest.mark.parametrize(

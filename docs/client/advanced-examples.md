@@ -19,7 +19,10 @@ paths. These examples do not assume that `/arc` is mounted on your laptop.
   running the controller.
 - Choose a headless image containing Python, `astropy`, and `canfar`. List images
   with `canfar image ls --kind headless`; a registry listing alone does not
-  establish which Python packages an image contains.
+  establish which Python packages an image contains. The platform's standard
+  images, such as `skaha/astroml`, ship the `canfar` client, which can be a
+  release or two behind; run `canfar version` in the image when the worker
+  depends on a recent feature.
 - Test the worker on one FITS file using that image before a larger run.
   Use a versioned image tag and record it; avoid a mutable `latest` tag for
   a reproducible pipeline.

@@ -3,8 +3,10 @@
 [CVMFS](https://cvmfs.readthedocs.io/en/stable/) is a read-only, on-demand
 filesystem for distributing large, versioned software trees. A Science
 Platform deployment may mount one or more CVMFS repositories in Sessions. The
-available repositories and software are deployment data; a missing path is not
-an instruction to install a CVMFS client yourself.
+open-source platform does not mount CVMFS by itself; an operator adds it to
+the Sessions of a deployment. The available repositories and software are
+therefore deployment data, and a missing path is not an instruction to install
+a CVMFS client yourself.
 
 CVMFS is for shared software and reference data. Keep notebooks, source code,
 intermediate files, and research products in writable [Science Platform
@@ -47,6 +49,14 @@ module list
 Module changes apply to the current process and Session. Put stable, required
 dependencies in a versioned Container Image or environment rather than
 depending on an unrecorded interactive shell.
+
+## Choose where software lives
+
+| You need | Use |
+| --- | --- |
+| The same environment for every run and every collaborator | A versioned [Container Image](containers/index.md) |
+| A compiler, library, or tool the Alliance stack already provides | A CVMFS module, recording its name and version |
+| A project's own Python or conda environment that changes often | An environment under `/arc/projects/<project>`, created from a lock file |
 
 ## Trade-offs
 

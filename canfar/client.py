@@ -23,7 +23,7 @@ from typing_extensions import Self
 
 from canfar import __version__
 from canfar.auth import oidc, x509
-from canfar.exceptions.context import AuthContextError
+from canfar.exceptions.context import AuthContextError, AuthRequiredError
 from canfar.hooks.httpx import auth, debug, errors, expiry
 from canfar.models.auth import (
     AuthenticationCredential,
@@ -395,13 +395,18 @@ class HTTPClient(BaseSettings):
 
         if isinstance(credential, X509Credential):
             if credential.path is None:
-                raise AuthContextError(
+                raise AuthRequiredError(
                     credential.idp,
                     "X.509 certificate path is missing.",
                 )
             try:
                 x509.valid(credential.path)
                 kwargs["verify"] = self._get_ssl_context(credential.path)
+            except FileNotFoundError as err:
+                raise AuthRequiredError(
+                    credential.idp,
+                    "X.509 certificate has not been issued.",
+                ) from err
             except (OSError, ValueError) as err:
                 raise AuthContextError(
                     credential.idp,
@@ -482,7 +487,7 @@ class HTTPClient(BaseSettings):
                     f"Bearer {credential.token.access.get_secret_value()}"
                 )
             elif not credential.refreshable:
-                raise AuthContextError(
+                raise AuthRequiredError(
                     credential.idp,
                     "OIDC Authentication Record has no usable access token.",
                 )

@@ -18,7 +18,11 @@ from canfar.errors import (
     structured_error_to_json,
     structured_error_to_yaml,
 )
-from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.context import (
+    AuthContextError,
+    AuthExpiredError,
+    AuthRequiredError,
+)
 
 OUTPUT_CONFLICT_EXIT_CODE = 2
 """Exit code for conflicting machine output flags."""
@@ -98,11 +102,17 @@ def boundary_failure(
             message=err.message,
             hint="Reset the configuration and log in again.",
         )
+    if isinstance(err, AuthRequiredError):
+        return StructuredError(
+            code=ErrorCode.AUTHENTICATION_REQUIRED,
+            message=str(err),
+            hint="Run `canfar login` and retry.",
+        )
     if isinstance(err, AuthExpiredError):
         return StructuredError(
             code=ErrorCode.AUTHENTICATION_EXPIRED,
             message=str(err),
-            hint="Authenticate again and retry.",
+            hint="Run `canfar login` to authenticate again, then retry.",
         )
     if isinstance(err, AuthContextError):
         return StructuredError(

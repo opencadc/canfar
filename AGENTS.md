@@ -29,6 +29,7 @@ Use these project commands with the `rtk` prefix. Set `UV_CACHE_DIR=/tmp/canfar-
 - Deterministic non-slow tests: `rtk proxy uv run --no-sync pytest tests -m "not slow" --no-cov -q -o cache_dir=/tmp/canfar-pytest-cache`
 - Docs build: `rtk proxy uv run --group docs mkdocs build`
 - Full test suite: `rtk proxy uv run --no-sync pytest`
+- Skill and docs truth: `rtk proxy uv run --no-sync pytest tests/test_skills.py --no-cov -q -n0`
 
 Run focused tests for changed behavior before broader validation. Use the deterministic suite for work without live credentials. The full suite contacts CANFAR and creates/deletes test Sessions; run it only with a valid account, usable Authentication Record, and certificate.
 
@@ -37,6 +38,10 @@ Pytest creates an empty temporary home by default, so a certificate in your norm
 Tests constructing `Configuration` must isolate `CONFIG_PATH`, even when using `model_validate`: settings sources can merge a populated configuration into explicit input. Report deterministic results separately from live service failures; a docs build or local test pass does not establish live workflow success.
 
 ## Agent skills
+
+### Published skill
+
+`skills/canfar/` is the one skill users install (`npx skills add opencadc/canfar`). A change to the CLI or Python surface updates `docs/` and the skill in the same change; `tests/test_skills.py` fails on commands, Python examples, API names, and links that drift. Put new platform knowledge in `docs/` and point the skill at it. See `docs/agents/skill.md`.
 
 ### Issue tracker
 
@@ -67,7 +72,7 @@ Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant e
 - Python `canfar.login()` / `canfar.alogin()` save credentials and discovered servers without selecting the active identity/server. Follow with `authentication.use()`, `server.list_servers()`, and `server.use()` as needed. In a running event loop, use `await alogin()` and offload synchronous selection/discovery with `asyncio.to_thread`; see `docs/client/get-started.md`.
 - `Session.create()` and `AsyncSession.create()` return `list[str]`, omit replicas that fail with HTTP/network errors, and return `[]` on total HTTP/network failure. Request validation errors still raise. `destroy_with()` has keyword-only `kind` and `status` filters in both clients.
 - Session creation does not imply readiness. Monitor the returned IDs, save results in persistent storage, and scope cleanup to the requested work. Closing a Python client does not delete remote Sessions.
-- CLI layout is `canfar login`, `canfar auth`, and `canfar server`. Bare `auth` runs `show`; canonical subcommands include `ls` and `rm`. `canfar auth login` remains a deprecated alias; `canfar context` was removed.
+- CLI layout is `canfar login`, `canfar auth`, and `canfar server`. Bare `auth` runs `show`; canonical subcommands include `ls` and `rm`. `canfar auth login` and `canfar context` were removed; login is `canfar login`.
 - CLI machine output is leaf `-o json` / `-o yaml` (or `--output`), replacing `--json` / `--yaml`. Supported leaves are bare `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `config show`, and `config get`. Stdout must contain only the payload; logs and diagnostics go to stderr. Do not add a human server banner or custom redaction/serialization layer.
 - `canfar ps` defaults to Pending and Running Sessions; use `--all` for other statuses. `ps -q` applies the same filters and can include the human banner, so use supported machine output for scripts. Quote `canfar prune` prefixes containing shell metacharacters and pass cleanup filters explicitly.
 - Built-in CADC/CANFAR server metadata lists `x509` only. Discovery enriches supported authentication modes from VOSI capabilities; do not add OIDC to static defaults without evidence.

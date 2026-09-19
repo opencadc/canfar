@@ -89,6 +89,44 @@ persistent VOSpace Service before stopping the Session. See [Storage](../storage
 
 <span id="user-context-and-permissions"></span>
 
+## What a Server requires of an image
+
+**A trusted registry.** A Science Platform Server launches images only from
+the registry hosts its operator trusts; the default is `images.canfar.net`.
+A request for an image elsewhere is rejected before anything starts.
+
+**A label, to be listed.** The Server builds its image list from the labels
+the Container Registry holds for each image: one label per Session Kind the
+image supports, named `notebook`, `desktop`, `desktop-app`, `carta`, `firefly`,
+`contributed`, or `headless`. The label is set on the image in the registry,
+and a `LABEL` line in a Dockerfile has no effect on it. The list is refreshed
+periodically, every 30 minutes by default, so a newly labelled image takes a
+while to appear in `canfar image ls` and the Science Portal. An unlabelled or
+private image can still be launched by its full name with
+[registry credentials](../../client/get-started.md#private-container-images).
+
+**No root.** Every container runs with your user ID, your group memberships as
+supplemental groups, no Linux capabilities, and no privilege escalation, so
+`sudo` and package installation at run time are unavailable. Install software
+when you build the image, and write runtime files under your home directory,
+`/scratch`, or `/tmp`.
+
+**A shell.** The Server runs `/bin/sh` and `cp` from your image while preparing
+the Session's user and group files, so a minimal image still needs both.
+
+| Session Kind | What the Server does | What the image must provide |
+| --- | --- | --- |
+| `notebook` | Starts JupyterLab itself, on port 8888 | `bash` and `jupyter lab` on the `PATH` |
+| `carta` | Runs the image's entrypoint | CARTA on port 6901, served under the path in `SKAHA_SESSION_URL_PATH` |
+| `desktop-app` | Opens the application inside a Desktop Session | An X11 application and `xterm`; an optional `/skaha/startup.sh` wraps the launch |
+| `contributed` | Runs the image's entrypoint | A web application on port 5000; see [Contributed applications](../sessions/contributed.md#contribute-an-application) |
+| `headless` | Runs the command you give, or the image's default | The command and its dependencies |
+
+The Server sets `HOME` to your persistent home directory. In every Kind except
+`desktop` it also sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`,
+`OPENBLAS_NUM_THREADS`, and `JULIA_NUM_THREADS` to the number of cores you
+requested; see [Session limits](../sessions/limits.md#threads-follow-the-request).
+
 ## Resource and security considerations
 
 - Keep credentials out of Dockerfiles, image layers, and command arguments.

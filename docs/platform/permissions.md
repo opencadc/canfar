@@ -8,6 +8,18 @@ A group lets a project share access with several accounts. Signing in confirms
 who you are; access to a directory or private image depends on the permissions
 its owner grants you.
 
+Each request passes a chain of separate checks, and a refusal at any link looks
+like "access denied". Work down the chain when diagnosing one:
+
+1. **Authentication**: your credential is valid for the Identity Provider.
+2. **Platform access**: your account may use this Science Platform Server at
+   all. The operator grants this once, through a platform access group or the
+   deployment's permissions service.
+3. **Group membership**: you belong to the project's group.
+4. **Allocation**: the project has storage, and the path lies inside it.
+5. **File permissions**: the directory grants that group read or write.
+6. **Registry role**: for a private image, your registry account may pull it.
+
 <span id="group-management-collaboration"></span>
 <span id="group-based-resource-sharing"></span>
 <span id="group-administration-interface"></span>
@@ -39,8 +51,8 @@ request a shared storage allocation and provide your group name.
 You must be an administrator of the group to change its membership.
 
 1. Open the group's membership editor and find the **Members** section.
-2. Search for your colleague by name, check the account in the results, and
-   select **Add member**.
+2. Search for your colleague by username or full name, check the account in
+   the results, and select **Add member**.
 3. To let a colleague manage membership too, use **Add administrator** in the
    **Administrators** section.
 4. Select **Update** to save changes. Reopen the group and confirm that the
@@ -48,6 +60,10 @@ You must be an administrator of the group to change its membership.
 
 Administrator status allows group management. It does not grant authority to
 allocate platform resources or edit data owned by someone else.
+
+A Session reads your group memberships once, when it starts. After you are
+added to a group, start a new Session to work with that group's files; a
+Session that was already running keeps the memberships it started with.
 
 <span id="canfar-permission-architecture"></span>
 <span id="permission-model-benefits"></span>
@@ -76,6 +92,12 @@ access separately from adding group members.
    file. For write access, have them create and remove a small test file in
    the agreed directory.
 
+A project directory on ARC is private to its group unless someone changes
+that. To release data publicly, place it on Vault and make it world-readable,
+in Storage Management or with
+[`vchmod o+r`](storage/vospace.md#legacy-vostools); for a citable release, use
+[data publication](doi.md).
+
 If you cannot edit permissions, ask the directory owner or CANFAR support.
 Use the path supplied for your allocation rather than assuming it matches the
 group name.
@@ -97,8 +119,10 @@ canfar config get active.server
 ```
 
 The names and capabilities in `canfar server ls` are deployment data. If the
-server is missing or login succeeds but a request is forbidden, contact the
-operator for that Science Platform deployment. See the [authentication guide](../cli/authentication-contexts.md) for credential and server selection details.
+server is missing or login succeeds but a request is forbidden, your account
+lacks platform access on that Server: contact the operator for that Science
+Platform deployment. An account with one Identity Provider grants nothing on a
+Server that belongs to another. See the [authentication guide](../cli/authentication-contexts.md) for credential and server selection details.
 
 ## Check access from the command line
 
@@ -116,6 +140,22 @@ deployment. A forbidden
 operation usually means that your account is not a member of the owning group,
 the path is outside the project's allocation, or the active credentials do not
 match the service.
+
+Inside a Session, every process runs with your user ID and your groups,
+including a `headless` command, so a batch job can read and write exactly what
+you can. Ask the filesystem what it sees:
+
+```bash title="Terminal inside your Session"
+id
+ls -ld /arc/projects/PROJECT
+namei -l /arc/projects/PROJECT/results/catalog.csv
+```
+
+`id` lists the groups this Session started with. `namei -l` shows the owner,
+group, and mode of every directory on the way to a file, which reveals the one
+that blocks you. Change sharing in
+[Storage Management](#grant-the-group-access-to-data), or with
+[`vchmod`](storage/vospace.md#legacy-vostools) for a VOSpace Service.
 
 Do not put credentials in a path, a notebook, an image, or a Session command.
 Use the configured Authentication Record or an explicitly supplied runtime

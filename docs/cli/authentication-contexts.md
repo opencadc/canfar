@@ -45,6 +45,15 @@ The CLI reuses a usable X.509 certificate when possible. Use `--force` to
 obtain a replacement. If the certificate is expired, login reports that and
 continues with certificate acquisition.
 
+The certificate is saved as `~/.ssl/cadcproxy.pem` and is valid for 30 days.
+The [legacy CADC tools](../platform/storage/vospace.md#legacy-vostools) read
+the same file, so one login serves both. Inside a Session on the CADC
+deployment, the Server places a delegated certificate at that path when the
+Session starts, and `~/.canfar` lives in your persistent home directory, so a
+login made in one Session is there in the next. For unattended work, log in
+from the environment that will run the job and check that the certificate
+outlasts it.
+
 ### SRCNet OIDC Device Authorization
 
 ```bash
@@ -131,7 +140,8 @@ canfar auth purge --force
 ```
 
 The purge restores built-in defaults and preserves unrelated registry and
-console settings.
+console settings. These are the commands for leaving an identity; there is no
+separate logout command.
 
 <span id="manage-servers"></span>
 

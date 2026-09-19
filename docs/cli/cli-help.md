@@ -111,7 +111,10 @@ canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 `KIND` is one of `desktop`, `notebook`, `carta`, `headless`, `firefly`, or
 `contributed`. `IMAGE` is a CANFAR Container Image such as
 `skaha/astroml:latest`; the client adds the CANFAR registry and `:latest` when
-they are omitted.
+they are omitted. That shorthand always expands to `images.canfar.net`, so on a
+Server that trusts another registry, write the full `REGISTRY/PROJECT/IMAGE:TAG`
+name from `canfar image ls`. Accepted ranges for every option are in
+[Session limits](../platform/sessions/limits.md).
 
 | Option | Effect |
 | --- | --- |
@@ -120,7 +123,7 @@ they are omitted.
 | `--memory`, `-m` | Requested RAM in GB. |
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
-| `--replicas`, `-r` | Number of Sessions; default `1`. |
+| `--replicas`, `-r` | Number of Sessions, 1 to 512; default `1`. |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
@@ -244,6 +247,27 @@ filtering. For example, `create -o json` is a raw list of Session IDs and
 `ps -o json` is a filtered array of Session response objects; neither is
 wrapped in a command-specific envelope. Human active-Server banners and logs
 never precede the machine payload on stdout. Diagnostics and errors use stderr.
+
+### Failures and exit status
+
+A command that fails exits with a nonzero status. In human mode the message
+and a hint go to stderr. In machine mode stderr carries one structured object
+with a stable `code`, a `message`, and a `hint`, and stdout stays empty:
+
+```json
+{"code": "authentication.required", "message": "Not authenticated with 'cadc'.\nReason: X.509 certificate has not been issued.", "hint": "Run `canfar login` and retry."}
+```
+
+| Code | Meaning | Next step |
+| --- | --- | --- |
+| `authentication.required` | No credential is saved for the active Identity Provider. | Run `canfar login`. |
+| `authentication.expired` | The saved credential has expired. | Run `canfar login` again. |
+| `authentication.credential_invalid` | A credential is saved but cannot be used, such as an unreadable certificate. | Check `canfar auth show`, then log in again. |
+| `transport.failure` | The request did not reach, or was refused by, the Science Platform Server. | Check connectivity and `canfar stats`, then retry. |
+
+Codes are stable; message and hint wording can change. Every command that
+contacts a Server reports a missing login this way, including the human-text
+commands `info`, `events`, `logs`, `open`, `stats`, and `image ls`.
 
 Put `-o/--output` after the command that owns it. Root `-o`, `--json`, and
 `--yaml` are not options, and commands without machine output reject `-o`.
