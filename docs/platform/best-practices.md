@@ -41,9 +41,9 @@ can wait for matching capacity.
 
 The Server sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`,
 and `JULIA_NUM_THREADS` to the cores you request, so a fixed request needs no
-extra setting. A flexible Session requests one core, which leaves those
-variables at `1`; set them yourself to let a threaded library use the burst
-capacity, as described in
+extra setting. A flexible Session requests only a small guaranteed share,
+which leaves those variables low, typically at `1`; set them yourself to let a
+threaded library use the burst capacity, as described in
 [Session limits](sessions/limits.md#threads-follow-the-request). Setting the
 variable explicitly also documents the intent in the command:
 

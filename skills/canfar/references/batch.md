@@ -79,8 +79,9 @@ with its own resources, and replicas start as capacity allows rather than
 together.
 
 The Server sets `OMP_NUM_THREADS` and the matching thread variables to the
-requested cores, which is 1 for a flexible request. For threaded code, pass
-`--cpu N` with `--memory`, or set `--env OMP_NUM_THREADS=N` yourself.
+requested cores, which is low, typically 1, for a flexible request. For
+threaded code, pass `--cpu N` with `--memory`, or set
+`--env OMP_NUM_THREADS=N` yourself.
 
 Headless Sessions are exempt from the per-user limit on interactive Sessions,
 so a large request queues as `Pending` until capacity frees up. `canfar stats`
@@ -102,8 +103,9 @@ canfar create headless IMAGE --name RUN --replicas 64 --env RUN_DIR=/arc/project
   and hyphens. Repeat `--env KEY=VALUE` per variable.
 - The client validates 1 to 512 replicas, 1 to 256 cores, 1 to 512 GB, and 1 to
   28 GPUs per request. `--dry-run`, used without `-o`, checks a request against
-  those bounds; the Server's live options come from
-  `canfar.context.Context().resources()` and can be lower.
+  those bounds. Each provider sets its own lower limits: read them from
+  `canfar.context.Context().resources()`, whose `options` list the fixed sizes
+  on offer. CANFAR's largest Session is 16 cores and 192 GB.
 - For more than 512 workers, split the manifest into parts and send one
   request per part, each with its own name and `MANIFEST`, into the same run
   directory. `REPLICA_COUNT` counts one request's replicas, and the run-wide

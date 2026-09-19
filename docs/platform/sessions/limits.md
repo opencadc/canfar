@@ -25,9 +25,28 @@ values are ignored for them. Check a request without creating anything:
 canfar create headless skaha/astroml:latest --cpu 8 --memory 32 --replicas 100 --dry-run
 ```
 
-Passing these checks does not mean the Server offers that combination. Query
-the live options with [`Context.resources()`](../../client/context.md), and
-omit `--cpu` and `--memory` to let the Server apply its flexible policy.
+Passing these checks does not mean the Server offers that combination. The
+client's ranges are only an outer bound; each platform provider decides its
+own flexible defaults and the largest Session it will run. Omit `--cpu` and
+`--memory` to let the Server apply its flexible policy.
+
+## What your Server offers
+
+Ask the Server. [`Context.resources()`](../../client/context.md) returns, for
+cores and for memory:
+
+| Field | Meaning |
+| --- | --- |
+| `defaultRequest` | What a flexible Session is guaranteed |
+| `defaultLimit` | What a flexible Session can burst to when capacity is free |
+| `options` | The values a fixed request may name; the largest is the biggest Session the Server runs |
+
+`canfar server ls -o json` also shows each Server's `cores`, `ram`, and `gpus`
+as they were when the Server was discovered.
+
+On the CANFAR deployment at the Canadian Astronomy Data Centre (CADC), a
+flexible Session can burst to 16 cores and 32 GB, and the largest fixed
+request is 16 cores and 192 GB.
 
 With more than one replica, Sessions are named `NAME-1` to `NAME-N`, and each
 container receives `REPLICA_ID` (starting at 1) and `REPLICA_COUNT`. See the
@@ -35,15 +54,15 @@ container receives `REPLICA_ID` (starting at 1) and `REPLICA_COUNT`. See the
 
 ## What the Server enforces
 
-These are the defaults of the open-source
-[Science Platform](https://github.com/opencadc/science-platform). An operator
-can change every one of them, so treat them as orientation and confirm the
+Each platform provider sets these policies. The defaults below are those of
+the open-source [Science Platform](https://github.com/opencadc/science-platform);
+treat them as orientation, prefer what your Server reports, and confirm the
 values that matter to your project with [support](../support/index.md).
 
 | Policy | Default | How it shows up |
 | --- | --- | --- |
-| Flexible resources (no `--cpu` or `--memory`) | 1 core and 4 GB guaranteed, bursting to 8 cores and 32 GB | The Session starts on little free capacity and shares the burst with other users |
-| Fixed resources (`--cpu` and `--memory`) | The request is also the limit | The values must be among the Server's offered options |
+| Flexible resources (no `--cpu` or `--memory`) | 1 core and 4 GB guaranteed, bursting to 8 cores and 32 GB; CANFAR bursts to 16 cores | The Session starts on little free capacity and shares the burst with other users |
+| Fixed resources (`--cpu` and `--memory`) | The request is also the limit | The values must be among the Server's `options`; on CANFAR at most 16 cores and 192 GB |
 | `desktop` and `firefly` sizes | Set by the Server | `--cpu` and `--memory` are ignored |
 | Interactive Session lifetime | 4 days | `canfar info SESSION_ID` shows the expiry time |
 | `headless` Session deadline | 14 days | A failed command is not restarted |
@@ -61,9 +80,9 @@ canfar ps
 canfar delete SESSION_ID
 ```
 
-The Server's API can renew an interactive Session, which resets its remaining
-lifetime to the full period. The `canfar` client does not offer that action
-yet, so save your work and start a new Session before the expiry time.
+Renew an interactive Session from the Science Portal before it expires; a
+renewal resets the remaining lifetime to the full period. The `canfar` client
+does not offer renewal yet.
 
 A fixed request can stay `Pending` longer than a flexible one, because it waits
 for a node with that much free capacity. `canfar events SESSION_ID` shows what
@@ -74,8 +93,10 @@ a Pending Session is waiting for; see [Batch processing](batch.md#monitor-and-tr
 The Server sets `OMP_NUM_THREADS`, `MKL_NUM_THREADS`, `OPENBLAS_NUM_THREADS`,
 and `JULIA_NUM_THREADS` to the number of cores you requested, so numerical
 libraries do not start more threads than the Session was granted. A flexible
-Session requests one core, so there these variables are `1` even though the
-Session can burst to more. To use the burst, set them yourself: pass
+Session requests only the Server's small guaranteed share, one core in the
+open-source configuration, so there these variables are low, typically `1`,
+even though the Session can burst to more. Check with
+`echo $OMP_NUM_THREADS`. To use the burst, set them yourself: pass
 `--env OMP_NUM_THREADS=4` to a `headless` Session, or export the variable in a
 notebook or terminal before the library is imported.
 

@@ -73,10 +73,11 @@ The skills, and in places the existing docs, were wrong on these points:
 - `docs/platform/sessions/contributed.md` said "Do not assume a fixed port".
   The launch template fixes port 5000, which a maintainer confirmed.
 
-Upstream issue worth reporting to `opencadc/science-platform`: `values.yaml`
-documents `flexResourceRequests.<type>.memoryInGB` and `cpuCores`, while the
-Deployment template reads `.memory` and `.cpu`, so the documented keys set
-nothing.
+Observed upstream and not confirmed by a maintainer: `values.yaml` in
+`opencadc/science-platform` documents `flexResourceRequests.<type>.memoryInGB`
+and `cpuCores`, while the Deployment template reads `.memory` and `.cpu`.
+Providers set their own flexible defaults, so the docs describe how to read
+them from a Server instead of naming chart keys.
 
 ## Not upstreamed on purpose
 
@@ -108,8 +109,8 @@ written into the docs:
 | Do platform images ship the client? | Yes, such as `skaha/astroml`, at times a release or two behind. | `client/advanced-examples.md`, the skill |
 | Contributed applications | They must serve on port 5000. | `platform/sessions/contributed.md` |
 
-Still open: whether the Science Portal offers Session renewal. The Server API
-does and the `canfar` client does not, which is what `limits.md` says.
+| Does the Science Portal offer Session renewal? | Yes. The `canfar` client does not yet. | `platform/sessions/limits.md` |
+| Who sets flexible defaults and the largest Session? | Each platform provider. On CANFAR a flexible Session bursts to 16 cores and 32 GB ([#308](https://github.com/opencadc/canfar/pull/308)), and the largest fixed request is 16 cores and 192 GB. | `platform/sessions/limits.md`, `canfar create --help` |
 
 ## Guidance kept in the skill
 

@@ -131,7 +131,7 @@ def creation(  # noqa: PLR0917
             "--cpu",
             "-c",
             help="Number of CPU cores.",
-            show_default="flexible: ≤8 cores",
+            show_default="flexible: set by the Server",
         ),
     ] = None,
     memory: Annotated[
@@ -140,7 +140,7 @@ def creation(  # noqa: PLR0917
             "--memory",
             "-m",
             help="Amount of RAM in GB.",
-            show_default="flexible: ≤32 GB",
+            show_default="flexible: set by the Server",
         ),
     ] = None,
     gpu: Annotated[
