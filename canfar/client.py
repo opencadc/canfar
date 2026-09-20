@@ -235,8 +235,12 @@ class HTTPClient(BaseSettings):
         if self.uses_runtime_credentials:
             return None
         credential = self.authentication_record
-        if isinstance(credential, OIDCCredential) and not credential.valid:
-            raise AuthContextError(
+        if (
+            isinstance(credential, OIDCCredential)
+            and not credential.access_usable
+            and not credential.valid
+        ):
+            raise AuthRequiredError(
                 credential.idp,
                 "OIDC Authentication Record cannot refresh tokens.",
             )
@@ -257,12 +261,18 @@ class HTTPClient(BaseSettings):
             credential, parameters = prepared
             if parameters is None:
                 return credential
-            refreshed = await oidc.refresh(*parameters)
-            return oidc._persist(  # noqa: SLF001
-                self.config,
-                credential,
-                refreshed,
-            )
+            try:
+                refreshed = await oidc.refresh(*parameters)
+                return oidc._persist(  # noqa: SLF001
+                    self.config,
+                    credential,
+                    refreshed,
+                )
+            except oidc.ReauthenticationRequiredError as err:
+                raise AuthRequiredError(credential.idp, str(err)) from None
+            except (ValueError, OSError):
+                msg = "Failed to refresh OIDC token"
+                raise auth.AuthenticationError(msg) from None
 
     @classmethod
     def build(
@@ -489,11 +499,6 @@ class HTTPClient(BaseSettings):
             if credential.token.access is not None:
                 headers["Authorization"] = (
                     f"Bearer {credential.token.access.get_secret_value()}"
-                )
-            elif not credential.refreshable:
-                raise AuthRequiredError(
-                    credential.idp,
-                    "OIDC Authentication Record has no usable access token.",
                 )
             headers["X-Skaha-Authentication-Type"] = "OIDC"
         elif isinstance(credential, X509Credential):

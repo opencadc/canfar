@@ -53,6 +53,10 @@ class SlowDownError(Exception):
     """Exception raised when the client should slow down its requests."""
 
 
+class ReauthenticationRequiredError(ValueError):
+    """The token endpoint rejected the client or refresh credentials."""
+
+
 def credential_from_idp(info: IdpInfo) -> OIDCCredential:
     """Initialize an OIDC Authentication Record from trusted IDP metadata."""
     if info.oidc_discovery_url is None:
@@ -208,8 +212,18 @@ def _install_client_credentials(
 ) -> tuple[str, str]:
     """Install registered client credentials and return their values."""
     identity, secret = _client_credentials(device)
-    credential.client.identity = identity
-    credential.client.secret = SecretStr(secret)
+    try:
+        client = Client(
+            identity=identity,
+            secret=SecretStr(secret),
+            secret_expires_at=device.get("client_secret_expires_at"),
+        )
+    except ValidationError:
+        msg = "OIDC device authorization failed: malformed client response"
+        raise ValueError(msg) from None
+    credential.client.identity = client.identity
+    credential.client.secret = client.secret
+    credential.client.secret_expires_at = client.secret_expires_at
     return identity, secret
 
 
@@ -320,7 +334,16 @@ def _map_refresh_errors() -> Generator[None, None, None]:
     """Map Authlib/httpx refresh failures to the fixed, secret-safe messages."""
     try:
         yield
-    except (OAuthError, httpx.HTTPError):
+    except OAuthError as err:
+        if err.error == "invalid_client":
+            msg = "OIDC client credentials were rejected."
+            raise ReauthenticationRequiredError(msg) from None
+        if err.error == "invalid_grant":
+            msg = "OIDC refresh credentials were rejected."
+            raise ReauthenticationRequiredError(msg) from None
+        msg = "OIDC token refresh failed"
+        raise ValueError(msg) from None
+    except httpx.HTTPError:
         msg = "OIDC token refresh failed"
         raise ValueError(msg) from None
     except (TypeError, ValueError):

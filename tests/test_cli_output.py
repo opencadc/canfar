@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from canfar.authentication import Authentication
 from canfar.cli import machine, output
 from canfar.errors import StructuredError
+from canfar.exceptions.context import AuthExpiredError, AuthRequiredError
 from canfar.models.http import Server
 
 
@@ -20,6 +21,20 @@ class SampleModel(BaseModel):
 
     name: str
     optional: str | None = None
+
+
+@pytest.mark.parametrize(
+    "error",
+    [
+        AuthExpiredError("cadc", "certificate expired"),
+        AuthRequiredError("srcnet", "client secret expired"),
+    ],
+)
+def test_authentication_recovery_hint_names_idp(error) -> None:
+    """Recovery names the failing IDP even when another IDP is selected."""
+    failure = output.boundary_failure(error)
+    idp = "cadc" if isinstance(error, AuthExpiredError) else "srcnet"
+    assert f"canfar login {idp}" in failure.hint
 
 
 def test_output_mode_values() -> None:

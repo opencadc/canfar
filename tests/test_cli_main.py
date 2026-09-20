@@ -14,7 +14,12 @@ from typer.testing import CliRunner
 
 from canfar.cli.main import cli, main
 from canfar.config.migration import ConfigResetRequiredError
-from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.context import (
+    AuthContextError,
+    AuthExpiredError,
+    AuthRequiredError,
+)
+from canfar.hooks.httpx.auth import AuthenticationError
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -205,7 +210,8 @@ def test_ps_machine_output_without_login_reports_authentication_required(
     ("error", "expected"),
     [
         (AuthContextError("cadc", "X.509 certificate cannot be used."), "invalid"),
-        (AuthExpiredError("x509", "auth expired"), "expired"),
+        (AuthExpiredError("cadc", "certificate expired"), "canfar login cadc"),
+        (AuthenticationError("Failed to refresh OIDC token"), "Retry the command"),
         (
             ConfigResetRequiredError("config.reset_required", "reset needed"),
             "reset needed",
@@ -236,11 +242,57 @@ def test_main_keeps_machine_errors_structured(
 ) -> None:
     """An unrendered boundary error in machine mode stays parseable on stderr."""
     monkeypatch.setattr(sys, "argv", ["canfar", "server", "ls", "-o", "json"])
-    error = AuthExpiredError("x509", "auth expired")
+    error = AuthExpiredError("cadc", "certificate expired")
 
     with patch("canfar.cli.main.cli", side_effect=error), pytest.raises(SystemExit):
         main()
 
     payload = json.loads(capsys.readouterr().err)
     assert payload["code"] == "authentication.expired"
-    assert "canfar login" in payload["hint"]
+    assert "canfar login cadc" in payload["hint"]
+
+
+@pytest.mark.parametrize("machine", [False, True], ids=["human", "json"])
+@pytest.mark.parametrize(
+    ("arguments", "operation"),
+    [
+        (["ps"], "canfar.cli.ps._fetch_sessions"),
+        (
+            ["create", "headless", "skaha/worker:v1"],
+            "canfar.cli.create._create_sessions",
+        ),
+    ],
+)
+@pytest.mark.parametrize(
+    ("error", "code", "hint"),
+    [
+        (
+            AuthExpiredError("cadc", "X.509 certificate expired."),
+            "authentication.expired",
+            "canfar login cadc",
+        ),
+        (
+            AuthRequiredError("srcnet", "OIDC client secret expired."),
+            "authentication.required",
+            "canfar login srcnet",
+        ),
+        (
+            AuthenticationError("Failed to refresh OIDC token"),
+            "transport.failure",
+            "Retry the command",
+        ),
+    ],
+)
+def test_session_commands_show_authentication_recovery(
+    *, machine, arguments, operation, error, code, hint
+) -> None:
+    """Leaf error handlers retain the same recovery guidance as the entrypoint."""
+    with patch(operation, side_effect=error):
+        result = runner.invoke(cli, [*arguments, *(["-o", "json"] if machine else [])])
+
+    assert result.exit_code == 1
+    assert hint in result.stderr
+    assert "Traceback" not in result.stderr
+    if machine:
+        assert result.stdout == ""
+        assert json.loads(result.stderr)["code"] == code

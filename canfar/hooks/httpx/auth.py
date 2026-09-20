@@ -1,9 +1,9 @@
-"""HTTPx authentication hooks for automatic token refresh and certificate renewal.
+"""HTTPx authentication hooks for automatic OIDC token refresh.
 
 This module provides httpx event hooks that automatically handle authentication
 expiry and refresh for different authentication modes:
 
-- **X509/Default Mode**: Automatically renews certificates when expired
+- **X509 Mode**: Requires explicit interactive login when certificates expire
 - **OIDC Mode**: Automatically refreshes access tokens using refresh tokens
 - **User-provided credentials**: Bypasses automatic refresh
 
@@ -33,6 +33,7 @@ import logging
 from typing import TYPE_CHECKING, Callable
 
 from canfar.auth import oidc
+from canfar.exceptions.context import AuthRequiredError
 from canfar.models.auth import OIDCCredential
 
 if TYPE_CHECKING:
@@ -69,12 +70,16 @@ def _refresh(
     if credential is None:
         log.debug("Skipping auth refresh without a saved OIDC record.")
         return None
-    if not credential.expired:
+    if credential.access_usable:
         return credential, None
     parameters = oidc._refresh(credential)  # noqa: SLF001
     if parameters is None:
-        log.warning("OIDC Authentication Record cannot be refreshed.")
-        return None
+        reason = (
+            "OIDC client secret expired."
+            if credential.client.secret_expired
+            else "OIDC refresh credentials are missing or expired."
+        )
+        raise AuthRequiredError(credential.idp, reason)
     return credential, parameters
 
 
@@ -139,6 +144,8 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
             log.debug("HTTP request headers updated with new token.")
             log.info("OIDC Access Token Refreshed.")
 
+        except oidc.ReauthenticationRequiredError as err:
+            raise AuthRequiredError(credential.idp, str(err)) from None
         except (ValueError, OSError):
             msg = "Failed to refresh OIDC token"
             raise AuthenticationError(msg) from None
@@ -165,11 +172,7 @@ def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
         previous = client.authentication_record
         if isinstance(previous, OIDCCredential) and previous.expired:
             log.debug("Starting asynchronous OIDC token refresh.")
-        try:
-            credential = await client._refresh_oidc()  # noqa: SLF001
-        except (ValueError, OSError):
-            msg = "Failed to refresh OIDC token"
-            raise AuthenticationError(msg) from None
+        credential = await client._refresh_oidc()  # noqa: SLF001
         if credential is None:
             return
         if credential == previous:

@@ -255,15 +255,15 @@ and a hint go to stderr. In machine mode stderr carries one structured object
 with a stable `code`, a `message`, and a `hint`, and stdout stays empty:
 
 ```json
-{"code": "authentication.required", "message": "Not authenticated with 'cadc'.\nReason: X.509 certificate has not been issued.", "hint": "Run `canfar login` and retry."}
+{"code": "authentication.required", "message": "Not authenticated with 'cadc'.\nReason: X.509 certificate has not been issued.", "hint": "Run `canfar login cadc` and retry."}
 ```
 
 | Code | Meaning | Next step |
 | --- | --- | --- |
-| `authentication.required` | No credential is saved for the active Identity Provider. | Run `canfar login`. |
-| `authentication.expired` | The saved credential has expired. | Run `canfar login` again. |
+| `authentication.required` | Credentials are missing, or OIDC refresh requires a new login. | Run `canfar login IDP` with the IDP named in the hint. |
+| `authentication.expired` | The saved credential has expired. | Run `canfar login IDP` with the IDP named in the hint. |
 | `authentication.credential_invalid` | A credential is saved but cannot be used, such as an unreadable certificate. | Check `canfar auth show`, then log in again. |
-| `transport.failure` | The request did not reach, or was refused by, the Science Platform Server. | Check connectivity and `canfar stats`, then retry. |
+| `transport.failure` | A request to the Science Platform or IDP failed. | Follow the hint, check connectivity, then retry. |
 
 Codes are stable; message and hint wording can change. Every command that
 contacts a Server reports a missing login this way, including the human-text

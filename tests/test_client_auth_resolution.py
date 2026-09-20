@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-from contextlib import ExitStack
+from contextlib import ExitStack, nullcontext
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -15,7 +15,6 @@ from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 from canfar.client import HTTPClient
 from canfar.exceptions.context import (
     AuthContextError,
-    AuthExpiredError,
     AuthRequiredError,
 )
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh
@@ -30,6 +29,7 @@ from canfar.models.auth import (
 )
 from canfar.models.config import Configuration
 from canfar.models.http import Server
+from canfar.sessions import AsyncSession
 from tests.test_auth_x509 import generate_cert
 
 if TYPE_CHECKING:
@@ -74,6 +74,7 @@ def _oidc(
     discovery: str | None = (
         "https://identity.example/.well-known/openid-configuration"
     ),
+    secret_expiry: int | None = None,
 ) -> OIDCCredential:
     """Build one OIDC Authentication Record for resolution tests."""
     return OIDCCredential(
@@ -82,7 +83,9 @@ def _oidc(
             discovery=discovery,
             token="https://identity.example/token",
         ),
-        client=Client(identity="client", secret="secret"),
+        client=Client(
+            identity="client", secret="secret", secret_expires_at=secret_expiry
+        ),
         token=Token(
             access=access,
             refresh=refresh,
@@ -676,11 +679,20 @@ class TestRequestAuthenticationResolution:
             HTTPClient(config=config) as client,
         ):
             request_client = client.client
-            with pytest.raises(AuthenticationError) as exc_info:
+            expected_error = (
+                AuthRequiredError if failure == "oauth" else AuthenticationError
+            )
+            with pytest.raises(expected_error) as exc_info:
                 request_client.get("probe")
             assert request_client.headers["Authorization"] == "Bearer old-access"
 
-        assert str(exc_info.value) == "Failed to refresh OIDC token"
+        expected_message = (
+            "Not authenticated with 'test'.\n"
+            "Reason: OIDC refresh credentials were rejected."
+            if failure == "oauth"
+            else "Failed to refresh OIDC token"
+        )
+        assert str(exc_info.value) == expected_message
         assert exc_info.value.__cause__ is None
         assert sentinel not in str(exc_info.value)
         assert sentinel not in caplog.text
@@ -769,7 +781,7 @@ class TestRequestAuthenticationResolution:
                 response = request_client.get("probe")
                 assert response.status_code == 200
             else:
-                with pytest.raises(AuthExpiredError):
+                with pytest.raises(AuthRequiredError):
                     request_client.get("probe")
 
         assert len(token_requests) == refreshes
@@ -778,3 +790,205 @@ class TestRequestAuthenticationResolution:
             assert platform_requests[0].headers["Authorization"] == (
                 f"Bearer {_REFRESHED_TOKEN}"
             )
+
+
+@pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
+@pytest.mark.parametrize(
+    (
+        "access",
+        "refresh",
+        "access_expiry",
+        "refresh_expiry",
+        "secret_expiry",
+        "refreshes",
+        "succeeds",
+    ),
+    [
+        pytest.param(
+            "saved", None, 1100, None, 900, 0, True, id="access-without-refresh"
+        ),
+        pytest.param(
+            "saved",
+            "refresh",
+            1100,
+            900,
+            900,
+            0,
+            True,
+            id="access-outlives-refresh-credentials",
+        ),
+        pytest.param(None, "refresh", 1100, None, None, 1, True, id="missing-access"),
+        pytest.param(
+            "saved", "refresh", 900, None, None, 1, True, id="legacy-unknown-expiry"
+        ),
+        pytest.param(
+            "saved", "refresh", 900, None, 0, 1, True, id="nonexpiring-secret"
+        ),
+        pytest.param(
+            "saved", "refresh", 900, 2000, 1000, 0, False, id="expired-secret"
+        ),
+        pytest.param(
+            "saved", "refresh", 900, 1000, 2000, 0, False, id="expired-refresh-token"
+        ),
+        pytest.param("saved", None, 900, None, 0, 0, False, id="missing-refresh-token"),
+    ],
+)
+async def test_oidc_request_recovery(
+    *,
+    monkeypatch,
+    tmp_path,
+    asynchronous,
+    access,
+    refresh,
+    access_expiry,
+    refresh_expiry,
+    secret_expiry,
+    refreshes,
+    succeeds,
+) -> None:
+    """Native requests distinguish access usability from refresh eligibility."""
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
+    monkeypatch.setattr("canfar.models.auth.time.time", lambda: 1000.0)
+    credential = _oidc(
+        access=access,
+        refresh=refresh,
+        access_expiry=access_expiry,
+        refresh_expiry=refresh_expiry,
+        secret_expiry=secret_expiry,
+    )
+    config = _configuration(credential)
+    token_requests: list[httpx.Request] = []
+    platform_requests: list[httpx.Request] = []
+    token_transport = httpx.MockTransport(
+        lambda request: (
+            token_requests.append(request)
+            or httpx.Response(
+                200,
+                json={
+                    "access_token": _REFRESHED_TOKEN,
+                    "expires_in": 300,
+                },
+            )
+        )
+    )
+    platform_transport = httpx.MockTransport(
+        lambda request: platform_requests.append(request) or httpx.Response(200)
+    )
+    with ExitStack() as stack:
+        _enter_clients(stack, platform_transport, token=token_transport)
+        client = stack.enter_context(HTTPClient(config=config))
+        async with client:
+            with nullcontext() if succeeds else pytest.raises(AuthRequiredError):
+                response = (
+                    await client.asynclient.get("probe")
+                    if asynchronous
+                    else client.client.get("probe")
+                )
+                assert response.status_code == 200
+
+    assert len(token_requests) == refreshes
+    assert len(platform_requests) == int(succeeds)
+    if succeeds:
+        expected_token = _REFRESHED_TOKEN if refreshes else access
+        assert (
+            platform_requests[0].headers["Authorization"] == f"Bearer {expected_token}"
+        )
+    if refreshes:
+        saved = Configuration().authentication["test"]
+        assert isinstance(saved, OIDCCredential)
+        assert saved.client.secret_expires_at == secret_expiry
+
+
+@pytest.mark.parametrize("asynchronous", [False, True], ids=["sync", "async"])
+@pytest.mark.parametrize(
+    "failure",
+    ["invalid_client", "invalid_grant", "timeout", "unavailable", "other_oauth"],
+)
+async def test_oidc_refresh_rejection_requires_login_only_for_credentials(
+    monkeypatch,
+    tmp_path,
+    asynchronous,
+    failure,
+    caplog,
+) -> None:
+    """Server rejections support legacy records without diagnosing outages as expiry."""
+    config_path = tmp_path / "config.yaml"
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
+    config = _configuration(_oidc(access_expiry=1, secret_expiry=None))
+    config.editor.save()
+    original = config_path.read_bytes()
+    token_requests: list[httpx.Request] = []
+    platform_requests: list[httpx.Request] = []
+    sentinel = "secret-provider-error-description"
+
+    def token_endpoint(request: httpx.Request) -> httpx.Response:
+        token_requests.append(request)
+        if failure == "timeout":
+            raise httpx.ReadTimeout(sentinel, request=request)
+        if failure == "unavailable":
+            return httpx.Response(503, text=sentinel)
+        return httpx.Response(
+            400,
+            json={
+                "error": "temporarily_unavailable"
+                if failure == "other_oauth"
+                else failure,
+                "error_description": sentinel,
+            },
+        )
+
+    platform = httpx.MockTransport(
+        lambda request: platform_requests.append(request) or httpx.Response(200)
+    )
+    needs_login = failure in {"invalid_client", "invalid_grant"}
+    with ExitStack() as stack:
+        _enter_clients(stack, platform, token=httpx.MockTransport(token_endpoint))
+        client = stack.enter_context(HTTPClient(config=config))
+        async with client:
+            with pytest.raises(
+                AuthRequiredError if needs_login else AuthenticationError
+            ) as error:
+                await client.asynclient.get(
+                    "probe"
+                ) if asynchronous else client.client.get("probe")
+
+    assert len(token_requests) == 1
+    assert platform_requests == []
+    assert config_path.read_bytes() == original
+    assert sentinel not in str(error.value)
+    assert sentinel not in caplog.text
+    if needs_login:
+        assert error.value.idp == "test"
+
+
+@pytest.mark.parametrize("operation", ["create", "logs"])
+@pytest.mark.parametrize("rejected", [False, True], ids=["outage", "rejected"])
+async def test_bulk_requests_preserve_oidc_recovery_errors(
+    monkeypatch, tmp_path, operation, rejected
+) -> None:
+    """A gathered refresh error remains a client failure with actionable recovery."""
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
+    config = _configuration(_oidc(access_expiry=1))
+    platform_requests: list[httpx.Request] = []
+    platform = httpx.MockTransport(
+        lambda request: platform_requests.append(request) or httpx.Response(200)
+    )
+    token = httpx.MockTransport(
+        lambda request: httpx.Response(
+            400 if rejected else 503,
+            json={"error": "invalid_client"},
+            request=request,
+        )
+    )
+    with ExitStack() as stack:
+        _enter_clients(stack, platform, token=token)
+        async with AsyncSession(config=config) as session:
+            call = (
+                session.create(name="batch", image="skaha/worker", replicas=2)
+                if operation == "create"
+                else session.logs(["one", "two"])
+            )
+            with pytest.raises(AuthRequiredError if rejected else AuthenticationError):
+                await call
+
+    assert platform_requests == []

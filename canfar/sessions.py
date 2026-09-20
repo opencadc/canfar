@@ -12,6 +12,7 @@ from httpx import HTTPError, Response
 
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.session import CreateRequest
 from canfar.utils import build
 
@@ -39,7 +40,7 @@ def _raise_authentication_failure(result: object) -> None:
     Reporting it as a per-Session transport failure would hide that no request
     was sent, so the asynchronous client raises it as the synchronous one does.
     """
-    if isinstance(result, AuthContextError | AuthExpiredError):
+    if isinstance(result, AuthContextError | AuthExpiredError | AuthenticationError):
         raise result
 
 

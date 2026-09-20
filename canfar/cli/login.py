@@ -7,7 +7,6 @@ from typing import Annotated
 import httpx
 import typer
 
-from canfar import CONFIG_PATH
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.prompts import select_idp, select_server
 from canfar.idp import get_idp, list_idps
@@ -20,24 +19,6 @@ from canfar.server import (
     discover,
 )
 from canfar.utils.console import emit_cli_active_server_banner, get_console
-
-
-def _authentication_exists_on_disk(idp: str) -> bool:
-    """Return whether persisted Authentication exists for an IDP.
-
-    In-memory default placeholder credentials are ignored until a config file
-    has been written to disk.
-
-    Args:
-        idp: Canonical Identity Provider key.
-
-    Returns:
-        True when ``idp`` is saved in the on-disk configuration file.
-    """
-    if not CONFIG_PATH.exists():
-        return False
-    config = Configuration()  # ty: ignore[missing-argument]
-    return idp in config.authentication
 
 
 def _login_flow(
@@ -54,17 +35,10 @@ def _login_flow(
 
     Args:
         idp: Canonical Identity Provider key.
-        force: When ``True``, overwrite an existing saved Authentication record.
+        force: Obtain a new X.509 certificate even when the current one is valid.
         dev: Include development registries and endpoints during server discovery.
         timeout: HTTP timeout in seconds for login HTTP requests.
     """
-    if _authentication_exists_on_disk(idp) and not force:
-        get_console(stderr=True).print(
-            f"[yellow]Authentication for '{idp}' already exists. "
-            "Use --force to re-authenticate.[/yellow]"
-        )
-        raise typer.Exit(1)
-
     idp_info = get_idp(idp)
     try:
         credential = authenticate_for_cli(idp_info, timeout=timeout, force=force)
@@ -132,7 +106,9 @@ def register_login_command(app: typer.Typer) -> None:
         ] = None,
         force: Annotated[
             bool,
-            typer.Option("-f", "--force", help="Force re-authentication."),
+            typer.Option(
+                "-f", "--force", help="Obtain a new CADC certificate even if valid."
+            ),
         ] = False,
         dev: Annotated[
             bool,

@@ -13,7 +13,7 @@ from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 from canfar.auth.oidc import refresh, sync_refresh
 
 _REFRESH_FAILURE_CASES = (
-    ("oauth", "OIDC token refresh failed"),
+    ("oauth", "OIDC refresh credentials were rejected."),
     ("http", "OIDC token refresh failed"),
     ("invalid-json", "OIDC token refresh failed: malformed token response"),
     ("empty-access", "OIDC token refresh failed: malformed token response"),
@@ -144,7 +144,7 @@ class TestRefreshFunction:
                 "authlib.integrations.httpx_client.AsyncOAuth2Client",
                 return_value=oauth_client,
             ),
-            pytest.raises(ValueError, match=r"^OIDC token refresh failed") as exc_info,
+            pytest.raises(ValueError, match=r"^OIDC ") as exc_info,
         ):
             await refresh(
                 url="https://example.com/token",

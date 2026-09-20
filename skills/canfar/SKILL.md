@@ -42,8 +42,11 @@ Three states mark progress. Claim only the one you observed:
 3. **Identity and Server.** `canfar auth show -o json` prints the active
    Authentication Record and `canfar server ls -o json` the Servers. The
    identity is usable when `canfar ps -o json` exits 0; keep its payload, the
-   user's active Sessions. An `expiry` of `null`, or an `authentication.*`
-   error code on stderr, means login is needed: **hand login to the user**.
+   user's active Sessions. An `authentication.required` or
+   `authentication.expired` error code on stderr means **hand login to the
+   user**. An access-token expiry alone does not decide this: OIDC credentials
+   may refresh, and their client-secret expiry is separate. Retry temporary
+   IDP failures as directed by the error's `hint`.
    Ask them to run `canfar login IDP` in their own terminal, with the record's
    `idp` (`cadc` for a CADC certificate, `srcnet` for the SRCNet OpenID Connect
    device flow), because credential entry and browser approval are theirs.

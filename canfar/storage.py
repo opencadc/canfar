@@ -10,7 +10,7 @@ from fsspec.implementations.asyn_wrapper import AsyncFileSystemWrapper
 from fsspec.implementations.local import LocalFileSystem
 
 from canfar.client import HTTPClient
-from canfar.exceptions.context import AuthContextError
+from canfar.exceptions.context import AuthContextError, AuthRequiredError
 from canfar.models.config import Configuration
 from canfar.models.http import LOCAL
 
@@ -91,6 +91,10 @@ async def _resolve(
             certificate=certificate,
         )
         credential = await client._materialize_credentials()  # noqa: SLF001
+    except AuthRequiredError:
+        # The upstream data CLI renders exception text, without structured hints.
+        reason = f"Credential cannot be used. Run 'canfar login {idp}'."
+        raise AuthRequiredError(idp, reason) from None
     except (KeyError, OSError, TypeError, ValueError):
         reason = "Credential cannot be used. Run 'canfar login' for this IDP."
         raise AuthContextError(idp, reason) from None

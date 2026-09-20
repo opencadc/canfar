@@ -39,10 +39,15 @@ def _check_expiry(client: HTTPClient) -> None:
     try:
         expired = credential.expired
     except x509.CertificateError as err:
-        raise AuthExpiredError(context=credential.mode, reason=str(err)) from err
+        raise AuthExpiredError(context=credential.idp, reason=str(err)) from err
 
     if expired:
-        raise AuthExpiredError(context=credential.mode, reason="auth expired")
+        reason = (
+            "X.509 certificate expired."
+            if credential.mode == "x509"
+            else "OIDC access token expired."
+        )
+        raise AuthExpiredError(context=credential.idp, reason=reason)
 
 
 def check(client: HTTPClient) -> Callable[[httpx.Request], None]:

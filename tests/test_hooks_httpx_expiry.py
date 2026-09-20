@@ -35,7 +35,8 @@ class TestCheck:
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
         mock_client.authentication_record.expired = True
-        mock_client.authentication_record.mode = "OIDC"
+        mock_client.authentication_record.mode = "oidc"
+        mock_client.authentication_record.idp = "srcnet"
 
         hook_func = check(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -43,8 +44,8 @@ class TestCheck:
         with pytest.raises(AuthExpiredError) as exc_info:
             hook_func(request)
 
-        assert "Auth Context 'OIDC' expired" in str(exc_info.value)
-        assert "auth expired" in str(exc_info.value)
+        assert "Authentication for 'srcnet' expired" in str(exc_info.value)
+        assert "Reason: OIDC access token expired." in str(exc_info.value)
 
     def test_check_with_real_client_expired(self) -> None:
         """Test check hook with real HTTPClient that has expired context."""
@@ -63,14 +64,15 @@ class TestCheck:
         with pytest.raises(AuthExpiredError) as exc_info:
             hook_func(request)
 
-        assert "Auth Context 'oidc' expired" in str(exc_info.value)
-        assert "auth expired" in str(exc_info.value)
+        assert "Authentication for 'testoidc' expired" in str(exc_info.value)
+        assert "Reason: OIDC access token expired." in str(exc_info.value)
 
     def test_check_converts_certificate_error(self) -> None:
         """Synchronous hook should surface certificate details when loading fails."""
 
         class Context:
             mode = "x509"
+            idp = "cadc"
 
             @property
             def expired(self) -> bool:
@@ -138,7 +140,8 @@ class TestACheck:
         mock_client = Mock()
         mock_client.uses_runtime_credentials = False
         mock_client.authentication_record.expired = True
-        mock_client.authentication_record.mode = "X509"
+        mock_client.authentication_record.mode = "x509"
+        mock_client.authentication_record.idp = "cadc"
 
         hook_func = acheck(mock_client)
         request = httpx.Request("GET", "https://example.com")
@@ -146,8 +149,8 @@ class TestACheck:
         with pytest.raises(AuthExpiredError) as exc_info:
             await hook_func(request)
 
-        assert "Auth Context 'X509' expired" in str(exc_info.value)
-        assert "auth expired" in str(exc_info.value)
+        assert "Authentication for 'cadc' expired" in str(exc_info.value)
+        assert "Reason: X.509 certificate expired." in str(exc_info.value)
 
     @pytest.mark.asyncio
     async def test_acheck_with_real_client_expired(self) -> None:
@@ -167,8 +170,8 @@ class TestACheck:
         with pytest.raises(AuthExpiredError) as exc_info:
             await hook_func(request)
 
-        assert "Auth Context 'oidc' expired" in str(exc_info.value)
-        assert "auth expired" in str(exc_info.value)
+        assert "Authentication for 'testoidc' expired" in str(exc_info.value)
+        assert "Reason: OIDC access token expired." in str(exc_info.value)
 
     @pytest.mark.anyio
     async def test_acheck_converts_certificate_error(self) -> None:
@@ -176,6 +179,7 @@ class TestACheck:
 
         class Context:
             mode = "x509"
+            idp = "cadc"
 
             @property
             def expired(self) -> bool:
@@ -200,6 +204,7 @@ class TestACheck:
 
         class Context:
             mode = "x509"
+            idp = "cadc"
 
             @property
             def expired(self) -> bool:
@@ -213,7 +218,7 @@ class TestACheck:
         )
         request = httpx.Request("GET", "https://example.com")
 
-        with pytest.raises(AuthExpiredError, match="auth expired"):
+        with pytest.raises(AuthExpiredError, match=r"X\.509 certificate expired\."):
             await hook(request)
 
     @pytest.mark.anyio
@@ -265,6 +270,7 @@ class TestSyncAsyncParity:
 
         class Context:
             mode = "x509"
+            idp = "cadc"
 
             @property
             def expired(self) -> bool:
@@ -278,10 +284,14 @@ class TestSyncAsyncParity:
 
         request = httpx.Request("GET", "https://example.com")
 
-        with pytest.raises(AuthExpiredError, match="auth expired") as sync_exc:
+        with pytest.raises(
+            AuthExpiredError, match=r"X\.509 certificate expired\."
+        ) as sync_exc:
             check(_ns())(request)
 
-        with pytest.raises(AuthExpiredError, match="auth expired") as async_exc:
+        with pytest.raises(
+            AuthExpiredError, match=r"X\.509 certificate expired\."
+        ) as async_exc:
             await acheck(_ns())(request)
 
         assert str(sync_exc.value) == str(async_exc.value)

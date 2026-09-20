@@ -13,7 +13,9 @@ from fsspec.implementations.local import LocalFileSystem
 from pydantic import AnyHttpUrl, AnyUrl
 
 from canfar import storage
-from canfar.exceptions.context import AuthContextError
+from canfar.auth.oidc import ReauthenticationRequiredError
+from canfar.exceptions.context import AuthContextError, AuthRequiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.active import ActiveConfig
 from canfar.models.config import Configuration
 from canfar.models.http import Server, VOSpaceService
@@ -378,12 +380,42 @@ async def test_unrefreshable_oidc_fails_secret_safe_before_vospace(
     constructor.assert_not_called()
 
 
+@pytest.mark.parametrize("rejected", [False, True], ids=["outage", "rejected"])
+async def test_storage_refresh_failure_preserves_recovery_and_saved_state(
+    monkeypatch, tmp_path, rejected
+) -> None:
+    """Storage reports its owning IDP and never diagnoses an outage as expiry."""
+    config = _config(credential=oidc_credential("inactive", access_expiry=1))
+    config.editor.save()
+    config_path = tmp_path / "config.yaml"
+    original = config_path.read_bytes()
+    failure = ReauthenticationRequiredError if rejected else ValueError
+    monkeypatch.setattr(
+        "canfar.client.oidc.refresh", AsyncMock(side_effect=failure("refresh failed"))
+    )
+    constructor = Mock()
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
+
+    with pytest.raises(AuthRequiredError if rejected else AuthenticationError) as err:
+        async with _vospace("archive")():
+            pass
+
+    if rejected:
+        assert "canfar login inactive" in str(err.value)
+    else:
+        assert "canfar login" not in str(err.value)
+    assert config_path.read_bytes() == original
+    constructor.assert_not_called()
+
+
 @pytest.mark.asyncio
-async def test_empty_saved_oidc_token_fails_cleanly(
+async def test_empty_unrefreshable_saved_oidc_token_fails_cleanly(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """An empty saved token cannot fall through to certificate construction."""
-    _config(credential=oidc_credential("inactive", access="")).editor.save()
+    """An empty token without refresh cannot fall through to certificate setup."""
+    _config(
+        credential=oidc_credential("inactive", access="", refresh=None)
+    ).editor.save()
     constructor = Mock()
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", constructor)
 

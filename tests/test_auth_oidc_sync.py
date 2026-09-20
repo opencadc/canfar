@@ -171,7 +171,11 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
     registration = httpx.Response(
         200,
         request=httpx.Request("POST", "https://example.com/register"),
-        json={"client_id": "client-id", "client_secret": "client-secret"},
+        json={
+            "client_id": "client-id",
+            "client_secret": "client-secret",
+            "client_secret_expires_at": 1893456000,
+        },
     )
     challenge = httpx.Response(
         200,
@@ -220,6 +224,7 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
 
     assert result.client.identity == "client-id"
     assert result.client.secret == SecretStr("client-secret")
+    assert result.client.secret_expires_at == 1893456000
     assert result.token.access == SecretStr("access-token")
     assert result.token.refresh == SecretStr("refresh-token")
     assert presented[0].user_code == SecretStr("ABC123")

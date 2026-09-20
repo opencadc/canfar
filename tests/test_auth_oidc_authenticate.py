@@ -22,6 +22,7 @@ class TestAuthenticateCredentialFunction:
         credential: OIDCCredential | None = None,
         userinfo_error: Exception | None = None,
         authenticated: list[str | None] | None = None,
+        registration_metadata: dict[str, object] | None = None,
     ) -> OIDCCredential:
         credential = credential or OIDCCredential(
             idp="test",
@@ -56,6 +57,7 @@ class TestAuthenticateCredentialFunction:
             registration_response.json.return_value = {
                 "client_id": "test_client_id",
                 "client_secret": "test_client_secret",
+                **(registration_metadata or {}),
             }
             userinfo_response = MagicMock()
             userinfo_response.json.return_value = {"preferred_username": "testuser"}
@@ -135,6 +137,31 @@ class TestAuthenticateCredentialFunction:
         assert result.token.refresh.get_secret_value() == "test_refresh_token"
         assert result.expiry.access == 1234567890
         assert result.expiry.refresh is None
+
+    @pytest.mark.parametrize("expiry", [None, 0, 1893456000])
+    async def test_authenticate_retains_client_secret_expiry(self, expiry) -> None:
+        """Registration metadata survives the separate token installation."""
+        result = await self._authenticate_with_tokens(
+            {"access_token": "access", "expires_at": 1234567890},
+            registration_metadata={}
+            if expiry is None
+            else {"client_secret_expires_at": expiry},
+        )
+        assert result.client.secret_expires_at == expiry
+        assert result.expiry.access == 1234567890
+
+    async def test_authenticate_hides_malformed_client_secret_expiry(
+        self, caplog
+    ) -> None:
+        """Malformed registration metadata does not expose provider data."""
+        sentinel = "secret-malformed-client-metadata"
+        with pytest.raises(ValueError, match="malformed client response") as error:
+            await self._authenticate_with_tokens(
+                {"access_token": "access"},
+                registration_metadata={"client_secret_expires_at": sentinel},
+            )
+        assert sentinel not in str(error.value)
+        assert sentinel not in caplog.text
 
     @pytest.mark.asyncio
     async def test_authenticate_notifies_authenticated_username(self) -> None:

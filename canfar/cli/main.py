@@ -28,6 +28,7 @@ from canfar.cli.stats import get_stats
 from canfar.cli.version import callback as version_callback
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.utils.console import activate_cli_root, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
@@ -280,7 +281,12 @@ def main() -> None:
     """
     try:
         cli()
-    except (AuthExpiredError, AuthContextError, ConfigResetRequiredError) as err:
+    except (
+        AuthExpiredError,
+        AuthContextError,
+        ConfigResetRequiredError,
+        AuthenticationError,
+    ) as err:
         failure = output.boundary_failure(err)
         mode = _leaf_output_mode(sys.argv[1:])
         if mode is output.OutputMode.HUMAN:

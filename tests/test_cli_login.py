@@ -10,10 +10,12 @@ import yaml
 from pydantic import AnyHttpUrl, AnyUrl
 from typer.testing import CliRunner
 
+from canfar.auth import x509
 from canfar.cli.main import cli
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
+from tests.test_auth_x509 import generate_cert
 
 runner = CliRunner()
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
@@ -79,7 +81,6 @@ def test_login_without_config_file_does_not_require_force(tmp_path: Path) -> Non
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
         patch("canfar.server._validate_server", return_value=validated),
@@ -123,7 +124,6 @@ def test_login_saves_auth_and_server_atomically(tmp_path: Path) -> None:
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
         patch("canfar.server._validate_server", return_value=validated),
@@ -188,7 +188,6 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch("canfar.cli.login.authenticate_for_cli", authenticate),
         patch("canfar.server._validate_server", validate),
@@ -211,9 +210,20 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
     assert isinstance(validate.call_args.kwargs["config"], Configuration)
 
 
-def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
-    """Repeated login without --force is rejected."""
+@pytest.mark.parametrize("expired", [False, True])
+def test_login_existing_cadc_reuses_or_reauthenticates(
+    tmp_path: Path, expired: bool
+) -> None:
+    """A saved record permits certificate reuse or interactive re-authentication."""
     config_path = tmp_path / "config.yaml"
+    certificate = tmp_path / "cert.pem"
+    generate_cert(certificate, expired=expired)
+    inspect_certificate = x509.inspect
+
+    def acquire_certificate() -> dict:
+        generate_cert(certificate)
+        return inspect_certificate(certificate)
+
     _write_config(
         config_path,
         {
@@ -222,7 +232,7 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
             "authentication": {
                 "cadc": {
                     "mode": "x509",
-                    "path": "/existing/cert.pem",
+                    "path": str(certificate),
                     "expiry": 1.0,
                 }
             },
@@ -237,25 +247,58 @@ def test_login_existing_without_force_exits_nonzero(tmp_path: Path) -> None:
             },
         },
     )
+    selected = Server(
+        idp="cadc",
+        name="CADC-CANFAR",
+        uri=AnyUrl(_CADC_URI),
+        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+        version="v1",
+        auths=["x509"],
+    )
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch(
+            "canfar.auth.x509.inspect",
+            side_effect=lambda: inspect_certificate(certificate),
+        ),
+        patch("canfar.auth.x509.gather", side_effect=acquire_certificate) as gather,
+        patch("canfar.cli.login.discover", return_value=[selected]),
+        patch("canfar.server._validate_server", return_value=selected),
     ):
         result = runner.invoke(cli, ["login", "cadc"])
+        saved = Configuration()
 
-    assert result.exit_code == 1
-    assert "already exists" in result.stderr
+    assert result.exit_code == 0, result.output
+    assert gather.call_count == int(expired)
+    assert (
+        saved.authentication["cadc"].expiry
+        == inspect_certificate(certificate)["expiry"]
+    )
+    assert saved.active.authentication == "cadc"
+    assert saved.active.server == "CADC-CANFAR"
 
 
-def test_login_presents_device_flow_failure_on_terminal(tmp_path: Path) -> None:
-    """CLI login renders terminal device-flow failures on stderr."""
+@pytest.mark.parametrize("existing", [False, True])
+def test_login_presents_device_flow_failure_on_terminal(
+    tmp_path: Path, existing: bool
+) -> None:
+    """Device login runs with a saved record and preserves it on failure."""
     config_path = tmp_path / "config.yaml"
+    if existing:
+        _write_config(
+            config_path,
+            {
+                "version": 1,
+                "active": {"authentication": "srcnet", "server": None},
+                "authentication": {"srcnet": {"mode": "oidc"}},
+            },
+        )
+    original = config_path.read_bytes() if existing else None
 
     with (
         _patch_config(config_path),
-        patch("canfar.cli.login.CONFIG_PATH", config_path),
         patch("canfar.models.config.CONFIG_PATH", config_path),
         patch(
             "canfar.cli.login.authenticate_for_cli",
@@ -266,3 +309,4 @@ def test_login_presents_device_flow_failure_on_terminal(tmp_path: Path) -> None:
 
     assert result.exit_code == 1
     assert "OIDC device authorization was denied" in result.stderr
+    assert (config_path.read_bytes() if config_path.exists() else None) == original
