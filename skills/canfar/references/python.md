@@ -5,6 +5,10 @@ application or for many concurrent requests. Open both with `with` or
 `async with`. They use the identity and Server Selection saved by CLI login;
 closing a client leaves its remote Sessions running.
 
+The default HTTP `timeout` is 30 seconds. See
+[HTTPClient](https://www.opencadc.org/canfar/edge/client/client/) for timeout
+semantics and the unreleased async client's wait for connection capacity.
+
 ```python
 from canfar.sessions import Session
 

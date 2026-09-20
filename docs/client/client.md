@@ -27,9 +27,13 @@ The main settings are:
 - `authentication_idp`: a transient Identity Provider selector for this client.
 - `token`: a runtime bearer token.
 - `certificate`: a runtime X.509 certificate path.
-- `timeout`: HTTP request inactivity timeout in seconds (1–300), not a total
-  job deadline.
+- `timeout`: HTTP request inactivity timeout in seconds (1–300, default 30), not
+  a total job deadline.
 - `concurrency`: maximum async connection count (1–128).
+
+In the unreleased async client, requests wait for a free connection without a
+pool timeout. Connect, read, and write timeouts still use `timeout`, and
+`concurrency` still limits connections. Synchronous pool waits also use `timeout`.
 
 When no explicit `url` is supplied, the active Server Selection in
 `Configuration` supplies the Science Platform Server. Without a runtime

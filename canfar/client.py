@@ -103,7 +103,9 @@ class HTTPClient(BaseSettings):
     timeout: int = Field(
         30,
         title="HTTP Timeout",
-        description="HTTP request timeout in seconds.",
+        description=(
+            "HTTP inactivity timeout in seconds. Async pool waits have no deadline."
+        ),
         gt=0,
         le=300,
     )
@@ -381,6 +383,8 @@ class HTTPClient(BaseSettings):
             "base_url": self._get_base_url(),
         }
         if asynchronous:
+            # Queued bulk requests wait for a connection without timing out locally.
+            kwargs["timeout"] = Timeout(self.timeout, pool=None)
             kwargs["limits"] = Limits(
                 max_connections=self.concurrency,
                 max_keepalive_connections=self.concurrency // 4,
