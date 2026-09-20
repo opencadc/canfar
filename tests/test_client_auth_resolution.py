@@ -961,10 +961,16 @@ async def test_oidc_refresh_rejection_requires_login_only_for_credentials(
         assert error.value.idp == "test"
 
 
-@pytest.mark.parametrize("operation", ["create", "logs"])
+@pytest.mark.parametrize(
+    ("operation", "arguments"),
+    [
+        ("create", {"name": "batch", "image": "skaha/worker", "replicas": 2}),
+        ("logs", {"ids": ["one", "two"]}),
+    ],
+)
 @pytest.mark.parametrize("rejected", [False, True], ids=["outage", "rejected"])
 async def test_bulk_requests_preserve_oidc_recovery_errors(
-    monkeypatch, tmp_path, operation, rejected
+    monkeypatch, tmp_path, operation, arguments, rejected
 ) -> None:
     """A gathered refresh error remains a client failure with actionable recovery."""
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
@@ -983,12 +989,7 @@ async def test_bulk_requests_preserve_oidc_recovery_errors(
     with ExitStack() as stack:
         _enter_clients(stack, platform, token=token)
         async with AsyncSession(config=config) as session:
-            call = (
-                session.create(name="batch", image="skaha/worker", replicas=2)
-                if operation == "create"
-                else session.logs(["one", "two"])
-            )
             with pytest.raises(AuthRequiredError if rejected else AuthenticationError):
-                await call
+                await getattr(session, operation)(**arguments)
 
     assert platform_requests == []
