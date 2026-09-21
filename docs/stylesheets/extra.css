@@ -133,7 +133,7 @@
 
 .md-typeset .canfar-actions p {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: .5rem;
   margin: 0;
 }
@@ -291,6 +291,14 @@
 @media (max-width: 34em) {
   .canfar-intro {
     padding: .95rem 1rem;
+  }
+
+  .canfar-actions {
+    width: 100%;
+  }
+
+  .md-typeset .canfar-actions p {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .md-typeset .canfar-home h1 {

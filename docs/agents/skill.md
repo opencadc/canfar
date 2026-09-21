@@ -1,9 +1,10 @@
 # The CANFAR skill
 
 `skills/canfar/` is the one skill published for users' coding agents. Users
-install it with `npx skills add opencadc/canfar` and invoke it as `/canfar`;
-see [Use CANFAR with a coding agent](../client/agents.md). It is separate from
-`AGENTS.md`, which guides agents working on this repository.
+install it with `npx skills add opencadc/canfar --skill canfar`; see
+[CANFAR Agent Skill](../platform/agent-skill.md) for installation and invocation
+in each agent. It is separate from `AGENTS.md`, which guides agents working on
+this repository.
 
 ## How it stays true
 

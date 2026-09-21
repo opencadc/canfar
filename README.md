@@ -31,11 +31,12 @@ session.connect(ids)
 ## Agent skills
 
 ```bash
-npx skills add opencadc/canfar
+npx skills add opencadc/canfar --skill canfar
 ```
 
-Then ask your coding agent, for example `/canfar start a notebook session`.
-See [Use CANFAR with a coding agent](docs/client/agents.md).
+Select the skill in your coding agent, then ask it to start a notebook or help
+with another CANFAR task. See [CANFAR Agent Skill](docs/platform/agent-skill.md)
+for installation and examples for your agent.
 
 ---
 <p align="center">
