@@ -1936,7 +1936,7 @@ Server where they were launched.</p>
 <tbody>
 <tr>
 <td><code>--force</code>, <code>-f</code></td>
-<td>Obtain new credentials and rediscover instead of refusing an existing record.</td>
+<td>Obtain a new CADC certificate even when the current one is valid.</td>
 </tr>
 <tr>
 <td><code>--dev</code></td>
@@ -1950,19 +1950,29 @@ Server where they were launched.</p>
 </table>
 <p>Login authenticates the selected IDP, discovers compatible Science Platform
 Servers, selects one when necessary, and saves the Authentication Record and
-Server Selection. A saved record causes a repeat login to fail unless
-<code>--force</code> is supplied.</p>
+Server Selection. You can log in again when an Authentication Record already
+exists; <code>--force</code> is not required to recover expired credentials.</p>
 <h3 id="cadc-x509">CADC X.509<a class="headerlink" href="#cadc-x509" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
-<p>The CLI reuses a usable X.509 certificate when possible. Use <code>--force</code> to
-obtain a replacement. If the certificate is expired, login reports that and
-continues with certificate acquisition.</p>
+<p>The CLI reuses a usable X.509 certificate when possible. If the certificate
+is missing or expired, login asks for your CADC credentials to obtain a new
+one. Use <code>--force</code> to replace a certificate that is still valid. Ordinary
+commands cannot renew an expired certificate; run <code>canfar login cadc</code> yourself.</p>
+<p>The certificate is saved as <code>~/.ssl/cadcproxy.pem</code> and is valid for 30 days.
+The <a href="../../platform/storage/vospace/#legacy-vostools">legacy CADC tools</a> read
+the same file, so one login serves both. Inside a Session on the CADC
+deployment, the Server places a delegated certificate at that path when the
+Session starts, and <code>~/.canfar</code> lives in your persistent home directory, so a
+login made in one Session is there in the next. For unattended work, log in
+from the environment that will run the job and check that the certificate
+outlasts it.</p>
 <h3 id="srcnet-oidc-device-authorization">SRCNet OIDC Device Authorization<a class="headerlink" href="#srcnet-oidc-device-authorization" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>srcnet
 </code></pre></div>
-<p>The CLI performs OIDC discovery and dynamic client registration, then presents
-the Device Authorization challenge in the terminal:</p>
+<p>Each explicit <code>canfar login srcnet</code> performs OIDC discovery and fresh dynamic
+client registration, then presents the Device Authorization challenge in the
+terminal, even when you have a saved Authentication Record:</p>
 <ol>
 <li>It prints a verification URL, user code, and a terminal QR code.</li>
 <li>It opens the verification URL in the default browser when possible.</li>
@@ -1974,6 +1984,16 @@ challenge has an IDP-provided expiry; <code>--timeout</code> controls HTTP reque
 does not extend that challenge. Denial, expiry, malformed responses, and
 network failures stop login with an error; run the command again after fixing
 the cause.</p>
+<p>Ordinary commands use a valid access token or refresh it without opening a
+browser. The access token, refresh token, and registered client secret have
+separate lifetimes. CANFAR saves the client-secret expiry reported by the IDP;
+it does not assume a fixed lifetime. An expired client secret prevents refresh
+but does not prevent use of an access token that is still valid. Older records
+without that expiry can still attempt refresh.</p>
+<p>When refresh credentials are missing, known to be expired, or rejected by the
+IDP, run <code>canfar login srcnet</code> and approve the new device challenge. A timeout
+or temporary IDP failure leaves your saved credentials intact so you can retry
+the command.</p>
 <p>For troubleshooting, put root logging options before <code>login</code>:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>login<span class="w"> </span>srcnet
 canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>login<span class="w"> </span>cadc<span class="w"> </span>--force
@@ -2015,7 +2035,8 @@ flag:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>purge<span class="w"> </span>--force
 </code></pre></div>
 <p>The purge restores built-in defaults and preserves unrelated registry and
-console settings.</p>
+console settings. These are the commands for leaving an identity; there is no
+separate logout command.</p>
 <p><span id="manage-servers"></span></p>
 <h2 id="server-selection">Server Selection<a class="headerlink" href="#server-selection" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>ls
@@ -2080,7 +2101,7 @@ canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
   </span>
 
     

@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -1000,6 +1030,8 @@
       
         
           
+        
+      
         
       
         
@@ -1138,6 +1170,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2061,6 +2121,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#concurrent-sessions-and-shared-storage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Concurrent Sessions and shared storage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#remote-read-performance" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2174,8 +2245,15 @@ Replace <code>USER</code> and <code>PROJECT</code> with your username and projec
 <div class="highlight"><span class="filename">Terminal inside your Session</span><pre><span></span><code>df<span class="w"> </span>-h<span class="w"> </span>/arc/home/USER<span class="w"> </span>/arc/projects/PROJECT
 du<span class="w"> </span>-sh<span class="w"> </span>/arc/projects/PROJECT
 </code></pre></div>
-<p><code>df</code> reports filesystem capacity, not your personal or project quota.
-<code>du</code> measures accessible files and can take time on a large directory.
+<p><code>df</code> on any path under <code>/arc</code> reports the whole ARC filesystem. It never shows
+your home or project allocation, so use it only to confirm the mount.
+<code>du</code> measures the files you can read and can take time on a large directory.
+Usage figures can lag behind a large write or cleanup, so check again after a
+few minutes before concluding that nothing changed.</p>
+<p>Keep your home directory small: configuration, keys, and short scripts.
+Datasets, software environments, and download caches belong in project space.
+When home is nearly full, saving files and even logging in to a Session can
+fail, so free space there first when either starts to misbehave.
 Use the <a href="https://www.canfar.net/storage/vault/list/">Vault web interface</a>
 for Vault data, and ask <a href="../support/">support</a> to confirm the quota
 that applies to your project.</p>
@@ -2202,10 +2280,10 @@ Identifier</strong>. The identifier is configuration data, not a Python module m
 or a new fsspec protocol. List identifiers and construct a filesystem explicitly:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">identifiers</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>  <span class="c1"># configured identifiers, plus the reserved &quot;local&quot;</span>
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>  <span class="c1"># configured identifiers, plus the reserved "local"</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">entries</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/project&quot;</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">entries</span> <span class="o">=</span> <span class="n">remote</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">"/project"</span><span class="p">,</span> <span class="n">detail</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
@@ -2223,6 +2301,52 @@ canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </s
 <code>arc:</code> are examples of Storage Identifiers; use the names returned by your
 configuration rather than assuming that every deployment has those identifiers.
 See <a href="transfers/">Data transfers</a> for command details.</p>
+<h2 id="concurrent-sessions-and-shared-storage">Concurrent Sessions and shared storage<a class="headerlink" href="#concurrent-sessions-and-shared-storage" title="Permanent link">&para;</a></h2>
+<p>Every Session you run mounts the same <code>/arc/home/&lt;user&gt;</code> and the same project
+directories, while each Session gets its own <code>/scratch</code>. Two Sessions, or the
+replicas of one batch run, can therefore write to the same persistent files at
+the same time.</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Location</th>
+<th>Shared between Sessions?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Configuration, keys, <code>~/.canfar</code></td>
+<td><code>/arc/home/&lt;user&gt;</code></td>
+<td>Yes, all of your Sessions</td>
+</tr>
+<tr>
+<td>Project data and results</td>
+<td><code>/arc/projects/&lt;project&gt;</code></td>
+<td>Yes, all members' Sessions</td>
+</tr>
+<tr>
+<td>Staging and intermediates</td>
+<td><code>/scratch</code></td>
+<td>No, one Session only</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Give each writer its own output file, named from the input or the replica,
+  and keep many writers out of one directory when a run produces thousands of
+  files.</li>
+<li>Write to a temporary name and rename it into place, so a reader or a
+  restarted job never sees a half-written file.</li>
+<li>Keep SQLite databases and other lock-heavy state on <code>/scratch</code> while they are
+  active, then copy an export or checkpoint to <code>/arc</code>. File locking on a shared
+  network filesystem is slow and can corrupt a database opened from two
+  Sessions.</li>
+<li>Share with collaborators through <code>/arc/projects/&lt;project&gt;</code> or a VOSpace
+  Service; another Session cannot see your <code>/scratch</code>.</li>
+</ul>
+<p>The <a href="../../client/advanced-examples/">advanced batch example</a> applies these
+rules to a replicated run.</p>
 <p><span id="storage-strategy-and-performance"></span></p>
 <h2 id="remote-read-performance">Remote-read performance<a class="headerlink" href="#remote-read-performance" title="Permanent link">&para;</a></h2>
 <p><code>vosfs</code> and fsspec provide two different read shapes:</p>
@@ -2245,6 +2369,7 @@ backend boundary and scientific-library recipes.</p>
 <li><a href="filesystem/">Filesystem and Python tools</a></li>
 <li><a href="transfers/">Data transfers</a></li>
 <li><a href="vospace/">VOSpace</a></li>
+<li><a href="archives/">CADC archive data</a></li>
 <li><a href="../sessions/">Session storage</a></li>
 <li><a href="../permissions/">Permissions</a></li>
 </ul>
@@ -2270,7 +2395,7 @@ backend boundary and scientific-library recipes.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:50:35 UTC">September 18, 2026</span>
   </span>
 
     

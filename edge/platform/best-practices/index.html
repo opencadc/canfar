@@ -874,6 +874,8 @@
       
         
       
+        
+      
     
     
     
@@ -1082,6 +1084,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -1122,6 +1152,8 @@
       
         
           
+        
+      
         
       
         
@@ -1262,6 +1294,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2270,8 +2330,8 @@ interactive Session, validate on a small input, and run the same command in a
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
 <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;input&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">)</span>
-<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"input"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">)</span>
+<span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">"output"</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="n">Path</span><span class="p">)</span>
 <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
 <span class="c1"># Load args.input, perform the analysis, and write args.output.</span>
@@ -2281,8 +2341,14 @@ interactive Session, validate on a small input, and run the same command in a
 <h2 id="request-measured-resources">Request measured resources<a class="headerlink" href="#request-measured-resources" title="Permanent link">&para;</a></h2>
 <p>Start with the flexible request while testing. Once a workload is understood,
 request the CPU, memory, and GPU it actually needs. Oversized fixed requests
-can wait for matching capacity. Set threaded libraries to the requested CPU
-count:</p>
+can wait for matching capacity.</p>
+<p>The Server sets <code>OMP_NUM_THREADS</code>, <code>MKL_NUM_THREADS</code>, <code>OPENBLAS_NUM_THREADS</code>,
+and <code>JULIA_NUM_THREADS</code> to the cores you request, so a fixed request needs no
+extra setting. A flexible Session requests only a small guaranteed share,
+which leaves those variables low, typically at <code>1</code>; set them yourself to let a
+threaded library use the burst capacity, as described in
+<a href="../sessions/limits/#threads-follow-the-request">Session limits</a>. Setting the
+variable explicitly also documents the intent in the command:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--cpu<span class="w"> </span><span class="m">4</span><span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>--memory<span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="se">\</span>
@@ -2368,7 +2434,7 @@ terminates unexpectedly.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 19, 2026 00:00:21 UTC">September 19, 2026</span>
   </span>
 
     

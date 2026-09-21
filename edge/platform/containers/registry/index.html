@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../sessions/contributed/" class="md-nav__link">
         
   
@@ -998,6 +1028,8 @@
       
         
           
+        
+      
         
       
         
@@ -1138,6 +1170,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2255,6 +2315,11 @@ with that endpoint and follow its access instructions:</p>
 <div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>REGISTRY/PROJECT/IMAGE:TAG<span class="w"> </span>.
 docker<span class="w"> </span>push<span class="w"> </span>REGISTRY/PROJECT/IMAGE:TAG
 </code></pre></div>
+<p>After the push, label the image in the registry with each Session Kind it
+supports (<code>notebook</code>, <code>headless</code>, <code>contributed</code>, and so on). The Science
+Platform Server lists an image for a Kind only when it carries that label, and
+picks up new labels on its next refresh; see
+<a href="../#what-a-server-requires-of-an-image">what a Server requires of an image</a>.</p>
 <p>Do not put passwords or access tokens in a Dockerfile, an image layer, a
 notebook, or a Session command. Prefer a short-lived credential mechanism
 provided by the registry operator.</p>
@@ -2315,7 +2380,7 @@ and <a href="../../support/">support</a>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

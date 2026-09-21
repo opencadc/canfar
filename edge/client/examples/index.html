@@ -1934,9 +1934,9 @@ for a fixed resource request:</p>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"my-notebook"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
         <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1953,9 +1953,9 @@ for a fixed resource request:</p>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-</span>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-notebook&quot;</span><span class="p">,</span>
-            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+</span>            <span class="n">name</span><span class="o">=</span><span class="s2">"my-notebook"</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
             <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="p">)</span>
@@ -1963,7 +1963,7 @@ for a fixed resource request:</p>
         <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
             <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -1983,12 +1983,12 @@ for headless Sessions:</p>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/terminal:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
-        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DATASET&quot;</span><span class="p">:</span> <span class="s2">&quot;example&quot;</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"my-headless"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/terminal:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/demo/run.py"</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">"DATASET"</span><span class="p">:</span> <span class="s2">"example"</span><span class="p">},</span>
         <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># successful Session IDs only</span>
@@ -2002,17 +2002,17 @@ for headless Sessions:</p>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-</span>            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-headless&quot;</span><span class="p">,</span>
-            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/terminal:latest&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-            <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
-            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;DATASET&quot;</span><span class="p">:</span> <span class="s2">&quot;example&quot;</span><span class="p">},</span>
+</span>            <span class="n">name</span><span class="o">=</span><span class="s2">"my-headless"</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/terminal:latest"</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/demo/run.py"</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">"DATASET"</span><span class="p">:</span> <span class="s2">"example"</span><span class="p">},</span>
             <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>  <span class="c1"># successful Session IDs only</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2030,7 +2030,7 @@ replicas fail, it returns <code>[]</code>.</p>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>    <span class="n">all_sessions</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-    <span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+    <span class="n">running</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"Running"</span><span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">),</span> <span class="n">running</span><span class="p">)</span>
 </code></pre></div>
 </div>
@@ -2042,10 +2042,10 @@ replicas fail, it returns <code>[]</code>.</p>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span><span class="hll">        <span class="n">all_sessions</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
-</span>        <span class="n">running</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">)</span>
+</span>        <span class="n">running</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"Running"</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">all_sessions</span><span class="p">),</span> <span class="n">running</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2064,7 +2064,7 @@ replicas fail, it returns <code>[]</code>.</p>
 <div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;session-id&quot;</span><span class="p">]</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"session-id"</span><span class="p">]</span>
     <span class="n">details</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>       <span class="c1"># list[dict[str, Any]]</span>
     <span class="n">events</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>      <span class="c1"># list[dict[str, str]]</span>
     <span class="n">logs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>          <span class="c1"># dict[str, str]</span>
@@ -2078,13 +2078,13 @@ replicas fail, it returns <code>[]</code>.</p>
 </span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;session-id&quot;</span><span class="p">]</span>
+</span><span class="hll">        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"session-id"</span><span class="p">]</span>
 </span>        <span class="n">details</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>       <span class="c1"># list[dict[str, Any]]</span>
         <span class="n">events</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>      <span class="c1"># list[dict[str, str]]</span>
         <span class="n">logs</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>          <span class="c1"># dict[str, str]</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">details</span><span class="p">,</span> <span class="n">events</span><span class="p">,</span> <span class="n">logs</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2108,12 +2108,12 @@ filters after <code>prefix</code> in <code>destroy_with()</code> are keyword-onl
 <div class="highlight"><span class="filename">session_example.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">&quot;session-id&quot;</span><span class="p">))</span>
+</span>    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">"session-id"</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span>
         <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span>
-            <span class="s2">&quot;my-headless-&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+            <span class="s2">"my-headless-"</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">"Completed"</span><span class="p">,</span>
         <span class="p">)</span>
     <span class="p">)</span>
 </code></pre></div>
@@ -2125,16 +2125,16 @@ filters after <code>prefix</code> in <code>destroy_with()</code> are keyword-onl
 </span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">&quot;session-id&quot;</span><span class="p">))</span>
+</span><span class="hll">        <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="s2">"session-id"</span><span class="p">))</span>
 </span>        <span class="nb">print</span><span class="p">(</span>
             <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span>
-                <span class="s2">&quot;my-headless-&quot;</span><span class="p">,</span>
-                <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-                <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+                <span class="s2">"my-headless-"</span><span class="p">,</span>
+                <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+                <span class="n">status</span><span class="o">=</span><span class="s2">"Completed"</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2147,15 +2147,15 @@ filters after <code>prefix</code> in <code>destroy_with()</code> are keyword-onl
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
-    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">)</span>
+    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"username"</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">"CLI_SECRET"</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="k">with</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-session&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/project/private-image:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/app/run.py&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"private-session"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/project/private-image:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/app/run.py"</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
 

@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../sessions/contributed/" class="md-nav__link">
         
   
@@ -1000,6 +1030,8 @@
       
         
           
+        
+      
         
       
         
@@ -1273,6 +1305,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2345,6 +2405,9 @@ use the authenticated CLI workflow below.</p>
 <span id="batch-job-data-staging"></span>
 <span id="external-data-import"></span></p>
 <h2 id="transfer-files-from-a-terminal">Transfer files from a terminal<a class="headerlink" href="#transfer-files-from-a-terminal" title="Permanent link">&para;</a></h2>
+<p>SSHFS and SFTP access to ARC are not supported. Use the commands below, or
+Storage Management in your browser, in place of older instructions that mount
+ARC over SSH.</p>
 <p><a href="../../../client/get-started/#install">Install the client</a> and log in to the
 identity provider that owns the storage service. The default <code>arc</code> and <code>vault</code>
 services use CADC credentials (<code>canfar login cadc</code>), independently of which
@@ -2381,6 +2444,12 @@ canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </s
 <p>Use <code>-R</code> (or <code>-r</code>) for a directory copy:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>local:/data/run-42<span class="w"> </span>vault:/project/runs/run-42
 </code></pre></div>
+<p><code>cp</code> checks each destination file's size against the source after the transfer
+and reports a mismatch as a failure. A recursive copy is a sequence of file
+copies, not a snapshot: files that change during the copy can arrive in mixed
+states, and a copy that stops partway leaves the files already transferred.
+For many files, prefer a workflow you can rerun, then compare the file count
+and, where the archive publishes them, the checksums.</p>
 <p>Create a destination first when that makes the workflow clearer:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>vault:/project/results
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/scratch/result.fits<span class="w"> </span>vault:/project/results/result.fits
@@ -2397,6 +2466,8 @@ canfar<span class="w"> </span>data<span class="w"> </span>rmdir<span class="w"> 
 </code></pre></div>
 <p><span id="scratch-to-arc-within-sessions"></span></p>
 <h2 id="download-an-archive-url-list">Download an archive URL list<a class="headerlink" href="#download-an-archive-url-list" title="Permanent link">&para;</a></h2>
+<p>For CADC archive files, use the identifier-based tools in
+<a href="../archives/">CADC archive data</a> instead of a URL list.</p>
 <p>If an astronomy archive gives you a text file with one download URL per line,
 you can use <code>wget</code> in a Session terminal where it is installed. Replace
 <code>PROJECT</code> and the URL-list filename, then save the inputs on persistent storage:</p>
@@ -2492,7 +2563,7 @@ support</a>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:50:35 UTC">September 18, 2026</span>
   </span>
 
     

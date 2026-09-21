@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/platform/containers/">
       
       
-        <link rel="prev" href="../storage/vospace/">
+        <link rel="prev" href="../storage/archives/">
       
       
         <link rel="next" href="build/">
@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -998,6 +1028,8 @@
       
         
           
+        
+      
         
       
         
@@ -1138,6 +1170,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2050,6 +2110,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#what-a-server-requires-of-an-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What a Server requires of an image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#resource-and-security-considerations" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2163,7 +2234,7 @@ configuration under persistent <code>/arc</code> storage.</p>
 
 <span class="k">RUN</span><span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-cache-dir<span class="w"> </span>astropy<span class="w"> </span>numpy
 <span class="k">COPY</span><span class="w"> </span>reduce.py<span class="w"> </span>/opt/workflow/reduce.py
-<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;/opt/workflow/reduce.py&quot;</span><span class="p">]</span>
+<span class="k">ENTRYPOINT</span><span class="w"> </span><span class="p">[</span><span class="s2">"python"</span><span class="p">,</span><span class="w"> </span><span class="s2">"/opt/workflow/reduce.py"</span><span class="p">]</span>
 </code></pre></div>
 <p>The base image, packages, and entrypoint must match the Session Kind. A
 <code>headless</code> image must provide the command that the batch request invokes; a
@@ -2184,6 +2255,66 @@ ephemeral <code>/scratch</code> storage. The image does not own those data lifet
 <p>Use <code>/scratch</code> for fast temporary work and copy results to <code>/arc</code> or a
 persistent VOSpace Service before stopping the Session. See <a href="../storage/">Storage</a>.</p>
 <p><span id="user-context-and-permissions"></span></p>
+<h2 id="what-a-server-requires-of-an-image">What a Server requires of an image<a class="headerlink" href="#what-a-server-requires-of-an-image" title="Permanent link">&para;</a></h2>
+<p><strong>A trusted registry.</strong> A Science Platform Server launches images only from
+the registry hosts its operator trusts; the default is <code>images.canfar.net</code>.
+A request for an image elsewhere is rejected before anything starts.</p>
+<p><strong>A label, to be listed.</strong> The Server builds its image list from the labels
+the Container Registry holds for each image: one label per Session Kind the
+image supports, named <code>notebook</code>, <code>desktop</code>, <code>desktop-app</code>, <code>carta</code>, <code>firefly</code>,
+<code>contributed</code>, or <code>headless</code>. The label is set on the image in the registry,
+and a <code>LABEL</code> line in a Dockerfile has no effect on it. The list is refreshed
+periodically, every 30 minutes by default, so a newly labelled image takes a
+while to appear in <code>canfar image ls</code> and the Science Portal. An unlabelled or
+private image can still be launched by its full name with
+<a href="../../client/get-started/#private-container-images">registry credentials</a>.</p>
+<p><strong>No root.</strong> Every container runs with your user ID, your group memberships as
+supplemental groups, no Linux capabilities, and no privilege escalation, so
+<code>sudo</code> and package installation at run time are unavailable. Install software
+when you build the image, and write runtime files under your home directory,
+<code>/scratch</code>, or <code>/tmp</code>.</p>
+<p><strong>A shell.</strong> The Server runs <code>/bin/sh</code> and <code>cp</code> from your image while preparing
+the Session's user and group files, so a minimal image still needs both.</p>
+<table>
+<thead>
+<tr>
+<th>Session Kind</th>
+<th>What the Server does</th>
+<th>What the image must provide</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>notebook</code></td>
+<td>Starts JupyterLab itself, on port 8888</td>
+<td><code>bash</code> and <code>jupyter lab</code> on the <code>PATH</code></td>
+</tr>
+<tr>
+<td><code>carta</code></td>
+<td>Runs the image's entrypoint</td>
+<td>CARTA on port 6901, served under the path in <code>SKAHA_SESSION_URL_PATH</code></td>
+</tr>
+<tr>
+<td><code>desktop-app</code></td>
+<td>Opens the application inside a Desktop Session</td>
+<td>An X11 application and <code>xterm</code>; an optional <code>/skaha/startup.sh</code> wraps the launch</td>
+</tr>
+<tr>
+<td><code>contributed</code></td>
+<td>Runs the image's entrypoint</td>
+<td>A web application on port 5000; see <a href="../sessions/contributed/#contribute-an-application">Contributed applications</a></td>
+</tr>
+<tr>
+<td><code>headless</code></td>
+<td>Runs the command you give, or the image's default</td>
+<td>The command and its dependencies</td>
+</tr>
+</tbody>
+</table>
+<p>The Server sets <code>HOME</code> to your persistent home directory. In every Kind except
+<code>desktop</code> it also sets <code>OMP_NUM_THREADS</code>, <code>MKL_NUM_THREADS</code>,
+<code>OPENBLAS_NUM_THREADS</code>, and <code>JULIA_NUM_THREADS</code> to the number of cores you
+requested; see <a href="../sessions/limits/#threads-follow-the-request">Session limits</a>.</p>
 <h2 id="resource-and-security-considerations">Resource and security considerations<a class="headerlink" href="#resource-and-security-considerations" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Keep credentials out of Dockerfiles, image layers, and command arguments.</li>
@@ -2232,7 +2363,7 @@ for development. See <a href="build/">Building Containers</a> and <a href="regis
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

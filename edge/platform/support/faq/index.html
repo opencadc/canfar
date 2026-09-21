@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../sessions/contributed/" class="md-nav__link">
         
   
@@ -998,6 +1028,8 @@
       
         
           
+        
+      
         
       
         
@@ -1138,6 +1170,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -1601,6 +1661,17 @@
     <span class="md-ellipsis">
       
         How do I get access?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#who-can-use-canfar-and-what-does-it-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who can use CANFAR and what does it cost?
       
     </span>
   </a>
@@ -2207,6 +2278,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#who-can-use-canfar-and-what-does-it-cost" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Who can use CANFAR and what does it cost?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#how-do-i-log-in-and-select-a-server" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2350,8 +2432,19 @@ Identifiers depend on the deployment and your account.</p>
 <h2 id="how-do-i-get-access">How do I get access?<a class="headerlink" href="#how-do-i-get-access" title="Permanent link">&para;</a></h2>
 <p>You need a CADC account and access to a Science Platform Server. Request a
 <a href="https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html">CADC account</a>
-if needed, then ask the platform or project administrator for CANFAR and group
-access. See <a href="../../get-started/">Getting started</a>.</p>
+if needed. Then either ask your project's administrator to add you to its
+group, or email <a href="mailto:support@canfar.net">support@canfar.net</a> with your CADC
+username and a short description of your research. See
+<a href="../../get-started/">Getting started</a>.</p>
+<p><span id="who-can-use-it-and-what-does-it-cost"></span></p>
+<h2 id="who-can-use-canfar-and-what-does-it-cost">Who can use CANFAR and what does it cost?<a class="headerlink" href="#who-can-use-canfar-and-what-does-it-cost" title="Permanent link">&para;</a></h2>
+<p>The CADC deployment serves Canadian astronomers and their collaborators.
+Access is provided for astronomical research, under the site's policies and
+within the storage and compute allocated to your project; it is not a
+general-purpose free cloud. A project that needs more than CANFAR can offer
+should apply for an <a href="https://docs.alliancecan.ca/">Alliance resource allocation</a>.
+An SRCNet Science Platform Server has its own eligibility rules and support
+contacts.</p>
 <p><span id="authentication-options-for-programs"></span>
 <span id="how-do-i-authenticate"></span></p>
 <h2 id="how-do-i-log-in-and-select-a-server">How do I log in and select a server?<a class="headerlink" href="#how-do-i-log-in-and-select-a-server" title="Permanent link">&para;</a></h2>
@@ -2428,9 +2521,9 @@ and <a href="../../storage/transfers/">Data transfers</a>.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">identifiers</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;IDENTIFIER&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"IDENTIFIER"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">&quot;/path&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">ls</span><span class="p">(</span><span class="s2">"/path"</span><span class="p">))</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
@@ -2453,7 +2546,6 @@ instructions for your project. Use a stable tag or digest and never store
 credentials in an image layer. A pushed image is usable only where the target
 Science Platform Server can pull it.</p>
 <p><span id="platform"></span>
-<span id="who-can-use-it-and-what-does-it-cost"></span>
 <span id="can-i-install-additional-software"></span>
 <span id="collaboration-and-sharing"></span>
 <span id="getting-help-and-community"></span>
@@ -2499,7 +2591,7 @@ passwords, and private data before sharing logs.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:50:35 UTC">September 18, 2026</span>
   </span>
 
     

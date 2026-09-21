@@ -896,6 +896,8 @@
       
         
       
+        
+      
     
     
     
@@ -1104,6 +1106,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -1144,6 +1174,8 @@
       
         
           
+        
+      
         
       
         
@@ -1284,6 +1316,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2301,6 +2361,18 @@
 A group lets a project share access with several accounts. Signing in confirms
 who you are; access to a directory or private image depends on the permissions
 its owner grants you.</p>
+<p>Each request passes a chain of separate checks, and a refusal at any link looks
+like "access denied". Work down the chain when diagnosing one:</p>
+<ol>
+<li><strong>Authentication</strong>: your credential is valid for the Identity Provider.</li>
+<li><strong>Platform access</strong>: your account may use this Science Platform Server at
+   all. The operator grants this once, through a platform access group or the
+   deployment's permissions service.</li>
+<li><strong>Group membership</strong>: you belong to the project's group.</li>
+<li><strong>Allocation</strong>: the project has storage, and the path lies inside it.</li>
+<li><strong>File permissions</strong>: the directory grants that group read or write.</li>
+<li><strong>Registry role</strong>: for a private image, your registry account may pull it.</li>
+</ol>
 <p><span id="group-management-collaboration"></span>
 <span id="group-based-resource-sharing"></span>
 <span id="group-administration-interface"></span>
@@ -2326,8 +2398,8 @@ request a shared storage allocation and provide your group name.</p>
 <p>You must be an administrator of the group to change its membership.</p>
 <ol>
 <li>Open the group's membership editor and find the <strong>Members</strong> section.</li>
-<li>Search for your colleague by name, check the account in the results, and
-   select <strong>Add member</strong>.</li>
+<li>Search for your colleague by username or full name, check the account in
+   the results, and select <strong>Add member</strong>.</li>
 <li>To let a colleague manage membership too, use <strong>Add administrator</strong> in the
    <strong>Administrators</strong> section.</li>
 <li>Select <strong>Update</strong> to save changes. Reopen the group and confirm that the
@@ -2335,6 +2407,9 @@ request a shared storage allocation and provide your group name.</p>
 </ol>
 <p>Administrator status allows group management. It does not grant authority to
 allocate platform resources or edit data owned by someone else.</p>
+<p>A Session reads your group memberships once, when it starts. After you are
+added to a group, start a new Session to work with that group's files; a
+Session that was already running keeps the memberships it started with.</p>
 <p><span id="canfar-permission-architecture"></span>
 <span id="permission-model-benefits"></span>
 <span id="advanced-permission-management"></span></p>
@@ -2359,6 +2434,11 @@ access separately from adding group members.</p>
    file. For write access, have them create and remove a small test file in
    the agreed directory.</li>
 </ol>
+<p>A project directory on ARC is private to its group unless someone changes
+that. To release data publicly, place it on Vault and make it world-readable,
+in Storage Management or with
+<a href="../storage/vospace/#legacy-vostools"><code>vchmod o+r</code></a>; for a citable release, use
+<a href="../doi/">data publication</a>.</p>
 <p>If you cannot edit permissions, ask the directory owner or CANFAR support.
 Use the path supplied for your allocation rather than assuming it matches the
 group name.</p>
@@ -2374,8 +2454,10 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>active.server
 </code></pre></div>
 <p>The names and capabilities in <code>canfar server ls</code> are deployment data. If the
-server is missing or login succeeds but a request is forbidden, contact the
-operator for that Science Platform deployment. See the <a href="../../cli/authentication-contexts/">authentication guide</a> for credential and server selection details.</p>
+server is missing or login succeeds but a request is forbidden, your account
+lacks platform access on that Server: contact the operator for that Science
+Platform deployment. An account with one Identity Provider grants nothing on a
+Server that belongs to another. See the <a href="../../cli/authentication-contexts/">authentication guide</a> for credential and server selection details.</p>
 <h2 id="check-access-from-the-command-line">Check access from the command line<a class="headerlink" href="#check-access-from-the-command-line" title="Permanent link">&para;</a></h2>
 <p>For data operations, start by listing the identifiers and paths you can use:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/projects/PROJECT
@@ -2388,6 +2470,18 @@ deployment. A forbidden
 operation usually means that your account is not a member of the owning group,
 the path is outside the project's allocation, or the active credentials do not
 match the service.</p>
+<p>Inside a Session, every process runs with your user ID and your groups,
+including a <code>headless</code> command, so a batch job can read and write exactly what
+you can. Ask the filesystem what it sees:</p>
+<div class="highlight"><span class="filename">Terminal inside your Session</span><pre><span></span><code>id
+ls<span class="w"> </span>-ld<span class="w"> </span>/arc/projects/PROJECT
+namei<span class="w"> </span>-l<span class="w"> </span>/arc/projects/PROJECT/results/catalog.csv
+</code></pre></div>
+<p><code>id</code> lists the groups this Session started with. <code>namei -l</code> shows the owner,
+group, and mode of every directory on the way to a file, which reveals the one
+that blocks you. Change sharing in
+<a href="#grant-the-group-access-to-data">Storage Management</a>, or with
+<a href="../storage/vospace/#legacy-vostools"><code>vchmod</code></a> for a VOSpace Service.</p>
 <p>Do not put credentials in a path, a notebook, an image, or a Session command.
 Use the configured Authentication Record or an explicitly supplied runtime
 credential as described in the <a href="../../client/client/">HTTP client guide</a> and
@@ -2459,7 +2553,7 @@ ownership or path is uncertain.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:50:35 UTC">September 18, 2026</span>
   </span>
 
     

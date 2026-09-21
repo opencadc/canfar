@@ -1986,7 +1986,7 @@ when prompted by your identity provider.</p>
 <div class="tabbed-block">
 <div class="highlight"><span class="filename">login.py</span><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
 
-<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="n">canfar</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s2">"srcnet"</span><span class="p">)</span>
 </code></pre></div>
 </div>
 <div class="tabbed-block">
@@ -1994,9 +1994,9 @@ when prompted by your identity provider.</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="hll">    <span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="hll">    <span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">"srcnet"</span><span class="p">)</span>
 </span>
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2017,13 +2017,13 @@ discovery failures raise <code>canfar.authentication.AuthenticationError</code>.
 list its compatible servers:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">authentication</span><span class="p">,</span> <span class="n">server</span>
 
-<span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"srcnet"</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">server</span><span class="o">.</span><span class="n">list_servers</span><span class="p">():</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">candidate</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </code></pre></div>
 <p>Choose a name from that output, replace <code>SERVER_NAME</code> below, and select it
 before you construct a Session client:</p>
-<div class="highlight"><pre><span></span><code><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;SERVER_NAME&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"SERVER_NAME"</span><span class="p">)</span>
 </code></pre></div>
 <p>These selection functions are synchronous and save the defaults used by new
 clients. In a notebook or another running event loop, run selection and
@@ -2032,14 +2032,14 @@ discovery in a worker thread because they can start their own event loop:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">canfar</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">authentication</span><span class="p">,</span> <span class="n">server</span>
 
-<span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
-<span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">&quot;srcnet&quot;</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">canfar</span><span class="o">.</span><span class="n">alogin</span><span class="p">(</span><span class="s2">"srcnet"</span><span class="p">)</span>
+<span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">authentication</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">"srcnet"</span><span class="p">)</span>
 <span class="n">candidates</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">list_servers</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">candidate</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">candidate</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">candidate</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
 </code></pre></div>
 <p>After choosing a name from that output, run this in the next notebook cell:</p>
-<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">&quot;SERVER_NAME&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">to_thread</span><span class="p">(</span><span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">,</span> <span class="s2">"SERVER_NAME"</span><span class="p">)</span>
 </code></pre></div>
 <p>The CLI <code>canfar login</code> flow includes selection, so you can use that route instead.</p>
 <div class="admonition note">
@@ -2055,9 +2055,9 @@ and <code>canfar server use SERVER_NAME</code> if needed.</p>
 
 <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"my-analysis"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
@@ -2075,8 +2075,8 @@ by Server Name, and <code>active</code> stores the selected references. The boun
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
-<span class="n">width</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;console.width&quot;</span><span class="p">)</span>
-<span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;console.width&quot;</span><span class="p">,</span> <span class="mi">132</span><span class="p">)</span>
+<span class="n">width</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"console.width"</span><span class="p">)</span>
+<span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">"console.width"</span><span class="p">,</span> <span class="mi">132</span><span class="p">)</span>
 <span class="n">config</span><span class="o">.</span><span class="n">editor</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
 </code></pre></div>
 <p><code>get()</code> can return a scalar, mapping, or whole list through a dotted path. List
@@ -2092,13 +2092,13 @@ private image:</p>
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
 <span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
-    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">&quot;username&quot;</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">&quot;CLI_SECRET&quot;</span><span class="p">)</span>
+    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"username"</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">"CLI_SECRET"</span><span class="p">)</span>
 <span class="p">)</span>
 <span class="k">with</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/my-project/private-image:latest&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;private-image-test&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/my-project/private-image:latest"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"private-image-test"</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
 <h2 id="read-next">Read next<a class="headerlink" href="#read-next" title="Permanent link">&para;</a></h2>

@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -998,6 +1028,8 @@
       
         
           
+        
+      
         
       
         
@@ -1138,6 +1170,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2132,6 +2192,42 @@ canfar<span class="w"> </span>stats
 </code></pre></div>
 <p><code>canfar logs SESSION_ID</code> is useful after the container has started. A Pending
 Session may not have application logs yet. See <a href="../sessions/batch/#monitor-and-troubleshoot">batch troubleshooting</a>.</p>
+<table>
+<thead>
+<tr>
+<th>Message or symptom</th>
+<th>Meaning</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>has reached the maximum of N active sessions</code></td>
+<td>You are at the per-user limit for interactive Sessions</td>
+<td>Delete one you no longer need; <code>headless</code> Sessions do not count</td>
+</tr>
+<tr>
+<td><code>image not in a trusted repository</code></td>
+<td>The image is on a registry this Server does not trust</td>
+<td>Use an image from <code>canfar image ls</code></td>
+</tr>
+<tr>
+<td><code>No authentication provided for unknown or private image</code></td>
+<td>The image is private, or not yet labelled and listed</td>
+<td>Supply <a href="../../client/get-started/#private-container-images">registry credentials</a></td>
+</tr>
+<tr>
+<td>Process <code>Killed</code>, exit code 137, or <code>No space left on device</code></td>
+<td>A Session limit was reached</td>
+<td>See <a href="../sessions/limits/#read-the-symptom">Session limits</a></td>
+</tr>
+<tr>
+<td><code>sudo</code> or a package install is refused</td>
+<td>Sessions never run as root</td>
+<td>Install the software in the <a href="../containers/#what-a-server-requires-of-an-image">Container Image</a></td>
+</tr>
+</tbody>
+</table>
 <p><span id="critical-data-issues"></span></p>
 <h3 id="a-data-operation-fails">A data operation fails<a class="headerlink" href="#a-data-operation-fails" title="Permanent link">&para;</a></h3>
 <p>Confirm the identifier and path, then check group membership with the project
@@ -2215,7 +2311,7 @@ and include a minimal reproduction.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

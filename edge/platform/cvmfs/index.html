@@ -747,6 +747,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choose-where-software-lives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose where software lives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#trade-offs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -816,6 +827,8 @@
       
         
           
+        
+      
         
       
         
@@ -1038,6 +1051,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../sessions/contributed/" class="md-nav__link">
         
   
@@ -1078,6 +1119,8 @@
       
         
           
+        
+      
         
       
         
@@ -1218,6 +1261,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2108,6 +2179,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#choose-where-software-lives" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Choose where software lives
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#trade-offs" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2166,8 +2248,10 @@
 <p><a href="https://cvmfs.readthedocs.io/en/stable/">CVMFS</a> is a read-only, on-demand
 filesystem for distributing large, versioned software trees. A Science
 Platform deployment may mount one or more CVMFS repositories in Sessions. The
-available repositories and software are deployment data; a missing path is not
-an instruction to install a CVMFS client yourself.</p>
+open-source platform does not mount CVMFS by itself; an operator adds it to
+the Sessions of a deployment. The available repositories and software are
+therefore deployment data, and a missing path is not an instruction to install
+a CVMFS client yourself.</p>
 <p>CVMFS is for shared software and reference data. Keep notebooks, source code,
 intermediate files, and research products in writable <a href="../storage/">Science Platform
 storage</a>, not under <code>/cvmfs</code>.</p>
@@ -2199,6 +2283,29 @@ module<span class="w"> </span>list
 <p>Module changes apply to the current process and Session. Put stable, required
 dependencies in a versioned Container Image or environment rather than
 depending on an unrecorded interactive shell.</p>
+<h2 id="choose-where-software-lives">Choose where software lives<a class="headerlink" href="#choose-where-software-lives" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>You need</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>The same environment for every run and every collaborator</td>
+<td>A versioned <a href="../containers/">Container Image</a></td>
+</tr>
+<tr>
+<td>A compiler, library, or tool the Alliance stack already provides</td>
+<td>A CVMFS module, recording its name and version</td>
+</tr>
+<tr>
+<td>A project's own Python or conda environment that changes often</td>
+<td>An environment under <code>/arc/projects/&lt;project&gt;</code>, created from a lock file</td>
+</tr>
+</tbody>
+</table>
 <h2 id="trade-offs">Trade-offs<a class="headerlink" href="#trade-offs" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The first access can be slower while metadata and files are fetched.</li>
@@ -2240,7 +2347,7 @@ private node-local cache for reproducibility.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

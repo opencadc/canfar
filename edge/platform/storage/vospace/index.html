@@ -18,7 +18,7 @@
         <link rel="prev" href="../transfers/">
       
       
-        <link rel="next" href="../../containers/">
+        <link rel="next" href="../archives/">
       
       
         
@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../sessions/contributed/" class="md-nav__link">
         
   
@@ -1000,6 +1030,8 @@
       
         
           
+        
+      
         
       
         
@@ -1245,6 +1277,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#legacy-vostools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy vostools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#related-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1259,6 +1302,34 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -2185,6 +2256,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#legacy-vostools" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Legacy vostools
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#related-guides" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2344,9 +2426,9 @@ guidance.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">identifiers</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">&quot;/project/catalog.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;/scratch/catalog.fits&quot;</span><span class="p">)</span>
+    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"/project/catalog.fits"</span><span class="p">,</span> <span class="s2">"/scratch/catalog.fits"</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
@@ -2404,6 +2486,64 @@ separate local copy whose freshness and cleanup are your responsibility.</p>
 filesystem or open handle alive across a Session shutdown or pass an open
 filesystem into a worker process; reconstruct it in the worker with the same
 Storage Identifier and usable credentials.</p>
+<p><span id="legacy-vostools"></span></p>
+<h2 id="legacy-vostools">Legacy vostools<a class="headerlink" href="#legacy-vostools" title="Permanent link">&para;</a></h2>
+<p>The <code>vos</code> package provides the older <code>vls</code>, <code>vcp</code>, <code>vsync</code>, <code>vmkdir</code>, <code>vrm</code>,
+and <code>vchmod</code> commands. Use <code>canfar data</code> for new work. Keep vostools for an
+existing script, for one-way directory synchronisation with <code>vsync</code>, and for
+setting VOSpace permissions with <code>vchmod</code>, which <code>canfar data</code> does not do.</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>vos
+</code></pre></div>
+<p>vostools reads the certificate at <code>~/.ssl/cadcproxy.pem</code>, the file that
+<code>canfar login cadc</code> writes and keeps valid for 30 days. Without the CANFAR
+client, <code>cadc-get-cert -u USERNAME</code> writes the same file, valid for 10 days
+unless you pass <code>--days-valid</code>. Every command also accepts <code>--certfile PATH</code> or
+<code>--token TOKEN</code>; with neither, it tries <code>~/.netrc</code> and then anonymous access.</p>
+<p><code>vos:</code> and <code>vault:</code> both name CADC Vault. Any other scheme names the CADC
+service of that name, so ARC is <code>arc:</code>. The long forms are
+<code>vos://cadc.nrc.ca~vault/PATH</code> and <code>vos://cadc.nrc.ca~arc/PATH</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vls -l vos:USER/</code></td>
+<td>List one node in detail. <code>-h</code> prints human-readable sizes; help is <code>--help</code>.</td>
+</tr>
+<tr>
+<td><code>vcp input.fits vos:USER/data/</code></td>
+<td>Upload. <code>vcp vos:USER/data/input.fits ./</code> downloads.</td>
+</tr>
+<tr>
+<td><code>vcp "vos:USER/data/*.fits" ./</code></td>
+<td>Download by pattern; quote it so the shell leaves it alone.</td>
+</tr>
+<tr>
+<td><code>vsync --recursive ./run-42 arc:projects/PROJECT/run-42</code></td>
+<td>Synchronise a local directory to VOSpace, one way. <code>--nstreams N</code> sets parallel streams (5 by default, at most 30).</td>
+</tr>
+<tr>
+<td><code>vmkdir -p vos:USER/a/b</code></td>
+<td>Create a directory and its parents.</td>
+</tr>
+<tr>
+<td><code>vchmod g+r vos:USER/data "GROUP"</code></td>
+<td>Let a group read. <code>g+w</code> grants write, and <code>g+rw</code> takes the read group and then the write group.</td>
+</tr>
+<tr>
+<td><code>vchmod o+r vos:USER/data</code></td>
+<td>Make a node public; <code>o-r</code> reverses it. <code>-R</code> applies a mode recursively.</td>
+</tr>
+</tbody>
+</table>
+<p><code>vcp</code> always copies recursively and cannot copy between two VOSpace services;
+download and upload instead, or use <code>canfar data cp</code>, which can. To give
+several groups the same permission, pass them as one quoted, space-separated
+argument, such as <code>"GROUP1 GROUP2"</code>, up to four groups.</p>
 <h2 id="related-guides">Related guides<a class="headerlink" href="#related-guides" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../">Storage overview</a></li>
@@ -2433,7 +2573,7 @@ Storage Identifier and usable credentials.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

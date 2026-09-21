@@ -2090,18 +2090,18 @@ Every worker reads that same file. Adapt this worker fragment with your own
 <span class="kn">from</span><span class="w"> </span><span class="nn">your_code</span><span class="w"> </span><span class="kn">import</span> <span class="n">run_analysis</span> 
 
 <span class="c1"># 1. Read the same saved input list in every worker</span>
-<span class="n">all_files</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/arc/projects/PROJECT/run/manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">all_files</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="s2">"/arc/projects/PROJECT/run/manifest.json"</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
 
-<span class="c1"># 2. &#39;chunk&#39; automatically gives each replica its unique subset of files</span>
+<span class="c1"># 2. 'chunk' automatically gives each replica its unique subset of files</span>
 <span class="c1">#    It reads environment variables ($REPLICA_ID, $REPLICA_COUNT) set by CANFAR.</span>
 <span class="n">my_files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">distributed</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">all_files</span><span class="p">))</span>
 
 <span class="c1"># 3. Process only your assigned files</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;This replica will process </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">my_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> files.&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"This replica will process </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">my_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> files."</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">datafile</span> <span class="ow">in</span> <span class="n">my_files</span><span class="p">:</span>
     <span class="n">run_analysis</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Done!&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"Done!"</span><span class="p">)</span>
 </code></pre></div>
 <div class="admonition info">
 <p class="admonition-title">Work Distribution Strategies</p>
@@ -2121,17 +2121,17 @@ cleanup, follow the <a href="../../client/advanced-examples/">complete pipeline<
 <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="c1"># Request two replicas, each running the tested worker script</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;galaxy-processing-batch&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;IMAGE_NAME&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/PROJECT/run/my_script.py&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"galaxy-processing-batch"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"IMAGE_NAME"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/PROJECT/run/my_script.py"</span><span class="p">,</span>
         <span class="n">replicas</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accepted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> of 2 requested Sessions: </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Accepted </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span><span class="si">}</span><span class="s2"> of 2 requested Sessions: </span><span class="si">{</span><span class="n">ids</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Check creation errors and missing outputs before retrying.&quot;</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"Check creation errors and missing outputs before retrying."</span><span class="p">)</span>
 </code></pre></div>
 
 

@@ -2062,7 +2062,10 @@ the active IDP and discovers them when no saved Servers are available.</p>
 <p><code>KIND</code> is one of <code>desktop</code>, <code>notebook</code>, <code>carta</code>, <code>headless</code>, <code>firefly</code>, or
 <code>contributed</code>. <code>IMAGE</code> is a CANFAR Container Image such as
 <code>skaha/astroml:latest</code>; the client adds the CANFAR registry and <code>:latest</code> when
-they are omitted.</p>
+they are omitted. That shorthand always expands to <code>images.canfar.net</code>, so on a
+Server that trusts another registry, write the full <code>REGISTRY/PROJECT/IMAGE:TAG</code>
+name from <code>canfar image ls</code>. Accepted ranges for every option are in
+<a href="../../platform/sessions/limits/">Session limits</a>.</p>
 <table>
 <thead>
 <tr>
@@ -2093,7 +2096,7 @@ they are omitted.</p>
 </tr>
 <tr>
 <td><code>--replicas</code>, <code>-r</code></td>
-<td>Number of Sessions; default <code>1</code>.</td>
+<td>Number of Sessions, 1 to 512; default <code>1</code>.</td>
 </tr>
 <tr>
 <td><code>--debug</code></td>
@@ -2203,7 +2206,7 @@ canfar<span class="w"> </span>ps<span class="w"> </span>-o<span class="w"> </spa
 <p><code>prune</code> treats a plain <code>PREFIX</code> as a literal prefix. A value containing regex
 metacharacters is treated as a regular expression. Quote such values so the
 shell does not expand them:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="s1">&#39;notebook.*&#39;</span><span class="w"> </span>notebook<span class="w"> </span>Completed
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>prune<span class="w"> </span><span class="s1">'notebook.*'</span><span class="w"> </span>notebook<span class="w"> </span>Completed
 </code></pre></div>
 <p><span id="images-and-platform-state"></span></p>
 <h3 id="platform-information">Platform information<a class="headerlink" href="#platform-information" title="Permanent link">&para;</a></h3>
@@ -2246,6 +2249,46 @@ filtering. For example, <code>create -o json</code> is a raw list of Session IDs
 <code>ps -o json</code> is a filtered array of Session response objects; neither is
 wrapped in a command-specific envelope. Human active-Server banners and logs
 never precede the machine payload on stdout. Diagnostics and errors use stderr.</p>
+<h3 id="failures-and-exit-status">Failures and exit status<a class="headerlink" href="#failures-and-exit-status" title="Permanent link">&para;</a></h3>
+<p>A command that fails exits with a nonzero status. In human mode the message
+and a hint go to stderr. In machine mode stderr carries one structured object
+with a stable <code>code</code>, a <code>message</code>, and a <code>hint</code>, and stdout stays empty:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span><span class="nt">"code"</span><span class="p">:</span><span class="w"> </span><span class="s2">"authentication.required"</span><span class="p">,</span><span class="w"> </span><span class="nt">"message"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Not authenticated with 'cadc'.\nReason: X.509 certificate has not been issued."</span><span class="p">,</span><span class="w"> </span><span class="nt">"hint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Run `canfar login cadc` and retry."</span><span class="p">}</span>
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Meaning</th>
+<th>Next step</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>authentication.required</code></td>
+<td>Credentials are missing, or OIDC refresh requires a new login.</td>
+<td>Run <code>canfar login IDP</code> with the IDP named in the hint.</td>
+</tr>
+<tr>
+<td><code>authentication.expired</code></td>
+<td>The saved credential has expired.</td>
+<td>Run <code>canfar login IDP</code> with the IDP named in the hint.</td>
+</tr>
+<tr>
+<td><code>authentication.credential_invalid</code></td>
+<td>A credential is saved but cannot be used, such as an unreadable certificate.</td>
+<td>Check <code>canfar auth show</code>, then log in again.</td>
+</tr>
+<tr>
+<td><code>transport.failure</code></td>
+<td>A request to the Science Platform or IDP failed.</td>
+<td>Follow the hint, check connectivity, then retry.</td>
+</tr>
+</tbody>
+</table>
+<p>Codes are stable; message and hint wording can change. Every command that
+contacts a Server reports a missing login this way, including the human-text
+commands <code>info</code>, <code>events</code>, <code>logs</code>, <code>open</code>, <code>stats</code>, and <code>image ls</code>.</p>
 <p>Put <code>-o/--output</code> after the command that owns it. Root <code>-o</code>, <code>--json</code>, and
 <code>--yaml</code> are not options, and commands without machine output reject <code>-o</code>.
 For <code>create</code>, <code>-o</code> is parsed only before <code>--</code>; after the delimiter it is a
@@ -2272,7 +2315,7 @@ container-command token.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:10 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
   </span>
 
     

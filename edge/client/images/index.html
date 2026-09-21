@@ -2147,7 +2147,7 @@ selection applies.</p>
 
 <span class="k">with</span> <span class="n">Images</span><span class="p">()</span> <span class="k">as</span> <span class="n">images</span><span class="p">:</span>
     <span class="n">all_images</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>                 <span class="c1"># list[str]</span>
-    <span class="n">headless</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">)</span>   <span class="c1"># list[str]</span>
+    <span class="n">headless</span> <span class="o">=</span> <span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">)</span>   <span class="c1"># list[str]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">headless</span><span class="p">)</span>
 </code></pre></div>
 <p>Each string is an image identifier such as
@@ -2241,7 +2241,7 @@ attributes and methods.</p>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Images</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CANFAR Image Management.</span>
+<span class="w">    </span><span class="sd">"""CANFAR Image Management.</span>
 
 <span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
 <span class="sd">    attributes and methods.</span>
@@ -2250,10 +2250,10 @@ attributes and methods.</p>
 <span class="sd">        &gt;&gt;&gt; from canfar.images import Images</span>
 <span class="sd">        &gt;&gt;&gt; images = Images()</span>
 <span class="sd">        &gt;&gt;&gt; images.fetch()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get images from CANFAR Server.</span>
+<span class="w">        </span><span class="sd">"""Get images from CANFAR Server.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            kind (str | None, optional): Type of image. Defaults to None.</span>
@@ -2264,24 +2264,24 @@ attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.images import Images</span>
 <span class="sd">            &gt;&gt;&gt; images = Images()</span>
-<span class="sd">            &gt;&gt;&gt; images.fetch(kind=&quot;headless&quot;)</span>
-<span class="sd">            [&#39;images.canfar.net/skaha/terminal:1.1.1&#39;]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; images.fetch(kind="headless")</span>
+<span class="sd">            ['images.canfar.net/skaha/terminal:1.1.1']</span>
+<span class="sd">        """</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># If kind is not None, add it to the data dictionary</span>
         <span class="k">if</span> <span class="n">kind</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kind</span>
-        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kind</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
         <span class="n">payload</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
+        <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Image</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get image details from CANFAR Server.</span>
+<span class="w">        </span><span class="sd">"""Get image details from CANFAR Server.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            list[Image]: Parsed image details payload from the server.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image"</span><span class="p">)</span>
         <span class="n">payload</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">Image</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
@@ -2351,12 +2351,12 @@ attributes and methods.</p>
 <span class="normal">58</span>
 <span class="normal">59</span>
 <span class="normal">60</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Image</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get image details from CANFAR Server.</span>
+<span class="w">    </span><span class="sd">"""Get image details from CANFAR Server.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        list[Image]: Parsed image details payload from the server.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image"</span><span class="p">)</span>
     <span class="n">payload</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">object</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">Image</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
@@ -2440,8 +2440,8 @@ attributes and methods.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.images</span><span class="w"> </span><span class="kn">import</span> <span class="n">Images</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">images</span> <span class="o">=</span> <span class="n">Images</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">)</span>
-<span class="go">[&#39;images.canfar.net/skaha/terminal:1.1.1&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">images</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">)</span>
+<span class="go">['images.canfar.net/skaha/terminal:1.1.1']</span>
 </code></pre></div>
 
 
@@ -2469,7 +2469,7 @@ attributes and methods.</p>
 <span class="normal">48</span>
 <span class="normal">49</span>
 <span class="normal">50</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">kind</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get images from CANFAR Server.</span>
+<span class="w">    </span><span class="sd">"""Get images from CANFAR Server.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        kind (str | None, optional): Type of image. Defaults to None.</span>
@@ -2480,16 +2480,16 @@ attributes and methods.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.images import Images</span>
 <span class="sd">        &gt;&gt;&gt; images = Images()</span>
-<span class="sd">        &gt;&gt;&gt; images.fetch(kind=&quot;headless&quot;)</span>
-<span class="sd">        [&#39;images.canfar.net/skaha/terminal:1.1.1&#39;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; images.fetch(kind="headless")</span>
+<span class="sd">        ['images.canfar.net/skaha/terminal:1.1.1']</span>
+<span class="sd">    """</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="c1"># If kind is not None, add it to the data dictionary</span>
     <span class="k">if</span> <span class="n">kind</span><span class="p">:</span>
-        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">kind</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">"type"</span><span class="p">]</span> <span class="o">=</span> <span class="n">kind</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"image"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
     <span class="n">payload</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="s2">"id"</span><span class="p">])</span> <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="n">payload</span><span class="p">]</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>

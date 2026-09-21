@@ -15,7 +15,7 @@
         <link rel="canonical" href="https://opencadc.github.io/canfar/edge/platform/sessions/contributed/">
       
       
-        <link rel="prev" href="../batch/">
+        <link rel="prev" href="../limits/">
       
       
         <link rel="next" href="../../storage/">
@@ -752,6 +752,8 @@
       
         
       
+        
+      
     
     
     
@@ -955,6 +957,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -1097,6 +1127,8 @@
       
         
       
+        
+      
     
     
     
@@ -1229,6 +1261,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2185,9 +2245,11 @@
 
 
 <h1 id="contributed-applications">Contributed applications<a class="headerlink" href="#contributed-applications" title="Permanent link">&para;</a></h1>
-<p>Contributed Sessions expose community-provided web applications through the
-Science Platform. The catalogue, image names, ports, and access requirements
-are deployment-specific.</p>
+<p>Contributed Sessions expose community-provided web applications, such as
+browser-based editors and reactive notebooks, through the Science Platform.
+The catalogue of images is deployment-specific; the contract an image must
+meet is the same everywhere and is described under
+<a href="#contribute-an-application">Contribute an application</a>.</p>
 <p><span id="getting-started"></span>
 <span id="troubleshooting"></span>
 <span id="whats-next"></span></p>
@@ -2222,15 +2284,50 @@ path with the application documentation rather than assuming that every
 contributed image exposes the same directories.</p>
 <p><span id="contributing-your-app"></span></p>
 <h2 id="contribute-an-application">Contribute an application<a class="headerlink" href="#contribute-an-application" title="Permanent link">&para;</a></h2>
-<p>Start with a container that can run the application without interactive setup.
-The platform operator must confirm the web endpoint, health check, command,
-resource needs, image registry, and security requirements for the target
-deployment. Do not assume a fixed port or startup path from another
-application.</p>
-<p>For the image workflow, see <a href="../../containers/">Container Images</a> and
-<a href="../../containers/registry/">Container Registry</a>. Contact
-<a href="mailto:support@canfar.net">support@canfar.net</a> before requesting that an image
-be added to the catalogue.</p>
+<p>A contributed image is a web application that meets this contract:</p>
+<table>
+<thead>
+<tr>
+<th>Requirement</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Listen on port 5000</td>
+<td>Serve plain HTTP on TCP port 5000, on all interfaces. The Server checks that port to decide the Session is ready and healthy, and routes the browser to it.</td>
+</tr>
+<tr>
+<td>Start by itself</td>
+<td>The Server sets no command. The image's own <code>ENTRYPOINT</code> or <code>CMD</code> must start the application without interactive setup.</td>
+</tr>
+<tr>
+<td>Run as any user</td>
+<td>The container starts as the Session owner's user and group IDs, never as root, with every Linux capability dropped and privilege escalation off. Keep runtime files in locations that user can write, such as the home directory or <code>/tmp</code>.</td>
+</tr>
+<tr>
+<td>Provide a shell</td>
+<td>The Server runs <code>/bin/sh</code> and <code>cp</code> from the image while it prepares the Session's user and group files.</td>
+</tr>
+<tr>
+<td>Tolerate a URL prefix</td>
+<td>The browser opens <code>https://HOST/session/contrib/SESSION_ID/</code>. The Server strips that prefix, so the application receives requests at <code>/</code>. Use relative links, or a configurable base URL, so pages and assets still load from the prefixed address.</td>
+</tr>
+</tbody>
+</table>
+<p>Within those limits the application sees the same environment as other
+Sessions: <code>HOME</code> is the user's persistent home directory, <code>/scratch</code> and the
+project directories are mounted, and <code>OMP_NUM_THREADS</code> and the matching
+thread variables are set to the requested core count.</p>
+<p>Test the image as an unprivileged user before publishing it:</p>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--user<span class="w"> </span><span class="m">12345</span>:12345<span class="w"> </span>--cap-drop<span class="w"> </span>ALL<span class="w"> </span>-p<span class="w"> </span><span class="m">5000</span>:5000<span class="w"> </span>IMAGE
+</code></pre></div>
+<p>Then push it to a registry the Server trusts and label it <code>contributed</code>, so
+it is listed for this Session Kind; see
+<a href="../../containers/#what-a-server-requires-of-an-image">Container Images</a>
+and <a href="../../containers/registry/">Container Registry</a>. Contact
+<a href="mailto:support@canfar.net">support@canfar.net</a> to have an application added
+to the shared catalogue.</p>
 <h2 id="related-guides">Related guides<a class="headerlink" href="#related-guides" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../">Sessions overview</a></li>
@@ -2260,7 +2357,7 @@ be added to the catalogue.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

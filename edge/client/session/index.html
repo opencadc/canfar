@@ -2350,13 +2350,13 @@ with <code>canfar.configure_logging()</code> if the output should be visible.</p
 
 <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;my-analysis&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"my-analysis"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
         <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Running&quot;</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s2">"Running"</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
@@ -2370,20 +2370,40 @@ contains the successful IDs only.</p>
 
 <span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;batch&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/terminal:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/demo/run.py&quot;</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"batch"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/terminal:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/demo/run.py"</span><span class="p">,</span>
         <span class="n">replicas</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
+<p><code>replicas</code> accepts 1 to 512; other ranges are in
+<a href="../../platform/sessions/limits/">Session limits</a>. Request GPUs with the <code>gpu</code>
+argument. The CLI option is <code>--gpu</code> as well, while the request model and the
+Server's API name the field <code>gpus</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+
+<span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"training"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"IMAGE_WITH_GPU_LIBRARIES"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/demo/train.py"</span><span class="p">,</span>
+        <span class="n">cores</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+        <span class="n">ram</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
+        <span class="n">gpu</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div>
+<p>Use an image built for the Server's GPU stack, and confirm the device inside
+the Session with <code>nvidia-smi</code>.</p>
 <h2 id="select-sessions-for-cleanup">Select Sessions for cleanup<a class="headerlink" href="#select-sessions-for-cleanup" title="Permanent link">&para;</a></h2>
 <p><code>destroy_with</code> has a keyword-only filter contract:</p>
 <div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span>
-    <span class="s2">&quot;batch-&quot;</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">status</span><span class="o">=</span><span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+    <span class="s2">"batch-"</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+    <span class="n">status</span><span class="o">=</span><span class="s2">"Completed"</span><span class="p">,</span>
 <span class="p">)</span>
 </code></pre></div>
 <p>Its signature is <code>destroy_with(prefix, *, kind="headless", status="Completed")</code>.
@@ -2426,21 +2446,7 @@ class and inherits its attributes and methods.</p>
 
               <details class="mkdocstrings-source">
                 <summary>Source code in <code>canfar/sessions.py</code></summary>
-                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span>
-<span class="normal">104</span>
-<span class="normal">105</span>
-<span class="normal">106</span>
-<span class="normal">107</span>
-<span class="normal">108</span>
-<span class="normal">109</span>
-<span class="normal">110</span>
-<span class="normal">111</span>
-<span class="normal">112</span>
-<span class="normal">113</span>
-<span class="normal">114</span>
-<span class="normal">115</span>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">115</span>
 <span class="normal">116</span>
 <span class="normal">117</span>
 <span class="normal">118</span>
@@ -2779,8 +2785,22 @@ class and inherits its attributes and methods.</p>
 <span class="normal">451</span>
 <span class="normal">452</span>
 <span class="normal">453</span>
-<span class="normal">454</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CANFAR Session Management Client.</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Session</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""CANFAR Session Management Client.</span>
 
 <span class="sd">    This class provides methods to manage sessions, including fetching</span>
 <span class="sd">    session details, creating new sessions, retrieving logs, and</span>
@@ -2793,7 +2813,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">                timeout=120,</span>
 <span class="sd">                concurrency=100, # No effect on sync client</span>
 <span class="sd">            )</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -2801,7 +2821,7 @@ class and inherits its attributes and methods.</p>
         <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">view</span><span class="p">:</span> <span class="n">View</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fetch open sessions for the user.</span>
+<span class="w">        </span><span class="sd">"""Fetch open sessions for the user.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            kind (Kind | None, optional): Session kind. Defaults to None.</span>
@@ -2814,28 +2834,28 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.fetch(kind=&quot;notebook&quot;)</span>
-<span class="sd">            [{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
-<span class="sd">              &#39;userid&#39;: &#39;username&#39;,</span>
-<span class="sd">              &#39;image&#39;: &#39;image-server/image/label:latest&#39;,</span>
-<span class="sd">              &#39;type&#39;: &#39;notebook&#39;,</span>
-<span class="sd">              &#39;status&#39;: &#39;Running&#39;,</span>
-<span class="sd">              &#39;name&#39;: &#39;example-notebook&#39;,</span>
-<span class="sd">              &#39;startTime&#39;: &#39;2222-12-14T02:24:06Z&#39;,</span>
-<span class="sd">              &#39;connectURL&#39;: &#39;https://something.example.com/ikvp1jtp&#39;,</span>
-<span class="sd">              &#39;requestedRAM&#39;: &#39;16G&#39;,</span>
-<span class="sd">              &#39;requestedCPUCores&#39;: &#39;2&#39;,</span>
-<span class="sd">              &#39;requestedGPUCores&#39;: &#39;&lt;none&gt;&#39;,</span>
-<span class="sd">              &#39;coresInUse&#39;: &#39;0m&#39;,</span>
-<span class="sd">              &#39;ramInUse&#39;: &#39;101Mi&#39;}]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.fetch(kind="notebook")</span>
+<span class="sd">            [{'id': 'ikvp1jtp',</span>
+<span class="sd">              'userid': 'username',</span>
+<span class="sd">              'image': 'image-server/image/label:latest',</span>
+<span class="sd">              'type': 'notebook',</span>
+<span class="sd">              'status': 'Running',</span>
+<span class="sd">              'name': 'example-notebook',</span>
+<span class="sd">              'startTime': '2222-12-14T02:24:06Z',</span>
+<span class="sd">              'connectURL': 'https://something.example.com/ikvp1jtp',</span>
+<span class="sd">              'requestedRAM': '16G',</span>
+<span class="sd">              'requestedCPUCores': '2',</span>
+<span class="sd">              'requestedGPUCores': '&lt;none&gt;',</span>
+<span class="sd">              'coresInUse': '0m',</span>
+<span class="sd">              'ramInUse': '101Mi'}]</span>
+<span class="sd">        """</span>
         <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">fetch_parameters</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
-        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get statistics for the entire platform.</span>
+<span class="w">        </span><span class="sd">"""Get statistics for the entire platform.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, Any]: Cluster statistics.</span>
@@ -2844,18 +2864,18 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.stats()</span>
-<span class="sd">            {&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>
-<span class="sd">             &#39;coresAvailable&#39;: 960,</span>
-<span class="sd">             &#39;maxCores&#39;: {&#39;cores&#39;: 32, &#39;withRam&#39;: &#39;147Gi&#39;}},</span>
-<span class="sd">             &#39;ram&#39;: {&#39;maxRAM&#39;: {&#39;ram&#39;: &#39;226Gi&#39;, &#39;withCores&#39;: 32}}}</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;stats&quot;</span><span class="p">}</span>
-        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+<span class="sd">            {'cores': {'requestedCPUCores': 377,</span>
+<span class="sd">             'coresAvailable': 960,</span>
+<span class="sd">             'maxCores': {'cores': 32, 'withRam': '147Gi'}},</span>
+<span class="sd">             'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}</span>
+<span class="sd">        """</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"stats"</span><span class="p">}</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
         <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get information about session[s].</span>
+<span class="w">        </span><span class="sd">"""Get information about session[s].</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
@@ -2864,9 +2884,9 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            list[dict[str, Any]]: Session information.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; session.info(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.info(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.info(ids="hjko98yghj")</span>
+<span class="sd">            &gt;&gt;&gt; session.info(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">        """</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -2874,7 +2894,7 @@ class and inherits its attributes and methods.</p>
                 <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">_session_url</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
             <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;failed to fetch session info for&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="n">_task_result</span><span class="p">(</span><span class="s2">"failed to fetch session info for"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
@@ -2882,7 +2902,7 @@ class and inherits its attributes and methods.</p>
         <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get logs from a session[s].</span>
+<span class="w">        </span><span class="sd">"""Get logs from a session[s].</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
@@ -2893,11 +2913,11 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            Dict[str, str]: Logs in text/plain format.</span>
 
 <span class="sd">        Examples:</span>
-<span class="sd">            &gt;&gt;&gt; session.logs(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.logs(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.logs(ids="hjko98yghj")</span>
+<span class="sd">            &gt;&gt;&gt; session.logs(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">        """</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;logs&quot;</span><span class="p">}</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"logs"</span><span class="p">}</span>
         <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -2908,11 +2928,11 @@ class and inherits its attributes and methods.</p>
                 <span class="p">)</span>
                 <span class="n">results</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
             <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;failed to fetch logs for session&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="n">_task_result</span><span class="p">(</span><span class="s2">"failed to fetch logs for session"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session ID: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Session ID: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
                 <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">None</span>
 
@@ -2924,14 +2944,14 @@ class and inherits its attributes and methods.</p>
         <span class="n">image</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">"headless"</span><span class="p">,</span>
         <span class="n">gpu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">args</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">replicas</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Launch a canfar session.</span>
+<span class="w">        </span><span class="sd">"""Launch a canfar session.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            name: Domain request or a unique name for the Session.</span>
@@ -2940,7 +2960,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">                Defaults to None, i.e. flexible mode.</span>
 <span class="sd">            ram (int, optional): Amount of RAM (GB).</span>
 <span class="sd">                Defaults to None, i.e. flexible mode.</span>
-<span class="sd">            kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
+<span class="sd">            kind (str, optional): Type of canfar session. Defaults to "headless".</span>
 <span class="sd">            gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">            cmd (Optional[str], optional): Command to run. Defaults to None.</span>
 <span class="sd">            args (Optional[str], optional): Arguments to the command. Defaults to None.</span>
@@ -2949,7 +2969,7 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            replicas (int, optional): Number of sessions to launch. Defaults to 1.</span>
 
 <span class="sd">        Notes:</span>
-<span class="sd">            - If cores and ram are not specified, the Session uses the Server&#39;s</span>
+<span class="sd">            - If cores and ram are not specified, the Session uses the Server's</span>
 <span class="sd">              flexible resource allocation policy. Limits depend on the Server.</span>
 <span class="sd">            - The name of the session suffixed with the replica number. eg. test-42</span>
 <span class="sd">              when replicas &gt; 1.</span>
@@ -2966,18 +2986,18 @@ class and inherits its attributes and methods.</p>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
 <span class="sd">            &gt;&gt;&gt; session.create(</span>
-<span class="sd">                    name=&quot;test&quot;,</span>
-<span class="sd">                    image=&#39;images.canfar.net/skaha/terminal:1.1.1&#39;,</span>
+<span class="sd">                    name="test",</span>
+<span class="sd">                    image='images.canfar.net/skaha/terminal:1.1.1',</span>
 <span class="sd">                    cores=2,</span>
 <span class="sd">                    ram=8,</span>
 <span class="sd">                    gpu=1,</span>
-<span class="sd">                    kind=&quot;headless&quot;,</span>
-<span class="sd">                    cmd=&quot;env&quot;,</span>
-<span class="sd">                    env={&quot;TEST&quot;: &quot;test&quot;},</span>
+<span class="sd">                    kind="headless",</span>
+<span class="sd">                    cmd="env",</span>
+<span class="sd">                    env={"TEST": "test"},</span>
 <span class="sd">                    replicas=2,</span>
 <span class="sd">                )</span>
-<span class="sd">            &gt;&gt;&gt; [&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;]</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; ["hjko98yghj", "ikvp1jtp"]</span>
+<span class="sd">        """</span>
         <span class="n">payloads</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">create_parameters</span><span class="p">(</span>
             <span class="n">name</span><span class="p">,</span>
             <span class="n">image</span><span class="p">,</span>
@@ -2992,15 +3012,15 @@ class and inherits its attributes and methods.</p>
         <span class="p">)</span>
         <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">session_kind</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">kind</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">CreateRequest</span><span class="p">)</span> <span class="k">else</span> <span class="n">kind</span>
-        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> session[s].&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">),</span> <span class="n">session_kind</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Creating </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> session[s]."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">),</span> <span class="n">session_kind</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">replica</span><span class="p">,</span> <span class="n">payload</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">payloads</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+                <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_response_session_id</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
             <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
                 <span class="n">_task_result</span><span class="p">(</span>
-                    <span class="s2">&quot;Failed to create session&quot;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;replica </span><span class="si">{</span><span class="n">replica</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="s2">"Failed to create session"</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">"replica </span><span class="si">{</span><span class="n">replica</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                     <span class="n">err</span><span class="p">,</span>
                 <span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span>
@@ -3010,7 +3030,7 @@ class and inherits its attributes and methods.</p>
         <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get deployment events for a session[s].</span>
+<span class="w">        </span><span class="sd">"""Get deployment events for a session[s].</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[str, List[str]]): Session ID[s].</span>
@@ -3027,12 +3047,12 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.events(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.events(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.events(ids="hjko98yghj")</span>
+<span class="sd">            &gt;&gt;&gt; session.events(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">        """</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;events&quot;</span><span class="p">}</span>
+        <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"events"</span><span class="p">}</span>
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -3041,16 +3061,16 @@ class and inherits its attributes and methods.</p>
                 <span class="p">)</span>
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">value</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">})</span>
             <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;Failed to fetch events for session&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+                <span class="n">_task_result</span><span class="p">(</span><span class="s2">"Failed to fetch events for session"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">results</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session ID: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Session ID: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                    <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">results</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Destroy canfar session[s].</span>
+<span class="w">        </span><span class="sd">"""Destroy canfar session[s].</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[str, List[str]]): Session ID[s].</span>
@@ -3062,9 +3082,9 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy(ids="hjko98yghj")</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">        """</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -3079,16 +3099,16 @@ class and inherits its attributes and methods.</p>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">=</span> <span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">=</span> <span class="s2">"Completed"</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Destroy session[s] matching a prefix or regex.</span>
+<span class="w">        </span><span class="sd">"""Destroy session[s] matching a prefix or regex.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            prefix (str): Prefix to match.</span>
 <span class="sd">                Treated literally unless regex meta-characters are found.</span>
-<span class="sd">            kind (Kind): Type of session. Defaults to &quot;headless&quot;.</span>
-<span class="sd">            status (Status): Status of the session. Defaults to &quot;Completed&quot;.</span>
+<span class="sd">            kind (Kind): Type of session. Defaults to "headless".</span>
+<span class="sd">            status (Status): Status of the session. Defaults to "Completed".</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Dict[str, bool]: A dictionary of session IDs</span>
@@ -3103,15 +3123,15 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
-<span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix="test")  # literal prefix</span>
+<span class="sd">            &gt;&gt;&gt; session.destroy_with(prefix="desktop$")  # regex</span>
+<span class="sd">        """</span>
         <span class="n">regex</span> <span class="o">=</span> <span class="n">_session_name_pattern</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
         <span class="n">sessions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">_matching_session_ids</span><span class="p">(</span><span class="n">sessions</span><span class="p">,</span> <span class="n">regex</span><span class="p">))</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Open session[s] in a web browser.</span>
+<span class="w">        </span><span class="sd">"""Open session[s] in a web browser.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            ids (Union[List[str], str]): Session ID[s].</span>
@@ -3119,17 +3139,17 @@ class and inherits its attributes and methods.</p>
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">            &gt;&gt;&gt; session = Session()</span>
-<span class="sd">            &gt;&gt;&gt; session.connect(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="sd">            &gt;&gt;&gt; session.connect(ids="hjko98yghj")</span>
+<span class="sd">            &gt;&gt;&gt; session.connect(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">        """</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
         <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
-            <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+            <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">)</span>
             <span class="n">url</span> <span class="o">=</span> <span class="n">connection_url</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;Running&quot;</span><span class="p">:</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please wait for the session to be ready.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">"Running"</span><span class="p">:</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">."</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Please wait for the session to be ready."</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -3196,28 +3216,14 @@ class and inherits its attributes and methods.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">"hjko98yghj"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">432</span>
-<span class="normal">433</span>
-<span class="normal">434</span>
-<span class="normal">435</span>
-<span class="normal">436</span>
-<span class="normal">437</span>
-<span class="normal">438</span>
-<span class="normal">439</span>
-<span class="normal">440</span>
-<span class="normal">441</span>
-<span class="normal">442</span>
-<span class="normal">443</span>
-<span class="normal">444</span>
-<span class="normal">445</span>
-<span class="normal">446</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">446</span>
 <span class="normal">447</span>
 <span class="normal">448</span>
 <span class="normal">449</span>
@@ -3225,8 +3231,22 @@ class and inherits its attributes and methods.</p>
 <span class="normal">451</span>
 <span class="normal">452</span>
 <span class="normal">453</span>
-<span class="normal">454</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Open session[s] in a web browser.</span>
+<span class="normal">454</span>
+<span class="normal">455</span>
+<span class="normal">456</span>
+<span class="normal">457</span>
+<span class="normal">458</span>
+<span class="normal">459</span>
+<span class="normal">460</span>
+<span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">connect</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Open session[s] in a web browser.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
@@ -3234,17 +3254,17 @@ class and inherits its attributes and methods.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.connect(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.connect(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.connect(ids="hjko98yghj")</span>
+<span class="sd">        &gt;&gt;&gt; session.connect(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">    """</span>
     <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
     <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">session</span> <span class="ow">in</span> <span class="n">info</span><span class="p">:</span>
-        <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;unknown&quot;</span><span class="p">)</span>
+        <span class="n">status</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"status"</span><span class="p">,</span> <span class="s2">"unknown"</span><span class="p">)</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">connection_url</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">&quot;Running&quot;</span><span class="p">:</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">.&quot;</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Please wait for the session to be ready.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="s2">"Running"</span><span class="p">:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Session </span><span class="si">%s</span><span class="s2"> is currently </span><span class="si">%s</span><span class="s2">."</span><span class="p">,</span> <span class="n">session</span><span class="p">[</span><span class="s2">"id"</span><span class="p">],</span> <span class="n">status</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Please wait for the session to be ready."</span><span class="p">)</span>
             <span class="k">continue</span>
         <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">open_new_tab</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -3267,7 +3287,7 @@ class and inherits its attributes and methods.</p>
     <span class="n">image</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">cores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">ram</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-    <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
     <span class="n">gpu</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">cmd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -3537,37 +3557,23 @@ returns an empty list. Does not raise for those errors.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-<span class="go">        name=&quot;test&quot;,</span>
-<span class="go">        image=&#39;images.canfar.net/skaha/terminal:1.1.1&#39;,</span>
+<span class="go">        name="test",</span>
+<span class="go">        image='images.canfar.net/skaha/terminal:1.1.1',</span>
 <span class="go">        cores=2,</span>
 <span class="go">        ram=8,</span>
 <span class="go">        gpu=1,</span>
-<span class="go">        kind=&quot;headless&quot;,</span>
-<span class="go">        cmd=&quot;env&quot;,</span>
-<span class="go">        env={&quot;TEST&quot;: &quot;test&quot;},</span>
+<span class="go">        kind="headless",</span>
+<span class="go">        cmd="env",</span>
+<span class="go">        env={"TEST": "test"},</span>
 <span class="go">        replicas=2,</span>
 <span class="go">    )</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">]</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">240</span>
-<span class="normal">241</span>
-<span class="normal">242</span>
-<span class="normal">243</span>
-<span class="normal">244</span>
-<span class="normal">245</span>
-<span class="normal">246</span>
-<span class="normal">247</span>
-<span class="normal">248</span>
-<span class="normal">249</span>
-<span class="normal">250</span>
-<span class="normal">251</span>
-<span class="normal">252</span>
-<span class="normal">253</span>
-<span class="normal">254</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">254</span>
 <span class="normal">255</span>
 <span class="normal">256</span>
 <span class="normal">257</span>
@@ -3638,20 +3644,34 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="normal">322</span>
 <span class="normal">323</span>
 <span class="normal">324</span>
-<span class="normal">325</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>  <span class="c1"># noqa: PLR0917</span>
+<span class="normal">325</span>
+<span class="normal">326</span>
+<span class="normal">327</span>
+<span class="normal">328</span>
+<span class="normal">329</span>
+<span class="normal">330</span>
+<span class="normal">331</span>
+<span class="normal">332</span>
+<span class="normal">333</span>
+<span class="normal">334</span>
+<span class="normal">335</span>
+<span class="normal">336</span>
+<span class="normal">337</span>
+<span class="normal">338</span>
+<span class="normal">339</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">create</span><span class="p">(</span>  <span class="c1"># noqa: PLR0917</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">CreateRequest</span><span class="p">,</span>
     <span class="n">image</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cores</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">ram</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">"headless"</span><span class="p">,</span>
     <span class="n">gpu</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">args</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">env</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">replicas</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Launch a canfar session.</span>
+<span class="w">    </span><span class="sd">"""Launch a canfar session.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        name: Domain request or a unique name for the Session.</span>
@@ -3660,7 +3680,7 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">            Defaults to None, i.e. flexible mode.</span>
 <span class="sd">        ram (int, optional): Amount of RAM (GB).</span>
 <span class="sd">            Defaults to None, i.e. flexible mode.</span>
-<span class="sd">        kind (str, optional): Type of canfar session. Defaults to &quot;headless&quot;.</span>
+<span class="sd">        kind (str, optional): Type of canfar session. Defaults to "headless".</span>
 <span class="sd">        gpu (Optional[int], optional): Number of GPUs. Defaults to None.</span>
 <span class="sd">        cmd (Optional[str], optional): Command to run. Defaults to None.</span>
 <span class="sd">        args (Optional[str], optional): Arguments to the command. Defaults to None.</span>
@@ -3669,7 +3689,7 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">        replicas (int, optional): Number of sessions to launch. Defaults to 1.</span>
 
 <span class="sd">    Notes:</span>
-<span class="sd">        - If cores and ram are not specified, the Session uses the Server&#39;s</span>
+<span class="sd">        - If cores and ram are not specified, the Session uses the Server's</span>
 <span class="sd">          flexible resource allocation policy. Limits depend on the Server.</span>
 <span class="sd">        - The name of the session suffixed with the replica number. eg. test-42</span>
 <span class="sd">          when replicas &gt; 1.</span>
@@ -3686,18 +3706,18 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.create(</span>
-<span class="sd">                name=&quot;test&quot;,</span>
-<span class="sd">                image=&#39;images.canfar.net/skaha/terminal:1.1.1&#39;,</span>
+<span class="sd">                name="test",</span>
+<span class="sd">                image='images.canfar.net/skaha/terminal:1.1.1',</span>
 <span class="sd">                cores=2,</span>
 <span class="sd">                ram=8,</span>
 <span class="sd">                gpu=1,</span>
-<span class="sd">                kind=&quot;headless&quot;,</span>
-<span class="sd">                cmd=&quot;env&quot;,</span>
-<span class="sd">                env={&quot;TEST&quot;: &quot;test&quot;},</span>
+<span class="sd">                kind="headless",</span>
+<span class="sd">                cmd="env",</span>
+<span class="sd">                env={"TEST": "test"},</span>
 <span class="sd">                replicas=2,</span>
 <span class="sd">            )</span>
-<span class="sd">        &gt;&gt;&gt; [&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; ["hjko98yghj", "ikvp1jtp"]</span>
+<span class="sd">    """</span>
     <span class="n">payloads</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">create_parameters</span><span class="p">(</span>
         <span class="n">name</span><span class="p">,</span>
         <span class="n">image</span><span class="p">,</span>
@@ -3712,15 +3732,15 @@ returns an empty list. Does not raise for those errors.</p>
     <span class="p">)</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">session_kind</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">kind</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">CreateRequest</span><span class="p">)</span> <span class="k">else</span> <span class="n">kind</span>
-    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Creating </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> session[s].&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">),</span> <span class="n">session_kind</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"Creating </span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> session[s]."</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">),</span> <span class="n">session_kind</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">replica</span><span class="p">,</span> <span class="n">payload</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">payloads</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
+            <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">payload</span><span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_response_session_id</span><span class="p">(</span><span class="n">response</span><span class="p">))</span>
         <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
             <span class="n">_task_result</span><span class="p">(</span>
-                <span class="s2">&quot;Failed to create session&quot;</span><span class="p">,</span>
-                <span class="sa">f</span><span class="s2">&quot;replica </span><span class="si">{</span><span class="n">replica</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">"Failed to create session"</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">"replica </span><span class="si">{</span><span class="n">replica</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">payloads</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
                 <span class="n">err</span><span class="p">,</span>
             <span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span>
@@ -3813,28 +3833,14 @@ returns an empty list. Does not raise for those errors.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">"hjko98yghj"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">385</span>
 <span class="normal">386</span>
 <span class="normal">387</span>
 <span class="normal">388</span>
@@ -3844,8 +3850,22 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="normal">392</span>
 <span class="normal">393</span>
 <span class="normal">394</span>
-<span class="normal">395</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy canfar session[s].</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span>
+<span class="normal">400</span>
+<span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Destroy canfar session[s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[str, List[str]]): Session ID[s].</span>
@@ -3857,9 +3877,9 @@ returns an empty list. Does not raise for those errors.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy(ids="hjko98yghj")</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">    """</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -3883,7 +3903,7 @@ returns an empty list. Does not raise for those errors.</p>
 
 
 <a href="#canfar.sessions.Session.destroy_with" class="headerlink" title="Permanent link">&para;</a></h2>
-<div class="doc-signature highlight"><pre><span></span><code><span class="nf">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;headless&#39;</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">&#39;Completed&#39;</span><span class="p">)</span>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'headless'</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="s1">'Completed'</span><span class="p">)</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -4009,28 +4029,14 @@ This method is useful for destroying multiple sessions at once.</li>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>  <span class="c1"># literal prefix</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;desktop$&quot;</span><span class="p">)</span>  <span class="c1"># regex</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"test"</span><span class="p">)</span>  <span class="c1"># literal prefix</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">destroy_with</span><span class="p">(</span><span class="n">prefix</span><span class="o">=</span><span class="s2">"desktop$"</span><span class="p">)</span>  <span class="c1"># regex</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
 <span class="normal">412</span>
 <span class="normal">413</span>
 <span class="normal">414</span>
@@ -4049,20 +4055,34 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="normal">427</span>
 <span class="normal">428</span>
 <span class="normal">429</span>
-<span class="normal">430</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
+<span class="normal">430</span>
+<span class="normal">431</span>
+<span class="normal">432</span>
+<span class="normal">433</span>
+<span class="normal">434</span>
+<span class="normal">435</span>
+<span class="normal">436</span>
+<span class="normal">437</span>
+<span class="normal">438</span>
+<span class="normal">439</span>
+<span class="normal">440</span>
+<span class="normal">441</span>
+<span class="normal">442</span>
+<span class="normal">443</span>
+<span class="normal">444</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">destroy_with</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
-    <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-    <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">=</span> <span class="s2">&quot;Completed&quot;</span><span class="p">,</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">=</span> <span class="s2">"headless"</span><span class="p">,</span>
+    <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">=</span> <span class="s2">"Completed"</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Destroy session[s] matching a prefix or regex.</span>
+<span class="w">    </span><span class="sd">"""Destroy session[s] matching a prefix or regex.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        prefix (str): Prefix to match.</span>
 <span class="sd">            Treated literally unless regex meta-characters are found.</span>
-<span class="sd">        kind (Kind): Type of session. Defaults to &quot;headless&quot;.</span>
-<span class="sd">        status (Status): Status of the session. Defaults to &quot;Completed&quot;.</span>
+<span class="sd">        kind (Kind): Type of session. Defaults to "headless".</span>
+<span class="sd">        status (Status): Status of the session. Defaults to "Completed".</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, bool]: A dictionary of session IDs</span>
@@ -4077,9 +4097,9 @@ This method is useful for destroying multiple sessions at once.</li>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix=&quot;test&quot;)  # literal prefix</span>
-<span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix=&quot;desktop$&quot;)  # regex</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix="test")  # literal prefix</span>
+<span class="sd">        &gt;&gt;&gt; session.destroy_with(prefix="desktop$")  # regex</span>
+<span class="sd">    """</span>
     <span class="n">regex</span> <span class="o">=</span> <span class="n">_session_name_pattern</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
     <span class="n">sessions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="o">=</span><span class="n">status</span><span class="p">)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">_matching_session_ids</span><span class="p">(</span><span class="n">sessions</span><span class="p">,</span> <span class="n">regex</span><span class="p">))</span>
@@ -4187,28 +4207,14 @@ follows the configured handlers, rather than printing to stdout.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">"hjko98yghj"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">327</span>
-<span class="normal">328</span>
-<span class="normal">329</span>
-<span class="normal">330</span>
-<span class="normal">331</span>
-<span class="normal">332</span>
-<span class="normal">333</span>
-<span class="normal">334</span>
-<span class="normal">335</span>
-<span class="normal">336</span>
-<span class="normal">337</span>
-<span class="normal">338</span>
-<span class="normal">339</span>
-<span class="normal">340</span>
-<span class="normal">341</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">341</span>
 <span class="normal">342</span>
 <span class="normal">343</span>
 <span class="normal">344</span>
@@ -4236,12 +4242,26 @@ follows the configured handlers, rather than printing to stdout.</p>
 <span class="normal">366</span>
 <span class="normal">367</span>
 <span class="normal">368</span>
-<span class="normal">369</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">events</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get deployment events for a session[s].</span>
+<span class="w">    </span><span class="sd">"""Get deployment events for a session[s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[str, List[str]]): Session ID[s].</span>
@@ -4258,12 +4278,12 @@ follows the configured handlers, rather than printing to stdout.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.events(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.events(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.events(ids="hjko98yghj")</span>
+<span class="sd">        &gt;&gt;&gt; session.events(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">    """</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;events&quot;</span><span class="p">}</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"events"</span><span class="p">}</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
@@ -4272,12 +4292,12 @@ follows the configured handlers, rather than printing to stdout.</p>
             <span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="n">value</span><span class="p">:</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">})</span>
         <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;Failed to fetch events for session&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">_task_result</span><span class="p">(</span><span class="s2">"Failed to fetch events for session"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">verbose</span> <span class="ow">and</span> <span class="n">results</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session ID: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Session ID: </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2"> </span><span class="si">%s</span><span class="s2">"</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">verbose</span> <span class="k">else</span> <span class="kc">None</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4400,40 +4420,26 @@ follows the configured handlers, rather than printing to stdout.</p>
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">)</span>
-<span class="go">[{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
-<span class="go">  &#39;userid&#39;: &#39;username&#39;,</span>
-<span class="go">  &#39;image&#39;: &#39;image-server/image/label:latest&#39;,</span>
-<span class="go">  &#39;type&#39;: &#39;notebook&#39;,</span>
-<span class="go">  &#39;status&#39;: &#39;Running&#39;,</span>
-<span class="go">  &#39;name&#39;: &#39;example-notebook&#39;,</span>
-<span class="go">  &#39;startTime&#39;: &#39;2222-12-14T02:24:06Z&#39;,</span>
-<span class="go">  &#39;connectURL&#39;: &#39;https://something.example.com/ikvp1jtp&#39;,</span>
-<span class="go">  &#39;requestedRAM&#39;: &#39;16G&#39;,</span>
-<span class="go">  &#39;requestedCPUCores&#39;: &#39;2&#39;,</span>
-<span class="go">  &#39;requestedGPUCores&#39;: &#39;&lt;none&gt;&#39;,</span>
-<span class="go">  &#39;coresInUse&#39;: &#39;0m&#39;,</span>
-<span class="go">  &#39;ramInUse&#39;: &#39;101Mi&#39;}]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">fetch</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">)</span>
+<span class="go">[{'id': 'ikvp1jtp',</span>
+<span class="go">  'userid': 'username',</span>
+<span class="go">  'image': 'image-server/image/label:latest',</span>
+<span class="go">  'type': 'notebook',</span>
+<span class="go">  'status': 'Running',</span>
+<span class="go">  'name': 'example-notebook',</span>
+<span class="go">  'startTime': '2222-12-14T02:24:06Z',</span>
+<span class="go">  'connectURL': 'https://something.example.com/ikvp1jtp',</span>
+<span class="go">  'requestedRAM': '16G',</span>
+<span class="go">  'requestedCPUCores': '2',</span>
+<span class="go">  'requestedGPUCores': '&lt;none&gt;',</span>
+<span class="go">  'coresInUse': '0m',</span>
+<span class="go">  'ramInUse': '101Mi'}]</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">117</span>
-<span class="normal">118</span>
-<span class="normal">119</span>
-<span class="normal">120</span>
-<span class="normal">121</span>
-<span class="normal">122</span>
-<span class="normal">123</span>
-<span class="normal">124</span>
-<span class="normal">125</span>
-<span class="normal">126</span>
-<span class="normal">127</span>
-<span class="normal">128</span>
-<span class="normal">129</span>
-<span class="normal">130</span>
-<span class="normal">131</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">131</span>
 <span class="normal">132</span>
 <span class="normal">133</span>
 <span class="normal">134</span>
@@ -4456,13 +4462,27 @@ follows the configured handlers, rather than printing to stdout.</p>
 <span class="normal">151</span>
 <span class="normal">152</span>
 <span class="normal">153</span>
-<span class="normal">154</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">fetch</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">kind</span><span class="p">:</span> <span class="n">Kind</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">status</span><span class="p">:</span> <span class="n">Status</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">view</span><span class="p">:</span> <span class="n">View</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetch open sessions for the user.</span>
+<span class="w">    </span><span class="sd">"""Fetch open sessions for the user.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        kind (Kind | None, optional): Session kind. Defaults to None.</span>
@@ -4475,23 +4495,23 @@ follows the configured handlers, rather than printing to stdout.</p>
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
-<span class="sd">        &gt;&gt;&gt; session.fetch(kind=&quot;notebook&quot;)</span>
-<span class="sd">        [{&#39;id&#39;: &#39;ikvp1jtp&#39;,</span>
-<span class="sd">          &#39;userid&#39;: &#39;username&#39;,</span>
-<span class="sd">          &#39;image&#39;: &#39;image-server/image/label:latest&#39;,</span>
-<span class="sd">          &#39;type&#39;: &#39;notebook&#39;,</span>
-<span class="sd">          &#39;status&#39;: &#39;Running&#39;,</span>
-<span class="sd">          &#39;name&#39;: &#39;example-notebook&#39;,</span>
-<span class="sd">          &#39;startTime&#39;: &#39;2222-12-14T02:24:06Z&#39;,</span>
-<span class="sd">          &#39;connectURL&#39;: &#39;https://something.example.com/ikvp1jtp&#39;,</span>
-<span class="sd">          &#39;requestedRAM&#39;: &#39;16G&#39;,</span>
-<span class="sd">          &#39;requestedCPUCores&#39;: &#39;2&#39;,</span>
-<span class="sd">          &#39;requestedGPUCores&#39;: &#39;&lt;none&gt;&#39;,</span>
-<span class="sd">          &#39;coresInUse&#39;: &#39;0m&#39;,</span>
-<span class="sd">          &#39;ramInUse&#39;: &#39;101Mi&#39;}]</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.fetch(kind="notebook")</span>
+<span class="sd">        [{'id': 'ikvp1jtp',</span>
+<span class="sd">          'userid': 'username',</span>
+<span class="sd">          'image': 'image-server/image/label:latest',</span>
+<span class="sd">          'type': 'notebook',</span>
+<span class="sd">          'status': 'Running',</span>
+<span class="sd">          'name': 'example-notebook',</span>
+<span class="sd">          'startTime': '2222-12-14T02:24:06Z',</span>
+<span class="sd">          'connectURL': 'https://something.example.com/ikvp1jtp',</span>
+<span class="sd">          'requestedRAM': '16G',</span>
+<span class="sd">          'requestedCPUCores': '2',</span>
+<span class="sd">          'requestedGPUCores': '&lt;none&gt;',</span>
+<span class="sd">          'coresInUse': '0m',</span>
+<span class="sd">          'ramInUse': '101Mi'}]</span>
+<span class="sd">    """</span>
     <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">fetch_parameters</span><span class="p">(</span><span class="n">kind</span><span class="p">,</span> <span class="n">status</span><span class="p">,</span> <span class="n">view</span><span class="p">)</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
@@ -4569,36 +4589,36 @@ follows the configured handlers, rather than printing to stdout.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">"hjko98yghj"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">176</span>
-<span class="normal">177</span>
-<span class="normal">178</span>
-<span class="normal">179</span>
-<span class="normal">180</span>
-<span class="normal">181</span>
-<span class="normal">182</span>
-<span class="normal">183</span>
-<span class="normal">184</span>
-<span class="normal">185</span>
-<span class="normal">186</span>
-<span class="normal">187</span>
-<span class="normal">188</span>
-<span class="normal">189</span>
-<span class="normal">190</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">190</span>
 <span class="normal">191</span>
 <span class="normal">192</span>
 <span class="normal">193</span>
 <span class="normal">194</span>
 <span class="normal">195</span>
 <span class="normal">196</span>
-<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get information about session[s].</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Get information about session[s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
@@ -4607,9 +4627,9 @@ follows the configured handlers, rather than printing to stdout.</p>
 <span class="sd">        list[dict[str, Any]]: Session information.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; session.info(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.info(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.info(ids="hjko98yghj")</span>
+<span class="sd">        &gt;&gt;&gt; session.info(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">    """</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -4617,7 +4637,7 @@ follows the configured handlers, rather than printing to stdout.</p>
             <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">_session_url</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
         <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;failed to fetch session info for&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">_task_result</span><span class="p">(</span><span class="s2">"failed to fetch session info for"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">results</span>
 </code></pre></div></td></tr></table></div>
             </details>
@@ -4715,28 +4735,14 @@ Defaults to False, which returns the collected logs.</p>
 
 
 <p><span class="doc-section-title">Examples:</span></p>
-    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;hjko98yghj&quot;</span><span class="p">,</span> <span class="s2">&quot;ikvp1jtp&quot;</span><span class="p">])</span>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="s2">"hjko98yghj"</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="o">=</span><span class="p">[</span><span class="s2">"hjko98yghj"</span><span class="p">,</span> <span class="s2">"ikvp1jtp"</span><span class="p">])</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">199</span>
-<span class="normal">200</span>
-<span class="normal">201</span>
-<span class="normal">202</span>
-<span class="normal">203</span>
-<span class="normal">204</span>
-<span class="normal">205</span>
-<span class="normal">206</span>
-<span class="normal">207</span>
-<span class="normal">208</span>
-<span class="normal">209</span>
-<span class="normal">210</span>
-<span class="normal">211</span>
-<span class="normal">212</span>
-<span class="normal">213</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">213</span>
 <span class="normal">214</span>
 <span class="normal">215</span>
 <span class="normal">216</span>
@@ -4761,12 +4767,26 @@ Defaults to False, which returns the collected logs.</p>
 <span class="normal">235</span>
 <span class="normal">236</span>
 <span class="normal">237</span>
-<span class="normal">238</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
+<span class="normal">238</span>
+<span class="normal">239</span>
+<span class="normal">240</span>
+<span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">logs</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">verbose</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get logs from a session[s].</span>
+<span class="w">    </span><span class="sd">"""Get logs from a session[s].</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        ids (Union[List[str], str]): Session ID[s].</span>
@@ -4777,11 +4797,11 @@ Defaults to False, which returns the collected logs.</p>
 <span class="sd">        Dict[str, str]: Logs in text/plain format.</span>
 
 <span class="sd">    Examples:</span>
-<span class="sd">        &gt;&gt;&gt; session.logs(ids=&quot;hjko98yghj&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; session.logs(ids=[&quot;hjko98yghj&quot;, &quot;ikvp1jtp&quot;])</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; session.logs(ids="hjko98yghj")</span>
+<span class="sd">        &gt;&gt;&gt; session.logs(ids=["hjko98yghj", "ikvp1jtp"])</span>
+<span class="sd">    """</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">_ids</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
-    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;logs&quot;</span><span class="p">}</span>
+    <span class="n">parameters</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"logs"</span><span class="p">}</span>
     <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">ids</span><span class="p">:</span>
@@ -4792,11 +4812,11 @@ Defaults to False, which returns the collected logs.</p>
             <span class="p">)</span>
             <span class="n">results</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span>
         <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="n">_task_result</span><span class="p">(</span><span class="s2">&quot;failed to fetch logs for session&quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+            <span class="n">_task_result</span><span class="p">(</span><span class="s2">"failed to fetch logs for session"</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Session ID: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">"Session ID: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
             <span class="n">log</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">None</span>
 
@@ -4851,35 +4871,35 @@ Defaults to False, which returns the collected logs.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">session</span><span class="o">.</span><span class="n">stats</span><span class="p">()</span>
-<span class="go">{&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>
-<span class="go"> &#39;coresAvailable&#39;: 960,</span>
-<span class="go"> &#39;maxCores&#39;: {&#39;cores&#39;: 32, &#39;withRam&#39;: &#39;147Gi&#39;}},</span>
-<span class="go"> &#39;ram&#39;: {&#39;maxRAM&#39;: {&#39;ram&#39;: &#39;226Gi&#39;, &#39;withCores&#39;: 32}}}</span>
+<span class="go">{'cores': {'requestedCPUCores': 377,</span>
+<span class="go"> 'coresAvailable': 960,</span>
+<span class="go"> 'maxCores': {'cores': 32, 'withRam': '147Gi'}},</span>
+<span class="go"> 'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}</span>
 </code></pre></div>
 
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>canfar/sessions.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">156</span>
-<span class="normal">157</span>
-<span class="normal">158</span>
-<span class="normal">159</span>
-<span class="normal">160</span>
-<span class="normal">161</span>
-<span class="normal">162</span>
-<span class="normal">163</span>
-<span class="normal">164</span>
-<span class="normal">165</span>
-<span class="normal">166</span>
-<span class="normal">167</span>
-<span class="normal">168</span>
-<span class="normal">169</span>
-<span class="normal">170</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">170</span>
 <span class="normal">171</span>
 <span class="normal">172</span>
 <span class="normal">173</span>
-<span class="normal">174</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get statistics for the entire platform.</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">stats</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Get statistics for the entire platform.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Dict[str, Any]: Cluster statistics.</span>
@@ -4888,13 +4908,13 @@ Defaults to False, which returns the collected logs.</p>
 <span class="sd">        &gt;&gt;&gt; from canfar.sessions import Session</span>
 <span class="sd">        &gt;&gt;&gt; session = Session()</span>
 <span class="sd">        &gt;&gt;&gt; session.stats()</span>
-<span class="sd">        {&#39;cores&#39;: {&#39;requestedCPUCores&#39;: 377,</span>
-<span class="sd">         &#39;coresAvailable&#39;: 960,</span>
-<span class="sd">         &#39;maxCores&#39;: {&#39;cores&#39;: 32, &#39;withRam&#39;: &#39;147Gi&#39;}},</span>
-<span class="sd">         &#39;ram&#39;: {&#39;maxRAM&#39;: {&#39;ram&#39;: &#39;226Gi&#39;, &#39;withCores&#39;: 32}}}</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;view&quot;</span><span class="p">:</span> <span class="s2">&quot;stats&quot;</span><span class="p">}</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;session&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+<span class="sd">        {'cores': {'requestedCPUCores': 377,</span>
+<span class="sd">         'coresAvailable': 960,</span>
+<span class="sd">         'maxCores': {'cores': 32, 'withRam': '147Gi'}},</span>
+<span class="sd">         'ram': {'maxRAM': {'ram': '226Gi', 'withCores': 32}}}</span>
+<span class="sd">    """</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"view"</span><span class="p">:</span> <span class="s2">"stats"</span><span class="p">}</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"session"</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
     <span class="n">data</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">data</span>
 </code></pre></div></td></tr></table></div>
@@ -4932,7 +4952,7 @@ Defaults to False, which returns the collected logs.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:10 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 18, 2026 23:33:01 UTC">September 18, 2026</span>
   </span>
 
     

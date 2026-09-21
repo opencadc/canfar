@@ -18,7 +18,7 @@
         <link rel="prev" href="../../contributing/">
       
       
-        <link rel="next" href="../../agents/architecture/">
+        <link rel="next" href="../../agents/skill/">
       
       
         
@@ -994,6 +994,8 @@
       
         
       
+        
+      
     
     
     
@@ -1014,7 +1016,7 @@
   
   
   
-    <a href="../../agents/architecture/" class="md-nav__link">
+    <a href="../../agents/skill/" class="md-nav__link">
       
   
   
@@ -1408,7 +1410,7 @@ intended to create or clean up platform resources.</p>
 <h2 id="local-validation">Local validation<a class="headerlink" href="#local-validation" title="Permanent link">&para;</a></h2>
 <p>The default local test gate excludes slow tests and avoids external
 Authentication:</p>
-<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow&quot;</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>run<span class="w"> </span>--no-sync<span class="w"> </span>pytest<span class="w"> </span>tests<span class="w"> </span>-m<span class="w"> </span><span class="s2">"not slow"</span><span class="w"> </span>--no-cov<span class="w"> </span>-q<span class="w"> </span><span class="se">\</span>
 <span class="w">  </span>-o<span class="w"> </span><span class="nv">cache_dir</span><span class="o">=</span>/tmp/canfar-pytest-cache
 </code></pre></div>
 <p>Useful focused checks include:</p>

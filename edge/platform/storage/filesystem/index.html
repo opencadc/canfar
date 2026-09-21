@@ -750,6 +750,8 @@
       
         
       
+        
+      
     
     
     
@@ -958,6 +960,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../../sessions/limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../sessions/contributed/" class="md-nav__link">
         
   
@@ -1000,6 +1030,8 @@
       
         
           
+        
+      
         
       
         
@@ -1240,6 +1272,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2314,15 +2374,15 @@ permissions, and cleanup:</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">cached</span> <span class="o">=</span> <span class="n">WholeFileCacheFileSystem</span><span class="p">(</span>
         <span class="n">fs</span><span class="o">=</span><span class="n">remote</span><span class="p">,</span>
-        <span class="n">cache_storage</span><span class="o">=</span><span class="s2">&quot;/arc/home/&lt;user&gt;/.cache/canfar/vault&quot;</span><span class="p">,</span>
+        <span class="n">cache_storage</span><span class="o">=</span><span class="s2">"/arc/home/&lt;user&gt;/.cache/canfar/vault"</span><span class="p">,</span>
         <span class="n">expiry_time</span><span class="o">=</span><span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span>
         <span class="n">check_files</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
-    <span class="k">with</span> <span class="n">cached</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/project/catalog.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">cached</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"/project/catalog.csv"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">process</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -2343,9 +2403,9 @@ or stage the file once to <code>/scratch</code>:</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">remote</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/project/catalog.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">remote</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"/project/catalog.csv"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">frame</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -2358,15 +2418,15 @@ local filename, so transfer the object to <code>/scratch</code> first when using
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="k">with</span> <span class="n">remote</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/project/array.npy&quot;</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">remote</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"/project/array.npy"</span><span class="p">,</span> <span class="s2">"rb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">handle</span><span class="p">:</span>
         <span class="n">array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">&quot;/project/array.npy&quot;</span><span class="p">,</span> <span class="s2">&quot;/scratch/array.npy&quot;</span><span class="p">)</span>
+    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"/project/array.npy"</span><span class="p">,</span> <span class="s2">"/scratch/array.npy"</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<span class="n">mapped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;/scratch/array.npy&quot;</span><span class="p">,</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">mapped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">"/scratch/array.npy"</span><span class="p">,</span> <span class="n">mmap_mode</span><span class="o">=</span><span class="s2">"r"</span><span class="p">,</span> <span class="n">allow_pickle</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 </code></pre></div>
 <h3 id="astropy-fits">Astropy FITS<a class="headerlink" href="#astropy-fits" title="Permanent link">&para;</a></h3>
 <p>Astropy can consume the staged file-like object directly. For repeated access,
@@ -2375,13 +2435,13 @@ or for a workflow that needs a local path, stage once and use <code>memmap=True<
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">&quot;/project/cube.fits&quot;</span><span class="p">,</span> <span class="s2">&quot;/scratch/cube.fits&quot;</span><span class="p">)</span>
+    <span class="n">remote</span><span class="o">.</span><span class="n">get_file</span><span class="p">(</span><span class="s2">"/project/cube.fits"</span><span class="p">,</span> <span class="s2">"/scratch/cube.fits"</span><span class="p">)</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">&quot;/scratch/cube.fits&quot;</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">fits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s2">"/scratch/cube.fits"</span><span class="p">,</span> <span class="n">memmap</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">hdul</span><span class="p">:</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">hdul</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
 </code></pre></div>
 <p>If a service is known to return a valid range response, an explicit
@@ -2394,8 +2454,8 @@ the complete object.</p>
 single staged remote object by byte offset:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">dask.dataframe</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">dd</span>
 
-<span class="n">frame</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;/scratch/catalog/part-*.csv&quot;</span><span class="p">)</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">&quot;source_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+<span class="n">frame</span> <span class="o">=</span> <span class="n">dd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"/scratch/catalog/part-*.csv"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">frame</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s2">"source_id"</span><span class="p">)</span><span class="o">.</span><span class="n">flux</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 </code></pre></div>
 <p>When workers read remote data directly, construct the filesystem in the worker
 environment and ensure every worker has CANFAR/vosfs and usable credentials.
@@ -2412,10 +2472,10 @@ service's metadata and transfer costs:</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span>
 
-<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">&quot;vault&quot;</span><span class="p">)</span>
+<span class="n">remote</span> <span class="o">=</span> <span class="n">filesystem</span><span class="p">(</span><span class="s2">"vault"</span><span class="p">)</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="n">store</span> <span class="o">=</span> <span class="n">FsspecStore</span><span class="o">.</span><span class="n">from_mapper</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">get_mapper</span><span class="p">(</span><span class="s2">&quot;/project/cube.zarr&quot;</span><span class="p">))</span>
-    <span class="n">cube</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="s2">&quot;science&quot;</span><span class="p">)</span>
+    <span class="n">store</span> <span class="o">=</span> <span class="n">FsspecStore</span><span class="o">.</span><span class="n">from_mapper</span><span class="p">(</span><span class="n">remote</span><span class="o">.</span><span class="n">get_mapper</span><span class="p">(</span><span class="s2">"/project/cube.zarr"</span><span class="p">))</span>
+    <span class="n">cube</span> <span class="o">=</span> <span class="n">da</span><span class="o">.</span><span class="n">from_zarr</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="s2">"science"</span><span class="p">)</span>
     <span class="n">mean</span> <span class="o">=</span> <span class="n">cube</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">remote</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>

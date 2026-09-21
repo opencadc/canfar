@@ -2137,10 +2137,13 @@ request outside those higher-level modules.</p>
 <li><code>authentication_idp</code>: a transient Identity Provider selector for this client.</li>
 <li><code>token</code>: a runtime bearer token.</li>
 <li><code>certificate</code>: a runtime X.509 certificate path.</li>
-<li><code>timeout</code>: HTTP request inactivity timeout in seconds (1–300), not a total
-  job deadline.</li>
+<li><code>timeout</code>: HTTP request inactivity timeout in seconds (1–300, default 30), not
+  a total job deadline.</li>
 <li><code>concurrency</code>: maximum async connection count (1–128).</li>
 </ul>
+<p>In the unreleased async client, requests wait for a free connection without a
+pool timeout. Connect, read, and write timeouts still use <code>timeout</code>, and
+<code>concurrency</code> still limits connections. Synchronous pool waits also use <code>timeout</code>.</p>
 <p>When no explicit <code>url</code> is supplied, the active Server Selection in
 <code>Configuration</code> supplies the Science Platform Server. Without a runtime
 credential, <code>authentication_idp</code> selects a saved Authentication Record for this
@@ -2161,16 +2164,16 @@ instead of silently sending an unauthenticated request.</p>
 <p>Use the native context manager that matches the transport:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
 
-<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">"runtime-token"</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">"https://example.test/skaha/v1"</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"context"</span><span class="p">)</span>
 
 
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="k">async</span> <span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span>
-        <span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span>
-        <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">,</span>
+        <span class="n">token</span><span class="o">=</span><span class="s2">"runtime-token"</span><span class="p">,</span>
+        <span class="n">url</span><span class="o">=</span><span class="s2">"https://example.test/skaha/v1"</span><span class="p">,</span>
     <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">asynclient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">asynclient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"context"</span><span class="p">)</span>
 </code></pre></div>
 <p><code>client</code> is the native <code>httpx.Client</code>; <code>asynclient</code> is the native
 <code>httpx.AsyncClient</code>. They are created lazily and closed by their matching
@@ -2186,9 +2189,9 @@ responses. Catch it at the application boundary when a request can fail:</p>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
 
-<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">&quot;runtime-token&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">&quot;https://example.test/skaha/v1&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">HTTPClient</span><span class="p">(</span><span class="n">token</span><span class="o">=</span><span class="s2">"runtime-token"</span><span class="p">,</span> <span class="n">url</span><span class="o">=</span><span class="s2">"https://example.test/skaha/v1"</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;invalid-endpoint&quot;</span><span class="p">)</span>
+        <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"invalid-endpoint"</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">HTTPStatusError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">exc</span><span class="o">.</span><span class="n">response</span><span class="o">.</span><span class="n">status_code</span><span class="p">)</span>
 </code></pre></div>
@@ -2197,7 +2200,7 @@ types. Do not log tokens, certificates, or raw credential records. Configure
 the application logger explicitly when diagnostics are needed:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar</span><span class="w"> </span><span class="kn">import</span> <span class="n">configure_logging</span>
 
-<span class="n">configure_logging</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">)</span>
+<span class="n">configure_logging</span><span class="p">(</span><span class="s2">"debug"</span><span class="p">)</span>
 </code></pre></div>
 <p><span id="configuration"></span></p>
 <h2 id="configuration-editing">Configuration editing<a class="headerlink" href="#configuration-editing" title="Permanent link">&para;</a></h2>
@@ -2619,7 +2622,7 @@ settings sources stay free to supply them.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:10 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 03:24:22 UTC">September 20, 2026</span>
   </span>
 
     

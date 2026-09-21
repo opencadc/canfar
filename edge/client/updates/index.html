@@ -1976,7 +1976,14 @@ the complete <a href="../get-started/#authenticate">login and selection example<
 Storage uses its owning server's IDP: an SRCNet login does not authenticate the
 default CADC <code>arc</code> or <code>vault</code> services.</p>
 <p>CADC CLI login can reuse a usable certificate rather than request a new one.
-Runtime tokens and certificates passed to an <a href="../client/">HTTP client</a> take
+If it has expired, <code>canfar login cadc</code> asks for your credentials again without
+requiring <code>--force</code>. <code>canfar login srcnet</code> starts a fresh device login even
+when a saved record exists. SRCNet access-token refresh now checks the
+separate client-secret expiry when the IDP supplies it. Missing, expired, or
+rejected refresh credentials produce an IDP-specific login instruction;
+temporary IDP failures preserve the saved record for a retry. See
+<a href="../../cli/authentication-contexts/#login">Authentication and Servers</a>.</p>
+<p>Runtime tokens and certificates passed to an <a href="../client/">HTTP client</a> take
 precedence over saved credentials, including saved-credential refresh and
 expiry hooks, for that client only.</p>
 <p><span id="logs-to-stdout"></span></p>
@@ -1985,8 +1992,8 @@ expiry hooks, for that client only.</p>
 <li>Use <code>-o json</code> or <code>-o yaml</code> on supported commands in place of <code>--json</code> and
   <code>--yaml</code>. Machine output contains only data on stdout; diagnostics use stderr.</li>
 <li>Use canonical command names such as <code>auth</code>, <code>create</code>, and <code>delete</code>. Several
-  alternative spellings were removed; the <a href="../migration/#update-command-lines">migration table</a>
-  lists replacements and the retained deprecated login alias.</li>
+  alternative spellings were removed, including the login alias under <code>auth</code>;
+  the <a href="../migration/#update-command-lines">migration table</a> lists replacements.</li>
 <li>Use <code>config.editor.get()</code>, <code>.set()</code>, and <code>.save()</code> for validated configuration
   edits. The stored schema remains stable; the editing methods moved.</li>
 <li>Use <code>--log-level</code> or repeated <code>-v</code> before the command. Add <code>--log-file PATH</code>
@@ -2082,7 +2089,7 @@ their contracts:</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 16, 2026 20:30:36 UTC">September 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
   </span>
 
     

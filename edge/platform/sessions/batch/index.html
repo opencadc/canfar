@@ -18,7 +18,7 @@
         <link rel="prev" href="../desktop/">
       
       
-        <link rel="next" href="../contributed/">
+        <link rel="next" href="../limits/">
       
       
         
@@ -752,6 +752,8 @@
       
         
       
+        
+      
     
     
     
@@ -1082,6 +1084,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../limits/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Limits
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../contributed/" class="md-nav__link">
         
   
@@ -1122,6 +1152,8 @@
       
         
           
+        
+      
         
       
         
@@ -1262,6 +1294,34 @@
     
   
     VOSpace
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../storage/archives/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CADC Archive Data
   
 
     
@@ -2296,7 +2356,7 @@ deterministically.</p>
 <h2 id="what-create-prints">What <code>create</code> prints<a class="headerlink" href="#what-create-prints" title="Permanent link">&para;</a></h2>
 <p>The library returns the Session IDs accepted by the platform. Human CLI output
 reports one successful Session as:</p>
-<div class="highlight"><pre><span></span><code>Successfully created session &#39;data-reduction&#39; (ID: SESSION_ID)
+<div class="highlight"><pre><span></span><code>Successfully created session 'data-reduction' (ID: SESSION_ID)
 </code></pre></div>
 <p>For multiple replicas it reports the count and lists each ID. <code>--output json</code>
 or <code>--output yaml</code> emits the raw list of returned IDs as data-only output; the
@@ -2382,12 +2442,12 @@ do not wait for <code>Running</code>; inspect status and events separately:</p>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nightly-reduction&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-        <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-        <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/reduce.py&quot;</span><span class="p">,</span>
-        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">},</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"nightly-reduction"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/myproject/scripts/reduce.py"</span><span class="p">,</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">"OMP_NUM_THREADS"</span><span class="p">:</span> <span class="s2">"4"</span><span class="p">},</span>
     <span class="p">)</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
@@ -2403,19 +2463,19 @@ do not wait for <code>Running</code>; inspect status and events separately:</p>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;nightly-reduction&quot;</span><span class="p">,</span>
-            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;headless&quot;</span><span class="p">,</span>
-            <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;python&quot;</span><span class="p">,</span>
-            <span class="n">args</span><span class="o">=</span><span class="s2">&quot;/arc/projects/myproject/scripts/reduce.py&quot;</span><span class="p">,</span>
-            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">:</span> <span class="s2">&quot;4&quot;</span><span class="p">},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"nightly-reduction"</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"headless"</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="s2">"python"</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="s2">"/arc/projects/myproject/scripts/reduce.py"</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">"OMP_NUM_THREADS"</span><span class="p">:</span> <span class="s2">"4"</span><span class="p">},</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">ids</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
             <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>

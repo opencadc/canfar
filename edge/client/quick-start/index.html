@@ -1963,9 +1963,9 @@ unavailable on your server. For SRCNet or direct Python login, see
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>    <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-        <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-        <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
+        <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
+        <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">"quickstart-notebook"</span><span class="p">,</span>
         <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
         <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
     <span class="p">)</span>
@@ -1980,15 +1980,15 @@ unavailable on your server. For SRCNet or direct Python login, see
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
 </span>        <span class="n">ids</span> <span class="o">=</span> <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
-            <span class="n">kind</span><span class="o">=</span><span class="s2">&quot;notebook&quot;</span><span class="p">,</span>
-            <span class="n">image</span><span class="o">=</span><span class="s2">&quot;images.canfar.net/skaha/astroml:latest&quot;</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;quickstart-notebook&quot;</span><span class="p">,</span>
+            <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
+            <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/skaha/astroml:latest"</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">"quickstart-notebook"</span><span class="p">,</span>
             <span class="n">cores</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
             <span class="n">ram</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2006,7 +2006,7 @@ before continuing. Creation does not mean the application is ready.</p>
 <div class="highlight"><span class="filename">open_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
     <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 </code></pre></div>
@@ -2018,11 +2018,11 @@ before continuing. Creation does not mean the application is ready.</p>
 </span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
         <span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2039,7 +2039,7 @@ it reaches <code>Running</code>. Run your analysis in the notebook before cleani
 <div class="highlight"><span class="filename">inspect_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 </code></pre></div>
@@ -2051,11 +2051,11 @@ it reaches <code>Running</code>. Run your analysis in the notebook before cleani
 </span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">events</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>
@@ -2078,7 +2078,7 @@ Closing a Python client or browser tab does not delete the remote Session.</p>
 <div class="highlight"><span class="filename">delete_notebook.py</span><pre><span></span><code><span class="hll"><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 </span>
 <span class="hll"><span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>    <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
     <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 </code></pre></div>
 </div>
@@ -2089,10 +2089,10 @@ Closing a Python client or browser tab does not delete the remote Session.</p>
 </span>
 <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="hll">    <span class="k">async</span> <span class="k">with</span> <span class="n">AsyncSession</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;SESSION_ID&quot;</span><span class="p">]</span>
+</span>        <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"SESSION_ID"</span><span class="p">]</span>
         <span class="nb">print</span><span class="p">(</span><span class="k">await</span> <span class="n">session</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span>
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">"__main__"</span><span class="p">:</span>
     <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">())</span>
 </code></pre></div>
 </div>

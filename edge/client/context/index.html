@@ -2055,9 +2055,9 @@ Server. The returned mapping can guide <code>Session.create()</code> resource re
 
 <span class="k">with</span> <span class="n">Context</span><span class="p">()</span> <span class="k">as</span> <span class="n">context</span><span class="p">:</span>
     <span class="n">resources</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">()</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="p">[</span><span class="s2">&quot;cores&quot;</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;memoryGB&quot;</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;gpus&quot;</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="p">[</span><span class="s2">"cores"</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"memoryGB"</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gpus"</span><span class="p">))</span>
 </code></pre></div>
 <p>The response is a <code>dict[str, Any]</code> whose keys and values are supplied by the
 server; common keys include <code>cores</code>, <code>memoryGB</code>, and <code>gpus</code>. Resource limits are
@@ -2138,7 +2138,7 @@ attributes and methods.</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;CANFAR Context.</span>
+<span class="w">    </span><span class="sd">"""CANFAR Context.</span>
 
 <span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
 <span class="sd">    attributes and methods.</span>
@@ -2147,10 +2147,10 @@ attributes and methods.</p>
 <span class="sd">        &gt;&gt;&gt; from canfar.context import Context</span>
 <span class="sd">        &gt;&gt;&gt; context = Context()</span>
 <span class="sd">        &gt;&gt;&gt; context.resources()</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">    """</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get available resources from the canfar server.</span>
+<span class="w">        </span><span class="sd">"""Get available resources from the canfar server.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary of available resources.</span>
@@ -2159,26 +2159,26 @@ attributes and methods.</p>
 <span class="sd">            &gt;&gt;&gt; from canfar.context import Context</span>
 <span class="sd">            &gt;&gt;&gt; context = Context()</span>
 <span class="sd">            &gt;&gt;&gt; context.resources()</span>
-<span class="sd">            {&#39;cores&#39;: {</span>
-<span class="sd">              &#39;default&#39;: 1,</span>
-<span class="sd">              &#39;defaultRequest&#39;: 1,</span>
-<span class="sd">              &#39;defaultLimit&#39;: 16,</span>
-<span class="sd">              &#39;defaultHeadless&#39;: 1,</span>
-<span class="sd">              &#39;options&#39;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
+<span class="sd">            {'cores': {</span>
+<span class="sd">              'default': 1,</span>
+<span class="sd">              'defaultRequest': 1,</span>
+<span class="sd">              'defaultLimit': 16,</span>
+<span class="sd">              'defaultHeadless': 1,</span>
+<span class="sd">              'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="sd">              },</span>
-<span class="sd">             &#39;memoryGB&#39;: {</span>
-<span class="sd">              &#39;default&#39;: 2,</span>
-<span class="sd">              &#39;defaultRequest&#39;: 4,</span>
-<span class="sd">              &#39;defaultLimit&#39;: 192,</span>
-<span class="sd">              &#39;defaultHeadless&#39;: 4,</span>
-<span class="sd">              &#39;options&#39;: [1,2,4...192]</span>
+<span class="sd">             'memoryGB': {</span>
+<span class="sd">              'default': 2,</span>
+<span class="sd">              'defaultRequest': 4,</span>
+<span class="sd">              'defaultLimit': 192,</span>
+<span class="sd">              'defaultHeadless': 4,</span>
+<span class="sd">              'options': [1,2,4...192]</span>
 <span class="sd">             },</span>
-<span class="sd">            &#39;gpus&#39;: {</span>
-<span class="sd">             &#39;options&#39;: [1,2, ... 28]</span>
+<span class="sd">            'gpus': {</span>
+<span class="sd">             'options': [1,2, ... 28]</span>
 <span class="sd">             }</span>
 <span class="sd">            }</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+<span class="sd">        """</span>
+        <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"context"</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -2240,22 +2240,22 @@ attributes and methods.</p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">()</span>
-<span class="go">{&#39;cores&#39;: {</span>
-<span class="go">  &#39;default&#39;: 1,</span>
-<span class="go">  &#39;defaultRequest&#39;: 1,</span>
-<span class="go">  &#39;defaultLimit&#39;: 16,</span>
-<span class="go">  &#39;defaultHeadless&#39;: 1,</span>
-<span class="go">  &#39;options&#39;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
+<span class="go">{'cores': {</span>
+<span class="go">  'default': 1,</span>
+<span class="go">  'defaultRequest': 1,</span>
+<span class="go">  'defaultLimit': 16,</span>
+<span class="go">  'defaultHeadless': 1,</span>
+<span class="go">  'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="go">  },</span>
-<span class="go"> &#39;memoryGB&#39;: {</span>
-<span class="go">  &#39;default&#39;: 2,</span>
-<span class="go">  &#39;defaultRequest&#39;: 4,</span>
-<span class="go">  &#39;defaultLimit&#39;: 192,</span>
-<span class="go">  &#39;defaultHeadless&#39;: 4,</span>
-<span class="go">  &#39;options&#39;: [1,2,4...192]</span>
+<span class="go"> 'memoryGB': {</span>
+<span class="go">  'default': 2,</span>
+<span class="go">  'defaultRequest': 4,</span>
+<span class="go">  'defaultLimit': 192,</span>
+<span class="go">  'defaultHeadless': 4,</span>
+<span class="go">  'options': [1,2,4...192]</span>
 <span class="go"> },</span>
-<span class="go">&#39;gpus&#39;: {</span>
-<span class="go"> &#39;options&#39;: [1,2, ... 28]</span>
+<span class="go">'gpus': {</span>
+<span class="go"> 'options': [1,2, ... 28]</span>
 <span class="go"> }</span>
 <span class="go">}</span>
 </code></pre></div>
@@ -2294,7 +2294,7 @@ attributes and methods.</p>
 <span class="normal">53</span>
 <span class="normal">54</span>
 <span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get available resources from the canfar server.</span>
+<span class="w">    </span><span class="sd">"""Get available resources from the canfar server.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A dictionary of available resources.</span>
@@ -2303,26 +2303,26 @@ attributes and methods.</p>
 <span class="sd">        &gt;&gt;&gt; from canfar.context import Context</span>
 <span class="sd">        &gt;&gt;&gt; context = Context()</span>
 <span class="sd">        &gt;&gt;&gt; context.resources()</span>
-<span class="sd">        {&#39;cores&#39;: {</span>
-<span class="sd">          &#39;default&#39;: 1,</span>
-<span class="sd">          &#39;defaultRequest&#39;: 1,</span>
-<span class="sd">          &#39;defaultLimit&#39;: 16,</span>
-<span class="sd">          &#39;defaultHeadless&#39;: 1,</span>
-<span class="sd">          &#39;options&#39;: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
+<span class="sd">        {'cores': {</span>
+<span class="sd">          'default': 1,</span>
+<span class="sd">          'defaultRequest': 1,</span>
+<span class="sd">          'defaultLimit': 16,</span>
+<span class="sd">          'defaultHeadless': 1,</span>
+<span class="sd">          'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="sd">          },</span>
-<span class="sd">         &#39;memoryGB&#39;: {</span>
-<span class="sd">          &#39;default&#39;: 2,</span>
-<span class="sd">          &#39;defaultRequest&#39;: 4,</span>
-<span class="sd">          &#39;defaultLimit&#39;: 192,</span>
-<span class="sd">          &#39;defaultHeadless&#39;: 4,</span>
-<span class="sd">          &#39;options&#39;: [1,2,4...192]</span>
+<span class="sd">         'memoryGB': {</span>
+<span class="sd">          'default': 2,</span>
+<span class="sd">          'defaultRequest': 4,</span>
+<span class="sd">          'defaultLimit': 192,</span>
+<span class="sd">          'defaultHeadless': 4,</span>
+<span class="sd">          'options': [1,2,4...192]</span>
 <span class="sd">         },</span>
-<span class="sd">        &#39;gpus&#39;: {</span>
-<span class="sd">         &#39;options&#39;: [1,2, ... 28]</span>
+<span class="sd">        'gpus': {</span>
+<span class="sd">         'options': [1,2, ... 28]</span>
 <span class="sd">         }</span>
 <span class="sd">        }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">&quot;context&quot;</span><span class="p">)</span>
+<span class="sd">    """</span>
+    <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"context"</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
             </details>
