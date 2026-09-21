@@ -23,7 +23,7 @@ from typing_extensions import Self
 
 from canfar import __version__
 from canfar.auth import oidc, x509
-from canfar.exceptions.context import AuthContextError
+from canfar.exceptions.context import AuthContextError, AuthRequiredError
 from canfar.hooks.httpx import auth, debug, errors, expiry
 from canfar.models.auth import (
     AuthenticationCredential,
@@ -103,7 +103,9 @@ class HTTPClient(BaseSettings):
     timeout: int = Field(
         30,
         title="HTTP Timeout",
-        description="HTTP request timeout in seconds.",
+        description=(
+            "HTTP inactivity timeout in seconds. Async pool waits have no deadline."
+        ),
         gt=0,
         le=300,
     )
@@ -233,8 +235,12 @@ class HTTPClient(BaseSettings):
         if self.uses_runtime_credentials:
             return None
         credential = self.authentication_record
-        if isinstance(credential, OIDCCredential) and not credential.valid:
-            raise AuthContextError(
+        if (
+            isinstance(credential, OIDCCredential)
+            and not credential.access_usable
+            and not credential.valid
+        ):
+            raise AuthRequiredError(
                 credential.idp,
                 "OIDC Authentication Record cannot refresh tokens.",
             )
@@ -255,12 +261,18 @@ class HTTPClient(BaseSettings):
             credential, parameters = prepared
             if parameters is None:
                 return credential
-            refreshed = await oidc.refresh(*parameters)
-            return oidc._persist(  # noqa: SLF001
-                self.config,
-                credential,
-                refreshed,
-            )
+            try:
+                refreshed = await oidc.refresh(*parameters)
+                return oidc._persist(  # noqa: SLF001
+                    self.config,
+                    credential,
+                    refreshed,
+                )
+            except oidc.ReauthenticationRequiredError as err:
+                raise AuthRequiredError(credential.idp, str(err)) from None
+            except (ValueError, OSError):
+                msg = "Failed to refresh OIDC token"
+                raise auth.AuthenticationError(msg) from None
 
     @classmethod
     def build(
@@ -381,6 +393,8 @@ class HTTPClient(BaseSettings):
             "base_url": self._get_base_url(),
         }
         if asynchronous:
+            # Queued bulk requests wait for a connection without timing out locally.
+            kwargs["timeout"] = Timeout(self.timeout, pool=None)
             kwargs["limits"] = Limits(
                 max_connections=self.concurrency,
                 max_keepalive_connections=self.concurrency // 4,
@@ -395,13 +409,18 @@ class HTTPClient(BaseSettings):
 
         if isinstance(credential, X509Credential):
             if credential.path is None:
-                raise AuthContextError(
+                raise AuthRequiredError(
                     credential.idp,
                     "X.509 certificate path is missing.",
                 )
             try:
                 x509.valid(credential.path)
                 kwargs["verify"] = self._get_ssl_context(credential.path)
+            except FileNotFoundError as err:
+                raise AuthRequiredError(
+                    credential.idp,
+                    "X.509 certificate has not been issued.",
+                ) from err
             except (OSError, ValueError) as err:
                 raise AuthContextError(
                     credential.idp,
@@ -480,11 +499,6 @@ class HTTPClient(BaseSettings):
             if credential.token.access is not None:
                 headers["Authorization"] = (
                     f"Bearer {credential.token.access.get_secret_value()}"
-                )
-            elif not credential.refreshable:
-                raise AuthContextError(
-                    credential.idp,
-                    "OIDC Authentication Record has no usable access token.",
                 )
             headers["X-Skaha-Authentication-Type"] = "OIDC"
         elif isinstance(credential, X509Credential):

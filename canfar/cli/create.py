@@ -15,6 +15,7 @@ from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.session import CreateRequest
 from canfar.models.types import Kind
 from canfar.sessions import AsyncSession
@@ -58,6 +59,8 @@ def _render_create_failure(
         return
 
     get_console(stderr=True).print(human_message)
+    if failure.hint:
+        get_console(stderr=True).print(f"[dim]{failure.hint}[/dim]")
     if show_traceback:
         get_console(stderr=True).print_exception()
 
@@ -99,7 +102,7 @@ def _render_create_result(
     _render_create_failure(
         failure,
         mode,
-        f"[bold red]{failure.message}[/bold red]\n[dim]{failure.hint}[/dim]",
+        f"[bold red]{failure.message}[/bold red]",
     )
     raise typer.Exit(1)
 
@@ -131,7 +134,7 @@ def creation(  # noqa: PLR0917
             "--cpu",
             "-c",
             help="Number of CPU cores.",
-            show_default="flexible: ≤8 cores",
+            show_default="flexible: set by the Server",
         ),
     ] = None,
     memory: Annotated[
@@ -140,7 +143,7 @@ def creation(  # noqa: PLR0917
             "--memory",
             "-m",
             help="Amount of RAM in GB.",
-            show_default="flexible: ≤32 GB",
+            show_default="flexible: set by the Server",
         ),
     ] = None,
     gpu: Annotated[
@@ -249,7 +252,12 @@ def creation(  # noqa: PLR0917
             "\n[bold yellow]Operation cancelled by user.[/bold yellow]",
         )
         raise typer.Exit(130) from KeyboardInterrupt
-    except (ConfigResetRequiredError, AuthExpiredError, AuthContextError) as err:
+    except (
+        ConfigResetRequiredError,
+        AuthExpiredError,
+        AuthContextError,
+        AuthenticationError,
+    ) as err:
         _render_create_failure(
             output.boundary_failure(err),
             mode,

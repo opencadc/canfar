@@ -13,9 +13,14 @@ to follow this guide.
 
 ## 1. Get an account and access
 
-Request a [Canadian Astronomy Data Centre (CADC) account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
-Ask your project administrator to add you to the group that owns the data you
-need. If you need help, contact [CANFAR support](support/index.md).
+1. Request a [Canadian Astronomy Data Centre (CADC) account](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/auth/request.html).
+2. Get access to the platform in one of two ways. If your project already
+   uses CANFAR, ask its administrator to add you to the project's group. If
+   not, email [support@canfar.net](mailto:support@canfar.net) with your CADC
+   username and a short description of your research.
+
+See [who can use CANFAR](support/faq.md#who-can-use-canfar-and-what-does-it-cost)
+for eligibility. If you need help, contact [CANFAR support](support/index.md).
 
 <span id="4-launch-your-first-session"></span>
 

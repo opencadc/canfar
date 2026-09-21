@@ -44,6 +44,26 @@ history lives on `ActiveConfig` and the Platform operation (there is no separate
 - Prefer Pydantic models for structured request/config data instead of ad hoc dict handling at call sites.
 - Keep secret-bearing config output redacted or explicitly justified.
 
+## Platform repositories
+
+The client talks to services maintained in other `opencadc` repositories.
+Checked on 2026-09-18:
+
+| Component | Repository | Notes |
+| --- | --- | --- |
+| Session service (skaha) | `opencadc/science-platform` (`skaha/`, chart in `helm/`) | Launch templates in `helm/skaha-config/launch-*.yaml` define each Session Kind's ports, probes, and limits |
+| Science Portal | `opencadc/science-portal` | `opencadc/canfar-portal` is the static canfar.net website |
+| Persistent storage (Cavern) | `opencadc/vos` (`cavern/`) | Chart in `opencadc/deployments` |
+| Object storage (Vault) | `opencadc/storage-inventory` (`vault/`) | |
+| Users, groups, POSIX mapping | `opencadc/ac` (`ac/`, `posix-mapper/`) | The SRCNet permissions service is external |
+| Service registry | `opencadc/reg` | |
+| Storage Management UI | `opencadc/storage-ui` | |
+| Container Registry | External Harbor instance | The Session service caches its artifact labels |
+| Legacy CLI tools | `opencadc/vostools`, `opencadc/cadctools` | `vos`, `cadcdata`, `cadctap`, `cadcutils` on PyPI |
+
+When the docs state a Server default, cite the chart value or template line it
+came from, and present it as a default an operator can change.
+
 ## Historical notes
 
 Files under `docs/agents/research/` and `docs/agents/reviews/` are dated

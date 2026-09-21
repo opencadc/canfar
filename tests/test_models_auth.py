@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
-from pydantic import AnyHttpUrl, AnyUrl
+from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar.models.auth import (
     Authentication,
@@ -74,6 +74,13 @@ class TestOIDCClientConfig:
         config = Client()
         assert config.identity is None
         assert config.secret is None
+        assert config.secret_expires_at is None
+
+    @pytest.mark.parametrize("expiry", [-1, True, 1.5, "not-a-timestamp"])
+    def test_rejects_invalid_secret_expiry(self, expiry: object) -> None:
+        """Client-secret deadlines must be nonnegative integer timestamps."""
+        with pytest.raises(ValidationError):
+            Client.model_validate({"secret_expires_at": expiry})
 
     def test_with_values(self) -> None:
         """Test OIDC client configuration with values."""
@@ -174,6 +181,22 @@ class TestCanonicalCredentialEligibility:
 
         with patch("canfar.models.auth.time.time", return_value=1_000.0):
             assert credential.refreshable is refreshable
+
+    @pytest.mark.parametrize(
+        ("expiry", "refreshable"),
+        [(None, True), (0, True), (999, False), (1_000, False), (1_001, True)],
+    )
+    def test_oidc_client_secret_expiry_boundaries(
+        self, expiry: int | None, refreshable: bool
+    ) -> None:
+        """Secret expiry affects refresh eligibility independently of access expiry."""
+        credential = self.oidc()
+        credential.client = Client(
+            identity="client", secret="secret", secret_expires_at=expiry
+        )
+        with patch("canfar.models.auth.time.time", return_value=1_000.0):
+            assert credential.refreshable is refreshable
+            assert credential.access_usable
 
     @pytest.mark.parametrize(
         ("expiry", "expired"),

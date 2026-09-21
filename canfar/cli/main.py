@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
 from typing import TYPE_CHECKING, Annotated
 
@@ -27,6 +28,7 @@ from canfar.cli.stats import get_stats
 from canfar.cli.version import callback as version_callback
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.utils.console import activate_cli_root, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
@@ -271,19 +273,29 @@ cli.command(
 
 
 def main() -> None:
-    """Main entry point."""
+    """Main entry point.
+
+    Raises:
+        SystemExit: With status 1 when a command ends on a boundary error that
+            it did not render itself.
+    """
     try:
         cli()
-    except AuthExpiredError as err:
-        get_console(stderr=True).print(err)
-        get_console(stderr=True).print(
-            "Authenticate with [italic cyan]canfar login[/italic cyan]"
-        )
-    except AuthContextError as err:
-        get_console(stderr=True).print(err)
-    except ConfigResetRequiredError as err:
-        get_console(stderr=True).print(err)
-        raise typer.Exit(1) from err
+    except (
+        AuthExpiredError,
+        AuthContextError,
+        ConfigResetRequiredError,
+        AuthenticationError,
+    ) as err:
+        failure = output.boundary_failure(err)
+        mode = _leaf_output_mode(sys.argv[1:])
+        if mode is output.OutputMode.HUMAN:
+            console = get_console(stderr=True)
+            console.print(f"[bold red]{failure.message}[/bold red]")
+            console.print(f"[dim]{failure.hint}[/dim]")
+        else:
+            output.to_stderr(failure, mode)
+        raise SystemExit(1) from err
 
 
 if __name__ == "__main__":

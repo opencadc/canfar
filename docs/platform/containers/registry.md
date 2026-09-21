@@ -83,6 +83,12 @@ docker build -t REGISTRY/PROJECT/IMAGE:TAG .
 docker push REGISTRY/PROJECT/IMAGE:TAG
 ```
 
+After the push, label the image in the registry with each Session Kind it
+supports (`notebook`, `headless`, `contributed`, and so on). The Science
+Platform Server lists an image for a Kind only when it carries that label, and
+picks up new labels on its next refresh; see
+[what a Server requires of an image](index.md#what-a-server-requires-of-an-image).
+
 Do not put passwords or access tokens in a Dockerfile, an image layer, a
 notebook, or a Session command. Prefer a short-lived credential mechanism
 provided by the registry operator.

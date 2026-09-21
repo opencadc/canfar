@@ -26,14 +26,14 @@ When `IDP` is omitted, the CLI prompts for one. Use these options when needed:
 
 | Option | Effect |
 | --- | --- |
-| `--force`, `-f` | Obtain new credentials and rediscover instead of refusing an existing record. |
+| `--force`, `-f` | Obtain a new CADC certificate even when the current one is valid. |
 | `--dev` | Include development registries and endpoints during Server Discovery. |
 | `--timeout`, `-t` | HTTP timeout in seconds for login requests; default `10`. |
 
 Login authenticates the selected IDP, discovers compatible Science Platform
 Servers, selects one when necessary, and saves the Authentication Record and
-Server Selection. A saved record causes a repeat login to fail unless
-`--force` is supplied.
+Server Selection. You can log in again when an Authentication Record already
+exists; `--force` is not required to recover expired credentials.
 
 ### CADC X.509
 
@@ -41,9 +41,19 @@ Server Selection. A saved record causes a repeat login to fail unless
 canfar login cadc
 ```
 
-The CLI reuses a usable X.509 certificate when possible. Use `--force` to
-obtain a replacement. If the certificate is expired, login reports that and
-continues with certificate acquisition.
+The CLI reuses a usable X.509 certificate when possible. If the certificate
+is missing or expired, login asks for your CADC credentials to obtain a new
+one. Use `--force` to replace a certificate that is still valid. Ordinary
+commands cannot renew an expired certificate; run `canfar login cadc` yourself.
+
+The certificate is saved as `~/.ssl/cadcproxy.pem` and is valid for 30 days.
+The [legacy CADC tools](../platform/storage/vospace.md#legacy-vostools) read
+the same file, so one login serves both. Inside a Session on the CADC
+deployment, the Server places a delegated certificate at that path when the
+Session starts, and `~/.canfar` lives in your persistent home directory, so a
+login made in one Session is there in the next. For unattended work, log in
+from the environment that will run the job and check that the certificate
+outlasts it.
 
 ### SRCNet OIDC Device Authorization
 
@@ -51,8 +61,9 @@ continues with certificate acquisition.
 canfar login srcnet
 ```
 
-The CLI performs OIDC discovery and dynamic client registration, then presents
-the Device Authorization challenge in the terminal:
+Each explicit `canfar login srcnet` performs OIDC discovery and fresh dynamic
+client registration, then presents the Device Authorization challenge in the
+terminal, even when you have a saved Authentication Record:
 
 1. It prints a verification URL, user code, and a terminal QR code.
 2. It opens the verification URL in the default browser when possible.
@@ -64,6 +75,18 @@ challenge has an IDP-provided expiry; `--timeout` controls HTTP requests and
 does not extend that challenge. Denial, expiry, malformed responses, and
 network failures stop login with an error; run the command again after fixing
 the cause.
+
+Ordinary commands use a valid access token or refresh it without opening a
+browser. The access token, refresh token, and registered client secret have
+separate lifetimes. CANFAR saves the client-secret expiry reported by the IDP;
+it does not assume a fixed lifetime. An expired client secret prevents refresh
+but does not prevent use of an access token that is still valid. Older records
+without that expiry can still attempt refresh.
+
+When refresh credentials are missing, known to be expired, or rejected by the
+IDP, run `canfar login srcnet` and approve the new device challenge. A timeout
+or temporary IDP failure leaves your saved credentials intact so you can retry
+the command.
 
 For troubleshooting, put root logging options before `login`:
 
@@ -131,7 +154,8 @@ canfar auth purge --force
 ```
 
 The purge restores built-in defaults and preserves unrelated registry and
-console settings.
+console settings. These are the commands for leaving an identity; there is no
+separate logout command.
 
 <span id="manage-servers"></span>
 

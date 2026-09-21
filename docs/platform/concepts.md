@@ -162,6 +162,36 @@ Desktop, CARTA, or Firefly as appropriate.
 <span id="system-components"></span>
 <span id="architecture-components"></span>
 
+## Platform components
+
+A Science Platform Server is several cooperating services. You rarely address
+them directly, but knowing which one answered explains most error messages.
+
+| Component | What it does for you |
+| --- | --- |
+| Science Portal | The browser interface for launching and managing Sessions |
+| Session service | Accepts `canfar create`, checks your access, and starts the Session on the cluster |
+| Container Registry | Stores Container Images and the labels that list them by Session Kind |
+| Service registry | Lets clients discover a Server and its VOSpace Services from an IVOA identifier |
+| Group management | Holds users, groups, and memberships; decides who may use the Server |
+| User and group mapping | Gives your account the numeric user and group IDs your Sessions run with |
+| Persistent storage | The mounted home and project directories, which are also a VOSpace Service |
+| Object storage | A VOSpace Service for long-term and shared data, reached through `canfar data` |
+| Storage Management | The browser interface for files and their permissions |
+
+When you create a Session, the Session service authenticates you, confirms
+your platform access and group memberships, checks the image's registry and
+your resource request, applies the per-user Session limit, and then starts a
+container with your user ID, your groups, your home directory, and the
+storage mounts. It returns a Session ID at once; the connect URL appears once
+the container is `Running`.
+
+The open-source platform names its persistent storage *Cavern* and mounts it
+at `/cavern`. The Canadian Astronomy Data Centre (CADC) deploys the same
+service as *ARC*, mounted at `/arc`, beside the *Vault* object store. These
+guides use the CADC names; on another Server, use the mounts and Storage
+Identifiers it reports.
+
 <span id="recommended-learning-path"></span>
 <span id="advanced-platform-usage"></span>
 

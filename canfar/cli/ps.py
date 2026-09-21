@@ -18,6 +18,7 @@ from canfar.cli._run import run
 from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
@@ -46,6 +47,8 @@ def _raise_fetch_failure(
     """Render one expected fetch failure and preserve exit code one."""
     if mode is output.OutputMode.HUMAN:
         get_console(stderr=True).print(f"[bold red]Error:[/bold red] {failure.message}")
+        if failure.hint:
+            get_console(stderr=True).print(failure.hint)
     else:
         output.to_stderr(failure, mode)
     raise typer.Exit(1) from error
@@ -63,6 +66,7 @@ def _fetch_session_payloads(
         ConfigResetRequiredError,
         AuthExpiredError,
         AuthContextError,
+        AuthenticationError,
         httpx.HTTPError,
     ) as err:
         _raise_fetch_failure(

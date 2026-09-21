@@ -26,7 +26,7 @@ and this branch. Existing scripts need the following changes.
 | `canfar authentication …` | `canfar auth …` |
 | `canfar run …` or `canfar launch …` | `canfar create …` |
 | `canfar del SESSION_ID` | `canfar delete SESSION_ID` |
-| `canfar auth login IDP` | Prefer `canfar login IDP`; the former remains a deprecated alias |
+| `canfar auth login IDP` | `canfar login IDP` |
 | `canfar context …` from older clients | Use `canfar auth` for credentials and `canfar server` for server selection |
 
 The output option belongs to the command, not the root `canfar` invocation.

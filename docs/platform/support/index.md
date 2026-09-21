@@ -51,6 +51,14 @@ canfar stats
 `canfar logs SESSION_ID` is useful after the container has started. A Pending
 Session may not have application logs yet. See [batch troubleshooting](../sessions/batch.md#monitor-and-troubleshoot).
 
+| Message or symptom | Meaning | Next step |
+| --- | --- | --- |
+| `has reached the maximum of N active sessions` | You are at the per-user limit for interactive Sessions | Delete one you no longer need; `headless` Sessions do not count |
+| `image not in a trusted repository` | The image is on a registry this Server does not trust | Use an image from `canfar image ls` |
+| `No authentication provided for unknown or private image` | The image is private, or not yet labelled and listed | Supply [registry credentials](../../client/get-started.md#private-container-images) |
+| Process `Killed`, exit code 137, or `No space left on device` | A Session limit was reached | See [Session limits](../sessions/limits.md#read-the-symptom) |
+| `sudo` or a package install is refused | Sessions never run as root | Install the software in the [Container Image](../containers/index.md#what-a-server-requires-of-an-image) |
+
 <span id="critical-data-issues"></span>
 
 ### A data operation fails

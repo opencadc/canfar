@@ -68,6 +68,18 @@ class Client(BaseModel):
         SecretStr | None,
         Field(description="OIDC client secret"),
     ] = None
+    secret_expires_at: int | None = Field(
+        default=None,
+        ge=0,
+        strict=True,
+        description="Secret expiry timestamp; zero means no expiry, None unknown.",
+    )
+
+    @property
+    def secret_expired(self) -> bool:
+        """Return whether the client secret has a known elapsed deadline."""
+        expiry = self.secret_expires_at
+        return expiry is not None and expiry != 0 and expiry <= time.time()
 
 
 class Token(BaseModel):
@@ -247,10 +259,19 @@ class OIDCCredential(BaseModel):
         return _oidc_expired(self.expiry)
 
     @property
+    def access_usable(self) -> bool:
+        """Return whether a nonempty access token has a future expiry."""
+        return _secret_present(self.token.access) and not self.expired
+
+    @property
     def refreshable(self) -> bool:
         """Return whether this record has usable, unexpired refresh credentials."""
         refresh_expiry = self.expiry.refresh
-        return self.valid and (refresh_expiry is None or refresh_expiry > time.time())
+        return (
+            self.valid
+            and not self.client.secret_expired
+            and (refresh_expiry is None or refresh_expiry > time.time())
+        )
 
 
 AuthenticationCredential = Annotated[

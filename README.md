@@ -28,6 +28,15 @@ ids = session.create(
 session.connect(ids)
 ```
 
+## Agent skills
+
+```bash
+npx skills add opencadc/canfar
+```
+
+Then ask your coding agent, for example `/canfar start a notebook session`.
+See [Use CANFAR with a coding agent](docs/client/agents.md).
+
 ---
 <p align="center">
     <a href="https://www.opencadc.org/canfar/latest/">

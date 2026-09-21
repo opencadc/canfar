@@ -18,13 +18,22 @@ from canfar.errors import (
     structured_error_to_json,
     structured_error_to_yaml,
 )
-from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.context import (
+    AuthContextError,
+    AuthExpiredError,
+    AuthRequiredError,
+)
+from canfar.hooks.httpx.auth import AuthenticationError
 
 OUTPUT_CONFLICT_EXIT_CODE = 2
 """Exit code for conflicting machine output flags."""
 
 BoundaryError = (
-    ConfigResetRequiredError | AuthExpiredError | AuthContextError | httpx.HTTPError
+    ConfigResetRequiredError
+    | AuthExpiredError
+    | AuthContextError
+    | AuthenticationError
+    | httpx.HTTPError
 )
 """Session boundary exceptions shared by ``create`` and ``ps``."""
 
@@ -98,17 +107,29 @@ def boundary_failure(
             message=err.message,
             hint="Reset the configuration and log in again.",
         )
+    if isinstance(err, AuthRequiredError):
+        return StructuredError(
+            code=ErrorCode.AUTHENTICATION_REQUIRED,
+            message=str(err),
+            hint=f"Run `canfar login {err.idp}` and retry.",
+        )
     if isinstance(err, AuthExpiredError):
         return StructuredError(
             code=ErrorCode.AUTHENTICATION_EXPIRED,
             message=str(err),
-            hint="Authenticate again and retry.",
+            hint=f"Run `canfar login {err.idp}` to authenticate again, then retry.",
         )
     if isinstance(err, AuthContextError):
         return StructuredError(
             code=ErrorCode.AUTHENTICATION_CREDENTIAL_INVALID,
             message=str(err),
             hint="Check the active Authentication Record and retry.",
+        )
+    if isinstance(err, AuthenticationError):
+        return StructuredError(
+            code=ErrorCode.TRANSPORT_FAILURE,
+            message=str(err),
+            hint="Retry the command. If it still fails, check the Identity Provider.",
         )
     return StructuredError(
         code=ErrorCode.TRANSPORT_FAILURE,

@@ -8,6 +8,7 @@ import pytest
 from pydantic import SecretStr
 
 from canfar.client import HTTPClient
+from canfar.exceptions.context import AuthRequiredError
 from canfar.hooks.httpx.auth import AuthenticationError, arefresh, refresh
 from canfar.models.auth import OIDCCredential
 from tests.helpers.config import oidc_config, x509_config
@@ -265,7 +266,7 @@ class TestSyncAsyncParity:
 
     @patch("canfar.auth.oidc.sync_refresh")
     @patch("canfar.auth.oidc.refresh")
-    async def test_invalid_record_skips_sync_and_async_refresh(
+    async def test_invalid_record_requires_login_in_sync_and_async_refresh(
         self,
         mock_async_refresh,
         mock_sync_refresh,
@@ -282,8 +283,10 @@ class TestSyncAsyncParity:
         client = HTTPClient(config=config)
         request = httpx.Request("GET", "/")
 
-        refresh(client)(request)
+        with pytest.raises(AuthRequiredError):
+            refresh(client)(request)
         mock_sync_refresh.assert_not_called()
 
-        await arefresh(client)(request)
+        with pytest.raises(AuthRequiredError):
+            await arefresh(client)(request)
         mock_async_refresh.assert_not_called()

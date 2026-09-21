@@ -96,7 +96,12 @@ plugins:
 # Dated engineering records stay in the repository for maintainers but are not
 # user-facing site pages. Excluding them also keeps MkDocs' unlisted-page
 # warning focused on accidental navigation omissions.
+# Publishes llms.txt and each page's Markdown source for coding agents.
+hooks:
+  - docs/hooks/llmstxt.py
+
 exclude_docs: |
+  hooks/**
   agents/adrs/**
   agents/research/**
   agents/reviews/**
@@ -200,12 +205,14 @@ nav:
           - Firefly: platform/sessions/firefly.md
           - Desktop: platform/sessions/desktop.md
           - Batch: platform/sessions/batch.md
+          - Limits: platform/sessions/limits.md
           - Contributed: platform/sessions/contributed.md
       - Storage:
           - Overview: platform/storage/index.md
           - Filesystem: platform/storage/filesystem.md
           - Data Transfers: platform/storage/transfers.md
           - VOSpace: platform/storage/vospace.md
+          - CADC Archive Data: platform/storage/archives.md
       - Containers:
           - Overview: platform/containers/index.md
           - Building Containers: platform/containers/build.md
@@ -262,6 +269,7 @@ nav:
           - Contributing: contributing.md
           - Testing: client/testing.md
           - Agent Guidance:
+              - CANFAR Skill: agents/skill.md
               - Architecture: agents/architecture.md
               - Domain Docs: agents/domain.md
               - Issue Tracker: agents/issue-tracker.md

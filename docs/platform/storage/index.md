@@ -39,8 +39,16 @@ df -h /arc/home/USER /arc/projects/PROJECT
 du -sh /arc/projects/PROJECT
 ```
 
-`df` reports filesystem capacity, not your personal or project quota.
-`du` measures accessible files and can take time on a large directory.
+`df` on any path under `/arc` reports the whole ARC filesystem. It never shows
+your home or project allocation, so use it only to confirm the mount.
+`du` measures the files you can read and can take time on a large directory.
+Usage figures can lag behind a large write or cleanup, so check again after a
+few minutes before concluding that nothing changed.
+
+Keep your home directory small: configuration, keys, and short scripts.
+Datasets, software environments, and download caches belong in project space.
+When home is nearly full, saving files and even logging in to a Session can
+fail, so free space there first when either starts to misbehave.
 Use the [Vault web interface](https://www.canfar.net/storage/vault/list/)
 for Vault data, and ask [support](../support/index.md) to confirm the quota
 that applies to your project.
@@ -104,6 +112,34 @@ The `local:` operand is always the machine running `canfar`. `vault:` and
 configuration rather than assuming that every deployment has those identifiers.
 See [Data transfers](transfers.md) for command details.
 
+## Concurrent Sessions and shared storage
+
+Every Session you run mounts the same `/arc/home/<user>` and the same project
+directories, while each Session gets its own `/scratch`. Two Sessions, or the
+replicas of one batch run, can therefore write to the same persistent files at
+the same time.
+
+| State | Location | Shared between Sessions? |
+| --- | --- | --- |
+| Configuration, keys, `~/.canfar` | `/arc/home/<user>` | Yes, all of your Sessions |
+| Project data and results | `/arc/projects/<project>` | Yes, all members' Sessions |
+| Staging and intermediates | `/scratch` | No, one Session only |
+
+- Give each writer its own output file, named from the input or the replica,
+  and keep many writers out of one directory when a run produces thousands of
+  files.
+- Write to a temporary name and rename it into place, so a reader or a
+  restarted job never sees a half-written file.
+- Keep SQLite databases and other lock-heavy state on `/scratch` while they are
+  active, then copy an export or checkpoint to `/arc`. File locking on a shared
+  network filesystem is slow and can corrupt a database opened from two
+  Sessions.
+- Share with collaborators through `/arc/projects/<project>` or a VOSpace
+  Service; another Session cannot see your `/scratch`.
+
+The [advanced batch example](../../client/advanced-examples.md) applies these
+rules to a replicated run.
+
 <span id="storage-strategy-and-performance"></span>
 
 ## Remote-read performance
@@ -129,5 +165,6 @@ backend boundary and scientific-library recipes.
 - [Filesystem and Python tools](filesystem.md)
 - [Data transfers](transfers.md)
 - [VOSpace](vospace.md)
+- [CADC archive data](archives.md)
 - [Session storage](../sessions/index.md)
 - [Permissions](../permissions.md)

@@ -60,6 +60,14 @@ Storage uses its owning server's IDP: an SRCNet login does not authenticate the
 default CADC `arc` or `vault` services.
 
 CADC CLI login can reuse a usable certificate rather than request a new one.
+If it has expired, `canfar login cadc` asks for your credentials again without
+requiring `--force`. `canfar login srcnet` starts a fresh device login even
+when a saved record exists. SRCNet access-token refresh now checks the
+separate client-secret expiry when the IDP supplies it. Missing, expired, or
+rejected refresh credentials produce an IDP-specific login instruction;
+temporary IDP failures preserve the saved record for a retry. See
+[Authentication and Servers](../cli/authentication-contexts.md#login).
+
 Runtime tokens and certificates passed to an [HTTP client](client.md) take
 precedence over saved credentials, including saved-credential refresh and
 expiry hooks, for that client only.
@@ -71,8 +79,8 @@ expiry hooks, for that client only.
 - Use `-o json` or `-o yaml` on supported commands in place of `--json` and
   `--yaml`. Machine output contains only data on stdout; diagnostics use stderr.
 - Use canonical command names such as `auth`, `create`, and `delete`. Several
-  alternative spellings were removed; the [migration table](migration.md#update-command-lines)
-  lists replacements and the retained deprecated login alias.
+  alternative spellings were removed, including the login alias under `auth`;
+  the [migration table](migration.md#update-command-lines) lists replacements.
 - Use `config.editor.get()`, `.set()`, and `.save()` for validated configuration
   edits. The stored schema remains stable; the editing methods moved.
 - Use `--log-level` or repeated `-v` before the command. Add `--log-file PATH`

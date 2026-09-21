@@ -68,6 +68,23 @@ class TestInitializationAndConfiguration:
         assert client.url is None
         assert isinstance(client.config, Configuration)
 
+    @pytest.mark.parametrize("timeout", [30, 7])
+    async def test_native_client_timeouts(self, timeout, monkeypatch, tmp_path) -> None:
+        """Only async pool waiting is exempt from the configured HTTP timeout."""
+        monkeypatch.setattr(
+            "canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"
+        )
+        with HTTPClient(
+            token=SecretStr("test-token"), url="https://example.test", timeout=timeout
+        ) as client:
+            assert client.client.timeout == httpx.Timeout(timeout)
+            async with client:
+                native_timeout = client.asynclient.timeout
+                assert native_timeout.pool is None
+                assert native_timeout.connect == timeout
+                assert native_timeout.read == timeout
+                assert native_timeout.write == timeout
+
     def test_constructor_arguments(self, canfar_client_fixture) -> None:
         """Test initialization with explicit constructor arguments."""
         config = Configuration()

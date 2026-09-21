@@ -61,11 +61,13 @@ support about account or project access.
    needed to interpret the research, while excluding credentials and
    unnecessary temporary files.
 5. Share the unpublished record or its data directory with referees using the
-   access workflow provided by DPS.
+   access workflow provided by DPS. Referees can read the package before the
+   DOI is minted, so the data can be reviewed alongside the paper.
 6. Select **Publish** when the package and metadata are final. Publishing
-   registers the DOI and locks the published data directory; contact
-   [CANFAR support](mailto:support@canfar.net) if a published record needs a
-   correction.
+   mints the DOI and locks the published data directory. Published files are
+   never changed afterwards: a correction is made by adding files, such as an
+   erratum or a corrected table. Contact
+   [CANFAR support](mailto:support@canfar.net) to add them.
 
 <span id="step-2-upload-data-package"></span>
 <span id="data-package-requirements"></span>
@@ -79,9 +81,12 @@ Keep the package self-describing and reproducible:
 - use stable, descriptive filenames and a short directory structure;
 - include machine-readable metadata alongside tables and images;
 - document missing values, coordinate systems, units, and selection criteria;
-- include a license and citation guidance for reuse; and
+- include a license and citation guidance for reuse;
+- include checksums for the data files, so readers can verify their copies;
 - verify that the package can be read from the published data directory before
-  selecting **Publish**.
+  selecting **Publish**; and
+- re-check the file list, authors, and title at the same time, because what
+  you publish stays as it is.
 
 Save the package and checkpoints in `/arc` or the data directory shown by
 DPS. Use `/scratch` only for temporary staging. The
