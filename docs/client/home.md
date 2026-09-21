@@ -108,4 +108,4 @@ An empty list means no notebooks match those filters. Follow the
 - [Examples](examples.md)
 - [Data access](data.md)
 - [Migration guide](migration.md)
-- [Use CANFAR with a coding agent](agents.md)
+- [CANFAR Agent Skill](../platform/agent-skill.md)

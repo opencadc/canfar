@@ -106,8 +106,9 @@ exclude_docs: |
   agents/research/**
   agents/reviews/**
 
-# Historical ALMA URLs remain available without duplicating the sidebar.
+# Historical URLs remain available without duplicating the sidebar.
 not_in_nav: |
+  client/agents.md
   platform/community/alma/*/*.md
 
 extra_css:
@@ -192,6 +193,7 @@ nav:
   - Platform:
       - Overview: platform/index.md
       - Getting Started: platform/get-started.md
+      - Agent Skill: platform/agent-skill.md
       - Concepts: platform/concepts.md
       - Best Practices: platform/best-practices.md
       - Permissions: platform/permissions.md
@@ -259,7 +261,6 @@ nav:
           - Reference: cli/cli-help.md
       - Demos:
           - SRCnet Workshop: demos/srcnet-workshop.md
-      - Use a Coding Agent: client/agents.md
       - Bug Reports: client/bug-reports.md
   - Contribute:
       - Code of Conduct: conduct.md
