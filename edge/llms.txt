@@ -13,6 +13,7 @@ inside those files are relative to the file that contains them.
 
 - [Overview](platform/index.md)
 - [Getting Started](platform/get-started.md)
+- [Agent Skill](platform/agent-skill.md)
 - [Concepts](platform/concepts.md)
 - [Best Practices](platform/best-practices.md)
 - [Permissions](platform/permissions.md)
@@ -69,7 +70,6 @@ inside those files are relative to the file that contains them.
 - [CLI / Logging](cli/logging.md)
 - [CLI / Reference](cli/cli-help.md)
 - [Demos / SRCnet Workshop](demos/srcnet-workshop.md)
-- [Use a Coding Agent](client/agents.md)
 - [Bug Reports](client/bug-reports.md)
 
 ## Contribute

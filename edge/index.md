@@ -27,6 +27,7 @@ Built on [IVOA standards](https://www.ivoa.net/documents/ "International Virtual
 
 [Get Started](platform/get-started.md){ .md-button .md-button--primary }
 [Open Portal](https://www.canfar.net/science-portal/){ .md-button .md-button--primary }
+[Use Agent Skill](platform/agent-skill.md){ .md-button .md-button--primary }
 
 </div>
 
