@@ -18,7 +18,7 @@ class IVOARegistrySearch(BaseModel):
     registries: dict[str, str] = Field(
         default={
             "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCNet",
-            "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
+            "https://cadc-west-01.canfar.net/reg/resource-caps": "CADC",
             (
                 "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
             ): "CADC@keel-dev",

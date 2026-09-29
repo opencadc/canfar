@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 runner = CliRunner()
 _CLI_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"}
-_CADC_REGISTRY = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+_CADC_REGISTRY = "https://cadc-west-01.canfar.net/reg/resource-caps"
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 
 
