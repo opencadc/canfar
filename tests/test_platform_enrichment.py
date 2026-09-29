@@ -636,7 +636,7 @@ class TestPlatformEnrichment:
         failure: str,
     ) -> None:
         """Auth and network failures leave memory and YAML byte-for-byte unchanged."""
-        registry_url = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+        registry_url = "https://cadc-west-01.canfar.net/reg/resource-caps"
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
         def registry_response(request: httpx.Request) -> httpx.Response:

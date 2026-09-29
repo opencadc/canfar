@@ -62,9 +62,7 @@ _BUILTIN_IDPS: dict[str, IdpInfo] = {
         auth_mode="x509",
         registry_name="CADC",
         leaf="arc",
-        registry_url=AnyHttpUrl(
-            "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
-        ),
+        registry_url=AnyHttpUrl("https://cadc-west-01.canfar.net/reg/resource-caps"),
         dev_registries={
             "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": (
                 "CADC@keel-dev"
