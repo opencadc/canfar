@@ -91,8 +91,16 @@ canfar data cp arc:/home/user/file.fits local:/tmp/file.fits
 Recursive copy is available for one directory and its descendants:
 
 ```bash
-canfar data cp -R local:/tmp/dataset arc:/home/user/dataset
+canfar data mkdir -p arc:/home/user
+canfar data cp -R local:/tmp/dataset arc:/home/user
 ```
+
+An existing destination directory receives the source directory by name, so
+this example writes `arc:/home/user/dataset`. Rerun the same command against
+the same existing parent directory to resume a partial copy. Matching files
+are skipped only after content checksums or byte comparison confirm equality;
+files with different contents are replaced. Without compatible checksums,
+verification can download both copies even when no upload is needed.
 
 For a cross-source move, make the verification and removal explicit:
 

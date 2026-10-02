@@ -26,7 +26,8 @@ runs on SRCNet. Data commands see every configured identifier.
 ```bash
 canfar data ls -lh arc:/home/USER
 canfar data cp local:/absolute/input.fits arc:/projects/PROJECT/input.fits
-canfar data cp -R local:/absolute/run-42 vault:/PROJECT/runs/run-42
+canfar data mkdir -p vault:/PROJECT/runs
+canfar data cp -R local:/absolute/run-42 vault:/PROJECT/runs
 canfar data mkdir -p arc:/projects/PROJECT/results
 canfar data info arc:/projects/PROJECT/input.fits
 ```
@@ -40,6 +41,12 @@ the destination with `info` or `ls`, then remove what the user authorized.
 
 Transfer is done when the destination is **verified**: it lists with the
 expected size.
+
+For a rerunnable directory copy, create the destination parent first and pass
+that existing directory to `cp -R`, as above. The source directory name is
+appended to it. Rerun the same command to resume: recursive copy skips only
+files whose contents match and replaces files whose contents differ. See
+[Data commands](https://www.opencadc.org/canfar/edge/cli/data/).
 
 ## Python
 
