@@ -10,9 +10,17 @@ from collections.abc import Awaitable, Callable, Generator
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any, NoReturn, cast
 
-import httpx
 from authlib.integrations.base_client.errors import OAuthError
 from authlib.oauth2.rfc8628 import DEVICE_CODE_GRANT_TYPE
+from httpx2 import (
+    AsyncClient,
+    HTTPError,
+    HTTPStatusError,
+    Response,
+    Timeout,
+    TransportError,
+)
+from httpx2 import Client as SyncClient
 from pydantic import SecretStr, ValidationError
 
 from canfar.models.auth import (
@@ -114,7 +122,7 @@ def _device_authorization_payload(identity: str) -> dict[str, str]:
     return {"client_id": identity, "scope": _OIDC_SCOPE}
 
 
-def _parse_device_authorization(response: httpx.Response) -> DeviceAuthorization:
+def _parse_device_authorization(response: Response) -> DeviceAuthorization:
     """Parse one OIDC Identity Provider challenge without exposing secrets."""
     try:
         return DeviceAuthorization.model_validate(response.json())
@@ -186,7 +194,7 @@ def _userinfo_headers(credential: OIDCCredential) -> dict[str, str]:
     return {"Authorization": f"Bearer {access.get_secret_value() if access else ''}"}
 
 
-def _userinfo_username(response: httpx.Response) -> str | None:
+def _userinfo_username(response: Response) -> str | None:
     """Validate UserInfo and return its optional display identifier."""
     response.raise_for_status()
     return response.json().get("preferred_username")
@@ -228,7 +236,7 @@ def _install_client_credentials(
 
 
 def _finalize_authentication(
-    response: httpx.Response,
+    response: Response,
     on_authenticated: Callable[[str | None], None] | None,
 ) -> None:
     """Validate UserInfo and notify observers of the authenticated username."""
@@ -239,7 +247,7 @@ def _finalize_authentication(
 
 async def discover(
     url: str,
-    client: httpx.AsyncClient | None = None,
+    client: AsyncClient | None = None,
     *,
     expected_issuer: str,
 ) -> dict[str, Any]:
@@ -247,7 +255,7 @@ async def discover(
 
     Args:
         url (str): OIDC Discovery URL.
-        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+        client (httpx2.AsyncClient | None, optional): Optional async HTTP client.
             If None, creates a new one. Defaults to None.
         expected_issuer: Exact issuer configured for the Identity Provider.
 
@@ -255,7 +263,7 @@ async def discover(
         dict[str, Any]: OIDC Identity Provider configuration.
     """
     if client is None:
-        async with httpx.AsyncClient() as http_client:
+        async with AsyncClient() as http_client:
             response = await http_client.get(url)
             response.raise_for_status()
             data: dict[str, Any] = response.json()
@@ -269,12 +277,12 @@ async def discover(
     return data
 
 
-async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[str, Any]:
+async def register(url: str, client: AsyncClient | None = None) -> dict[str, Any]:
     """Register a new client with the OIDC Identity Provider.
 
     Args:
         url (str): OIDC Registration URL.
-        client (httpx.AsyncClient | None, optional): Optional async HTTP client.
+        client (httpx2.AsyncClient | None, optional): Optional async HTTP client.
             If None, creates a new one. Defaults to None.
 
     Returns:
@@ -283,7 +291,7 @@ async def register(url: str, client: httpx.AsyncClient | None = None) -> dict[st
     payload = _registration_payload()
 
     if client is None:
-        async with httpx.AsyncClient() as http:
+        async with AsyncClient() as http:
             response = await http.post(url, json=payload)
             response.raise_for_status()
             data: dict[str, Any] = response.json()
@@ -320,7 +328,7 @@ async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[st
         )
     except OAuthError as error:
         _raise_poll_oauth_error(error)
-    except httpx.HTTPStatusError:
+    except HTTPStatusError:
         msg = "OIDC device authorization failed"
         raise ValueError(msg) from None
     except ValueError:
@@ -331,7 +339,7 @@ async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[st
 
 @contextmanager
 def _map_refresh_errors() -> Generator[None, None, None]:
-    """Map Authlib/httpx refresh failures to the fixed, secret-safe messages."""
+    """Map Authlib/httpx2 refresh failures to the fixed, secret-safe messages."""
     try:
         yield
     except OAuthError as err:
@@ -343,7 +351,7 @@ def _map_refresh_errors() -> Generator[None, None, None]:
             raise ReauthenticationRequiredError(msg) from None
         msg = "OIDC token refresh failed"
         raise ValueError(msg) from None
-    except httpx.HTTPError:
+    except HTTPError:
         msg = "OIDC token refresh failed"
         raise ValueError(msg) from None
     except (TypeError, ValueError):
@@ -551,7 +559,7 @@ async def start_device_authorization(
     url: str,
     identity: str,
     secret: str,
-    client: httpx.AsyncClient,
+    client: AsyncClient,
 ) -> DeviceAuthorization:
     """Request an OIDC device authorization challenge.
 
@@ -631,7 +639,7 @@ async def _poll_with_backoff(
             pass
         except SlowDownError:
             interval += 5
-        except httpx.TransportError:
+        except TransportError:
             interval *= 2
         remaining = deadline - time.monotonic()
         if remaining > 0:
@@ -702,11 +710,11 @@ async def authenticate_credential(
     Returns:
         Updated OIDC Authentication Record with tokens.
     """
-    request_timeout = None if timeout is None else httpx.Timeout(timeout)
+    request_timeout = None if timeout is None else Timeout(timeout)
     if request_timeout is None:
-        client_context = httpx.AsyncClient()
+        client_context = AsyncClient()
     else:
-        client_context = httpx.AsyncClient(timeout=request_timeout)
+        client_context = AsyncClient(timeout=request_timeout)
 
     async with client_context as client:
         response: dict[str, Any] = await discover(
@@ -768,7 +776,7 @@ async def authenticate_credential(
 
 def sync_discover(
     url: str,
-    client: httpx.Client,
+    client: SyncClient,
     *,
     expected_issuer: str,
 ) -> dict[str, Any]:
@@ -783,7 +791,7 @@ def sync_discover(
 
 def sync_register(
     url: str,
-    client: httpx.Client,
+    client: SyncClient,
 ) -> dict[str, Any]:
     """Register a device-flow client with a synchronous HTTP client."""
     payload = _registration_payload()
@@ -798,7 +806,7 @@ def sync_start_device_authorization(
     url: str,
     identity: str,
     secret: str,
-    client: httpx.Client,
+    client: SyncClient,
 ) -> DeviceAuthorization:
     """Request an OIDC device authorization challenge synchronously."""
     response = client.post(
@@ -826,7 +834,7 @@ def _sync_poll_token(
         )
     except OAuthError as error:
         _raise_poll_oauth_error(error)
-    except httpx.HTTPStatusError:
+    except HTTPStatusError:
         msg = "OIDC device authorization failed"
         raise ValueError(msg) from None
     except ValueError:
@@ -852,7 +860,7 @@ def sync_poll_device_token(
             pass
         except SlowDownError:
             interval += 5
-        except httpx.TransportError:
+        except TransportError:
             interval *= 2
         remaining = deadline - time.monotonic()
         if remaining > 0:
@@ -909,14 +917,14 @@ def sync_authenticate_credential(
     on_authenticated: Callable[[str | None], None] | None = None,
 ) -> OIDCCredential:
     """Authenticate an OIDC record with native synchronous HTTP operations."""
-    request_timeout = None if timeout is None else httpx.Timeout(timeout)
+    request_timeout = None if timeout is None else Timeout(timeout)
 
     from authlib.integrations.httpx_client import OAuth2Client  # noqa: PLC0415
 
     if request_timeout is None:
-        client_context = httpx.Client()
+        client_context = SyncClient()
     else:
-        client_context = httpx.Client(timeout=request_timeout)
+        client_context = SyncClient(timeout=request_timeout)
 
     with client_context as client:
         response = sync_discover(

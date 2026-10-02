@@ -5,7 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -35,24 +35,24 @@ def canfar_client_fixture():
     return _create_client
 
 
-def _sync_client_factory(transport: httpx.BaseTransport):
-    """Build native sync HTTPX clients over a supplied transport."""
-    return lambda **kwargs: httpx.Client(transport=transport, **kwargs)
+def _sync_client_factory(transport: httpx2.BaseTransport):
+    """Build native sync HTTPX2 clients over a supplied transport."""
+    return lambda **kwargs: httpx2.Client(transport=transport, **kwargs)
 
 
-def _async_client_factory(transport: httpx.BaseTransport):
-    """Build native async HTTPX clients over a supplied transport."""
-    return lambda **kwargs: httpx.AsyncClient(transport=transport, **kwargs)
+def _async_client_factory(transport: httpx2.BaseTransport):
+    """Build native async HTTPX2 clients over a supplied transport."""
+    return lambda **kwargs: httpx2.AsyncClient(transport=transport, **kwargs)
 
 
-def _response_transport(requests: list[httpx.Request]) -> httpx.MockTransport:
-    """Record requests and return one successful native HTTPX response."""
+def _response_transport(requests: list[httpx2.Request]) -> httpx2.MockTransport:
+    """Record requests and return one successful native HTTPX2 response."""
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         requests.append(request)
-        return httpx.Response(200, json={"ok": True}, request=request)
+        return httpx2.Response(200, json={"ok": True}, request=request)
 
-    return httpx.MockTransport(respond)
+    return httpx2.MockTransport(respond)
 
 
 class TestInitializationAndConfiguration:
@@ -77,7 +77,7 @@ class TestInitializationAndConfiguration:
         with HTTPClient(
             token=SecretStr("test-token"), url="https://example.test", timeout=timeout
         ) as client:
-            assert client.client.timeout == httpx.Timeout(timeout)
+            assert client.client.timeout == httpx2.Timeout(timeout)
             async with client:
                 native_timeout = client.asynclient.timeout
                 assert native_timeout.pool is None
@@ -134,12 +134,12 @@ class TestInitializationAndConfiguration:
         assert client.token.get_secret_value() == "constructor-token"
 
     def test_client_has_session_attribute(self, canfar_client_fixture) -> None:
-        """Test if HTTPClient object contains httpx.Client attribute."""
+        """Test if HTTPClient object contains httpx2.Client attribute."""
         client = canfar_client_fixture(
             token=SecretStr("test_token"), url="https://example.com"
         )
         assert hasattr(client, "client")
-        assert isinstance(client.client, httpx.Client)
+        assert isinstance(client.client, httpx2.Client)
 
     def test_bad_server_no_schema(self, canfar_client_fixture) -> None:
         """Test server URL without schema."""
@@ -164,7 +164,7 @@ class TestRuntimeCredentialHandling:
     ) -> None:
         """A sync request uses saved OIDC state when the runtime token is empty."""
         config = oidc_config(idp="oidc")
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -188,7 +188,7 @@ class TestRuntimeCredentialHandling:
         canfar_client_fixture,
     ) -> None:
         """An async request uses saved OIDC state when the runtime token is empty."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with patch(
             "canfar.client.AsyncClient",
@@ -347,7 +347,7 @@ class TestBaseURLConstruction:
 
     def test_runtime_url_precedence(self, canfar_client_fixture) -> None:
         """A request uses the runtime URL when runtime credentials are supplied."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -366,7 +366,7 @@ class TestBaseURLConstruction:
 
     def test_configured_url_from_context(self, canfar_client_fixture) -> None:
         """A request uses the configured Science Platform Server URL."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -429,7 +429,7 @@ class TestCertificateValidation:
         cert_path = tmp_path / "valid.pem"
         _create_test_certificate(cert_path)
 
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
         with (
             patch(
                 "canfar.client.Client",
@@ -453,7 +453,7 @@ class TestCertificateValidation:
         """A valid certificate can build a native client and complete a request."""
         cert_path = tmp_path / "valid.pem"
         _create_test_certificate(cert_path)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -501,7 +501,7 @@ class TestHTTPClientCreationAndHeaders:
         """A native sync request carries common and registry headers."""
         config = Configuration()
         config.registry = ContainerRegistry(username="test", secret="test")
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -537,7 +537,7 @@ class TestHTTPClientCreationAndHeaders:
         canfar_client_fixture,
     ) -> None:
         """A native async request carries common headers and returns its result."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(
@@ -564,12 +564,12 @@ class TestContextManagerBehavior:
     """Test context manager functionality."""
 
     def test_sync_context_manager_enter_exit(self, canfar_client_fixture) -> None:
-        """The sync context manager returns the client and closes HTTPX."""
-        requests: list[httpx.Request] = []
-        created: list[httpx.Client] = []
+        """The sync context manager returns the client and closes HTTPX2."""
+        requests: list[httpx2.Request] = []
+        created: list[httpx2.Client] = []
 
-        def factory(**kwargs: object) -> httpx.Client:
-            native = httpx.Client(transport=_response_transport(requests), **kwargs)
+        def factory(**kwargs: object) -> httpx2.Client:
+            native = httpx2.Client(transport=_response_transport(requests), **kwargs)
             created.append(native)
             return native
 
@@ -588,12 +588,12 @@ class TestContextManagerBehavior:
     async def test_async_context_manager_enter_exit(
         self, canfar_client_fixture
     ) -> None:
-        """The async context manager returns the client and closes HTTPX."""
-        requests: list[httpx.Request] = []
-        created: list[httpx.AsyncClient] = []
+        """The async context manager returns the client and closes HTTPX2."""
+        requests: list[httpx2.Request] = []
+        created: list[httpx2.AsyncClient] = []
 
-        def factory(**kwargs: object) -> httpx.AsyncClient:
-            native = httpx.AsyncClient(
+        def factory(**kwargs: object) -> httpx2.AsyncClient:
+            native = httpx2.AsyncClient(
                 transport=_response_transport(requests), **kwargs
             )
             created.append(native)
@@ -619,7 +619,7 @@ class TestSSLContextAndClientKwargs:
         """Runtime credentials bypass expiry checks from saved X.509 state."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
         config = x509_config(idp="x509", path=cert_path, expiry=0.0)
 
         with (
@@ -645,7 +645,7 @@ class TestSSLContextAndClientKwargs:
         """Async runtime credentials bypass saved X.509 expiry checks."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with patch(
             "canfar.client.AsyncClient",
@@ -668,7 +668,7 @@ class TestSSLContextAndClientKwargs:
         """A sync request rejects an expired saved X.509 record."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
         config = x509_config(idp="x509", path=cert_path, expiry=0.0)
 
         with (
@@ -689,7 +689,7 @@ class TestSSLContextAndClientKwargs:
         """An async request rejects an expired saved X.509 record."""
         cert_path = tmp_path / "expired.pem"
         generate_cert(cert_path, expired=True)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
         with (
             patch(

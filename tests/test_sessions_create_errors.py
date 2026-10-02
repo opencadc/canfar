@@ -7,7 +7,7 @@ import logging
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlsplit
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr, ValidationError
 
@@ -92,11 +92,11 @@ def _create_request() -> CreateRequest:
 def _create_responder(sent: list[list[tuple[str, str]]]):
     """Return a transport handler that records and identifies replicas."""
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         params = request.url.params.multi_items()
         sent.append(params)
         name = request.url.params["name"]
-        return httpx.Response(200, text=f"{name}-id\n", request=request)
+        return httpx2.Response(200, text=f"{name}-id\n", request=request)
 
     return respond
 
@@ -104,12 +104,12 @@ def _create_responder(sent: list[list[tuple[str, str]]]):
 def test_sync_create_serializes_the_public_request_contract() -> None:
     """Sync create serializes every replica through the HTTP boundary."""
     sent: list[list[tuple[str, str]]] = []
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_create_responder(sent)),
+                transport=httpx2.MockTransport(_create_responder(sent)),
                 **kwargs,
             ),
         ),
@@ -125,11 +125,11 @@ def test_sync_create_serializes_the_public_request_contract() -> None:
 async def test_async_create_serializes_the_public_request_contract() -> None:
     """Async create serializes every replica through the HTTP boundary."""
     sent: list[list[tuple[str, str]]] = []
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(_create_responder(sent)),
+            transport=httpx2.MockTransport(_create_responder(sent)),
             **kwargs,
         ),
     ):
@@ -205,20 +205,20 @@ async def test_async_create_waits_for_connection_pool_capacity(
 def _failure_responder(failed_names: set[str]):
     """Return a transport handler for partial or total replica failures."""
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         name = request.url.params["name"]
         if name in failed_names:
             if len(failed_names) == 1:
                 message = "connection refused"
-                raise httpx.ConnectError(message, request=request)
-            response = httpx.Response(503, request=request)
+                raise httpx2.ConnectError(message, request=request)
+            response = httpx2.Response(503, request=request)
             message = "service unavailable"
-            raise httpx.HTTPStatusError(
+            raise httpx2.HTTPStatusError(
                 message,
                 request=request,
                 response=response,
             )
-        return httpx.Response(200, text=f"{name}-id\n", request=request)
+        return httpx2.Response(200, text=f"{name}-id\n", request=request)
 
     return respond
 
@@ -234,12 +234,12 @@ def test_sync_create_omits_failed_replicas(
     request = CreateRequest(
         name="batch", image="skaha/terminal:latest", kind="headless", replicas=2
     )
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_failure_responder(failed_names)),
+                transport=httpx2.MockTransport(_failure_responder(failed_names)),
                 **kwargs,
             ),
         ),
@@ -260,11 +260,11 @@ async def test_async_create_omits_failed_replicas(
     request = CreateRequest(
         name="batch", image="skaha/terminal:latest", kind="headless", replicas=2
     )
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(_failure_responder(failed_names)),
+            transport=httpx2.MockTransport(_failure_responder(failed_names)),
             **kwargs,
         ),
     ):
@@ -303,11 +303,11 @@ async def test_async_create_rejects_invalid_requests(
             await session.create(name="batch", **request_kwargs)
 
 
-def _failure_log_responder(request: httpx.Request) -> httpx.Response:
+def _failure_log_responder(request: httpx2.Request) -> httpx2.Response:
     """Raise one safe-to-log HTTP failure for a create request."""
-    response = httpx.Response(500, request=request, text="no capacity")
+    response = httpx2.Response(500, request=request, text="no capacity")
     message = "server error"
-    raise httpx.HTTPStatusError(message, request=request, response=response)
+    raise httpx2.HTTPStatusError(message, request=request, response=response)
 
 
 def _assert_safe_create_log(caplog: pytest.LogCaptureFixture, secret: str) -> None:
@@ -327,12 +327,12 @@ def test_sync_create_failure_logs_only_safe_replica_context(
     """Sync create omits request payload and raw exception from logs."""
     environment_secret = "sync-create-environment-secret"
     caplog.set_level(logging.ERROR, logger="canfar.sessions")
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_failure_log_responder),
+                transport=httpx2.MockTransport(_failure_log_responder),
                 **kwargs,
             ),
         ),
@@ -359,11 +359,11 @@ async def test_async_create_failure_logs_only_safe_replica_context(
     """Async create omits request payload and raw exception from logs."""
     environment_secret = "async-create-environment-secret"
     caplog.set_level(logging.ERROR, logger="canfar.sessions")
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(_failure_log_responder),
+            transport=httpx2.MockTransport(_failure_log_responder),
             **kwargs,
         ),
     ):

@@ -1,9 +1,9 @@
-"""Tests for the refactored HTTPx authentication hooks."""
+"""Tests for the refactored HTTPX2 authentication hooks."""
 
 import time
 from unittest.mock import Mock, patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -31,9 +31,9 @@ def oidc_client() -> HTTPClient:
         refresh_expiry=time.time() + 3600,
     )
     client = HTTPClient(config=config)
-    # Mock the internal httpx clients to check header updates
-    client._client = Mock(spec=httpx.Client, headers={})  # noqa: SLF001
-    client._asynclient = Mock(spec=httpx.AsyncClient, headers={})  # noqa: SLF001
+    # Mock the internal httpx2 clients to check header updates
+    client._client = Mock(spec=httpx2.Client, headers={})  # noqa: SLF001
+    client._asynclient = Mock(spec=httpx2.AsyncClient, headers={})  # noqa: SLF001
     return client
 
 
@@ -59,7 +59,7 @@ class TestSyncHook:
     ) -> None:
         """Verify a successful token refresh updates state and headers."""
         hook_func = refresh(oidc_client)
-        request = httpx.Request("GET", "https://oidc.example.com")
+        request = httpx2.Request("GET", "https://oidc.example.com")
 
         hook_func(request)
 
@@ -93,7 +93,7 @@ class TestSyncHook:
         config = x509_config(idp="testx509", path=cert_path, version="v0")
         client = HTTPClient(config=config)
         hook_func = refresh(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         hook_func(request)
         mock_refresh.assert_not_called()
@@ -103,7 +103,7 @@ class TestSyncHook:
         """Verify the hook does nothing if runtime credentials are provided."""
         client = HTTPClient(token=SecretStr("runtime-token"), url="https://runtime.com")
         hook_func = refresh(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         hook_func(request)
         mock_refresh.assert_not_called()
@@ -126,7 +126,7 @@ class TestSyncHook:
             ),
         )
         hook_func = refresh(oidc_client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         hook_func(request)
         mock_refresh.assert_not_called()
@@ -135,7 +135,7 @@ class TestSyncHook:
     def test_refresh_failure_raises_error(self, mock_refresh, oidc_client) -> None:  # noqa: ARG002
         """Verify that a failure during refresh raises AuthenticationError."""
         hook_func = refresh(oidc_client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         with pytest.raises(AuthenticationError, match="Failed to refresh OIDC token"):
             hook_func(request)
@@ -163,7 +163,7 @@ class TestAsyncHook:
     ) -> None:
         """Verify a successful async token refresh updates state and headers."""
         hook_func = arefresh(oidc_client)
-        request = httpx.Request("GET", "https://oidc.example.com")
+        request = httpx2.Request("GET", "https://oidc.example.com")
 
         await hook_func(request)
 
@@ -196,7 +196,7 @@ class TestAsyncHook:
         config = x509_config(idp="testx509", path=cert_path, version="v0")
         client = HTTPClient(config=config)
         hook_func = arefresh(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         await hook_func(request)
         mock_refresh.assert_not_called()
@@ -209,7 +209,7 @@ class TestAsyncHook:
     ) -> None:
         """Verify a failure during async refresh raises AuthenticationError."""
         hook_func = arefresh(oidc_client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         with pytest.raises(AuthenticationError, match="Failed to refresh OIDC token"):
             await hook_func(request)
@@ -232,12 +232,12 @@ class TestSyncAsyncParity:
             url="https://platform.example",
         )
 
-        sync_request = httpx.Request("GET", "https://platform.example/sync")
+        sync_request = httpx2.Request("GET", "https://platform.example/sync")
         refresh(client)(sync_request)
         assert sync_request.headers["Authorization"] == "Bearer saved-access-token"
 
         async with client:
-            async_request = httpx.Request("GET", "https://platform.example/async")
+            async_request = httpx2.Request("GET", "https://platform.example/async")
             await arefresh(client)(async_request)
 
         assert async_request.headers["Authorization"] == "Bearer saved-access-token"
@@ -256,7 +256,7 @@ class TestSyncAsyncParity:
         generate_cert(cert_path)
         config = x509_config(idp="testx509", path=cert_path, version="v0")
         client = HTTPClient(config=config)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         refresh(client)(request)
         mock_sync_refresh.assert_not_called()
@@ -281,7 +281,7 @@ class TestSyncAsyncParity:
             refresh_expiry=time.time() + 3600,
         )
         client = HTTPClient(config=config)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         with pytest.raises(AuthRequiredError):
             refresh(client)(request)

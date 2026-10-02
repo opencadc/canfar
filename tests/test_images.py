@@ -1,6 +1,6 @@
 """Test Canfar Images API."""
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -44,14 +44,14 @@ def test_images_details_returns_models() -> None:
         }
     ]
 
-    def respond(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, json=payload, request=request)
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(200, json=payload, request=request)
 
     with pytest.MonkeyPatch.context() as monkeypatch:
         monkeypatch.setattr(
             "canfar.client.Client",
-            lambda **kwargs: httpx.Client(
-                transport=httpx.MockTransport(respond), **kwargs
+            lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         )
         with Images(token=SecretStr("token"), url="https://example.test") as images:
@@ -65,11 +65,11 @@ def test_images_details_returns_models() -> None:
 
 def test_images_fetch_uses_http_client_params() -> None:
     """Fetch returns image IDs and passes optional kind as request parameter."""
-    requests: list[httpx.Request] = []
+    requests: list[httpx2.Request] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         requests.append(request)
-        return httpx.Response(
+        return httpx2.Response(
             200,
             json=[{"id": "images.canfar.net/skaha/terminal:latest"}],
             request=request,
@@ -78,8 +78,8 @@ def test_images_fetch_uses_http_client_params() -> None:
     with pytest.MonkeyPatch.context() as monkeypatch:
         monkeypatch.setattr(
             "canfar.client.Client",
-            lambda **kwargs: httpx.Client(
-                transport=httpx.MockTransport(respond), **kwargs
+            lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         )
         with Images(

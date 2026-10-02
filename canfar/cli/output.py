@@ -7,8 +7,8 @@ import sys
 from enum import Enum
 from typing import Any
 
-import httpx
 import yaml
+from httpx2 import HTTPError
 from pydantic_core import to_jsonable_python
 
 from canfar.config.migration import ConfigResetRequiredError
@@ -33,7 +33,7 @@ BoundaryError = (
     | AuthExpiredError
     | AuthContextError
     | AuthenticationError
-    | httpx.HTTPError
+    | HTTPError
 )
 """Session boundary exceptions shared by ``create`` and ``ps``."""
 
@@ -96,7 +96,7 @@ def boundary_failure(
 
     Args:
         err: One of the expected create/ps boundary exceptions.
-        transport_message: Human-facing summary used only for ``httpx.HTTPError``.
+        transport_message: Human-facing summary used only for ``httpx2.HTTPError``.
 
     Returns:
         StructuredError describing the failure for both output streams.

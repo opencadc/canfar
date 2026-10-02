@@ -1,4 +1,4 @@
-"""HTTPx hook to check for authentication expiry."""
+"""HTTPX2 hook to check for authentication expiry."""
 
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from collections.abc import Awaitable
 
-    import httpx
+    from httpx2 import Request
 
     from canfar.client import HTTPClient
 
@@ -50,7 +50,7 @@ def _check_expiry(client: HTTPClient) -> None:
         raise AuthExpiredError(context=credential.idp, reason=reason)
 
 
-def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
+def check(client: HTTPClient) -> Callable[[Request], None]:
     """Create a hook to check for authentication expiry.
 
     Args:
@@ -58,11 +58,11 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
 
     """
 
-    def hook(request: httpx.Request) -> None:  # noqa: ARG001
+    def hook(request: Request) -> None:  # noqa: ARG001
         """Check if the active Authentication credential is expired.
 
         Args:
-            request (httpx.Request): The request.
+            request (httpx2.Request): The request.
 
         Raises:
             AuthExpiredError: If the active Authentication credential is expired.
@@ -73,26 +73,26 @@ def check(client: HTTPClient) -> Callable[[httpx.Request], None]:
     return hook
 
 
-def acheck(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
+def acheck(client: HTTPClient) -> Callable[[Request], Awaitable[None]]:
     """Create an async hook to check for authentication expiry.
 
-    This returns an async callable suitable for httpx's async event hooks.
+    This returns an async callable suitable for httpx2's async event hooks.
 
     Args:
         client (HTTPClient): The CANFAR client.
     """
 
-    async def hook(request: httpx.Request) -> None:  # noqa: ARG001
+    async def hook(request: Request) -> None:  # noqa: ARG001
         """Check if the active Authentication credential is expired.
 
         Args:
-            request (httpx.Request): The request.
+            request (httpx2.Request): The request.
 
         Raises:
             AuthExpiredError: If the active Authentication credential is expired.
         """
         # No await needed: _check_expiry is synchronous; async is only required
-        # by the httpx async event-hook signature.
+        # by the httpx2 async event-hook signature.
         _check_expiry(client)
 
     return hook

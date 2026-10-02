@@ -10,7 +10,7 @@ from email.utils import formatdate
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from httpx import URL, AsyncClient, Client, Limits, Timeout
+from httpx2 import URL, AsyncClient, Client, Limits, Timeout
 from pydantic import (
     AnyHttpUrl,
     Field,
@@ -137,22 +137,22 @@ class HTTPClient(BaseSettings):
     # Client Properties
     @property
     def client(self) -> Client:
-        """Get the synchronous HTTPx Client.
+        """Get the synchronous HTTPX2 Client.
 
         Returns:
-            Client: The synchronous HTTPx client.
+            Client: The synchronous HTTPX2 client.
         """
         if not self._client:
             self._client = self._create_sync_client()
-            log.debug("Synchronous HTTPx client created")
+            log.debug("Synchronous HTTPX2 client created")
         return self._client
 
     @property
     def asynclient(self) -> AsyncClient:
-        """Get the asynchronous HTTPx Async Client."""
+        """Get the asynchronous HTTPX2 Async Client."""
         if not self._asynclient:
             self._asynclient = self._create_async_client()
-            log.debug("Asynchronous HTTPx client created")
+            log.debug("Asynchronous HTTPX2 client created")
         return self._asynclient
 
     @property
@@ -205,10 +205,10 @@ class HTTPClient(BaseSettings):
         return self
 
     def _create_async_client(self) -> AsyncClient:
-        """Create an asynchronous HTTPx client.
+        """Create an asynchronous HTTPX2 client.
 
         Returns:
-            AsyncClient: The asynchronous HTTPx client.
+            AsyncClient: The asynchronous HTTPX2 client.
         """
         credential = self._resolved_authentication_record()
         kwargs = self._get_client_kwargs(asynchronous=True, credential=credential)
@@ -218,10 +218,10 @@ class HTTPClient(BaseSettings):
         return client
 
     def _create_sync_client(self) -> Client:
-        """Create a synchronous HTTPx client.
+        """Create a synchronous HTTPX2 client.
 
         Returns:
-            Client: The synchronous HTTPx client.
+            Client: The synchronous HTTPX2 client.
         """
         credential = self._resolved_authentication_record()
         kwargs = self._get_client_kwargs(asynchronous=False, credential=credential)
@@ -375,14 +375,14 @@ class HTTPClient(BaseSettings):
         *,
         credential: AuthenticationCredential | None,
     ) -> dict[str, Any]:
-        """Get the keyword arguments for creating an HTTPx client.
+        """Get the keyword arguments for creating an HTTPX2 client.
 
         Args:
             asynchronous (bool): Whether the client is asynchronous.
             credential: Pre-resolved Authentication Record for this client build.
 
         Returns:
-            dict[str, Any]: Keyword arguments for creating an HTTPx client.
+            dict[str, Any]: Keyword arguments for creating an HTTPX2 client.
         """
         kwargs: dict[str, Any] = {
             "timeout": Timeout(self.timeout),
@@ -435,7 +435,7 @@ class HTTPClient(BaseSettings):
         asynchronous: bool,
         credential: AuthenticationCredential | None,
     ) -> dict[str, list[Any]]:
-        """Build native HTTPX hooks from the shared transport policy."""
+        """Build native HTTPX2 hooks from the shared transport policy."""
         catcher = errors.acatch if asynchronous else errors.catch
         request_logger = debug.arequest if asynchronous else debug.request
         response_logger = debug.aresponse if asynchronous else debug.response

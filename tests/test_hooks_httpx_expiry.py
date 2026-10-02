@@ -1,10 +1,10 @@
-"""Tests for the HTTPx expiry hooks."""
+"""Tests for the HTTPX2 expiry hooks."""
 
 from types import SimpleNamespace
 from typing import Any
 from unittest.mock import Mock
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -26,7 +26,7 @@ class TestCheck:
         mock_client.authentication_record.expired = False
 
         hook_func = check(mock_client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         hook_func(request)
 
@@ -39,7 +39,7 @@ class TestCheck:
         mock_client.authentication_record.idp = "srcnet"
 
         hook_func = check(mock_client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError) as exc_info:
             hook_func(request)
@@ -59,7 +59,7 @@ class TestCheck:
         client = HTTPClient(config=config)
 
         hook_func = check(client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError) as exc_info:
             hook_func(request)
@@ -86,7 +86,7 @@ class TestCheck:
                 uses_runtime_credentials=False,
             )
         )
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match="detailed certificate issue"):
             hook(request)
@@ -102,7 +102,7 @@ class TestCheck:
             url="https://runtime.com",
         )
         hook_func = check(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         hook_func(request)
 
@@ -113,7 +113,7 @@ class TestCheck:
         config = x509_config(idp="testx509", path=cert_path, version="v0", expiry=0.0)
         client = HTTPClient(config=config)
         hook_func = check(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         with pytest.raises(AuthExpiredError):
             hook_func(request)
@@ -130,7 +130,7 @@ class TestACheck:
         mock_client.authentication_record.expired = False
 
         hook_func = acheck(mock_client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         await hook_func(request)
 
@@ -144,7 +144,7 @@ class TestACheck:
         mock_client.authentication_record.idp = "cadc"
 
         hook_func = acheck(mock_client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError) as exc_info:
             await hook_func(request)
@@ -165,7 +165,7 @@ class TestACheck:
         client = HTTPClient(config=config)
 
         hook_func = acheck(client)
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError) as exc_info:
             await hook_func(request)
@@ -193,7 +193,7 @@ class TestACheck:
                 uses_runtime_credentials=False,
             )
         )
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match="detailed certificate issue"):
             await hook(request)
@@ -216,7 +216,7 @@ class TestACheck:
                 uses_runtime_credentials=False,
             )
         )
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(AuthExpiredError, match=r"X\.509 certificate expired\."):
             await hook(request)
@@ -233,7 +233,7 @@ class TestACheck:
             url="https://runtime.com",
         )
         hook_func = acheck(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         await hook_func(request)
 
@@ -245,7 +245,7 @@ class TestACheck:
         config = x509_config(idp="testx509", path=cert_path, version="v0", expiry=0.0)
         client = HTTPClient(config=config)
         hook_func = acheck(client)
-        request = httpx.Request("GET", "/")
+        request = httpx2.Request("GET", "/")
 
         with pytest.raises(AuthExpiredError):
             await hook_func(request)
@@ -282,7 +282,7 @@ class TestSyncAsyncParity:
                 uses_runtime_credentials=False,
             )
 
-        request = httpx.Request("GET", "https://example.com")
+        request = httpx2.Request("GET", "https://example.com")
 
         with pytest.raises(
             AuthExpiredError, match=r"X\.509 certificate expired\."
