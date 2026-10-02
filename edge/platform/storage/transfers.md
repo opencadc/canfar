@@ -137,15 +137,20 @@ canfar data cp vault:/project/input.fits local:/scratch/input.fits
 Use `-R` (or `-r`) for a directory copy:
 
 ```bash
-canfar data cp -R local:/data/run-42 vault:/project/runs/run-42
+canfar data mkdir -p vault:/project/runs
+canfar data cp -R local:/data/run-42 vault:/project/runs
 ```
 
 `cp` checks each destination file's size against the source after the transfer
 and reports a mismatch as a failure. A recursive copy is a sequence of file
 copies, not a snapshot: files that change during the copy can arrive in mixed
 states, and a copy that stops partway leaves the files already transferred.
-For many files, prefer a workflow you can rerun, then compare the file count
-and, where the archive publishes them, the checksums.
+The example writes `vault:/project/runs/run-42`. Rerun the same command against
+the existing parent directory to resume it. Recursive copy skips files only
+after verifying matching content checksums or comparing bytes; matching size
+alone is insufficient. Files with different contents are replaced. Without
+compatible checksums, verification can download both copies. After a rerun,
+compare the file count and, where the archive publishes them, the checksums.
 
 Create a destination first when that makes the workflow clearer:
 

@@ -840,6 +840,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#updated-http-and-storage-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated HTTP and storage dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-these-changes-landed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1859,6 +1870,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#updated-http-and-storage-dependencies" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Updated HTTP and storage dependencies
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#where-these-changes-landed" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1906,14 +1928,14 @@
 <span id="recent-updates"></span></p>
 <h1 id="whats-new-in-the-client">What's new in the client<a class="headerlink" href="#whats-new-in-the-client" title="Permanent link">&para;</a></h1>
 <h2 id="unreleased-changes-since-v141">Unreleased: changes since v1.4.1<a class="headerlink" href="#unreleased-changes-since-v141" title="Permanent link">&para;</a></h2>
-<p>This guide describes the <code>feat/interfaces</code> development branch. The previous
+<p>This guide describes the development client after v1.4.1. The previous
 published Python client is <a href="https://github.com/opencadc/canfar/releases/tag/v1.4.1">v1.4.1</a>
 (June 11, 2026). Installing <code>canfar</code> from PyPI does not yet provide all the
 features below. Follow <a href="../get-started/#install">Install and set up</a> to choose
 a released or development installation, and read the
 <a href="../migration/">upgrade guide</a> before updating scripts.</p>
-<p>The branch still reports version <code>1.4.1</code> in its package metadata. Check command
-help and Python capabilities as well as the version. Platform releases such
+<p>The development checkout still reports version <code>1.4.1</code> in its package metadata.
+Check command help and Python capabilities as well as the version. Platform releases such
 as <a href="../../releases/2026-2/">2026.2</a> have separate numbering and deployment scope.</p>
 <p><span id="improved-session-data-validation"></span></p>
 <h2 id="copy-and-read-research-data">Copy and read research data<a class="headerlink" href="#copy-and-read-research-data" title="Permanent link">&para;</a></h2>
@@ -2000,44 +2022,48 @@ their contracts:</p>
 <p><span id="backend-upgrades"></span>
 <span id="previous-versions"></span>
 <span id="stay-updated"></span></p>
+<h2 id="updated-http-and-storage-dependencies">Updated HTTP and storage dependencies<a class="headerlink" href="#updated-http-and-storage-dependencies" title="Permanent link">&para;</a></h2>
+<p>The development client uses <code>httpx2</code> 2.13.1 or later and requires Authlib 1.8.0
+or later for compatible OpenID Connect clients. If your code handles HTTP
+exceptions or supplies test transports, use the corresponding <code>httpx2</code> types;
+see the <a href="../migration/#update-http-client-imports">upgrade guide</a>.</p>
+<p>The storage dependencies are pinned to <code>vosfs</code> 0.10.0 and <code>fsspec-cli</code> 0.9.0.
+Recursive copies can be rerun into an existing destination directory and skip
+files only after verifying their contents. See <a href="../../cli/data/">Data commands</a>.
+The runtime, development, and documentation dependency requirements and
+lockfile have also been refreshed. Python 3.10 remains supported.</p>
 <h2 id="where-these-changes-landed">Where these changes landed<a class="headerlink" href="#where-these-changes-landed" title="Permanent link">&para;</a></h2>
-<p>This distinction matters if you have been testing development checkouts:</p>
+<p>The interfaces described above have landed on main since v1.4.1. This
+dependency update builds on them:</p>
 <table>
 <thead>
 <tr>
 <th>Area</th>
-<th>Already on main after v1.4.1</th>
-<th>Added or changed on this branch</th>
+<th>Main after v1.4.1</th>
+<th>This dependency update</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Storage</td>
-<td><code>canfar data</code>, Python storage access, and caching guidance</td>
-<td>Explicit <code>identifiers()</code> / <code>filesystem()</code> interface replaces dynamic storage imports and public source factories</td>
+<td><code>canfar data</code>, explicit <code>identifiers()</code> / <code>filesystem()</code>, and caching guidance</td>
+<td><code>vosfs</code> 0.10.0 and <code>fsspec-cli</code> 0.9.0, including verified recursive-copy resumption</td>
 </tr>
 <tr>
 <td>Authentication</td>
-<td>Certificate reuse and credential/server workflows</td>
-<td>Native Python OIDC login and explicit selection guidance</td>
+<td>Native Python OIDC login, certificate reuse, and explicit credential/server selection</td>
+<td>Authlib 1.8.0 or later for <code>httpx2</code> compatibility</td>
 </tr>
 <tr>
-<td>CLI output</td>
-<td>Machine output and configurable human banner</td>
-<td><code>-o/--output</code>, canonical command names, and consistent request/result models</td>
-</tr>
-<tr>
-<td>Configuration</td>
-<td>Stored authentication and server selections</td>
-<td>Bound <code>config.editor</code> replaces configuration service methods</td>
-</tr>
-<tr>
-<td>Logging</td>
-<td>Root controls and optional file logging</td>
-<td>Smaller implementation using standard-library logging; updated diagnostics and documentation</td>
+<td>HTTP transport</td>
+<td>Native synchronous and asynchronous HTTP clients</td>
+<td><code>httpx2</code> clients, exceptions, and test transports</td>
 </tr>
 </tbody>
 </table>
+<p>Canonical <code>-o/--output</code> commands, validated <code>config.editor</code> edits, and
+standard-library logging with <code>--log-file</code> are also on main after v1.4.1;
+follow the <a href="../migration/">upgrade guide</a> when moving from the published client.</p>
 <p>For published release history, see the <a href="../../changelog/">client changelog</a>.</p>
 
 
@@ -2061,7 +2087,7 @@ their contracts:</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
   </span>
 
     

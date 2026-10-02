@@ -9,7 +9,7 @@ it. Replace `SESSION_ID` with the ID printed by `canfar create` or `canfar ps`.
 ## Install and log in
 
 [Install the client](../client/get-started.md#install) first. These examples describe the unreleased
-`feat/interfaces` interface; follow the installation guide to choose a
+development interface; follow the installation guide to choose a
 compatible environment.
 
 ```bash

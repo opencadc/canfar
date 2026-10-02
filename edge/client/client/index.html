@@ -2090,7 +2090,7 @@
 <h1 id="httpclient">HTTPClient<a class="headerlink" href="#httpclient" title="Permanent link">&para;</a></h1>
 <p><code>canfar.client.HTTPClient</code> is the lower-level transport used by the Session,
 Image, Context, and Overview clients. It composes native synchronous and
-asynchronous <code>httpx</code> clients and is useful when an application needs a CANFAR
+asynchronous <code>httpx2</code> clients and is useful when an application needs a CANFAR
 request outside those higher-level modules.</p>
 <h2 id="construct-a-client">Construct a client<a class="headerlink" href="#construct-a-client" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
@@ -2128,7 +2128,7 @@ non-empty runtime <code>token</code> wins over a saved X.509 or OIDC record; a r
 <code>certificate</code> likewise wins. An empty runtime token is treated as absent: a supplied runtime certificate
 still takes precedence, otherwise the client uses the selected saved record. Runtime credentials are not persisted.</p>
 <p>Without runtime credentials, the client resolves the selected saved record when
-its sync or async HTTPX client is first created. An expired OIDC record is
+its sync or async HTTPX2 client is first created. An expired OIDC record is
 refreshed through the saved Authentication Record and the refreshed token is
 persisted. If the record cannot refresh or an X.509 certificate is invalid,
 client construction/request setup raises the established authentication error
@@ -2147,17 +2147,17 @@ instead of silently sending an unauthenticated request.</p>
     <span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">asynclient</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"context"</span><span class="p">)</span>
 </code></pre></div>
-<p><code>client</code> is the native <code>httpx.Client</code>; <code>asynclient</code> is the native
-<code>httpx.AsyncClient</code>. They are created lazily and closed by their matching
+<p><code>client</code> is the native <code>httpx2.Client</code>; <code>asynclient</code> is the native
+<code>httpx2.AsyncClient</code>. They are created lazily and closed by their matching
 context manager. Do not use the async client from synchronous code or expect a
 sync client to run through an event loop.</p>
 <p><span id="logging"></span>
 <span id="error-handling"></span>
 <span id="debug-logging"></span></p>
 <h2 id="errors-and-logging">Errors and logging<a class="headerlink" href="#errors-and-logging" title="Permanent link">&para;</a></h2>
-<p>HTTP response hooks raise <code>httpx.HTTPStatusError</code> by default for unsuccessful
+<p>HTTP response hooks raise <code>httpx2.HTTPStatusError</code> by default for unsuccessful
 responses. Catch it at the application boundary when a request can fail:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">httpx</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPStatusError</span>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">httpx2</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPStatusError</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">canfar.client</span><span class="w"> </span><span class="kn">import</span> <span class="n">HTTPClient</span>
 
@@ -2274,7 +2274,7 @@ variables, or a configuration file.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Get the synchronous HTTPx Client.</p>
+        <p>Get the synchronous HTTPX2 Client.</p>
 
 
 <table>
@@ -2291,12 +2291,12 @@ variables, or a configuration file.</p>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>The synchronous HTTPx client.</p>
+                <p>The synchronous HTTPX2 client.</p>
               </div>
                 <p>
                   <span class="doc-returns-annotation">
                     <b>TYPE:</b>
-                      <code><span title="httpx.Client">Client</span></code>
+                      <code><span title="httpx2.Client">Client</span></code>
                   </span>
                 </p>
             </td>
@@ -2326,7 +2326,7 @@ variables, or a configuration file.</p>
 
     <div class="doc doc-contents ">
 
-        <p>Get the asynchronous HTTPx Async Client.</p>
+        <p>Get the asynchronous HTTPX2 Async Client.</p>
 
     </div>
 
@@ -2594,7 +2594,7 @@ settings sources stay free to supply them.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 03:24:22 UTC">September 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
   </span>
 
     

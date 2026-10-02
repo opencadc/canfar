@@ -5,8 +5,8 @@ Images, VOSpace Services, and Science Platform metadata.
 
 ## Install and authenticate
 
-[Install the client](get-started.md#install) first. These examples describe the unreleased
-`feat/interfaces` interface; follow the installation guide to choose a
+[Install the client](get-started.md#install) first. These examples describe the
+unreleased development client; follow the installation guide to choose a
 compatible environment.
 
 ```bash
