@@ -6,7 +6,7 @@ from inspect import signature
 from typing import Any
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -101,10 +101,10 @@ def test_connection_url_is_the_shared_eligibility_policy(
     assert connection_url(record) == expected
 
 
-def _respond(request: httpx.Request) -> httpx.Response:
+def _respond(request: httpx2.Request) -> httpx2.Response:
     """Return deterministic lifecycle payloads from one public transport."""
     if request.url.path.endswith("/session"):
-        return httpx.Response(
+        return httpx2.Response(
             200,
             json=[
                 {"id": "batch-1", "name": "batch-1"},
@@ -116,11 +116,11 @@ def _respond(request: httpx.Request) -> httpx.Response:
     session_id = request.url.path.rsplit("/", 1)[-1]
     if session_id in {"failed", "missing"}:
         message = "connection refused"
-        raise httpx.ConnectError(message, request=request)
+        raise httpx2.ConnectError(message, request=request)
     if request.method == "DELETE":
-        return httpx.Response(204, request=request)
+        return httpx2.Response(204, request=request)
     if request.url.params.get("view") == "events":
-        return httpx.Response(200, text=f"event-{session_id}", request=request)
+        return httpx2.Response(200, text=f"event-{session_id}", request=request)
 
     records: dict[str, dict[str, Any]] = {
         "stopped": {
@@ -140,16 +140,16 @@ def _respond(request: httpx.Request) -> httpx.Response:
         },
         "no-url": {"id": "no-url", "status": "Running"},
     }
-    return httpx.Response(200, json=records[session_id], request=request)
+    return httpx2.Response(200, json=records[session_id], request=request)
 
 
-def _filtered_destroy_responder(requests: list[httpx.Request]):
+def _filtered_destroy_responder(requests: list[httpx2.Request]):
     """Record the filtered list request and accept its matching deletion."""
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         if request.method == "GET" and request.url.path.endswith("/session"):
             requests.append(request)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json=[
                     {
@@ -162,7 +162,7 @@ def _filtered_destroy_responder(requests: list[httpx.Request]):
                 request=request,
             )
         if request.method == "DELETE":
-            return httpx.Response(204, request=request)
+            return httpx2.Response(204, request=request)
         message = f"Unexpected request: {request.method} {request.url}"
         raise AssertionError(message)
 
@@ -171,12 +171,12 @@ def _filtered_destroy_responder(requests: list[httpx.Request]):
 
 def test_sync_lifecycle_share_public_policy() -> None:
     """Sync events, destruction, selection, and connection share one policy."""
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_respond),
+                transport=httpx2.MockTransport(_respond),
                 **kwargs,
             ),
         ),
@@ -208,12 +208,12 @@ def test_sync_lifecycle_share_public_policy() -> None:
 @pytest.mark.asyncio
 async def test_async_lifecycle_share_public_policy() -> None:
     """Async events, destruction, selection, and connection share one policy."""
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with (
         patch(
             "canfar.client.AsyncClient",
             side_effect=lambda **kwargs: real_async_client(
-                transport=httpx.MockTransport(_respond),
+                transport=httpx2.MockTransport(_respond),
                 **kwargs,
             ),
         ),
@@ -245,13 +245,13 @@ async def test_async_lifecycle_share_public_policy() -> None:
 
 def test_sync_destroy_with_passes_kind_and_status_filters() -> None:
     """Sync destroy_with forwards its filter keywords to Session.fetch."""
-    requests: list[httpx.Request] = []
-    real_client = httpx.Client
+    requests: list[httpx2.Request] = []
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_filtered_destroy_responder(requests)),
+                transport=httpx2.MockTransport(_filtered_destroy_responder(requests)),
                 **kwargs,
             ),
         ),
@@ -270,12 +270,12 @@ def test_sync_destroy_with_passes_kind_and_status_filters() -> None:
 @pytest.mark.asyncio
 async def test_async_destroy_with_passes_kind_and_status_filters() -> None:
     """Async destroy_with forwards its filter keywords to Session.fetch."""
-    requests: list[httpx.Request] = []
-    real_async_client = httpx.AsyncClient
+    requests: list[httpx2.Request] = []
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(_filtered_destroy_responder(requests)),
+            transport=httpx2.MockTransport(_filtered_destroy_responder(requests)),
             **kwargs,
         ),
     ):

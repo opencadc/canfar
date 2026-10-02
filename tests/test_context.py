@@ -1,6 +1,6 @@
 """Test Canfar Context API."""
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -26,11 +26,11 @@ def test_context(context) -> None:
 
 def test_context_resources_use_http_client() -> None:
     """Resources returns decoded context payload."""
-    requests: list[httpx.Request] = []
+    requests: list[httpx2.Request] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         requests.append(request)
-        return httpx.Response(
+        return httpx2.Response(
             200,
             json={"cores": {"default": 1}},
             request=request,
@@ -44,8 +44,8 @@ def test_context_resources_use_http_client() -> None:
     ):
         monkeypatch.setattr(
             "canfar.client.Client",
-            lambda **kwargs: httpx.Client(
-                transport=httpx.MockTransport(respond), **kwargs
+            lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         )
         # The client is lazy, so the transport is installed before the request.

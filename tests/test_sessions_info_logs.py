@@ -6,7 +6,7 @@ import logging
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
@@ -40,15 +40,15 @@ _INFO_LOG_CASES = (
 )
 
 
-def _respond(request: httpx.Request) -> httpx.Response:
+def _respond(request: httpx2.Request) -> httpx2.Response:
     """Return deterministic info/log payloads or one transport failure."""
     session_id = request.url.path.rsplit("/", 1)[-1]
     if session_id == "failed":
         message = "connection refused"
-        raise httpx.ConnectError(message, request=request)
+        raise httpx2.ConnectError(message, request=request)
     if request.url.params.get("view") == "logs":
-        return httpx.Response(200, text=f"log-{session_id}", request=request)
-    return httpx.Response(200, json={"id": session_id}, request=request)
+        return httpx2.Response(200, text=f"log-{session_id}", request=request)
+    return httpx2.Response(200, json={"id": session_id}, request=request)
 
 
 def _verbose_messages(caplog: pytest.LogCaptureFixture) -> list[str]:
@@ -71,12 +71,12 @@ def test_sync_info_and_logs_share_public_policy(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Sync info/logs preserve shape, order, failures, and verbose routing."""
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(_respond),
+                transport=httpx2.MockTransport(_respond),
                 **kwargs,
             ),
         ),
@@ -109,11 +109,11 @@ async def test_async_info_and_logs_share_public_policy(
     caplog: pytest.LogCaptureFixture,
 ) -> None:
     """Async info/logs preserve shape, order, failures, and verbose routing."""
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(_respond),
+            transport=httpx2.MockTransport(_respond),
             **kwargs,
         ),
     ):

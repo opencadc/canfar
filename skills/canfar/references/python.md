@@ -8,6 +8,9 @@ closing a client leaves its remote Sessions running.
 The default HTTP `timeout` is 30 seconds. See
 [HTTPClient](https://www.opencadc.org/canfar/edge/client/client/) for timeout
 semantics and the unreleased async client's wait for connection capacity.
+The development client uses native `httpx2` clients; import HTTP exceptions
+and test transports from `httpx2`. See the
+[upgrade guide](https://www.opencadc.org/canfar/edge/client/migration/#update-http-client-imports).
 
 ```python
 from canfar.sessions import Session

@@ -6,7 +6,7 @@ import base64
 from unittest.mock import patch
 from urllib.parse import parse_qs
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 
@@ -23,11 +23,11 @@ _REFRESH_FAILURE_SENTINEL = "secret-provider-diagnostic"
 
 def _refresh_failure_response(
     failure: str,
-    request: httpx.Request,
-) -> httpx.Response:
+    request: httpx2.Request,
+) -> httpx2.Response:
     """Return one deterministic failed refresh response."""
     if failure == "oauth":
-        return httpx.Response(
+        return httpx2.Response(
             400,
             json={
                 "error": "invalid_grant",
@@ -36,13 +36,13 @@ def _refresh_failure_response(
             request=request,
         )
     if failure == "http":
-        return httpx.Response(
+        return httpx2.Response(
             503,
             text=_REFRESH_FAILURE_SENTINEL,
             request=request,
         )
     if failure == "empty-access":
-        return httpx.Response(
+        return httpx2.Response(
             200,
             json={
                 "access_token": "",
@@ -50,7 +50,7 @@ def _refresh_failure_response(
             },
             request=request,
         )
-    return httpx.Response(
+    return httpx2.Response(
         200,
         content=_REFRESH_FAILURE_SENTINEL,
         headers={"Content-Type": "application/json"},
@@ -58,7 +58,7 @@ def _refresh_failure_response(
     )
 
 
-def _assert_basic_refresh_request(request: httpx.Request) -> None:
+def _assert_basic_refresh_request(request: httpx2.Request) -> None:
     """Assert the client secret is sent only with HTTP Basic authentication."""
     assert request.headers["Authorization"] == (
         "Basic " + base64.b64encode(b"client-id:client-secret").decode()
@@ -75,11 +75,11 @@ class TestRefreshFunction:
     @pytest.mark.asyncio
     async def test_refresh_success(self) -> None:
         """Authlib refreshes asynchronously with Basic auth and complete metadata."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
-        def token_endpoint(request: httpx.Request) -> httpx.Response:
+        def token_endpoint(request: httpx2.Request) -> httpx2.Response:
             requests.append(request)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": "new-access",
@@ -95,7 +95,7 @@ class TestRefreshFunction:
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(token_endpoint),
+            transport=httpx2.MockTransport(token_endpoint),
         )
         with (
             patch(
@@ -135,7 +135,7 @@ class TestRefreshFunction:
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(
+            transport=httpx2.MockTransport(
                 lambda request: _refresh_failure_response(failure, request)
             ),
         )
@@ -164,11 +164,11 @@ class TestSyncRefreshFunction:
 
     def test_sync_refresh_preserves_omitted_refresh_token(self) -> None:
         """Authlib preserves an omitted refresh token in the sync response."""
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
-        def token_endpoint(request: httpx.Request) -> httpx.Response:
+        def token_endpoint(request: httpx2.Request) -> httpx2.Response:
             requests.append(request)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": "new-access",
@@ -183,7 +183,7 @@ class TestSyncRefreshFunction:
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(token_endpoint),
+            transport=httpx2.MockTransport(token_endpoint),
         )
         with (
             patch(

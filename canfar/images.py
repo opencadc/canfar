@@ -9,7 +9,7 @@ from canfar.client import HTTPClient
 from canfar.models.containers import Image
 
 if TYPE_CHECKING:
-    from httpx import Response
+    from httpx2 import Response
 
 log = logging.getLogger(__name__)
 

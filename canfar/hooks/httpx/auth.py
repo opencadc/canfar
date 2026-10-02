@@ -1,13 +1,13 @@
-"""HTTPx authentication hooks for automatic OIDC token refresh.
+"""HTTPX2 authentication hooks for automatic OIDC token refresh.
 
-This module provides httpx event hooks that automatically handle authentication
+This module provides httpx2 event hooks that automatically handle authentication
 expiry and refresh for different authentication modes:
 
 - **X509 Mode**: Requires explicit interactive login when certificates expire
 - **OIDC Mode**: Automatically refreshes access tokens using refresh tokens
 - **User-provided credentials**: Bypasses automatic refresh
 
-The hooks are designed to be used with httpx clients to provide seamless
+The hooks are designed to be used with httpx2 clients to provide seamless
 authentication management without requiring manual intervention.
 
 Usage:
@@ -18,7 +18,7 @@ Usage:
     client = HTTPClient()
     auth_hook = create_auth_hook(client)
 
-    # The hook is automatically applied to the client's httpx instances
+    # The hook is automatically applied to the client's httpx2 instances
     ```
 
 Note:
@@ -39,7 +39,7 @@ from canfar.models.auth import OIDCCredential
 if TYPE_CHECKING:
     from collections.abc import Awaitable, MutableMapping
 
-    import httpx
+    from httpx2 import Request
     from pydantic import SecretStr
 
     from canfar.client import HTTPClient
@@ -86,7 +86,7 @@ def _refresh(
 def _apply_access_header(
     token: SecretStr,
     httpx_client_headers: MutableMapping[str, str],
-    request: httpx.Request,
+    request: Request,
 ) -> None:
     """Apply one access token to the active client and outgoing request."""
     header = f"Bearer {token.get_secret_value()}"
@@ -94,21 +94,21 @@ def _apply_access_header(
     request.headers["Authorization"] = header
 
 
-def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
-    """Create an authentication refresh hook for httpx clients.
+def refresh(client: HTTPClient) -> Callable[[Request], None]:
+    """Create an authentication refresh hook for httpx2 clients.
 
     Args:
         client (HTTPClient): The HTTPClient instance.
 
     Returns:
-        Callable[[httpx.Request], None]: The auth hook function.
+        Callable[[httpx2.Request], None]: The auth hook function.
     """
 
-    def hook(request: httpx.Request) -> None:
-        """Synchronous refresh hook for httpx clients.
+    def hook(request: Request) -> None:
+        """Synchronous refresh hook for httpx2 clients.
 
         Args:
-            request (httpx.Request): The outgoing HTTP request.
+            request (httpx2.Request): The outgoing HTTP request.
         """
         prepared = _refresh(client)
         if prepared is None:
@@ -153,21 +153,21 @@ def refresh(client: HTTPClient) -> Callable[[httpx.Request], None]:
     return hook
 
 
-def arefresh(client: HTTPClient) -> Callable[[httpx.Request], Awaitable[None]]:
-    """Create an asynchronous authentication refresh hook for httpx clients.
+def arefresh(client: HTTPClient) -> Callable[[Request], Awaitable[None]]:
+    """Create an asynchronous authentication refresh hook for httpx2 clients.
 
     Args:
         client (HTTPClient): The HTTPClient instance.
 
     Returns:
-        Callable[[httpx.Request], Awaitable[None]]: The async auth hook.
+        Callable[[httpx2.Request], Awaitable[None]]: The async auth hook.
     """
 
-    async def ahook(request: httpx.Request) -> None:
-        """Asynchronous refresh hook for httpx clients.
+    async def ahook(request: Request) -> None:
+        """Asynchronous refresh hook for httpx2 clients.
 
         Args:
-            request (httpx.Request): The outgoing HTTP request.
+            request (httpx2.Request): The outgoing HTTP request.
         """
         previous = client.authentication_record
         if isinstance(previous, OIDCCredential) and previous.expired:

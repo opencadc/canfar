@@ -1,6 +1,6 @@
-"""Module for providing httpx event hooks to log error responses.
+"""Module for providing httpx2 event hooks to log error responses.
 
-When using httpx event hooks for 'response' events, the response body is read
+When using httpx2 event hooks for 'response' events, the response body is read
 inside the error-handling context so that body-download errors (e.g.
 ReadTimeout during streaming) are warning-logged alongside status errors.
 """
@@ -9,7 +9,15 @@ import contextlib
 import logging
 from collections.abc import Generator
 
-import httpx
+from httpx2 import (
+    ConnectTimeout,
+    HTTPStatusError,
+    PoolTimeout,
+    ReadTimeout,
+    RequestError,
+    Response,
+    WriteTimeout,
+)
 
 from canfar.utils.logging import safe_url
 
@@ -33,7 +41,7 @@ POOL_ERR_MSG = (
 )
 
 
-def _request_url(error: httpx.RequestError) -> str:
+def _request_url(error: RequestError) -> str:
     try:
         request = error.request
     except RuntimeError:
@@ -43,7 +51,7 @@ def _request_url(error: httpx.RequestError) -> str:
 
 @contextlib.contextmanager
 def _error_handling() -> Generator[None, None, None]:
-    """Context manager that logs and re-raises httpx errors.
+    """Context manager that logs and re-raises httpx2 errors.
 
     Wraps both the body-read and ``raise_for_status()`` calls so that errors
     from either step are warning-logged.  Use as::
@@ -53,16 +61,16 @@ def _error_handling() -> Generator[None, None, None]:
             response.raise_for_status()
 
     Raises:
-        httpx.ConnectTimeout: on connect timeout.
-        httpx.ReadTimeout: on read timeout.
-        httpx.WriteTimeout: on write timeout.
-        httpx.PoolTimeout: on pool timeout.
-        httpx.HTTPStatusError: on 4xx/5xx status.
-        httpx.RequestError: for other request errors.
+        httpx2.ConnectTimeout: on connect timeout.
+        httpx2.ReadTimeout: on read timeout.
+        httpx2.WriteTimeout: on write timeout.
+        httpx2.PoolTimeout: on pool timeout.
+        httpx2.HTTPStatusError: on 4xx/5xx status.
+        httpx2.RequestError: for other request errors.
     """
     try:
         yield
-    except httpx.ConnectTimeout as err:
+    except ConnectTimeout as err:
         log.warning(
             "%s URL: %s",
             CONN_ERR_MSG,
@@ -70,7 +78,7 @@ def _error_handling() -> Generator[None, None, None]:
             exc_info=False,
         )
         raise
-    except httpx.ReadTimeout as err:
+    except ReadTimeout as err:
         log.warning(
             "%s URL: %s",
             READ_ERR_MSG,
@@ -78,7 +86,7 @@ def _error_handling() -> Generator[None, None, None]:
             exc_info=False,
         )
         raise
-    except httpx.WriteTimeout as err:
+    except WriteTimeout as err:
         log.warning(
             "%s URL: %s",
             WRITE_ERR_MSG,
@@ -86,7 +94,7 @@ def _error_handling() -> Generator[None, None, None]:
             exc_info=False,
         )
         raise
-    except httpx.PoolTimeout as err:
+    except PoolTimeout as err:
         log.warning(
             "%s URL: %s",
             POOL_ERR_MSG,
@@ -94,7 +102,7 @@ def _error_handling() -> Generator[None, None, None]:
             exc_info=False,
         )
         raise
-    except httpx.HTTPStatusError as err:
+    except HTTPStatusError as err:
         log.warning(
             "HTTP %d error for %s %s",
             err.response.status_code,
@@ -103,7 +111,7 @@ def _error_handling() -> Generator[None, None, None]:
             exc_info=False,
         )
         raise
-    except httpx.RequestError as err:
+    except RequestError as err:
         log.warning(
             "Request error for %s (%s)",
             _request_url(err),
@@ -113,38 +121,38 @@ def _error_handling() -> Generator[None, None, None]:
         raise
 
 
-def catch(response: httpx.Response) -> None:
+def catch(response: Response) -> None:
     """Read the response body and raise HTTPStatusError for error responses.
 
     Args:
-        response: An httpx.Response object.
+        response: An httpx2.Response object.
 
     Raises:
-        httpx.ConnectTimeout: on connect timeout.
-        httpx.ReadTimeout: on read timeout (body download or raise_for_status).
-        httpx.WriteTimeout: on write timeout.
-        httpx.PoolTimeout: on pool timeout.
-        httpx.HTTPStatusError: on 4xx/5xx status.
-        httpx.RequestError: for other request errors.
+        httpx2.ConnectTimeout: on connect timeout.
+        httpx2.ReadTimeout: on read timeout (body download or raise_for_status).
+        httpx2.WriteTimeout: on write timeout.
+        httpx2.PoolTimeout: on pool timeout.
+        httpx2.HTTPStatusError: on 4xx/5xx status.
+        httpx2.RequestError: for other request errors.
     """
     with _error_handling():
         response.read()
         response.raise_for_status()
 
 
-async def acatch(response: httpx.Response) -> None:
+async def acatch(response: Response) -> None:
     """Read the response body and raise HTTPStatusError for error responses (async).
 
     Args:
-        response: An httpx.Response object.
+        response: An httpx2.Response object.
 
     Raises:
-        httpx.ConnectTimeout: on connect timeout.
-        httpx.ReadTimeout: on read timeout (body download or raise_for_status).
-        httpx.WriteTimeout: on write timeout.
-        httpx.PoolTimeout: on pool timeout.
-        httpx.HTTPStatusError: on 4xx/5xx status.
-        httpx.RequestError: for other request errors.
+        httpx2.ConnectTimeout: on connect timeout.
+        httpx2.ReadTimeout: on read timeout (body download or raise_for_status).
+        httpx2.WriteTimeout: on write timeout.
+        httpx2.PoolTimeout: on pool timeout.
+        httpx2.HTTPStatusError: on 4xx/5xx status.
+        httpx2.RequestError: for other request errors.
     """
     with _error_handling():
         await response.aread()

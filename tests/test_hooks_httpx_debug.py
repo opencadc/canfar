@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -18,17 +18,17 @@ async def test_http_debug_hooks_log_url_and_response(
 ) -> None:
     """Sync and async clients log query URL plus response at DEBUG."""
 
-    def respond(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(
             200,
             json=[{"id": "abc"}],
             request=request,
         )
 
     base_url = "https://example.test/skaha/v0/"
-    transport = httpx.MockTransport(respond)
-    real_client = httpx.Client
-    real_async_client = httpx.AsyncClient
+    transport = httpx2.MockTransport(respond)
+    real_client = httpx2.Client
+    real_async_client = httpx2.AsyncClient
 
     with (
         patch(

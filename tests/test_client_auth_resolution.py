@@ -7,7 +7,7 @@ from contextlib import ExitStack, nullcontext
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client, OAuth2Client
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
@@ -98,13 +98,13 @@ def _oidc(
 
 def _enter_clients(
     stack: ExitStack,
-    platform: httpx.BaseTransport,
+    platform: httpx2.BaseTransport,
     *,
-    token: httpx.BaseTransport | None = None,
+    token: httpx2.BaseTransport | None = None,
 ) -> None:
     """Enter sync/async platform clients and optional Authlib token clients."""
-    sync = httpx.Client
-    async_client = httpx.AsyncClient
+    sync = httpx2.Client
+    async_client = httpx2.AsyncClient
     stack.enter_context(
         patch(
             "canfar.client.Client",
@@ -191,18 +191,18 @@ class TestRequestAuthenticationResolution:
                 update={"client": Client(identity="client", secret="client-secret")}
             )
         )
-        platform_requests: list[httpx.Request] = []
-        token_requests: list[httpx.Request] = []
-        platform_transport = httpx.MockTransport(
+        platform_requests: list[httpx2.Request] = []
+        token_requests: list[httpx2.Request] = []
+        platform_transport = httpx2.MockTransport(
             lambda request: (
                 platform_requests.append(request)
-                or httpx.Response(200, request=request)
+                or httpx2.Response(200, request=request)
             )
         )
-        token_transport = httpx.MockTransport(
+        token_transport = httpx2.MockTransport(
             lambda request: (
                 token_requests.append(request)
-                or httpx.Response(200, json=token_response, request=request)
+                or httpx2.Response(200, json=token_response, request=request)
             )
         )
         oauth_client = OAuth2Client(
@@ -218,7 +218,7 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: httpx.Client(
+                side_effect=lambda **kwargs: httpx2.Client(
                     transport=platform_transport, **kwargs
                 ),
             ),
@@ -349,10 +349,10 @@ class TestRequestAuthenticationResolution:
             expected_type = "RUNTIME-X509"
         before_config = config.model_dump(mode="json")
 
-        requests: list[httpx.Request] = []
-        transport = httpx.MockTransport(
+        requests: list[httpx2.Request] = []
+        transport = httpx2.MockTransport(
             lambda request: (
-                requests.append(request) or httpx.Response(200, request=request)
+                requests.append(request) or httpx2.Response(200, request=request)
             )
         )
 
@@ -384,13 +384,13 @@ class TestRequestAuthenticationResolution:
         config = _configuration(
             _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
         )
-        token_requests: list[httpx.Request] = []
-        platform_requests: list[httpx.Request] = []
+        token_requests: list[httpx2.Request] = []
+        platform_requests: list[httpx2.Request] = []
 
-        async def refresh_token(request: httpx.Request) -> httpx.Response:
+        async def refresh_token(request: httpx2.Request) -> httpx2.Response:
             token_requests.append(request)
             await asyncio.sleep(0.01)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -402,11 +402,11 @@ class TestRequestAuthenticationResolution:
                 request=request,
             )
 
-        token_transport = httpx.MockTransport(refresh_token)
-        platform_transport = httpx.MockTransport(
+        token_transport = httpx2.MockTransport(refresh_token)
+        platform_transport = httpx2.MockTransport(
             lambda request: (
                 platform_requests.append(request)
-                or httpx.Response(200, request=request)
+                or httpx2.Response(200, request=request)
             )
         )
         oauth_client = AsyncOAuth2Client(
@@ -422,7 +422,7 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: httpx.AsyncClient(
+                side_effect=lambda **kwargs: httpx2.AsyncClient(
                     transport=platform_transport, **kwargs
                 ),
             ),
@@ -464,12 +464,12 @@ class TestRequestAuthenticationResolution:
         config = _configuration(
             _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
         )
-        token_requests: list[httpx.Request] = []
+        token_requests: list[httpx2.Request] = []
 
-        async def refresh_token(request: httpx.Request) -> httpx.Response:
+        async def refresh_token(request: httpx2.Request) -> httpx2.Response:
             token_requests.append(request)
             await asyncio.sleep(0.01)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -481,9 +481,9 @@ class TestRequestAuthenticationResolution:
                 request=request,
             )
 
-        token_transport = httpx.MockTransport(refresh_token)
-        platform_transport = httpx.MockTransport(
-            lambda request: httpx.Response(200, request=request)
+        token_transport = httpx2.MockTransport(refresh_token)
+        platform_transport = httpx2.MockTransport(
+            lambda request: httpx2.Response(200, request=request)
         )
 
         with (
@@ -492,7 +492,7 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: httpx.AsyncClient(
+                side_effect=lambda **kwargs: httpx2.AsyncClient(
                     transport=platform_transport, **kwargs
                 ),
             ),
@@ -507,8 +507,8 @@ class TestRequestAuthenticationResolution:
                 first = arefresh(client)
                 second = arefresh(client)
                 await asyncio.gather(
-                    first(httpx.Request("GET", "https://platform.example/one")),
-                    second(httpx.Request("GET", "https://platform.example/two")),
+                    first(httpx2.Request("GET", "https://platform.example/one")),
+                    second(httpx2.Request("GET", "https://platform.example/two")),
                 )
 
         assert len(token_requests) == 1
@@ -525,15 +525,15 @@ class TestRequestAuthenticationResolution:
         config = _configuration(
             _oidc(access="expired", access_expiry=now - 1, refresh_expiry=now + 1_000)
         )
-        platform_requests: list[httpx.Request] = []
-        platform_transport = httpx.MockTransport(
+        platform_requests: list[httpx2.Request] = []
+        platform_transport = httpx2.MockTransport(
             lambda request: (
                 platform_requests.append(request)
-                or httpx.Response(200, request=request)
+                or httpx2.Response(200, request=request)
             )
         )
-        token_transport = httpx.MockTransport(
-            lambda request: httpx.Response(
+        token_transport = httpx2.MockTransport(
+            lambda request: httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -558,13 +558,13 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: httpx.Client(
+                side_effect=lambda **kwargs: httpx2.Client(
                     transport=platform_transport, **kwargs
                 ),
             ),
             patch(
                 "canfar.client.AsyncClient",
-                side_effect=lambda **kwargs: httpx.AsyncClient(
+                side_effect=lambda **kwargs: httpx2.AsyncClient(
                     transport=platform_transport, **kwargs
                 ),
             ),
@@ -613,27 +613,27 @@ class TestRequestAuthenticationResolution:
             )
         )
         original = config.authentication["test"].model_copy(deep=True)
-        platform_requests: list[httpx.Request] = []
-        token_requests: list[httpx.Request] = []
+        platform_requests: list[httpx2.Request] = []
+        token_requests: list[httpx2.Request] = []
 
-        def token_endpoint(request: httpx.Request) -> httpx.Response:
+        def token_endpoint(request: httpx2.Request) -> httpx2.Response:
             token_requests.append(request)
             if failure == "oauth":
-                return httpx.Response(
+                return httpx2.Response(
                     400,
                     json={"error": "invalid_grant", "error_description": sentinel},
                     request=request,
                 )
             if failure == "network":
-                raise httpx.ConnectError(sentinel, request=request)
+                raise httpx2.ConnectError(sentinel, request=request)
             if failure == "malformed":
-                return httpx.Response(
+                return httpx2.Response(
                     200,
                     content=sentinel,
                     headers={"Content-Type": "application/json"},
                     request=request,
                 )
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -645,17 +645,17 @@ class TestRequestAuthenticationResolution:
                 request=request,
             )
 
-        platform_transport = httpx.MockTransport(
+        platform_transport = httpx2.MockTransport(
             lambda request: (
                 platform_requests.append(request)
-                or httpx.Response(200, request=request)
+                or httpx2.Response(200, request=request)
             )
         )
         oauth_client = OAuth2Client(
             "client",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(token_endpoint),
+            transport=httpx2.MockTransport(token_endpoint),
         )
 
         with (
@@ -664,7 +664,7 @@ class TestRequestAuthenticationResolution:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: httpx.Client(
+                side_effect=lambda **kwargs: httpx2.Client(
                     transport=platform_transport, **kwargs
                 ),
             ),
@@ -728,12 +728,12 @@ class TestRequestAuthenticationResolution:
                 refresh_expiry=refresh_expiry,
             )
         )
-        token_requests: list[httpx.Request] = []
-        platform_requests: list[httpx.Request] = []
-        token_transport = httpx.MockTransport(
+        token_requests: list[httpx2.Request] = []
+        platform_requests: list[httpx2.Request] = []
+        token_transport = httpx2.MockTransport(
             lambda request: (
                 token_requests.append(request)
-                or httpx.Response(
+                or httpx2.Response(
                     200,
                     json={
                         "access_token": _REFRESHED_TOKEN,
@@ -746,10 +746,10 @@ class TestRequestAuthenticationResolution:
                 )
             )
         )
-        platform_transport = httpx.MockTransport(
+        platform_transport = httpx2.MockTransport(
             lambda request: (
                 platform_requests.append(request)
-                or httpx.Response(200, request=request)
+                or httpx2.Response(200, request=request)
             )
         )
 
@@ -857,12 +857,12 @@ async def test_oidc_request_recovery(
         secret_expiry=secret_expiry,
     )
     config = _configuration(credential)
-    token_requests: list[httpx.Request] = []
-    platform_requests: list[httpx.Request] = []
-    token_transport = httpx.MockTransport(
+    token_requests: list[httpx2.Request] = []
+    platform_requests: list[httpx2.Request] = []
+    token_transport = httpx2.MockTransport(
         lambda request: (
             token_requests.append(request)
-            or httpx.Response(
+            or httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -871,8 +871,8 @@ async def test_oidc_request_recovery(
             )
         )
     )
-    platform_transport = httpx.MockTransport(
-        lambda request: platform_requests.append(request) or httpx.Response(200)
+    platform_transport = httpx2.MockTransport(
+        lambda request: platform_requests.append(request) or httpx2.Response(200)
     )
     with ExitStack() as stack:
         _enter_clients(stack, platform_transport, token=token_transport)
@@ -917,17 +917,17 @@ async def test_oidc_refresh_rejection_requires_login_only_for_credentials(
     config = _configuration(_oidc(access_expiry=1, secret_expiry=None))
     config.editor.save()
     original = config_path.read_bytes()
-    token_requests: list[httpx.Request] = []
-    platform_requests: list[httpx.Request] = []
+    token_requests: list[httpx2.Request] = []
+    platform_requests: list[httpx2.Request] = []
     sentinel = "secret-provider-error-description"
 
-    def token_endpoint(request: httpx.Request) -> httpx.Response:
+    def token_endpoint(request: httpx2.Request) -> httpx2.Response:
         token_requests.append(request)
         if failure == "timeout":
-            raise httpx.ReadTimeout(sentinel, request=request)
+            raise httpx2.ReadTimeout(sentinel, request=request)
         if failure == "unavailable":
-            return httpx.Response(503, text=sentinel)
-        return httpx.Response(
+            return httpx2.Response(503, text=sentinel)
+        return httpx2.Response(
             400,
             json={
                 "error": "temporarily_unavailable"
@@ -937,12 +937,12 @@ async def test_oidc_refresh_rejection_requires_login_only_for_credentials(
             },
         )
 
-    platform = httpx.MockTransport(
-        lambda request: platform_requests.append(request) or httpx.Response(200)
+    platform = httpx2.MockTransport(
+        lambda request: platform_requests.append(request) or httpx2.Response(200)
     )
     needs_login = failure in {"invalid_client", "invalid_grant"}
     with ExitStack() as stack:
-        _enter_clients(stack, platform, token=httpx.MockTransport(token_endpoint))
+        _enter_clients(stack, platform, token=httpx2.MockTransport(token_endpoint))
         client = stack.enter_context(HTTPClient(config=config))
         async with client:
             with pytest.raises(
@@ -975,12 +975,12 @@ async def test_bulk_requests_preserve_oidc_recovery_errors(
     """A gathered refresh error remains a client failure with actionable recovery."""
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
     config = _configuration(_oidc(access_expiry=1))
-    platform_requests: list[httpx.Request] = []
-    platform = httpx.MockTransport(
-        lambda request: platform_requests.append(request) or httpx.Response(200)
+    platform_requests: list[httpx2.Request] = []
+    platform = httpx2.MockTransport(
+        lambda request: platform_requests.append(request) or httpx2.Response(200)
     )
-    token = httpx.MockTransport(
-        lambda request: httpx.Response(
+    token = httpx2.MockTransport(
+        lambda request: httpx2.Response(
             400 if rejected else 503,
             json={"error": "invalid_client"},
             request=request,

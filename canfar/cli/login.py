@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Annotated
 
-import httpx
 import typer
+from httpx2 import HTTPError
 
 from canfar.cli.login_auth import authenticate_for_cli
 from canfar.cli.prompts import select_idp, select_server
@@ -47,7 +47,7 @@ def _login_flow(
         TimeoutError,
         ValueError,
         RuntimeError,
-        httpx.HTTPError,
+        HTTPError,
     ) as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc

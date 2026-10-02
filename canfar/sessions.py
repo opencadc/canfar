@@ -8,7 +8,7 @@ import re
 from typing import TYPE_CHECKING, Any, TypeVar
 from webbrowser import open_new_tab
 
-from httpx import HTTPError, Response
+from httpx2 import HTTPError, Response
 
 from canfar.client import HTTPClient
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
@@ -27,7 +27,7 @@ _Result = TypeVar("_Result")
 def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
     """Log a failed HTTP task with safe caller context.
 
-    Status codes and safe request context are already logged by HTTPX response hooks;
+    Status codes and safe request context are already logged by HTTPX2 response hooks;
     this adds a Session identifier or replica position and exception class only.
     """
     log.error("%s: %s (%s)", operation, context, type(exc).__name__)

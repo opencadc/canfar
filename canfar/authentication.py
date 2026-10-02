@@ -6,7 +6,7 @@ import asyncio
 import sys
 from typing import TYPE_CHECKING, NoReturn
 
-import httpx
+from httpx2 import HTTPError
 
 import canfar.server as server_service
 from canfar.auth import oidc
@@ -52,7 +52,7 @@ _OIDC_DEVICE_LOGIN_ERRORS = (
     TimeoutError,
     TypeError,
     ValueError,
-    httpx.HTTPError,
+    HTTPError,
 )
 
 
