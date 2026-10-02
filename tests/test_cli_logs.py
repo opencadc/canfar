@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
@@ -49,3 +50,38 @@ def test_logs_reports_fetch_error() -> None:
     assert "boom" not in result.stdout
     assert "Could not fetch logs" in result.stderr
     assert "boom" in result.stderr
+
+
+@pytest.mark.parametrize(
+    ("log_text", "expected"),
+    [
+        pytest.param(
+            "[bold]progress[/bold]\nhello world",
+            "progress\nhello world",
+            id="valid-markup",
+        ),
+        pytest.param(
+            "[bold]progress[/bold]\n"
+            "SynthesisImagerVi2::defineImage Define image coordinates for "
+            "[/arc/projects/foo/bar]",
+            "[bold]progress[/bold]\n"
+            "SynthesisImagerVi2::defineImage Define image coordinates for "
+            "[/arc/projects/foo/bar]",
+            id="casa-literal-fallback",
+        ),
+    ],
+)
+def test_logs_renders_once_with_markup_fallback(log_text: str, expected: str) -> None:
+    """Render markup or fall back to literal text without partial or duplicate logs."""
+    with patch("canfar.cli.logs.AsyncSession") as session_cls:
+        session = _mock_async_session(session_cls)
+        session.logs.return_value = {"abc": log_text}
+        result = runner.invoke(cli, ["logs", "abc"])
+
+    assert result.exit_code == 0, result.exception
+    assert result.stdout.count("Logs for session abc") == 1
+    assert "[bold magenta]" not in result.stdout
+    assert result.stdout.count(expected) == 1
+    assert result.stdout.endswith(f"{expected}\n")
+    assert result.stdout.count("progress") == 1
+    session.logs.assert_awaited_once_with(ids=["abc"])
