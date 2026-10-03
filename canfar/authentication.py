@@ -56,28 +56,6 @@ _OIDC_DEVICE_LOGIN_ERRORS = (
 )
 
 
-def _authentication_error(
-    *,
-    code: ErrorCode,
-    message: str,
-    hint: str | None = None,
-) -> AuthenticationError:
-    """Build a validated authentication failure."""
-    return AuthenticationError(
-        StructuredError(code=code, message=message, hint=hint),
-    )
-
-
-def _fail(
-    *,
-    code: ErrorCode,
-    message: str,
-    hint: str | None = None,
-) -> NoReturn:
-    """Raise ``AuthenticationError`` with a validated structured payload."""
-    raise _authentication_error(code=code, message=message, hint=hint)
-
-
 def login(idp: str, force: bool = False) -> None:
     """Authenticate IDP, discover servers, save records.
 
@@ -95,7 +73,7 @@ def login(idp: str, force: bool = False) -> None:
     idp_info = get_idp(idp)
     config = Configuration()  # ty: ignore[missing-argument]
 
-    if _has_authentication(config, idp) and not force:
+    if idp in config.authentication and not force:
         return
 
     credential = _authenticate(idp_info)
@@ -122,7 +100,7 @@ async def alogin(idp: str, force: bool = False) -> None:
     idp_info = get_idp(idp)
     config = Configuration()  # ty: ignore[missing-argument]
 
-    if _has_authentication(config, idp) and not force:
+    if idp in config.authentication and not force:
         return
 
     credential = await _authenticate_async(idp_info)
@@ -152,14 +130,14 @@ def use(idp: str) -> None:
     get_idp(idp)
     config = Configuration()  # ty: ignore[missing-argument]
 
-    try:
-        _authentication_record(config, idp)
-    except KeyError as exc:
-        raise _authentication_error(
-            code=ErrorCode.AUTHENTICATION_REQUIRED,
-            message=f"Authentication for IDP '{idp}' is not configured.",
-            hint="Run canfar.login() for this IDP before selecting it.",
-        ) from exc
+    if idp not in config.authentication:
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_REQUIRED,
+                message=f"Authentication for IDP '{idp}' is not configured.",
+                hint="Run canfar.login() for this IDP before selecting it.",
+            )
+        )
 
     server_service.activate_authentication(idp, config=config)
 
@@ -191,18 +169,22 @@ def remove(idp: str, *, force: bool = False) -> None:
     get_idp(idp)
     config = Configuration()  # ty: ignore[missing-argument]
 
-    if not _has_authentication(config, idp):
-        _fail(
-            code=ErrorCode.AUTHENTICATION_REQUIRED,
-            message=f"Authentication for IDP '{idp}' is not configured.",
-            hint="Nothing to remove for this IDP.",
+    if idp not in config.authentication:
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_REQUIRED,
+                message=f"Authentication for IDP '{idp}' is not configured.",
+                hint="Nothing to remove for this IDP.",
+            )
         )
 
     if config.active.authentication == idp and not force:
-        _fail(
-            code=ErrorCode.AUTHENTICATION_REQUIRED,
-            message=f"Cannot remove active authentication '{idp}' without --force.",
-            hint="Use --force or switch authentication before removing.",
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_REQUIRED,
+                message=f"Cannot remove active authentication '{idp}' without --force.",
+                hint="Use --force or switch authentication before removing.",
+            )
         )
 
     _remove_authentication(config, idp)
@@ -220,10 +202,12 @@ def purge(*, force: bool = False) -> None:
         AuthenticationError: ``force`` is false.
     """
     if not force:
-        _fail(
-            code=ErrorCode.AUTHENTICATION_REQUIRED,
-            message="Authentication purge requires --force.",
-            hint="Re-run with --force to reset authentication and server state.",
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_REQUIRED,
+                message="Authentication purge requires --force.",
+                hint="Re-run with --force to reset authentication and server state.",
+            )
         )
 
     config = Configuration()  # ty: ignore[missing-argument]
@@ -240,35 +224,20 @@ def show() -> Authentication:
         AuthenticationError: Active authentication is not configured.
     """
     config = Configuration()  # ty: ignore[missing-argument]
-    try:
-        credential = _authentication_record(config, config.active.authentication)
-    except KeyError as exc:
-        raise _authentication_error(
-            code=ErrorCode.AUTHENTICATION_REQUIRED,
-            message=(
-                f"Active authentication '{config.active.authentication}' "
-                "is not configured."
-            ),
-            hint="Run canfar.login() to configure authentication.",
-        ) from exc
+    credential = config.authentication.get(config.active.authentication)
+    if credential is None:
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_REQUIRED,
+                message=(
+                    f"Active authentication '{config.active.authentication}' "
+                    "is not configured."
+                ),
+                hint="Run canfar.login() to configure authentication.",
+            )
+        )
 
     return _authentication_for_credential(config, credential)
-
-
-def _has_authentication(config: Configuration, idp: str) -> bool:
-    return idp in config.authentication
-
-
-def _authentication_record(
-    config: Configuration,
-    idp: str,
-) -> AuthenticationCredential:
-    """Return a saved Authentication Record by its IDP key."""
-    try:
-        return config.authentication[idp]
-    except KeyError as exc:
-        msg = f"Authentication record for IDP '{idp}' not found."
-        raise KeyError(msg) from exc
 
 
 def _remove_authentication(config: Configuration, idp: str) -> None:
@@ -378,10 +347,12 @@ def _authenticate_x509(idp: str) -> X509Credential:
     try:
         info = x509.inspect()
     except (FileNotFoundError, ValueError) as exc:
-        raise _authentication_error(
-            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-            message=f"No usable X509 credential found for IDP '{idp}'.",
-            hint="Obtain a certificate before calling canfar.login().",
+        raise AuthenticationError(
+            StructuredError(
+                code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+                message=f"No usable X509 credential found for IDP '{idp}'.",
+                hint="Obtain a certificate before calling canfar.login().",
+            )
         ) from exc
 
     return X509Credential(
@@ -407,10 +378,12 @@ def _print_device_challenge(challenge: DeviceAuthorization) -> None:
 
 def _raise_oidc_authentication_error(exc: Exception) -> NoReturn:
     """Translate an OIDC device-login failure into a structured error."""
-    raise _authentication_error(
-        code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
-        message=f"OIDC authentication failed: {exc}",
-        hint="Complete the device authorization before it expires.",
+    raise AuthenticationError(
+        StructuredError(
+            code=ErrorCode.AUTHENTICATION_CREDENTIAL_MISSING,
+            message=f"OIDC authentication failed: {exc}",
+            hint="Complete the device authorization before it expires.",
+        )
     ) from exc
 
 

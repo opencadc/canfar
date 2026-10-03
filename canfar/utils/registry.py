@@ -4,7 +4,10 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from contextlib import asynccontextmanager
+from functools import partial
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 from pydantic import AnyHttpUrl, BaseModel, ConfigDict
 
@@ -12,9 +15,13 @@ from canfar.auth.x509 import CertificateError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.idp import get_idp, registry_sources
 from canfar.models.config import Configuration
-from canfar.models.registry import IVOARegistrySearch
-from canfar.models.registry import Server as RegistryResource
-from canfar.utils.discover import Discover
+from canfar.models.registry import (
+    Server as RegistryResource,  # noqa: TC001 - Pydantic resolves field annotations at runtime
+)
+from canfar.utils import discover
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator, Awaitable, Callable
 
 log = logging.getLogger(__name__)
 
@@ -62,7 +69,6 @@ async def evidence(
     *,
     dev: bool,
     timeout: int,
-    check_platforms: bool,
 ) -> RegistryEvidence:
     """Acquire and extract registry records through one shared pipeline.
 
@@ -70,7 +76,6 @@ async def evidence(
         idp: Canonical Identity Provider key.
         dev: Include development registries and endpoints during discovery.
         timeout: HTTP timeout in seconds for registry requests.
-        check_platforms: Probe Science Platform endpoints for reachability.
 
     Returns:
         RegistryEvidence: Extracted resources plus the acquisition outcome.
@@ -78,14 +83,11 @@ async def evidence(
     idp_info = get_idp(idp)
     sources = registry_sources(idp, include_dev=dev)
     development_sources = set(idp_info.dev_registries)
-    search = IVOARegistrySearch(
-        registries=sources,
-        leaf=idp_info.leaf,
-    )
-    async with Discover(search, timeout=timeout) as discovery:
+    async with discover.client(timeout) as http:
         registries = await asyncio.gather(
             *(
-                discovery.fetch(
+                discover.fetch(
+                    http,
                     url,
                     name,
                     development=url in development_sources,
@@ -93,17 +95,12 @@ async def evidence(
                 for url, name in sources.items()
             )
         )
-        successful = [registry for registry in registries if registry.success]
-        resources = [
-            resource
-            for registry in successful
-            for resource in discovery.extract(registry, dev=dev)
-        ]
-        if check_platforms:
-            endpoints = [
-                resource for resource in resources if resource.uri.endswith("/skaha")
-            ]
-            await asyncio.gather(*(discovery.check(endpoint) for endpoint in endpoints))
+    successful = [registry for registry in registries if registry.success]
+    resources = [
+        resource
+        for registry in successful
+        for resource in discover.extract(registry, leaf=idp_info.leaf, dev=dev)
+    ]
 
     return RegistryEvidence(
         leaf=idp_info.leaf,
@@ -115,6 +112,24 @@ async def evidence(
         ),
         available=bool(successful),
     )
+
+
+@asynccontextmanager
+async def reachability(
+    timeout: int,
+) -> AsyncIterator[Callable[[RegistryResource], Awaitable[RegistryResource]]]:
+    """Open one HTTP client that checks Science Platform reachability.
+
+    Args:
+        timeout: HTTP timeout in seconds for each check.
+
+    Yields:
+        A check that sends ``HEAD`` to a record's URL and records the HTTP
+        ``status``, or the ``failure`` (``timeout`` or ``unreachable``) when no
+        response arrives.
+    """
+    async with discover.client(timeout) as http:
+        yield partial(discover.check, http)
 
 
 def select_storage(
@@ -191,12 +206,7 @@ async def discover_storage(
         message = "Server URI is required to inspect its VOSpace Service."
         raise RegistryEvidenceError(message)
 
-    found = await evidence(
-        idp,
-        dev=dev,
-        timeout=timeout,
-        check_platforms=False,
-    )
+    found = await evidence(idp, dev=dev, timeout=timeout)
     if not found.available:
         errors = "; ".join(found.errors)
         message = (

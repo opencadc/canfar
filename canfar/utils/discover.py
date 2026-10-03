@@ -2,149 +2,157 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from urllib.parse import urlsplit, urlunsplit
 
-from httpx2 import AsyncClient, HTTPError, Timeout
-from typing_extensions import Self
+from httpx2 import AsyncClient, HTTPError, Timeout, TimeoutException
 
-from canfar.models.registry import (
-    IVOARegistry,
-    IVOARegistrySearch,
-    Server,
+from canfar.models.registry import IVOARegistry, Server
+
+log = logging.getLogger(__name__)
+
+NAMES: dict[str, str] = {
+    "ivo://canfar.net/src/skaha": "canSRC",
+    "ivo://swesrc.chalmers.se/skaha": "sweSRC",
+    "ivo://canfar.cam.uksrc.org/skaha": "ukCAM",
+    "ivo://canfar.ral.uksrc.org/skaha": "ukRAL",
+    "ivo://src.skach.org/skaha": "chSRC",
+    "ivo://espsrc.iaa.csic.es/skaha": "espSRC",
+    "ivo://canfar.itsrc.oact.inaf.it/skaha": "itaINAF",
+    "ivo://shion-sp.mtk.nao.ac.jp/skaha": "jpSRC",
+    "ivo://canfar.krsrc.kr/skaha": "krSRC",
+    "ivo://canfar.ska.zverse.space/skaha": "cnSRC",
+    "ivo://canfar.itsrc.ext.cineca.it/skaha": "itCINECA",
+    "ivo://canfar.srcnet.skao.int/skaha": "skaSRC",
+    "ivo://aussrc.org/skaha": "ausSRC",
+    "ivo://cadc.nrc.ca/skaha": "canfar",
+}
+"""Server Names for known Science Platform URIs."""
+
+OMIT = frozenset({("CADC", "ivo://canfar.net/src/skaha")})
+"""(registry name, URI) records that discovery skips."""
+
+DEVELOPMENT_MARKERS = (
+    "dev",
+    "development",
+    "test",
+    "demo",
+    "stage",
+    "staging",
+    "rc-",
+    "preprod",
 )
-from canfar.utils.console import get_console
+"""URI or URL fragments that mark a development record."""
 
 
-class Discover:
-    """Optimized server discovery with single HTTP client and Pydantic models."""
+def client(timeout: int) -> AsyncClient:
+    """Return the HTTP client that registry fetches and checks share."""
+    return AsyncClient(timeout=Timeout(timeout), http2=True, follow_redirects=True)
 
-    def __init__(self, config: IVOARegistrySearch, timeout: int = 2) -> None:
-        """Initialize registry discovery."""
-        self.config = config
-        self.client = AsyncClient(
-            timeout=Timeout(timeout),
-            http2=True,
-            follow_redirects=True,
+
+async def fetch(
+    http: AsyncClient,
+    url: str,
+    name: str,
+    *,
+    development: bool = False,
+) -> IVOARegistry:
+    """Fetch registry contents.
+
+    Args:
+        http: Shared discovery HTTP client.
+        url: Registry URL.
+        name: Common name for the registry.
+        development: Whether this source contains development records.
+
+    Returns:
+        IVOARegistry: Registry contents, or the error when the fetch failed.
+    """
+    try:
+        start_time = time.time()
+        response = await http.get(url)
+        response.raise_for_status()
+        log.info("Fetched %s in %.2fs", name, time.time() - start_time)
+    except HTTPError as error:
+        return IVOARegistry(
+            name=name,
+            source=url,
+            development=development,
+            content="",
+            success=False,
+            error=str(error),
         )
+    return IVOARegistry(
+        name=name,
+        source=url,
+        development=development,
+        content=response.text,
+    )
 
-    async def __aenter__(self) -> Self:
-        """Async context manager entry method.
 
-        Returns:
-            Discover: The instance of this class.
-        """
-        return self
+def extract(
+    registry: IVOARegistry,
+    *,
+    leaf: str | None,
+    dev: bool = False,
+) -> list[Server]:
+    """Extract Science Platform and preferred VOSpace registry records.
 
-    async def __aexit__(
-        self,
-        exc_type: type[BaseException] | None,
-        exc_val: BaseException | None,
-        exc_tb: object,
-    ) -> None:
-        """Async context manager exit method - cleans up HTTP client.
+    Args:
+        registry: Fetched registry contents.
+        leaf: Preferred VOSpace URI leaf for the Identity Provider.
+        dev: Keep development records.
 
-        Args:
-            exc_type: The exception type if an exception was raised in the context.
-            exc_val: The exception value if an exception was raised in the context.
-            exc_tb: The traceback if an exception was raised in the context.
-        """
-        await self.client.aclose()
+    Returns:
+        list[Server]: Science Platform (``skaha``) and ``leaf`` records.
+    """
+    if not registry.success:
+        return []
 
-    async def fetch(
-        self,
-        url: str,
-        name: str,
-        *,
-        development: bool = False,
-    ) -> IVOARegistry:
-        """Fetch registry contents.
+    endpoints: list[Server] = []
+    for entry in registry.content.splitlines():
+        line = entry.strip()
+        if line.startswith("#") or "=" not in line:
+            continue
 
-        Args:
-            url (str): Registry URL.
-            name (str): Common name for the registry.
-            development: Whether this source contains development records.
-
-        Returns:
-            RegistryInfo: Registry information.
-        """
-        try:
-            start_time = time.time()
-            response = await self.client.get(url)
-            response.raise_for_status()
-            elapsed = time.time() - start_time
-            get_console(stderr=True).print(
-                f"[dim]Fetched {name} in {elapsed:.2f}s[/dim]"
+        uri, url = (part.strip() for part in line.split("=", 1))
+        record_leaf = uri.rpartition("/")[2]
+        if record_leaf not in {"skaha", leaf}:
+            continue
+        base = _without_terminal_capabilities(url)
+        if base is None or (registry.name, uri) in OMIT:
+            continue
+        development = any(
+            marker in uri.lower() or marker in base.lower()
+            for marker in DEVELOPMENT_MARKERS
+        )
+        if development and not dev:
+            continue
+        endpoints.append(
+            Server(
+                registry=registry.source or registry.name,
+                development=registry.development or development,
+                uri=uri,
+                url=base,
+                name=NAMES.get(uri) if record_leaf == "skaha" else None,
             )
+        )
+    return endpoints
 
-            return IVOARegistry(
-                name=name,
-                source=url,
-                development=development,
-                content=response.text,
-                success=True,
-            )
-        except HTTPError as error:
-            error_msg = str(error)
-            return IVOARegistry(
-                name=name,
-                source=url,
-                development=development,
-                content="",
-                success=False,
-                error=error_msg,
-            )
 
-    def extract(self, registry: IVOARegistry, dev: bool = False) -> list[Server]:
-        """Extract Science Platform and preferred VOSpace registry records."""
-        if not registry.success or not registry.content:
-            return []
-
-        endpoints: list[Server] = []
-
-        for entry in registry.content.splitlines():
-            line = entry.strip()
-            if line.startswith("#") or not line or "=" not in line:
-                continue
-
-            uri, url = line.split("=", 1)
-            uri, url = uri.strip(), url.strip()
-
-            leaf = uri.rpartition("/")[2]
-            if leaf in {"skaha", self.config.leaf}:
-                url = _without_terminal_capabilities(url)
-                if url is None:
-                    continue
-                record_development = any(
-                    word in uri.lower() or word in url.lower()
-                    for word in self.config.excluded
-                )
-                # Apply exclusion filters
-                if not dev and record_development:
-                    continue
-
-                # Apply omit filters
-                if (registry.name, uri) in self.config.omit:
-                    continue
-                endpoint = Server(
-                    registry=registry.source or registry.name,
-                    development=registry.development or record_development,
-                    uri=uri,
-                    url=url,
-                    name=self.config.names.get(uri) if leaf == "skaha" else None,
-                )
-                endpoints.append(endpoint)
-
-        return endpoints
-
-    async def check(self, endpoint: Server) -> Server:
-        """Check endpoint status using HEAD request."""
-        try:
-            response = await self.client.head(endpoint.url)
-            endpoint.status = response.status_code
-        except HTTPError:
-            endpoint.status = None
-        return endpoint
+async def check(http: AsyncClient, endpoint: Server) -> Server:
+    """Record the endpoint's ``HEAD`` status, or why no response arrived."""
+    try:
+        response = await http.head(endpoint.url)
+        endpoint.status = response.status_code
+    except TimeoutException:
+        endpoint.status = None
+        endpoint.failure = "timeout"
+    except HTTPError:
+        endpoint.status = None
+        endpoint.failure = "unreachable"
+    return endpoint
 
 
 def _without_terminal_capabilities(url: str) -> str | None:

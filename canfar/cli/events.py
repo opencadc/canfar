@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 from typing import Annotated
 
@@ -9,7 +10,6 @@ import typer
 from rich import box
 from rich.table import Table
 
-from canfar.cli._run import run
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
@@ -58,4 +58,4 @@ def get_events(
 
                 get_console().print(table)
 
-    run(_get_events())
+    asyncio.run(_get_events())

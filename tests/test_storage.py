@@ -81,18 +81,13 @@ def _isolate_configuration(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> N
 
 
 @pytest.mark.asyncio
-async def test_source_reloads_config_and_runtime_token_wins(
+async def test_source_reloads_config_on_entry(
     monkeypatch: pytest.MonkeyPatch,
-    tmp_path: Path,
 ) -> None:
-    """Entry reloads endpoint state and keeps token-over-certificate precedence."""
+    """Entry reloads endpoint state and closes the filesystem on exit."""
     config = _config(credential=oidc_credential("inactive"))
     config.editor.save()
-    source = _vospace(
-        "archive",
-        token="runtime-token",
-        certificate=tmp_path / "ignored.pem",
-    )
+    source = _vospace("archive")
 
     config.servers["inactive"].storage["archive"].url = AnyHttpUrl(
         "https://changed.example/vospace"
@@ -103,7 +98,7 @@ async def test_source_reloads_config_and_runtime_token_wins(
     async with source() as filesystem:
         assert filesystem.endpoint == "https://changed.example/vospace"
         assert filesystem.kwargs == {
-            "token": "runtime-token",
+            "token": "access-token",
             "asynchronous": True,
             "skip_instance_cache": True,
             **_LISTINGS,
@@ -112,6 +107,28 @@ async def test_source_reloads_config_and_runtime_token_wins(
         assert filesystem.closed is False
 
     assert filesystem.closed is True
+
+
+def test_runtime_token_wins_over_certificate(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """A runtime token takes precedence over a runtime certificate."""
+    _config(credential=oidc_credential("inactive")).editor.save()
+    monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
+
+    filesystem = storage.filesystem(
+        "archive",
+        token="runtime-token",
+        certificate=tmp_path / "ignored.pem",
+    )
+
+    assert filesystem.kwargs == {
+        "token": "runtime-token",
+        "asynchronous": False,
+        "skip_instance_cache": True,
+        **_LISTINGS,
+    }
 
 
 @pytest.mark.asyncio
@@ -272,8 +289,7 @@ async def test_saved_x509_is_validated_before_construction(
     inspect.assert_called_once_with(certificate)
 
 
-@pytest.mark.asyncio
-async def test_runtime_x509_overrides_saved_authentication_record(
+def test_runtime_x509_overrides_saved_authentication_record(
     monkeypatch: pytest.MonkeyPatch,
     tmp_path: Path,
 ) -> None:
@@ -288,8 +304,9 @@ async def test_runtime_x509_overrides_saved_authentication_record(
     monkeypatch.setattr("canfar.client.x509.valid", valid)
     monkeypatch.setattr(vosfs, "VOSpaceFileSystem", _Filesystem)
 
-    async with _vospace("archive", certificate=certificate)() as filesystem:
-        assert filesystem.kwargs["certfile"] == certificate.as_posix()
+    filesystem = storage.filesystem("archive", certificate=certificate)
+
+    assert filesystem.kwargs["certfile"] == certificate.as_posix()
 
     valid.assert_called_once_with(certificate)
 

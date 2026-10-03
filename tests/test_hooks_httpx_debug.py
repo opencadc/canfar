@@ -1,4 +1,4 @@
-"""HTTP debug hooks log request URL and response body at DEBUG."""
+"""HTTP hooks log one line per response at INFO and full exchanges at DEBUG."""
 
 from __future__ import annotations
 
@@ -49,23 +49,28 @@ async def test_http_debug_hooks_log_url_and_response(
         async with HTTPClient(token=SecretStr("token"), url=base_url) as aclient:
             await aclient.asynclient.get("session", params={"status": "Running"})
 
-    messages = [
-        record.getMessage()
-        for record in caplog.records
-        if record.name == "canfar.hooks.httpx.debug"
+    records = [
+        record for record in caplog.records if record.name == "canfar.hooks.httpx.debug"
     ]
-    assert any(
-        message.startswith("GET ") and "session?status=Running" in message
-        for message in messages
-    )
-    assert any(
-        message.startswith("HTTP STATUS CODE -> 200")
-        and '"id"' in message
-        and "abc" in message
-        for message in messages
-    )
-    assert sum(1 for message in messages if message.startswith("GET ")) == 2
+    summaries = [r.getMessage() for r in records if r.levelno == logging.INFO]
+    details = [r.getMessage() for r in records if r.levelno == logging.DEBUG]
+
+    # INFO is one redacted line per response, as `canfar -v` shows it.
+    assert summaries == ["GET https://example.test/skaha/v0/session -> 200"] * 2
+    # DEBUG adds the full request URL and the response body.
     assert (
-        sum(1 for message in messages if message.startswith("HTTP STATUS CODE -> 200"))
+        sum(
+            1
+            for message in details
+            if message.startswith("GET ") and "session?status=Running" in message
+        )
+        == 2
+    )
+    assert (
+        sum(
+            1
+            for message in details
+            if message.startswith("HTTP STATUS CODE -> 200") and '"id"' in message
+        )
         == 2
     )

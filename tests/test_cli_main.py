@@ -128,13 +128,11 @@ def test_version_debug_retains_bug_report_diagnostics() -> None:
     ("root_options", "env_level", "minimum_level"),
     [
         ([], None, logging.CRITICAL),
-        (["-v"], None, logging.ERROR),
-        (["-vv"], None, logging.WARNING),
-        (["-vvv"], None, logging.INFO),
-        (["-vvvv"], None, logging.DEBUG),
-        (["-vvvvv"], None, logging.DEBUG),
+        (["-v"], None, logging.INFO),
+        (["-vv"], None, logging.DEBUG),
+        (["-vvv"], None, logging.DEBUG),
         ([], "info", logging.INFO),
-        (["-v"], "chatty", logging.ERROR),
+        (["-v"], "chatty", logging.INFO),
         (["--log-level", "warning", "-vvvv"], "chatty", logging.WARNING),
     ],
 )

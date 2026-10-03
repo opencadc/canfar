@@ -12,7 +12,12 @@ from typer.testing import CliRunner
 
 from canfar.cli.main import cli
 from canfar.models.config import Configuration
-from canfar.models.http import Server
+from canfar.models.http import (
+    ResourceRange,
+    Server,
+    ServerResources,
+    SessionResources,
+)
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -88,7 +93,9 @@ def test_server_use_selects_by_uri(tmp_path: Path) -> None:
         version="v1",
         auths=["x509"],
     )
-    fetched = target.model_copy(update={"cores": 8, "ram": 64}, deep=True)
+    fetched = target.model_copy(
+        update={"resources": ServerResources(sessions=3)}, deep=True
+    )
 
     with (
         _patch_config(config_path),
@@ -114,7 +121,9 @@ def test_server_use_selects_by_name(tmp_path: Path) -> None:
         version="v1",
         auths=["x509"],
     )
-    fetched = target.model_copy(update={"cores": 8, "ram": 64}, deep=True)
+    fetched = target.model_copy(
+        update={"resources": ServerResources(sessions=3)}, deep=True
+    )
 
     with (
         _patch_config(config_path),
@@ -150,13 +159,10 @@ def test_server_ls_json_output(tmp_path: Path) -> None:
         "auths",
         "idp",
         "storage",
-        "cores",
-        "ram",
-        "gpus",
-        "status",
+        "resources",
     }
     assert server["uri"] == _CADC_URI
-    assert server["status"] is None
+    assert server["resources"] is None
 
 
 def test_server_ls_machine_output_includes_server_name(tmp_path: Path) -> None:
@@ -172,3 +178,47 @@ def test_server_ls_machine_output_includes_server_name(tmp_path: Path) -> None:
     assert json.loads(json_result.stdout)[0]["name"] == "CADC-CANFAR"
     assert yaml_result.exit_code == 0
     assert yaml.safe_load(yaml_result.stdout)[0]["name"] == "CADC-CANFAR"
+
+
+def test_server_ls_shows_session_resources(tmp_path: Path) -> None:
+    """Human ``server ls`` shows each Server's limits and marks unknown ones."""
+    config_path = tmp_path / "config.yaml"
+    _write_config(config_path)
+    limited = Server(
+        idp="cadc",
+        name="CADC-CANFAR",
+        uri=AnyUrl(_CADC_URI),
+        url=AnyHttpUrl("https://ws-uv.canfar.net/skaha"),
+        version="v1",
+        resources=ServerResources(
+            flexible=SessionResources(
+                cores=ResourceRange(min=1, max=2),
+                ram=ResourceRange(min=2, max=4),
+            ),
+            fixed=SessionResources(
+                cores=ResourceRange(min=1, max=34),
+                ram=ResourceRange(min=1, max=384),
+            ),
+            gpus=ResourceRange(min=0, max=0),
+            sessions=5,
+        ),
+    )
+    unknown = limited.model_copy(
+        update={"name": "Legacy", "resources": None}, deep=True
+    )
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.cli.server.auth_show"),
+        patch("canfar.cli.server.server_list", return_value=[limited, unknown]),
+    ):
+        result = runner.invoke(cli, ["server", "ls"])
+
+    assert result.exit_code == 0
+    rows = [line.split() for line in result.stdout.splitlines()]
+    assert [
+        *("CADC-CANFAR", _CADC_URI, "v1"),
+        *("1-2", "cores", "1-34", "cores", "none", "5"),
+    ] in rows
+    assert ["https://ws-uv.canfar.net/skaha", "2-4", "GB", "1-384", "GB"] in rows
+    assert ["Legacy", _CADC_URI, "v1", *["unknown"] * 4] in rows

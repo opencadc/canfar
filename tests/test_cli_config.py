@@ -7,8 +7,8 @@ from typing import TYPE_CHECKING
 from unittest.mock import patch
 from urllib.parse import urlparse
 
-import click
 import yaml
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.config import _format_value, config
@@ -500,7 +500,7 @@ def test_config_get_json_redacts_secrets_inside_credential_record(
 def test_config_help_uses_config_command_descriptions() -> None:
     """Config help exposes the canonical command descriptions."""
     result = runner.invoke(config, ["--help"])
-    help_text = click.unstyle(result.stdout)
+    help_text = Text.from_ansi(result.stdout).plain
 
     assert result.exit_code == 0
     assert "show  Display client configuration" in help_text

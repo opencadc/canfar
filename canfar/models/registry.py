@@ -1,67 +1,20 @@
 """Registry and discovery-related models for Canfar API.
 
-This module contains Pydantic models related to server discovery,
-registry search configuration, and server information.
+This module contains Pydantic models related to server discovery and
+server information.
 """
 
 from __future__ import annotations
 
 from base64 import b64encode
+from typing import Literal
 
-from pydantic import AnyHttpUrl, BaseModel, Field, model_validator
+from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, model_validator
 from typing_extensions import Self
 
-
-class IVOARegistrySearch(BaseModel):
-    """Configuration model for server discovery settings."""
-
-    registries: dict[str, str] = Field(
-        default={
-            "https://spsrc27.iaa.csic.es/reg/resource-caps": "SRCNet",
-            "https://cadc-west-01.canfar.net/reg/resource-caps": "CADC",
-            (
-                "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
-            ): "CADC@keel-dev",
-        }
-    )
-
-    leaf: str | None = None
-
-    names: dict[str, str] = Field(
-        default={
-            "ivo://canfar.net/src/skaha": "canSRC",
-            "ivo://swesrc.chalmers.se/skaha": "sweSRC",
-            "ivo://canfar.cam.uksrc.org/skaha": "ukCAM",
-            "ivo://canfar.ral.uksrc.org/skaha": "ukRAL",
-            "ivo://src.skach.org/skaha": "chSRC",
-            "ivo://espsrc.iaa.csic.es/skaha": "espSRC",
-            "ivo://canfar.itsrc.oact.inaf.it/skaha": "itaINAF",
-            "ivo://shion-sp.mtk.nao.ac.jp/skaha": "jpSRC",
-            "ivo://canfar.krsrc.kr/skaha": "krSRC",
-            "ivo://canfar.ska.zverse.space/skaha": "cnSRC",
-            "ivo://canfar.itsrc.ext.cineca.it/skaha": "itCINECA",
-            "ivo://canfar.srcnet.skao.int/skaha": "skaSRC",
-            "ivo://aussrc.org/skaha": "ausSRC",
-            "ivo://cadc.nrc.ca/skaha": "canfar",
-        }
-    )
-
-    omit: list[tuple[str, str]] = Field(
-        default=[("CADC", "ivo://canfar.net/src/skaha")]
-    )
-
-    excluded: tuple[str, ...] = Field(
-        default=(
-            "dev",
-            "development",
-            "test",
-            "demo",
-            "stage",
-            "staging",
-            "rc-",
-            "preprod",
-        )
-    )
+ProbeStatus = Literal["pending", "connected", "timeout", "unreachable", "error"]
+"""Discovery state of one Science Platform Server; every state but ``pending``
+is an outcome."""
 
 
 class IVOARegistry(BaseModel):
@@ -83,7 +36,34 @@ class Server(BaseModel):
     uri: str
     url: str
     status: int | None = None
+    failure: Literal["timeout", "unreachable"] | None = None
     name: str | None = None
+
+
+class ServerProbe(BaseModel):
+    """Discovery state of one Science Platform Server.
+
+    Discovery reports each Server as ``pending`` once the registries list it,
+    then again with its outcome.
+
+    Attributes:
+        name: Server Name discovery gives the endpoint.
+        uri: IVOA URI from the registry.
+        url: Endpoint URL from the registry.
+        status: ``pending`` while discovery checks the Server; ``connected``
+            when its session capabilities were read; otherwise why discovery
+            could not use it.
+        detail: Short reason for a ``timeout``, ``unreachable``, or ``error``
+            outcome.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    name: str
+    uri: str
+    url: str
+    status: ProbeStatus
+    detail: str | None = None
 
 
 class ContainerRegistry(BaseModel):

@@ -112,6 +112,54 @@ Default `arc` and `vault` storage uses CADC credentials independently of your
 compute selection. Log in to CADC for those services even if your Session
 uses an SRCNet server.
 
+### Read Server limits from `resources`
+
+Each saved Server records the limits its context endpoint advertises in one
+`resources` block, which replaces the flat `cores`, `ram`, and `gpus` fields.
+Those fields held only the flexible burst limits and the largest GPU count, and
+showed `2`, `16`, and `0` when the Server had never reported them.
+
+| v1.4.1 field | Current field |
+| --- | --- |
+| `cores` | `resources.flexible.cores.max` |
+| `ram` | `resources.flexible.ram.max` |
+| `gpus` | `resources.gpus.max` |
+
+A limit the Server does not advertise is `null` in `canfar server ls -o json`
+and `None` in Python, so check for it before comparing. The Server `status`
+field, which discovery never filled in, is also gone from the configuration and
+from `canfar server ls -o json`. Configuration files saved by v1.4.1 still
+load, and the retired fields are dropped the next time the configuration is
+saved. Run `canfar login IDP` or `canfar server use NAME` to read the limits
+again.
+
+### Request at most 256 replicas
+
+`canfar create --replicas` and `CreateRequest(replicas=...)` accept 1 to 256,
+down from 512 in v1.4.1. Send larger runs as several requests, each with its
+own name; see [Batch processing](../platform/sessions/batch.md).
+
+### Install cadcutils for CADC tools
+
+`canfar` no longer installs `cadcutils`; `canfar login cadc` obtains the proxy
+certificate itself. If your scripts run `cadc-get-cert` or import `cadcutils`,
+install it explicitly, or install `cadcdata` or `vos`, which depend on it:
+
+```bash
+pip install cadcutils
+```
+
+### Replace removed helper APIs
+
+| v1.4.1 helper | Current replacement |
+| --- | --- |
+| `ServerDiscoveryError.structured`, `ServerFetchError.structured` | `error.code` and `str(error)` |
+| `canfar.idp.is_valid_idp(key)` | `canfar.idp.get_idp(key)`, which raises `KeyError` for an unknown key |
+| `canfar.errors.structured_error_to_json(error)` | `error.model_dump_json()` |
+| `canfar.errors.structured_error_to_yaml(error)` | `yaml.safe_dump(error.model_dump(mode="json"))` |
+| `canfar.utils.logging.CanfarLogger().configure(...)` | `canfar.configure_logging(...)` |
+| `canfar.auth.x509.gather(days_valid=...)` | `gather()`; CADC certificates are valid for 30 days |
+
 <span id="notes-on-protocol-stability"></span>
 
 ## Migrate from the older skaha package

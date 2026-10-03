@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Annotated, get_args
 
-import click
 import typer
 from rich import box
 from rich.table import Table
@@ -73,7 +72,6 @@ def ls(
         typer.Option(
             "--kind",
             "-k",
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Kind)),
             help="Filter by image kind.",
         ),

@@ -7,19 +7,7 @@ expiry and refresh for different authentication modes:
 - **OIDC Mode**: Automatically refreshes access tokens using refresh tokens
 - **User-provided credentials**: Bypasses automatic refresh
 
-The hooks are designed to be used with httpx2 clients to provide seamless
-authentication management without requiring manual intervention.
-
-Usage:
-    ```python
-    from canfar.client import HTTPClient
-    from canfar.hooks.httpx.auth import create_auth_hook
-
-    client = HTTPClient()
-    auth_hook = create_auth_hook(client)
-
-    # The hook is automatically applied to the client's httpx2 instances
-    ```
+``HTTPClient`` installs these hooks on the httpx2 clients it builds.
 
 Note:
     The hooks modify the request before it's sent, updating headers and
@@ -54,20 +42,17 @@ class AuthenticationError(Exception):
 RefreshParameters = tuple[str, str, str, str]
 
 
-def _get_oidc_credential(client: HTTPClient) -> OIDCCredential | None:
-    """Return the selected canonical OIDC record unless runtime auth wins."""
-    if client.uses_runtime_credentials:
-        return None
-    credential = client.authentication_record
-    return credential if isinstance(credential, OIDCCredential) else None
-
-
 def _refresh(
     client: HTTPClient,
 ) -> tuple[OIDCCredential, RefreshParameters | None] | None:
-    """Resolve one OIDC record and prepare its refresh inputs."""
-    credential = _get_oidc_credential(client)
-    if credential is None:
+    """Resolve the saved OIDC record and prepare its refresh inputs.
+
+    Runtime credentials take precedence, so they skip refresh.
+    """
+    credential = (
+        None if client.uses_runtime_credentials else client.authentication_record
+    )
+    if not isinstance(credential, OIDCCredential):
         log.debug("Skipping auth refresh without a saved OIDC record.")
         return None
     if credential.access_usable:
@@ -175,22 +160,16 @@ def arefresh(client: HTTPClient) -> Callable[[Request], Awaitable[None]]:
         credential = await client._refresh_oidc()  # noqa: SLF001
         if credential is None:
             return
-        if credential == previous:
-            if credential.token.access is not None:
-                _apply_access_header(
-                    credential.token.access,
-                    client.asynclient.headers,
-                    request,
-                )
-            log.debug("Skipping auth refresh, access token is not expired.")
-            return
-        log.debug("Asynchronous OIDC token refresh successful.")
         if credential.token.access is not None:
             _apply_access_header(
                 credential.token.access,
                 client.asynclient.headers,
                 request,
             )
+        if credential == previous:
+            log.debug("Skipping auth refresh, access token is not expired.")
+            return
+        log.debug("Asynchronous OIDC token refresh successful.")
         log.debug("HTTP request headers updated with new token.")
         log.info("OIDC Access Token Refreshed.")
 

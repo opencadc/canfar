@@ -8,7 +8,7 @@ import logging.handlers
 import os
 import sys
 import threading
-from contextlib import suppress
+from contextlib import contextmanager, suppress
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
@@ -22,9 +22,11 @@ from rich.traceback import install as install_rich_traceback
 from canfar.errors import ErrorCode, LoggingEnvironmentError, StructuredError
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
+    from collections.abc import Callable, Iterator
 
 LOGGER_NAME = "canfar"
+LIBRARY_LOGGER_NAMES = ("vosfs", "fsspec_cli")
+"""Storage libraries behind ``canfar data`` whose records follow CANFAR's level."""
 _LOCK = threading.Lock()
 
 MAX_LOGFILE_SIZE = 10 * 1024 * 1024  # 10MB
@@ -46,11 +48,10 @@ class LoggingLevel(str, Enum):
 DEFAULT_LOG_LEVEL = LoggingLevel.CRITICAL
 VERBOSITY_LEVELS = (
     LoggingLevel.CRITICAL,
-    LoggingLevel.ERROR,
-    LoggingLevel.WARNING,
     LoggingLevel.INFO,
     LoggingLevel.DEBUG,
 )
+"""Levels for no ``-v``, ``-v`` (progress), and ``-vv`` or more (debugging)."""
 
 
 class InvalidLoggingEnvironmentError(ValueError):
@@ -197,95 +198,54 @@ def _resolve_log_level(
         raise InvalidLoggingEnvironmentError(env_level) from err
 
 
-class CanfarLogger:
-    """Configure stdlib logging for the CANFAR logger name."""
-
-    def __init__(self) -> None:
-        """Initialize per-instance file-handler state."""
-        self._rich_handler: RichHandler | None = None
-        self._file_handler: logging.handlers.RotatingFileHandler | None = None
-
-    @property
-    def logger(self) -> logging.Logger:
-        """Return the CANFAR root logger."""
-        return logging.getLogger(LOGGER_NAME)
-
-    def configure(
-        self,
-        loglevel: int | str = logging.INFO,
-        *,
-        log_file: Path | None = None,
-        warning_writer: Callable[[StructuredError], None] | None = None,
-    ) -> None:
-        """Configure Rich stderr logging and an optional rotating JSONL file sink."""
-        target = _resolve_log_file_path(log_file) if log_file is not None else None
-        with _LOCK:
-            install_rich_traceback(show_locals=False, suppress=[])
-            self._cleanup_handlers()
-            if isinstance(loglevel, str):
-                loglevel = getattr(logging, loglevel.upper())
-            logger = self.logger
-            logger.setLevel(loglevel)
-            self._rich_handler = RichHandler(
-                console=Console(stderr=True),
-                show_path=True,
-                show_time=True,
-                enable_link_path=True,
-                rich_tracebacks=True,
-                tracebacks_show_locals=False,
-            )
-            self._rich_handler.setLevel(loglevel)
-            self._rich_handler.setFormatter(logging.Formatter("%(message)s"))
-            logger.addHandler(self._rich_handler)
-
-            if target is not None:
-                self._setup_file_logging(
-                    target,
-                    MAX_LOGFILE_SIZE,
-                    MAX_LOGFILE_COUNT,
-                    int(loglevel),
-                    warning_writer,
-                )
-
-            logger.propagate = False
-
-    def _setup_file_logging(
-        self,
-        logfile: Path,
-        size: int,
-        count: int,
-        level: int,
-        warning_writer: Callable[[StructuredError], None] | None = None,
-    ) -> None:
-        """Attach a rotating JSON Lines file handler when the path is usable."""
-        try:
-            logfile.parent.mkdir(parents=True, exist_ok=True)
-            self._file_handler = _ResilientRotatingFileHandler(
-                filename=logfile,
-                maxBytes=size,
-                backupCount=count,
-                encoding="utf-8",
-            )
-        except OSError:
-            self._file_handler = None
-            _warn_file_sink_unavailable(warning_writer)
-            return
-        self._file_handler.warning_writer = warning_writer
-        self._file_handler.setLevel(level)
-        self._file_handler.setFormatter(_JSONLinesFormatter())
-        self.logger.addHandler(self._file_handler)
-
-    def _cleanup_handlers(self) -> None:
-        """Remove existing handlers to allow reconfiguration."""
-        logger = self.logger
-        for handler in logger.handlers[:]:
-            handler.close()
-            logger.removeHandler(handler)
-        self._rich_handler = None
-        self._file_handler = None
+_rich_handler: RichHandler | None = None
+"""The stderr handler that ``configure_logging`` installed, if any."""
 
 
-_canfar_logger = CanfarLogger()
+def _loggers() -> list[logging.Logger]:
+    """Return the CANFAR logger and the storage library loggers it routes."""
+    return [logging.getLogger(name) for name in (LOGGER_NAME, *LIBRARY_LOGGER_NAMES)]
+
+
+def _file_handler(
+    logfile: Path,
+    level: int,
+    warning_writer: Callable[[StructuredError], None] | None,
+) -> logging.Handler | None:
+    """Return a rotating JSON Lines file handler, or None when the path is unusable."""
+    try:
+        logfile.parent.mkdir(parents=True, exist_ok=True)
+        handler = _ResilientRotatingFileHandler(
+            filename=logfile,
+            maxBytes=MAX_LOGFILE_SIZE,
+            backupCount=MAX_LOGFILE_COUNT,
+            encoding="utf-8",
+        )
+    except OSError:
+        _warn_file_sink_unavailable(warning_writer)
+        return None
+    handler.warning_writer = warning_writer
+    handler.setLevel(level)
+    handler.setFormatter(_JSONLinesFormatter())
+    return handler
+
+
+@contextmanager
+def logs_through(console: Console) -> Iterator[None]:
+    """Write CANFAR's stderr log records through ``console`` for a while.
+
+    A Rich live display on ``console`` stays intact only when everything else
+    written to stderr goes through that same console.
+    """
+    handler = _rich_handler
+    if handler is None:
+        yield
+        return
+    previous, handler.console = handler.console, console
+    try:
+        yield
+    finally:
+        handler.console = previous
 
 
 def configure_logging(
@@ -295,14 +255,47 @@ def configure_logging(
     log_file: Path | None = None,
     warning_writer: Callable[[StructuredError], None] | None = None,
 ) -> LoggingLevel:
-    """Configure logging explicitly using CLI, environment, and packaged policy."""
-    level = _resolve_log_level(loglevel, verbosity)
-    _canfar_logger.configure(
-        loglevel=level.value,
-        log_file=log_file,
-        warning_writer=warning_writer,
-    )
-    return level
+    """Configure Rich stderr logging and an optional rotating JSONL file sink.
+
+    The CANFAR and storage library loggers share the handlers; configuring
+    again replaces them. The level comes from ``loglevel``, then
+    ``verbosity``, then ``CANFAR_LOGLEVEL``, then the packaged default.
+
+    Returns:
+        The resolved logging level.
+    """
+    global _rich_handler  # noqa: PLW0603 - logging configuration is process-wide.
+
+    resolved = _resolve_log_level(loglevel, verbosity)
+    target = _resolve_log_file_path(log_file) if log_file is not None else None
+    level: int = getattr(logging, resolved.value.upper())
+    with _LOCK:
+        install_rich_traceback(show_locals=False, suppress=[])
+        for logger in _loggers():
+            for handler in logger.handlers[:]:
+                handler.close()
+                logger.removeHandler(handler)
+        _rich_handler = RichHandler(
+            console=Console(stderr=True),
+            show_path=True,
+            show_time=True,
+            enable_link_path=True,
+            rich_tracebacks=True,
+            tracebacks_show_locals=False,
+        )
+        _rich_handler.setLevel(level)
+        _rich_handler.setFormatter(logging.Formatter("%(message)s"))
+        handlers: list[logging.Handler] = [_rich_handler]
+        if target is not None and (
+            file_handler := _file_handler(target, level, warning_writer)
+        ):
+            handlers.append(file_handler)
+        for logger in _loggers():
+            logger.setLevel(level)
+            for handler in handlers:
+                logger.addHandler(handler)
+            logger.propagate = False
+    return resolved
 
 
 def get_logger(name: str | None = None) -> logging.Logger:

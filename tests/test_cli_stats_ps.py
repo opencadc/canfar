@@ -6,9 +6,9 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import click
 import pytest
 import yaml
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
@@ -85,7 +85,7 @@ def test_ps_help_describes_default_status_filter() -> None:
     result = runner.invoke(cli, ["ps", "--help"])
 
     assert result.exit_code == 0
-    help_text = " ".join(click.unstyle(result.output).replace("│", " ").split())
+    help_text = " ".join(Text.from_ansi(result.output).plain.replace("│", " ").split())
     assert "default shows Pending and Running" in help_text
 
 

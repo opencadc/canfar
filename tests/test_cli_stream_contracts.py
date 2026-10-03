@@ -236,7 +236,7 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
     flag: list[str],
     load: Callable[[str], Any],
 ) -> None:
-    """Fresh registry discovery emits progress on stderr and data on stdout."""
+    """Fresh registry discovery logs progress on stderr and data on stdout."""
     config_path = tmp_path / "config.yaml"
     _write_config(config_path, with_server=False)
     registry_body = f"{_CADC_URI}=https://fresh.example/skaha/capabilities"
@@ -276,7 +276,7 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
             side_effect=_client_factory(httpx2.MockTransport(capability_response)),
         ),
     ):
-        result = runner.invoke(cli, ["server", "ls", *flag])
+        result = runner.invoke(cli, ["--log-level", "info", "server", "ls", *flag])
 
     assert result.exit_code == 0, result.stderr
     payload = load(result.stdout)

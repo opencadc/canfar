@@ -7,7 +7,7 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - Domain request/response and config shapes live in `canfar/models/`.
 - HTTP composition, credential precedence, sync/async clients, and auth hooks live in `canfar/client.py`.
 - User-facing library operations live in `canfar/sessions.py`, `canfar/images.py`, `canfar/context.py`, and `canfar/overview.py`.
-- Typer command adapters live in `canfar/cli/` and should stay thin over library modules.
+- Typer command adapters live in `canfar/cli/` and should stay thin over library modules. Root commands are registered lazily in `canfar/cli/main.py` (`_COMMANDS`), so each command imports only its own module; `canfar/__init__.py` also loads `authentication`, `server`, `login`, and `alogin` on first use.
 - Auth flows live in `canfar/auth/`; request/response hooks live in `canfar/hooks/`.
 - Discovery, logging, request builders, and other helper modules live in `canfar/utils/`.
 

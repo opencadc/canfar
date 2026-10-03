@@ -24,15 +24,6 @@ log = logging.getLogger(__name__)
 _Result = TypeVar("_Result")
 
 
-def _log_http_task_failure(operation: str, context: object, exc: BaseException) -> None:
-    """Log a failed HTTP task with safe caller context.
-
-    Status codes and safe request context are already logged by HTTPX2 response hooks;
-    this adds a Session identifier or replica position and exception class only.
-    """
-    log.error("%s: %s (%s)", operation, context, type(exc).__name__)
-
-
 def _raise_authentication_failure(result: object) -> None:
     """Raise a collected Authentication failure, which belongs to the client.
 
@@ -52,7 +43,8 @@ def _task_result(
     """Keep one failure and logging policy for collected transport results."""
     _raise_authentication_failure(result)
     if isinstance(result, Exception):
-        _log_http_task_failure(operation, context, result)
+        # HTTPX2 response hooks already log the status and safe request context.
+        log.error("%s: %s (%s)", operation, context, type(result).__name__)
         return None
     return result
 

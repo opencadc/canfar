@@ -157,13 +157,12 @@ def test_render_stdout_accepts_model_list() -> None:
     """Stdout rendering serializes lists of Pydantic models."""
     rendered = output.render_stdout(
         [
-            Server(name="CADC", status=None),
-            Server(name="SRC", status=None),
+            Server(name="CADC"),
+            Server(name="SRC"),
         ],
         output.OutputMode.JSON,
     )
     payload = json.loads(rendered)
     assert len(payload) == 2
     assert payload[0]["name"] == "CADC"
-    assert "status" in payload[0]
-    assert payload[0]["status"] is None
+    assert payload[0]["resources"] is None

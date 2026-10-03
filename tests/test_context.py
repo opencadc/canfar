@@ -53,3 +53,27 @@ def test_context_resources_use_http_client() -> None:
 
     assert len(requests) == 1
     assert requests[0].url.path.endswith("/context")
+
+
+def test_context_resources_raise_for_error_status_without_error_hooks() -> None:
+    """A client without error hooks still reports a missing context endpoint."""
+    with (
+        pytest.MonkeyPatch.context() as monkeypatch,
+        Context(
+            token=SecretStr("token"),
+            url="https://example.test/skaha/v1",
+            raise_http_errors=False,
+        ) as context,
+    ):
+        monkeypatch.setattr(
+            "canfar.client.Client",
+            lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(
+                    lambda request: httpx2.Response(404, request=request)
+                ),
+                **kwargs,
+            ),
+        )
+
+        with pytest.raises(httpx2.HTTPStatusError):
+            context.resources()

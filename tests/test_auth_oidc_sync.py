@@ -206,7 +206,6 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
         "expires_at": 1893456000,
     }
     presented: list[DeviceAuthorization] = []
-    authenticated: list[str | None] = []
 
     with (
         patch("canfar.auth.oidc.SyncClient") as client_class,
@@ -219,7 +218,6 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
             credential,
             expected_issuer="https://example.com",
             on_challenge=presented.append,
-            on_authenticated=authenticated.append,
         )
 
     assert result.client.identity == "client-id"
@@ -228,7 +226,6 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
     assert result.token.access == SecretStr("access-token")
     assert result.token.refresh == SecretStr("refresh-token")
     assert presented[0].user_code == SecretStr("ABC123")
-    assert authenticated == ["test-user"]
     sync_client.get.assert_any_call(
         "https://example.com/.well-known/openid-configuration"
     )

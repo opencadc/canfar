@@ -228,9 +228,10 @@ def _output_owners() -> set[str]:
         if any("--output" in getattr(p, "opts", []) for p in command.params):
             owners.add(" ".join(path))
         # `data` mounts an upstream application that owns its own stdout.
-        if hasattr(command, "commands") and path != ("data",):
-            for name, child in command.commands.items():
-                walk(child, (*path, name))
+        if hasattr(command, "list_commands") and path != ("data",):
+            ctx = typer.Context(command)
+            for name in command.list_commands(ctx):
+                walk(command.get_command(ctx, name), (*path, name))
 
     walk(typer.main.get_command(cli), ())
     return owners

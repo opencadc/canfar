@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Annotated
 import humanize
 import typer
 from rich import box
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Confirm
 from rich.table import Table
 
 from canfar.authentication import (
@@ -28,8 +28,8 @@ from canfar.authentication import (
 )
 from canfar.cli import output
 from canfar.cli.machine import OutputOption, resolve_mode
+from canfar.cli.prompts import select_server
 from canfar.config.migration import ConfigResetRequiredError
-from canfar.errors import StructuredError
 from canfar.idp import get_idp
 from canfar.models.config import Configuration
 from canfar.server import (
@@ -44,8 +44,7 @@ from canfar.server import (
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
-    from typing import NoReturn
-
+    from canfar.models.auth import Authentication
     from canfar.models.http import Server
 
 auth = typer.Typer(
@@ -55,23 +54,6 @@ auth = typer.Typer(
     invoke_without_command=True,
     rich_markup_mode="rich",
 )
-
-
-def _raise_config_reset(
-    error: ConfigResetRequiredError,
-    mode: output.OutputMode,
-) -> NoReturn:
-    """Render an expected persisted-configuration reset failure."""
-    failure = StructuredError(
-        code=error.code,
-        message=error.message,
-        hint="Reset the configuration and log in again.",
-    )
-    if mode is output.OutputMode.HUMAN:
-        get_console(stderr=True).print(f"[bold red]{failure.message}[/bold red]")
-    else:
-        output.to_stderr(failure, mode)
-    raise typer.Exit(1) from error
 
 
 def _format_expiry(expiry: float | None) -> str:
@@ -97,50 +79,18 @@ def _print_auth_switched(idp: str) -> None:
 
 
 def _prompt_server_selector(servers: list[Server]) -> str:
-    """Prompt until the user selects a server URI or list index."""
-    if len(servers) == 1 and servers[0].uri is not None:
-        selector = str(servers[0].uri)
+    """Return the URI of the server the user selects."""
+    selectable = [server for server in servers if server.uri is not None]
+    selected = select_server(selectable)
+    if len(selectable) == 1:
         get_console().print(
-            f"[green]✓[/green] Auto-selected server {servers[0].name or selector}",
+            f"[green]✓[/green] Auto-selected server {selected.name or selected.uri}",
         )
-        return selector
-
-    get_console().print("[bold blue]Select compatible server[/bold blue]")
-    for index, server in enumerate(servers, start=1):
-        label = server.name or str(server.uri)
-        get_console().print(f"  {index}. {label} ({server.uri})")
-    while True:
-        choice = Prompt.ask("Server URI or number")
-        uri_matches = [item for item in servers if str(item.uri) == choice]
-        if uri_matches:
-            return choice
-        try:
-            selected = servers[int(choice) - 1]
-        except (ValueError, IndexError):
-            get_console(stderr=True).print(
-                "[red]Enter a valid server URI or number.[/red]"
-            )
-            continue
-        if selected.uri is None:
-            get_console(stderr=True).print(
-                "[red]Enter a valid server URI or number.[/red]"
-            )
-            continue
-        return str(selected.uri)
+    return str(selected.uri)
 
 
-def _render_auth_show_table() -> None:
+def _render_auth_show_table(summary: Authentication) -> None:
     """Render the active Authentication summary for human output."""
-    try:
-        summary = auth_show()
-    except ConfigResetRequiredError as exc:
-        _raise_config_reset(exc, output.OutputMode.HUMAN)
-    except AuthenticationError as exc:
-        get_console(stderr=True).print(f"[bold red]{exc.error.message}[/bold red]")
-        if exc.error.hint:
-            get_console(stderr=True).print(exc.error.hint)
-        raise typer.Exit(1) from exc
-
     table = Table(title="Active Authentication", show_lines=True, box=box.SIMPLE)
     table.add_column("Field", style="cyan")
     table.add_column("Value", style="magenta")
@@ -152,9 +102,8 @@ def _render_auth_show_table() -> None:
     get_console().print(table)
 
 
-def _render_auth_list_table() -> None:
+def _render_auth_list_table(summaries: list[Authentication]) -> None:
     """Render saved Authentication records for human output."""
-    summaries = auth_list()
     table = Table(
         title="Saved Authentication Records",
         show_lines=True,
@@ -182,19 +131,18 @@ def _auth_show(mode: output.OutputMode) -> None:
         mode: Effective CLI output mode.
 
     Raises:
-        typer.Exit: Exit code 1 when no active authentication is available.
+        SystemExit: Exit code 1 when no active authentication is available.
     """
-    if mode is not output.OutputMode.HUMAN:
-        try:
-            summary = auth_show()
-        except ConfigResetRequiredError as exc:
-            _raise_config_reset(exc, mode)
-        except AuthenticationError as exc:
-            output.to_stderr(exc.error, mode)
-            raise typer.Exit(1) from exc
+    try:
+        summary = auth_show()
+    except ConfigResetRequiredError as exc:
+        output.fail(output.boundary_failure(exc), mode)
+    except AuthenticationError as exc:
+        output.fail(exc.error, mode)
+    if mode is output.OutputMode.HUMAN:
+        _render_auth_show_table(summary)
+    else:
         output.to_stdout(summary, mode)
-        return
-    _render_auth_show_table()
 
 
 @auth.callback(invoke_without_command=True)
@@ -240,11 +188,11 @@ def auth_list_command(
     try:
         summaries = auth_list()
     except ConfigResetRequiredError as exc:
-        _raise_config_reset(exc, mode)
+        output.fail(output.boundary_failure(exc), mode)
     if mode is not output.OutputMode.HUMAN:
         output.to_stdout(summaries, mode)
         return
-    _render_auth_list_table()
+    _render_auth_list_table(summaries)
 
 
 @auth.command("use")
@@ -311,10 +259,7 @@ def auth_remove_command(
     try:
         auth_remove(idp, force=force)
     except AuthenticationError as exc:
-        get_console(stderr=True).print(f"[bold red]{exc.error.message}[/bold red]")
-        if exc.error.hint:
-            get_console(stderr=True).print(exc.error.hint)
-        raise typer.Exit(1) from exc
+        output.fail(exc.error, output.OutputMode.HUMAN)
     except KeyError as exc:
         get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
         raise typer.Exit(1) from exc
@@ -342,7 +287,6 @@ def auth_purge_command(
     try:
         auth_purge(force=True)
     except AuthenticationError as exc:
-        get_console(stderr=True).print(f"[bold red]{exc.error.message}[/bold red]")
-        raise typer.Exit(1) from exc
+        output.fail(exc.error, output.OutputMode.HUMAN)
 
     get_console().print("[green]✓[/green] Authentication and server state reset")

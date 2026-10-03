@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated
 
 import typer
 from rich.prompt import Confirm
 
-from canfar.cli._run import run
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
@@ -57,4 +57,4 @@ def delete_sessions(
                 )
 
     if proceed:
-        run(_delete())
+        asyncio.run(_delete())

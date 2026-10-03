@@ -14,14 +14,15 @@ Root controls must precede the command:
 
 ```bash
 canfar --log-level debug ps
-canfar -vvv ps
+canfar -v ps
 canfar --log-file ./logs/canfar.jsonl ps
 ```
 
 | Control | Result |
 | --- | --- |
 | No CLI control | Use `CANFAR_LOGLEVEL`, or `critical` when it is unset. |
-| `-v` | `error`; `-vv` is `warning`; `-vvv` is `info`; `-vvvv` and above are `debug`. |
+| `-v` | `info`: progress, such as one line per Science Platform HTTP response. |
+| `-vv` | `debug`, as do further repetitions. |
 | `--log-level LEVEL` | Select `critical`, `error`, `warning`, `info`, or `debug`. |
 | `--log-file PATH` | Add the rotating JSON Lines file sink. |
 
@@ -54,9 +55,17 @@ Logging setup warnings use the selected machine format on stderr when a leaf
 output mode is present. They never add a banner or log record to the machine
 payload on stdout.
 
-At `debug`, Science Platform HTTP hooks log the request method and URL and the
-response status and body. These records follow the same stderr/file routing;
-do not enable debug logging if response bodies must remain private.
+At `info`, Science Platform HTTP hooks log one line per response, such as
+`GET https://ws-uv.canfar.net/skaha/v1/session -> 200`, with credentials and
+query values removed from the URL. At `debug`, they also log the request URL
+with its query and the response body. These records follow the same
+stderr/file routing; do not enable debug logging if response bodies must
+remain private.
+
+The storage libraries behind `canfar data`, `vosfs` and `fsspec-cli`, follow
+the same level and sinks. Their current releases log no transfer progress, so
+`canfar -v data cp` prints nothing on success; per-file progress is tracked
+in [shinybrar/vosfs#346](https://github.com/shinybrar/vosfs/issues/346).
 
 <span id="rotating-json-lines-file-sink"></span>
 <span id="json-lines-schema"></span>

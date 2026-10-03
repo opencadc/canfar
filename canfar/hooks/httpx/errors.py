@@ -16,6 +16,7 @@ from httpx2 import (
     ReadTimeout,
     RequestError,
     Response,
+    TimeoutException,
     WriteTimeout,
 )
 
@@ -23,22 +24,24 @@ from canfar.utils.logging import safe_url
 
 log = logging.getLogger(__name__)
 
-CONN_ERR_MSG = (
-    "Failed to establish connection within the timeout period. "
-    "The server may be unreachable or not responding."
-)
-READ_ERR_MSG = (
-    "Failed to receive response within the timeout period. "
-    "The server may be overloaded or not responding."
-)
-WRITE_ERR_MSG = (
-    "Failed to send request within the timeout period. "
-    "There may be network issues or the server is not accepting requests."
-)
-POOL_ERR_MSG = (
-    "Failed to acquire a connection from the pool within the timeout period. "
-    "All connections are currently in use."
-)
+_TIMEOUT_MESSAGES: dict[type[TimeoutException], str] = {
+    ConnectTimeout: (
+        "Failed to establish connection within the timeout period. "
+        "The server may be unreachable or not responding."
+    ),
+    ReadTimeout: (
+        "Failed to receive response within the timeout period. "
+        "The server may be overloaded or not responding."
+    ),
+    WriteTimeout: (
+        "Failed to send request within the timeout period. "
+        "There may be network issues or the server is not accepting requests."
+    ),
+    PoolTimeout: (
+        "Failed to acquire a connection from the pool within the timeout period. "
+        "All connections are currently in use."
+    ),
+}
 
 
 def _request_url(error: RequestError) -> str:
@@ -70,34 +73,10 @@ def _error_handling() -> Generator[None, None, None]:
     """
     try:
         yield
-    except ConnectTimeout as err:
+    except tuple(_TIMEOUT_MESSAGES) as err:
         log.warning(
             "%s URL: %s",
-            CONN_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        raise
-    except ReadTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            READ_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        raise
-    except WriteTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            WRITE_ERR_MSG,
-            _request_url(err),
-            exc_info=False,
-        )
-        raise
-    except PoolTimeout as err:
-        log.warning(
-            "%s URL: %s",
-            POOL_ERR_MSG,
+            _TIMEOUT_MESSAGES[type(err)],
             _request_url(err),
             exc_info=False,
         )

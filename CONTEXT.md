@@ -91,6 +91,7 @@ _Avoid_: Resource profile, quota
 - A **Session** starts from one **Container Image**.
 - A **Container Registry** publishes many **Container Images**.
 - A **Resource Allocation Mode** shapes resources requested for a **Session**.
+- A **Science Platform Server** advertises resource limits for each **Resource Allocation Mode**; discovery saves them with the Server.
 
 ## Example dialogue
 
