@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import inspect
 from pathlib import Path
 from threading import Barrier
 from typing import TYPE_CHECKING
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, call, patch
 
 import httpx2
 import pytest
@@ -16,14 +17,23 @@ from pydantic import AnyHttpUrl, AnyUrl
 from canfar._server_discovery import (
     _discover_for_idp,
     _discovered_to_server,
-    _select_storage,
 )
 from canfar.errors import ErrorCode
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import OIDCCredential, RuntimeCredential, X509Credential
 from canfar.models.config import Configuration
-from canfar.models.http import Server, VOSpaceService
-from canfar.models.registry import IVOARegistry, IVOARegistrySearch
+from canfar.models.http import (
+    ResourceRange,
+    Server,
+    ServerResources,
+    SessionResources,
+    VOSpaceService,
+)
+from canfar.models.registry import (
+    ContainerRegistry,
+    IVOARegistry,
+    ServerProbe,
+)
 from canfar.models.registry import Server as DiscoveredServer
 from canfar.server import (
     ServerDiscoveryError,
@@ -40,11 +50,13 @@ from canfar.server import (
 from canfar.server import (
     list_servers as server_list,
 )
-from canfar.utils.discover import Discover
+from canfar.utils import discover as registry_discovery
+from canfar.utils.registry import RegistryEvidenceError, select_storage
 from tests.helpers.config import assign_servers
 
 if TYPE_CHECKING:
     from collections.abc import Callable
+    from contextlib import AbstractContextManager
 
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
@@ -94,6 +106,20 @@ def _http_client_factory(
     return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
+_RESOURCES = ServerResources(
+    flexible=SessionResources(
+        cores=ResourceRange(min=1, max=16),
+        ram=ResourceRange(min=4, max=32),
+    ),
+    fixed=SessionResources(
+        cores=ResourceRange(min=1, max=16),
+        ram=ResourceRange(min=1, max=192),
+    ),
+    gpus=ResourceRange(min=1, max=4),
+    sessions=5,
+)
+
+
 def _cadc_server(**updates: object) -> Server:
     """Build a default CADC server record for tests."""
     base = {
@@ -114,6 +140,24 @@ def _anonymous_config(*servers: Server, idp: str = "cadc") -> Configuration:
         active=ActiveConfig(authentication=idp, server=None),
         authentication={idp: X509Credential(idp=idp)},
         servers={server.name: server for server in servers if server.name is not None},
+    )
+
+
+def _use_discovery(stub: AsyncMock) -> AbstractContextManager[object]:
+    """Route registry fetch, extract, and check through one test double."""
+
+    async def fetch(_http: object, *args: object, **kwargs: object) -> object:
+        return await stub.fetch(*args, **kwargs)
+
+    def extract(registry: object, *, leaf: str | None, dev: bool = False) -> object:
+        del leaf
+        return stub.extract(registry, dev=dev)
+
+    async def check(_http: object, endpoint: object) -> object:
+        return await stub.check(endpoint)
+
+    return patch.multiple(
+        "canfar.utils.discover", fetch=fetch, extract=extract, check=check
     )
 
 
@@ -200,7 +244,7 @@ class TestServerUse:
     ) -> None:
         """Activation records a Server Name through the editor boundary."""
         target = _cadc_server(name="Selected-CADC")
-        fetched = target.model_copy(update={"cores": 8}, deep=True)
+        fetched = target.model_copy(update={"resources": _RESOURCES}, deep=True)
         config_path = tmp_path / "config.yaml"
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
@@ -252,10 +296,7 @@ class TestServerUse:
     def test_use_by_uri_updates_active_server(self, tmp_path: Path) -> None:
         """Selecting by URI fetches, validates, and saves the active server."""
         target = _cadc_server()
-        fetched = target.model_copy(
-            update={"cores": 16, "ram": 192, "gpus": 4},
-            deep=True,
-        )
+        fetched = target.model_copy(update={"resources": _RESOURCES}, deep=True)
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -278,7 +319,7 @@ class TestServerUse:
     def test_use_by_unique_name_updates_active_server(self, tmp_path: Path) -> None:
         """Selecting by unique display name resolves and saves."""
         target = _cadc_server(name="CADC-CANFAR")
-        fetched = target.model_copy(update={"cores": 8, "ram": 64}, deep=True)
+        fetched = target.model_copy(update={"resources": _RESOURCES}, deep=True)
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -327,7 +368,7 @@ class TestServerUse:
             uri=AnyUrl("ivo://canfar.cam.uksrc.org/skaha"),
             url=AnyHttpUrl("https://canfar.cam.uksrc.org/skaha"),
         )
-        fetched = discovered.model_copy(update={"cores": 16, "ram": 192}, deep=True)
+        fetched = discovered.model_copy(update={"resources": _RESOURCES}, deep=True)
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
@@ -493,10 +534,7 @@ class TestServerDiscovery:
                 "https://platform.example/skaha-arc/capabilities"
             ),
         )
-        search = IVOARegistrySearch(leaf="arc")
-
-        async with Discover(search) as discovery:
-            resources = discovery.extract(registry)
+        resources = registry_discovery.extract(registry, leaf="arc")
 
         assert [(resource.uri, resource.url) for resource in resources] == [
             ("ivo://cadc.nrc.ca/skaha", "https://platform.example/skaha"),
@@ -676,7 +714,7 @@ class TestServerDiscovery:
         config = _anonymous_config()
 
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar.client.Client",
                 side_effect=_http_client_factory(transport),
@@ -730,7 +768,7 @@ class TestServerDiscovery:
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
-        def enriched(
+        def with_storage(
             server: Server,
             *,
             storage_resource: DiscoveredServer,
@@ -738,8 +776,6 @@ class TestServerDiscovery:
         ) -> Server:
             return server.model_copy(
                 update={
-                    "version": "v1",
-                    "auths": ["oidc"],
                     "storage": {
                         server.name: VOSpaceService(
                             uri=storage_resource.uri,
@@ -751,8 +787,22 @@ class TestServerDiscovery:
             )
 
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
-            patch("canfar._server_discovery.enrich", side_effect=enriched),
+            _use_discovery(mock_discovery),
+            patch(
+                "canfar._server_discovery._enrich_storage",
+                side_effect=with_storage,
+            ),
+            patch(
+                "canfar._server_discovery.enrich",
+                side_effect=lambda server, **_kwargs: server.model_copy(
+                    update={"version": "v1", "auths": ["oidc"]},
+                    deep=True,
+                ),
+            ),
+            patch(
+                "canfar._server_discovery._fetch_resources",
+                side_effect=lambda server, **_kwargs: server,
+            ),
         ):
             servers = await _discover_for_idp("srcnet")
 
@@ -779,7 +829,7 @@ class TestServerDiscovery:
             url="https://storage.example/arc",
         )
 
-        assert _select_storage(endpoint, [dev_storage], strict=False) is None
+        assert select_storage(endpoint, [dev_storage], strict=False) is None
 
     @pytest.mark.asyncio
     async def test_mixed_registry_records_keep_per_record_environment(self) -> None:
@@ -794,14 +844,13 @@ class TestServerDiscovery:
                 "https://storage.example/dev/capabilities"
             ),
         )
-        search = IVOARegistrySearch(leaf="cavern")
-
-        async with Discover(search) as discovery:
-            endpoint, storage = discovery.extract(registry, dev=True)
+        endpoint, storage = registry_discovery.extract(
+            registry, leaf="cavern", dev=True
+        )
 
         assert endpoint.development is False
         assert storage.development is True
-        assert _select_storage(endpoint, [storage], strict=False) is None
+        assert select_storage(endpoint, [storage], strict=False) is None
 
     def test_ambiguous_cross_registry_storage_is_not_last_write_wins(self) -> None:
         """Multiple namespace fallbacks are omitted or actionable, never arbitrary."""
@@ -820,9 +869,9 @@ class TestServerDiscovery:
             for index in (1, 2)
         ]
 
-        assert _select_storage(endpoint, storage, strict=False) is None
-        with pytest.raises(ServerFetchError, match="Multiple preferred VOSpace"):
-            _select_storage(endpoint, storage, strict=True)
+        assert select_storage(endpoint, storage, strict=False) is None
+        with pytest.raises(RegistryEvidenceError, match="Multiple preferred VOSpace"):
+            select_storage(endpoint, storage, strict=True)
 
     @pytest.mark.asyncio
     async def test_capability_enrichment_runs_concurrently_off_event_loop(
@@ -860,14 +909,14 @@ class TestServerDiscovery:
             endpoint: DiscoveredServer,
             idp: str,
             **kwargs: object,
-        ) -> Server:
+        ) -> tuple[Server, ServerProbe]:
             worker_config = kwargs["config"]
             assert isinstance(worker_config, Configuration)
             worker_configs.append(worker_config)
             assert kwargs["token"] == "current-token"
             assert kwargs["certificate"] is None
             concurrent.wait()
-            return Server(
+            server = Server(
                 idp=idp,
                 name=endpoint.name,
                 uri=AnyUrl(endpoint.uri),
@@ -875,10 +924,17 @@ class TestServerDiscovery:
                 version="v1",
                 auths=["oidc"],
             )
+            probe = ServerProbe(
+                name=str(endpoint.name),
+                uri=endpoint.uri,
+                url=endpoint.url,
+                status="connected",
+            )
+            return server, probe
 
         materialize = AsyncMock(return_value=RuntimeCredential(token="current-token"))
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar._server_discovery._discovered_to_server",
                 side_effect=convert,
@@ -930,11 +986,15 @@ class TestServerDiscovery:
 
         def response(request: httpx2.Request) -> httpx2.Response:
             requests.append(request)
+            if request.url.path.endswith("/context"):
+                return httpx2.Response(
+                    200, json={"maxInteractiveSessions": 3}, request=request
+                )
             return httpx2.Response(200, text=session_capabilities, request=request)
 
         materialize = AsyncMock(return_value=RuntimeCredential(token="runtime-token"))
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar.client.HTTPClient._materialize_credentials",
                 new=materialize,
@@ -948,10 +1008,14 @@ class TestServerDiscovery:
             [server] = await _discover_for_idp("srcnet", config=config)
 
         assert server.version == "v1"
+        assert server.resources == ServerResources(sessions=3)
         materialize.assert_awaited_once_with()
         refresh.assert_not_called()
-        assert [request.headers["Authorization"] for request in requests] == [
-            "Bearer runtime-token"
+        assert [
+            (request.url.path, request.headers["Authorization"]) for request in requests
+        ] == [
+            ("/skaha/capabilities", "Bearer runtime-token"),
+            ("/skaha/v1/context", "Bearer runtime-token"),
         ]
 
     @pytest.mark.asyncio
@@ -992,7 +1056,7 @@ class TestServerDiscovery:
         monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
         monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar.client.Client",
                 side_effect=_http_client_factory(httpx2.MockTransport(response)),
@@ -1004,8 +1068,11 @@ class TestServerDiscovery:
             )
 
         assert server.version == "v1"
-        assert [request.headers["Authorization"] for request in requests] == [
-            "Bearer environment-token"
+        assert [
+            (request.url.path, request.headers["Authorization"]) for request in requests
+        ] == [
+            ("/skaha/capabilities", "Bearer environment-token"),
+            ("/skaha/v1/context", "Bearer environment-token"),
         ]
 
     @pytest.mark.asyncio
@@ -1046,7 +1113,7 @@ class TestServerDiscovery:
         monkeypatch.delenv("CANFAR_TOKEN", raising=False)
         monkeypatch.setenv("CANFAR_CERTIFICATE", certificate.as_posix())
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar.client.x509.inspect",
                 return_value={
@@ -1079,7 +1146,7 @@ class TestServerDiscovery:
 
         assert server.version == "v1"
         valid.assert_called_once_with(certificate)
-        get_ssl_context.assert_called_once_with(certificate)
+        assert get_ssl_context.call_args_list == [call(certificate), call(certificate)]
 
     @pytest.mark.parametrize(
         "capabilities_case",
@@ -1150,13 +1217,7 @@ class TestServerDiscovery:
 
         capabilities_transport = httpx2.MockTransport(capabilities_response)
         real_async_client = httpx2.AsyncClient
-        known = _cadc_server(
-            name="canfar",
-            cores=8,
-            ram=64,
-            gpus=1,
-            status="reachable",
-        )
+        known = _cadc_server(name="canfar", resources=_RESOURCES)
         config_path = tmp_path / "config.yaml"
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
@@ -1334,7 +1395,7 @@ class TestServerDiscovery:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -1372,7 +1433,7 @@ class TestServerDiscovery:
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            _use_discovery(mock_discovery),
             patch(
                 "canfar._server_discovery.enrich",
                 side_effect=lambda item, **_kwargs: item.model_copy(
@@ -1410,7 +1471,7 @@ class TestServerDiscovery:
             "canfar.client.Client",
             side_effect=_http_client_factory(transport),
         ):
-            server = _discovered_to_server(
+            server, probe = _discovered_to_server(
                 endpoint,
                 "srcnet",
                 config=_anonymous_config(idp="srcnet"),
@@ -1420,6 +1481,7 @@ class TestServerDiscovery:
         assert server.name == "Broken"
         assert str(server.url) == "https://broken.example.org/skaha"
         assert server.version is None
+        assert (probe.name, probe.status) == ("Broken", "error")
 
     def test_discovered_to_server_names_unnamed_endpoint_by_host_slug(self) -> None:
         """Endpoints without a registry name are named by their URI host slug."""
@@ -1441,27 +1503,24 @@ class TestServerDiscovery:
             "canfar.client.Client",
             side_effect=_http_client_factory(transport),
         ):
-            server = _discovered_to_server(
+            server, probe = _discovered_to_server(
                 endpoint,
                 "srcnet",
                 config=_anonymous_config(idp="srcnet"),
             )
 
         assert server.name == "swesrc-chalmers-se"
+        assert (probe.name, probe.status) == ("swesrc-chalmers-se", "error")
 
     @pytest.mark.asyncio
     async def test_discover_for_idp_raises_when_registry_fetch_fails(self) -> None:
         """Registry fetch failures surface as ServerDiscoveryError."""
-        mock_discovery = AsyncMock()
-        mock_discovery.fetch.return_value = MagicMock(
-            success=False,
-            error="connection refused",
+        failed = IVOARegistry(
+            name="CADC", content="", success=False, error="connection refused"
         )
-        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
-        mock_discovery.__aexit__ = AsyncMock(return_value=None)
 
         with (
-            patch("canfar.utils.registry.Discover", return_value=mock_discovery),
+            patch("canfar.utils.discover.fetch", AsyncMock(return_value=failed)),
             pytest.raises(ServerDiscoveryError, match="Failed to discover"),
         ):
             await _discover_for_idp("cadc")
@@ -1469,56 +1528,243 @@ class TestServerDiscovery:
     @pytest.mark.asyncio
     async def test_discover_for_idp_honors_dev_sources_and_timeout(self) -> None:
         """Dev discovery includes dev registries and propagates request timeout."""
-        mock_discovery = AsyncMock()
-        mock_discovery.fetch.side_effect = [
-            MagicMock(name="CADC", success=True, content="prod"),
-            MagicMock(name="CADC@keel-dev", success=True, content="dev"),
-        ]
-        mock_discovery.extract = MagicMock(return_value=[])
-        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
-        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        fetch = AsyncMock(
+            side_effect=[
+                IVOARegistry(name="CADC", content="prod"),
+                IVOARegistry(name="CADC@keel-dev", content="dev"),
+            ]
+        )
 
-        with patch(
-            "canfar.utils.registry.Discover", return_value=mock_discovery
-        ) as factory:
+        with (
+            patch(
+                "canfar.utils.discover.client", wraps=registry_discovery.client
+            ) as client,
+            patch("canfar.utils.discover.fetch", fetch),
+            patch("canfar.utils.discover.extract", return_value=[]) as extract,
+        ):
             servers = await _discover_for_idp("cadc", dev=True, timeout=11)
 
         assert servers == []
-        search = factory.call_args.args[0]
-        assert (
-            "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
-            in search.registries
+        assert "https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps" in [
+            call.args[1] for call in fetch.call_args_list
+        ]
+        client.assert_called_once_with(11)
+        assert extract.call_args.kwargs["dev"] is True
+
+
+class TestDiscoveryOutcomes:
+    """Discovery reports why each Science Platform Server is usable or not."""
+
+    def test_discover_reports_each_outcome_and_reads_resources(
+        self,
+        tmp_path: Path,
+    ) -> None:
+        """Probe, capability, and context replies map to one outcome per Server."""
+        registry_url = "https://cadc-west-01.canfar.net/reg/resource-caps"
+        hosts = ("ok", "slow", "down", "broken", "late", "refused", "denied")
+        registry_body = "\n".join(
+            f"ivo://{host}.example/skaha=https://{host}.example/skaha/capabilities"
+            for host in hosts
         )
-        assert factory.call_args.kwargs["timeout"] == 11
-        assert mock_discovery.extract.call_args.kwargs["dev"] is True
+
+        def registry_response(request: httpx2.Request) -> httpx2.Response:
+            if request.method == "GET" and str(request.url) == registry_url:
+                return httpx2.Response(200, text=registry_body, request=request)
+            if request.url.host == "slow.example":
+                message = "timed out"
+                raise httpx2.ConnectTimeout(message, request=request)
+            if request.url.host == "down.example":
+                message = "name not resolved"
+                raise httpx2.ConnectError(message, request=request)
+            if request.url.host == "broken.example":
+                return httpx2.Response(503, request=request)
+            return httpx2.Response(200, request=request)
+
+        platform_requests: list[httpx2.Request] = []
+
+        def platform_response(request: httpx2.Request) -> httpx2.Response:
+            platform_requests.append(request)
+            if request.url.host == "late.example":
+                message = "timed out"
+                raise httpx2.ReadTimeout(message, request=request)
+            if request.url.host == "refused.example":
+                message = "connection refused"
+                raise httpx2.ConnectError(message, request=request)
+            if request.url.host == "denied.example":
+                return httpx2.Response(403, request=request)
+            if request.url.path.endswith("/context"):
+                return httpx2.Response(
+                    200,
+                    json={
+                        "cores": {
+                            "defaultRequest": 1,
+                            "defaultLimit": 2,
+                            "options": [1, 2, 4],
+                        },
+                        "maxInteractiveSessions": 3,
+                    },
+                    request=request,
+                )
+            capabilities = f"""
+                <capabilities>
+                  <capability
+                    standardID="http://www.opencadc.org/std/platform#session-1">
+                    <interface>
+                      <accessURL use="base">https://{request.url.host}/skaha/v1</accessURL>
+                      <securityMethod standardID="ivo://ivoa.net/sso#token" />
+                    </interface>
+                  </capability>
+                </capabilities>
+            """
+            return httpx2.Response(200, text=capabilities, request=request)
+
+        probes: list[ServerProbe] = []
+        real_async_client = httpx2.AsyncClient
+        with (
+            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
+            patch(
+                "canfar.utils.discover.AsyncClient",
+                side_effect=lambda **_kwargs: real_async_client(
+                    transport=httpx2.MockTransport(registry_response),
+                ),
+            ),
+            patch(
+                "canfar.client.Client",
+                side_effect=_http_client_factory(
+                    httpx2.MockTransport(platform_response)
+                ),
+            ),
+        ):
+            config = _anonymous_config()
+            config.editor.set(
+                "registry",
+                ContainerRegistry(username="user", secret="registry-secret"),
+            )
+            with patch("canfar._server_discovery.log") as log:
+                servers = discover(
+                    "cadc", config=config, save=False, on_probe=probes.append
+                )
+
+        assert {probe.name: probe.status for probe in probes} == {
+            "ok-example": "connected",
+            "slow-example": "timeout",
+            "down-example": "unreachable",
+            "broken-example": "error",
+            "late-example": "timeout",
+            "refused-example": "unreachable",
+            "denied-example": "error",
+        }
+        names = [probe.name for probe in probes]
+        assert [probe.status for probe in probes[:7]] == ["pending"] * 7
+        assert sorted(names[:7]) == sorted(names[7:])
+        outcomes = {probe.name: probe for probe in probes[7:]}
+        assert outcomes["broken-example"].detail == (
+            "HTTP 503 from https://broken.example/skaha"
+        )
+        reasons = [
+            call.args[1:3]
+            for call in log.debug.call_args_list
+            if call.args[0] == "Server %s %s: %s"
+        ]
+        assert sorted(reasons) == sorted(
+            (probe.name, probe.status)
+            for probe in outcomes.values()
+            if probe.status != "connected"
+        )
+        [server] = servers
+        assert server.name == "ok-example"
+        assert server.resources == ServerResources(
+            flexible=SessionResources(cores=ResourceRange(min=1, max=2)),
+            fixed=SessionResources(cores=ResourceRange(min=1, max=4)),
+            sessions=3,
+        )
+        assert config.servers["ok-example"].resources == server.resources
+        assert all(
+            "X-Skaha-Registry-Auth" not in request.headers
+            for request in platform_requests
+        )
+
+    @pytest.mark.asyncio
+    async def test_one_slow_endpoint_does_not_delay_the_others(self) -> None:
+        """A reachable Server is inspected while another check is still waiting."""
+        endpoints = [
+            DiscoveredServer(
+                registry="SRCNet",
+                uri=f"ivo://{host}.example/skaha",
+                url=f"https://{host}.example/skaha",
+                name=host,
+            )
+            for host in ("slow", "fast")
+        ]
+        released = asyncio.Event()
+
+        async def check(endpoint: DiscoveredServer) -> DiscoveredServer:
+            if endpoint.name == "slow":
+                await released.wait()
+                endpoint.failure = "timeout"
+            else:
+                endpoint.status = 200
+            return endpoint
+
+        def inspect(
+            endpoint: DiscoveredServer, idp: str, **_kwargs: object
+        ) -> tuple[Server, ServerProbe]:
+            probe = ServerProbe(
+                name="fast", uri=endpoint.uri, url=endpoint.url, status="connected"
+            )
+            return _cadc_server(name="fast", idp=idp), probe
+
+        def on_probe(probe: ServerProbe) -> None:
+            if probe.status == "connected":
+                released.set()
+
+        mock_discovery = AsyncMock()
+        mock_discovery.fetch.return_value = MagicMock(success=True, content="line")
+        mock_discovery.extract = MagicMock(return_value=endpoints)
+        mock_discovery.check = AsyncMock(side_effect=check)
+        mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
+        mock_discovery.__aexit__ = AsyncMock(return_value=None)
+        with (
+            _use_discovery(mock_discovery),
+            patch(
+                "canfar._server_discovery._discovered_to_server",
+                side_effect=inspect,
+            ),
+        ):
+            servers = await asyncio.wait_for(
+                _discover_for_idp(
+                    "srcnet",
+                    config=_anonymous_config(idp="srcnet"),
+                    on_probe=on_probe,
+                ),
+                timeout=5,
+            )
+
+        assert [server.name for server in servers] == ["fast"]
 
 
 class TestServerModelFields:
     """Tests for extended Server resource fields."""
 
-    def test_server_accepts_resource_fields(self) -> None:
-        """Server models accept cores, ram, and gpus."""
-        server = _cadc_server(
-            cores=16,
-            ram=192,
-            gpus=4,
-        )
+    def test_server_accepts_session_resources(self) -> None:
+        """Server models carry advertised Session resource limits."""
+        server = _cadc_server(resources=_RESOURCES)
 
-        assert server.cores == 16
-        assert server.ram == 192
-        assert server.gpus == 4
+        assert server.resources == _RESOURCES
 
-    def test_server_resource_defaults(self) -> None:
-        """Server models apply default resource settings without enrichment."""
-        server = _cadc_server()
+    def test_server_resources_are_unknown_without_enrichment(self) -> None:
+        """Server models do not invent limits a Server never advertised."""
+        assert _cadc_server().resources is None
 
-        assert server.cores == 2
-        assert server.ram == 16
-        assert server.gpus == 0
+    @pytest.mark.parametrize("field", ["cores", "ram", "gpus"])
+    def test_server_rejects_retired_resource_fields(self, field: str) -> None:
+        """Retired flat limits are not accepted in place of ``resources``."""
+        with pytest.raises(ValueError, match="Extra inputs are not permitted"):
+            _cadc_server(**{field: 4})
 
     def test_server_discovery_error_exposes_structured_code(self) -> None:
         """Discovery errors carry stable structured error codes."""
         error = ServerDiscoveryError("none found", code=ErrorCode.SERVER_NONE_AVAILABLE)
 
         assert error.code == ErrorCode.SERVER_NONE_AVAILABLE
-        assert error.structured.code == "server.none_available"
+        assert ServerFetchError("unreachable").code == ErrorCode.TRANSPORT_FAILURE

@@ -54,12 +54,21 @@ record has `status` `Running` and a nonempty `connectURL`; poll `fetch()` or
 ```python
 from canfar.context import Context
 from canfar.images import Images
+from canfar.models.http import ServerResources
 from canfar.overview import Overview
+from canfar.server import list_servers
 
 print(Context().resources())  # live CPU, memory, and GPU options
+print(ServerResources.from_context(Context().resources()))  # as limit ranges
+print([server.resources for server in list_servers()])  # saved at discovery
 print(Images().fetch(kind="notebook"))  # image names for one Session Kind
 print(Overview().availability())  # whether the Server is up
 ```
+
+`resources` holds `flexible` and `fixed` CPU and memory ranges, `gpus`, and
+`sessions`, the interactive Session limit; `None` marks a value the Server
+does not advertise, and a Server that never reported limits has
+`resources=None`.
 
 ## Identity in Python
 

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated
 
 import typer
 from rich.errors import MarkupError
 
-from canfar.cli._run import run
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
@@ -49,4 +49,4 @@ def get_logs(
                 rendered_logs = console.render_str(log_text, markup=False)
             console.print(rendered_logs)
 
-    run(_get_logs())
+    asyncio.run(_get_logs())

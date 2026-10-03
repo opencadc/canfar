@@ -8,42 +8,19 @@ from pydantic import ValidationError
 from canfar.models.registry import (
     ContainerRegistry,
     IVOARegistry,
-    IVOARegistrySearch,
     Server,
 )
+from canfar.utils import discover
 
 
-class TestIVOARegistrySearch:
-    """Test IVOARegistrySearch class."""
+class TestDiscoveryConstants:
+    """Discovery skips and names records from fixed module constants."""
 
-    def test_default_values(self) -> None:
-        """Test default values for IVOARegistrySearch."""
-        search = IVOARegistrySearch()
-        assert search.names is not None
-
-        assert ("CADC", "ivo://canfar.net/src/skaha") in search.omit
-        assert "dev" in search.excluded
-        assert "test" in search.excluded
-        assert "staging" in search.excluded
-
-    def test_with_custom_values(self) -> None:
-        """Test IVOARegistrySearch with custom values."""
-        custom_registries = {"https://custom.registry.com": "Custom"}
-        custom_names = {"ivo://custom.com/service": "Custom Service"}
-        custom_omit = [("Custom", "ivo://custom.com/service")]
-        custom_excluded = ("custom", "exclude")
-
-        search = IVOARegistrySearch(
-            registries=custom_registries,
-            names=custom_names,
-            omit=custom_omit,
-            excluded=custom_excluded,
-        )
-
-        assert search.registries == custom_registries
-        assert search.names == custom_names
-        assert search.omit == custom_omit
-        assert search.excluded == custom_excluded
+    def test_constants(self) -> None:
+        """Known omissions, development markers, and Server Names are fixed."""
+        assert ("CADC", "ivo://canfar.net/src/skaha") in discover.OMIT
+        assert {"dev", "test", "staging"} <= set(discover.DEVELOPMENT_MARKERS)
+        assert discover.NAMES["ivo://cadc.nrc.ca/skaha"] == "canfar"
 
 
 class TestIVOARegistry:

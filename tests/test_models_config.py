@@ -121,6 +121,19 @@ class TestConfigurationDefaults:
         assert config.servers["canfar"].name == "canfar"
         assert isinstance(config.registry, ContainerRegistry)
 
+    def test_default_records_are_not_shared(self, tmp_path: Path) -> None:
+        """Editing one default Configuration leaves the next one unchanged."""
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            first = Configuration()
+            first.active.servers["cadc"] = "canfar"
+            first.authentication["cadc"].expiry = 42.0
+            first.servers["canfar"].storage.clear()
+            second = Configuration()
+
+        assert second.active.servers == {}
+        assert second.authentication["cadc"].expiry == 0.0
+        assert set(second.servers["canfar"].storage) == {"arc", "vault"}
+
     def test_model_config_settings(self) -> None:
         """Extra fields are forbidden on the configuration model."""
         with pytest.raises(ValidationError, match="Extra inputs are not permitted"):

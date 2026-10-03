@@ -72,7 +72,7 @@ with Session() as session:
     )
 ```
 
-`replicas` accepts 1 to 512; other ranges are in
+`replicas` accepts 1 to 256; other ranges are in
 [Session limits](../platform/sessions/limits.md). Request GPUs with the `gpu`
 argument. The CLI option is `--gpu` as well, while the request model and the
 Server's API name the field `gpus`:

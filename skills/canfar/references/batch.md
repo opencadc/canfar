@@ -101,12 +101,15 @@ canfar create headless IMAGE --name RUN --replicas 64 --env RUN_DIR=/arc/project
 - Stdout is a JSON array of accepted Session IDs. Replicas are named `RUN-1`
   to `RUN-64`; a single replica is named `RUN`. Names take letters, digits,
   and hyphens. Repeat `--env KEY=VALUE` per variable.
-- The client validates 1 to 512 replicas, 1 to 256 cores, 1 to 512 GB, and 1 to
-  28 GPUs per request. `--dry-run`, used without `-o`, checks a request against
-  those bounds. Each provider sets its own lower limits: read them from
-  `canfar.context.Context().resources()`, whose `options` list the fixed sizes
-  on offer. CANFAR's largest Session is 16 cores and 192 GB.
-- For more than 512 workers, split the manifest into parts and send one
+- The client validates 1 to 256 replicas, 1 to 256 cores, 1 to 512 GB, and 1 to
+  28 GPUs per request. Each provider sets its own lower limits, saved per
+  Server under `resources` in `canfar server ls -o json`; the CLI also rejects
+  values outside the active Server's known `fixed` and `gpus` ranges.
+  `--dry-run`, used without `-o`, checks a request against both. A range can
+  include sizes the Server does not offer: `canfar.context.Context().resources()`
+  lists every fixed size in its `options`. CANFAR's largest Session is 16
+  cores and 192 GB.
+- For more than 256 workers, split the manifest into parts and send one
   request per part, each with its own name and `MANIFEST`, into the same run
   directory. `REPLICA_COUNT` counts one request's replicas, and the run-wide
   `index` keeps the parts' outputs apart.

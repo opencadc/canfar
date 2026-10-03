@@ -2,12 +2,11 @@
 
 from __future__ import annotations
 
+import asyncio
 from typing import Annotated, get_args
 
-import click
 import typer
 
-from canfar.cli._run import run
 from canfar.models.types import Pruneable, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
@@ -28,7 +27,6 @@ def prune_sessions(
     kind: Annotated[
         Pruneable,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Pruneable)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Pruneable)),
             help="Filter by session kind.",
         ),
@@ -36,7 +34,6 @@ def prune_sessions(
     status: Annotated[
         Status,
         typer.Argument(
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),
@@ -60,4 +57,4 @@ def prune_sessions(
                 f"[bold green] Deleted {len(response)} sessions.[/bold green]"
             )
 
-    run(_prune())
+    asyncio.run(_prune())

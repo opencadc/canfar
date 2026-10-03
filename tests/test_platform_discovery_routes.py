@@ -11,10 +11,10 @@ import canfar.utils.discover as registry_discovery
 def test_platform_is_the_only_production_discovery_route() -> None:
     """Discovery enters through Platform and keeps only its low-level adapter."""
     assert callable(platform.discover)
-    assert {"fetch", "extract", "check"} <= vars(registry_discovery.Discover).keys()
-    assert "max_connections" not in signature(registry_discovery.Discover).parameters
-    assert not iscoroutinefunction(registry_discovery.Discover.extract)
-    assert "servers" not in vars(registry_discovery.Discover)
+    assert iscoroutinefunction(registry_discovery.fetch)
+    assert iscoroutinefunction(registry_discovery.check)
+    assert not iscoroutinefunction(registry_discovery.extract)
+    assert "max_connections" not in signature(registry_discovery.client).parameters
     assert not hasattr(registry_discovery, "servers")
     assert not hasattr(registry_models, "ServerResults")
     assert find_spec("canfar.utils.display") is None

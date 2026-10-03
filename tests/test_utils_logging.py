@@ -5,23 +5,26 @@ from __future__ import annotations
 import json
 import logging
 from contextlib import ExitStack
+from io import StringIO
 from logging.handlers import RotatingFileHandler
 from typing import TYPE_CHECKING
 from unittest.mock import Mock, patch
 
 import pytest
+from rich.console import Console
 from rich.logging import RichHandler
 
 from canfar.errors import ErrorCode
 from canfar.utils.logging import (
+    LIBRARY_LOGGER_NAMES,
     LOGGER_NAME,
     MAX_LOGFILE_COUNT,
     MAX_LOGFILE_SIZE,
-    CanfarLogger,
     InvalidLoggingEnvironmentError,
     LoggingLevel,
     configure_logging,
     get_logger,
+    logs_through,
     safe_url,
 )
 
@@ -40,59 +43,55 @@ def _emit_exception_log(logger: logging.Logger) -> None:
 
 def _clear_handlers() -> None:
     """Release handlers through the stdlib logger boundary."""
-    logger = logging.getLogger(LOGGER_NAME)
-    for handler in logger.handlers[:]:
-        handler.close()
-        logger.removeHandler(handler)
+    for name in (LOGGER_NAME, *LIBRARY_LOGGER_NAMES):
+        logger = logging.getLogger(name)
+        for handler in logger.handlers[:]:
+            handler.close()
+            logger.removeHandler(handler)
 
 
 @pytest.fixture
-def canfar_logger() -> Generator[CanfarLogger]:
-    """Fresh CanfarLogger cleaned after each test."""
-    logger = CanfarLogger()
+def clean_handlers() -> Generator[None]:
+    """Start and end each test without CANFAR handlers."""
     _clear_handlers()
-    yield logger
+    yield
     _clear_handlers()
 
 
-def test_configure_rich_stderr_defaults(canfar_logger: CanfarLogger) -> None:
-    """Default configure attaches Rich stderr logging and stops propagation."""
-    canfar_logger.configure()
+@pytest.mark.usefixtures("clean_handlers")
+def test_configure_rich_stderr_defaults() -> None:
+    """Configuring attaches Rich stderr logging and stops propagation."""
+    configure_logging(loglevel="INFO")
 
-    logger = canfar_logger.logger
+    logger = get_logger()
     rich_handlers = [h for h in logger.handlers if isinstance(h, RichHandler)]
     assert logger.level == logging.INFO
     assert len(rich_handlers) == 1
     assert not logger.propagate
 
 
-def test_reconfigure_replaces_handlers(canfar_logger: CanfarLogger) -> None:
+@pytest.mark.usefixtures("clean_handlers")
+def test_reconfigure_replaces_handlers() -> None:
     """Reconfiguration replaces previous handlers."""
-    canfar_logger.configure(loglevel=logging.INFO)
+    configure_logging(loglevel=logging.INFO)
     first = next(
-        handler
-        for handler in canfar_logger.logger.handlers
-        if isinstance(handler, RichHandler)
+        handler for handler in get_logger().handlers if isinstance(handler, RichHandler)
     )
-    canfar_logger.configure(loglevel=logging.DEBUG)
+    configure_logging(loglevel=logging.DEBUG)
     second = next(
-        handler
-        for handler in canfar_logger.logger.handlers
-        if isinstance(handler, RichHandler)
+        handler for handler in get_logger().handlers if isinstance(handler, RichHandler)
     )
     assert second is not first
-    assert first not in canfar_logger.logger.handlers
+    assert first not in get_logger().handlers
 
 
-def test_separate_logger_lifecycles_do_not_accumulate_handlers(
+def test_repeated_configuration_does_not_accumulate_handlers(
     tmp_path: Path,
 ) -> None:
     """Repeated application lifecycles leave one stderr/file sink pair."""
-    first = CanfarLogger()
-    second = CanfarLogger()
     try:
-        first.configure(loglevel=logging.INFO, log_file=tmp_path / "first.jsonl")
-        second.configure(loglevel=logging.INFO, log_file=tmp_path / "second.jsonl")
+        configure_logging(loglevel=logging.INFO, log_file=tmp_path / "first.jsonl")
+        configure_logging(loglevel=logging.INFO, log_file=tmp_path / "second.jsonl")
 
         logger = logging.getLogger(LOGGER_NAME)
         assert len([h for h in logger.handlers if isinstance(h, RichHandler)]) == 1
@@ -107,7 +106,8 @@ def test_separate_logger_lifecycles_do_not_accumulate_handlers(
     ("kwargs", "expected"),
     [
         ({"loglevel": "DEBUG"}, LoggingLevel.DEBUG),
-        ({"verbosity": 2}, LoggingLevel.WARNING),
+        ({"verbosity": 1}, LoggingLevel.INFO),
+        ({"verbosity": 2}, LoggingLevel.DEBUG),
         ({}, LoggingLevel.CRITICAL),
     ],
 )
@@ -118,9 +118,11 @@ def test_configure_logging_resolves_precedence(
 ) -> None:
     """CLI level beats verbosity; unset falls back to packaged critical."""
     monkeypatch.delenv("CANFAR_LOGLEVEL", raising=False)
-    with patch("canfar.utils.logging._canfar_logger.configure") as configure:
+    try:
         assert configure_logging(**kwargs) is expected  # type: ignore[arg-type]
-        configure.assert_called_once()
+        assert get_logger().level == getattr(logging, expected.value.upper())
+    finally:
+        _clear_handlers()
 
 
 def test_invalid_canfar_loglevel_fails_fast(
@@ -172,6 +174,33 @@ def test_jsonl_file_sink_writes_flat_events(
         _clear_handlers()
 
 
+@pytest.mark.parametrize("library", LIBRARY_LOGGER_NAMES)
+def test_storage_library_records_follow_the_cli_verbosity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    library: str,
+) -> None:
+    """``-v`` shows storage library progress through CANFAR's own sinks."""
+    log_file = tmp_path / "library.jsonl"
+    monkeypatch.delenv("CANFAR_LOGLEVEL", raising=False)
+    try:
+        configure_logging(verbosity=1, log_file=log_file)
+        logging.getLogger(f"{library}.transfer").info("copied")
+        logging.getLogger(f"{library}.transfer").debug("hidden at -v")
+        for handler in logging.getLogger(library).handlers:
+            handler.flush()
+
+        events = [
+            json.loads(line)
+            for line in log_file.read_text(encoding="utf-8").splitlines()
+        ]
+        assert [(event["logger"], event["message"]) for event in events] == [
+            (f"{library}.transfer", "copied")
+        ]
+    finally:
+        _clear_handlers()
+
+
 def test_jsonl_file_sink_includes_exception_text(tmp_path: Path) -> None:
     """Exception diagnostics remain available as one escaped JSONL field."""
     log_file = tmp_path / "exception.jsonl"
@@ -191,13 +220,13 @@ def test_jsonl_file_sink_includes_exception_text(tmp_path: Path) -> None:
 def test_jsonl_rotates_with_small_max_size(tmp_path: Path) -> None:
     """Rotating handler keeps JSON Lines across rollover."""
     log_file = tmp_path / "rotating.jsonl"
-    logger = CanfarLogger()
+    logger = get_logger()
     try:
         with patch("canfar.utils.logging.MAX_LOGFILE_SIZE", 256):
-            logger.configure(loglevel=logging.INFO, log_file=log_file)
+            configure_logging(loglevel=logging.INFO, log_file=log_file)
         for index in range(8):
-            logger.logger.info("rotation-event-%d %s", index, "x" * 80)
-        for handler in logger.logger.handlers:
+            logger.info("rotation-event-%d %s", index, "x" * 80)
+        for handler in logger.handlers:
             handler.flush()
         files = sorted(tmp_path.glob("rotating.jsonl*"))
         assert log_file in files
@@ -213,16 +242,16 @@ def test_file_sink_failure_keeps_stderr_and_warns_once(
     failure: str,
 ) -> None:
     """Write/rollover errors disable only the file sink."""
-    logger = CanfarLogger()
+    logger = get_logger()
     warning_writer = Mock()
-    logger.configure(
+    configure_logging(
         loglevel=logging.CRITICAL,
         log_file=tmp_path / f"{failure}.jsonl",
         warning_writer=warning_writer,
     )
     handlers = [
         candidate
-        for candidate in logger.logger.handlers
+        for candidate in logger.handlers
         if isinstance(candidate, RotatingFileHandler)
     ]
     assert len(handlers) == 1
@@ -247,8 +276,8 @@ def test_file_sink_failure_keeps_stderr_and_warns_once(
                         side_effect=OSError("synthetic rollover failure"),
                     )
                 )
-            logger.logger.critical("critical-event-one")
-            logger.logger.critical("critical-event-two")
+            logger.critical("critical-event-one")
+            logger.critical("critical-event-two")
 
         stderr = capsys.readouterr().err
         assert failing.call_count == 1
@@ -261,3 +290,31 @@ def test_file_sink_failure_keeps_stderr_and_warns_once(
         )
     finally:
         _clear_handlers()
+
+
+def test_logs_through_routes_stderr_records_then_restores(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Records print through a borrowed console only inside the block."""
+    monkeypatch.delenv("CANFAR_LOGLEVEL", raising=False)
+    borrowed = StringIO()
+    try:
+        configure_logging(loglevel="INFO")
+        with logs_through(Console(file=borrowed, width=120)):
+            get_logger("live").info("inside")
+        get_logger("live").info("outside")
+    finally:
+        _clear_handlers()
+
+    assert "inside" in borrowed.getvalue()
+    assert "outside" not in borrowed.getvalue()
+
+
+def test_logs_through_without_configured_logging_is_a_no_op() -> None:
+    """Python callers that never configure logging can still use the block."""
+    _clear_handlers()
+    with (
+        patch("canfar.utils.logging._rich_handler", None),
+        logs_through(Console(file=StringIO())),
+    ):
+        pass

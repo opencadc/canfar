@@ -1,12 +1,15 @@
-"""Shared helpers for CLI machine output integration."""
+"""Shared option declarations for CLI commands."""
 
 from __future__ import annotations
 
-from typing import Annotated, Literal
+from typing import TYPE_CHECKING, Annotated, Literal
 
 import typer
 
 from canfar.cli import output
+
+if TYPE_CHECKING:
+    from pydantic import BaseModel
 
 OutputOption = Annotated[
     Literal["json", "yaml"] | None,
@@ -35,3 +38,17 @@ def resolve_mode(output_format: str | None) -> output.OutputMode:
     if output_format is None:
         return output.OutputMode.HUMAN
     return output.OutputMode(output_format)
+
+
+def maximum(model: type[BaseModel], field: str) -> int:
+    """Return the largest value ``model`` accepts for ``field``, for option ranges.
+
+    Args:
+        model: Pydantic model that declares the bound.
+        field: Field with an ``le`` constraint.
+
+    Returns:
+        The field's inclusive upper bound.
+    """
+    metadata = model.model_fields[field].metadata
+    return next(rule.le for rule in metadata if hasattr(rule, "le"))

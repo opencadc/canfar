@@ -47,14 +47,10 @@ def stripe(
     replica = int(os.environ.get("REPLICA_ID", "1")) if replica is None else replica
     total = int(os.environ.get("REPLICA_COUNT", "1")) if total is None else total
 
-    if replica < 1:
+    if replica < 1 or 0 < total < replica:
         return
-    if total <= 0:
-        yield from itertools.islice(iterable, replica - 1, None, total)
-    elif replica > total:
-        return
-    else:
-        yield from itertools.islice(iterable, replica - 1, None, total)
+    # islice raises ValueError for a non-positive step (total).
+    yield from itertools.islice(iterable, replica - 1, None, total)
 
 
 def chunk(

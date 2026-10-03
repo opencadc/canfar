@@ -2,20 +2,32 @@
 
 from __future__ import annotations
 
+import re
+from io import StringIO
 from pathlib import Path
+from typing import TYPE_CHECKING
 from unittest.mock import MagicMock, patch
 
 import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
+from rich.console import Console
+from rich.logging import RichHandler
 from typer.testing import CliRunner
 
 from canfar.auth import x509
+from canfar.cli.login import _live_output
 from canfar.cli.main import cli
+from canfar.errors import ErrorCode
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
+from canfar.models.registry import ServerProbe
+from canfar.server import ServerDiscoveryError
 from tests.test_auth_x509 import generate_cert
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 runner = CliRunner()
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
@@ -178,11 +190,13 @@ def test_login_passes_dev_and_timeout_to_http_steps(tmp_path: Path) -> None:
         dev: bool,
         timeout: int,
         save: bool,
+        on_probe: Callable[[ServerProbe], None],
     ) -> list[Server]:
         assert idp == "cadc"
         assert dev is True
         assert timeout == 9
         assert save is False
+        assert callable(on_probe)
         _merge_servers(config, discovered, idp)
         return discovered
 
@@ -310,3 +324,207 @@ def test_login_presents_device_flow_failure_on_terminal(
     assert result.exit_code == 1
     assert "OIDC device authorization was denied" in result.stderr
     assert (config_path.read_bytes() if config_path.exists() else None) == original
+
+
+def _probe(name: str, status: str) -> ServerProbe:
+    return ServerProbe(
+        name=name,
+        uri=f"ivo://{name}.example/skaha",
+        url=f"https://{name}.example/skaha",
+        status=status,
+    )
+
+
+def _login_with_outcomes(
+    tmp_path: Path,
+    outcomes: list[ServerProbe],
+    *,
+    root: tuple[str, ...] = (),
+    options: tuple[str, ...] = (),
+    error: ServerDiscoveryError | None = None,
+):
+    """Log in while fake discovery reports ``outcomes``; return the result.
+
+    Discovery raises ``error``, or the no-Server error when nothing connected.
+    """
+    config_path = tmp_path / "config.yaml"
+    credential = X509Credential(idp="cadc", path=Path("/new/cert.pem"), expiry=456.0)
+    discovered = [
+        Server(
+            idp="cadc",
+            name="canSRC",
+            uri=AnyUrl("ivo://canSRC.example/skaha"),
+            url=AnyHttpUrl("https://canSRC.example/skaha"),
+            version="v1",
+            auths=["x509"],
+        )
+    ]
+
+    def discover(idp: str, *, config: Configuration, on_probe, **_kwargs):
+        for probe in outcomes:
+            on_probe(probe)
+        if error is not None:
+            raise error
+        if not any(probe.status == "connected" for probe in outcomes):
+            message = f"No servers discovered for IDP '{idp}'."
+            raise ServerDiscoveryError(message, code=ErrorCode.SERVER_NONE_AVAILABLE)
+        _merge_servers(config, discovered, idp)
+        return discovered
+
+    with (
+        _patch_config(config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.login.authenticate_for_cli", return_value=credential),
+        patch("canfar.server._validate_server", return_value=discovered[0]),
+        patch("canfar.cli.login.discover", side_effect=discover),
+    ):
+        return runner.invoke(cli, [*root, "login", "cadc", *options])
+
+
+_OUTCOMES = [
+    *(
+        _probe(name, "pending")
+        for name in ("ukRAL", "canSRC", "cnSRC", "krSRC", "canSRC")
+    ),
+    _probe("ukRAL", "timeout"),
+    _probe("canSRC", "connected"),
+    _probe("cnSRC", "unreachable"),
+    _probe("krSRC", "error"),
+    _probe("canSRC", "error"),
+]
+"""Pending reports, then one outcome each; ``canSRC`` is listed twice."""
+
+
+def test_login_shows_discovery_squares_legend_and_timeout_hint(
+    tmp_path: Path,
+) -> None:
+    """Login shows one glyph per Server, a legend, and how to wait longer.
+
+    CliRunner stderr has no color, so each state uses its plain glyph.
+    """
+    result = _login_with_outcomes(tmp_path, _OUTCOMES)
+
+    assert result.exit_code == 0
+    assert result.stderr.strip().splitlines()[-4:-2] == [
+        "+ x ! ~",
+        "+ 1 discovered   ~ 1 timeout   x 1 unreachable   ! 1 failed",
+    ]
+    summary, hint = result.stderr.strip().splitlines()[-2:]
+    assert re.fullmatch(
+        r"Checked 4 servers in \d+\.\ds with a 10s request timeout\.", summary
+    )
+    assert hint == "1 timed out. To wait longer, run canfar login cadc --timeout 20"
+    assert "canSRC" not in result.stderr
+    assert "Fetched" not in result.stderr
+    assert "Login completed successfully" in result.stdout
+
+
+@pytest.mark.parametrize(
+    ("options", "hint"),
+    [
+        (("--dev", "--timeout", "9"), "run canfar login cadc --dev --timeout 18"),
+        (("--timeout", "200"), "run canfar login cadc --timeout 300"),
+        (("--timeout", "300"), None),
+    ],
+    ids=["keeps-dev", "caps-at-300", "already-at-limit"],
+)
+def test_login_timeout_hint_repeats_scope_and_respects_the_limit(
+    tmp_path: Path,
+    options: tuple[str, ...],
+    hint: str | None,
+) -> None:
+    """The suggested command keeps --dev and never exceeds the client limit."""
+    result = _login_with_outcomes(tmp_path, _OUTCOMES, options=options)
+
+    assert result.exit_code == 0
+    last = result.stderr.strip().splitlines()[-1]
+    if hint is None:
+        assert last.startswith("Checked 4 servers in ")
+    else:
+        assert last.endswith(hint)
+
+
+@pytest.mark.parametrize(
+    ("root", "named"),
+    [
+        (("--log-level", "info"), True),
+        (("-vvv",), True),
+        (("--log-level", "warning"), False),
+    ],
+    ids=["info", "-vvv", "warning"],
+)
+def test_login_names_discovered_servers_from_info_logging(
+    tmp_path: Path,
+    root: tuple[str, ...],
+    named: bool,
+) -> None:
+    """INFO or more verbose logging labels each glyph with its Server Name."""
+    result = _login_with_outcomes(tmp_path, _OUTCOMES, root=root)
+
+    assert result.exit_code == 0
+    labelled = [
+        "+", "canSRC", "x", "cnSRC", "!", "krSRC", "~", "ukRAL",
+    ]  # fmt: skip
+    assert (labelled in [line.split() for line in result.stderr.splitlines()]) is named
+
+
+def test_login_shows_discovery_outcomes_before_no_server_error(
+    tmp_path: Path,
+) -> None:
+    """When no Server connects, the grid still explains each failure."""
+    result = _login_with_outcomes(
+        tmp_path,
+        [
+            _probe("ukRAL", "pending"),
+            _probe("ukCAM", "pending"),
+            _probe("ukRAL", "unreachable"),
+            _probe("ukCAM", "error"),
+        ],
+    )
+
+    assert result.exit_code == 1
+    lines = result.stderr.strip().splitlines()
+    assert lines[-5:-3] == [
+        "! x",
+        "+ 0 discovered   ~ 0 timeout   x 1 unreachable   ! 1 failed",
+    ]
+    assert lines[-3].startswith("Checked 2 servers in ")
+    assert lines[-2:] == ["", "No servers discovered for IDP 'cadc'."]
+
+
+def test_login_registry_failure_suggests_network_check_or_longer_timeout(
+    tmp_path: Path,
+) -> None:
+    """A registry that cannot be read gets advice instead of an empty grid."""
+    error = ServerDiscoveryError(
+        "Failed to discover servers for IDP 'cadc': CADC: timed out"
+    )
+
+    result = _login_with_outcomes(tmp_path, [], error=error)
+
+    assert result.exit_code == 1
+    assert result.stderr.strip().splitlines()[-2:] == [
+        "Failed to discover servers for IDP 'cadc': CADC: timed out",
+        (
+            "Check your network connection, or if the registry is slow, run "
+            "canfar login cadc --timeout 20"
+        ),
+    ]
+
+
+def test_live_output_routes_logs_and_restores_console(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Log records print through the live console, which then reverts."""
+    live = Console(file=StringIO(), width=120, force_terminal=True)
+    original = Console(file=StringIO())
+    handler = RichHandler(console=original)
+    monkeypatch.setattr("canfar.utils.logging._rich_handler", handler)
+    monkeypatch.setattr("canfar.cli.login.Console", lambda **_kwargs: Console(width=72))
+
+    with _live_output(live):
+        assert handler.console is live
+        assert live.width == 72
+
+    assert handler.console is original
+    assert live.width == 120

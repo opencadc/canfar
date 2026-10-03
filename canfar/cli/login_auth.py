@@ -7,7 +7,6 @@ import webbrowser
 from typing import TYPE_CHECKING, Any
 
 import humanize
-import segno
 from rich import progress as rich_progress
 
 from canfar.auth import oidc, x509
@@ -45,6 +44,8 @@ async def _interactive_device_flow(
     verification_url = challenge.verification_uri_complete or challenge.verification_uri
     console.print(f"\n  {verification_url}\n")
     console.print(f"[bold]Code:[/bold] {challenge.user_code.get_secret_value()}")
+
+    import segno  # noqa: PLC0415
 
     qr = segno.make(verification_url, error="H")
     qr.terminal(compact=True)

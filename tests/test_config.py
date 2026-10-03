@@ -46,9 +46,7 @@ class TestConfigDefaults:
         assert str(srv.url) == "https://ws-uv.canfar.net/skaha"
         assert srv.version == "v1"
         assert srv.auths == ["x509"]
-        assert srv.cores == 2
-        assert srv.ram == 16
-        assert srv.gpus == 0
+        assert srv.resources is None
         assert config.registry.model_dump(exclude_none=True) == {}
         assert config.console.width == 120
 
@@ -342,6 +340,56 @@ class TestConfigEditing:
 
         assert config.active.server == "CADC-CANFAR"
         assert config.servers["CADC-CANFAR"].name == ("CADC-CANFAR")
+
+
+class TestRetiredServerFields:
+    """Test configuration files written before Server resources existed."""
+
+    def test_v1_4_1_server_limits_load_and_are_dropped_on_save(
+        self, tmp_path: Path
+    ) -> None:
+        """Flat v1.4.1 limits load as unknown resources and are not rewritten."""
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            yaml.dump(
+                {
+                    "version": 1,
+                    "active": {"authentication": "cadc", "server": "canfar"},
+                    "authentication": {
+                        "cadc": {"mode": "x509", "path": "/c.pem", "expiry": 1.0}
+                    },
+                    "servers": {
+                        "canfar": {
+                            "idp": "cadc",
+                            "uri": "ivo://cadc.nrc.ca/skaha",
+                            "url": "https://ws-uv.canfar.net/skaha",
+                            "version": "v1",
+                            "cores": 2,
+                            "ram": 16,
+                            "gpus": 0,
+                            "status": "reachable",
+                        }
+                    },
+                }
+            ),
+            encoding="utf-8",
+        )
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.editor.save()
+
+        assert config.servers["canfar"].resources is None
+        saved = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        assert {"cores", "ram", "gpus", "status"}.isdisjoint(saved["servers"]["canfar"])
+
+    def test_editing_a_retired_server_field_fails(self, tmp_path: Path) -> None:
+        """Edits name ``resources`` instead of silently dropping retired keys."""
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            config = Configuration()
+
+            with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
+                config.editor.set("servers.canfar.cores", 4)
 
 
 class TestConfigManualReset:

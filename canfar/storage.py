@@ -141,26 +141,20 @@ def _build(
     )
 
 
-def _vospace(
-    identifier: str,
-    *,
-    token: str | SecretStr | None = None,
-    certificate: Path | str | None = None,
-) -> AsyncFilesystemSource:
+def _vospace(identifier: str) -> AsyncFilesystemSource:
     """Return a fresh authenticated async filesystem source.
 
     Args:
         identifier: Storage Identifier of the configured VOSpace Service.
-        token: Runtime bearer token, preferred over any saved credential.
-        certificate: Runtime X.509 certificate path.
 
     Returns:
-        AsyncFilesystemSource: Factory yielding one authenticated filesystem.
+        AsyncFilesystemSource: Factory yielding one authenticated filesystem,
+            resolved from the saved configuration on each entry.
     """
 
     @asynccontextmanager
     async def source() -> AsyncIterator[AbstractFileSystem]:
-        endpoint, credential = await _resolve(identifier, token, certificate)
+        endpoint, credential = await _resolve(identifier)
         filesystem = _build(endpoint, credential, asynchronous=True)
         try:
             yield filesystem

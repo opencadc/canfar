@@ -1,25 +1,35 @@
 """X509 Certificate Management Module.
 
-This module provides functionality to obtain and inspect X509 PEM certificates
-using the cadcutils.net.auth library as the backbone for X509 authentication.
+This module obtains CADC proxy certificates from the CADC credential service
+and inspects X509 PEM certificates.
 """
 
 from __future__ import annotations
 
+import getpass
 import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from cadcutils.net.auth import Subject, get_cert
 from cryptography import x509
+from defusedxml import ElementTree
 
-from canfar import CERT_PATH
+from canfar import CERT_PATH, __version__
+from canfar.idp import get_idp
 
 if TYPE_CHECKING:
+    import httpx2
+
     from canfar.models.auth import X509Credential
 
 log = logging.getLogger(__name__)
+
+_CREDENTIAL_SERVICE = "ivo://cadc.nrc.ca/cred"
+_CDP_PROXY = "ivo://ivoa.net/std/CDP#proxy-1.0"
+_BASIC_AA = "ivo://ivoa.net/sso#BasicAA"
+_DAYS_VALID = 30
+_CDP_TIMEOUT = 30
 
 
 class CertificateError(ValueError):
@@ -67,20 +77,16 @@ def assert_valid_dates(
 
 def gather(
     username: str | None = None,
-    days_valid: int = 30,
     cert_path: Path | None = None,
 ) -> dict[str, Any]:
-    """Gather user credentials and obtain X509 certificate.
+    """Prompt for CADC credentials and save a new proxy certificate.
 
-    This function uses cadcutils.net.auth.get_cert as the backbone to obtain
-    X509 certificates, similar to how the cadc-get-cert CLI tool works.
+    The CADC credential service issues a certificate valid for 30 days through
+    the IVOA Credential Delegation Protocol (CDP), as ``cadc-get-cert`` does.
 
     Args:
-        username (str, optional): Username for authentication. Will prompt if None.
-            Defaults to None.
-        days_valid (int): Number of days the certificate should be valid.
-            Defaults to 30.
-        cert_path (Path, optional): Path to save certificate.
+        username (str, optional): CADC username. Prompts when omitted.
+        cert_path (Path, optional): Path to save the certificate.
             Defaults to ~/.ssl/cadcproxy.pem.
 
     Returns:
@@ -92,41 +98,67 @@ def gather(
         ValueError: If certificate retrieval fails.
 
     Examples:
-        >>> info = gather(username="myuser", days_valid=30)
+        >>> info = gather(username="myuser")
         >>> print(f"Certificate saved to {info['path']}")
     """
-    # Get credentials if not provided
     if not username:
         username = input("Username: ")
-
-    # Set default path
     if cert_path is None:
-        log.debug("Using default certificate path: ~/.ssl/cadcproxy.pem")
         cert_path = Path.home() / ".ssl" / "cadcproxy.pem"
 
+    # httpx2 loads only to fetch a certificate, keeping CLI startup light.
+    import httpx2  # noqa: PLC0415
+
+    password = getpass.getpass("Password: ")
+    if not password:
+        msg = "Failed to obtain X509 certificate: Password cannot be empty"
+        raise ValueError(msg)
     try:
-        # Create subject for authentication
-        subject = Subject(username=username)
-
-        # Use cadcutils.net.auth.get_cert to obtain the certificate
-        cert_content = get_cert(
-            subject=subject,
-            days_valid=days_valid,
-        )
-
-        # Ensure the directory exists
+        with httpx2.Client(
+            headers={"User-Agent": f"python-canfar/{__version__}"},
+            timeout=_CDP_TIMEOUT,
+        ) as client:
+            response = client.get(
+                _certificate_url(client),
+                params={"daysValid": _DAYS_VALID},
+                auth=(username, password),
+            )
+            response.raise_for_status()
         cert_path.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write certificate to file with secure permissions
-        cert_path.write_text(cert_content)
-        cert_path.chmod(0o600)  # Read/write for owner only
-
-        # Get certificate info for return
+        cert_path.write_text(response.text)
+        cert_path.chmod(0o600)
         return inspect(cert_path)
-
     except Exception as e:
         msg = f"Failed to obtain X509 certificate: {e}"
         raise ValueError(msg) from e
+
+
+def _certificate_url(client: httpx2.Client) -> str:
+    """Resolve the CADC credential service's password-authenticated CDP URL."""
+    response = client.get(str(get_idp("cadc").registry_url))
+    response.raise_for_status()
+    for line in response.text.splitlines():
+        uri, _, url = line.partition("=")
+        if uri.strip() == _CREDENTIAL_SERVICE:
+            break
+    else:
+        msg = f"The CADC registry does not list {_CREDENTIAL_SERVICE}."
+        raise ValueError(msg)
+
+    response = client.get(url.strip())
+    response.raise_for_status()
+    for capability in ElementTree.fromstring(response.text).findall(".//{*}capability"):
+        if capability.get("standardID") != _CDP_PROXY:
+            continue
+        for interface in capability.findall("{*}interface"):
+            methods = {
+                sm.get("standardID") for sm in interface.findall("{*}securityMethod")
+            }
+            access = interface.findtext("{*}accessURL")
+            if _BASIC_AA in methods and access:
+                return access.strip()
+    msg = f"{_CREDENTIAL_SERVICE} offers no password login for certificates."
+    raise ValueError(msg)
 
 
 def inspect(path: Path = CERT_PATH) -> dict[str, Any]:

@@ -3,7 +3,31 @@
 import pytest
 from pydantic import ValidationError
 
-from canfar.models.http import Server, VOSpaceService
+from canfar.models.http import (
+    ResourceRange,
+    Server,
+    ServerResources,
+    SessionResources,
+    VOSpaceService,
+)
+
+_LIMIT_RANGE_CONTEXT = {
+    "cores": {
+        "default": 1,
+        "defaultRequest": 1,
+        "defaultLimit": 2,
+        "options": list(range(1, 35)),
+    },
+    "memoryGB": {
+        "default": 2,
+        "defaultRequest": 2,
+        "defaultLimit": 4,
+        "options": list(range(1, 385)),
+    },
+    "gpus": {"options": []},
+    "maxInteractiveSessions": 5,
+}
+"""Context payload from a Server that derives limits from a LimitRange."""
 
 
 class TestVOSpaceService:
@@ -57,12 +81,12 @@ class TestServer:
     ) -> None:
         """Persisted Server data comes only from validated input."""
         monkeypatch.setenv("CANFAR_SERVER_NAME", "Environment Server")
-        monkeypatch.setenv("CANFAR_SERVER_CORES", "64")
+        monkeypatch.setenv("CANFAR_SERVER_RESOURCES", '{"sessions": 64}')
 
         server = Server()
 
         assert server.name is None
-        assert server.cores == 2
+        assert server.resources is None
         assert not hasattr(server, "capabilities")
         assert not hasattr(server, "fetch")
         assert not hasattr(server, "afetch")
@@ -74,7 +98,6 @@ class TestServer:
         assert server.uri is None
         assert server.url is None
         assert server.version is None
-        assert server.status is None
         assert server.storage == {}
 
     def test_with_all_values(self) -> None:
@@ -202,3 +225,102 @@ class TestServer:
         # Test examples from URL field
         server = Server(url="https://services.swesrc.chalmers.se/skaha")
         assert str(server.url) == "https://services.swesrc.chalmers.se/skaha"
+
+
+class TestServerResources:
+    """Test Session resource limits read from context payloads."""
+
+    def test_reads_flexible_and_fixed_limits_from_context(self) -> None:
+        """Flexible spans request to limit; fixed spans the offered options."""
+        resources = ServerResources.from_context(_LIMIT_RANGE_CONTEXT)
+
+        assert resources.model_dump() == {
+            "flexible": {"cores": {"min": 1, "max": 2}, "ram": {"min": 2, "max": 4}},
+            "fixed": {"cores": {"min": 1, "max": 34}, "ram": {"min": 1, "max": 384}},
+            "gpus": {"min": 0, "max": 0},
+            "sessions": 5,
+        }
+
+    def test_reads_file_based_context_with_sparse_options(self) -> None:
+        """File-based contexts may send sparse options and a quoted Session count."""
+        resources = ServerResources.from_context(
+            {
+                "cores": {
+                    "defaultRequest": 1,
+                    "defaultLimit": 8,
+                    "options": [16, 1, 2],
+                },
+                "memoryGB": {
+                    "defaultRequest": 4,
+                    "defaultLimit": 32,
+                    "options": [1, 2, 4, 192],
+                },
+                "gpus": {"options": [1, 2, 28]},
+                "maxInteractiveSessions": "5",
+            }
+        )
+
+        assert resources.fixed == SessionResources(
+            cores=ResourceRange(min=1, max=16),
+            ram=ResourceRange(min=1, max=192),
+        )
+        assert resources.gpus == ResourceRange(min=1, max=28)
+        assert resources.sessions == 5
+
+    def test_missing_or_malformed_values_stay_unknown(self) -> None:
+        """Older platforms produce partial resources instead of invented defaults."""
+        resources = ServerResources.from_context(
+            {
+                "cores": {"defaultRequest": 8, "defaultLimit": 2, "options": [1, 2]},
+                "memoryGB": {"defaultRequest": 2, "defaultLimit": 20, "options": []},
+                "maxInteractiveSessions": 0,
+            }
+        )
+
+        assert resources == ServerResources(
+            flexible=SessionResources(ram=ResourceRange(min=2, max=20)),
+            fixed=SessionResources(cores=ResourceRange(min=1, max=2)),
+        )
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            {},
+            {"error": "not found"},
+            {
+                "cores": {"default-request": 1, "default-limit": 16},
+                "memory": {"options-gb": [1, 2, 4]},
+            },
+        ],
+        ids=["empty", "unrelated", "pre-2024-keys"],
+    )
+    def test_rejects_payloads_without_recognizable_limits(self, payload: dict) -> None:
+        """A payload with no recognizable limit is not usable resources."""
+        with pytest.raises(ValueError, match="no recognizable resource limits"):
+            ServerResources.from_context(payload)
+
+    @pytest.mark.parametrize(
+        "bounds",
+        [{"min": 3, "max": 2}, {"min": -1, "max": 2}, {"min": 1}],
+    )
+    def test_range_rejects_invalid_bounds(self, bounds: dict) -> None:
+        """Ranges are inclusive, non-negative, and need both bounds."""
+        with pytest.raises(ValidationError):
+            ResourceRange.model_validate(bounds)
+
+    def test_server_round_trips_resources_and_omits_unknown_values(self) -> None:
+        """Saved configuration omits unknown limits and reloads the same model."""
+        server = Server(
+            name="canSRC",
+            resources=ServerResources(gpus=ResourceRange(min=0, max=0), sessions=5),
+        )
+
+        saved = server.model_dump(mode="json", exclude_none=True)
+
+        assert saved["resources"] == {
+            "flexible": {},
+            "fixed": {},
+            "gpus": {"min": 0, "max": 0},
+            "sessions": 5,
+        }
+        assert Server.model_validate(saved) == server

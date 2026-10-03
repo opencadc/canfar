@@ -23,7 +23,7 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.config import Configuration
-from canfar.models.http import Server, VOSpaceService
+from canfar.models.http import Server, ServerResources, VOSpaceService
 from canfar.models.registry import ContainerRegistry
 from tests.test_auth_x509 import generate_cert
 
@@ -35,10 +35,28 @@ _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 _CADC_URL = "https://ws-uv.canfar.net/skaha"
 _REFRESHED_TOKEN = "opaque-refreshed-access-token"
 _CONTEXT_PAYLOAD = {
-    "cores": {"defaultLimit": None},
-    "memoryGB": {"defaultLimit": 192},
-    "gpus": {"options": [0, 1, 2, 4]},
+    "cores": {
+        "default": 1,
+        "defaultRequest": 1,
+        "defaultLimit": 2,
+        "options": list(range(1, 35)),
+    },
+    "memoryGB": {
+        "default": 2,
+        "defaultRequest": 2,
+        "defaultLimit": 4,
+        "options": list(range(1, 385)),
+    },
+    "gpus": {"options": []},
+    "maxInteractiveSessions": 5,
 }
+_CONTEXT_RESOURCES = {
+    "flexible": {"cores": {"min": 1, "max": 2}, "ram": {"min": 2, "max": 4}},
+    "fixed": {"cores": {"min": 1, "max": 34}, "ram": {"min": 1, "max": 384}},
+    "gpus": {"min": 0, "max": 0},
+    "sessions": 5,
+}
+_KNOWN_RESOURCES = ServerResources(sessions=1)
 _VOSPACE_CAPABILITIES = """
     <capabilities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
       <capability standardID="ivo://ivoa.net/std/VOSpace/v2.0#nodes">
@@ -169,10 +187,7 @@ class TestPlatformEnrichment:
         known = _server(
             name="Stable-Name",
             storage=_primary_storage("Stable-Name"),
-            cores=8,
-            ram=64,
-            gpus=1,
-            status="reachable",
+            resources=_KNOWN_RESOURCES,
         )
         requests: list[httpx2.Request] = []
 
@@ -204,9 +219,7 @@ class TestPlatformEnrichment:
             **known.model_dump(mode="json"),
             "version": "v2",
             "auths": ["oidc"],
-            "cores": 2,
-            "ram": 192,
-            "gpus": 4,
+            "resources": _CONTEXT_RESOURCES,
         }
         assert persisted.active.server == "Stable-Name"
         assert persisted.servers["Stable-Name"] == activated.server
@@ -221,20 +234,17 @@ class TestPlatformEnrichment:
             {"connect": 7, "read": 7, "write": 7, "pool": 7},
         ]
 
-    @pytest.mark.parametrize("failure", ["transport", "parse", "validation"])
-    def test_activation_uses_resource_defaults_when_context_is_unusable(
+    @pytest.mark.parametrize("failure", ["transport", "missing", "parse", "validation"])
+    def test_activation_keeps_known_resources_when_context_is_unusable(
         self,
         tmp_path: Path,
         failure: str,
     ) -> None:
-        """Expected context failures keep server identity and safe defaults."""
+        """Expected context failures keep server identity and known resources."""
         known = _server(
             name="Stable-Name",
             storage=_primary_storage("Stable-Name"),
-            cores=8,
-            ram=64,
-            gpus=1,
-            status="reachable",
+            resources=_KNOWN_RESOURCES,
         )
 
         def response(request: httpx2.Request) -> httpx2.Response:
@@ -248,10 +258,12 @@ class TestPlatformEnrichment:
             if failure == "transport":
                 message = "context unavailable"
                 raise httpx2.ConnectError(message, request=request)
+            if failure == "missing":
+                return httpx2.Response(404, request=request)
             if failure == "parse":
                 return httpx2.Response(200, content=b"{", request=request)
             return httpx2.Response(
-                200, json={"cores": {"defaultLimit": 0}}, request=request
+                200, json={"cores": {"default-limit": 16}}, request=request
             )
 
         config_patch, client_patch = _patch_client(
@@ -264,11 +276,8 @@ class TestPlatformEnrichment:
 
         assert (
             activated.server.name,
-            activated.server.status,
-            activated.server.cores,
-            activated.server.ram,
-            activated.server.gpus,
-        ) == ("Stable-Name", "reachable", 2, 16, 0)
+            activated.server.resources,
+        ) == ("Stable-Name", _KNOWN_RESOURCES)
 
     @pytest.mark.parametrize("authentication", ["oidc", "x509"])
     @pytest.mark.parametrize("strict", [False, True])
@@ -330,10 +339,7 @@ class TestPlatformEnrichment:
         known = _server(
             name="Known-CADC",
             url=AnyHttpUrl("https://registry.example/skaha"),
-            cores=8,
-            ram=64,
-            gpus=1,
-            status="reachable",
+            resources=_KNOWN_RESOURCES,
         )
         expected = known.model_copy(
             update={

@@ -132,7 +132,7 @@ class HTTPClient(BaseSettings):
     # Private attributes
     _client: Client | None = PrivateAttr(default=None)
     _asynclient: AsyncClient | None = PrivateAttr(default=None)
-    _refresh_lock: asyncio.Lock | None = PrivateAttr(default=None)
+    _refresh_lock: asyncio.Lock = PrivateAttr(default_factory=asyncio.Lock)
 
     # Client Properties
     @property
@@ -143,7 +143,7 @@ class HTTPClient(BaseSettings):
             Client: The synchronous HTTPX2 client.
         """
         if not self._client:
-            self._client = self._create_sync_client()
+            self._client = Client(**self._client_options(asynchronous=False))
             log.debug("Synchronous HTTPX2 client created")
         return self._client
 
@@ -151,7 +151,7 @@ class HTTPClient(BaseSettings):
     def asynclient(self) -> AsyncClient:
         """Get the asynchronous HTTPX2 Async Client."""
         if not self._asynclient:
-            self._asynclient = self._create_async_client()
+            self._asynclient = AsyncClient(**self._client_options(asynchronous=True))
             log.debug("Asynchronous HTTPX2 client created")
         return self._asynclient
 
@@ -204,31 +204,13 @@ class HTTPClient(BaseSettings):
 
         return self
 
-    def _create_async_client(self) -> AsyncClient:
-        """Create an asynchronous HTTPX2 client.
-
-        Returns:
-            AsyncClient: The asynchronous HTTPX2 client.
-        """
+    def _client_options(self, *, asynchronous: bool) -> dict[str, Any]:
+        """Return the keyword arguments for a sync or async HTTPX2 client."""
         credential = self._resolved_authentication_record()
-        kwargs = self._get_client_kwargs(asynchronous=True, credential=credential)
-        headers = self._get_http_headers(credential=credential)
-        client = AsyncClient(**kwargs)
-        client.headers.update(headers)
-        return client
-
-    def _create_sync_client(self) -> Client:
-        """Create a synchronous HTTPX2 client.
-
-        Returns:
-            Client: The synchronous HTTPX2 client.
-        """
-        credential = self._resolved_authentication_record()
-        kwargs = self._get_client_kwargs(asynchronous=False, credential=credential)
-        headers = self._get_http_headers(credential=credential)
-        client = Client(**kwargs)
-        client.headers.update(headers)
-        return client
+        return {
+            **self._get_client_kwargs(asynchronous, credential=credential),
+            "headers": self._get_http_headers(credential=credential),
+        }
 
     def _resolved_authentication_record(self) -> AuthenticationCredential | None:
         """Resolve saved Authentication Record once for client construction."""
@@ -246,15 +228,9 @@ class HTTPClient(BaseSettings):
             )
         return credential
 
-    def _get_refresh_lock(self) -> asyncio.Lock:
-        """Return the one async refresh lock shared by this client."""
-        if self._refresh_lock is None:
-            self._refresh_lock = asyncio.Lock()
-        return self._refresh_lock
-
     async def _refresh_oidc(self) -> OIDCCredential | None:
         """Resolve and refresh the canonical saved OIDC record under one lock."""
-        async with self._get_refresh_lock():
+        async with self._refresh_lock:
             prepared = auth._refresh(self)  # noqa: SLF001
             if prepared is None:
                 return None
@@ -284,7 +260,7 @@ class HTTPClient(BaseSettings):
         token: Any = None,
         certificate: Any = None,
         **extra: Any,
-    ) -> HTTPClient:
+    ) -> Self:
         """Build a client, omitting runtime credentials that were not supplied.
 
         Unset credentials are omitted rather than passed as ``None`` so the
@@ -299,7 +275,7 @@ class HTTPClient(BaseSettings):
             **extra: Further client settings passed through unchanged.
 
         Returns:
-            HTTPClient: A client bound to the supplied credentials.
+            A client of the calling class bound to the supplied credentials.
         """
         supplied = {"token": token, "certificate": certificate}
         return cls(
@@ -350,20 +326,14 @@ class HTTPClient(BaseSettings):
         """
         if self.url:
             return URL(str(self.url))
-        if self.config.active.server is None:
+        name = self.config.active.server
+        server = self.config.servers.get(name) if name is not None else None
+        if server is None:
             msg = (
                 "Server not found for Authentication Record: "
                 f"{self.config.active.authentication}"
             )
             raise ValueError(msg)
-        try:
-            server = self.config.servers[self.config.active.server]
-        except KeyError as exc:
-            msg = (
-                "Server not found for Authentication Record: "
-                f"{self.config.active.authentication}"
-            )
-            raise ValueError(msg) from exc
         if server.url is None:
             msg = f"Active server has no URL configured: {server}"
             raise ValueError(msg)

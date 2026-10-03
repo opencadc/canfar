@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import base64
 import datetime
 import math
 import tempfile
+from functools import partial
 from pathlib import Path
 from unittest.mock import patch
 
+import httpx2
 import pytest
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
@@ -252,11 +255,57 @@ def test_authenticate_credential_gather_fails(mock_gather) -> None:
 # --- Tests for canfar.auth.x509.gather --- #
 
 
-@patch("canfar.auth.x509.get_cert")
+_PEM = "---BEGIN CERT---...---END CERT---"
+_REGISTRY = "https://cadc-west-01.canfar.net/reg/resource-caps"
+_CAPABILITIES = "https://cred.example/cred/capabilities"
+_GENERATE = "https://cred.example/cred/generate"
+
+
+def _cred_capabilities(*methods: str) -> str:
+    security = "".join(
+        f'<securityMethod standardID="ivo://ivoa.net/sso#{method}"/>'
+        for method in methods
+    )
+    return (
+        '<vosi:capabilities xmlns:vosi="http://www.ivoa.net/xml/VOSICapabilities/v1.0">'
+        '<capability standardID="ivo://ivoa.net/std/CDP#proxy-1.0">'
+        f'<interface><accessURL use="base">{_GENERATE}</accessURL>{security}'
+        "</interface></capability></vosi:capabilities>"
+    )
+
+
+def _basic(username: str, password: str) -> str:
+    return "Basic " + base64.b64encode(f"{username}:{password}".encode()).decode()
+
+
+@pytest.fixture
+def cred_service(monkeypatch: pytest.MonkeyPatch) -> list[httpx2.Request]:
+    """Serve the CADC registry and credential service; record each request."""
+    requests: list[httpx2.Request] = []
+    pages = {
+        _REGISTRY: f"ivo://cadc.nrc.ca/cred = {_CAPABILITIES}\n",
+        _CAPABILITIES: _cred_capabilities("tls-with-certificate", "BasicAA"),
+        _GENERATE: _PEM,
+    }
+
+    def handler(request: httpx2.Request) -> httpx2.Response:
+        requests.append(request)
+        url = str(request.url.copy_with(query=None))
+        return httpx2.Response(200, text=pages[url])
+
+    monkeypatch.setattr(
+        "httpx2.Client",
+        partial(httpx2.Client, transport=httpx2.MockTransport(handler)),
+    )
+    monkeypatch.setattr("getpass.getpass", lambda _prompt: "secret")
+    return requests
+
+
 @patch("canfar.auth.x509.inspect")
-def test_gather_happy_path(mock_inspect, mock_get_cert, tmp_path) -> None:
-    """Test the happy path for `gather` with a username provided."""
-    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
+def test_gather_requests_a_certificate_with_the_password(
+    mock_inspect, cred_service, tmp_path
+) -> None:
+    """``gather`` finds the CDP endpoint and saves the certificate it issues."""
     cert_path = tmp_path / "test.pem"
     mock_inspect.return_value = {"path": str(cert_path), "expiry": 12345.67}
 
@@ -264,61 +313,89 @@ def test_gather_happy_path(mock_inspect, mock_get_cert, tmp_path) -> None:
 
     assert result["path"] == str(cert_path)
     assert math.isclose(result["expiry"], 12345.67, abs_tol=1e-9)
-    mock_get_cert.assert_called_once()
-    assert cert_path.exists()
-    assert cert_path.read_text() == "---BEGIN CERT---...---END CERT---"
+    generate = cred_service[-1]
+    assert generate.url.params["daysValid"] == "30"
+    assert generate.headers["Authorization"] == _basic("testuser", "secret")
+    assert cert_path.read_text() == _PEM
 
 
 @patch("builtins.input")
-@patch("canfar.auth.x509.get_cert")
 @patch("canfar.auth.x509.inspect")
 def test_gather_prompts_for_username(
-    mock_inspect, mock_get_cert, mock_input, tmp_path
+    mock_inspect, mock_input, cred_service, tmp_path
 ) -> None:
     """Test that `gather` prompts for a username if not provided."""
     mock_input.return_value = "prompted_user"
-    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
     cert_path = tmp_path / "test.pem"
     mock_inspect.return_value = {"path": str(cert_path), "expiry": 12345.67}
 
     x509_auth.gather(cert_path=cert_path)
 
     mock_input.assert_called_once_with("Username: ")
-    subject_arg = mock_get_cert.call_args[1]["subject"]
-    assert subject_arg.username == "prompted_user"
+    assert cred_service[-1].headers["Authorization"] == _basic(
+        "prompted_user", "secret"
+    )
 
 
+@pytest.mark.usefixtures("cred_service")
 @patch("pathlib.Path.home")
-@patch("canfar.auth.x509.get_cert")
 @patch("canfar.auth.x509.inspect")
-def test_gather_uses_default_path(
-    mock_inspect, mock_get_cert, mock_home, tmp_path
-) -> None:
+def test_gather_uses_default_path(mock_inspect, mock_home, tmp_path) -> None:
     """Test that `gather` uses the default certificate path if none is provided."""
-    # Point Path.home() to the pytest temporary directory
     mock_home.return_value = tmp_path
-    mock_get_cert.return_value = "---BEGIN CERT---...---END CERT---"
-
     expected_path = tmp_path / ".ssl" / "cadcproxy.pem"
     mock_inspect.return_value = {"path": str(expected_path), "expiry": 12345.67}
 
-    # Run the function without a path
     result = x509_auth.gather(username="testuser")
 
-    # Verify the result from the mocked inspect call
     assert result["path"] == str(expected_path)
-
-    # Verify that the file was actually created with the correct content and permissions
-    assert expected_path.exists()
-    assert expected_path.read_text() == "---BEGIN CERT---...---END CERT---"
+    assert expected_path.read_text() == _PEM
     assert (expected_path.stat().st_mode & 0o777) == 0o600
 
 
-@patch("canfar.auth.x509.get_cert")
-def test_gather_get_cert_fails(mock_get_cert, tmp_path) -> None:
-    """Test that `gather` raises a ValueError if `get_cert` fails."""
-    mock_get_cert.side_effect = Exception("Network error")
+def test_gather_rejects_an_empty_password(cred_service, monkeypatch, tmp_path) -> None:
+    """An empty password fails before any request."""
+    monkeypatch.setattr("getpass.getpass", lambda _prompt: "")
+
+    with pytest.raises(ValueError, match="Password cannot be empty"):
+        x509_auth.gather(username="testuser", cert_path=tmp_path / "test.pem")
+
+    assert cred_service == []
+
+
+def test_gather_requires_password_login(monkeypatch, tmp_path) -> None:
+    """A credential service without BasicAA cannot issue a certificate here."""
+    pages = {
+        _REGISTRY: f"ivo://cadc.nrc.ca/cred = {_CAPABILITIES}",
+        _CAPABILITIES: _cred_capabilities("tls-with-certificate"),
+    }
+    monkeypatch.setattr("getpass.getpass", lambda _prompt: "secret")
+    monkeypatch.setattr(
+        "httpx2.Client",
+        partial(
+            httpx2.Client,
+            transport=httpx2.MockTransport(
+                lambda request: httpx2.Response(200, text=pages[str(request.url)])
+            ),
+        ),
+    )
     cert_path = tmp_path / "test.pem"
 
-    with pytest.raises(ValueError, match="Failed to obtain X509 certificate"):
+    with pytest.raises(ValueError, match="offers no password login"):
         x509_auth.gather(username="testuser", cert_path=cert_path)
+    assert not cert_path.exists()
+
+
+def test_gather_wraps_http_errors(monkeypatch, tmp_path) -> None:
+    """Test that `gather` raises a ValueError if the service rejects the login."""
+    monkeypatch.setattr("getpass.getpass", lambda _prompt: "wrong")
+    monkeypatch.setattr(
+        "httpx2.Client",
+        partial(
+            httpx2.Client,
+            transport=httpx2.MockTransport(lambda _request: httpx2.Response(401)),
+        ),
+    )
+
+    with pytest.raises(ValueError, match="Failed to obtain X509 certificate"):
+        x509_auth.gather(username="testuser", cert_path=tmp_path / "test.pem")
