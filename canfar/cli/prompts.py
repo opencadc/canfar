@@ -5,28 +5,38 @@ from __future__ import annotations
 import sys
 from typing import TYPE_CHECKING
 
-import questionary
+from rich.markup import escape
+from rich.prompt import IntPrompt
+
+from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from canfar.idp import IdpInfo
     from canfar.models.http import Server
 
 
-def _get_selection_style() -> questionary.Style:
-    """Return the shared style for interactive CLI selections."""
-    return questionary.Style(
-        [
-            ("question", "bold"),
-            ("answer", "fg:#ff9d00 bold"),
-            ("pointer", "fg:#ff9d00 bold"),
-            ("highlighted", "fg:#ff9d00 bold"),
-            ("selected", "fg:#cc5454"),
-            ("separator", "fg:#cc5454"),
-            ("instruction", ""),
-            ("text", ""),
-            ("disabled", "fg:#858585 italic"),
-        ]
-    )
+def choose(title: str, labels: list[str]) -> int:
+    """Print numbered choices and return the index of the one the user picks.
+
+    Args:
+        title: Question shown above the choices.
+        labels: One label per choice, in display order.
+
+    Returns:
+        Zero-based index of the selected label.
+
+    Raises:
+        SystemExit: When the user cancels the prompt.
+    """
+    console = get_console()
+    console.print(f"[bold]{escape(title)}[/bold]")
+    for number, label in enumerate(labels, start=1):
+        console.print(f"  {number}. {escape(label)}")
+    numbers = [str(number) for number in range(1, len(labels) + 1)]
+    try:
+        return IntPrompt.ask("Number", choices=numbers, console=console) - 1
+    except (KeyboardInterrupt, EOFError):
+        sys.exit(0)
 
 
 def select_idp(idps: list[IdpInfo]) -> str:
@@ -41,25 +51,8 @@ def select_idp(idps: list[IdpInfo]) -> str:
     Raises:
         SystemExit: When the user cancels the prompt.
     """
-    choices = [
-        questionary.Choice(
-            title=f"{idp.name} ({idp.key})",
-            value=idp.key,
-        )
-        for idp in idps
-    ]
-    try:
-        selected: str | None = questionary.select(
-            "Select an Identity Provider",
-            choices=choices,
-            style=_get_selection_style(),
-        ).ask()
-    except KeyboardInterrupt:
-        sys.exit(0)
-
-    if selected is None:
-        sys.exit(0)
-    return selected
+    labels = [f"{idp.name} ({idp.key})" for idp in idps]
+    return idps[choose("Select an Identity Provider", labels)].key
 
 
 def select_server(servers: list[Server]) -> Server:
@@ -74,32 +67,11 @@ def select_server(servers: list[Server]) -> Server:
     Raises:
         SystemExit: When the user cancels the prompt or no servers exist.
     """
+    servers = [server for server in servers if server.uri is not None]
     if not servers:
         sys.exit(1)
-
     if len(servers) == 1:
         return servers[0]
 
-    choices = [
-        questionary.Choice(
-            title=f"{server.name or server.uri} ({server.uri})",
-            value=server,
-        )
-        for server in servers
-        if server.uri is not None
-    ]
-    if not choices:
-        sys.exit(1)
-
-    try:
-        selected: Server | None = questionary.select(
-            "Select a Science Platform Server",
-            choices=choices,
-            style=_get_selection_style(),
-        ).ask()
-    except KeyboardInterrupt:
-        sys.exit(0)
-
-    if selected is None:
-        sys.exit(0)
-    return selected
+    labels = [f"{server.name or server.uri} ({server.uri})" for server in servers]
+    return servers[choose("Select a Science Platform Server", labels)]

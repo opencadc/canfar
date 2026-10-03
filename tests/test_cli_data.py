@@ -10,7 +10,6 @@ from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import click
 import pytest
 import typer
 from typer.testing import CliRunner
@@ -89,7 +88,7 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
 
     monkeypatch.setattr(storage, "Configuration", configuration)
     monkeypatch.setattr(storage, "_vospace", source_factory)
-    monkeypatch.setattr(data_cli, "App", FakeApp)
+    monkeypatch.setattr("fsspec_cli.App", FakeApp)
 
     data_cli.group()
     data_cli.group()
@@ -213,7 +212,7 @@ def test_recursion_capability_omits_rm_flags_but_keeps_cp_flags(
     """The recursion capability registers ``cp`` flags and withholds ``rm`` ones."""
     monkeypatch.setattr(storage, "Configuration", _configuration)
     group = data_cli.group()
-    context = click.Context(group)
+    context = typer.Context(group)
 
     def options(command: str) -> set[str]:
         resolved = group.get_command(context, command)
@@ -257,3 +256,32 @@ def test_importing_data_module_does_not_load_configuration() -> None:
     finally:
         sys.modules["canfar.cli.data"] = original
         package.data = original_attribute
+
+
+def test_data_help_explains_operands_and_lists_identifiers(monkeypatch) -> None:
+    """Group and command help say how to name remote and local paths."""
+    monkeypatch.setattr(storage, "Configuration", partial(_configuration, "vault"))
+
+    group_help = runner.invoke(cli, ["data", "--help"], env={"COLUMNS": "200"})
+    command_help = runner.invoke(cli, ["data", "cp", "--help"], env={"COLUMNS": "200"})
+
+    assert group_help.exit_code == command_help.exit_code == 0
+    syntax = "Name every path IDENTIFIER:/PATH"
+    assert syntax in " ".join(group_help.stdout.split())
+    command_text = " ".join(command_help.stdout.split())
+    assert syntax in command_text
+    assert "use local:/PATH for files on this computer" in command_text
+    assert "Identifiers: vault, local." in command_text
+
+
+@pytest.mark.parametrize("operand", ["/tmp/", "./out.fits", "results/out.fits"])
+def test_data_bare_local_path_gets_a_local_hint(monkeypatch, operand: str) -> None:
+    """A rejected bare path adds a hint after the upstream diagnostic."""
+    monkeypatch.setattr(storage, "Configuration", partial(_configuration, "vault"))
+
+    result = runner.invoke(cli, ["data", "cp", "vault:/home/user/a.fits", operand])
+
+    assert result.exit_code == 2
+    upstream, hint = result.stderr.splitlines()
+    assert upstream.endswith("invalid mapped filesystem operand")
+    assert hint.startswith("Hint: name files on this computer local:/PATH")

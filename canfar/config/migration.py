@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from canfar.errors import ErrorCode
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -24,17 +26,28 @@ class ConfigResetRequiredError(Exception):
         self.message = message
 
 
-def requires_manual_reset(data: dict[str, Any]) -> bool:
-    """Return True when YAML data cannot be loaded as current configuration."""
-    version = data.get("version")
-    return version not in (1, "1")
+_RETIRED_SERVER_FIELDS = ("cores", "ram", "gpus", "status")
+"""Server fields retired after v1.4.1; ``resources`` replaces the limits."""
 
 
-def _reset_message(config_path: Path) -> str:
-    return (
-        "CANFAR configuration reset needed. "
-        f"Run `rm -rf {config_path}` and perform a new login"
-    )
+def drop_retired_server_fields(data: dict[str, Any]) -> dict[str, Any]:
+    """Remove retired Server fields so v1.4.1 configuration files still load.
+
+    The next save writes the configuration without them.
+
+    Args:
+        data: Parsed YAML configuration, changed in place.
+
+    Returns:
+        The same configuration data.
+    """
+    servers = data.get("servers")
+    if isinstance(servers, dict):
+        for server in servers.values():
+            if isinstance(server, dict):
+                for field in _RETIRED_SERVER_FIELDS:
+                    server.pop(field, None)
+    return data
 
 
 def ensure_current_config(config_path: Path) -> None:
@@ -52,10 +65,9 @@ def ensure_current_config(config_path: Path) -> None:
     with config_path.open(encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
 
-    if not isinstance(data, dict):
-        code = "config.invalid"
-        raise ConfigResetRequiredError(code, _reset_message(config_path))
-
-    if requires_manual_reset(data):
-        code = "config.invalid"
-        raise ConfigResetRequiredError(code, _reset_message(config_path))
+    if not isinstance(data, dict) or data.get("version") not in (1, "1"):
+        message = (
+            "CANFAR configuration reset needed. "
+            f"Run `rm -rf {config_path}` and perform a new login"
+        )
+        raise ConfigResetRequiredError(ErrorCode.CONFIG_INVALID.value, message)

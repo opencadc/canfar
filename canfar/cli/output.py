@@ -5,37 +5,37 @@ from __future__ import annotations
 import json
 import sys
 from enum import Enum
-from typing import Any
+from typing import TYPE_CHECKING, Any, NoReturn
 
 import yaml
-from httpx2 import HTTPError
 from pydantic_core import to_jsonable_python
+from rich.markup import escape
 
 from canfar.config.migration import ConfigResetRequiredError
-from canfar.errors import (
-    ErrorCode,
-    StructuredError,
-    structured_error_to_json,
-    structured_error_to_yaml,
-)
+from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import (
     AuthContextError,
     AuthExpiredError,
     AuthRequiredError,
 )
-from canfar.hooks.httpx.auth import AuthenticationError
+from canfar.utils.console import get_console
+
+if TYPE_CHECKING:
+    from httpx2 import HTTPError
+
+    from canfar.hooks.httpx.auth import AuthenticationError
+
+    BoundaryError = (
+        ConfigResetRequiredError
+        | AuthExpiredError
+        | AuthContextError
+        | AuthenticationError
+        | HTTPError
+    )
+    """Session boundary exceptions shared by ``create`` and ``ps``."""
 
 OUTPUT_CONFLICT_EXIT_CODE = 2
 """Exit code for conflicting machine output flags."""
-
-BoundaryError = (
-    ConfigResetRequiredError
-    | AuthExpiredError
-    | AuthContextError
-    | AuthenticationError
-    | HTTPError
-)
-"""Session boundary exceptions shared by ``create`` and ``ps``."""
 
 
 class OutputMode(str, Enum):
@@ -82,9 +82,10 @@ def render_stderr_error(error: StructuredError, mode: OutputMode) -> str:
             lines.append(error.hint)
         return "\n".join(lines) + "\n"
 
+    payload = error.model_dump(mode="json")
     if mode is OutputMode.JSON:
-        return structured_error_to_json(error) + "\n"
-    return structured_error_to_yaml(error)
+        return json.dumps(payload, ensure_ascii=False) + "\n"
+    return yaml.safe_dump(payload, sort_keys=False, allow_unicode=True)
 
 
 def boundary_failure(
@@ -101,6 +102,8 @@ def boundary_failure(
     Returns:
         StructuredError describing the failure for both output streams.
     """
+    from canfar.hooks.httpx.auth import AuthenticationError  # noqa: PLC0415
+
     if isinstance(err, ConfigResetRequiredError):
         return StructuredError(
             code=err.code,
@@ -146,3 +149,31 @@ def to_stdout(data: Any, mode: OutputMode) -> None:
 def to_stderr(error: StructuredError, mode: OutputMode) -> None:
     """Write rendered structured error data to stderr."""
     sys.stderr.write(render_stderr_error(error, mode))
+
+
+def fail(
+    error: StructuredError,
+    mode: OutputMode,
+    human: str | None = None,
+    *,
+    code: int = 1,
+) -> NoReturn:
+    """Report a failed command on stderr in the selected mode, then exit.
+
+    Args:
+        error: Structured error written in JSON and YAML modes.
+        mode: Effective CLI output mode.
+        human: Rich markup printed in human mode instead of the error message.
+        code: Process exit status.
+
+    Raises:
+        SystemExit: Always, with ``code``.
+    """
+    if mode is OutputMode.HUMAN:
+        console = get_console(stderr=True)
+        console.print(human or f"[bold red]{escape(error.message)}[/bold red]")
+        if error.hint:
+            console.print(f"[dim]{escape(error.hint)}[/dim]")
+    else:
+        to_stderr(error, mode)
+    raise SystemExit(code)

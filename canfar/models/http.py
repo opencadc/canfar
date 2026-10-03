@@ -2,19 +2,21 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Annotated, Any
 
-from pydantic import AnyHttpUrl, AnyUrl, BaseModel, ConfigDict, Field, field_validator
-
-DEFAULT_SERVER_CORES = 2
-"""Default CPU core limit when context enrichment is unavailable."""
-
-DEFAULT_SERVER_RAM_GB = 16
-"""Default RAM limit in GB when context enrichment is unavailable."""
-
-DEFAULT_SERVER_GPUS = 0
-"""Default GPU count when context enrichment is unavailable."""
-
+from pydantic import (
+    AnyHttpUrl,
+    AnyUrl,
+    BaseModel,
+    ConfigDict,
+    Field,
+    TypeAdapter,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
+from typing_extensions import Self
 
 LOCAL = "local"
 """Reserved Storage Identifier for the machine where the code runs."""
@@ -36,6 +38,180 @@ class VOSpaceService(BaseModel):
             msg = "VOSpace Service base URL must not end with /capabilities."
             raise ValueError(msg)
         return url
+
+
+class ResourceRange(BaseModel):
+    """Inclusive range of whole-number Session resource values."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    min: int = Field(title="Minimum", description="Smallest value.", ge=0)
+    max: int = Field(title="Maximum", description="Largest value.", ge=0)
+
+    @model_validator(mode="after")
+    def _check_order(self) -> Self:
+        """Reject a range whose minimum exceeds its maximum."""
+        if self.min > self.max:
+            msg = f"Minimum {self.min} exceeds maximum {self.max}."
+            raise ValueError(msg)
+        return self
+
+    def __str__(self) -> str:
+        """Return ``min-max``, or one value when both bounds match."""
+        return str(self.min) if self.min == self.max else f"{self.min}-{self.max}"
+
+
+class SessionResources(BaseModel):
+    """CPU and memory bounds for one Resource Allocation Mode."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    cores: ResourceRange | None = Field(
+        default=None,
+        title="CPU Cores",
+        description="CPU core bounds; None when the Server does not advertise them.",
+    )
+    ram: ResourceRange | None = Field(
+        default=None,
+        title="RAM (GB)",
+        description=(
+            "Memory bounds in GB; None when the Server does not advertise them."
+        ),
+    )
+
+
+class ServerResources(BaseModel):
+    """Session resource limits advertised by a Science Platform Server.
+
+    ``None`` marks a value the Server does not advertise.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    flexible: SessionResources = Field(
+        default_factory=SessionResources,
+        title="Flexible Resources",
+        description=(
+            "Sessions without explicit CPU or memory: the guaranteed request (min) "
+            "and the burst limit (max)."
+        ),
+    )
+    fixed: SessionResources = Field(
+        default_factory=SessionResources,
+        title="Fixed Resources",
+        description=(
+            "Sessions with explicit CPU or memory: the smallest (min) and largest "
+            "(max) values the Server accepts."
+        ),
+    )
+    gpus: ResourceRange | None = Field(
+        default=None,
+        title="GPUs",
+        description="GPU counts a Session can request; 0 to 0 when none are offered.",
+    )
+    sessions: int | None = Field(
+        default=None,
+        title="Interactive Session Limit",
+        description=(
+            "Maximum Pending or Running interactive Sessions per user; headless "
+            "Sessions do not count."
+        ),
+        ge=1,
+    )
+
+    @classmethod
+    def from_context(cls, payload: Mapping[str, Any]) -> Self:
+        """Read limits from a Science Platform Server context payload.
+
+        Values the payload omits or malforms stay ``None``, so older platform
+        versions produce partial resources.
+
+        Args:
+            payload: JSON object from the Server's context endpoint, as returned
+                by ``canfar.context.Context().resources()``.
+
+        Returns:
+            Limits for each Resource Allocation Mode, GPUs, and Sessions.
+
+        Raises:
+            ValueError: If the payload advertises no recognizable limit.
+
+        Examples:
+            >>> from canfar.models.http import ServerResources
+            >>> ServerResources.from_context(
+            ...     {
+            ...         "cores": {
+            ...             "defaultRequest": 1,
+            ...             "defaultLimit": 2,
+            ...             "options": [1, 2, 4],
+            ...         },
+            ...         "gpus": {"options": []},
+            ...     }
+            ... ).fixed.cores
+            ResourceRange(min=1, max=4)
+        """
+        cores = _section(payload, "cores")
+        memory = _section(payload, "memoryGB")
+        resources = cls(
+            flexible=SessionResources(
+                cores=_bounds(cores.get("defaultRequest"), cores.get("defaultLimit")),
+                ram=_bounds(memory.get("defaultRequest"), memory.get("defaultLimit")),
+            ),
+            fixed=SessionResources(
+                cores=_span(cores.get("options")),
+                ram=_span(memory.get("options")),
+            ),
+            gpus=_span(
+                _section(payload, "gpus").get("options"),
+                empty=ResourceRange(min=0, max=0),
+            ),
+            sessions=_sessions(payload.get("maxInteractiveSessions")),
+        )
+        if resources == cls():
+            msg = "Context payload advertises no recognizable resource limits."
+            raise ValueError(msg)
+        return resources
+
+
+_OPTIONS = TypeAdapter(list[int])
+_SESSIONS = TypeAdapter(Annotated[int, Field(ge=1)])
+
+
+def _section(payload: Mapping[str, Any], key: str) -> Mapping[str, Any]:
+    """Return one resource section of a context payload, or an empty mapping."""
+    section = payload.get(key)
+    return section if isinstance(section, Mapping) else {}
+
+
+def _bounds(low: object, high: object) -> ResourceRange | None:
+    """Return an inclusive range, or None when a bound is missing or invalid."""
+    try:
+        return ResourceRange.model_validate({"min": low, "max": high})
+    except ValidationError:
+        return None
+
+
+def _span(
+    options: object,
+    *,
+    empty: ResourceRange | None = None,
+) -> ResourceRange | None:
+    """Return the smallest-to-largest range of advertised options."""
+    try:
+        values = _OPTIONS.validate_python(options)
+    except ValidationError:
+        return None
+    if not values:
+        return empty
+    return _bounds(min(values), max(values))
+
+
+def _sessions(value: object) -> int | None:
+    """Return a positive Session count, or None when missing or invalid."""
+    try:
+        return _SESSIONS.validate_python(value)
+    except ValidationError:
+        return None
 
 
 class Server(BaseModel):
@@ -100,33 +276,13 @@ class Server(BaseModel):
         title="VOSpace Services",
         description="VOSpace Services keyed by globally unique Storage Identifier.",
     )
-
-    cores: int = Field(
-        default=DEFAULT_SERVER_CORES,
-        title="Default CPU Core Limit",
-        description="Default maximum CPU cores available for session creation.",
-        ge=1,
-    )
-    ram: int = Field(
-        default=DEFAULT_SERVER_RAM_GB,
-        title="Default RAM Limit (GB)",
-        description="Default maximum RAM in gigabytes for session creation.",
-        ge=1,
-    )
-    gpus: int = Field(
-        default=DEFAULT_SERVER_GPUS,
-        title="Maximum GPU Count",
-        description="Maximum GPUs available for session creation.",
-        ge=0,
-    )
-    status: str | None = Field(
+    resources: ServerResources | None = Field(
         default=None,
-        title="Discovery Reachability Status",
+        title="Session Resources",
         description=(
-            "Persisted compatibility field for discovery reachability status "
-            "when known."
+            "Session resource limits read from the Server's context endpoint; "
+            "None when unknown."
         ),
-        max_length=256,
     )
 
     @field_validator("storage", mode="before")

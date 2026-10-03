@@ -14,7 +14,7 @@ request.
 | `--cpu` / `cores` | 1 to 256 cores |
 | `--memory` / `ram` | 1 to 512 GB |
 | `--gpu` / `gpu` | 1 to 28 GPUs |
-| `--replicas` / `replicas` | 1 to 512; exactly 1 for `desktop` and `firefly` |
+| `--replicas` / `replicas` | 1 to 256; exactly 1 for `desktop` and `firefly` |
 | Command, arguments, `--env` | `headless` Sessions only |
 | `--name` | Letters, digits, and hyphens |
 
@@ -25,9 +25,12 @@ values are ignored for them. Check a request without creating anything:
 canfar create headless skaha/astroml:latest --cpu 8 --memory 32 --replicas 100 --dry-run
 ```
 
-Passing these checks does not mean the Server offers that combination. The
-client's ranges are only an outer bound; each platform provider decides its
-own flexible defaults and the largest Session it will run. Omit `--cpu` and
+When the active Server's limits are known, `canfar create` also rejects a
+`--cpu`, `--memory`, or `--gpu` value outside them, `--dry-run` included; the
+Python client leaves that check to the Server. A value inside the limits can
+still be refused, because a fixed request must match one of the Server's
+`options` and those can skip values. Each platform provider decides its own
+flexible defaults and the largest Session it will run. Omit `--cpu` and
 `--memory` to let the Server apply its flexible policy.
 
 ## What your Server offers
@@ -41,8 +44,29 @@ cores and for memory:
 | `defaultLimit` | What a flexible Session can burst to when capacity is free |
 | `options` | The values a fixed request may name; the largest is the biggest Session the Server runs |
 
-`canfar server ls -o json` also shows each Server's `cores`, `ram`, and `gpus`
-as they were when the Server was discovered.
+Server discovery, which `canfar login` runs, reads this endpoint for every
+Server that connects, and `canfar server use` reads it again for the Server you
+choose. `canfar server ls` shows the result for each Server, and
+`canfar server ls -o json` returns it under `resources`, shown here with
+illustrative values:
+
+```yaml
+resources:
+  flexible:                    # no --cpu or --memory
+    cores: {min: 1, max: 16}   # defaultRequest to defaultLimit
+    ram: {min: 4, max: 32}     # GB
+  fixed:                       # --cpu and --memory
+    cores: {min: 1, max: 16}   # smallest to largest option
+    ram: {min: 1, max: 192}
+  gpus: {min: 1, max: 28}      # {min: 0, max: 0} when none are offered
+  sessions: 5                  # interactive Sessions per user
+```
+
+A value the Server does not advertise is `null`, shown as `unknown`; older
+platform versions can leave some or all of them unknown. `canfar create --help`
+shows the ranges `--cpu`, `--memory`, and `--gpu` accept for the active
+Server, and how far a flexible Session can burst as the default, for example
+`[default: flexible ≤ 16]`.
 
 On the CANFAR deployment at the Canadian Astronomy Data Centre (CADC), a
 flexible Session can burst to 16 cores and 32 GB, and the largest fixed

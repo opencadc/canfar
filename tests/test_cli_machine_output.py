@@ -6,9 +6,9 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, patch
 
-import click
 import pytest
 import yaml
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
@@ -163,7 +163,7 @@ def test_auth_ls_invalid_output_format_is_rejected() -> None:
 
     assert result.exit_code == 2
     assert result.stdout == ""
-    assert "Invalid value" in click.unstyle(result.stderr)
+    assert "Invalid value" in Text.from_ansi(result.stderr).plain
 
 
 def test_passthrough_output_options_keep_human_banner(tmp_path: Path) -> None:
@@ -315,14 +315,14 @@ def test_root_output_option_before_command_path_is_not_supported(
         result = runner.invoke(cli, ["-o", "json", "auth", "ls"])
 
     assert result.exit_code == 2
-    assert "-o" in click.unstyle(result.stderr)
+    assert "-o" in Text.from_ansi(result.stderr).plain
 
 
 def test_unsupported_command_rejects_leaf_json_flag() -> None:
     """Commands without machine flags reject ``--json`` at the leaf."""
     result = runner.invoke(cli, ["auth", "purge", "--json", "--force"])
     assert result.exit_code == 2
-    assert "--json" in click.unstyle(result.stderr)
+    assert "--json" in Text.from_ansi(result.stderr).plain
 
 
 def test_unsupported_command_rejects_leaf_output_option() -> None:
@@ -331,4 +331,4 @@ def test_unsupported_command_rejects_leaf_output_option() -> None:
 
     assert result.exit_code == 2
     assert result.stdout == ""
-    assert "No such option: -o" in click.unstyle(result.stderr)
+    assert "No such option: -o" in Text.from_ansi(result.stderr).plain

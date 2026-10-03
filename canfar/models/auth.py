@@ -11,21 +11,14 @@ from typing import Annotated, Literal
 from pydantic import BaseModel, ConfigDict, Field, SecretStr
 
 from canfar.auth import x509
+from canfar.idp import AuthMode
 
 log = logging.getLogger(__name__)
 
 
-def _secret_present(value: SecretStr | str | None) -> bool:
+def _secret_present(value: SecretStr | None) -> bool:
     """Return whether a secret field holds a non-empty value."""
-    if value is None:
-        return False
-    if isinstance(value, SecretStr):
-        return bool(value.get_secret_value())
-    return bool(value)
-
-
-AuthMode = Literal["x509", "oidc"]
-"""Supported authentication modes for domain records."""
+    return value is not None and bool(value.get_secret_value())
 
 
 class Authentication(BaseModel):
@@ -103,20 +96,6 @@ class Token(BaseModel):
     ] = None
 
 
-def _oidc_valid(endpoints: Endpoint, client: Client, token: Token) -> bool:
-    """Return whether OIDC state can authenticate and refresh."""
-    if not (
-        endpoints.discovery
-        and endpoints.token
-        and client.identity
-        and _secret_present(client.secret)
-        and _secret_present(token.refresh)
-    ):
-        log.warning("Missing required OIDC configuration.")
-        return False
-    return True
-
-
 class Expiry(BaseModel):
     """OIDC token expiry times."""
 
@@ -126,24 +105,6 @@ class Expiry(BaseModel):
     refresh: Annotated[
         float | None, Field(description="Refresh token expiry in ctime")
     ] = None
-
-
-def _oidc_expired(expiry: Expiry) -> bool:
-    """Return whether an OIDC access token is expired."""
-    if expiry.access is None:
-        log.warning("OIDC access token expiry is not set.")
-        return True
-    return expiry.access <= time.time()
-
-
-def _x509_expiry(path: Path | None, expiry: float) -> float | None:
-    """Return the known or certificate-derived X.509 expiry timestamp."""
-    if path is None:
-        return None
-    if math.isclose(expiry, 0.0, abs_tol=1e-9):
-        expiry = x509.expiry(path)
-        log.debug("computed expiry from cert: %s", expiry)
-    return expiry
 
 
 class DeviceAuthorization(BaseModel):
@@ -218,12 +179,16 @@ class X509Credential(BaseModel):
 
     @property
     def expired(self) -> bool:
-        """Return whether this X.509 Authentication Record is expired."""
-        expiry = _x509_expiry(self.path, self.expiry)
-        if expiry is None:
+        """Return whether this X.509 Authentication Record is expired.
+
+        An unknown (zero) expiry is read from the certificate and kept.
+        """
+        if self.path is None:
             return True
-        self.expiry = expiry
-        return expiry <= time.time()
+        if math.isclose(self.expiry, 0.0, abs_tol=1e-9):
+            self.expiry = x509.expiry(self.path)
+            log.debug("computed expiry from cert: %s", self.expiry)
+        return self.expiry <= time.time()
 
 
 class OIDCCredential(BaseModel):
@@ -251,12 +216,24 @@ class OIDCCredential(BaseModel):
     @property
     def valid(self) -> bool:
         """Return whether this Authentication Record can refresh OIDC tokens."""
-        return _oidc_valid(self.endpoints, self.client, self.token)
+        if not (
+            self.endpoints.discovery
+            and self.endpoints.token
+            and self.client.identity
+            and _secret_present(self.client.secret)
+            and _secret_present(self.token.refresh)
+        ):
+            log.warning("Missing required OIDC configuration.")
+            return False
+        return True
 
     @property
     def expired(self) -> bool:
         """Return whether this OIDC Authentication Record's access token expired."""
-        return _oidc_expired(self.expiry)
+        if self.expiry.access is None:
+            log.warning("OIDC access token expiry is not set.")
+            return True
+        return self.expiry.access <= time.time()
 
     @property
     def access_usable(self) -> bool:

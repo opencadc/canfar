@@ -40,8 +40,11 @@ canfar data ls -lh local:/tmp
 
 Storage Identifiers are configuration keys, not protocols. There is no
 `active:/` source, bare local-path shorthand, empty `:/path` source, or
-`canfar storage` command. A data command sees all configured sources, not only
-the active Server Selection.
+`canfar storage` command: name files on your computer `local:/PATH`, not
+`/PATH`. A data command sees all configured sources, not only the active
+Server Selection. Each data command's `--help` ends with this syntax and the
+configured identifiers, and a usage error caused by a bare local path adds a
+`local:/PATH` hint.
 
 ## Command surface
 
@@ -87,6 +90,13 @@ Copy between local and remote sources:
 canfar data cp local:/tmp/file.fits arc:/home/user/file.fits
 canfar data cp arc:/home/user/file.fits local:/tmp/file.fits
 ```
+
+A single-file copy always transfers the file, even when the destination
+already holds identical content; only a rerun recursive copy skips verified
+files. A copy between two storage identifiers, such as `vault:` to `arc:`,
+downloads the file to a temporary file on the computer running the command and
+then uploads it, so that computer needs room for the file. A copy within one
+identifier uses that service's own copy.
 
 Recursive copy is available for one directory and its descendants:
 

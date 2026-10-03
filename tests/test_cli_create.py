@@ -1,11 +1,13 @@
 """Tests for the create CLI module."""
 
 import json
+from pathlib import Path
 from unittest.mock import AsyncMock, patch
 
 import httpx2
 import pytest
 import yaml
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
@@ -249,10 +251,7 @@ class TestCreateCLI:
             (["--output", "yaml"], yaml.safe_load),
         ],
     )
-    @pytest.mark.parametrize(
-        "invalid_args",
-        [("--cpu", "-1"), ("--env", "BROKEN")],
-    )
+    @pytest.mark.parametrize("invalid_args", [("--env", "BROKEN")])
     @patch("canfar.cli.create.AsyncSession")
     def test_create_command_machine_validation_failure_is_structured(
         self,
@@ -279,10 +278,7 @@ class TestCreateCLI:
         mock_session_cls,
     ):
         """Human validation failure keeps detailed diagnostics and exit one."""
-        result = runner.invoke(
-            cli,
-            ["create", "headless", "skaha/worker:v1", "--cpu", "-1"],
-        )
+        result = runner.invoke(cli, ["create", "headless", "worker"])
 
         assert result.exit_code == 1
         assert "Error:" in result.stderr
@@ -437,3 +433,230 @@ class TestCreateCLI:
         assert error.code == ErrorCode.COMMAND_CANCELLED.value
         assert secret not in result.stderr
         assert "Traceback" not in result.stderr
+
+
+def _save_limited_server(path: Path) -> None:
+    """Save an active Server that advertises Session resource limits."""
+    path.write_text(
+        yaml.dump(
+            {
+                "version": 1,
+                "active": {"authentication": "cadc", "server": "canSRC"},
+                "authentication": {"cadc": {"mode": "x509"}},
+                "servers": {
+                    "canSRC": {
+                        "idp": "cadc",
+                        "uri": "ivo://canfar.net/src/skaha",
+                        "url": "https://src.canfar.net/skaha",
+                        "version": "v1",
+                        "resources": {
+                            "flexible": {
+                                "cores": {"min": 1, "max": 2},
+                                "ram": {"min": 2, "max": 4},
+                            },
+                            "fixed": {
+                                "cores": {"min": 1, "max": 34},
+                                "ram": {"min": 1, "max": 384},
+                            },
+                            "gpus": {"min": 0, "max": 0},
+                        },
+                    }
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
+class TestCreateServerLimits:
+    """Typer validates resource options against the active Server's limits."""
+
+    @pytest.mark.parametrize(
+        ("arguments", "message"),
+        [
+            (
+                ["--cpu", "64"],
+                "Invalid value for '--cpu' / '-c': 64 is not in the range 1<=x<=34.",
+            ),
+            (
+                ["--memory", "512"],
+                (
+                    "Invalid value for '--memory' / '-m': 512 is not in the range "
+                    "1<=x<=384."
+                ),
+            ),
+            (
+                ["--gpu", "1"],
+                "Invalid value for '--gpu' / '-g': 1 is not in the range 0<=x<=0.",
+            ),
+        ],
+    )
+    @pytest.mark.parametrize("flag", [[], ["-o", "json"]], ids=["human", "json"])
+    @patch("canfar.cli.create.AsyncSession")
+    def test_rejects_values_outside_active_server_limits(
+        self,
+        mock_session_cls,
+        tmp_path: Path,
+        arguments: list[str],
+        message: str,
+        flag: list[str],
+    ) -> None:
+        """Out-of-range values are usage errors on stderr, before any request."""
+        config_path = tmp_path / "config.yaml"
+        _save_limited_server(config_path)
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            result = runner.invoke(
+                cli,
+                ["create", "headless", "skaha/worker:v1", *arguments, *flag],
+                env={"COLUMNS": "200"},
+            )
+
+        assert result.exit_code == 2
+        assert result.stdout == ""
+        assert message in " ".join(Text.from_ansi(result.stderr).plain.split())
+        mock_session_cls.assert_not_called()
+
+    def test_accepts_requests_within_the_server_limits(self, tmp_path: Path) -> None:
+        """The largest values the Server accepts still pass."""
+        config_path = tmp_path / "config.yaml"
+        _save_limited_server(config_path)
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            result = runner.invoke(
+                cli,
+                [
+                    *("create", "headless", "skaha/worker:v1"),
+                    *("--cpu", "34", "--memory", "384", "--dry-run"),
+                ],
+            )
+
+        assert result.exit_code == 0, result.stderr
+        assert "Dry run complete." in result.stdout
+
+    @pytest.mark.parametrize(
+        ("arguments", "message"),
+        [
+            (["--cpu", "257"], "257 is not in the range 1<=x<=256."),
+            (["--memory", "0"], "0 is not in the range 1<=x<=512."),
+            (["--gpu", "29"], "29 is not in the range 1<=x<=28."),
+            (["--replicas", "257"], "257 is not in the range 1<=x<=256."),
+        ],
+    )
+    def test_unknown_server_limits_keep_the_client_bounds(
+        self, arguments: list[str], message: str
+    ) -> None:
+        """Without saved limits, the client's own bounds still apply."""
+        result = runner.invoke(
+            cli,
+            ["create", "headless", "skaha/worker:v1", *arguments],
+            env={"COLUMNS": "200"},
+        )
+
+        assert result.exit_code == 2
+        assert message in " ".join(Text.from_ansi(result.stderr).plain.split())
+
+
+@pytest.mark.parametrize(
+    ("limited", "expected"),
+    [
+        (
+            True,
+            [
+                "<int range> [1<=x<=34] Number of CPU cores. [default: flexible ≤ 2]",
+                "<int range> [1<=x<=384] Amount of RAM in GB. [default: flexible ≤ 4]",
+                "<int range> [0<=x<=0] Number of GPUs.",
+            ],
+        ),
+        (
+            False,
+            [
+                (
+                    "<int range> [1<=x<=256] Number of CPU cores. "
+                    "[default: flexible, set by the Server]"
+                ),
+                (
+                    "<int range> [1<=x<=512] Amount of RAM in GB. "
+                    "[default: flexible, set by the Server]"
+                ),
+                "<int range> [1<=x<=28] Number of GPUs.",
+            ],
+        ),
+    ],
+    ids=["active-server-limits", "unknown-limits"],
+)
+def test_create_help_shows_the_active_server_ranges(
+    tmp_path: Path, limited: bool, expected: list[str]
+) -> None:
+    """Typer shows each resource range, and the flexible limit as the default."""
+    config_path = tmp_path / "config.yaml"
+    if limited:
+        _save_limited_server(config_path)
+
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        result = runner.invoke(cli, ["create", "--help"], env={"COLUMNS": "200"})
+
+    assert result.exit_code == 0
+    help_text = " ".join(result.stdout.split())
+    for text in expected:
+        assert text in help_text
+    assert "canSRC" not in help_text
+
+
+@pytest.mark.parametrize(
+    ("resources", "arguments", "message"),
+    [
+        (
+            {"fixed": {"cores": {"min": 1, "max": 300}}},
+            ["--cpu", "300"],
+            "300 is not in the range 1<=x<=256.",
+        ),
+        (
+            {"gpus": {"min": 0, "max": 0}},
+            ["--gpu", "1"],
+            "1 is not in the range 0<=x<=0.",
+        ),
+    ],
+    ids=["server-above-client-bound", "server-without-gpus"],
+)
+def test_server_ranges_never_widen_the_client_bounds(
+    tmp_path: Path,
+    resources: dict[str, object],
+    arguments: list[str],
+    message: str,
+) -> None:
+    """Typer accepts only values that both the client and the Server allow."""
+    config_path = tmp_path / "config.yaml"
+    _save_limited_server(config_path)
+    config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+    config["servers"]["canSRC"]["resources"] = resources
+    config_path.write_text(yaml.dump(config), encoding="utf-8")
+
+    with patch("canfar.models.config.CONFIG_PATH", config_path):
+        result = runner.invoke(
+            cli,
+            ["create", "headless", "skaha/worker:v1", *arguments, "--dry-run"],
+            env={"COLUMNS": "200"},
+        )
+
+    assert result.exit_code == 2
+    assert message in " ".join(Text.from_ansi(result.stderr).plain.split())
+
+
+def test_zero_gpus_on_a_server_without_gpus_requests_none(tmp_path: Path) -> None:
+    """``--gpu 0`` is the one value a GPU-less Server accepts, and means none."""
+    config_path = tmp_path / "config.yaml"
+    _save_limited_server(config_path)
+
+    with (
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+        patch("canfar.cli.create.AsyncSession") as session_cls,
+    ):
+        session = session_cls.return_value.__aenter__.return_value
+        session.create = AsyncMock(return_value=["id-1"])
+        result = runner.invoke(
+            cli, ["create", "headless", "skaha/worker:v1", "--gpu", "0"]
+        )
+
+    assert result.exit_code == 0, result.stderr
+    assert session.create.await_args.args[0].gpus is None

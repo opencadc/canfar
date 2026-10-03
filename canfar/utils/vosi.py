@@ -44,7 +44,7 @@ def _normalize_auth_id(standard_id: str) -> str:
     Returns:
         The normalized auth mode string (renamed if necessary).
     """
-    raw = standard_id.split("#", 1)[-1] if "#" in standard_id else standard_id
+    raw = standard_id.split("#", 1)[-1]
     return AUTH_RENAME.get(raw, raw)
 
 
@@ -174,11 +174,10 @@ def capabilities(  # noqa: PLR0912 too many branches (clarity)
             else:
                 version = std_major
 
-            key = (baseurl, version)
-            bucket = buckets.get(key)
-            if not bucket:
-                bucket = Capability(baseurl=baseurl, version=version, auth_modes=[])
-                buckets[key] = bucket
+            bucket = buckets.setdefault(
+                (baseurl, version),
+                Capability(baseurl=baseurl, version=version, auth_modes=[]),
+            )
 
             for sec in iface.findall("{*}securityMethod"):
                 sid = sec.get("standardID")

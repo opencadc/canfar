@@ -117,9 +117,9 @@ class TestCreateSpec:
         assert spec.replicas == 1
 
         spec = CreateRequest(
-            name="test", image="skaha/test", kind="headless", replicas=512
+            name="test", image="skaha/test", kind="headless", replicas=256
         )
-        assert spec.replicas == 512
+        assert spec.replicas == 256
 
         # Invalid values
         with pytest.raises(ValidationError):
@@ -127,7 +127,7 @@ class TestCreateSpec:
 
         with pytest.raises(ValidationError):
             CreateRequest(
-                name="test", image="skaha/test", kind="headless", replicas=513
+                name="test", image="skaha/test", kind="headless", replicas=257
             )
 
     def test_kind_validation(self) -> None:

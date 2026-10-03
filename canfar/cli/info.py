@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timezone
 from typing import Annotated, Any
 
@@ -11,7 +12,6 @@ from pydantic import ValidationError
 from rich import box
 from rich.table import Table
 
-from canfar.cli._run import run
 from canfar.models.session import FetchResponse
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
@@ -176,4 +176,4 @@ def get_info(
 ) -> None:
     """Get detailed information about one or more sessions."""
     emit_cli_active_server_banner()
-    run(_get_info(session_ids, debug))
+    asyncio.run(_get_info(session_ids, debug))

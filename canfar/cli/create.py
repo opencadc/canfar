@@ -2,30 +2,37 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any, get_args
+import asyncio
+from typing import TYPE_CHECKING, Annotated, Any, cast, get_args
 
-import click
 import typer
 from httpx2 import HTTPError
 from pydantic import ValidationError
+from rich.markup import escape
+from typer.core import TyperOption
 
 from canfar.cli import output
-from canfar.cli._run import run
-from canfar.cli.machine import OutputOption, resolve_mode
+from canfar.cli.machine import OutputOption, maximum, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError
+from canfar.models.config import Configuration
+from canfar.models.http import ServerResources
 from canfar.models.session import CreateRequest
-from canfar.models.types import Kind
+from canfar.models.types import Pruneable
 from canfar.sessions import AsyncSession
 from canfar.utils import funny
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
-kinds: list[str] = list(get_args(Kind))
-# Remove desktop-app from the list of kinds for usage message since,
-# they can only be created from within a desktop session.
-kinds.remove("desktop-app")
+if TYPE_CHECKING:
+    from typer._click.core import Parameter
+    from typer._click.types import IntRange
+
+    from canfar.models.http import ResourceRange
+
+Creatable = Pruneable
+"""Session kinds the CLI creates; desktop-app starts only inside a desktop."""
 
 
 def _parse_environment(env: list[str] | None) -> dict[str, Any]:
@@ -40,29 +47,80 @@ def _parse_environment(env: list[str] | None) -> dict[str, Any]:
     return environment
 
 
+# Client bounds from ``CreateRequest``; saved Server limits narrow the first three.
+_MAX_CORES = maximum(CreateRequest, "cores")
+_MAX_RAM_GB = maximum(CreateRequest, "ram")
+_MAX_GPUS = maximum(CreateRequest, "gpus")
+_MAX_REPLICAS = maximum(CreateRequest, "replicas")
+
+_CPU_HELP = "Number of CPU cores."
+_MEMORY_HELP = "Amount of RAM in GB."
+
+
+def _active_resources() -> ServerResources | None:
+    """Return the active Server's saved limits, when known.
+
+    Limits are saved during discovery and Server Selection.
+    """
+    try:
+        config = Configuration()  # ty: ignore[missing-argument]
+    except (ConfigResetRequiredError, ValueError):
+        return None
+    name = config.active.server
+    server = config.servers.get(name) if name is not None else None
+    return server.resources if server is not None else None
+
+
+def apply_server_limits(params: list[Parameter]) -> None:
+    """Narrow ``--cpu``, ``--memory``, and ``--gpu`` to the active Server.
+
+    Runs before ``create`` parses its arguments, so Typer both validates
+    requests against, and shows in help, the ranges of the Server a new
+    Session would use, with its flexible range as the default. Unknown limits
+    keep the client bounds and the generic default.
+    """
+    resources = _active_resources()
+    if resources is None:
+        resources = ServerResources()
+    options = {param.name: param for param in params if isinstance(param, TyperOption)}
+    _narrow(options["cpu"], resources.fixed.cores, _MAX_CORES)
+    _narrow(options["memory"], resources.fixed.ram, _MAX_RAM_GB)
+    _narrow(options["gpu"], resources.gpus, _MAX_GPUS)
+    options["cpu"].help = _with_default(_CPU_HELP, resources.flexible.cores)
+    options["memory"].help = _with_default(_MEMORY_HELP, resources.flexible.ram)
+
+
+def _narrow(option: TyperOption, bounds: ResourceRange | None, maximum: int) -> None:
+    """Accept the values both the client and the Server allow in ``option``.
+
+    A Server that offers none, such as no GPUs, accepts only ``0``.
+    """
+    low, high = 1, maximum
+    if bounds is not None:
+        low, high = max(low, bounds.min), min(high, bounds.max)
+        if low > high:
+            low = high = 0
+    option.type = cast("type[IntRange]", type(option.type))(min=low, max=high)
+
+
+def _with_default(text: str, bounds: ResourceRange | None) -> str:
+    """Append the flexible burst limit as the default, styled like Typer's.
+
+    Typer wraps a string ``show_default`` in parentheses, so the default is
+    part of the Rich markup help instead.
+    """
+    flexible = (
+        f"flexible ≤ {bounds.max}"
+        if bounds is not None
+        else "flexible, set by the Server"
+    )
+    return f"{text} [dim]{escape(f'[default: {flexible}]')}[/dim]"
+
+
 async def _create_sessions(request: CreateRequest) -> list[str]:
     """Create the requested Sessions on the selected Science Platform Server."""
     async with AsyncSession() as session:
         return await session.create(request)
-
-
-def _render_create_failure(
-    failure: StructuredError,
-    mode: output.OutputMode,
-    human_message: str,
-    *,
-    show_traceback: bool = False,
-) -> None:
-    """Render one create failure without mixing human and machine streams."""
-    if mode is not output.OutputMode.HUMAN:
-        output.to_stderr(failure, mode)
-        return
-
-    get_console(stderr=True).print(human_message)
-    if failure.hint:
-        get_console(stderr=True).print(f"[dim]{failure.hint}[/dim]")
-    if show_traceback:
-        get_console(stderr=True).print_exception()
 
 
 def _render_create_result(
@@ -99,21 +157,15 @@ def _render_create_result(
             "`canfar events SESSION_ID` to inspect image pulls or admission."
         ),
     )
-    _render_create_failure(
-        failure,
-        mode,
-        f"[bold red]{failure.message}[/bold red]",
-    )
-    raise typer.Exit(1)
+    output.fail(failure, mode)
 
 
 def creation(  # noqa: PLR0917
     kind: Annotated[
-        Kind,
+        Creatable,
         typer.Argument(
             ...,
-            click_type=click.Choice(kinds, case_sensitive=True),  # ty: ignore[invalid-argument-type]
-            metavar="|".join(kinds),
+            metavar="|".join(get_args(Creatable)),
             help="Session Kind.",
         ),
     ],
@@ -133,8 +185,9 @@ def creation(  # noqa: PLR0917
         typer.Option(
             "--cpu",
             "-c",
-            help="Number of CPU cores.",
-            show_default="flexible: set by the Server",
+            help=_with_default(_CPU_HELP, None),
+            min=1,
+            max=_MAX_CORES,
         ),
     ] = None,
     memory: Annotated[
@@ -142,12 +195,14 @@ def creation(  # noqa: PLR0917
         typer.Option(
             "--memory",
             "-m",
-            help="Amount of RAM in GB.",
-            show_default="flexible: set by the Server",
+            help=_with_default(_MEMORY_HELP, None),
+            min=1,
+            max=_MAX_RAM_GB,
         ),
     ] = None,
     gpu: Annotated[
-        int | None, typer.Option("--gpu", "-g", help="Number of GPUs.")
+        int | None,
+        typer.Option("--gpu", "-g", help="Number of GPUs.", min=1, max=_MAX_GPUS),
     ] = None,
     env: Annotated[
         list[str] | None,
@@ -156,7 +211,14 @@ def creation(  # noqa: PLR0917
         ),
     ] = None,
     replicas: Annotated[
-        int, typer.Option("--replicas", "-r", help="Number of replicas to create.")
+        int,
+        typer.Option(
+            "--replicas",
+            "-r",
+            help="Number of replicas to create.",
+            min=1,
+            max=_MAX_REPLICAS,
+        ),
     ] = 1,
     debug: Annotated[
         bool,
@@ -202,24 +264,24 @@ def creation(  # noqa: PLR0917
             cores=cpu,
             ram=memory,
             kind=kind,
-            gpus=gpu,
+            gpus=gpu or None,
             cmd=cmd or None,
             args=args or None,
             env=environment or None,
             replicas=replicas,
         )
     except ValueError as err:
-        _render_create_failure(
+        if isinstance(err, ValidationError) and mode is output.OutputMode.HUMAN:
+            get_console(stderr=True).print_exception()
+        output.fail(
             StructuredError(
                 code=ErrorCode.COMMAND_VALIDATION_FAILED,
                 message="Session request validation failed.",
                 hint="Check the create arguments and retry.",
             ),
             mode,
-            f"[bold red]Error: {err}[/bold red]",
-            show_traceback=isinstance(err, ValidationError),
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
         )
-        raise typer.Exit(1) from err
 
     if dry or debug:
         (get_console() if dry else get_console(stderr=True)).print(
@@ -240,9 +302,9 @@ def creation(  # noqa: PLR0917
         return
 
     try:
-        session_ids = run(_create_sessions(request))
+        session_ids = asyncio.run(_create_sessions(request))
     except KeyboardInterrupt:
-        _render_create_failure(
+        output.fail(
             StructuredError(
                 code=ErrorCode.COMMAND_CANCELLED,
                 message="Operation cancelled by user.",
@@ -250,29 +312,21 @@ def creation(  # noqa: PLR0917
             ),
             mode,
             "\n[bold yellow]Operation cancelled by user.[/bold yellow]",
+            code=130,
         )
-        raise typer.Exit(130) from KeyboardInterrupt
     except (
         ConfigResetRequiredError,
         AuthExpiredError,
         AuthContextError,
         AuthenticationError,
+        HTTPError,
     ) as err:
-        _render_create_failure(
-            output.boundary_failure(err),
-            mode,
-            f"[bold red]Error: {err}[/bold red]",
-        )
-        raise typer.Exit(1) from err
-    except HTTPError as err:
-        _render_create_failure(
+        output.fail(
             output.boundary_failure(
                 err, transport_message="Unable to create session(s)."
             ),
             mode,
-            f"[bold red]Error: {err}[/bold red]",
-            show_traceback=True,
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
         )
-        raise typer.Exit(1) from err
 
     _render_create_result(session_ids, name, mode)

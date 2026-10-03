@@ -17,6 +17,7 @@ from pydantic import (
 
 if TYPE_CHECKING:
     from pydantic.fields import FieldInfo
+    from pydantic_settings.sources.types import Traversable
 
 from pydantic_settings import (
     BaseSettings,
@@ -94,11 +95,6 @@ class ConsoleConfig(BaseModel):
         title="Console Banner",
         description="Show the active Server Selection in human CLI output.",
     )
-    file: Path | None = Field(
-        default=None,
-        title="Console File",
-        description="File to write console output to. Defaults to stdout.",
-    )
 
 
 class Configuration(BaseSettings):
@@ -123,26 +119,22 @@ class Configuration(BaseSettings):
         default=1,
         description="Configuration schema version.",
     )
+    # Pydantic deep-copies these mutable defaults for each instance.
     active: ActiveConfig = Field(
-        default_factory=lambda: default_active.model_copy(deep=True),
+        default=default_active,
         description="Active authentication and server selection.",
     )
     authentication: Annotated[
         dict[str, AuthenticationCredential],
         Field(
-            default_factory=lambda: {
-                idp: c.model_copy(deep=True)
-                for idp, c in default_authentication.items()
-            },
+            default=default_authentication,
             description="Saved authentication credentials keyed by IDP.",
         ),
     ]
     servers: Annotated[
         dict[str, Server],
         Field(
-            default_factory=lambda: {
-                name: s.model_copy(deep=True) for name, s in default_servers.items()
-            },
+            default=default_servers,
             description="Known science platform servers keyed by Server Name.",
         ),
     ]
@@ -315,3 +307,9 @@ class _CheckedYamlConfigSettingsSource(YamlConfigSettingsSource):
 
         ensure_current_config(yaml_file)
         super().__init__(settings_cls, yaml_file=yaml_file)
+
+    def _read_file(self, file_path: Path | Traversable) -> dict[str, Any]:
+        """Read YAML configuration without retired Server fields."""
+        from canfar.config.migration import drop_retired_server_fields  # noqa: PLC0415
+
+        return drop_retired_server_fields(super()._read_file(file_path))

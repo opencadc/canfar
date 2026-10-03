@@ -112,18 +112,6 @@ def get_idp(key: str) -> IdpInfo:
         raise KeyError(message) from exc
 
 
-def is_valid_idp(key: str) -> bool:
-    """Return whether ``key`` identifies a built-in Identity Provider.
-
-    Args:
-        key: Candidate canonical IDP key.
-
-    Returns:
-        bool: ``True`` when ``key`` is a built-in IDP, otherwise ``False``.
-    """
-    return key in _BUILTIN_IDPS
-
-
 def registry_sources(key: str, *, include_dev: bool = False) -> dict[str, str]:
     """Return registry resource-caps sources for an IDP.
 

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Annotated, get_args
+from typing import Annotated, get_args
 
-import click
 import humanize
 import typer
 from httpx2 import HTTPError
@@ -14,7 +14,6 @@ from rich import box
 from rich.table import Table
 
 from canfar.cli import output
-from canfar.cli._run import run
 from canfar.cli.machine import OutputOption, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
@@ -23,11 +22,6 @@ from canfar.models.session import FetchResponse
 from canfar.models.types import Kind, Status
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
-
-if TYPE_CHECKING:
-    from typing import NoReturn
-
-    from canfar.errors import StructuredError
 
 
 async def _fetch_sessions(
@@ -39,21 +33,6 @@ async def _fetch_sessions(
         return await session.fetch(kind=kind, status=status)
 
 
-def _raise_fetch_failure(
-    error: Exception,
-    failure: StructuredError,
-    mode: output.OutputMode,
-) -> NoReturn:
-    """Render one expected fetch failure and preserve exit code one."""
-    if mode is output.OutputMode.HUMAN:
-        get_console(stderr=True).print(f"[bold red]Error:[/bold red] {failure.message}")
-        if failure.hint:
-            get_console(stderr=True).print(failure.hint)
-    else:
-        output.to_stderr(failure, mode)
-    raise typer.Exit(1) from error
-
-
 def _fetch_session_payloads(
     kind: Kind | None,
     status: Status | None,
@@ -61,7 +40,7 @@ def _fetch_session_payloads(
 ) -> list[dict[str, str]]:
     """Fetch session payloads and map expected boundary failures."""
     try:
-        return run(_fetch_sessions(kind, status))
+        return asyncio.run(_fetch_sessions(kind, status))
     except (
         ConfigResetRequiredError,
         AuthExpiredError,
@@ -69,8 +48,7 @@ def _fetch_session_payloads(
         AuthenticationError,
         HTTPError,
     ) as err:
-        _raise_fetch_failure(
-            err,
+        output.fail(
             output.boundary_failure(err, transport_message="Unable to list sessions."),
             mode,
         )
@@ -169,7 +147,6 @@ def show(
         typer.Option(
             "--kind",
             "-k",
-            click_type=click.Choice(list(get_args(Kind)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Kind)),
             help="Filter by session kind.",
         ),
@@ -179,7 +156,6 @@ def show(
         typer.Option(
             "--status",
             "-s",
-            click_type=click.Choice(list(get_args(Status)), case_sensitive=True),  # ty: ignore[invalid-argument-type]
             metavar="|".join(get_args(Status)),
             help="Filter by session status.",
         ),

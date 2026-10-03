@@ -8,27 +8,23 @@ from typing import TYPE_CHECKING
 from xml.etree.ElementTree import ParseError
 
 from defusedxml.common import DefusedXmlException
-from httpx2 import HTTPError
+from httpx2 import HTTPError, TimeoutException, TransportError
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar.auth.x509 import CertificateError
-from canfar.errors import ErrorCode, StructuredError
+from canfar.errors import ErrorCode
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
 from canfar.hooks.httpx.auth import AuthenticationError as HTTPAuthenticationError
 from canfar.idp import get_idp
 from canfar.models.config import Configuration
-from canfar.models.http import (
-    DEFAULT_SERVER_CORES,
-    DEFAULT_SERVER_GPUS,
-    DEFAULT_SERVER_RAM_GB,
-    Server,
-    VOSpaceService,
-)
+from canfar.models.http import Server, ServerResources, VOSpaceService
+from canfar.models.registry import ProbeStatus, ServerProbe
 from canfar.models.registry import Server as RegistryResource
 from canfar.utils import registry, vosi
 from canfar.utils.registry import RegistryEvidenceError
 
 if TYPE_CHECKING:
+    from collections.abc import Awaitable, Callable
     from pathlib import Path
 
 log = logging.getLogger(__name__)
@@ -47,21 +43,12 @@ class ServerDiscoveryError(RuntimeError):
     ) -> None:
         super().__init__(message)
         self.code = code
-        self.structured = StructuredError(code=code, message=message)
 
 
 class ServerFetchError(RuntimeError):
     """Raised when server fetch or validation fails."""
 
-    def __init__(
-        self,
-        message: str,
-        *,
-        code: ErrorCode = ErrorCode.TRANSPORT_FAILURE,
-    ) -> None:
-        super().__init__(message)
-        self.code = code
-        self.structured = StructuredError(code=code, message=message)
+    code = ErrorCode.TRANSPORT_FAILURE
 
 
 def _merge_storage(
@@ -87,26 +74,36 @@ async def _discover_for_idp(
     config: Configuration | None = None,
     dev: bool = False,
     timeout: int = 2,
+    on_probe: Callable[[ServerProbe], None] | None = None,
 ) -> list[Server]:
-    """Discover active servers for a single Identity Provider."""
-    evidence = await registry.evidence(
-        idp,
-        dev=dev,
-        timeout=timeout,
-        check_platforms=True,
-    )
+    """Discover active servers for a single Identity Provider.
+
+    Each Science Platform endpoint runs its reachability check and, when
+    reachable, its inspection independently, so one slow endpoint does not
+    hold back the others. ``on_probe`` receives each endpoint as ``pending``
+    once the registries list it, then again with its outcome as soon as it is
+    known.
+    """
+
+    def report(probe: ServerProbe) -> None:
+        if probe.status not in {"pending", "connected"}:
+            log.debug("Server %s %s: %s", probe.name, probe.status, probe.detail)
+        if on_probe is not None:
+            on_probe(probe)
+
+    evidence = await registry.evidence(idp, dev=dev, timeout=timeout)
     if not evidence.available:
         errors = "; ".join(evidence.errors)
         msg = f"Failed to discover servers for IDP '{idp}': {errors}"
         raise ServerDiscoveryError(msg)
 
-    endpoints = [
-        resource
-        for resource in evidence.resources
-        if resource.uri.endswith("/skaha") and resource.status == 200
+    platforms = [
+        resource for resource in evidence.resources if resource.uri.endswith("/skaha")
     ]
-    if not endpoints:
+    if not platforms:
         return []
+    for platform in platforms:
+        report(_probe(platform, "pending"))
 
     storage_resources = [
         resource
@@ -116,37 +113,99 @@ async def _discover_for_idp(
     workers = await registry.workers(
         config,
         idp,
-        endpoint=endpoints[0],
-        count=len(endpoints),
+        endpoint=platforms[0],
+        count=len(platforms),
     )
-    if workers is None:
-        return [_registry_resource_to_server(endpoint, idp) for endpoint in endpoints]
+    token = workers.token if workers is not None else None
+    certificate = workers.certificate if workers is not None else None
+    configs = workers.configs if workers is not None else (None,) * len(platforms)
 
-    return list(
-        await asyncio.gather(
-            *(
-                asyncio.to_thread(
-                    _discovered_to_server,
+    async def inspect(
+        check: Callable[[RegistryResource], Awaitable[RegistryResource]],
+        endpoint: RegistryResource,
+        worker_config: Configuration | None,
+    ) -> Server | None:
+        endpoint = await check(endpoint)
+        if endpoint.status != 200:
+            report(_failed_probe(endpoint))
+            return None
+        if worker_config is None:
+            report(
+                _probe(
                     endpoint,
-                    idp,
-                    config=worker_config,
-                    token=workers.token,
-                    certificate=workers.certificate,
-                    timeout=timeout,
-                    storage_resource=_select_storage(
-                        endpoint,
-                        storage_resources,
-                        strict=False,
-                    ),
-                )
-                for endpoint, worker_config in zip(
-                    endpoints,
-                    workers.configs,
-                    strict=True,
+                    "error",
+                    "No usable credentials to inspect session capabilities.",
                 )
             )
+            return _registry_resource_to_server(endpoint, idp)
+        server, probe = await asyncio.to_thread(
+            _discovered_to_server,
+            endpoint,
+            idp,
+            config=worker_config,
+            token=token,
+            certificate=certificate,
+            timeout=timeout,
+            storage_resource=registry.select_storage(
+                endpoint,
+                storage_resources,
+                strict=False,
+            ),
         )
+        report(probe)
+        return server
+
+    async with registry.reachability(timeout) as check:
+        servers = await asyncio.gather(
+            *(
+                inspect(check, platform, worker_config)
+                for platform, worker_config in zip(platforms, configs, strict=True)
+            )
+        )
+    return [server for server in servers if server is not None]
+
+
+def _endpoint_name(endpoint: RegistryResource) -> str:
+    """Return the Server Name discovery gives an endpoint, or its URI."""
+    if endpoint.name:
+        return endpoint.name
+    try:
+        return _host_slug(AnyUrl(endpoint.uri)) or endpoint.uri
+    except ValidationError:
+        return endpoint.uri
+
+
+def _probe(
+    endpoint: RegistryResource,
+    status: ProbeStatus,
+    detail: str | None = None,
+) -> ServerProbe:
+    """Describe one endpoint's discovery outcome."""
+    return ServerProbe(
+        name=_endpoint_name(endpoint),
+        uri=endpoint.uri,
+        url=endpoint.url,
+        status=status,
+        detail=detail,
     )
+
+
+def _failed_probe(endpoint: RegistryResource) -> ServerProbe:
+    """Describe an endpoint whose reachability check did not return HTTP 200."""
+    if endpoint.status is not None:
+        return _probe(endpoint, "error", f"HTTP {endpoint.status} from {endpoint.url}")
+    if endpoint.failure == "timeout":
+        return _probe(endpoint, "timeout", f"{endpoint.url} did not respond in time")
+    return _probe(endpoint, "unreachable", f"{endpoint.url} could not be reached")
+
+
+def _probe_status(error: BaseException | None) -> ProbeStatus:
+    """Classify why a Server's session capabilities could not be read."""
+    if isinstance(error, TimeoutException):
+        return "timeout"
+    if isinstance(error, TransportError):
+        return "unreachable"
+    return "error"
 
 
 def _host_slug(uri: AnyUrl) -> str | None:
@@ -154,19 +213,6 @@ def _host_slug(uri: AnyUrl) -> str | None:
     if uri.host is None:
         return None
     return uri.host.replace(".", "-")
-
-
-def _select_storage(
-    endpoint: RegistryResource,
-    resources: list[RegistryResource],
-    *,
-    strict: bool,
-) -> RegistryResource | None:
-    """Map private registry ambiguity to the public server fetch error."""
-    try:
-        return registry.select_storage(endpoint, resources, strict=strict)
-    except RegistryEvidenceError as exc:
-        raise ServerFetchError(str(exc)) from exc
 
 
 async def _discover_storage(
@@ -224,18 +270,47 @@ def _discovered_to_server(
     certificate: Path | None = None,
     timeout: int = 2,
     storage_resource: RegistryResource | None = None,
-) -> Server:
-    """Convert a registry discovery record to a persisted HTTP server model."""
-    server = _registry_resource_to_server(endpoint, idp)
-    return enrich(
-        server,
-        config=config,
+) -> tuple[Server, ServerProbe]:
+    """Inspect one reachable registry endpoint as a Science Platform Server.
+
+    Storage and resource failures keep the Server usable. A session
+    capabilities failure keeps registry metadata only and classifies the
+    endpoint as timed out, unreachable, or in error.
+
+    Returns:
+        The Server to merge and its discovery outcome.
+    """
+    base_config = config or Configuration()  # ty: ignore[missing-argument]
+    server = _enrich_storage(
+        _registry_resource_to_server(endpoint, idp),
+        storage_resource=storage_resource,
+        config=base_config,
+        authentication_idp=idp,
         token=token,
         certificate=certificate,
         strict=False,
         timeout=timeout,
-        storage_resource=storage_resource,
     )
+    try:
+        server = enrich(
+            server,
+            config=base_config,
+            authentication_idp=idp,
+            token=token,
+            certificate=certificate,
+            timeout=timeout,
+        )
+    except ServerFetchError as exc:
+        return server, _probe(endpoint, _probe_status(exc.__cause__), str(exc))
+    server = _fetch_resources(
+        server,
+        config=base_config,
+        authentication_idp=idp,
+        token=token,
+        certificate=certificate,
+        timeout=timeout,
+    )
+    return server, _probe(endpoint, "connected")
 
 
 def enrich(
@@ -263,8 +338,7 @@ def enrich(
         strict: When ``False``, keep usable registry and existing storage data
             when session or storage capabilities cannot be retrieved or parsed.
             Other successful enrichment may still be returned, so the result can
-            be partial. Discovery uses non-strict mode so one malformed endpoint
-            does not abort listing for an IDP.
+            be partial.
         timeout: HTTP timeout in seconds for VOSI capabilities requests.
         storage_resource: Retained same-namespace VOSpace registry record. Passing
             ``None`` records that the preferred resource was absent; omitting the
@@ -538,49 +612,44 @@ def _fetch_resources(
     config: Configuration,
     authentication_idp: str,
     timeout: int,
+    token: str | None = None,
+    certificate: Path | None = None,
 ) -> Server:
-    """Return a Server populated from its authenticated context endpoint."""
-    from canfar.client import HTTPClient  # noqa: PLC0415
+    """Return a Server with resources read from its context endpoint.
+
+    A failing or unrecognizable context endpoint keeps the Server's current
+    resources, which stay ``None`` until a usable payload has been read.
+    """
+    from canfar.context import Context  # noqa: PLC0415
 
     if server.url is None or server.version is None:
         msg = "Server URL and version are required for resource enrichment."
         raise ValueError(msg)
-    client = HTTPClient(
-        config=config,
-        authentication_idp=authentication_idp,
-        url=AnyHttpUrl(f"{server.url}/{server.version}"),
-        timeout=timeout,
-        raise_http_errors=False,
-    )
     try:
-        with client:
-            response = client.client.get("context")
-            response.raise_for_status()
-            data = dict(response.json())
-
-        cores_data = data.get("cores") or {}
-        ram_data = data.get("memoryGB") or {}
-        gpus_data = data.get("gpus") or {}
-        cores = cores_data.get("defaultLimit")
-        ram = ram_data.get("defaultLimit")
-        gpu_options = gpus_data.get("options") or []
-        return Server.model_validate(
-            {
-                **server.model_dump(mode="python"),
-                "cores": cores if cores is not None else DEFAULT_SERVER_CORES,
-                "ram": ram if ram is not None else DEFAULT_SERVER_RAM_GB,
-                "gpus": max(gpu_options) if gpu_options else DEFAULT_SERVER_GPUS,
-            }
-        )
-    except (HTTPError, OSError, ValueError, TypeError):
-        return server.model_copy(
-            update={
-                "cores": DEFAULT_SERVER_CORES,
-                "ram": DEFAULT_SERVER_RAM_GB,
-                "gpus": DEFAULT_SERVER_GPUS,
-            },
-            deep=True,
-        )
+        with Context.build(
+            config=config,
+            authentication_idp=authentication_idp,
+            url=AnyHttpUrl(f"{server.url}/{server.version}"),
+            token=token,
+            certificate=certificate,
+            timeout=timeout,
+            raise_http_errors=False,
+        ) as context:
+            # Do not send Container Registry credentials to every discovered Server.
+            context.client.headers.pop("X-Skaha-Registry-Auth", None)
+            resources = ServerResources.from_context(context.resources())
+    except (
+        HTTPError,
+        OSError,
+        ValueError,
+        TypeError,
+        AuthContextError,
+        AuthExpiredError,
+        HTTPAuthenticationError,
+    ) as exc:
+        log.debug("Keeping known resources for %s: %s", server.url, exc)
+        return server
+    return server.model_copy(update={"resources": resources}, deep=True)
 
 
 def _store_discovered_servers(config: Configuration, servers: list[Server]) -> None:
@@ -599,8 +668,12 @@ def discover(
     dev: bool = False,
     timeout: int = 2,
     save: bool = True,
+    on_probe: Callable[[ServerProbe], None] | None = None,
 ) -> list[Server]:
     """Discover, merge, and optionally persist servers for ``idp``.
+
+    Each connected Server also reads its session resource limits from its
+    context endpoint.
 
     Args:
         idp: Canonical Identity Provider key.
@@ -608,6 +681,9 @@ def discover(
         dev: Include development registries and endpoints during discovery.
         timeout: HTTP timeout in seconds for discovery requests.
         save: Persist the configuration after merging discovered servers.
+        on_probe: Called with each Science Platform endpoint as ``pending``
+            once the registries list it, then with its outcome (``connected``,
+            ``timeout``, ``unreachable``, or ``error``) as soon as it is known.
 
     Returns:
         list[Server]: Newly discovered server records.
@@ -622,6 +698,7 @@ def discover(
             config=target_config,
             dev=dev,
             timeout=timeout,
+            on_probe=on_probe,
         )
     )
     known_servers = dict(target_config.servers)
@@ -658,6 +735,8 @@ def discover(
             )
             if server.storage:
                 updates["storage"] = _merge_storage(known.storage, server.storage)
+            if server.resources is not None:
+                updates["resources"] = server.resources
             merged_server = known.model_copy(update=updates, deep=True)
         canonical[name] = merged_server
 

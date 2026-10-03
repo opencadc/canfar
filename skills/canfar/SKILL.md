@@ -74,7 +74,11 @@ Three states mark progress. Claim only the one you observed:
    generates one. Pass `--cpu` and `--memory` (GB) together only when the user
    gives sizes or a test run measured them; without them the Server applies
    its flexible policy, and fixed requests can wait longer for capacity.
-   `--gpu N` requests GPUs.
+   `--gpu N` requests GPUs. The Server's limits are under `resources` in
+   `canfar server ls -o json`: `flexible` and `fixed` CPU and memory ranges,
+   `gpus`, and `sessions`, the interactive Session limit; `null` is unknown.
+   `canfar create --help` shows the accepted ranges; a value outside them
+   exits 2 with `Invalid value` on stderr.
 
    ```bash
    canfar create notebook IMAGE --name analysis -o json

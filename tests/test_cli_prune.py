@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import click
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
@@ -33,7 +33,7 @@ def test_prune_success_and_usage_message() -> None:
 
     help_result = runner.invoke(cli, ["prune", "--help"])
     assert help_result.exit_code == 0
-    help_text = " ".join(click.unstyle(help_result.output).split())
+    help_text = " ".join(Text.from_ansi(help_result.output).plain.split())
     assert (
         "Usage: canfar prune [OPTIONS] PREFIX KIND STATUS COMMAND [ARGS]..."
         in help_text

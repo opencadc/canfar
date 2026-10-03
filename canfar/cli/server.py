@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Annotated
 import typer
 from rich import box
 from rich.table import Table
+from rich.text import Text
 
 from canfar.authentication import AuthenticationError
 from canfar.authentication import show as auth_show
@@ -28,13 +29,43 @@ from canfar.server import (
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
-    from canfar.models.http import Server
+    from canfar.models.http import ResourceRange, Server, SessionResources
 
 server = typer.Typer(
     name="server",
     help="Manage science platform servers.",
     no_args_is_help=True,
 )
+
+_UNKNOWN = "[dim]unknown[/dim]"
+
+
+def _range_cell(bounds: ResourceRange | None, unit: str = "") -> str:
+    """Format an inclusive resource range, or mark it unknown."""
+    if bounds is None:
+        return _UNKNOWN
+    return f"{bounds} {unit}".rstrip()
+
+
+def _mode(resources: SessionResources) -> str:
+    """Format the CPU and memory bounds of one Resource Allocation Mode."""
+    return (
+        f"{_range_cell(resources.cores, 'cores')}\n{_range_cell(resources.ram, 'GB')}"
+    )
+
+
+def _resource_cells(item: Server) -> tuple[str, str, str, str]:
+    """Return the flexible, fixed, GPU, and Session limit cells for one Server."""
+    resources = item.resources
+    if resources is None:
+        return _UNKNOWN, _UNKNOWN, _UNKNOWN, _UNKNOWN
+    gpus = resources.gpus
+    return (
+        _mode(resources.flexible),
+        _mode(resources.fixed),
+        "none" if gpus is not None and gpus.max == 0 else _range_cell(gpus),
+        _UNKNOWN if resources.sessions is None else str(resources.sessions),
+    )
 
 
 def _render_server_list_table(servers: list[Server]) -> None:
@@ -45,18 +76,35 @@ def _render_server_list_table(servers: list[Server]) -> None:
         )
         return
 
-    table = Table(title="Known Servers", show_lines=True, box=box.SIMPLE)
+    table = Table(
+        title="Known Servers",
+        caption=(
+            "[italic]Flexible[/italic] resources allow dynamic allocation based on "
+            "availability.\n"
+            "[italic]Fixed[/italic] resources guarantee allocation.\n"
+            "[italic]Sessions[/italic] limit per user."
+        ),
+        caption_style="dim",
+        caption_justify="left",
+        show_lines=True,
+        box=box.SIMPLE,
+    )
     table.add_column("Name", style="magenta")
-    table.add_column("URI", style="cyan")
-    table.add_column("URL", style="blue")
+    table.add_column("URI / URL", style="cyan")
     table.add_column("Version", style="green")
+    table.add_column("Flexible")
+    table.add_column("Fixed")
+    table.add_column("GPUs")
+    table.add_column("Sessions")
 
     for item in servers:
+        uri = str(item.uri) if item.uri is not None else "N/A"
+        url = str(item.url) if item.url is not None else "N/A"
         table.add_row(
             item.name or "N/A",
-            str(item.uri) if item.uri is not None else "N/A",
-            str(item.url) if item.url is not None else "N/A",
+            Text.assemble(uri, "\n", (url, "blue")),
             item.version or "N/A",
+            *_resource_cells(item),
         )
     get_console().print(table)
 
@@ -72,39 +120,22 @@ def server_list_command(
         auth_show()
         servers = server_list()
     except ConfigResetRequiredError as exc:
-        error = StructuredError(
-            code=exc.code,
-            message=exc.message,
-            hint="Reset the configuration and log in again.",
-        )
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(f"[bold red]{error.message}[/bold red]")
-        else:
-            output.to_stderr(error, mode)
-        raise typer.Exit(1) from exc
+        output.fail(output.boundary_failure(exc), mode)
     except AuthenticationError as exc:
-        if mode is not output.OutputMode.HUMAN:
-            output.to_stderr(exc.error, mode)
-        else:
-            get_console(stderr=True).print(f"[bold red]{exc.error.message}[/bold red]")
-            if exc.error.hint:
-                get_console(stderr=True).print(exc.error.hint)
-        raise typer.Exit(1) from exc
+        output.fail(exc.error, mode)
     except ServerDiscoveryError as exc:
-        error = StructuredError(
-            code=exc.code,
-            message=str(exc),
-            hint="Verify registry connectivity and retry.",
+        output.fail(
+            StructuredError(
+                code=exc.code,
+                message=str(exc),
+                hint="Verify registry connectivity and retry.",
+            ),
+            mode,
         )
-        if mode is not output.OutputMode.HUMAN:
-            output.to_stderr(error, mode)
-        else:
-            get_console(stderr=True).print(f"[bold red]{exc}[/bold red]")
-        raise typer.Exit(1) from exc
 
     if mode is not output.OutputMode.HUMAN:
         if not servers:
-            output.to_stderr(
+            output.fail(
                 StructuredError(
                     code=ErrorCode.SERVER_NONE_AVAILABLE,
                     message="No compatible servers available for active IDP.",
@@ -112,7 +143,6 @@ def server_list_command(
                 ),
                 mode,
             )
-            raise typer.Exit(1)
         output.to_stdout(servers, mode)
         return
 

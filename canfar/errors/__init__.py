@@ -1,17 +1,10 @@
-"""Structured error codes and machine-mode serialization for CANFAR."""
+"""Structured error codes and payloads for CANFAR."""
 
 from canfar.errors.codes import ErrorCode
-from canfar.errors.model import (
-    LoggingEnvironmentError,
-    StructuredError,
-    structured_error_to_json,
-    structured_error_to_yaml,
-)
+from canfar.errors.model import LoggingEnvironmentError, StructuredError
 
 __all__ = [
     "ErrorCode",
     "LoggingEnvironmentError",
     "StructuredError",
-    "structured_error_to_json",
-    "structured_error_to_yaml",
 ]

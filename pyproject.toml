@@ -47,15 +47,12 @@ classifiers = [
 
 dependencies = [
     "authlib>=1.8.0",
-    "cadcutils>=1.6.2",
-    "click>=8.5.0",
     "defusedxml>=0.7.1",
     "httpx2[http2]>=2.13.1",
     "humanize>=4.16.0",
     "pydantic>=2.13.5",
     "pydantic-settings>=2.15.0",
     "pyyaml>=6.0.3",
-    "questionary>=2.1.1",
     "rich>=15.0.0",
     "segno>=1.6.6",
     "typer>=0.27.2",

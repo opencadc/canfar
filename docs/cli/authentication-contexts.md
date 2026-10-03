@@ -31,9 +31,57 @@ When `IDP` is omitted, the CLI prompts for one. Use these options when needed:
 | `--timeout`, `-t` | HTTP timeout in seconds for login requests; default `10`. |
 
 Login authenticates the selected IDP, discovers compatible Science Platform
-Servers, selects one when necessary, and saves the Authentication Record and
-Server Selection. You can log in again when an Authentication Record already
+Servers, and saves the Authentication Record and Server Selection. When several
+compatible Servers are discovered, the CLI lists them by number and asks you to
+type the number of the one to use; the IDP prompt works the same way. You can log in again when an Authentication Record already
 exists; `--force` is not required to recover expired credentials.
+
+<span id="discovery-outcomes"></span>
+
+### Discovery outcomes
+
+While it discovers Servers, login shows a live grid on stderr: one square per
+Server, in Server Name order, redrawn every second. A hollow square is still
+being checked; it fills in with its outcome as soon as that Server answers or
+fails, so slow Servers do not hold back the others. A legend counts each
+outcome:
+
+```text
+■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+■ 14 discovered   ■ 5 timeout   ■ 4 unreachable   ■ 2 failed
+Checked 25 servers in 13.2s with a 10s request timeout.
+5 timed out. To wait longer, run canfar login srcnet --timeout 20
+```
+
+| Outcome | Without color | Meaning |
+| --- | --- | --- |
+| discovered | `+` | The Server answered and published usable session capabilities. |
+| timeout | `~` | The Server did not answer within `--timeout` seconds. |
+| unreachable | `x` | The connection failed, for example on DNS or TLS. |
+| failed | `!` | The Server answered, but with an error status or unusable capabilities. |
+| pending | `.` | The Server is still being checked. |
+
+When stderr has no color, for example in a CI log or with `NO_COLOR` set, each
+outcome uses the glyph in the second column instead of a colored square.
+
+The last lines report how many Servers were checked, how long that took, and
+the request timeout. When a Server times out, login prints the same login
+command with a doubled `--timeout`, up to the 300-second limit. If discovery
+is interrupted, for example with Ctrl-C, the last line instead says how many
+Servers were not checked. If no registry can be read, login shows no grid; it
+prints the error and suggests checking the network or a longer `--timeout`.
+
+Newly discovered Servers are saved, and when none is discovered the grid still
+appears before the error. A Server saved by an earlier login stays available
+for selection with its saved details even if it times out or fails this time.
+Each discovered Server also reports its Session limits; see
+[Server Selection](#manage-servers). Add `-v` (or `--log-level info`) before
+`login` to label each square with its Server Name and to log how long each
+registry took, and `--log-level debug` for the reason behind each outcome:
+
+```bash
+canfar --log-level info login srcnet
+```
 
 ### CADC X.509
 
@@ -135,8 +183,8 @@ canfar auth use cadc
 ```
 
 When switching, CANFAR reuses a compatible remembered Server Selection when
-one exists. If several compatible Servers need a choice, the CLI prompts for a
-Server URI or list number.
+one exists. If several compatible Servers need a choice, the CLI lists them by
+number and prompts for one.
 
 Remove one Authentication Record and its associated Servers with:
 
@@ -171,6 +219,23 @@ canfar server use SELECTOR
 runs discovery and persists the result. Its machine payload is a list of
 Server records and is data-only on stdout.
 
+Alongside each Server's URI and URL, the table shows the Session limits the
+Server advertises, and a caption under the table summarizes the columns:
+
+| Column | Meaning |
+| --- | --- |
+| Flexible | Cores and memory a Session without `--cpu` or `--memory` is guaranteed, and what it can burst to. |
+| Fixed | The smallest and largest `--cpu` and `--memory` values the Server accepts. |
+| GPUs | The `--gpu` values the Server accepts, or `none`. |
+| Sessions | How many interactive Sessions you can run at once; `headless` Sessions do not count. |
+
+`unknown` marks a limit the Server does not advertise, as older platform
+versions may not. The machine payload carries the same values in each
+Server's `resources`, with `null` for unknown. Discovery reads the limits, and
+`server use` reads them again for the selected Server. `canfar create` rejects
+values outside the active Server's known limits; see
+[Session limits](../platform/sessions/limits.md#what-your-server-offers).
+
 `server use` accepts either a Server Name or an IVOA URI:
 
 ```bash
@@ -201,7 +266,18 @@ servers:
     idp: cadc
     uri: ivo://cadc.nrc.ca/skaha
     url: https://ws-uv.canfar.net/skaha
+    resources:
+      flexible:
+        cores: {min: 1, max: 16}
+        ram: {min: 4, max: 32}
+      fixed:
+        cores: {min: 1, max: 16}
+        ram: {min: 1, max: 192}
+      sessions: 5
 ```
+
+`resources` is written by discovery and `server use`; it is absent until a
+Server has reported its limits.
 
 Use `canfar config get` and `canfar config set` for dotted configuration
 paths. Values passed to `config set` are parsed as YAML:

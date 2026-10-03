@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
+import asyncio
 import webbrowser
 from typing import Annotated
 
 import typer
 
-from canfar.cli._run import run
 from canfar.sessions import AsyncSession, connection_url
 from canfar.utils.console import emit_cli_active_server_banner
 
@@ -46,4 +46,4 @@ def open_sessions(
                     err=True,
                 )
 
-    run(_open_sessions())
+    asyncio.run(_open_sessions())

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from canfar.idp import IdpInfo, get_idp, is_valid_idp, list_idps, registry_sources
+from canfar.idp import IdpInfo, get_idp, list_idps, registry_sources
 
 
 class TestListIdps:
@@ -120,22 +120,6 @@ class TestGetIdpUnknown:
         """Unknown IDP keys raise KeyError."""
         with pytest.raises(KeyError, match="unknown"):
             get_idp("unknown")
-
-
-class TestIsValidIdp:
-    """Tests for is_valid_idp()."""
-
-    def test_is_valid_idp_cadc(self) -> None:
-        """Canonical cadc key is valid."""
-        assert is_valid_idp("cadc") is True
-
-    def test_is_valid_idp_srcnet(self) -> None:
-        """Canonical srcnet key is valid."""
-        assert is_valid_idp("srcnet") is True
-
-    def test_is_valid_idp_unknown(self) -> None:
-        """Unknown keys are not valid."""
-        assert is_valid_idp("unknown") is False
 
 
 class TestIdpInfoModel:

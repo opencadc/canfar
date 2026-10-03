@@ -51,14 +51,7 @@ def show(
         ValueError,
         yaml.YAMLError,
     ) as error:
-        failure = _configuration_failure(error)
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(
-                f"[bold red]Error:[/bold red] {failure.message}"
-            )
-        else:
-            output.to_stderr(failure, mode)
-        raise typer.Exit(1) from error
+        output.fail(_configuration_failure(error), mode)
 
     if not CONFIG_PATH.exists():
         get_console(stderr=True).print(
@@ -113,30 +106,19 @@ def get(
         ValueError,
         yaml.YAMLError,
     ) as err:
-        failure = _configuration_failure(err)
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(
-                f"[bold red]Error:[/bold red] {failure.message}"
-            )
-        else:
-            output.to_stderr(failure, mode)
-        raise typer.Exit(1) from err
+        output.fail(_configuration_failure(err), mode)
 
     try:
         value = cfg.editor.get(key)
     except (AttributeError, KeyError, IndexError, TypeError, ValueError) as err:
-        failure = StructuredError(
-            code=ErrorCode.COMMAND_VALIDATION_FAILED,
-            message=f"Configuration key '{key}' could not be read.",
-            hint=str(err),
+        output.fail(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message=f"Configuration key '{key}' could not be read.",
+                hint=str(err),
+            ),
+            mode,
         )
-        if mode is output.OutputMode.HUMAN:
-            get_console(stderr=True).print(
-                f"[bold red]Error:[/bold red] {failure.message}"
-            )
-        else:
-            output.to_stderr(failure, mode)
-        raise typer.Exit(1) from err
 
     if mode is not output.OutputMode.HUMAN:
         output.to_stdout(value, mode)

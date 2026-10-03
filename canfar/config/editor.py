@@ -31,38 +31,14 @@ def _parse_dotted_path(path: str) -> list[str]:
     return segments
 
 
-def _get_from_container(container: Any, key: str) -> Any:
-    if isinstance(container, dict):
-        return container[key]
-
-    msg = f"Expected mapping for key {key!r}"
-    raise KeyError(msg)
-
-
-def _set_in_container(container: Any, key: str, value: Any) -> None:
-    if isinstance(container, dict):
-        container[key] = value
-        return
-
-    msg = f"Expected mapping for key {key!r}"
-    raise TypeError(msg)
-
-
-def _ensure_child_container(parent: Any, key: str) -> Any:
-    if not isinstance(parent, dict):
-        msg = f"Expected mapping for key {key!r}"
-        raise TypeError(msg)
-
-    if key not in parent or parent[key] is None:
-        parent[key] = {}
-    return parent[key]
-
-
 def get_value(config: Configuration, path: str) -> Any:
     """Get a nested configuration value via dotted path."""
     value: Any = config.model_dump(mode="json", exclude_none=False)
     for segment in _parse_dotted_path(path):
-        value = _get_from_container(value, segment)
+        if not isinstance(value, dict):
+            msg = f"Expected mapping for key {segment!r}"
+            raise KeyError(msg)
+        value = value[segment]
     return value
 
 
@@ -80,14 +56,17 @@ def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
 
 def _updated_data(config: Configuration, path: str, value: Any) -> dict[str, Any]:
     """Return serialized top-level data with one dotted-path value updated."""
-    segments = _parse_dotted_path(path)
+    *parents, leaf = _parse_dotted_path(path)
     data = config.model_dump(mode="python")
     cursor: Any = data
-
-    for segment in segments[:-1]:
-        cursor = _ensure_child_container(cursor, segment)
-
-    _set_in_container(cursor, segments[-1], value)
+    for segment in parents:
+        if cursor.get(segment) is None:
+            cursor[segment] = {}
+        cursor = cursor[segment]
+        if not isinstance(cursor, dict):
+            msg = f"Expected mapping below key {segment!r}"
+            raise TypeError(msg)
+    cursor[leaf] = value
     return data
 
 
@@ -117,16 +96,12 @@ def _restore_oidc_secrets(config: Configuration, data: dict[str, Any]) -> None:
             token["refresh"] = credential.token.refresh.get_secret_value()
 
 
-def _default_config_path() -> Path:
-    """Resolve the configured YAML path lazily to preserve test isolation."""
+def _save_config(config: Configuration) -> None:
+    """Atomically save a validated Configuration to YAML."""
+    # Resolved at call time so tests can isolate the configuration path.
     from canfar.models.config import CONFIG_PATH  # noqa: PLC0415
 
-    return CONFIG_PATH
-
-
-def _save_config(config: Configuration, path: Path | None = None) -> None:
-    """Atomically save a validated Configuration to YAML."""
-    target = path or _default_config_path()
+    target = CONFIG_PATH
     target.parent.mkdir(parents=True, exist_ok=True)
     temporary: Path | None = None
     try:

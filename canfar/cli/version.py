@@ -5,6 +5,7 @@ from __future__ import annotations
 import platform
 import sys
 from importlib import metadata
+from typing import Annotated
 
 import typer
 from rich.table import Table
@@ -14,12 +15,9 @@ from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 
 def callback(
-    debug: bool = typer.Option(
-        default=False,
-        flag_value="--debug",
-        is_flag=True,
-        help="Show detailed information for bug reports.",
-    ),
+    debug: Annotated[
+        bool, typer.Option("--debug", help="Show detailed information for bug reports.")
+    ] = False,
 ) -> None:
     """CANFAR Python Client version information."""
     emit_cli_active_server_banner()
@@ -70,7 +68,6 @@ def callback(
         "typer",
         "rich",
         "pydantic",
-        "cadcutils",
     ]
 
     for dep in key_deps:
@@ -112,20 +109,13 @@ def _get_installation_info() -> str:
         str: Installation method information.
     """
     try:
-        # Check if we can find the package metadata
         dist = metadata.distribution("canfar")
-        if not dist.files:
-            return "unknown"
-
-        # Check if installed in development mode
-        is_development = False
-        for file in dist.files:
-            if str(file).endswith(".egg-link") or "site-packages" not in str(file):
-                is_development = True
-                break
-
-        if is_development:
-            return "development/editable"
-        return "pip/wheel"  # noqa: TRY300
     except metadata.PackageNotFoundError:
         return "development (not installed)"
+    if not dist.files:
+        return "unknown"
+    development = any(
+        str(file).endswith(".egg-link") or "site-packages" not in str(file)
+        for file in dist.files
+    )
+    return "development/editable" if development else "pip/wheel"

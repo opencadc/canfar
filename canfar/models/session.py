@@ -61,7 +61,7 @@ class CreateRequest(BaseModel):
         1,
         description="Number of sessions to launch.",
         ge=1,
-        le=512,
+        le=256,
         exclude=True,
     )
 
@@ -286,24 +286,7 @@ class FetchResponse(BaseModel):
     @classmethod
     def _validate_type(cls, v: Any) -> str:
         """Validate type field, fall back to 'headless' if invalid."""
-        if v in (None, "", []):
-            return "headless"
-        if isinstance(v, str):
-            # Check if it's a valid Kind value
-            valid_kinds = get_args(Kind)
-            if v in valid_kinds:
-                return v
-            # Invalid type, will be tracked as anomaly in model validator
-            return "headless"
-        return "headless"
-
-    @field_validator("status", mode="before")
-    @classmethod
-    def _validate_status(cls, v: Any) -> str:
-        """Validate status field, allow any string value."""
-        if v in (None, "", []):
-            return "Unknown"
-        return str(v)
+        return v if isinstance(v, str) and v in get_args(Kind) else "headless"
 
     @field_validator("supplementalGroups", mode="before")
     @classmethod
@@ -333,7 +316,7 @@ class FetchResponse(BaseModel):
                 return None
         return None
 
-    @field_validator("id", "name", mode="before")
+    @field_validator("id", "name", "status", mode="before")
     @classmethod
     def _validate_string_fields(cls, v: Any) -> str:
         """Validate string fields, default to 'Unknown' if missing."""
@@ -351,10 +334,6 @@ class FetchResponse(BaseModel):
             notes.append("missing id in response")
         if self.name == "Unknown":
             notes.append("missing name in response")
-        if self.type == "headless":
-            # Only track as anomaly if it was actually missing/invalid
-            # We can't easily tell here, so we'll skip this
-            pass
         if self.startTime is None:
             notes.append("missing or invalid startTime in response")
         if self.expiryTime is None:

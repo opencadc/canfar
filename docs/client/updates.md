@@ -83,11 +83,51 @@ expiry hooks, for that client only.
   the [migration table](migration.md#update-command-lines) lists replacements.
 - Use `config.editor.get()`, `.set()`, and `.save()` for validated configuration
   edits. The stored schema remains stable; the editing methods moved.
-- Use `--log-level` or repeated `-v` before the command. Add `--log-file PATH`
-  for a rotating JSON Lines file. Python applications use standard-library
-  logging and `canfar.configure_logging()`. See [Logging](../cli/logging.md).
+- Use `--log-level`, `-v` (`info`: one line per Science Platform HTTP
+  response), or `-vv` (`debug`) before the command; `-v` previously selected
+  `error`, and `info` needed `-vvv`. Add `--log-file PATH` for a rotating JSON
+  Lines file. Python applications use standard-library logging and
+  `canfar.configure_logging()`. See [Logging](../cli/logging.md).
+- Name local files `local:/PATH` in `canfar data`. Each data command's
+  `--help` now explains the `IDENTIFIER:/PATH` syntax and lists the configured
+  identifiers, and a rejected bare local path prints a hint.
 - Set `console.banner` to control the active-server banner in human output.
   Supported machine-output commands omit it automatically.
+- Read Server limits from `resources`. The flat `cores`, `ram`, and `gpus`
+  Server fields are gone, as are the unused Server `status` field and
+  `console.file` setting; saved configurations still load. See the
+  [upgrade guide](migration.md#read-server-limits-from-resources).
+- Type a number to choose an Identity Provider or Server when `canfar login`
+  or `canfar auth use` asks; the prompts list the choices by number instead of
+  using arrow-key menus.
+- Request at most 256 replicas per `create` call, down from 512, in both the
+  CLI and `CreateRequest`. Split larger runs into several requests.
+
+<span id="server-resources"></span>
+
+## See which Servers connect and what they offer
+
+While it discovers Servers, `canfar login` shows a live grid: one square per
+Server, filling in as each Server answers, and a legend that counts the ones
+discovered, timed out, unreachable, or failed. Each Server is checked and
+inspected on its own, so slow Servers no longer hold back the rest. A summary
+line gives the number of Servers checked and the request timeout, and suggests
+a longer `--timeout` when Servers time out. `--log-level info` labels the
+squares with Server Names, and output without color uses a distinct glyph per
+outcome. Newly discovered Servers are saved; a Server saved by an earlier login
+stays selectable even if it does not answer this time. When none is
+discovered, the grid still shows why before the error. The registry timing
+line ("Fetched ... in Ns") is now an INFO log record instead of console
+output.
+
+Each discovered Server also reports the Session limits it advertises: what a
+flexible Session is guaranteed and can burst to, the smallest and largest
+fixed CPU and memory values, GPUs, and the number of interactive Sessions per
+user. `canfar server ls` shows them, `canfar server ls -o json` returns them
+under `resources`, and `canfar create` rejects a `--cpu`, `--memory`, or
+`--gpu` value outside the active Server's limits before sending the request.
+A limit the Server does not advertise stays unknown rather than defaulted. See
+[What your Server offers](../platform/sessions/limits.md#what-your-server-offers).
 
 <span id="asynchronous-sessions"></span>
 <span id="destroy-sessions"></span>
@@ -132,6 +172,13 @@ Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See [Data commands](../cli/data.md).
 The runtime, development, and documentation dependency requirements and
 lockfile have also been refreshed. Python 3.10 remains supported.
+
+The client no longer depends on `cadcutils`, `questionary`, or `click`.
+`canfar login cadc` requests the proxy certificate from the CADC credential
+service directly, interactive choices are numbered prompts, and command
+choices come from Typer. If you use `cadc-get-cert` or import `cadcutils`,
+install it yourself; see the
+[upgrade guide](migration.md#install-cadcutils-for-cadc-tools).
 
 ## Where these changes landed
 
