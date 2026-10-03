@@ -1946,7 +1946,7 @@ particular, Session creation is <code>canfar create</code>, and login is <code>c
 <h2 id="root-logging-options">Root logging options<a class="headerlink" href="#root-logging-options" title="Permanent link">&para;</a></h2>
 <p>Root logging options must come before the command:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>debug<span class="w"> </span>ps
-canfar<span class="w"> </span>-vvv<span class="w"> </span>ps
+canfar<span class="w"> </span>-v<span class="w"> </span>ps
 canfar<span class="w"> </span>--log-file<span class="w"> </span>./logs/canfar.jsonl<span class="w"> </span>ps
 </code></pre></div>
 <table>
@@ -1963,7 +1963,7 @@ canfar<span class="w"> </span>--log-file<span class="w"> </span>./logs/canfar.js
 </tr>
 <tr>
 <td><code>-v</code></td>
-<td>Increase verbosity; four or more repetitions select <code>debug</code>.</td>
+<td><code>info</code> progress; <code>-vv</code> or more selects <code>debug</code>.</td>
 </tr>
 <tr>
 <td><code>--log-file PATH</code></td>
@@ -2006,7 +2006,11 @@ prompts for one. The options are:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 canfar<span class="w"> </span>login<span class="w"> </span>srcnet<span class="w"> </span>--force
 </code></pre></div>
-<p>The interactive credential flow and Server Selection are described in
+<p>During discovery, login shows a live grid of the Servers it found, counting
+those discovered, timed out, unreachable, or failed, and suggests a longer
+<code>--timeout</code> when a Server times out; <code>--log-level info</code> labels each square with
+its Server Name. The interactive credential flow, discovery outcomes, and
+Server Selection are described in
 <a href="../authentication-contexts/">Authentication and Servers</a>.</p>
 <h3 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permanent link">&para;</a></h3>
 <div class="highlight"><span class="filename">Command syntax</span><pre><span></span><code>canfar auth
@@ -2025,7 +2029,10 @@ associated Servers; <code>auth purge --force</code> resets Authentication and Se
 canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>SELECTOR
 </code></pre></div>
 <p><code>SELECTOR</code> may be a Server Name or an IVOA URI. <code>server ls</code> lists Servers for
-the active IDP and discovers them when no saved Servers are available.</p>
+the active IDP and discovers them when no saved Servers are available. It
+shows each Server's flexible and fixed CPU and memory limits, GPUs, and
+interactive Session limit, or <code>unknown</code> when the Server does not advertise
+one; machine output has them under <code>resources</code>.</p>
 <h2 id="sessions">Sessions<a class="headerlink" href="#sessions" title="Permanent link">&para;</a></h2>
 <p><span id="canfar-create"></span></p>
 <h3 id="create">Create<a class="headerlink" href="#create" title="Permanent link">&para;</a></h3>
@@ -2068,7 +2075,7 @@ name from <code>canfar image ls</code>. Accepted ranges for every option are in
 </tr>
 <tr>
 <td><code>--replicas</code>, <code>-r</code></td>
-<td>Number of Sessions, 1 to 512; default <code>1</code>.</td>
+<td>Number of Sessions, 1 to 256; default <code>1</code>.</td>
 </tr>
 <tr>
 <td><code>--debug</code></td>
@@ -2091,7 +2098,15 @@ like CANFAR options:</p>
 canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>--<span class="w"> </span>worker<span class="w"> </span>--output<span class="w"> </span>json<span class="w"> </span>-o<span class="w"> </span>yaml
 </code></pre></div>
 <p>The <code>--output</code> option must appear before <code>--</code>. <code>--dry-run</code> cannot be combined
-with machine output.</p>
+with machine output. <code>--cpu</code>, <code>--memory</code>, <code>--gpu</code>, and <code>--replicas</code> accept
+the ranges <code>canfar create --help</code> shows. When the active Server's limits are
+known, the <code>--cpu</code>, <code>--memory</code>, and <code>--gpu</code> ranges narrow to the values both
+the client and that Server accept, and the default shows how far a flexible
+Session can burst, for example <code>[default: flexible ≤ 16]</code>. A Server without
+GPUs accepts only <code>--gpu 0</code>, which requests none. A value outside a range is a
+usage error:
+exit code 2 with <code>Invalid value</code> on stderr, before any request is sent,
+<code>--dry-run</code> included.</p>
 <p><span id="canfar-ps"></span></p>
 <h3 id="list-sessions">List Sessions<a class="headerlink" href="#list-sessions" title="Permanent link">&para;</a></h3>
 <div class="highlight"><span class="filename">Command syntax</span><pre><span></span><code>canfar ps [OPTIONS]
@@ -2287,7 +2302,7 @@ container-command token.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

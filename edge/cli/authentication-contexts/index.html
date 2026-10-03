@@ -1921,9 +1921,77 @@ Server where they were launched.</p>
 </tbody>
 </table>
 <p>Login authenticates the selected IDP, discovers compatible Science Platform
-Servers, selects one when necessary, and saves the Authentication Record and
-Server Selection. You can log in again when an Authentication Record already
+Servers, and saves the Authentication Record and Server Selection. When several
+compatible Servers are discovered, the CLI lists them by number and asks you to
+type the number of the one to use; the IDP prompt works the same way. You can log in again when an Authentication Record already
 exists; <code>--force</code> is not required to recover expired credentials.</p>
+<p><span id="discovery-outcomes"></span></p>
+<h3 id="discovery-outcomes">Discovery outcomes<a class="headerlink" href="#discovery-outcomes" title="Permanent link">&para;</a></h3>
+<p>While it discovers Servers, login shows a live grid on stderr: one square per
+Server, in Server Name order, redrawn every second. A hollow square is still
+being checked; it fills in with its outcome as soon as that Server answers or
+fails, so slow Servers do not hold back the others. A legend counts each
+outcome:</p>
+<div class="highlight"><pre><span></span><code>■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■ ■
+■ 14 discovered   ■ 5 timeout   ■ 4 unreachable   ■ 2 failed
+Checked 25 servers in 13.2s with a 10s request timeout.
+5 timed out. To wait longer, run canfar login srcnet --timeout 20
+</code></pre></div>
+<table>
+<thead>
+<tr>
+<th>Outcome</th>
+<th>Without color</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>discovered</td>
+<td><code>+</code></td>
+<td>The Server answered and published usable session capabilities.</td>
+</tr>
+<tr>
+<td>timeout</td>
+<td><code>~</code></td>
+<td>The Server did not answer within <code>--timeout</code> seconds.</td>
+</tr>
+<tr>
+<td>unreachable</td>
+<td><code>x</code></td>
+<td>The connection failed, for example on DNS or TLS.</td>
+</tr>
+<tr>
+<td>failed</td>
+<td><code>!</code></td>
+<td>The Server answered, but with an error status or unusable capabilities.</td>
+</tr>
+<tr>
+<td>pending</td>
+<td><code>.</code></td>
+<td>The Server is still being checked.</td>
+</tr>
+</tbody>
+</table>
+<p>When stderr has no color, for example in a CI log or with <code>NO_COLOR</code> set, each
+outcome uses the glyph in the second column instead of a colored square. When
+the registries list only one Server, as for <code>canfar login cadc</code>, login skips
+the squares and legend and prints only the summary lines.</p>
+<p>The last lines report how many Servers were checked, how long that took, and
+the request timeout. When a Server times out, login prints the same login
+command with a doubled <code>--timeout</code>, up to the 300-second limit. If discovery
+is interrupted, for example with Ctrl-C, the last line instead says how many
+Servers were not checked. If no registry can be read, login shows no grid; it
+prints the error and suggests checking the network or a longer <code>--timeout</code>.</p>
+<p>Newly discovered Servers are saved, and when none is discovered the grid still
+appears before the error. A Server saved by an earlier login stays available
+for selection with its saved details even if it times out or fails this time.
+Each discovered Server also reports its Session limits; see
+<a href="#manage-servers">Server Selection</a>. Add <code>-v</code> (or <code>--log-level info</code>) before
+<code>login</code> to label each square with its Server Name and to log how long each
+registry took, and <code>--log-level debug</code> for the reason behind each outcome:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>--log-level<span class="w"> </span>info<span class="w"> </span>login<span class="w"> </span>srcnet
+</code></pre></div>
 <h3 id="cadc-x509">CADC X.509<a class="headerlink" href="#cadc-x509" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 </code></pre></div>
@@ -1995,8 +2063,8 @@ credential material.</p>
 canfar<span class="w"> </span>auth<span class="w"> </span>use<span class="w"> </span>cadc
 </code></pre></div>
 <p>When switching, CANFAR reuses a compatible remembered Server Selection when
-one exists. If several compatible Servers need a choice, the CLI prompts for a
-Server URI or list number.</p>
+one exists. If several compatible Servers need a choice, the CLI lists them by
+number and prompts for one.</p>
 <p>Remove one Authentication Record and its associated Servers with:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet
 canfar<span class="w"> </span>auth<span class="w"> </span>rm<span class="w"> </span>srcnet<span class="w"> </span>--force
@@ -2018,6 +2086,40 @@ canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> 
 <p><code>server ls</code> lists the saved Servers for the active IDP. If none are saved, it
 runs discovery and persists the result. Its machine payload is a list of
 Server records and is data-only on stdout.</p>
+<p>Alongside each Server's URI and URL, the table shows the Session limits the
+Server advertises, and a caption under the table summarizes the columns:</p>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Flexible</td>
+<td>Cores and memory a Session without <code>--cpu</code> or <code>--memory</code> is guaranteed, and what it can burst to.</td>
+</tr>
+<tr>
+<td>Fixed</td>
+<td>The smallest and largest <code>--cpu</code> and <code>--memory</code> values the Server accepts.</td>
+</tr>
+<tr>
+<td>GPUs</td>
+<td>The <code>--gpu</code> values the Server accepts, or <code>none</code>.</td>
+</tr>
+<tr>
+<td>Sessions</td>
+<td>How many interactive Sessions you can run at once; <code>headless</code> Sessions do not count.</td>
+</tr>
+</tbody>
+</table>
+<p><code>unknown</code> marks a limit the Server does not advertise, as older platform
+versions may not. The machine payload carries the same values in each
+Server's <code>resources</code>, with <code>null</code> for unknown. Discovery reads the limits, and
+<code>server use</code> reads them again for the selected Server. <code>canfar create</code> rejects
+values outside the active Server's known limits; see
+<a href="../../platform/sessions/limits/#what-your-server-offers">Session limits</a>.</p>
 <p><code>server use</code> accepts either a Server Name or an IVOA URI:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>canfar
 canfar<span class="w"> </span>server<span class="w"> </span>use<span class="w"> </span>ivo://cadc.nrc.ca/skaha
@@ -2040,7 +2142,17 @@ Servers. <code>active.server</code> refers to a Server Name, not an IVOA URI:</p
 <span class="w">    </span><span class="nt">idp</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
 <span class="w">    </span><span class="nt">uri</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ivo://cadc.nrc.ca/skaha</span>
 <span class="w">    </span><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://ws-uv.canfar.net/skaha</span>
+<span class="w">    </span><span class="nt">resources</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">flexible</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">cores</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">16</span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">ram</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">fixed</span><span class="p">:</span>
+<span class="w">        </span><span class="nt">cores</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">16</span><span class="p p-Indicator">}</span>
+<span class="w">        </span><span class="nt">ram</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">192</span><span class="p p-Indicator">}</span>
+<span class="w">      </span><span class="nt">sessions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
 </code></pre></div>
+<p><code>resources</code> is written by discovery and <code>server use</code>; it is absent until a
+Server has reported its limits.</p>
 <p>Use <code>canfar config get</code> and <code>canfar config set</code> for dotted configuration
 paths. Values passed to <code>config set</code> are parsed as YAML:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>active.server
@@ -2073,7 +2185,7 @@ canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 20, 2026 05:08:21 UTC">September 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:29:50 UTC">October 3, 2026</span>
   </span>
 
     

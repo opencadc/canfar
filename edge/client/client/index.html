@@ -2403,7 +2403,7 @@ variables, or a configuration file.</p>
     <span class="n">token</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">certificate</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">HTTPClient</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Self</span>
 </code></pre></div>
 
     <div class="doc doc-contents ">
@@ -2543,18 +2543,14 @@ settings sources stay free to supply them.</p>
       <tbody>
           <tr class="doc-section-item">
             <td>
-                <code>HTTPClient</code>
+                <span class="doc-returns-annotation">
+                    <code><span title="typing_extensions.Self">Self</span></code>
+                </span>
             </td>
             <td class="doc-returns-details">
               <div class="doc-md-description">
-                <p>A client bound to the supplied credentials.</p>
+                <p>A client of the calling class bound to the supplied credentials.</p>
               </div>
-                <p>
-                  <span class="doc-returns-annotation">
-                    <b>TYPE:</b>
-                      <code><a class="autorefs autorefs-internal" title="&lt;span class=&quot;doc doc-object-name doc-class-name&quot;&gt;canfar.client.HTTPClient&lt;/span&gt;" href="#canfar.client.HTTPClient">HTTPClient</a></code>
-                  </span>
-                </p>
             </td>
           </tr>
       </tbody>

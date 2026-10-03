@@ -1866,8 +1866,11 @@ canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </s
 </code></pre></div>
 <p>Storage Identifiers are configuration keys, not protocols. There is no
 <code>active:/</code> source, bare local-path shorthand, empty <code>:/path</code> source, or
-<code>canfar storage</code> command. A data command sees all configured sources, not only
-the active Server Selection.</p>
+<code>canfar storage</code> command: name files on your computer <code>local:/PATH</code>, not
+<code>/PATH</code>. A data command sees all configured sources, not only the active
+Server Selection. Each data command's <code>--help</code> ends with this syntax and the
+configured identifiers, and a usage error caused by a bare local path adds a
+<code>local:/PATH</code> hint.</p>
 <h2 id="command-surface">Command surface<a class="headerlink" href="#command-surface" title="Permanent link">&para;</a></h2>
 <p>Use <code>canfar data --help</code> for the installed upstream options. The available
 commands are:</p>
@@ -1935,6 +1938,12 @@ canfar<span class="w"> </span>data<span class="w"> </span>cat<span class="w"> </
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/tmp/file.fits<span class="w"> </span>arc:/home/user/file.fits
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>arc:/home/user/file.fits<span class="w"> </span>local:/tmp/file.fits
 </code></pre></div>
+<p>A single-file copy always transfers the file, even when the destination
+already holds identical content; only a rerun recursive copy skips verified
+files. A copy between two storage identifiers, such as <code>vault:</code> to <code>arc:</code>,
+downloads the file to a temporary file on the computer running the command and
+then uploads it, so that computer needs room for the file. A copy within one
+identifier uses that service's own copy.</p>
 <p>Recursive copy is available for one directory and its descendants:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>data<span class="w"> </span>mkdir<span class="w"> </span>-p<span class="w"> </span>arc:/home/user
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>local:/tmp/dataset<span class="w"> </span>arc:/home/user
@@ -1977,7 +1986,7 @@ are documented in <a href="../../client/data/">Data Access</a>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

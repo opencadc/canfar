@@ -829,6 +829,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#see-which-servers-connect-and-what-they-offer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See which Servers connect and what they offer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#create-and-inspect-sessions-reliably" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1859,6 +1870,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#see-which-servers-connect-and-what-they-offer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        See which Servers connect and what they offer
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#create-and-inspect-sessions-reliably" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1990,12 +2012,48 @@ expiry hooks, for that client only.</p>
   the <a href="../migration/#update-command-lines">migration table</a> lists replacements.</li>
 <li>Use <code>config.editor.get()</code>, <code>.set()</code>, and <code>.save()</code> for validated configuration
   edits. The stored schema remains stable; the editing methods moved.</li>
-<li>Use <code>--log-level</code> or repeated <code>-v</code> before the command. Add <code>--log-file PATH</code>
-  for a rotating JSON Lines file. Python applications use standard-library
-  logging and <code>canfar.configure_logging()</code>. See <a href="../../cli/logging/">Logging</a>.</li>
+<li>Use <code>--log-level</code>, <code>-v</code> (<code>info</code>: one line per Science Platform HTTP
+  response), or <code>-vv</code> (<code>debug</code>) before the command; <code>-v</code> previously selected
+  <code>error</code>, and <code>info</code> needed <code>-vvv</code>. Add <code>--log-file PATH</code> for a rotating JSON
+  Lines file. Python applications use standard-library logging and
+  <code>canfar.configure_logging()</code>. See <a href="../../cli/logging/">Logging</a>.</li>
+<li>Name local files <code>local:/PATH</code> in <code>canfar data</code>. Each data command's
+  <code>--help</code> now explains the <code>IDENTIFIER:/PATH</code> syntax and lists the configured
+  identifiers, and a rejected bare local path prints a hint.</li>
 <li>Set <code>console.banner</code> to control the active-server banner in human output.
   Supported machine-output commands omit it automatically.</li>
+<li>Read Server limits from <code>resources</code>. The flat <code>cores</code>, <code>ram</code>, and <code>gpus</code>
+  Server fields are gone, as are the unused Server <code>status</code> field and
+  <code>console.file</code> setting; saved configurations still load. See the
+  <a href="../migration/#read-server-limits-from-resources">upgrade guide</a>.</li>
+<li>Type a number to choose an Identity Provider or Server when <code>canfar login</code>
+  or <code>canfar auth use</code> asks; the prompts list the choices by number instead of
+  using arrow-key menus.</li>
+<li>Request at most 256 replicas per <code>create</code> call, down from 512, in both the
+  CLI and <code>CreateRequest</code>. Split larger runs into several requests.</li>
 </ul>
+<p><span id="server-resources"></span></p>
+<h2 id="see-which-servers-connect-and-what-they-offer">See which Servers connect and what they offer<a class="headerlink" href="#see-which-servers-connect-and-what-they-offer" title="Permanent link">&para;</a></h2>
+<p>While it discovers Servers, <code>canfar login</code> shows a live grid: one square per
+Server, filling in as each Server answers, and a legend that counts the ones
+discovered, timed out, unreachable, or failed. Each Server is checked and
+inspected on its own, so slow Servers no longer hold back the rest. A summary
+line gives the number of Servers checked and the request timeout, and suggests
+a longer <code>--timeout</code> when Servers time out. <code>--log-level info</code> labels the
+squares with Server Names, and output without color uses a distinct glyph per
+outcome. Newly discovered Servers are saved; a Server saved by an earlier login
+stays selectable even if it does not answer this time. When none is
+discovered, the grid still shows why before the error. The registry timing
+line ("Fetched ... in Ns") is now an INFO log record instead of console
+output.</p>
+<p>Each discovered Server also reports the Session limits it advertises: what a
+flexible Session is guaranteed and can burst to, the smallest and largest
+fixed CPU and memory values, GPUs, and the number of interactive Sessions per
+user. <code>canfar server ls</code> shows them, <code>canfar server ls -o json</code> returns them
+under <code>resources</code>, and <code>canfar create</code> rejects a <code>--cpu</code>, <code>--memory</code>, or
+<code>--gpu</code> value outside the active Server's limits before sending the request.
+A limit the Server does not advertise stays unknown rather than defaulted. See
+<a href="../../platform/sessions/limits/#what-your-server-offers">What your Server offers</a>.</p>
 <p><span id="asynchronous-sessions"></span>
 <span id="destroy-sessions"></span></p>
 <p><span id="firefly-support"></span>
@@ -2032,6 +2090,12 @@ Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See <a href="../../cli/data/">Data commands</a>.
 The runtime, development, and documentation dependency requirements and
 lockfile have also been refreshed. Python 3.10 remains supported.</p>
+<p>The client no longer depends on <code>cadcutils</code>, <code>questionary</code>, or <code>click</code>.
+<code>canfar login cadc</code> requests the proxy certificate from the CADC credential
+service directly, interactive choices are numbered prompts, and command
+choices come from Typer. If you use <code>cadc-get-cert</code> or import <code>cadcutils</code>,
+install it yourself; see the
+<a href="../migration/#install-cadcutils-for-cadc-tools">upgrade guide</a>.</p>
 <h2 id="where-these-changes-landed">Where these changes landed<a class="headerlink" href="#where-these-changes-landed" title="Permanent link">&para;</a></h2>
 <p>The interfaces described above have landed on main since v1.4.1. This
 dependency update builds on them:</p>
@@ -2087,7 +2151,7 @@ follow the <a href="../migration/">upgrade guide</a> when moving from the publis
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

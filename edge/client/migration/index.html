@@ -1966,6 +1966,85 @@ The <a href="../get-started/#authenticate">setup guide</a> shows the complete se
 <p>Default <code>arc</code> and <code>vault</code> storage uses CADC credentials independently of your
 compute selection. Log in to CADC for those services even if your Session
 uses an SRCNet server.</p>
+<h3 id="read-server-limits-from-resources">Read Server limits from <code>resources</code><a class="headerlink" href="#read-server-limits-from-resources" title="Permanent link">&para;</a></h3>
+<p>Each saved Server records the limits its context endpoint advertises in one
+<code>resources</code> block, which replaces the flat <code>cores</code>, <code>ram</code>, and <code>gpus</code> fields.
+Those fields held only the flexible burst limits and the largest GPU count, and
+showed <code>2</code>, <code>16</code>, and <code>0</code> when the Server had never reported them.</p>
+<table>
+<thead>
+<tr>
+<th>v1.4.1 field</th>
+<th>Current field</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>cores</code></td>
+<td><code>resources.flexible.cores.max</code></td>
+</tr>
+<tr>
+<td><code>ram</code></td>
+<td><code>resources.flexible.ram.max</code></td>
+</tr>
+<tr>
+<td><code>gpus</code></td>
+<td><code>resources.gpus.max</code></td>
+</tr>
+</tbody>
+</table>
+<p>A limit the Server does not advertise is <code>null</code> in <code>canfar server ls -o json</code>
+and <code>None</code> in Python, so check for it before comparing. The Server <code>status</code>
+field, which discovery never filled in, is also gone from the configuration and
+from <code>canfar server ls -o json</code>. Configuration files saved by v1.4.1 still
+load, and the retired fields are dropped the next time the configuration is
+saved. Run <code>canfar login IDP</code> or <code>canfar server use NAME</code> to read the limits
+again.</p>
+<h3 id="request-at-most-256-replicas">Request at most 256 replicas<a class="headerlink" href="#request-at-most-256-replicas" title="Permanent link">&para;</a></h3>
+<p><code>canfar create --replicas</code> and <code>CreateRequest(replicas=...)</code> accept 1 to 256,
+down from 512 in v1.4.1. Send larger runs as several requests, each with its
+own name; see <a href="../../platform/sessions/batch/">Batch processing</a>.</p>
+<h3 id="install-cadcutils-for-cadc-tools">Install cadcutils for CADC tools<a class="headerlink" href="#install-cadcutils-for-cadc-tools" title="Permanent link">&para;</a></h3>
+<p><code>canfar</code> no longer installs <code>cadcutils</code>; <code>canfar login cadc</code> obtains the proxy
+certificate itself. If your scripts run <code>cadc-get-cert</code> or import <code>cadcutils</code>,
+install it explicitly, or install <code>cadcdata</code> or <code>vos</code>, which depend on it:</p>
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>cadcutils
+</code></pre></div>
+<h3 id="replace-removed-helper-apis">Replace removed helper APIs<a class="headerlink" href="#replace-removed-helper-apis" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>v1.4.1 helper</th>
+<th>Current replacement</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ServerDiscoveryError.structured</code>, <code>ServerFetchError.structured</code></td>
+<td><code>error.code</code> and <code>str(error)</code></td>
+</tr>
+<tr>
+<td><code>canfar.idp.is_valid_idp(key)</code></td>
+<td><code>canfar.idp.get_idp(key)</code>, which raises <code>KeyError</code> for an unknown key</td>
+</tr>
+<tr>
+<td><code>canfar.errors.structured_error_to_json(error)</code></td>
+<td><code>error.model_dump_json()</code></td>
+</tr>
+<tr>
+<td><code>canfar.errors.structured_error_to_yaml(error)</code></td>
+<td><code>yaml.safe_dump(error.model_dump(mode="json"))</code></td>
+</tr>
+<tr>
+<td><code>canfar.utils.logging.CanfarLogger().configure(...)</code></td>
+<td><code>canfar.configure_logging(...)</code></td>
+</tr>
+<tr>
+<td><code>canfar.auth.x509.gather(days_valid=...)</code></td>
+<td><code>gather()</code>; CADC certificates are valid for 30 days</td>
+</tr>
+</tbody>
+</table>
 <p><span id="notes-on-protocol-stability"></span></p>
 <h2 id="migrate-from-the-older-skaha-package">Migrate from the older skaha package<a class="headerlink" href="#migrate-from-the-older-skaha-package" title="Permanent link">&para;</a></h2>
 <p>The supported package is <code>canfar</code>, published from
@@ -2109,7 +2188,7 @@ a reset. Contact <a href="../../platform/support/">support</a> if the error pers
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

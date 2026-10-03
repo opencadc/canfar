@@ -2367,7 +2367,7 @@ request.</p>
 </tr>
 <tr>
 <td><code>--replicas</code> / <code>replicas</code></td>
-<td>1 to 512; exactly 1 for <code>desktop</code> and <code>firefly</code></td>
+<td>1 to 256; exactly 1 for <code>desktop</code> and <code>firefly</code></td>
 </tr>
 <tr>
 <td>Command, arguments, <code>--env</code></td>
@@ -2383,9 +2383,12 @@ request.</p>
 values are ignored for them. Check a request without creating anything:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--cpu<span class="w"> </span><span class="m">8</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">32</span><span class="w"> </span>--replicas<span class="w"> </span><span class="m">100</span><span class="w"> </span>--dry-run
 </code></pre></div>
-<p>Passing these checks does not mean the Server offers that combination. The
-client's ranges are only an outer bound; each platform provider decides its
-own flexible defaults and the largest Session it will run. Omit <code>--cpu</code> and
+<p>When the active Server's limits are known, <code>canfar create</code> also rejects a
+<code>--cpu</code>, <code>--memory</code>, or <code>--gpu</code> value outside them, <code>--dry-run</code> included; the
+Python client leaves that check to the Server. A value inside the limits can
+still be refused, because a fixed request must match one of the Server's
+<code>options</code> and those can skip values. Each platform provider decides its own
+flexible defaults and the largest Session it will run. Omit <code>--cpu</code> and
 <code>--memory</code> to let the Server apply its flexible policy.</p>
 <h2 id="what-your-server-offers">What your Server offers<a class="headerlink" href="#what-your-server-offers" title="Permanent link">&para;</a></h2>
 <p>Ask the Server. <a href="../../../client/context/"><code>Context.resources()</code></a> returns, for
@@ -2412,8 +2415,26 @@ cores and for memory:</p>
 </tr>
 </tbody>
 </table>
-<p><code>canfar server ls -o json</code> also shows each Server's <code>cores</code>, <code>ram</code>, and <code>gpus</code>
-as they were when the Server was discovered.</p>
+<p>Server discovery, which <code>canfar login</code> runs, reads this endpoint for every
+Server that connects, and <code>canfar server use</code> reads it again for the Server you
+choose. <code>canfar server ls</code> shows the result for each Server, and
+<code>canfar server ls -o json</code> returns it under <code>resources</code>, shown here with
+illustrative values:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">resources</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">flexible</span><span class="p">:</span><span class="w">                    </span><span class="c1"># no --cpu or --memory</span>
+<span class="w">    </span><span class="nt">cores</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">16</span><span class="p p-Indicator">}</span><span class="w">   </span><span class="c1"># defaultRequest to defaultLimit</span>
+<span class="w">    </span><span class="nt">ram</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">}</span><span class="w">     </span><span class="c1"># GB</span>
+<span class="w">  </span><span class="nt">fixed</span><span class="p">:</span><span class="w">                       </span><span class="c1"># --cpu and --memory</span>
+<span class="w">    </span><span class="nt">cores</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">16</span><span class="p p-Indicator">}</span><span class="w">   </span><span class="c1"># smallest to largest option</span>
+<span class="w">    </span><span class="nt">ram</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">192</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">gpus</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">min</span><span class="p">:</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="nt"> max</span><span class="p">:</span><span class="w"> </span><span class="nv">28</span><span class="p p-Indicator">}</span><span class="w">      </span><span class="c1"># {min: 0, max: 0} when none are offered</span>
+<span class="w">  </span><span class="nt">sessions</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span><span class="w">                  </span><span class="c1"># interactive Sessions per user</span>
+</code></pre></div>
+<p>A value the Server does not advertise is <code>null</code>, shown as <code>unknown</code>; older
+platform versions can leave some or all of them unknown. <code>canfar create --help</code>
+shows the ranges <code>--cpu</code>, <code>--memory</code>, and <code>--gpu</code> accept for the active
+Server, and how far a flexible Session can burst as the default, for example
+<code>[default: flexible ≤ 16]</code>.</p>
 <p>On the CANFAR deployment at the Canadian Astronomy Data Centre (CADC), a
 flexible Session can burst to 16 cores and 32 GB, and the largest fixed
 request is 16 cores and 192 GB.</p>
@@ -2581,7 +2602,7 @@ stack. <code>canfar info SESSION_ID</code> shows what was requested and what is 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 19, 2026 00:00:21 UTC">September 19, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

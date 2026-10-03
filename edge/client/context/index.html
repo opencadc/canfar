@@ -1375,6 +1375,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#canfar.models.http.ServerResources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ServerResources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#canfar.models.http.ServerResources.from_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;from_context
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1987,6 +2009,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#canfar.models.http.ServerResources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-class"></code>&nbsp;ServerResources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#canfar.models.http.ServerResources.from_context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        <code class="doc-symbol doc-symbol-toc doc-symbol-method"></code>&nbsp;from_context
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -2032,8 +2076,22 @@ Server. The returned mapping can guide <code>Session.create()</code> resource re
     <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"gpus"</span><span class="p">))</span>
 </code></pre></div>
 <p>The response is a <code>dict[str, Any]</code> whose keys and values are supplied by the
-server; common keys include <code>cores</code>, <code>memoryGB</code>, and <code>gpus</code>. Resource limits are
-server metadata, not a second Configuration model.</p>
+server; common keys include <code>cores</code>, <code>memoryGB</code>, <code>gpus</code>, and
+<code>maxInteractiveSessions</code>. Resource limits are server metadata, not a second
+Configuration model: Server discovery reads this payload with
+<code>ServerResources.from_context()</code> and saves the result as each Server's
+<code>resources</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServerResources</span>
+
+<span class="k">with</span> <span class="n">Context</span><span class="p">()</span> <span class="k">as</span> <span class="n">context</span><span class="p">:</span>
+    <span class="n">resources</span> <span class="o">=</span> <span class="n">ServerResources</span><span class="o">.</span><span class="n">from_context</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">resources</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">flexible</span><span class="o">.</span><span class="n">cores</span><span class="p">)</span>  <span class="c1"># guaranteed request to burst limit</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">resources</span><span class="o">.</span><span class="n">fixed</span><span class="o">.</span><span class="n">ram</span><span class="p">)</span>  <span class="c1"># smallest to largest fixed memory, in GB</span>
+</code></pre></div>
+<p>A value the Server does not advertise is <code>None</code>. <code>from_context()</code> raises
+<code>ValueError</code> when the payload holds no limit it recognizes, as from older
+platform versions.</p>
 
 
 <div class="doc doc-object doc-class">
@@ -2109,7 +2167,14 @@ attributes and methods.</p>
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">Context</span><span class="p">(</span><span class="n">HTTPClient</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">"""CANFAR Context.</span>
 
 <span class="sd">    This class is a subclass of the `HTTPClient` class and inherits its</span>
@@ -2124,8 +2189,15 @@ attributes and methods.</p>
     <span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""Get available resources from the canfar server.</span>
 
+<span class="sd">        ``canfar.models.http.ServerResources.from_context()`` reads this payload</span>
+<span class="sd">        into flexible and fixed limits; discovery saves them as</span>
+<span class="sd">        ``Server.resources``.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary of available resources.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            httpx2.HTTPStatusError: If the Server answers with an error status.</span>
 
 <span class="sd">        Examples:</span>
 <span class="sd">            &gt;&gt;&gt; from canfar.context import Context</span>
@@ -2135,22 +2207,22 @@ attributes and methods.</p>
 <span class="sd">              'default': 1,</span>
 <span class="sd">              'defaultRequest': 1,</span>
 <span class="sd">              'defaultLimit': 16,</span>
-<span class="sd">              'defaultHeadless': 1,</span>
 <span class="sd">              'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="sd">              },</span>
 <span class="sd">             'memoryGB': {</span>
 <span class="sd">              'default': 2,</span>
 <span class="sd">              'defaultRequest': 4,</span>
-<span class="sd">              'defaultLimit': 192,</span>
-<span class="sd">              'defaultHeadless': 4,</span>
+<span class="sd">              'defaultLimit': 32,</span>
 <span class="sd">              'options': [1,2,4...192]</span>
 <span class="sd">             },</span>
 <span class="sd">            'gpus': {</span>
 <span class="sd">             'options': [1,2, ... 28]</span>
-<span class="sd">             }</span>
+<span class="sd">             },</span>
+<span class="sd">            'maxInteractiveSessions': 5</span>
 <span class="sd">            }</span>
 <span class="sd">        """</span>
         <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"context"</span><span class="p">)</span>
+        <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
 </code></pre></div></td></tr></table></div>
               </details>
@@ -2182,6 +2254,9 @@ attributes and methods.</p>
     <div class="doc doc-contents ">
 
         <p>Get available resources from the canfar server.</p>
+<p><code>canfar.models.http.ServerResources.from_context()</code> reads this payload
+into flexible and fixed limits; discovery saves them as
+<code>Server.resources</code>.</p>
 
 
 <table>
@@ -2208,6 +2283,30 @@ attributes and methods.</p>
     </table>
 
 
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><span title="httpx2.HTTPStatusError">HTTPStatusError</span></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the Server answers with an error status.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
 <p><span class="doc-section-title">Examples:</span></p>
     <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.context</span><span class="w"> </span><span class="kn">import</span> <span class="n">Context</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">context</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
@@ -2216,19 +2315,18 @@ attributes and methods.</p>
 <span class="go">  'default': 1,</span>
 <span class="go">  'defaultRequest': 1,</span>
 <span class="go">  'defaultLimit': 16,</span>
-<span class="go">  'defaultHeadless': 1,</span>
 <span class="go">  'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="go">  },</span>
 <span class="go"> 'memoryGB': {</span>
 <span class="go">  'default': 2,</span>
 <span class="go">  'defaultRequest': 4,</span>
-<span class="go">  'defaultLimit': 192,</span>
-<span class="go">  'defaultHeadless': 4,</span>
+<span class="go">  'defaultLimit': 32,</span>
 <span class="go">  'options': [1,2,4...192]</span>
 <span class="go"> },</span>
 <span class="go">'gpus': {</span>
 <span class="go"> 'options': [1,2, ... 28]</span>
-<span class="go"> }</span>
+<span class="go"> },</span>
+<span class="go">'maxInteractiveSessions': 5</span>
 <span class="go">}</span>
 </code></pre></div>
 
@@ -2265,11 +2363,25 @@ attributes and methods.</p>
 <span class="normal">52</span>
 <span class="normal">53</span>
 <span class="normal">54</span>
-<span class="normal">55</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""Get available resources from the canfar server.</span>
+
+<span class="sd">    ``canfar.models.http.ServerResources.from_context()`` reads this payload</span>
+<span class="sd">    into flexible and fixed limits; discovery saves them as</span>
+<span class="sd">    ``Server.resources``.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        A dictionary of available resources.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        httpx2.HTTPStatusError: If the Server answers with an error status.</span>
 
 <span class="sd">    Examples:</span>
 <span class="sd">        &gt;&gt;&gt; from canfar.context import Context</span>
@@ -2279,23 +2391,477 @@ attributes and methods.</p>
 <span class="sd">          'default': 1,</span>
 <span class="sd">          'defaultRequest': 1,</span>
 <span class="sd">          'defaultLimit': 16,</span>
-<span class="sd">          'defaultHeadless': 1,</span>
 <span class="sd">          'options': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]</span>
 <span class="sd">          },</span>
 <span class="sd">         'memoryGB': {</span>
 <span class="sd">          'default': 2,</span>
 <span class="sd">          'defaultRequest': 4,</span>
-<span class="sd">          'defaultLimit': 192,</span>
-<span class="sd">          'defaultHeadless': 4,</span>
+<span class="sd">          'defaultLimit': 32,</span>
 <span class="sd">          'options': [1,2,4...192]</span>
 <span class="sd">         },</span>
 <span class="sd">        'gpus': {</span>
 <span class="sd">         'options': [1,2, ... 28]</span>
-<span class="sd">         }</span>
+<span class="sd">         },</span>
+<span class="sd">        'maxInteractiveSessions': 5</span>
 <span class="sd">        }</span>
 <span class="sd">    """</span>
     <span class="n">response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="s2">"context"</span><span class="p">)</span>
+    <span class="n">response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">json</span><span class="p">())</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<a id="canfar.models.http.ServerResources"></a>
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Session resource limits advertised by a Science Platform Server.</p>
+<p><code>None</code> marks a value the Server does not advertise.</p>
+
+
+
+
+
+
+
+
+              <details class="mkdocstrings-source">
+                <summary>Source code in <code>canfar/models/http.py</code></summary>
+                <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span><span class="w"> </span><span class="nc">ServerResources</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Session resource limits advertised by a Science Platform Server.</span>
+
+<span class="sd">    ``None`` marks a value the Server does not advertise.</span>
+<span class="sd">    """</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">"forbid"</span><span class="p">)</span>
+
+    <span class="n">flexible</span><span class="p">:</span> <span class="n">SessionResources</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Flexible Resources"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Sessions without explicit CPU or memory: the guaranteed request (min) "</span>
+            <span class="s2">"and the burst limit (max)."</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">fixed</span><span class="p">:</span> <span class="n">SessionResources</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Fixed Resources"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Sessions with explicit CPU or memory: the smallest (min) and largest "</span>
+            <span class="s2">"(max) values the Server accepts."</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="n">gpus</span><span class="p">:</span> <span class="n">ResourceRange</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"GPUs"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">"GPU counts a Session can request; 0 to 0 when none are offered."</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">sessions</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">title</span><span class="o">=</span><span class="s2">"Interactive Session Limit"</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">"Maximum Pending or Running interactive Sessions per user; headless "</span>
+            <span class="s2">"Sessions do not count."</span>
+        <span class="p">),</span>
+        <span class="n">ge</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">from_context</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">"""Read limits from a Science Platform Server context payload.</span>
+
+<span class="sd">        Values the payload omits or malforms stay ``None``, so older platform</span>
+<span class="sd">        versions produce partial resources.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            payload: JSON object from the Server's context endpoint, as returned</span>
+<span class="sd">                by ``canfar.context.Context().resources()``.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Limits for each Resource Allocation Mode, GPUs, and Sessions.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the payload advertises no recognizable limit.</span>
+
+<span class="sd">        Examples:</span>
+<span class="sd">            &gt;&gt;&gt; from canfar.models.http import ServerResources</span>
+<span class="sd">            &gt;&gt;&gt; ServerResources.from_context(</span>
+<span class="sd">            ...     {</span>
+<span class="sd">            ...         "cores": {</span>
+<span class="sd">            ...             "defaultRequest": 1,</span>
+<span class="sd">            ...             "defaultLimit": 2,</span>
+<span class="sd">            ...             "options": [1, 2, 4],</span>
+<span class="sd">            ...         },</span>
+<span class="sd">            ...         "gpus": {"options": []},</span>
+<span class="sd">            ...     }</span>
+<span class="sd">            ... ).fixed.cores</span>
+<span class="sd">            ResourceRange(min=1, max=4)</span>
+<span class="sd">        """</span>
+        <span class="n">cores</span> <span class="o">=</span> <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"cores"</span><span class="p">)</span>
+        <span class="n">memory</span> <span class="o">=</span> <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"memoryGB"</span><span class="p">)</span>
+        <span class="n">resources</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">flexible</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">(</span>
+                <span class="n">cores</span><span class="o">=</span><span class="n">_bounds</span><span class="p">(</span><span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultRequest"</span><span class="p">),</span> <span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultLimit"</span><span class="p">)),</span>
+                <span class="n">ram</span><span class="o">=</span><span class="n">_bounds</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultRequest"</span><span class="p">),</span> <span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultLimit"</span><span class="p">)),</span>
+            <span class="p">),</span>
+            <span class="n">fixed</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">(</span>
+                <span class="n">cores</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span><span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">)),</span>
+                <span class="n">ram</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">)),</span>
+            <span class="p">),</span>
+            <span class="n">gpus</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span>
+                <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"gpus"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">),</span>
+                <span class="n">empty</span><span class="o">=</span><span class="n">ResourceRange</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+            <span class="p">),</span>
+            <span class="n">sessions</span><span class="o">=</span><span class="n">_sessions</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"maxInteractiveSessions"</span><span class="p">)),</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">resources</span> <span class="o">==</span> <span class="bp">cls</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Context payload advertises no recognizable resource limits."</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">resources</span>
+</code></pre></div></td></tr></table></div>
+              </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="canfar.models.http.ServerResources.from_context" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_context</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#canfar.models.http.ServerResources.from_context" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_context</span><span class="p">(</span><span class="n">payload</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read limits from a Science Platform Server context payload.</p>
+<p>Values the payload omits or malforms stay <code>None</code>, so older platform
+versions produce partial resources.</p>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">PARAMETER</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>payload</code>
+            </td>
+            <td class="doc-param-details">
+              <div class="doc-md-description">
+                <p>JSON object from the Server's context endpoint, as returned
+by <code>canfar.context.Context().resources()</code>.</p>
+              </div>
+              <p>
+                  <span class="doc-param-annotation">
+                    <b>TYPE:</b>
+                      <code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="typing.Any">Any</span>]</code>
+                  </span>
+              </p>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RETURNS</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <span class="doc-returns-annotation">
+                    <code><span title="typing_extensions.Self">Self</span></code>
+                </span>
+            </td>
+            <td class="doc-returns-details">
+              <div class="doc-md-description">
+                <p>Limits for each Resource Allocation Mode, GPUs, and Sessions.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<table>
+      <thead>
+        <tr>
+          <th><span class="doc-section-title">RAISES</span></th>
+          <th><span>DESCRIPTION</span></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+              <span class="doc-raises-annotation">
+                  <code><span title="ValueError">ValueError</span></code>
+              </span>
+            </td>
+            <td class="doc-raises-details">
+              <div class="doc-md-description">
+                <p>If the payload advertises no recognizable limit.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Examples:</span></p>
+    <div class="highlight"><pre><span></span><code><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.http</span><span class="w"> </span><span class="kn">import</span> <span class="n">ServerResources</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">ServerResources</span><span class="o">.</span><span class="n">from_context</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">{</span>
+<span class="gp">... </span>        <span class="s2">"cores"</span><span class="p">:</span> <span class="p">{</span>
+<span class="gp">... </span>            <span class="s2">"defaultRequest"</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"defaultLimit"</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="s2">"options"</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+<span class="gp">... </span>        <span class="p">},</span>
+<span class="gp">... </span>        <span class="s2">"gpus"</span><span class="p">:</span> <span class="p">{</span><span class="s2">"options"</span><span class="p">:</span> <span class="p">[]},</span>
+<span class="gp">... </span>    <span class="p">}</span>
+<span class="gp">... </span><span class="p">)</span><span class="o">.</span><span class="n">fixed</span><span class="o">.</span><span class="n">cores</span>
+<span class="go">ResourceRange(min=1, max=4)</span>
+</code></pre></div>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>canfar/models/http.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span>
+<span class="normal">158</span>
+<span class="normal">159</span>
+<span class="normal">160</span>
+<span class="normal">161</span>
+<span class="normal">162</span>
+<span class="normal">163</span>
+<span class="normal">164</span>
+<span class="normal">165</span>
+<span class="normal">166</span>
+<span class="normal">167</span>
+<span class="normal">168</span>
+<span class="normal">169</span>
+<span class="normal">170</span>
+<span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_context</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">payload</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Self</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Read limits from a Science Platform Server context payload.</span>
+
+<span class="sd">    Values the payload omits or malforms stay ``None``, so older platform</span>
+<span class="sd">    versions produce partial resources.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        payload: JSON object from the Server's context endpoint, as returned</span>
+<span class="sd">            by ``canfar.context.Context().resources()``.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Limits for each Resource Allocation Mode, GPUs, and Sessions.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the payload advertises no recognizable limit.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; from canfar.models.http import ServerResources</span>
+<span class="sd">        &gt;&gt;&gt; ServerResources.from_context(</span>
+<span class="sd">        ...     {</span>
+<span class="sd">        ...         "cores": {</span>
+<span class="sd">        ...             "defaultRequest": 1,</span>
+<span class="sd">        ...             "defaultLimit": 2,</span>
+<span class="sd">        ...             "options": [1, 2, 4],</span>
+<span class="sd">        ...         },</span>
+<span class="sd">        ...         "gpus": {"options": []},</span>
+<span class="sd">        ...     }</span>
+<span class="sd">        ... ).fixed.cores</span>
+<span class="sd">        ResourceRange(min=1, max=4)</span>
+<span class="sd">    """</span>
+    <span class="n">cores</span> <span class="o">=</span> <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"cores"</span><span class="p">)</span>
+    <span class="n">memory</span> <span class="o">=</span> <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"memoryGB"</span><span class="p">)</span>
+    <span class="n">resources</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">flexible</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">(</span>
+            <span class="n">cores</span><span class="o">=</span><span class="n">_bounds</span><span class="p">(</span><span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultRequest"</span><span class="p">),</span> <span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultLimit"</span><span class="p">)),</span>
+            <span class="n">ram</span><span class="o">=</span><span class="n">_bounds</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultRequest"</span><span class="p">),</span> <span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"defaultLimit"</span><span class="p">)),</span>
+        <span class="p">),</span>
+        <span class="n">fixed</span><span class="o">=</span><span class="n">SessionResources</span><span class="p">(</span>
+            <span class="n">cores</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span><span class="n">cores</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">)),</span>
+            <span class="n">ram</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span><span class="n">memory</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">)),</span>
+        <span class="p">),</span>
+        <span class="n">gpus</span><span class="o">=</span><span class="n">_span</span><span class="p">(</span>
+            <span class="n">_section</span><span class="p">(</span><span class="n">payload</span><span class="p">,</span> <span class="s2">"gpus"</span><span class="p">)</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"options"</span><span class="p">),</span>
+            <span class="n">empty</span><span class="o">=</span><span class="n">ResourceRange</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">),</span>
+        <span class="n">sessions</span><span class="o">=</span><span class="n">_sessions</span><span class="p">(</span><span class="n">payload</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"maxInteractiveSessions"</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="k">if</span> <span class="n">resources</span> <span class="o">==</span> <span class="bp">cls</span><span class="p">():</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">"Context payload advertises no recognizable resource limits."</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">resources</span>
 </code></pre></div></td></tr></table></div>
             </details>
     </div>
@@ -2331,7 +2897,7 @@ attributes and methods.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="August 18, 2026 07:58:44 UTC">August 18, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:16:14 UTC">October 3, 2026</span>
   </span>
 
     

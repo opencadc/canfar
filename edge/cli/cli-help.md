@@ -29,14 +29,14 @@ Root logging options must come before the command:
 
 ```bash
 canfar --log-level debug ps
-canfar -vvv ps
+canfar -v ps
 canfar --log-file ./logs/canfar.jsonl ps
 ```
 
 | Option | Effect |
 | --- | --- |
 | `--log-level LEVEL` | `critical`, `error`, `warning`, `info`, or `debug`. |
-| `-v` | Increase verbosity; four or more repetitions select `debug`. |
+| `-v` | `info` progress; `-vv` or more selects `debug`. |
 | `--log-file PATH` | Add the rotating JSON Lines file sink. |
 
 See [Logging](logging.md) for precedence, stream routing, file records, and
@@ -68,7 +68,11 @@ canfar login cadc
 canfar login srcnet --force
 ```
 
-The interactive credential flow and Server Selection are described in
+During discovery, login shows a live grid of the Servers it found, counting
+those discovered, timed out, unreachable, or failed, and suggests a longer
+`--timeout` when a Server times out; `--log-level info` labels each square with
+its Server Name. The interactive credential flow, discovery outcomes, and
+Server Selection are described in
 [Authentication and Servers](authentication-contexts.md).
 
 ### Authentication
@@ -96,7 +100,10 @@ canfar server use SELECTOR
 ```
 
 `SELECTOR` may be a Server Name or an IVOA URI. `server ls` lists Servers for
-the active IDP and discovers them when no saved Servers are available.
+the active IDP and discovers them when no saved Servers are available. It
+shows each Server's flexible and fixed CPU and memory limits, GPUs, and
+interactive Session limit, or `unknown` when the Server does not advertise
+one; machine output has them under `resources`.
 
 ## Sessions
 
@@ -123,7 +130,7 @@ name from `canfar image ls`. Accepted ranges for every option are in
 | `--memory`, `-m` | Requested RAM in GB. |
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
-| `--replicas`, `-r` | Number of Sessions, 1 to 512; default `1`. |
+| `--replicas`, `-r` | Number of Sessions, 1 to 256; default `1`. |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
@@ -138,7 +145,15 @@ canfar create headless skaha/terminal:1.1.2 -- worker --output json -o yaml
 ```
 
 The `--output` option must appear before `--`. `--dry-run` cannot be combined
-with machine output.
+with machine output. `--cpu`, `--memory`, `--gpu`, and `--replicas` accept
+the ranges `canfar create --help` shows. When the active Server's limits are
+known, the `--cpu`, `--memory`, and `--gpu` ranges narrow to the values both
+the client and that Server accept, and the default shows how far a flexible
+Session can burst, for example `[default: flexible ≤ 16]`. A Server without
+GPUs accepts only `--gpu 0`, which requests none. A value outside a range is a
+usage error:
+exit code 2 with `Invalid value` on stderr, before any request is sent,
+`--dry-run` included.
 
 <span id="canfar-ps"></span>
 
