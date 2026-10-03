@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 
@@ -34,7 +34,7 @@ class TestAuthenticateCredentialFunction:
         )
 
         with (
-            patch("httpx.AsyncClient") as mock_client_class,
+            patch("canfar.auth.oidc.AsyncClient") as mock_client_class,
             patch(
                 "authlib.integrations.httpx_client.AsyncOAuth2Client"
             ) as oauth_client_class,
@@ -90,13 +90,13 @@ class TestAuthenticateCredentialFunction:
         )
         endpoints = credential.endpoints
         client = credential.client
-        userinfo_error = httpx.HTTPStatusError(
+        userinfo_error = httpx2.HTTPStatusError(
             "userinfo failed",
-            request=httpx.Request("GET", "https://example.com/userinfo"),
-            response=httpx.Response(500),
+            request=httpx2.Request("GET", "https://example.com/userinfo"),
+            response=httpx2.Response(500),
         )
 
-        with pytest.raises(httpx.HTTPStatusError):
+        with pytest.raises(httpx2.HTTPStatusError):
             await self._authenticate_with_tokens(
                 {
                     "access_token": "new-access",

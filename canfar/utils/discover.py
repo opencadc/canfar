@@ -5,7 +5,7 @@ from __future__ import annotations
 import time
 from urllib.parse import urlsplit, urlunsplit
 
-import httpx
+from httpx2 import AsyncClient, HTTPError, Timeout
 from typing_extensions import Self
 
 from canfar.models.registry import (
@@ -22,8 +22,8 @@ class Discover:
     def __init__(self, config: IVOARegistrySearch, timeout: int = 2) -> None:
         """Initialize registry discovery."""
         self.config = config
-        self.client = httpx.AsyncClient(
-            timeout=httpx.Timeout(timeout),
+        self.client = AsyncClient(
+            timeout=Timeout(timeout),
             http2=True,
             follow_redirects=True,
         )
@@ -84,7 +84,7 @@ class Discover:
                 content=response.text,
                 success=True,
             )
-        except httpx.HTTPError as error:
+        except HTTPError as error:
             error_msg = str(error)
             return IVOARegistry(
                 name=name,
@@ -142,7 +142,7 @@ class Discover:
         try:
             response = await self.client.head(endpoint.url)
             endpoint.status = response.status_code
-        except httpx.HTTPError:
+        except HTTPError:
             endpoint.status = None
         return endpoint
 

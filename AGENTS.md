@@ -12,7 +12,7 @@
 - `canfar/models/config.py` defines `Configuration`; `canfar/config/editor.py` owns validated dotted edits and atomic persistence through `config.editor`.
 - `canfar/authentication.py` owns public credential operations and Python `login`/`alogin`; `canfar/auth/` implements X.509 and OIDC flows. Shared OIDC credential initialization lives in `canfar/auth/oidc.py`.
 - `canfar/server.py` owns public Server Selection and discovery operations; `canfar/_server_discovery.py` implements discovery and metadata enrichment. Selection policy does not live on `Configuration`.
-- `canfar/client.py` composes native sync/async `httpx` clients, credentials, auth hooks, and timeouts. Runtime credential precedence applies to hooks as well as headers and TLS.
+- `canfar/client.py` composes native sync/async `httpx2` clients, credentials, auth hooks, and timeouts. Runtime credential precedence applies to hooks as well as headers and TLS.
 - `canfar/sessions.py`, `canfar/images.py`, `canfar/context.py`, and `canfar/overview.py` expose Science Platform operations.
 - `canfar/storage.py` resolves configured Storage Identifiers into fsspec filesystems; `canfar/cli/data.py` integrates the delegated storage CLI.
 - `canfar/cli/` contains Typer adapters. `machine.py` declares leaf output options; `output.py` renders structured output.
@@ -63,7 +63,7 @@ Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant e
 - Use domain Pydantic models under `canfar/models/` directly; do not introduce a separate DTO/request-model layer. Use those models for structured output where applicable.
 - Prefer Python stdlib utilities and Pydantic built-ins (`logging`, `model_dump`, `model_dump_json`, `SecretStr`, `to_jsonable_python`) over custom serialization, configuration glue, or telemetry stacks. Preserve CLI `--log-file` behavior.
 - Prefer deleting unused code and dependencies over adding abstraction layers. Keep the supported native sync and async interfaces and distributed helpers.
-- Prefer functional tests at public seams (`CliRunner`, `httpx.MockTransport`) over large Authlib-mock matrices or near-duplicate unit cases.
+- Prefer functional tests at public seams (`CliRunner`, `httpx2.MockTransport`) over large Authlib-mock matrices or near-duplicate unit cases.
 
 ## Current Interface Contracts
 

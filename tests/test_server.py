@@ -8,7 +8,7 @@ from threading import Barrier
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import httpx
+import httpx2
 import pytest
 import yaml
 from pydantic import AnyHttpUrl, AnyUrl
@@ -87,10 +87,10 @@ def test_enrich_preserves_storage_resource_annotation() -> None:
 
 
 def _http_client_factory(
-    transport: httpx.BaseTransport,
-) -> Callable[..., httpx.Client]:
-    """Return an HTTPX client factory bound to a test transport."""
-    client_type = httpx.Client
+    transport: httpx2.BaseTransport,
+) -> Callable[..., httpx2.Client]:
+    """Return an HTTPX2 client factory bound to a test transport."""
+    client_type = httpx2.Client
     return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
@@ -529,10 +529,10 @@ class TestServerDiscovery:
             )
         )
 
-        def registry_response(request: httpx.Request) -> httpx.Response:
+        def registry_response(request: httpx2.Request) -> httpx2.Response:
             if request.method == "GET":
-                return httpx.Response(200, text=registry_body, request=request)
-            return httpx.Response(200, request=request)
+                return httpx2.Response(200, text=registry_body, request=request)
+            return httpx2.Response(200, request=request)
 
         session_capabilities = """
             <capabilities>
@@ -546,29 +546,29 @@ class TestServerDiscovery:
             </capabilities>
         """
 
-        def capabilities_response(request: httpx.Request) -> httpx.Response:
+        def capabilities_response(request: httpx2.Request) -> httpx2.Response:
             content = (
                 _VOSPACE_CAPABILITIES
                 if str(request.url) == "https://storage.example/arc/capabilities"
                 else session_capabilities
             )
-            return httpx.Response(200, text=content, request=request)
+            return httpx2.Response(200, text=content, request=request)
 
-        real_async_client = httpx.AsyncClient
+        real_async_client = httpx2.AsyncClient
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = _anonymous_config(known)
             with (
                 patch(
-                    "canfar.utils.discover.httpx.AsyncClient",
+                    "canfar.utils.discover.AsyncClient",
                     side_effect=lambda **_kwargs: real_async_client(
-                        transport=httpx.MockTransport(registry_response)
+                        transport=httpx2.MockTransport(registry_response)
                     ),
                 ),
                 patch(
                     "canfar.client.Client",
                     side_effect=_http_client_factory(
-                        httpx.MockTransport(capabilities_response)
+                        httpx2.MockTransport(capabilities_response)
                     ),
                 ),
             ):
@@ -599,14 +599,14 @@ class TestServerDiscovery:
             )
         )
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             if mode == "unreachable":
                 message = "storage unavailable"
-                raise httpx.ConnectError(message, request=request)
-            return httpx.Response(200, text="<capabilities />", request=request)
+                raise httpx2.ConnectError(message, request=request)
+            return httpx2.Response(200, text="<capabilities />", request=request)
 
         server = _cadc_server()
-        transport = httpx.MockTransport(response)
+        transport = httpx2.MockTransport(response)
         config_path = tmp_path / "config.yaml"
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = _anonymous_config()
@@ -666,8 +666,8 @@ class TestServerDiscovery:
               </capability>
             </capabilities>
         """
-        transport = httpx.MockTransport(
-            lambda request: httpx.Response(
+        transport = httpx2.MockTransport(
+            lambda request: httpx2.Response(
                 200,
                 text=session_capabilities,
                 request=request,
@@ -916,7 +916,7 @@ class TestServerDiscovery:
             authentication={"srcnet": OIDCCredential(idp="srcnet")},
             servers={},
         )
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
         session_capabilities = """
             <capabilities>
               <capability standardID="http://www.opencadc.org/std/platform#session-1">
@@ -928,9 +928,9 @@ class TestServerDiscovery:
             </capabilities>
         """
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             requests.append(request)
-            return httpx.Response(200, text=session_capabilities, request=request)
+            return httpx2.Response(200, text=session_capabilities, request=request)
 
         materialize = AsyncMock(return_value=RuntimeCredential(token="runtime-token"))
         with (
@@ -941,7 +941,7 @@ class TestServerDiscovery:
             ),
             patch(
                 "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
+                side_effect=_http_client_factory(httpx2.MockTransport(response)),
             ),
             patch("canfar.auth.oidc.sync_refresh") as refresh,
         ):
@@ -973,7 +973,7 @@ class TestServerDiscovery:
         mock_discovery.check = AsyncMock(side_effect=lambda item: item)
         mock_discovery.__aenter__ = AsyncMock(return_value=mock_discovery)
         mock_discovery.__aexit__ = AsyncMock(return_value=None)
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
         session_capabilities = """
             <capabilities>
               <capability standardID="http://www.opencadc.org/std/platform#session-1">
@@ -985,9 +985,9 @@ class TestServerDiscovery:
             </capabilities>
         """
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             requests.append(request)
-            return httpx.Response(200, text=session_capabilities, request=request)
+            return httpx2.Response(200, text=session_capabilities, request=request)
 
         monkeypatch.delenv("CANFAR_CERTIFICATE", raising=False)
         monkeypatch.setenv("CANFAR_TOKEN", "environment-token")
@@ -995,7 +995,7 @@ class TestServerDiscovery:
             patch("canfar.utils.registry.Discover", return_value=mock_discovery),
             patch(
                 "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
+                side_effect=_http_client_factory(httpx2.MockTransport(response)),
             ),
         ):
             [server] = await _discover_for_idp(
@@ -1062,8 +1062,8 @@ class TestServerDiscovery:
             patch(
                 "canfar.client.Client",
                 side_effect=_http_client_factory(
-                    httpx.MockTransport(
-                        lambda request: httpx.Response(
+                    httpx2.MockTransport(
+                        lambda request: httpx2.Response(
                             200,
                             text=session_capabilities,
                             request=request,
@@ -1099,18 +1099,18 @@ class TestServerDiscovery:
         capabilities_case: str,
     ) -> None:
         """Discovery updates endpoint facts without replacing known optional data."""
-        registry_url = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+        registry_url = "https://cadc-west-01.canfar.net/reg/resource-caps"
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
-        def registry_response(request: httpx.Request) -> httpx.Response:
+        def registry_response(request: httpx2.Request) -> httpx2.Response:
             if request.method == "GET" and str(request.url) == registry_url:
-                return httpx.Response(200, text=registry_body, request=request)
+                return httpx2.Response(200, text=registry_body, request=request)
             if request.method == "HEAD" and str(request.url) == _CADC_URL:
-                return httpx.Response(200, request=request)
+                return httpx2.Response(200, request=request)
             message = f"Unexpected request: {request.method} {request.url}"
             raise AssertionError(message)
 
-        async_transport = httpx.MockTransport(registry_response)
+        async_transport = httpx2.MockTransport(registry_response)
         partial = """
             <capabilities>
               <capability standardID="http://www.opencadc.org/std/platform#session-2">
@@ -1131,25 +1131,25 @@ class TestServerDiscovery:
             </capabilities>
         """
 
-        def capabilities_response(request: httpx.Request) -> httpx.Response:
+        def capabilities_response(request: httpx2.Request) -> httpx2.Response:
             if capabilities_case == "network":
                 message = "connection refused"
-                raise httpx.ConnectError(message, request=request)
+                raise httpx2.ConnectError(message, request=request)
             if capabilities_case == "timeout":
                 message = "timed out"
-                raise httpx.ReadTimeout(message, request=request)
+                raise httpx2.ReadTimeout(message, request=request)
             if capabilities_case == "non-success":
-                return httpx.Response(503, request=request)
+                return httpx2.Response(503, request=request)
             content = {
                 "empty": "",
                 "malformed": "<capabilities>",
                 "partial": partial,
                 "success": success,
             }[capabilities_case]
-            return httpx.Response(200, text=content, request=request)
+            return httpx2.Response(200, text=content, request=request)
 
-        capabilities_transport = httpx.MockTransport(capabilities_response)
-        real_async_client = httpx.AsyncClient
+        capabilities_transport = httpx2.MockTransport(capabilities_response)
+        real_async_client = httpx2.AsyncClient
         known = _cadc_server(
             name="canfar",
             cores=8,
@@ -1165,7 +1165,7 @@ class TestServerDiscovery:
 
             with (
                 patch(
-                    "canfar.utils.discover.httpx.AsyncClient",
+                    "canfar.utils.discover.AsyncClient",
                     side_effect=lambda **_kwargs: real_async_client(
                         transport=async_transport,
                     ),
@@ -1398,8 +1398,8 @@ class TestServerDiscovery:
             status=200,
             name="Broken",
         )
-        transport = httpx.MockTransport(
-            lambda request: httpx.Response(
+        transport = httpx2.MockTransport(
+            lambda request: httpx2.Response(
                 200,
                 text="<capabilities>",
                 request=request,
@@ -1430,8 +1430,8 @@ class TestServerDiscovery:
             status=200,
             name=None,
         )
-        transport = httpx.MockTransport(
-            lambda request: httpx.Response(
+        transport = httpx2.MockTransport(
+            lambda request: httpx2.Response(
                 503,
                 request=request,
             )

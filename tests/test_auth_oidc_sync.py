@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock, call, patch
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
 from pydantic import SecretStr
@@ -30,13 +30,13 @@ def _challenge(
 
 
 def _oauth_client(
-    *responses: httpx.Response | Exception,
-) -> tuple[OAuth2Client, list[httpx.Request]]:
+    *responses: httpx2.Response | Exception,
+) -> tuple[OAuth2Client, list[httpx2.Request]]:
     """Return an Authlib client backed by deterministic token responses."""
     remaining = iter(responses)
-    requests: list[httpx.Request] = []
+    requests: list[httpx2.Request] = []
 
-    def token_endpoint(request: httpx.Request) -> httpx.Response:
+    def token_endpoint(request: httpx2.Request) -> httpx2.Response:
         """Return the next deterministic token response."""
         requests.append(request)
         response = next(remaining)
@@ -49,7 +49,7 @@ def _oauth_client(
             "client_id",
             "client_secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(token_endpoint),
+            transport=httpx2.MockTransport(token_endpoint),
         ),
         requests,
     )
@@ -58,8 +58,8 @@ def _oauth_client(
 def test_sync_poll_device_token_waits_at_protocol_interval() -> None:
     """A pending authorization waits before the next token request."""
     client, requests = _oauth_client(
-        httpx.Response(400, json={"error": "authorization_pending"}),
-        httpx.Response(200, json={"access_token": "access-token"}),
+        httpx2.Response(400, json={"error": "authorization_pending"}),
+        httpx2.Response(200, json={"access_token": "access-token"}),
     )
 
     with client, patch("canfar.auth.oidc.time.sleep") as sleep:
@@ -77,9 +77,9 @@ def test_sync_poll_device_token_waits_at_protocol_interval() -> None:
 def test_sync_poll_device_token_expires_at_challenge_deadline() -> None:
     """Pending authorization stops at the challenge expiry deadline."""
     client, requests = _oauth_client(
-        httpx.Response(400, json={"error": "authorization_pending"}),
-        httpx.Response(400, json={"error": "authorization_pending"}),
-        httpx.Response(200, json={"access_token": "too-late"}),
+        httpx2.Response(400, json={"error": "authorization_pending"}),
+        httpx2.Response(400, json={"error": "authorization_pending"}),
+        httpx2.Response(200, json={"access_token": "too-late"}),
     )
     clock = 0.0
 
@@ -109,7 +109,7 @@ def test_sync_poll_device_token_expires_at_challenge_deadline() -> None:
 def test_sync_poll_device_token_reports_denial_without_secrets() -> None:
     """Terminal denial omits OIDC Identity Provider response data."""
     client, requests = _oauth_client(
-        httpx.Response(
+        httpx2.Response(
             400,
             json={
                 "error": "access_denied",
@@ -131,8 +131,8 @@ def test_sync_poll_device_token_reports_denial_without_secrets() -> None:
 def test_sync_poll_device_token_retries_transport_failure() -> None:
     """A transport failure backs off and retries before succeeding."""
     client, _ = _oauth_client(
-        httpx.ConnectTimeout("network timeout"),
-        httpx.Response(200, json={"access_token": "access-token"}),
+        httpx2.ConnectTimeout("network timeout"),
+        httpx2.Response(200, json={"access_token": "access-token"}),
     )
 
     with client, patch("canfar.auth.oidc.time.sleep") as sleep:
@@ -155,9 +155,9 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
         ),
         client=Client(),
     )
-    discovery = httpx.Response(
+    discovery = httpx2.Response(
         200,
-        request=httpx.Request(
+        request=httpx2.Request(
             "GET", "https://example.com/.well-known/openid-configuration"
         ),
         json={
@@ -168,18 +168,18 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
             "userinfo_endpoint": "https://example.com/userinfo",
         },
     )
-    registration = httpx.Response(
+    registration = httpx2.Response(
         200,
-        request=httpx.Request("POST", "https://example.com/register"),
+        request=httpx2.Request("POST", "https://example.com/register"),
         json={
             "client_id": "client-id",
             "client_secret": "client-secret",
             "client_secret_expires_at": 1893456000,
         },
     )
-    challenge = httpx.Response(
+    challenge = httpx2.Response(
         200,
-        request=httpx.Request("POST", "https://example.com/device"),
+        request=httpx2.Request("POST", "https://example.com/device"),
         json={
             "verification_uri": "https://example.com/device",
             "user_code": "ABC123",
@@ -188,9 +188,9 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
             "device_code": "device-code",
         },
     )
-    userinfo = httpx.Response(
+    userinfo = httpx2.Response(
         200,
-        request=httpx.Request("GET", "https://example.com/userinfo"),
+        request=httpx2.Request("GET", "https://example.com/userinfo"),
         json={"preferred_username": "test-user"},
     )
     sync_client = MagicMock()
@@ -209,7 +209,7 @@ def test_sync_authenticate_credential_runs_complete_native_flow() -> None:
     authenticated: list[str | None] = []
 
     with (
-        patch("canfar.auth.oidc.httpx.Client") as client_class,
+        patch("canfar.auth.oidc.SyncClient") as client_class,
         patch("authlib.integrations.httpx_client.OAuth2Client") as oauth_client_class,
         patch("canfar.auth.oidc.time.sleep"),
     ):

@@ -6,7 +6,7 @@ import asyncio
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from pydantic import AnyHttpUrl, SecretStr
@@ -36,7 +36,7 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
 ) -> None:
     """CLI login owns browser, QR, Rich, and human OIDC presentation."""
     idp_info = get_idp("srcnet")
-    client = AsyncMock(spec=httpx.AsyncClient)
+    client = AsyncMock(spec=httpx2.AsyncClient)
     oauth_client = AsyncMock(spec=AsyncOAuth2Client)
     discovery = MagicMock()
     discovery.json.return_value = {
@@ -76,7 +76,7 @@ def test_authenticate_for_cli_presents_oidc_device_challenge(
     console = MagicMock()
 
     with (
-        patch("canfar.auth.oidc.httpx.AsyncClient") as client_class,
+        patch("canfar.auth.oidc.AsyncClient") as client_class,
         patch(
             "authlib.integrations.httpx_client.AsyncOAuth2Client"
         ) as oauth_client_class,

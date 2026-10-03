@@ -14,7 +14,7 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 ## Current Seams
 
 - `Configuration` is the validated persisted data seam; `config.editor` owns dotted edits and atomic saves. Tests that construct it must isolate `CONFIG_PATH` from the developer's real `~/.canfar/config.yaml`.
-- `HTTPClient` is the transport seam. It decides runtime credential precedence before creating `httpx` clients.
+- `HTTPClient` is the transport seam. It decides runtime credential precedence before creating `httpx2` clients. Authlib 1.8.0 or later uses `httpx2` through its `authlib.integrations.httpx_client` integration; the integration name and CANFAR's `canfar/hooks/httpx/` module paths are retained.
 - `Session` and `AsyncSession` duplicate many operations in sync/async form. Keep behavior aligned when changing either adapter.
 - CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.
 - Request builders in `canfar/utils/build.py` are useful test surfaces for payload shape and validation.

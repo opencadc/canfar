@@ -7,8 +7,8 @@ import logging
 from typing import TYPE_CHECKING
 from xml.etree.ElementTree import ParseError
 
-import httpx
 from defusedxml.common import DefusedXmlException
+from httpx2 import HTTPError
 from pydantic import AnyHttpUrl, AnyUrl, ValidationError
 
 from canfar.auth.x509 import CertificateError
@@ -309,7 +309,7 @@ def enrich(
             )
         )
     except (
-        httpx.HTTPError,
+        HTTPError,
         OSError,
         AuthContextError,
         AuthExpiredError,
@@ -401,7 +401,7 @@ def _enrich_storage(
             )
             valid = vosi.is_vospace_service(xml)
         except (
-            httpx.HTTPError,
+            HTTPError,
             OSError,
             AuthContextError,
             AuthExpiredError,
@@ -572,7 +572,7 @@ def _fetch_resources(
                 "gpus": max(gpu_options) if gpu_options else DEFAULT_SERVER_GPUS,
             }
         )
-    except (httpx.HTTPError, OSError, ValueError, TypeError):
+    except (HTTPError, OSError, ValueError, TypeError):
         return server.model_copy(
             update={
                 "cores": DEFAULT_SERVER_CORES,

@@ -89,6 +89,6 @@ library regression.
 
 - Mirror the source module path under `tests/`.
 - Mark network or long-running tests with `integration` and/or `slow`.
-- Prefer observable public seams such as `httpx.MockTransport`, `CliRunner`,
+- Prefer observable public seams such as `httpx2.MockTransport`, `CliRunner`,
   and the public Configuration editor.
 - Keep sync tests synchronous and async tests on the native async path.

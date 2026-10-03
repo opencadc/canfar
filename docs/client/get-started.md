@@ -30,11 +30,11 @@ uv add canfar
 
 ### Try this development branch
 
-To test the examples on `feat/interfaces`, use a separate checkout and Python
+To test the development examples on `main`, use a separate checkout and Python
 environment. With Git and `uv` installed, run:
 
 ```bash
-git clone --branch feat/interfaces https://github.com/opencadc/canfar.git canfar-preview
+git clone --branch main https://github.com/opencadc/canfar.git canfar-preview
 cd canfar-preview
 uv sync
 source .venv/bin/activate
