@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import asyncio
-from typing import TYPE_CHECKING, Annotated, Any, cast, get_args
+from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import typer
 from httpx2 import HTTPError
 from pydantic import ValidationError
 from rich.markup import escape
+from typer._click.types import IntRange
 from typer.core import TyperOption
 
 from canfar.cli import output
@@ -27,7 +28,6 @@ from canfar.utils.console import emit_cli_active_server_banner, get_console
 
 if TYPE_CHECKING:
     from typer._click.core import Parameter
-    from typer._click.types import IntRange
 
     from canfar.models.http import ResourceRange
 
@@ -100,7 +100,7 @@ def _narrow(option: TyperOption, bounds: ResourceRange | None, maximum: int) -> 
         low, high = max(low, bounds.min), min(high, bounds.max)
         if low > high:
             low = high = 0
-    option.type = cast("type[IntRange]", type(option.type))(min=low, max=high)
+    option.type = IntRange(min=low, max=high)
 
 
 def _with_default(text: str, bounds: ResourceRange | None) -> str:

@@ -597,7 +597,7 @@ def test_create_help_shows_the_active_server_ranges(
         result = runner.invoke(cli, ["create", "--help"], env={"COLUMNS": "200"})
 
     assert result.exit_code == 0
-    help_text = " ".join(result.stdout.split())
+    help_text = " ".join(Text.from_ansi(result.stdout).plain.split())
     for text in expected:
         assert text in help_text
     assert "canSRC" not in help_text
