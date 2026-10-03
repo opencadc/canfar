@@ -6,9 +6,9 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Annotated, get_args
 
 import click
-import httpx
 import humanize
 import typer
+from httpx2 import HTTPError
 from pydantic import ValidationError
 from rich import box
 from rich.table import Table
@@ -67,7 +67,7 @@ def _fetch_session_payloads(
         AuthExpiredError,
         AuthContextError,
         AuthenticationError,
-        httpx.HTTPError,
+        HTTPError,
     ) as err:
         _raise_fetch_failure(
             err,

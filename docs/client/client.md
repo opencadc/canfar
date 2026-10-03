@@ -4,7 +4,7 @@
 
 `canfar.client.HTTPClient` is the lower-level transport used by the Session,
 Image, Context, and Overview clients. It composes native synchronous and
-asynchronous `httpx` clients and is useful when an application needs a CANFAR
+asynchronous `httpx2` clients and is useful when an application needs a CANFAR
 request outside those higher-level modules.
 
 ## Construct a client
@@ -51,7 +51,7 @@ non-empty runtime `token` wins over a saved X.509 or OIDC record; a runtime
 still takes precedence, otherwise the client uses the selected saved record. Runtime credentials are not persisted.
 
 Without runtime credentials, the client resolves the selected saved record when
-its sync or async HTTPX client is first created. An expired OIDC record is
+its sync or async HTTPX2 client is first created. An expired OIDC record is
 refreshed through the saved Authentication Record and the refreshed token is
 persisted. If the record cannot refresh or an X.509 certificate is invalid,
 client construction/request setup raises the established authentication error
@@ -74,8 +74,8 @@ async def request() -> None:
         response = await client.asynclient.get("context")
 ```
 
-`client` is the native `httpx.Client`; `asynclient` is the native
-`httpx.AsyncClient`. They are created lazily and closed by their matching
+`client` is the native `httpx2.Client`; `asynclient` is the native
+`httpx2.AsyncClient`. They are created lazily and closed by their matching
 context manager. Do not use the async client from synchronous code or expect a
 sync client to run through an event loop.
 
@@ -85,11 +85,11 @@ sync client to run through an event loop.
 
 ## Errors and logging
 
-HTTP response hooks raise `httpx.HTTPStatusError` by default for unsuccessful
+HTTP response hooks raise `httpx2.HTTPStatusError` by default for unsuccessful
 responses. Catch it at the application boundary when a request can fail:
 
 ```python
-from httpx import HTTPStatusError
+from httpx2 import HTTPStatusError
 
 from canfar.client import HTTPClient
 

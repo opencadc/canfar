@@ -51,8 +51,7 @@ class TestGetIdpCadc:
         idp = get_idp("cadc")
 
         assert (
-            str(idp.registry_url)
-            == "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+            str(idp.registry_url) == "https://cadc-west-01.canfar.net/reg/resource-caps"
         )
 
     def test_get_idp_cadc_key(self) -> None:
@@ -66,17 +65,14 @@ class TestGetIdpCadc:
         sources = registry_sources("cadc")
 
         assert sources == {
-            "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps": "CADC",
+            "https://cadc-west-01.canfar.net/reg/resource-caps": "CADC",
         }
 
     def test_registry_sources_cadc_can_include_dev(self) -> None:
         """CADC discovery can opt into development registries."""
         sources = registry_sources("cadc", include_dev=True)
 
-        assert (
-            sources["https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"]
-            == "CADC"
-        )
+        assert sources["https://cadc-west-01.canfar.net/reg/resource-caps"] == "CADC"
         assert (
             sources["https://rc-ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"]
             == "CADC@keel-dev"
@@ -152,6 +148,6 @@ class TestIdpInfoModel:
                 key="cadc",
                 name="CADC",
                 auth_mode="x509",
-                registry_url="https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps",
+                registry_url="https://cadc-west-01.canfar.net/reg/resource-caps",
                 unexpected="value",
             )

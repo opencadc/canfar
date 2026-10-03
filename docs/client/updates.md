@@ -5,15 +5,15 @@
 
 ## Unreleased: changes since v1.4.1
 
-This guide describes the `feat/interfaces` development branch. The previous
+This guide describes the development client after v1.4.1. The previous
 published Python client is [v1.4.1](https://github.com/opencadc/canfar/releases/tag/v1.4.1)
 (June 11, 2026). Installing `canfar` from PyPI does not yet provide all the
 features below. Follow [Install and set up](get-started.md#install) to choose
 a released or development installation, and read the
 [upgrade guide](migration.md) before updating scripts.
 
-The branch still reports version `1.4.1` in its package metadata. Check command
-help and Python capabilities as well as the version. Platform releases such
+The development checkout still reports version `1.4.1` in its package metadata.
+Check command help and Python capabilities as well as the version. Platform releases such
 as [2026.2](../releases/2026-2.md) have separate numbering and deployment scope.
 
 <span id="improved-session-data-validation"></span>
@@ -120,16 +120,32 @@ Start with the [Python tutorial](quick-start.md) or
 <span id="previous-versions"></span>
 <span id="stay-updated"></span>
 
+## Updated HTTP and storage dependencies
+
+The development client uses `httpx2` 2.13.1 or later and requires Authlib 1.8.0
+or later for compatible OpenID Connect clients. If your code handles HTTP
+exceptions or supplies test transports, use the corresponding `httpx2` types;
+see the [upgrade guide](migration.md#update-http-client-imports).
+
+The storage dependencies are pinned to `vosfs` 0.10.0 and `fsspec-cli` 0.9.0.
+Recursive copies can be rerun into an existing destination directory and skip
+files only after verifying their contents. See [Data commands](../cli/data.md).
+The runtime, development, and documentation dependency requirements and
+lockfile have also been refreshed. Python 3.10 remains supported.
+
 ## Where these changes landed
 
-This distinction matters if you have been testing development checkouts:
+The interfaces described above have landed on main since v1.4.1. This
+dependency update builds on them:
 
-| Area | Already on main after v1.4.1 | Added or changed on this branch |
+| Area | Main after v1.4.1 | This dependency update |
 | --- | --- | --- |
-| Storage | `canfar data`, Python storage access, and caching guidance | Explicit `identifiers()` / `filesystem()` interface replaces dynamic storage imports and public source factories |
-| Authentication | Certificate reuse and credential/server workflows | Native Python OIDC login and explicit selection guidance |
-| CLI output | Machine output and configurable human banner | `-o/--output`, canonical command names, and consistent request/result models |
-| Configuration | Stored authentication and server selections | Bound `config.editor` replaces configuration service methods |
-| Logging | Root controls and optional file logging | Smaller implementation using standard-library logging; updated diagnostics and documentation |
+| Storage | `canfar data`, explicit `identifiers()` / `filesystem()`, and caching guidance | `vosfs` 0.10.0 and `fsspec-cli` 0.9.0, including verified recursive-copy resumption |
+| Authentication | Native Python OIDC login, certificate reuse, and explicit credential/server selection | Authlib 1.8.0 or later for `httpx2` compatibility |
+| HTTP transport | Native synchronous and asynchronous HTTP clients | `httpx2` clients, exceptions, and test transports |
+
+Canonical `-o/--output` commands, validated `config.editor` edits, and
+standard-library logging with `--log-file` are also on main after v1.4.1;
+follow the [upgrade guide](migration.md) when moving from the published client.
 
 For published release history, see the [client changelog](../changelog.md).

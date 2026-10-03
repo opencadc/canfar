@@ -3,7 +3,7 @@
 import asyncio
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr
 
@@ -36,20 +36,20 @@ def test_overview_updates_base_url_and_parses_availability() -> None:
         "<vosi:note>ok</vosi:note></vosi:availability>"
     )
 
-    def respond(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text=payload, request=request)
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(200, text=payload, request=request)
 
     with (
         patch(
             "canfar.client.Client",
-            side_effect=lambda **kwargs: httpx.Client(
-                transport=httpx.MockTransport(respond), **kwargs
+            side_effect=lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         ),
         patch(
             "canfar.client.AsyncClient",
-            side_effect=lambda **kwargs: httpx.AsyncClient(
-                transport=httpx.MockTransport(respond), **kwargs
+            side_effect=lambda **kwargs: httpx2.AsyncClient(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         ),
         Overview(
@@ -82,14 +82,14 @@ def test_overview_availability_false_paths() -> None:
         ]
     )
 
-    def respond(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text=next(responses), request=request)
+    def respond(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(200, text=next(responses), request=request)
 
     with (
         patch(
             "canfar.client.Client",
-            side_effect=lambda **kwargs: httpx.Client(
-                transport=httpx.MockTransport(respond), **kwargs
+            side_effect=lambda **kwargs: httpx2.Client(
+                transport=httpx2.MockTransport(respond), **kwargs
             ),
         ),
         Overview(token=SecretStr("token"), url="https://example.test") as overview,

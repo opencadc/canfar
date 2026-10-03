@@ -1,7 +1,7 @@
 # Asynchronous Sessions
 
 `AsyncSession` is the native asynchronous counterpart to `Session`. It uses a
-native `httpx.AsyncClient`; it is not a synchronous client wrapped in an event
+native `httpx2.AsyncClient`; it is not a synchronous client wrapped in an event
 loop. Use it inside an existing async application and close it with `async with`.
 
 ## Return shapes and parity

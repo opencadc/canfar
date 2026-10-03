@@ -66,7 +66,7 @@ def callback(
 
     # Core dependencies that are most likely to cause issues
     key_deps = [
-        "httpx",
+        "httpx2",
         "typer",
         "rich",
         "pydantic",

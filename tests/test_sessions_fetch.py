@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from pydantic import SecretStr, ValidationError
 
@@ -21,16 +21,16 @@ def test_sync_fetch_preserves_request_and_response_contract() -> None:
     """Sync fetch preserves filters and the server response shape."""
     sent: list[tuple[str, str]] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         sent.extend(request.url.params.multi_items())
-        return httpx.Response(200, json=_FETCH_PAYLOAD, request=request)
+        return httpx2.Response(200, json=_FETCH_PAYLOAD, request=request)
 
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(respond),
+                transport=httpx2.MockTransport(respond),
                 **kwargs,
             ),
         ),
@@ -46,15 +46,15 @@ async def test_async_fetch_preserves_request_and_response_contract() -> None:
     """Async fetch preserves filters and the server response shape."""
     sent: list[tuple[str, str]] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         sent.extend(request.url.params.multi_items())
-        return httpx.Response(200, json=_FETCH_PAYLOAD, request=request)
+        return httpx2.Response(200, json=_FETCH_PAYLOAD, request=request)
 
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(respond),
+            transport=httpx2.MockTransport(respond),
             **kwargs,
         ),
     ):
@@ -68,16 +68,16 @@ def test_sync_stats_preserves_response_shape() -> None:
     """Sync stats returns the decoded platform response."""
     sent: list[tuple[str, str]] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         sent.extend(request.url.params.multi_items())
-        return httpx.Response(200, json=_STATS_PAYLOAD, request=request)
+        return httpx2.Response(200, json=_STATS_PAYLOAD, request=request)
 
-    real_client = httpx.Client
+    real_client = httpx2.Client
     with (
         patch(
             "canfar.client.Client",
             side_effect=lambda **kwargs: real_client(
-                transport=httpx.MockTransport(respond),
+                transport=httpx2.MockTransport(respond),
                 **kwargs,
             ),
         ),
@@ -93,15 +93,15 @@ async def test_async_stats_preserves_response_shape() -> None:
     """Async stats returns the decoded platform response."""
     sent: list[tuple[str, str]] = []
 
-    def respond(request: httpx.Request) -> httpx.Response:
+    def respond(request: httpx2.Request) -> httpx2.Response:
         sent.extend(request.url.params.multi_items())
-        return httpx.Response(200, json=_STATS_PAYLOAD, request=request)
+        return httpx2.Response(200, json=_STATS_PAYLOAD, request=request)
 
-    real_async_client = httpx.AsyncClient
+    real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
         side_effect=lambda **kwargs: real_async_client(
-            transport=httpx.MockTransport(respond),
+            transport=httpx2.MockTransport(respond),
             **kwargs,
         ),
     ):

@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 from authlib.integrations.httpx_client import OAuth2Client
 from pydantic import AnyHttpUrl, AnyUrl
@@ -61,10 +61,10 @@ def _primary_storage(name: str, *, leaf: str = "arc") -> dict[str, VOSpaceServic
 
 
 def _http_client_factory(
-    transport: httpx.BaseTransport,
-) -> Callable[..., httpx.Client]:
-    """Return an HTTPX client factory bound to a test transport."""
-    client_type = httpx.Client
+    transport: httpx2.BaseTransport,
+) -> Callable[..., httpx2.Client]:
+    """Return an HTTPX2 client factory bound to a test transport."""
+    client_type = httpx2.Client
     return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
@@ -150,8 +150,8 @@ def _capabilities(
     )
 
 
-def _patch_client(tmp_path: Path, transport: httpx.BaseTransport):
-    """Patch CONFIG_PATH and the sync HTTPX client factory."""
+def _patch_client(tmp_path: Path, transport: httpx2.BaseTransport):
+    """Patch CONFIG_PATH and the sync HTTPX2 client factory."""
     return (
         patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
         patch("canfar.client.Client", side_effect=_http_client_factory(transport)),
@@ -174,24 +174,24 @@ class TestPlatformEnrichment:
             gpus=1,
             status="reachable",
         )
-        requests: list[httpx.Request] = []
+        requests: list[httpx2.Request] = []
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             """Serve capabilities and context for activation enrichment."""
             requests.append(request)
             if request.url.host == "storage.example":
-                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
+                return httpx2.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
-                return httpx.Response(
+                return httpx2.Response(
                     200, text=_capabilities(_CADC_URL), request=request
                 )
             if request.url.path.endswith("/v2/context"):
-                return httpx.Response(200, json=_CONTEXT_PAYLOAD, request=request)
+                return httpx2.Response(200, json=_CONTEXT_PAYLOAD, request=request)
             message = f"Unexpected request: {request.method} {request.url}"
             raise AssertionError(message)
 
         config_patch, client_patch = _patch_client(
-            tmp_path, httpx.MockTransport(response)
+            tmp_path, httpx2.MockTransport(response)
         )
         with config_patch, client_patch:
             config = _anonymous_config(known)
@@ -237,25 +237,25 @@ class TestPlatformEnrichment:
             status="reachable",
         )
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             """Serve capabilities and a parametrized unusable context reply."""
             if request.url.host == "storage.example":
-                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
+                return httpx2.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
-                return httpx.Response(
+                return httpx2.Response(
                     200, text=_capabilities(_CADC_URL), request=request
                 )
             if failure == "transport":
                 message = "context unavailable"
-                raise httpx.ConnectError(message, request=request)
+                raise httpx2.ConnectError(message, request=request)
             if failure == "parse":
-                return httpx.Response(200, content=b"{", request=request)
-            return httpx.Response(
+                return httpx2.Response(200, content=b"{", request=request)
+            return httpx2.Response(
                 200, json={"cores": {"defaultLimit": 0}}, request=request
             )
 
         config_patch, client_patch = _patch_client(
-            tmp_path, httpx.MockTransport(response)
+            tmp_path, httpx2.MockTransport(response)
         )
         with config_patch, client_patch:
             activated = platform.activate(
@@ -290,10 +290,10 @@ class TestPlatformEnrichment:
             credential = X509Credential(
                 idp="cadc", path=tmp_path, expiry=9_999_999_999.0
             )
-        requests: list[httpx.Request] = []
-        transport = httpx.MockTransport(
+        requests: list[httpx2.Request] = []
+        transport = httpx2.MockTransport(
             lambda request: (
-                requests.append(request) or httpx.Response(200, request=request)
+                requests.append(request) or httpx2.Response(200, request=request)
             )
         )
         config_path = tmp_path / "config.yaml"
@@ -348,13 +348,13 @@ class TestPlatformEnrichment:
             auth_modes=("token", "tls-with-certificate"),
         )
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             """Serve validated capability metadata for enrich."""
             assert str(request.url) == "https://registry.example/skaha/capabilities"
-            return httpx.Response(200, text=capabilities, request=request)
+            return httpx2.Response(200, text=capabilities, request=request)
 
         config_patch, client_patch = _patch_client(
-            tmp_path, httpx.MockTransport(response)
+            tmp_path, httpx2.MockTransport(response)
         )
         with config_patch, client_patch:
             enriched = platform.enrich(
@@ -403,14 +403,14 @@ class TestPlatformEnrichment:
         observed: dict[str, str | None] = {}
         config_path = tmp_path / "config.yaml"
 
-        def response(request: httpx.Request) -> httpx.Response:
+        def response(request: httpx2.Request) -> httpx2.Response:
             """Capture enrich capabilities request headers and return XML."""
             observed["authorization"] = request.headers.get("Authorization")
             observed["auth_type"] = request.headers.get("X-Skaha-Authentication-Type")
             observed["accept"] = request.headers.get("Accept")
             observed["content_type"] = request.headers.get("Content-Type")
             observed["registry"] = request.headers.get("X-Skaha-Registry-Auth")
-            return httpx.Response(200, text=capabilities, request=request)
+            return httpx2.Response(200, text=capabilities, request=request)
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             if source == "missing":
@@ -437,7 +437,7 @@ class TestPlatformEnrichment:
             before = config.model_dump(mode="json")
             with patch(
                 "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(response)),
+                side_effect=_http_client_factory(httpx2.MockTransport(response)),
             ):
                 enriched = platform.enrich(target, config=config)
 
@@ -483,25 +483,25 @@ class TestPlatformEnrichment:
             auths=None,
         )
         capabilities = _capabilities("https://srcnet.example/skaha")
-        platform_requests: list[httpx.Request] = []
-        token_requests: list[httpx.Request] = []
+        platform_requests: list[httpx2.Request] = []
+        token_requests: list[httpx2.Request] = []
 
-        def platform_response(request: httpx.Request) -> httpx.Response:
+        def platform_response(request: httpx2.Request) -> httpx2.Response:
             """Serve capabilities then a failed context fetch during refresh."""
             platform_requests.append(request)
             if request.url.host == "storage.example":
-                return httpx.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
+                return httpx2.Response(200, text=_VOSPACE_CAPABILITIES, request=request)
             if request.url.path.endswith("/capabilities"):
-                return httpx.Response(200, text=capabilities, request=request)
+                return httpx2.Response(200, text=capabilities, request=request)
             if request.url.path.endswith("/v2/context"):
-                return httpx.Response(503, request=request)
+                return httpx2.Response(503, request=request)
             message = f"Unexpected request: {request.method} {request.url}"
             raise AssertionError(message)
 
-        def token_response(request: httpx.Request) -> httpx.Response:
+        def token_response(request: httpx2.Request) -> httpx2.Response:
             """Return a successful OIDC token refresh payload."""
             token_requests.append(request)
-            return httpx.Response(
+            return httpx2.Response(
                 200,
                 json={
                     "access_token": _REFRESHED_TOKEN,
@@ -517,7 +517,7 @@ class TestPlatformEnrichment:
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(token_response),
+            transport=httpx2.MockTransport(token_response),
         )
         config_path = tmp_path / "config.yaml"
         with (
@@ -526,8 +526,8 @@ class TestPlatformEnrichment:
             patch("authlib.oauth2.rfc6749.wrappers.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: httpx.Client(
-                    transport=httpx.MockTransport(platform_response), **kwargs
+                side_effect=lambda **kwargs: httpx2.Client(
+                    transport=httpx2.MockTransport(platform_response), **kwargs
                 ),
             ),
             patch(
@@ -583,14 +583,14 @@ class TestPlatformEnrichment:
             version=None,
             auths=None,
         )
-        platform_requests: list[httpx.Request] = []
+        platform_requests: list[httpx2.Request] = []
         config_path = tmp_path / "config.yaml"
         oauth_client = OAuth2Client(
             "client-id",
             "client-secret",
             token_endpoint_auth_method="client_secret_basic",
-            transport=httpx.MockTransport(
-                lambda request: httpx.Response(503, request=request)
+            transport=httpx2.MockTransport(
+                lambda request: httpx2.Response(503, request=request)
             ),
         )
 
@@ -599,11 +599,11 @@ class TestPlatformEnrichment:
             patch("canfar.models.auth.time.time", return_value=now),
             patch(
                 "canfar.client.Client",
-                side_effect=lambda **kwargs: httpx.Client(
-                    transport=httpx.MockTransport(
+                side_effect=lambda **kwargs: httpx2.Client(
+                    transport=httpx2.MockTransport(
                         lambda request: (
                             platform_requests.append(request)
-                            or httpx.Response(200, request=request)
+                            or httpx2.Response(200, request=request)
                         )
                     ),
                     **kwargs,
@@ -636,37 +636,37 @@ class TestPlatformEnrichment:
         failure: str,
     ) -> None:
         """Auth and network failures leave memory and YAML byte-for-byte unchanged."""
-        registry_url = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+        registry_url = "https://cadc-west-01.canfar.net/reg/resource-caps"
         registry_body = f"{_CADC_URI}={_CADC_URL}/capabilities"
 
-        def registry_response(request: httpx.Request) -> httpx.Response:
+        def registry_response(request: httpx2.Request) -> httpx2.Response:
             """Serve CADC registry contents for discovery before enrich fails."""
             if request.method == "GET" and str(request.url) == registry_url:
-                return httpx.Response(200, text=registry_body, request=request)
+                return httpx2.Response(200, text=registry_body, request=request)
             if request.method == "HEAD" and str(request.url) == _CADC_URL:
-                return httpx.Response(200, request=request)
+                return httpx2.Response(200, request=request)
             message = f"Unexpected request: {request.method} {request.url}"
             raise AssertionError(message)
 
-        def unavailable(request: httpx.Request) -> httpx.Response:
+        def unavailable(request: httpx2.Request) -> httpx2.Response:
             """Simulate auth or transport failure during capability fetch."""
             if failure == "network":
                 message = "connection refused"
-                raise httpx.ConnectError(message, request=request)
-            return httpx.Response(401, request=request)
+                raise httpx2.ConnectError(message, request=request)
+            return httpx2.Response(401, request=request)
 
-        class _RegistryAsyncClient(httpx.AsyncClient):
+        class _RegistryAsyncClient(httpx2.AsyncClient):
             def __init__(self, **kwargs: object) -> None:
-                kwargs["transport"] = httpx.MockTransport(registry_response)
+                kwargs["transport"] = httpx2.MockTransport(registry_response)
                 super().__init__(**kwargs)
 
         config_path = tmp_path / "config.yaml"
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            patch("canfar.utils.discover.httpx.AsyncClient", _RegistryAsyncClient),
+            patch("canfar.utils.discover.AsyncClient", _RegistryAsyncClient),
             patch(
                 "canfar.client.Client",
-                side_effect=_http_client_factory(httpx.MockTransport(unavailable)),
+                side_effect=_http_client_factory(httpx2.MockTransport(unavailable)),
             ),
         ):
             config = _anonymous_config()
@@ -703,15 +703,15 @@ class TestPlatformEnrichment:
         """Strictness keeps known servers on parse failure; defects still escape."""
         server = _server(version=None, auths=None) if mode == "malformed" else _server()
 
-        def handler(request: httpx.Request) -> httpx.Response:
+        def handler(request: httpx2.Request) -> httpx2.Response:
             """Return malformed capabilities or raise an unexpected defect."""
             if mode == "unexpected":
                 message = "unexpected platform route"
                 raise AssertionError(message)
-            return httpx.Response(200, text="<capabilities>", request=request)
+            return httpx2.Response(200, text="<capabilities>", request=request)
 
         config_patch, client_patch = _patch_client(
-            tmp_path, httpx.MockTransport(handler)
+            tmp_path, httpx2.MockTransport(handler)
         )
         with config_patch, client_patch:
             if raises is None:

@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Annotated
 
 import typer
+from rich.errors import MarkupError
 
 from canfar.cli._run import run
 from canfar.sessions import AsyncSession
@@ -38,9 +39,14 @@ def get_logs(
             return
 
         for session_id, log_text in all_logs.items():
-            get_console().print(
+            console = get_console()
+            console.print(
                 f"\n[bold magenta] Logs for session {session_id} [/bold magenta]\n"
             )
-            get_console().print(log_text)
+            try:
+                rendered_logs = console.render_str(log_text)
+            except MarkupError:
+                rendered_logs = console.render_str(log_text, markup=False)
+            console.print(rendered_logs)
 
     run(_get_logs())

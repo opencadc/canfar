@@ -6,14 +6,14 @@ import logging
 from typing import TYPE_CHECKING
 
 from defusedxml import ElementTree
-from httpx import URL
+from httpx2 import URL
 from pydantic import model_validator
 from typing_extensions import Self
 
 from canfar.client import HTTPClient
 
 if TYPE_CHECKING:
-    from httpx import Response
+    from httpx2 import Response
 
 log = logging.getLogger(__name__)
 

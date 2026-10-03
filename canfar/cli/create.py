@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import Annotated, Any, get_args
 
 import click
-import httpx
 import typer
+from httpx2 import HTTPError
 from pydantic import ValidationError
 
 from canfar.cli import output
@@ -264,7 +264,7 @@ def creation(  # noqa: PLR0917
             f"[bold red]Error: {err}[/bold red]",
         )
         raise typer.Exit(1) from err
-    except httpx.HTTPError as err:
+    except HTTPError as err:
         _render_create_failure(
             output.boundary_failure(
                 err, transport_message="Unable to create session(s)."

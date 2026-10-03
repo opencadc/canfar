@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 from canfar.client import HTTPClient
 
 if TYPE_CHECKING:
-    from httpx import Response
+    from httpx2 import Response
 
 
 class Context(HTTPClient):

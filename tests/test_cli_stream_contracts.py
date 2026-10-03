@@ -4,11 +4,10 @@ from __future__ import annotations
 
 import json
 from contextlib import ExitStack
-from types import SimpleNamespace
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
-import httpx
+import httpx2
 import pytest
 import yaml
 from typer.testing import CliRunner
@@ -27,7 +26,7 @@ if TYPE_CHECKING:
 
 runner = CliRunner()
 _CLI_ENV = {"COLUMNS": "120", "NO_COLOR": "1", "FORCE_COLOR": "0", "TERM": "dumb"}
-_CADC_REGISTRY = "https://ws.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/reg/resource-caps"
+_CADC_REGISTRY = "https://cadc-west-01.canfar.net/reg/resource-caps"
 _CADC_URI = "ivo://cadc.nrc.ca/skaha"
 
 
@@ -73,18 +72,18 @@ def _write_config(path: Path, *, with_server: bool) -> None:
 
 
 def _async_client_factory(
-    transport: httpx.AsyncBaseTransport,
-) -> Callable[..., httpx.AsyncClient]:
-    """Return the real HTTPX async client bound to a test transport."""
-    client_type = httpx.AsyncClient
+    transport: httpx2.AsyncBaseTransport,
+) -> Callable[..., httpx2.AsyncClient]:
+    """Return the real HTTPX2 async client bound to a test transport."""
+    client_type = httpx2.AsyncClient
     return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
 def _client_factory(
-    transport: httpx.BaseTransport,
-) -> Callable[..., httpx.Client]:
-    """Return the real HTTPX client bound to a test transport."""
-    client_type = httpx.Client
+    transport: httpx2.BaseTransport,
+) -> Callable[..., httpx2.Client]:
+    """Return the real HTTPX2 client bound to a test transport."""
+    client_type = httpx2.Client
     return lambda **kwargs: client_type(transport=transport, **kwargs)
 
 
@@ -170,23 +169,23 @@ def test_real_ps_log_and_payload_stay_on_separate_streams(
     config_path = tmp_path / "config.yaml"
     _write_config(config_path, with_server=True)
 
-    def response(request: httpx.Request) -> httpx.Response:
+    def response(request: httpx2.Request) -> httpx2.Response:
         """Return an empty Session list payload."""
-        return httpx.Response(200, json=[], request=request)
+        return httpx2.Response(200, json=[], request=request)
 
     with (
         _config_path(config_path),
         patch(
             "canfar.client.AsyncClient",
-            side_effect=_async_client_factory(httpx.MockTransport(response)),
+            side_effect=_async_client_factory(httpx2.MockTransport(response)),
         ),
     ):
         result = runner.invoke(cli, ["-vvvv", "ps", *flag])
 
     assert result.exit_code == 0
     assert load(result.stdout) == []
-    assert "Asynchronous HTTPx client created" not in result.stdout
-    assert "Asynchronous HTTPx client created" in result.stderr
+    assert "Asynchronous HTTPX2 client created" not in result.stdout
+    assert "Asynchronous HTTPX2 client created" in result.stderr
 
 
 @pytest.mark.parametrize(
@@ -205,16 +204,16 @@ def test_ps_transport_failure_is_one_structured_machine_error(
     config_path = tmp_path / "config.yaml"
     _write_config(config_path, with_server=True)
 
-    def unavailable(request: httpx.Request) -> httpx.Response:
+    def unavailable(request: httpx2.Request) -> httpx2.Response:
         """Simulate a refused Session list request."""
         message = "connection refused"
-        raise httpx.ConnectError(message, request=request)
+        raise httpx2.ConnectError(message, request=request)
 
     with (
         _config_path(config_path),
         patch(
             "canfar.client.AsyncClient",
-            side_effect=_async_client_factory(httpx.MockTransport(unavailable)),
+            side_effect=_async_client_factory(httpx2.MockTransport(unavailable)),
         ),
     ):
         result = runner.invoke(cli, ["ps", *flag])
@@ -242,11 +241,11 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
     _write_config(config_path, with_server=False)
     registry_body = f"{_CADC_URI}=https://fresh.example/skaha/capabilities"
 
-    def registry_response(request: httpx.Request) -> httpx.Response:
+    def registry_response(request: httpx2.Request) -> httpx2.Response:
         if request.method == "GET" and str(request.url) == _CADC_REGISTRY:
-            return httpx.Response(200, text=registry_body, request=request)
+            return httpx2.Response(200, text=registry_body, request=request)
         if request.method == "HEAD":
-            return httpx.Response(200, request=request)
+            return httpx2.Response(200, request=request)
         message = f"Unexpected request: {request.method} {request.url}"
         raise AssertionError(message)
 
@@ -263,20 +262,18 @@ def test_fresh_server_discovery_keeps_progress_out_of_machine_payload(
         </capabilities>
     """
 
-    def capability_response(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text=capabilities, request=request)
+    def capability_response(request: httpx2.Request) -> httpx2.Response:
+        return httpx2.Response(200, text=capabilities, request=request)
 
-    discovery_httpx = SimpleNamespace(
-        AsyncClient=_async_client_factory(httpx.MockTransport(registry_response)),
-        HTTPError=httpx.HTTPError,
-        Timeout=httpx.Timeout,
-    )
     with (
         _config_path(config_path),
-        patch("canfar.utils.discover.httpx", discovery_httpx),
+        patch(
+            "canfar.utils.discover.AsyncClient",
+            side_effect=_async_client_factory(httpx2.MockTransport(registry_response)),
+        ),
         patch(
             "canfar.client.Client",
-            side_effect=_client_factory(httpx.MockTransport(capability_response)),
+            side_effect=_client_factory(httpx2.MockTransport(capability_response)),
         ),
     ):
         result = runner.invoke(cli, ["server", "ls", *flag])
@@ -295,15 +292,15 @@ def test_fresh_server_discovery_errors_are_diagnostics(
     config_path = tmp_path / "config.yaml"
     _write_config(config_path, with_server=False)
 
-    def unavailable(request: httpx.Request) -> httpx.Response:
+    def unavailable(request: httpx2.Request) -> httpx2.Response:
         message = "registry unavailable"
-        raise httpx.ConnectError(message, request=request)
+        raise httpx2.ConnectError(message, request=request)
 
     with (
         _config_path(config_path),
         patch(
-            "canfar.utils.discover.httpx.AsyncClient",
-            side_effect=_async_client_factory(httpx.MockTransport(unavailable)),
+            "canfar.utils.discover.AsyncClient",
+            side_effect=_async_client_factory(httpx2.MockTransport(unavailable)),
         ),
     ):
         result = runner.invoke(cli, ["server", "ls"])
@@ -330,15 +327,15 @@ def test_fresh_server_discovery_failure_is_one_structured_machine_error(
     config_path = tmp_path / "config.yaml"
     _write_config(config_path, with_server=False)
 
-    def unavailable(request: httpx.Request) -> httpx.Response:
+    def unavailable(request: httpx2.Request) -> httpx2.Response:
         message = "registry unavailable"
-        raise httpx.ConnectError(message, request=request)
+        raise httpx2.ConnectError(message, request=request)
 
     with (
         _config_path(config_path),
         patch(
-            "canfar.utils.discover.httpx.AsyncClient",
-            side_effect=_async_client_factory(httpx.MockTransport(unavailable)),
+            "canfar.utils.discover.AsyncClient",
+            side_effect=_async_client_factory(httpx2.MockTransport(unavailable)),
         ),
     ):
         result = runner.invoke(cli, ["server", "ls", *flag])

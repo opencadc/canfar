@@ -6,14 +6,14 @@
 
 ## Upgrade from v1.4.1
 
-The changes below are **unreleased** on `feat/interfaces`. They are not all
-available in the published v1.4.1 package. Choose an installation using
+The changes below describe the **unreleased development client**. They are not
+all available in the published v1.4.1 package. Choose an installation using
 [Install and set up](get-started.md#install), then check `canfar --help` and the
 help for each command you automate. The development checkout still reports
 `1.4.1`, so the version string alone cannot identify its interface.
 
-See [What's new](updates.md) for new features and the distinction between main
-and this branch. Existing scripts need the following changes.
+See [What's new](updates.md) for features added on main since v1.4.1 and the
+current dependency update. Existing scripts need the following changes.
 
 <span id="documentation-and-links"></span>
 
@@ -66,6 +66,18 @@ credential and server selection, rather than removed Configuration service
 methods. See [Install and set up](get-started.md#edit-and-save-configuration).
 The stored schema is unchanged by the editor move; a reset is unnecessary if
 your existing configuration loads successfully.
+
+### Update HTTP client imports
+
+CANFAR now uses `httpx2` for its synchronous and asynchronous HTTP clients.
+If you catch transport errors or provide test transports, import their types
+from `httpx2`:
+
+```python
+from httpx2 import HTTPStatusError, MockTransport
+```
+
+See [HTTPClient](client.md) for the native client types and error handling.
 
 ### Update storage imports from main checkouts
 
