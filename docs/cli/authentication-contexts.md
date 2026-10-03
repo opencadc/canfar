@@ -62,7 +62,9 @@ Checked 25 servers in 13.2s with a 10s request timeout.
 | pending | `.` | The Server is still being checked. |
 
 When stderr has no color, for example in a CI log or with `NO_COLOR` set, each
-outcome uses the glyph in the second column instead of a colored square.
+outcome uses the glyph in the second column instead of a colored square. When
+the registries list only one Server, as for `canfar login cadc`, login skips
+the squares and legend and prints only the summary lines.
 
 The last lines report how many Servers were checked, how long that took, and
 the request timeout. When a Server times out, login prints the same login

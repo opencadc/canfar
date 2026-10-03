@@ -102,6 +102,7 @@ def test_server_listed_twice_keeps_its_best_state(
 ) -> None:
     """A Server listed by several registries shows one best state."""
     grid = DiscoveryGrid("srcnet", timeout=10)
+    grid.update(_probe("other", "unreachable"))
     for status in reports:
         grid.update(_probe("canSRC", status))
 
@@ -142,7 +143,24 @@ def test_finished_grid_omits_hint_without_a_useful_retry(
 
     grid.finish()
 
-    assert len(_render(grid)) == 3
+    (summary,) = _render(grid)
+    assert summary.startswith("Checked 1 server in ")
+
+
+def test_single_server_shows_only_progress_summary_and_hint() -> None:
+    """One Server needs no squares or legend; a timeout still suggests a retry."""
+    grid = DiscoveryGrid("cadc", timeout=10, retry="canfar login cadc --timeout 20")
+    grid.update(_probe("canfar", "pending"))
+
+    assert _render(grid) == ["Checking 1 server... 0s"]
+
+    grid.update(_probe("canfar", "timeout"))
+    grid.finish()
+
+    summary, hint = _render(grid, color=True)
+    assert summary.startswith("Checked 1 server in ")
+    assert summary.endswith("s with a 10s request timeout.")
+    assert hint == "1 timed out. To wait longer, run canfar login cadc --timeout 20"
 
 
 def test_stopped_grid_reports_unchecked_servers_without_a_hint() -> None:

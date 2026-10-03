@@ -473,16 +473,22 @@ def test_login_shows_discovery_outcomes_before_no_server_error(
 ) -> None:
     """When no Server connects, the grid still explains each failure."""
     result = _login_with_outcomes(
-        tmp_path, [_probe("ukRAL", "pending"), _probe("ukRAL", "unreachable")]
+        tmp_path,
+        [
+            _probe("ukRAL", "pending"),
+            _probe("ukCAM", "pending"),
+            _probe("ukRAL", "unreachable"),
+            _probe("ukCAM", "error"),
+        ],
     )
 
     assert result.exit_code == 1
     lines = result.stderr.strip().splitlines()
     assert lines[-5:-3] == [
-        "x",
-        "+ 0 discovered   ~ 0 timeout   x 1 unreachable   ! 0 failed",
+        "! x",
+        "+ 0 discovered   ~ 0 timeout   x 1 unreachable   ! 1 failed",
     ]
-    assert lines[-3].startswith("Checked 1 server in ")
+    assert lines[-3].startswith("Checked 2 servers in ")
     assert lines[-2:] == ["", "No servers discovered for IDP 'cadc'."]
 
 

@@ -45,7 +45,8 @@ class DiscoveryGrid:
     Pass ``update`` as ``discover(on_probe=...)`` and render the grid with
     ``rich.live.Live``. Each Server keeps its square, in Server Name order,
     while its state changes; ``finish`` freezes the elapsed time and replaces
-    the progress line with a summary. Consoles without color, such as piped
+    the progress line with a summary. With a single Server, only the progress
+    or summary lines show. Consoles without color, such as piped
     stderr or ``NO_COLOR``, show a distinct glyph per state instead.
 
     Args:
@@ -103,7 +104,7 @@ class DiscoveryGrid:
             yield Text()
 
     def _lines(self, console: Console) -> Iterator[RenderableType]:
-        """Yield squares, legend, and progress or summary."""
+        """Yield squares and legend for several Servers, then progress or summary."""
         with self._lock:
             probes = sorted(
                 self._probes.values(),
@@ -116,14 +117,17 @@ class DiscoveryGrid:
                 yield Text(f"Discovering {self._idp} servers... {running:.0f}s", "dim")
             return
 
-        mono = console.no_color or console.color_system is None
         counts = Counter(probe.status for probe in probes)
-        yield self._grid(probes, mono=mono)
-        yield Text("   ").join(
-            Text.assemble(self._glyph(status, mono=mono), f" {counts[status]} {label}")
-            for status, (*_, label) in _STYLES.items()
-            if status != "pending" or counts[status]
-        )
+        if len(probes) > 1:
+            mono = console.no_color or console.color_system is None
+            yield self._grid(probes, mono=mono)
+            yield Text("   ").join(
+                Text.assemble(
+                    self._glyph(status, mono=mono), f" {counts[status]} {label}"
+                )
+                for status, (*_, label) in _STYLES.items()
+                if status != "pending" or counts[status]
+            )
         total = f"{len(probes)} {'server' if len(probes) == 1 else 'servers'}"
         if elapsed is None:
             yield Text(f"Checking {total}... {running:.0f}s", "dim")
