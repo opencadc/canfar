@@ -63,9 +63,11 @@ stderr/file routing; do not enable debug logging if response bodies must
 remain private.
 
 The storage libraries behind `canfar data`, `vosfs` and `fsspec-cli`, follow
-the same level and sinks. Their current releases log no transfer progress, so
-`canfar -v data cp` prints nothing on success; per-file progress is tracked
-in [shinybrar/vosfs#346](https://github.com/shinybrar/vosfs/issues/346).
+the same level and sinks. Use `canfar -v data cp` to log completed file
+operations to stderr and, when configured, your log file. Recursive copies
+also report verified skips and a final verification record. A remote copy
+can emit records from both libraries. Use `-vv` for storage endpoint,
+content-identity, and staging details.
 
 <span id="rotating-json-lines-file-sink"></span>
 <span id="json-lines-schema"></span>
