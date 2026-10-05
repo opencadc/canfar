@@ -1540,21 +1540,21 @@ here whenever it moves.</p>
 <tbody>
 <tr>
 <td><code>vosfs</code></td>
-<td><code>v0.10.0</code></td>
-<td><code>git+https://github.com/shinybrar/vosfs@v0.10.0</code></td>
+<td><code>v0.11.0</code></td>
+<td><code>git+https://github.com/shinybrar/vosfs@v0.11.0</code></td>
 </tr>
 <tr>
 <td><code>fsspec-cli</code></td>
-<td><code>fsspec-cli-v0.9.0</code></td>
+<td><code>fsspec-cli-v0.10.0</code></td>
 <td>same repository, <code>subdirectory=src/fsspec-cli</code></td>
 </tr>
 </tbody>
 </table>
-<p>Verified on October 2, 2026. The lockfile resolves these tags to
-<code>1820a705f047138d8e572fff4b83644d4b8374e2</code> and
-<code>924ba4d69f09d4651a5511434cf0d0c3c1cd941d</code>, respectively.</p>
+<p>Verified on October 4, 2026. The lockfile resolves these tags to
+<code>d7e2cbc5a5d121a2cc006796884452ad5ed7539c</code> and
+<code>054cfd9e1cd68081d23578595a9c5c16f70dee60</code>, respectively.</p>
 <p>CANFAR imports <code>httpx2</code> and requires Authlib 1.8.0 or later, whose existing
-<code>authlib.integrations.httpx_client</code> integration uses <code>httpx2</code>. <code>vosfs</code> 0.10.0
+<code>authlib.integrations.httpx_client</code> integration uses <code>httpx2</code>. <code>vosfs</code> 0.11.0
 still declares and uses <code>httpx</code>, so the original package remains a transitive
 dependency in <code>uv.lock</code>.</p>
 <h2 id="why-this-matters">Why this matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h2>
@@ -1576,9 +1576,12 @@ dependency in <code>uv.lock</code>.</p>
 <li><code>v0.8.0</code> / <code>fsspec-cli-v0.7.0</code> — server-side <code>Range</code> support.</li>
 <li><code>v0.9.0</code> / <code>fsspec-cli-v0.8.0</code> — upstream simplification of both packages.</li>
 <li><code>v0.10.0</code> / <code>fsspec-cli-v0.9.0</code> — verified recursive-copy resumption and
-  restored shell listings (current). Recursive copies skip a destination file
+  restored shell listings. Recursive copies skip a destination file
   only after matching content checksums or comparing staged bytes; size alone
   is insufficient. See <a href="../../cli/data/">Data commands</a>.</li>
+<li><code>v0.11.0</code> / <code>fsspec-cli-v0.10.0</code> — per-file transfer logging and fewer
+  requests for tree and bulk operations (current). See
+  <a href="../../cli/logging/">Logging</a>.</li>
 </ul>
 
 
@@ -1602,7 +1605,7 @@ dependency in <code>uv.lock</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 5, 2026 00:05:06 UTC">October 5, 2026</span>
   </span>
 
     

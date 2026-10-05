@@ -8,15 +8,15 @@ here whenever it moves.
 
 | Distribution | Pin | Source |
 | --- | --- | --- |
-| `vosfs` | `v0.10.0` | `git+https://github.com/shinybrar/vosfs@v0.10.0` |
-| `fsspec-cli` | `fsspec-cli-v0.9.0` | same repository, `subdirectory=src/fsspec-cli` |
+| `vosfs` | `v0.11.0` | `git+https://github.com/shinybrar/vosfs@v0.11.0` |
+| `fsspec-cli` | `fsspec-cli-v0.10.0` | same repository, `subdirectory=src/fsspec-cli` |
 
-Verified on October 2, 2026. The lockfile resolves these tags to
-`1820a705f047138d8e572fff4b83644d4b8374e2` and
-`924ba4d69f09d4651a5511434cf0d0c3c1cd941d`, respectively.
+Verified on October 4, 2026. The lockfile resolves these tags to
+`d7e2cbc5a5d121a2cc006796884452ad5ed7539c` and
+`054cfd9e1cd68081d23578595a9c5c16f70dee60`, respectively.
 
 CANFAR imports `httpx2` and requires Authlib 1.8.0 or later, whose existing
-`authlib.integrations.httpx_client` integration uses `httpx2`. `vosfs` 0.10.0
+`authlib.integrations.httpx_client` integration uses `httpx2`. `vosfs` 0.11.0
 still declares and uses `httpx`, so the original package remains a transitive
 dependency in `uv.lock`.
 
@@ -39,6 +39,9 @@ dependency in `uv.lock`.
 - `v0.8.0` / `fsspec-cli-v0.7.0` — server-side `Range` support.
 - `v0.9.0` / `fsspec-cli-v0.8.0` — upstream simplification of both packages.
 - `v0.10.0` / `fsspec-cli-v0.9.0` — verified recursive-copy resumption and
-  restored shell listings (current). Recursive copies skip a destination file
+  restored shell listings. Recursive copies skip a destination file
   only after matching content checksums or comparing staged bytes; size alone
   is insufficient. See [Data commands](../cli/data.md).
+- `v0.11.0` / `fsspec-cli-v0.10.0` — per-file transfer logging and fewer
+  requests for tree and bulk operations (current). See
+  [Logging](../cli/logging.md).
