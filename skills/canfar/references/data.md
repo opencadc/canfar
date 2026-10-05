@@ -48,6 +48,10 @@ appended to it. Rerun the same command to resume: recursive copy skips only
 files whose contents match and replaces files whose contents differ. See
 [Data commands](https://www.opencadc.org/canfar/edge/cli/data/).
 
+Use `canfar -v data cp` to report completed transfers and verified recursive
+copy skips on stderr. Add `--log-file PATH` before `data` to save the same
+records; see [Logging](https://www.opencadc.org/canfar/edge/cli/logging/).
+
 ## Python
 
 ```python

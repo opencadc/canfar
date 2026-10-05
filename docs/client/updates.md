@@ -167,9 +167,12 @@ or later for compatible OpenID Connect clients. If your code handles HTTP
 exceptions or supplies test transports, use the corresponding `httpx2` types;
 see the [upgrade guide](migration.md#update-http-client-imports).
 
-The storage dependencies are pinned to `vosfs` 0.10.0 and `fsspec-cli` 0.9.0.
+The storage dependencies are pinned to `vosfs` 0.11.0 and `fsspec-cli` 0.10.0.
 Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See [Data commands](../cli/data.md).
+These releases reduce requests during tree and bulk operations and report
+per-file transfers when you use `canfar -v data cp`; see
+[Logging](../cli/logging.md).
 The runtime, development, and documentation dependency requirements and
 lockfile have also been refreshed. Python 3.10 remains supported.
 
@@ -187,7 +190,7 @@ dependency update builds on them:
 
 | Area | Main after v1.4.1 | This dependency update |
 | --- | --- | --- |
-| Storage | `canfar data`, explicit `identifiers()` / `filesystem()`, and caching guidance | `vosfs` 0.10.0 and `fsspec-cli` 0.9.0, including verified recursive-copy resumption |
+| Storage | `canfar data`, explicit `identifiers()` / `filesystem()`, and caching guidance | `vosfs` 0.11.0 and `fsspec-cli` 0.10.0, including verified recursive-copy resumption and transfer logging |
 | Authentication | Native Python OIDC login, certificate reuse, and explicit credential/server selection | Authlib 1.8.0 or later for `httpx2` compatibility |
 | HTTP transport | Native synchronous and asynchronous HTTP clients | `httpx2` clients, exceptions, and test transports |
 
