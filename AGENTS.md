@@ -37,6 +37,8 @@ Pytest creates an empty temporary home by default, so a certificate in your norm
 
 Tests constructing `Configuration` must isolate `CONFIG_PATH`, even when using `model_validate`: settings sources can merge a populated configuration into explicit input. Report deterministic results separately from live service failures; a docs build or local test pass does not establish live workflow success.
 
+Agent shells may set `NO_COLOR=1`, `FORCE_COLOR=0`, and `TERM=dumb`, which fail CLI colour-output tests; clear them before treating those failures as a baseline.
+
 ## Agent skills
 
 ### Published skill
@@ -57,7 +59,7 @@ Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant e
 
 ## Working Preferences
 
-- Use normal concise prose; use caveman style only when explicitly requested.
+- Use normal concise prose; use caveman style only when explicitly requested. Keep PR descriptions and issues direct (root cause, fix, verification) and docs concise, without long narratives.
 - During design grilling, ask one question at a time and converge decisions incrementally. Reuse established tracker and domain choices when rerunning setup.
 - During refactors, preserve existing tests and API/CLI output behavior unless a change is explicitly approved.
 - Use domain Pydantic models under `canfar/models/` directly; do not introduce a separate DTO/request-model layer. Use those models for structured output where applicable.
@@ -82,6 +84,7 @@ Single-context layout: root `CONTEXT.md` is the domain glossary. Read relevant e
 - Observability uses stdlib `logging`, Rich stderr, and an optional rotating JSON Lines file via `--log-file`. There is no Logfire or `canfar/utils/telemetry.py` layer. SecretStr masking does not make arbitrary debug response bodies safe to share. `-v` is INFO (one redacted line per Science Platform HTTP response) and `-vv` or more is DEBUG; the `vosfs` and `fsspec_cli` loggers follow the same level and sinks.
 - `canfar data` is a thin POSIX-shaped CLI over configured Storage Identifiers, plus reserved `local`; every operand is `IDENTIFIER:/PATH` (no bare local paths). Each subcommand's help ends with that syntax and the configured identifiers, and a usage error after a bare local path adds a `local:/PATH` hint. Python storage access is `canfar.storage.identifiers()` / `filesystem(identifier)`; do not recreate VOSpace functionality in CANFAR or expose dynamic identifier imports.
 - Remote storage uses its owning server's IDP independently of the active compute selection. Default `arc` and `vault` require CADC credentials even when compute uses SRCNet. Recursive removal and cross-source `mv` are unsupported; copy and verify before separately scoped removal.
+- `cryptography` 49+ publishes no Intel (x86_64) macOS wheels. Docs recommend only `uv tool install canfar --no-build-package cryptography` for Intel Macs (resolves 48.0.1; the receipt keeps the option for `uv tool upgrade`); `uv run pip` fails on uv-managed Python with `externally-managed-environment`. `authlib>=1.8.0` is a hard floor: older releases raise `httpx` rather than `httpx2` errors, escaping canfar's OIDC error handling.
 
 ## Documentation and Presentations
 
