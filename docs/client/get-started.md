@@ -30,69 +30,44 @@ uv add canfar
 
 ### Install on an Intel Mac
 
-The `cryptography` library, which canfar uses for certificates, stopped
-publishing prebuilt Intel macOS packages (wheels) in version 49.0.0. On an
-Intel Mac, a plain install therefore tries to compile `cryptography` and fails
-with `Failed to build cryptography`. Tell the installer to use wheels only. It
-then installs `cryptography` 48.0.1, the last release with Intel macOS wheels.
-You do not need Homebrew, Rust, or a compiler. On Apple Silicon, Linux, and
-Windows the same option changes nothing: they still get the latest
-`cryptography`.
+`cryptography` 49.0.0 and later publish no Intel macOS wheels, so a plain
+install on an Intel Mac tries to compile it and fails with
+`Failed to build cryptography`. Install from wheels only. You then get
+`cryptography` 48.0.1, the last Intel release, without Homebrew or a compiler.
+Other platforms still get the latest release.
 
-!!! warning "Older cryptography release"
+!!! warning "cryptography 48.0.1 has known vulnerabilities"
 
-    `cryptography` 48.0.1 has published security advisories
-    ([GHSA-g6cj-pr64-35w5](https://github.com/advisories/GHSA-g6cj-pr64-35w5),
-    [GHSA-jwv3-5hgf-82ww](https://github.com/advisories/GHSA-jwv3-5hgf-82ww),
-    [GHSA-m2h6-j472-rp4c](https://github.com/advisories/GHSA-m2h6-j472-rp4c)).
-    canfar does not use the affected features, PKCS#7 decryption and X.509
-    certificate-path verification, but other packages might. Install canfar in
-    its own environment, as below, so that nothing else depends on this release.
+    | Advisory | Severity | Fixed in |
+    | --- | --- | --- |
+    | [GHSA-g6cj-pr64-35w5](https://github.com/advisories/GHSA-g6cj-pr64-35w5): PKCS#7 decryption oracle | High | 50.0.0 |
+    | [GHSA-jwv3-5hgf-82ww](https://github.com/advisories/GHSA-jwv3-5hgf-82ww): X.509 path-building denial of service | High | 49.0.0 |
+    | [GHSA-m2h6-j472-rp4c](https://github.com/advisories/GHSA-m2h6-j472-rp4c): X.509 name-constraint bypass | Moderate | 49.0.0 |
 
-First, check the processor:
+    canfar uses neither PKCS#7 nor X.509 path verification, but other packages
+    in the same environment might. Keep canfar in its own environment.
 
-```bash
-sysctl -n machdep.cpu.brand_string
-```
-
-If this prints `Apple M…`, your Mac is Apple Silicon and your Python is an
-Intel build running under Rosetta. Use a native Python instead, which gets
-current `cryptography` releases, and skip the rest of this section:
-
-```bash
-uv tool install canfar --python cpython-3.13-macos-aarch64
-```
-
-On an Intel processor, install canfar with wheels only:
-
-=== "uv tool (recommended)"
+=== "uv pip"
 
     ```bash
-    uv tool install canfar --no-build-package cryptography
-    ```
-
-    Pass the same option when you upgrade:
-
-    ```bash
-    uv tool upgrade canfar --no-build-package cryptography
+    uv pip install --upgrade canfar --only-binary cryptography
     ```
 
 === "pip"
 
     ```bash
-    python3 -m venv ~/.venvs/canfar
-    source ~/.venvs/canfar/bin/activate
-    python -m pip install --upgrade pip
-    python -m pip install --upgrade --only-binary cryptography canfar
+    python -m pip install --upgrade canfar --only-binary cryptography
     ```
 
-    Pass `--only-binary cryptography` on every upgrade. Without it, the next
-    upgrade tries to compile `cryptography` again.
+=== "uv tool"
+
+    ```bash
+    uv tool install canfar --no-build-package cryptography
+    ```
 
 === "uv project"
 
-    In a project managed with `uv add`, cap `cryptography` for Intel Macs only
-    in your project's `pyproject.toml`:
+    Add to your `pyproject.toml`, then run `uv add canfar`:
 
     ```toml
     [tool.uv]
@@ -101,12 +76,17 @@ On an Intel processor, install canfar with wheels only:
     ]
     ```
 
-    Then run `uv add canfar`. The lockfile records 48.0.1 for Intel Macs and
-    the latest release for every other platform.
+Repeat the option on every upgrade. To keep using a plain
+`uv pip install --upgrade canfar`, add this to `~/.config/uv/uv.toml` once:
 
-Confirm the install with `canfar version`. If it reports that the canfar
-configuration file has changed, follow
-[Recover a legacy configuration](migration.md#configuration).
+```toml
+[pip]
+only-binary = ["cryptography"]
+```
+
+If `sysctl -n machdep.cpu.brand_string` prints `Apple M…`, your Mac is Apple
+Silicon running an Intel Python under Rosetta. Use a native Python instead; it
+gets current releases.
 
 ### Try this development branch
 
