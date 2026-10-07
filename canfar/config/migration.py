@@ -13,37 +13,25 @@ if TYPE_CHECKING:
 
 
 class ConfigResetRequiredError(Exception):
-    """Raised when an existing configuration must be manually reset.
+    """Raised when this client cannot read an existing configuration file.
 
     Attributes:
         code: Stable dotted error code for automation.
         message: Human-readable error summary.
-        hint: Optional remediation guidance.
+        hint: Command that moves the file aside, then the next step.
     """
 
-    def __init__(self, code: str, message: str, hint: str | None = None) -> None:
-        super().__init__(message)
-        self.code = code
-        self.message = message
-        self.hint = hint
-
-
-def reset_required(config_path: Path) -> ConfigResetRequiredError:
-    """Build the error that asks the user to move an unreadable config file aside.
-
-    Args:
-        config_path: Path to the YAML configuration file.
-
-    Returns:
-        Error naming the file and the command that backs it up.
-    """
-    backup = config_path.with_suffix(".bak")
-    return ConfigResetRequiredError(
-        ErrorCode.CONFIG_INVALID.value,
-        f"canfar configuration file has changed: {config_path} "
-        "cannot be read by this version.",
-        hint=f"Run `mv -i {config_path} {backup}`, then `canfar login` and try again.",
-    )
+    def __init__(self, config_path: Path) -> None:
+        self.code = ErrorCode.CONFIG_INVALID.value
+        self.message = (
+            f"canfar configuration file has changed: {config_path} "
+            "cannot be read by this version."
+        )
+        self.hint = (
+            f"Run `mv -i {config_path} {config_path.with_suffix('.bak')}`, "
+            "then `canfar login` and try again."
+        )
+        super().__init__(self.message)
 
 
 _RETIRED_SERVER_FIELDS = ("cores", "ram", "gpus", "status")
@@ -86,7 +74,7 @@ def ensure_current_config(config_path: Path) -> None:
         with config_path.open(encoding="utf-8") as handle:
             data = yaml.safe_load(handle) or {}
     except yaml.YAMLError as err:
-        raise reset_required(config_path) from err
+        raise ConfigResetRequiredError(config_path) from err
 
     if not isinstance(data, dict) or data.get("version") not in (1, "1"):
-        raise reset_required(config_path)
+        raise ConfigResetRequiredError(config_path)

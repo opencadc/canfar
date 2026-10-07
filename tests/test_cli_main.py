@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 from unittest.mock import patch
 
@@ -24,7 +25,6 @@ from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
-    from pathlib import Path
 
 runner = CliRunner()
 
@@ -213,8 +213,8 @@ def test_ps_machine_output_without_login_reports_authentication_required(
         (AuthExpiredError("cadc", "certificate expired"), "canfar login cadc"),
         (AuthenticationError("Failed to refresh OIDC token"), "Retry the command"),
         (
-            ConfigResetRequiredError("config.reset_required", "reset needed"),
-            "reset needed",
+            ConfigResetRequiredError(Path("/home/me/.canfar/config.yaml")),
+            "configuration file has changed",
         ),
     ],
 )

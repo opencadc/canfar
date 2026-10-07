@@ -15,9 +15,8 @@ from typer.main import get_group
 
 import canfar.models.config as config_model
 from canfar.cli import output
-from canfar.config.migration import ConfigResetRequiredError, reset_required
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.models.config import Configuration
 from canfar.utils.console import activate_cli_root, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
@@ -349,10 +348,10 @@ def main() -> None:
         config_path = config_model.CONFIG_PATH
         if (
             isinstance(err, ValidationError)
-            and err.title == Configuration.model_config.get("title")
+            and err.title == config_model.Configuration.model_config["title"]
             and config_path.exists()
         ):
-            err = reset_required(config_path)
+            err = ConfigResetRequiredError(config_path)
         boundary = (
             AuthExpiredError,
             AuthContextError,

@@ -30,7 +30,7 @@ def get_console(*, stderr: bool = False) -> Console:
     try:
         width = Configuration().console.width  # ty: ignore[missing-argument]
     except (ConfigResetRequiredError, ValueError):
-        # An unreadable config file must not stop errors about it from printing.
+        # The error for an unreadable config file prints through this console.
         width = None
     return Console(width=width, stderr=stderr)
 
