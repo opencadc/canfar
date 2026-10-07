@@ -32,9 +32,22 @@ uv add canfar
 
 `cryptography` 49.0.0 and later publish no Intel macOS wheels, so a plain
 install on an Intel Mac tries to compile it and fails with
-`Failed to build cryptography`. Install from wheels only. You then get
-`cryptography` 48.0.1, the last Intel release, without Homebrew or a compiler.
-Other platforms still get the latest release.
+`Failed to build cryptography`. Install canfar as a [uv](https://docs.astral.sh/uv/)
+tool from wheels only. You get `cryptography` 48.0.1, the last Intel release,
+in an environment of its own, without Homebrew or a compiler:
+
+```bash
+uv tool install canfar --no-build-package cryptography
+```
+
+uv remembers the option, so later upgrades need no extra flags:
+
+```bash
+uv tool upgrade canfar
+```
+
+Do not run `uv run pip install …`: uv-managed Python rejects it with
+`error: externally-managed-environment`.
 
 !!! warning "cryptography 48.0.1 has known vulnerabilities"
 
@@ -44,45 +57,8 @@ Other platforms still get the latest release.
     | [GHSA-jwv3-5hgf-82ww](https://github.com/advisories/GHSA-jwv3-5hgf-82ww): X.509 path-building denial of service | High | 49.0.0 |
     | [GHSA-m2h6-j472-rp4c](https://github.com/advisories/GHSA-m2h6-j472-rp4c): X.509 name-constraint bypass | Moderate | 49.0.0 |
 
-    canfar uses neither PKCS#7 nor X.509 path verification, but other packages
-    in the same environment might. Keep canfar in its own environment.
-
-=== "uv pip"
-
-    ```bash
-    uv pip install --upgrade canfar --only-binary cryptography
-    ```
-
-=== "pip"
-
-    ```bash
-    python -m pip install --upgrade canfar --only-binary cryptography
-    ```
-
-=== "uv tool"
-
-    ```bash
-    uv tool install canfar --no-build-package cryptography
-    ```
-
-=== "uv project"
-
-    Add to your `pyproject.toml`, then run `uv add canfar`:
-
-    ```toml
-    [tool.uv]
-    constraint-dependencies = [
-        "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",
-    ]
-    ```
-
-Repeat the option on every upgrade. To keep using a plain
-`uv pip install --upgrade canfar`, add this to `~/.config/uv/uv.toml` once:
-
-```toml
-[pip]
-only-binary = ["cryptography"]
-```
+    canfar uses neither PKCS#7 nor X.509 path verification, and no unrelated
+    packages share the tool environment.
 
 If `sysctl -n machdep.cpu.brand_string` prints `Apple M…`, your Mac is Apple
 Silicon running an Intel Python under Rosetta. Use a native Python instead; it
