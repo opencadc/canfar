@@ -48,9 +48,9 @@ classifiers = [
 dependencies = [
     "authlib>=1.8.0",
     "defusedxml>=0.7.1",
-    "httpx2[http2]>=2.13.1",
+    "httpx2[http2]>=2.0.0",
     "humanize>=4.16.0",
-    "pydantic>=2.13.5",
+    "pydantic>=2.7.0",
     "pydantic-settings>=2.15.0",
     "pyyaml>=6.0.3",
     "rich>=15.0.0",
@@ -58,7 +58,8 @@ dependencies = [
     "typer>=0.27.2",
     "vosfs @ git+https://github.com/shinybrar/vosfs@v0.11.0",
     "fsspec-cli @ git+https://github.com/shinybrar/vosfs@fsspec-cli-v0.10.0#subdirectory=src/fsspec-cli",
-    "cryptography>=50.0.2",
+    "cryptography>=45.0.1",
+    "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",
 ]
 
 [dependency-groups]
