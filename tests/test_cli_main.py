@@ -213,8 +213,8 @@ def test_ps_machine_output_without_login_reports_authentication_required(
         (AuthExpiredError("cadc", "certificate expired"), "canfar login cadc"),
         (AuthenticationError("Failed to refresh OIDC token"), "Retry the command"),
         (
-            ConfigResetRequiredError(Path("/home/me/.canfar/config.yaml")),
-            "configuration file has changed",
+            ConfigResetRequiredError(Path("/home/me/.canfar/config.yaml"), []),
+            "CANFAR config error",
         ),
     ],
 )
@@ -250,21 +250,25 @@ def unreadable_config(
 
 
 @pytest.mark.parametrize(
-    "content",
+    ("content", "problem"),
     [
-        "version: 1\nfuture_key: true\n",
-        "version: 99\n",
-        "version: [1\n",
+        (
+            "version: 1\nfuture_key: true\n",
+            "future_key = True (Extra inputs are not permitted)",
+        ),
+        ("version: 99\n", "version = 99 (expected 1)"),
+        ("version: [1\n", "invalid YAML: while parsing a flow sequence"),
     ],
     ids=["unknown-field", "unsupported-version", "malformed-yaml"],
 )
 def test_main_reports_unreadable_config_without_traceback(
     content: str,
+    problem: str,
     unreadable_config: Path,
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """A config file this client cannot read ends with move-aside instructions."""
+    """A config file this client cannot read names the problem and the reset."""
     unreadable_config.write_text(content, encoding="utf-8")
     monkeypatch.setattr(sys, "argv", ["canfar", "version"])
 
@@ -274,12 +278,32 @@ def test_main_reports_unreadable_config_without_traceback(
     assert stopped.value.code == 1
     captured = capsys.readouterr()
     assert captured.out == ""
-    assert "configuration file has changed" in captured.err
-    backup = unreadable_config.with_suffix(".bak")
-    assert f"mv -i {unreadable_config} {backup}" in captured.err
+    assert "CANFAR config error:" in captured.err
+    assert problem in captured.err
+    assert f"`rm {unreadable_config}`" in captured.err
     assert "canfar login" in captured.err
     assert "Traceback" not in captured.err
     assert "ValidationError" not in captured.err
+
+
+def test_main_hides_credential_values_in_config_errors(
+    unreadable_config: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Invalid fields in credential sections print their key, never their value."""
+    unreadable_config.write_text(
+        "version: 1\nregistry:\n  username: me\n  secret: [hunter2]\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(sys, "argv", ["canfar", "version"])
+
+    with pytest.raises(SystemExit):
+        main()
+
+    err = capsys.readouterr().err
+    assert "registry.secret = <hidden>" in err
+    assert "hunter2" not in err
 
 
 def test_main_reports_unreadable_config_as_structured_error(
@@ -287,7 +311,7 @@ def test_main_reports_unreadable_config_as_structured_error(
     monkeypatch: pytest.MonkeyPatch,
     capsys: pytest.CaptureFixture[str],
 ) -> None:
-    """Machine output keeps stdout empty and names the move-aside command."""
+    """Machine output keeps stdout empty and names the reset command."""
     unreadable_config.write_text("version: 1\nfuture_key: true\n", encoding="utf-8")
     monkeypatch.setattr(sys, "argv", ["canfar", "ps", "-o", "json"])
 
@@ -299,7 +323,8 @@ def test_main_reports_unreadable_config_as_structured_error(
     assert captured.out == ""
     error = json.loads(captured.err)
     assert error["code"] == "config.invalid"
-    assert f"mv -i {unreadable_config}" in error["hint"]
+    assert "future_key = True" in error["message"]
+    assert f"rm {unreadable_config}" in error["hint"]
 
 
 def test_main_keeps_machine_errors_structured(

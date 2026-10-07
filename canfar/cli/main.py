@@ -351,7 +351,7 @@ def main() -> None:
             and err.title == config_model.Configuration.model_config["title"]
             and config_path.exists()
         ):
-            err = ConfigResetRequiredError(config_path)
+            err = ConfigResetRequiredError.from_validation(config_path, err)
         boundary = (
             AuthExpiredError,
             AuthContextError,
