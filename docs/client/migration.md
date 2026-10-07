@@ -224,7 +224,7 @@ The default configuration path changed from `~/.skaha/config.yaml` to
 `active`. Unsupported formats are rejected; the client does not automatically
 back up or rewrite them. Running login again cannot bypass an unreadable file.
 
-If the error says a configuration reset is needed:
+If the error says the canfar configuration file has changed:
 
 1. Note the exact configuration file path in the error. Preserve that file;
    it may contain registry settings or server details you need later.
@@ -232,7 +232,7 @@ If the error says a configuration reset is needed:
    following example asks before overwriting an existing backup:
 
     ```bash
-    mv -i ~/.canfar/config.yaml ~/.canfar/config.yaml.before-upgrade
+    mv -i ~/.canfar/config.yaml ~/.canfar/config.bak
     ```
 
     If that backup already exists, choose another name. Do not delete the

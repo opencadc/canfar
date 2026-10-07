@@ -28,6 +28,86 @@ With `uv`:
 uv add canfar
 ```
 
+### Install on an Intel Mac
+
+The `cryptography` library, which canfar uses for certificates, stopped
+publishing prebuilt Intel macOS packages (wheels) in version 49.0.0. On an
+Intel Mac, a plain install therefore tries to compile `cryptography` and fails
+with `Failed to build cryptography`. Tell the installer to use wheels only. It
+then installs `cryptography` 48.0.1, the last release with Intel macOS wheels.
+You do not need Homebrew, Rust, or a compiler. On Apple Silicon, Linux, and
+Windows the same option changes nothing: they still get the latest
+`cryptography`.
+
+!!! warning "Older cryptography release"
+
+    `cryptography` 48.0.1 has published security advisories
+    ([GHSA-g6cj-pr64-35w5](https://github.com/advisories/GHSA-g6cj-pr64-35w5),
+    [GHSA-jwv3-5hgf-82ww](https://github.com/advisories/GHSA-jwv3-5hgf-82ww),
+    [GHSA-m2h6-j472-rp4c](https://github.com/advisories/GHSA-m2h6-j472-rp4c)).
+    canfar does not use the affected features, PKCS#7 decryption and X.509
+    certificate-path verification, but other packages might. Install canfar in
+    its own environment, as below, so that nothing else depends on this release.
+
+First, check the processor:
+
+```bash
+sysctl -n machdep.cpu.brand_string
+```
+
+If this prints `Apple M…`, your Mac is Apple Silicon and your Python is an
+Intel build running under Rosetta. Use a native Python instead, which gets
+current `cryptography` releases, and skip the rest of this section:
+
+```bash
+uv tool install canfar --python cpython-3.13-macos-aarch64
+```
+
+On an Intel processor, install canfar with wheels only:
+
+=== "uv tool (recommended)"
+
+    ```bash
+    uv tool install canfar --no-build-package cryptography
+    ```
+
+    Pass the same option when you upgrade:
+
+    ```bash
+    uv tool upgrade canfar --no-build-package cryptography
+    ```
+
+=== "pip"
+
+    ```bash
+    python3 -m venv ~/.venvs/canfar
+    source ~/.venvs/canfar/bin/activate
+    python -m pip install --upgrade pip
+    python -m pip install --upgrade --only-binary cryptography canfar
+    ```
+
+    Pass `--only-binary cryptography` on every upgrade. Without it, the next
+    upgrade tries to compile `cryptography` again.
+
+=== "uv project"
+
+    In a project managed with `uv add`, cap `cryptography` for Intel Macs only
+    in your project's `pyproject.toml`:
+
+    ```toml
+    [tool.uv]
+    constraint-dependencies = [
+        "cryptography<49; sys_platform == 'darwin' and platform_machine == 'x86_64'",
+    ]
+    ```
+
+    Then run `uv add canfar`. The lockfile records 48.0.1 for Intel Macs and
+    the latest release for every other platform.
+
+Confirm the install with `canfar version`. If it reports that the canfar
+configuration file has changed, follow
+[Recover a legacy configuration](migration.md#configuration).
+
 ### Try this development branch
 
 To test the development examples on `main`, use a separate checkout and Python
