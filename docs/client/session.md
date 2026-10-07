@@ -11,7 +11,7 @@ The current interface has these return shapes. Check the
 
 | Method | Result |
 | --- | --- |
-| `fetch(kind=None, status=None, view=None)` | `list[dict[str, str]]` |
+| `fetch(kind=None, status=None)` | `list[dict[str, str]]` |
 | `create(...)` | `list[str]` containing the accepted Session IDs |
 | `info(ids)` | `list[dict[str, Any]]` |
 | `logs(ids, verbose=False)` | `dict[str, str]`, or `None` when `verbose=True` |
@@ -23,9 +23,7 @@ The current interface has these return shapes. Check the
 the failure without raising. If all requested launches fail, it returns `[]`.
 Validation errors in the request are raised before the HTTP call.
 
-`fetch(view="all")` requests the server's all-Sessions view when the caller is
-authorized; the response remains a list of dictionaries. `stats()` returns the
-Science Platform Server's aggregate resource statistics as a dictionary.
+`stats()` returns the Science Platform Server's aggregate resource statistics as a dictionary.
 
 `logs(..., verbose=True)` and `events(..., verbose=True)` route their results to
 the `canfar.sessions` logger and return `None`; configure application logging

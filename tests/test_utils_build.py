@@ -16,11 +16,6 @@ class TestFetchParameters:
         result = fetch_parameters(kind="headless")
         assert result == {"type": "headless"}  # kind becomes type due to alias
 
-    def test_fetch_parameters_with_all(self) -> None:
-        """Test fetch_parameters with all parameters."""
-        result = fetch_parameters(kind="notebook", status="Running", view="all")
-        assert result == {"type": "notebook", "status": "Running", "view": "all"}
-
 
 class TestCreateParameters:
     """Test the create_parameters function."""
