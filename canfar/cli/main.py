@@ -9,12 +9,15 @@ from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at
 from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
+from pydantic import ValidationError
 from typer.core import TyperCommand, TyperGroup
 from typer.main import get_group
 
+import canfar.models.config as config_model
 from canfar.cli import output
-from canfar.config.migration import ConfigResetRequiredError
+from canfar.config.migration import ConfigResetRequiredError, reset_required
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.models.config import Configuration
 from canfar.utils.console import activate_cli_root, get_console
 from canfar.utils.logging import (
     InvalidLogFilePathError,
@@ -343,6 +346,13 @@ def main() -> None:
         # The HTTP authentication hook is imported only by commands that use it.
         from canfar.hooks.httpx.auth import AuthenticationError  # noqa: PLC0415
 
+        config_path = config_model.CONFIG_PATH
+        if (
+            isinstance(err, ValidationError)
+            and err.title == Configuration.model_config.get("title")
+            and config_path.exists()
+        ):
+            err = reset_required(config_path)
         boundary = (
             AuthExpiredError,
             AuthContextError,

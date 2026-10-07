@@ -20,8 +20,10 @@ from canfar.exceptions.context import (
     AuthRequiredError,
 )
 from canfar.hooks.httpx.auth import AuthenticationError
+from canfar.utils.console import get_console
 
 if TYPE_CHECKING:
+    from collections.abc import Iterator
     from pathlib import Path
 
 runner = CliRunner()
@@ -232,6 +234,72 @@ def test_main_exits_nonzero_for_boundary_errors(
     captured = capsys.readouterr()
     assert expected in captured.err
     assert captured.out == ""
+
+
+@pytest.fixture
+def unreadable_config(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[Path]:
+    """Point the client at a config file and build consoles without cached state."""
+    config_path = tmp_path / "config.yaml"
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", config_path)
+    monkeypatch.setenv("COLUMNS", "500")
+    get_console.cache_clear()
+    yield config_path
+    get_console.cache_clear()
+
+
+@pytest.mark.parametrize(
+    "content",
+    [
+        "version: 1\nfuture_key: true\n",
+        "version: 99\n",
+        "version: [1\n",
+    ],
+    ids=["unknown-field", "unsupported-version", "malformed-yaml"],
+)
+def test_main_reports_unreadable_config_without_traceback(
+    content: str,
+    unreadable_config: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """A config file this client cannot read ends with move-aside instructions."""
+    unreadable_config.write_text(content, encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["canfar", "version"])
+
+    with pytest.raises(SystemExit) as stopped:
+        main()
+
+    assert stopped.value.code == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert "configuration file has changed" in captured.err
+    backup = unreadable_config.with_suffix(".bak")
+    assert f"mv -i {unreadable_config} {backup}" in captured.err
+    assert "canfar login" in captured.err
+    assert "Traceback" not in captured.err
+    assert "ValidationError" not in captured.err
+
+
+def test_main_reports_unreadable_config_as_structured_error(
+    unreadable_config: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Machine output keeps stdout empty and names the move-aside command."""
+    unreadable_config.write_text("version: 1\nfuture_key: true\n", encoding="utf-8")
+    monkeypatch.setattr(sys, "argv", ["canfar", "ps", "-o", "json"])
+
+    with pytest.raises(SystemExit) as stopped:
+        main()
+
+    assert stopped.value.code == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    error = json.loads(captured.err)
+    assert error["code"] == "config.invalid"
+    assert f"mv -i {unreadable_config}" in error["hint"]
 
 
 def test_main_keeps_machine_errors_structured(

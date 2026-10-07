@@ -418,8 +418,12 @@ class TestConfigManualReset:
 
         assert exc_info.value.code == "config.invalid"
         assert str(exc_info.value) == (
-            "CANFAR configuration reset needed. "
-            f"Run `rm -rf {config_path}` and perform a new login"
+            f"canfar configuration file has changed: {config_path} "
+            "cannot be read by this version."
+        )
+        assert exc_info.value.hint == (
+            f"Run `mv -i {config_path} {config_path.with_suffix('.bak')}`, "
+            "then `canfar login` and try again."
         )
         assert config_path.read_text(encoding="utf-8") == original
         assert list(tmp_path.glob("*.back*")) == []

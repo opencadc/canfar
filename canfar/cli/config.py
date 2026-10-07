@@ -21,17 +21,15 @@ config: typer.Typer = typer.Typer()
 
 def _configuration_failure(error: Exception) -> StructuredError:
     """Convert an expected persisted-configuration failure."""
+    hint = "Check the configuration file and retry."
     if isinstance(error, ConfigResetRequiredError):
         code = error.code
         message = error.message
+        hint = error.hint or hint
     else:
         code = ErrorCode.CONFIG_INVALID
         message = f"Configuration could not be loaded: {error}"
-    return StructuredError(
-        code=code,
-        message=message,
-        hint="Check the configuration file and retry.",
-    )
+    return StructuredError(code=code, message=message, hint=hint)
 
 
 @config.command("show", help="Display client configuration")
