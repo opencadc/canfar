@@ -72,11 +72,14 @@ does not advertise, and a Server that never reported limits has
 
 ## Identity in Python
 
-`canfar.login()` and `canfar.alogin()` save credentials and discovered Servers
-and leave the active identity and Server as they were. Select them with
-`canfar.authentication.use` and `canfar.server.use`, or use CLI login, which
-does the whole flow. Python CADC login expects an existing certificate, and
-Python OIDC login prints the verification URL for the user to open.
+`canfar.login()` and `canfar.alogin()` return `True` when that Identity
+Provider has a saved Authentication Record. They leave the active identity and
+Server as they were. Select them with `canfar.authentication.use` and
+`canfar.server.use`, or use CLI login, which does the whole flow. A reused
+record prints `Already authenticated for '<idp>'.` A new login prints
+`Authenticated for '<idp>'.` Python CADC login expects an existing certificate,
+and Python OIDC login prints the verification URL, the user-facing device code,
+and `Waiting for approval.`
 
 Inside a running event loop, such as a notebook, `await canfar.alogin(...)`
 and run the synchronous selection and discovery calls in a worker thread, as

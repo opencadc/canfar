@@ -356,7 +356,9 @@ class TestAuthenticationLogin:
         with pytest.raises(KeyError, match="Unknown IDP"):
             canfar.authentication.login("unknown")
 
-    def test_login_existing_without_force_is_noop(self, tmp_path: Path) -> None:
+    def test_login_existing_without_force_is_noop(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
         """Existing authentication is preserved when force is false."""
         config_data = {
             "version": 1,
@@ -389,16 +391,17 @@ class TestAuthenticationLogin:
             patch("canfar.authentication._authenticate") as mock_auth,
             patch("canfar.authentication.server_service.discover") as mock_discover,
         ):
-            canfar.authentication.login("cadc")
+            assert canfar.authentication.login("cadc") is True
 
         mock_auth.assert_not_called()
         mock_discover.assert_not_called()
+        assert "Already authenticated for 'cadc'." in capsys.readouterr().out
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
         assert config.authentication["cadc"].path == Path("/existing/cert.pem")
 
     def test_login_saves_auth_and_servers_without_changing_active(
-        self, tmp_path: Path
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
         """login() persists authentication and servers but not active selection."""
         config_path = tmp_path / "config.yaml"
@@ -433,7 +436,11 @@ class TestAuthenticationLogin:
                 ),
             ),
         ):
-            canfar.authentication.login("cadc", force=True)
+            assert canfar.authentication.login("cadc", force=True) is True
+
+        output = capsys.readouterr().out
+        assert "Discovering servers for 'cadc'." in output
+        assert "Authenticated for 'cadc'." in output
 
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
@@ -491,7 +498,7 @@ class TestAuthenticationLogin:
                 return_value=[],
             ),
         ):
-            canfar.authentication.login("cadc", force=True)
+            assert canfar.authentication.login("cadc", force=True) is True
 
         with _patch_config(config_path):
             config = canfar.models.config.Configuration()
