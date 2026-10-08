@@ -21,7 +21,7 @@ from pydantic import (
 )
 from typing_extensions import Self
 
-from canfar.models.types import Kind, Status, View
+from canfar.models.types import Kind, Status
 
 
 class CreateRequest(BaseModel):
@@ -179,7 +179,6 @@ class FetchRequest(BaseModel):
         description="Status of the session.",
         examples=["Running"],
     )
-    view: View | None = Field(None, description="Number of views.", examples=["all"])
 
     model_config = ConfigDict(validate_assignment=True, populate_by_name=True)
 

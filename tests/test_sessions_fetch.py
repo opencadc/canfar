@@ -11,8 +11,8 @@ from pydantic import SecretStr, ValidationError
 from canfar.sessions import AsyncSession, Session
 
 _FETCH_PAYLOAD = [{"id": "session-1", "name": "notebook", "status": "Running"}]
-_FETCH_FILTERS = {"kind": "notebook", "status": "Running", "view": "all"}
-_FETCH_PARAMS = [("type", "notebook"), ("status", "Running"), ("view", "all")]
+_FETCH_FILTERS = {"kind": "notebook", "status": "Running"}
+_FETCH_PARAMS = [("type", "notebook"), ("status", "Running")]
 _STATS_PAYLOAD = {"cores": {"available": 4}, "ram": {"available": "8G"}}
 _BASE_URL = "https://example.test/skaha/v1/"
 
@@ -111,7 +111,7 @@ async def test_async_stats_preserves_response_shape() -> None:
     assert sent == [("view", "stats")]
 
 
-@pytest.mark.parametrize("field", ["kind", "status", "view"])
+@pytest.mark.parametrize("field", ["kind", "status"])
 def test_sync_fetch_rejects_invalid_filter(field: str) -> None:
     """Invalid Session filters fail at the synchronous public boundary."""
     with (
@@ -122,7 +122,7 @@ def test_sync_fetch_rejects_invalid_filter(field: str) -> None:
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("field", ["kind", "status", "view"])
+@pytest.mark.parametrize("field", ["kind", "status"])
 async def test_async_fetch_rejects_invalid_filter(field: str) -> None:
     """Invalid Session filters fail at the asynchronous public boundary."""
     async with AsyncSession(

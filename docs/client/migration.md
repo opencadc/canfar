@@ -159,6 +159,7 @@ pip install cadcutils
 | `canfar.errors.structured_error_to_yaml(error)` | `yaml.safe_dump(error.model_dump(mode="json"))` |
 | `canfar.utils.logging.CanfarLogger().configure(...)` | `canfar.configure_logging(...)` |
 | `canfar.auth.x509.gather(days_valid=...)` | `gather()`; CADC certificates are valid for 30 days |
+| `fetch(view="all")` | `fetch(kind=..., status=...)` lists Sessions |
 
 <span id="notes-on-protocol-stability"></span>
 
