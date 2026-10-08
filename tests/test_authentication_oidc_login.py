@@ -79,11 +79,14 @@ def test_login_runs_plain_sync_oidc_flow_and_persists_record(
         ) as authenticate_credential,
         patch("canfar.authentication.server_service.discover", return_value=[]),
     ):
-        canfar.login("srcnet")
+        assert canfar.login("srcnet") is True
 
     output = capsys.readouterr().out
     assert "https://example.com/device" in output
     assert "ABC123" in output
+    assert "Waiting for approval." in output
+    assert "Discovering servers for 'srcnet'." in output
+    assert "Authenticated for 'srcnet'." in output
     assert "secret-device-code" not in output
     authenticate_credential.assert_called_once()
     with _patch_config(config_path):
@@ -120,11 +123,14 @@ async def test_alogin_uses_native_async_flow_without_asyncio_run(
             "asyncio.run", side_effect=AssertionError("library API used asyncio.run")
         ),
     ):
-        await canfar.alogin("srcnet")
+        assert await canfar.alogin("srcnet") is True
 
     output = capsys.readouterr().out
     assert "https://example.com/device" in output
     assert "ABC123" in output
+    assert "Waiting for approval." in output
+    assert "Discovering servers for 'srcnet'." in output
+    assert "Authenticated for 'srcnet'." in output
     assert "secret-device-code" not in output
     authenticate_credential.assert_awaited_once()
     with _patch_config(config_path):

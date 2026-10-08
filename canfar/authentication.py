@@ -56,15 +56,19 @@ _OIDC_DEVICE_LOGIN_ERRORS = (
 )
 
 
-def login(idp: str, force: bool = False) -> None:
+def login(idp: str, force: bool = False) -> bool:
     """Authenticate IDP, discover servers, save records.
 
     Skips work when auth already saved and ``force`` is false. Does not change
-    active auth or server selection.
+    active auth or server selection. Prints a status line and returns ``True``
+    when ``idp`` has a saved Authentication Record.
 
     Args:
         idp: Canonical Identity Provider key.
         force: Re-authenticate and rediscover when true.
+
+    Returns:
+        True when ``idp`` has a saved Authentication Record after the call.
 
     Raises:
         KeyError: Unknown IDP key.
@@ -74,24 +78,32 @@ def login(idp: str, force: bool = False) -> None:
     config = Configuration()  # ty: ignore[missing-argument]
 
     if idp in config.authentication and not force:
-        return
+        _print_status(f"Already authenticated for '{idp}'.")
+        return True
 
     credential = _authenticate(idp_info)
     config.editor.set(f"authentication.{credential.idp}", credential)
+    _print_status(f"Discovering servers for '{idp}'.")
     server_service.discover(idp, config=config, save=False)
     config.editor.save()
+    _print_status(f"Authenticated for '{idp}'.")
+    return True
 
 
-async def alogin(idp: str, force: bool = False) -> None:
+async def alogin(idp: str, force: bool = False) -> bool:
     """Authenticate an IDP from an existing asynchronous event loop.
 
     The OIDC protocol uses native asynchronous HTTP and polling. Synchronous
     X.509 inspection and Science Platform discovery run in worker threads so
-    this API does not block the caller's event loop.
+    this API does not block the caller's event loop. Prints a status line and
+    returns ``True`` when ``idp`` has a saved Authentication Record.
 
     Args:
         idp: Canonical Identity Provider key.
         force: Re-authenticate and rediscover when true.
+
+    Returns:
+        True when ``idp`` has a saved Authentication Record after the call.
 
     Raises:
         KeyError: Unknown IDP key.
@@ -101,11 +113,13 @@ async def alogin(idp: str, force: bool = False) -> None:
     config = Configuration()  # ty: ignore[missing-argument]
 
     if idp in config.authentication and not force:
-        return
+        _print_status(f"Already authenticated for '{idp}'.")
+        return True
 
     credential = await _authenticate_async(idp_info)
     editor = config.editor
     editor.set(f"authentication.{credential.idp}", credential)
+    _print_status(f"Discovering servers for '{idp}'.")
     await asyncio.to_thread(
         server_service.discover,
         idp,
@@ -113,6 +127,8 @@ async def alogin(idp: str, force: bool = False) -> None:
         save=False,
     )
     await asyncio.to_thread(editor.save)
+    _print_status(f"Authenticated for '{idp}'.")
+    return True
 
 
 def use(idp: str) -> None:
@@ -362,6 +378,12 @@ def _authenticate_x509(idp: str) -> X509Credential:
     )
 
 
+def _print_status(message: str) -> None:
+    """Print one login status line to stdout immediately."""
+    sys.stdout.write(f"{message}\n")
+    sys.stdout.flush()
+
+
 def _print_device_challenge(challenge: DeviceAuthorization) -> None:
     """Print only user-facing device authorization data to the terminal."""
     lines = [f"Verification URL: {challenge.verification_uri}"]
@@ -370,9 +392,8 @@ def _print_device_challenge(challenge: DeviceAuthorization) -> None:
             f"Verification URL (complete): {challenge.verification_uri_complete}"
         )
     lines.append(f"Device code: {challenge.user_code.get_secret_value()}")
-    sys.stdout.write(
-        "\n".join(lines) + "\n",
-    )
+    lines.append("Waiting for approval.")
+    sys.stdout.write("\n".join(lines) + "\n")
     sys.stdout.flush()
 
 

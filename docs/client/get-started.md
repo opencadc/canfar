@@ -115,7 +115,7 @@ when prompted by your identity provider.
     ```python title="login.py"
     import canfar
 
-    canfar.login("srcnet")
+    assert canfar.login("srcnet") is True
     ```
 
 === "Async Python"
@@ -125,7 +125,7 @@ when prompted by your identity provider.
     import canfar
 
     async def main() -> None:
-        await canfar.alogin("srcnet")
+        assert await canfar.alogin("srcnet") is True
 
     if __name__ == "__main__":
         asyncio.run(main())
@@ -135,14 +135,18 @@ In Jupyter, define `main()` without the script entrypoint and run
 `await main()` in another cell. The async login performs native asynchronous
 network requests.
 
-Python prints the verification URL and user-facing device code, then waits
-for approval. It does not open a browser or render the CLI's QR code.
+Python prints the verification URL, the user-facing device code, and
+`Waiting for approval.` It does not open a browser or render the CLI's QR code.
 The private OAuth device token is never printed.
 
 Both functions save the Authentication Record and discovered Science Platform
 Servers but do not change the active Authentication or Server Selection. They
-return `None`; an unknown Identity Provider raises `KeyError`, and credential or
-discovery failures raise `canfar.authentication.AuthenticationError`.
+return `True` when that Identity Provider has a saved Authentication Record,
+including when an existing record is kept because `force` is false. A reused
+record prints `Already authenticated for '<idp>'.` A new login prints
+`Discovering servers for '<idp>'.` and then `Authenticated for '<idp>'.`
+An unknown Identity Provider raises `KeyError`, and credential or discovery
+failures raise `canfar.authentication.AuthenticationError`.
 
 ### Select the identity and server in Python
 
@@ -173,7 +177,7 @@ import asyncio
 import canfar
 from canfar import authentication, server
 
-await canfar.alogin("srcnet")
+assert await canfar.alogin("srcnet") is True
 await asyncio.to_thread(authentication.use, "srcnet")
 candidates = await asyncio.to_thread(server.list_servers)
 for candidate in candidates:
