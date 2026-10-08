@@ -2,7 +2,7 @@
 
 from typing import get_args
 
-from canfar.models.types import Kind, Pruneable, Status, View
+from canfar.models.types import Kind, Pruneable, Status
 
 
 def test_supported_literal_alias_values() -> None:
@@ -11,7 +11,6 @@ def test_supported_literal_alias_values() -> None:
         "Kind": get_args(Kind),
         "Pruneable": get_args(Pruneable),
         "Status": get_args(Status),
-        "View": get_args(View),
     } == {
         "Kind": (
             "desktop",
@@ -39,5 +38,4 @@ def test_supported_literal_alias_values() -> None:
             "Error",
             "Failed",
         ),
-        "View": ("all",),
     }

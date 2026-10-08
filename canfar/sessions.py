@@ -19,7 +19,7 @@ from canfar.utils import build
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
-    from canfar.models.types import Kind, Status, View
+    from canfar.models.types import Kind, Status
 log = logging.getLogger(__name__)
 _Result = TypeVar("_Result")
 
@@ -124,14 +124,12 @@ class Session(HTTPClient):
         self,
         kind: Kind | None = None,
         status: Status | None = None,
-        view: View | None = None,
     ) -> list[dict[str, str]]:
         """Fetch open sessions for the user.
 
         Args:
             kind (Kind | None, optional): Session kind. Defaults to None.
             status (Status | None, optional): Session status. Defaults to None.
-            view (View | None, optional): View leve. Defaults to None.
 
         Returns:
             list[dict[str, str]]: Session[s] information.
@@ -154,7 +152,7 @@ class Session(HTTPClient):
               'coresInUse': '0m',
               'ramInUse': '101Mi'}]
         """
-        parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
+        parameters: dict[str, Any] = build.fetch_parameters(kind, status)
         response: Response = self.client.get(url="session", params=parameters)
         data: list[dict[str, str]] = response.json()
         return data
@@ -484,18 +482,12 @@ class AsyncSession(HTTPClient):
         self,
         kind: Kind | None = None,
         status: Status | None = None,
-        view: View | None = None,
     ) -> list[dict[str, str]]:
         """List open sessions for the user.
 
         Args:
             kind (Kind | None, optional): Session kind. Defaults to None.
             status (Status | None, optional): Session status. Defaults to None.
-            view (View | None, optional): Session view level. Defaults to None.
-
-        Notes:
-            By default, only the calling user's sessions are listed. If views is
-            set to 'all', all user sessions are listed (with limited information).
 
         Returns:
             list: Sessions information.
@@ -531,7 +523,7 @@ class AsyncSession(HTTPClient):
             'cpuCoresInUse': '<none>',
             'gpuUtilization': '<none>'}]
         """
-        parameters: dict[str, Any] = build.fetch_parameters(kind, status, view)
+        parameters: dict[str, Any] = build.fetch_parameters(kind, status)
         response: Response = await self.asynclient.get(url="session", params=parameters)
         data: list[dict[str, str]] = response.json()
         return data

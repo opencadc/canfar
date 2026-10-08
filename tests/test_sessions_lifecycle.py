@@ -19,8 +19,7 @@ _EXPECTED_OPEN_URL = "https://example.test/running"
 _EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
     "fetch": (
         "(self, kind: 'Kind | None' = None, "
-        "status: 'Status | None' = None, "
-        "view: 'View | None' = None) -> 'list[dict[str, str]]'"
+        "status: 'Status | None' = None) -> 'list[dict[str, str]]'"
     ),
     "stats": "(self) -> 'dict[str, Any]'",
     "info": "(self, ids: 'list[str] | str') -> 'list[dict[str, Any]]'",

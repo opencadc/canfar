@@ -7,20 +7,18 @@ from typing import TYPE_CHECKING, Any
 from canfar.models.session import CreateRequest, FetchRequest
 
 if TYPE_CHECKING:
-    from canfar.models.types import Kind, Status, View
+    from canfar.models.types import Kind, Status
 
 
 def fetch_parameters(
     kind: Kind | None = None,
     status: Status | None = None,
-    view: View | None = None,
 ) -> dict[str, Any]:
     """Build query parameters for fetching sessions.
 
     Args:
         kind: Session kind filter (serialized as ``type``).
         status: Session status filter.
-        view: View scope filter.
 
     Returns:
         dict[str, Any]: Serialized fetch parameters with ``None`` fields omitted.
@@ -28,7 +26,7 @@ def fetch_parameters(
     # Kind is an alias for type in the API.
     # It is renamed as kind to avoid conflicts with the built-in type function.
     # by_alias=true, returns, {"type": "headless"} instead of {"kind": "headless"}
-    return FetchRequest(kind=kind, status=status, view=view).model_dump(  # ty: ignore[unknown-argument]
+    return FetchRequest(kind=kind, status=status).model_dump(  # ty: ignore[unknown-argument]
         exclude_none=True, by_alias=True
     )
 
