@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 from rich.console import Console
 
+from canfar.config.migration import ConfigResetRequiredError
 from canfar.models.config import Configuration
 
 if TYPE_CHECKING:
@@ -26,7 +27,11 @@ def get_console(*, stderr: bool = False) -> Console:
     Returns:
         Rich console instance sized from user configuration.
     """
-    width = Configuration().console.width  # ty: ignore[missing-argument]
+    try:
+        width = Configuration().console.width  # ty: ignore[missing-argument]
+    except (ConfigResetRequiredError, ValueError):
+        # The error for an unreadable config file prints through this console.
+        width = None
     return Console(width=width, stderr=stderr)
 
 

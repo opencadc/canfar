@@ -108,7 +108,7 @@ def boundary_failure(
         return StructuredError(
             code=err.code,
             message=err.message,
-            hint="Reset the configuration and log in again.",
+            hint=err.hint,
         )
     if isinstance(err, AuthRequiredError):
         return StructuredError(

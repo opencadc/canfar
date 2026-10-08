@@ -22,14 +22,10 @@ config: typer.Typer = typer.Typer()
 def _configuration_failure(error: Exception) -> StructuredError:
     """Convert an expected persisted-configuration failure."""
     if isinstance(error, ConfigResetRequiredError):
-        code = error.code
-        message = error.message
-    else:
-        code = ErrorCode.CONFIG_INVALID
-        message = f"Configuration could not be loaded: {error}"
+        return output.boundary_failure(error)
     return StructuredError(
-        code=code,
-        message=message,
+        code=ErrorCode.CONFIG_INVALID,
+        message=f"Configuration could not be loaded: {error}",
         hint="Check the configuration file and retry.",
     )
 

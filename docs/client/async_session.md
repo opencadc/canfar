@@ -10,7 +10,7 @@ The async methods preserve the synchronous result contracts:
 
 | Method | Result |
 | --- | --- |
-| `await fetch(kind=None, status=None, view=None)` | `list[dict[str, str]]` |
+| `await fetch(kind=None, status=None)` | `list[dict[str, str]]` |
 | `await create(...)` | `list[str]` containing the IDs that launched successfully |
 | `await info(ids)` | `list[dict[str, Any]]` |
 | `await logs(ids, verbose=False)` | `dict[str, str]`, or `None` when `verbose=True` |
@@ -22,8 +22,7 @@ The async methods preserve the synchronous result contracts:
 Invalid request values raise before the HTTP request. Verbose logs and events
 are sent to the `canfar.sessions` logger and return `None`.
 
-`fetch(view="all")` requests the server's all-Sessions view when authorized,
-and `stats()` returns aggregate Science Platform Server resource statistics.
+`stats()` returns aggregate Science Platform Server resource statistics.
 
 <span id="creating-sessions"></span>
 

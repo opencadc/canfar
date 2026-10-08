@@ -22,6 +22,3 @@ Status: TypeAlias = Literal[
     "Pending", "Running", "Terminating", "Succeeded", "Completed", "Error", "Failed"
 ]
 """Session status constants."""
-
-View: TypeAlias = Literal["all"]
-"""Session view constants."""

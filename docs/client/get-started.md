@@ -28,6 +28,42 @@ With `uv`:
 uv add canfar
 ```
 
+### Install on an Intel Mac
+
+`cryptography` 49.0.0 and later publish no Intel macOS wheels, so a plain
+install on an Intel Mac tries to compile it and fails with
+`Failed to build cryptography`. Install canfar as a [uv](https://docs.astral.sh/uv/)
+tool from wheels only. You get `cryptography` 48.0.1, the last Intel release,
+in an environment of its own, without Homebrew or a compiler:
+
+```bash
+uv tool install canfar --no-build-package cryptography
+```
+
+uv remembers the option, so later upgrades need no extra flags:
+
+```bash
+uv tool upgrade canfar
+```
+
+Do not run `uv run pip install …`: uv-managed Python rejects it with
+`error: externally-managed-environment`.
+
+!!! warning "cryptography 48.0.1 has known vulnerabilities"
+
+    | Advisory | Severity | Fixed in |
+    | --- | --- | --- |
+    | [GHSA-g6cj-pr64-35w5](https://github.com/advisories/GHSA-g6cj-pr64-35w5): PKCS#7 decryption oracle | High | 50.0.0 |
+    | [GHSA-jwv3-5hgf-82ww](https://github.com/advisories/GHSA-jwv3-5hgf-82ww): X.509 path-building denial of service | High | 49.0.0 |
+    | [GHSA-m2h6-j472-rp4c](https://github.com/advisories/GHSA-m2h6-j472-rp4c): X.509 name-constraint bypass | Moderate | 49.0.0 |
+
+    canfar uses neither PKCS#7 nor X.509 path verification, and no unrelated
+    packages share the tool environment.
+
+If `sysctl -n machdep.cpu.brand_string` prints `Apple M…`, your Mac is Apple
+Silicon running an Intel Python under Rosetta. Use a native Python instead; it
+gets current releases.
+
 ### Try this development branch
 
 To test the development examples on `main`, use a separate checkout and Python
