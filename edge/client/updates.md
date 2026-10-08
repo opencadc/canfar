@@ -53,7 +53,10 @@ verification URL and approve the request with your identity provider (IDP),
 the service that manages your account. The CLI can also open a browser and
 show a QR code.
 
-Python login saves credentials and discovered servers. You then explicitly
+Python login saves credentials and discovered servers, prints a status line,
+and returns `True` when that Identity Provider has a saved Authentication
+Record. An existing record prints `Already authenticated for '<idp>'.` and is
+kept unless you pass `force=True`. You then explicitly
 select the identity and a compatible server before creating a Session. Follow
 the complete [login and selection example](get-started.md#authenticate).
 Storage uses its owning server's IDP: an SRCNet login does not authenticate the
@@ -102,8 +105,9 @@ expiry hooks, for that client only.
   using arrow-key menus.
 - Request at most 256 replicas per `create` call, down from 512, in both the
   CLI and `CreateRequest`. Split larger runs into several requests.
-- Removed `view="all"` from `fetch()` calls. The all-Sessions view is no longer supported, and `fetch()` now accepts only kind and status. 
-  `stats()`, `logs()`, and `events()` are unchanged.
+- Removed `view="all"` and the `View` type from `fetch()` calls. The
+  all-Sessions view is no longer supported, and `fetch()` now accepts only
+  `kind` and `status`. `stats()`, `logs()`, and `events()` are unchanged.
 
 <span id="server-resources"></span>
 
