@@ -38,7 +38,10 @@ Three states mark progress. Claim only the one you observed:
    `--help` before adding a flag this skill does not show; that help is the
    authority for flags. Work in the user's existing environment, and install
    only on request with its package manager (`uv add canfar`, or
-   `pip install canfar` in a virtual environment).
+   `pip install canfar` in a virtual environment; on an Intel Mac, see
+   [Install on an Intel Mac](https://opencadc.github.io/canfar/client/get-started/#install-on-an-intel-mac)).
+   On `config.invalid`, give the user the `hint` command; the file holds their
+   credentials.
 3. **Identity and Server.** `canfar auth show -o json` prints the active
    Authentication Record and `canfar server ls -o json` the Servers. The
    identity is usable when `canfar ps -o json` exits 0; keep its payload, the
