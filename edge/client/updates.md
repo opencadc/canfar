@@ -102,6 +102,8 @@ expiry hooks, for that client only.
   using arrow-key menus.
 - Request at most 256 replicas per `create` call, down from 512, in both the
   CLI and `CreateRequest`. Split larger runs into several requests.
+- Removed `view="all"` from `fetch()` calls. The all-Sessions view is no longer supported, and `fetch()` now accepts only kind and status. 
+  `stats()`, `logs()`, and `events()` are unchanged.
 
 <span id="server-resources"></span>
 

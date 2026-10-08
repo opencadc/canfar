@@ -1922,6 +1922,53 @@ matches that release:</p>
 <p>With <code>uv</code>:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>add<span class="w"> </span>canfar
 </code></pre></div>
+<h3 id="install-on-an-intel-mac">Install on an Intel Mac<a class="headerlink" href="#install-on-an-intel-mac" title="Permanent link">&para;</a></h3>
+<p><code>cryptography</code> 49.0.0 and later publish no Intel macOS wheels, so a plain
+install on an Intel Mac tries to compile it and fails with
+<code>Failed to build cryptography</code>. Install canfar as a <a href="https://docs.astral.sh/uv/">uv</a>
+tool from wheels only. You get <code>cryptography</code> 48.0.1, the last Intel release,
+in an environment of its own, without Homebrew or a compiler:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--no-build-package<span class="w"> </span>cryptography
+</code></pre></div>
+<p>uv remembers the option, so later upgrades need no extra flags:</p>
+<div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>upgrade<span class="w"> </span>canfar
+</code></pre></div>
+<p>Do not run <code>uv run pip install …</code>: uv-managed Python rejects it with
+<code>error: externally-managed-environment</code>.</p>
+<div class="admonition warning">
+<p class="admonition-title">cryptography 48.0.1 has known vulnerabilities</p>
+<table>
+<thead>
+<tr>
+<th>Advisory</th>
+<th>Severity</th>
+<th>Fixed in</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/advisories/GHSA-g6cj-pr64-35w5">GHSA-g6cj-pr64-35w5</a>: <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/PKCS/issues/7" title="GitHub Issue: squidfunk/PKCS #7">PKCS#7</a> decryption oracle</td>
+<td>High</td>
+<td>50.0.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/advisories/GHSA-jwv3-5hgf-82ww">GHSA-jwv3-5hgf-82ww</a>: X.509 path-building denial of service</td>
+<td>High</td>
+<td>49.0.0</td>
+</tr>
+<tr>
+<td><a href="https://github.com/advisories/GHSA-m2h6-j472-rp4c">GHSA-m2h6-j472-rp4c</a>: X.509 name-constraint bypass</td>
+<td>Moderate</td>
+<td>49.0.0</td>
+</tr>
+</tbody>
+</table>
+<p>canfar uses neither <a class="magiclink magiclink-github magiclink-issue" href="https://github.com/squidfunk/PKCS/issues/7" title="GitHub Issue: squidfunk/PKCS #7">PKCS#7</a> nor X.509 path verification, and no unrelated
+packages share the tool environment.</p>
+</div>
+<p>If <code>sysctl -n machdep.cpu.brand_string</code> prints <code>Apple M…</code>, your Mac is Apple
+Silicon running an Intel Python under Rosetta. Use a native Python instead; it
+gets current releases.</p>
 <h3 id="try-this-development-branch">Try this development branch<a class="headerlink" href="#try-this-development-branch" title="Permanent link">&para;</a></h3>
 <p>To test the development examples on <code>main</code>, use a separate checkout and Python
 environment. With Git and <code>uv</code> installed, run:</p>
@@ -2103,7 +2150,7 @@ private image:</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 2, 2026 23:20:35 UTC">October 2, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 7, 2026 21:14:11 UTC">October 7, 2026</span>
   </span>
 
     

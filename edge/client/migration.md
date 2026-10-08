@@ -159,6 +159,7 @@ pip install cadcutils
 | `canfar.errors.structured_error_to_yaml(error)` | `yaml.safe_dump(error.model_dump(mode="json"))` |
 | `canfar.utils.logging.CanfarLogger().configure(...)` | `canfar.configure_logging(...)` |
 | `canfar.auth.x509.gather(days_valid=...)` | `gather()`; CADC certificates are valid for 30 days |
+| `fetch(view="all")` | `fetch(kind=..., status=...)` lists Sessions |
 
 <span id="notes-on-protocol-stability"></span>
 
@@ -224,7 +225,8 @@ The default configuration path changed from `~/.skaha/config.yaml` to
 `active`. Unsupported formats are rejected; the client does not automatically
 back up or rewrite them. Running login again cannot bypass an unreadable file.
 
-If the error says a configuration reset is needed:
+If a command fails with `CANFAR config error`, the error lists each invalid
+`key = value` and suggests removing the file. To keep a copy instead:
 
 1. Note the exact configuration file path in the error. Preserve that file;
    it may contain registry settings or server details you need later.
@@ -232,7 +234,7 @@ If the error says a configuration reset is needed:
    following example asks before overwriting an existing backup:
 
     ```bash
-    mv -i ~/.canfar/config.yaml ~/.canfar/config.yaml.before-upgrade
+    mv -i ~/.canfar/config.yaml ~/.canfar/config.bak
     ```
 
     If that backup already exists, choose another name. Do not delete the
