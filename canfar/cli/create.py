@@ -119,7 +119,7 @@ def _with_default(text: str, bounds: ResourceRange | None) -> str:
 
 async def _create_sessions(request: CreateRequest) -> list[str]:
     """Create the requested Sessions on the selected Science Platform Server."""
-    async with AsyncSession() as session:
+    async with AsyncSession(errors="ignore") as session:
         return await session.create(request)
 
 

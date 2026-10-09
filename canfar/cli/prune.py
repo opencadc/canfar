@@ -49,7 +49,7 @@ def prune_sessions(
 
     async def _prune() -> None:
         """Delete matching sessions from the science platform server."""
-        async with AsyncSession() as session:
+        async with AsyncSession(errors="ignore") as session:
             response = await session.destroy_with(
                 prefix=prefix, kind=kind, status=status
             )

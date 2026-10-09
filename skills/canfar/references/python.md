@@ -42,7 +42,14 @@ are for `kind="headless"`; [batch.md](batch.md) covers replicas.
 | `events(ids)` | a list of `{id: text}` dictionaries |
 | `destroy(ids)` | a dictionary of success booleans |
 | `destroy_with(prefix, *, kind=..., status=...)` | the same, for names matching a literal prefix or a regex |
+| `renew(ids)` | a dictionary of success booleans; resets interactive Session lifetimes (unreleased) |
 | `connect(ids)` | `None`; opens ready Sessions in a browser after one readiness check |
+
+In the unreleased client, those methods except `fetch` and `connect` also take
+`errors="raise"` (or `CANFAR_ERRORS=raise`): every request runs, then
+`canfar.exceptions.session.SessionRequestError` carries `results` and the
+per-ID `errors`. See
+[Raise on failures](https://www.opencadc.org/canfar/edge/client/session/#raise-on-failures).
 
 `logs(..., verbose=True)` and `events(..., verbose=True)` send their text to
 the `canfar.sessions` logger and return `None`. A Session is ready when its

@@ -162,6 +162,23 @@ their contracts:
 Start with the [Python tutorial](quick-start.md) or
 [headless workflow](../platform/sessions/batch.md).
 
+<span id="renew-sessions-and-raise-on-failures"></span>
+
+## Renew Sessions and raise on failures
+
+- `canfar renew SESSION_ID...`, `Session.renew()`, and `AsyncSession.renew()`
+  reset the lifetime of interactive Sessions, as the Science Portal does. The
+  Python methods return `dict[str, bool]`, like `destroy()`.
+- `create`, `info`, `logs`, `events`, `destroy`, `destroy_with`, and `renew`
+  accept `errors="ignore"` (the default, unchanged behavior) or
+  `errors="raise"`. Raising runs every request first, then reports partial
+  results and per-Session errors in `SessionRequestError`. Set the client
+  default with `errors=` or `CANFAR_ERRORS`. See
+  [Raise on failures](session.md#raise-on-failures).
+- `HTTPClient` and the Session clients accept a caller-owned `transport` for
+  sharing a connection pool with bearer tokens; closing a client leaves it
+  open. See [Share a connection pool](client.md#share-a-connection-pool).
+
 <span id="backend-upgrades"></span>
 <span id="previous-versions"></span>
 <span id="stay-updated"></span>

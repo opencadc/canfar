@@ -11,6 +11,7 @@ import pytest
 from pydantic import AnyHttpUrl, AnyUrl, SecretStr
 
 from canfar.exceptions.context import AuthRequiredError
+from canfar.exceptions.session import SessionRequestError
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
@@ -157,6 +158,7 @@ _UNAUTHENTICATED_CALLS = (
     pytest.param("logs", {"ids": ["one", "two"]}, id="logs"),
     pytest.param("events", {"ids": ["one", "two"]}, id="events"),
     pytest.param("destroy", {"ids": ["one", "two"]}, id="destroy"),
+    pytest.param("renew", {"ids": ["one", "two"]}, id="renew"),
     pytest.param(
         "create",
         {"name": "probe", "image": "skaha/terminal:1.1.2", "replicas": 2},
@@ -189,3 +191,61 @@ async def test_async_calls_without_a_credential_ask_for_login(
     async with AsyncSession(config=_unauthenticated(tmp_path)) as session:
         with pytest.raises(AuthRequiredError):
             await getattr(session, method)(**arguments)
+
+
+def test_sync_info_and_logs_raise_when_errors_is_raise() -> None:
+    """Sync info and logs raise SessionRequestError under errors='raise'."""
+    real_client = httpx2.Client
+    with (
+        patch(
+            "canfar.client.Client",
+            side_effect=lambda **kwargs: real_client(
+                transport=httpx2.MockTransport(_respond),
+                **kwargs,
+            ),
+        ),
+        Session(token=SecretStr("token"), url=_BASE_URL, errors="raise") as session,
+    ):
+        ids = ["one", "failed"]
+
+        with pytest.raises(SessionRequestError) as exc_info:
+            session.info(ids)
+        assert exc_info.value.operation == "info"
+        assert exc_info.value.results == [{"id": "one"}]
+        assert "failed" in exc_info.value.errors
+        assert isinstance(exc_info.value.errors["failed"], httpx2.ConnectError)
+
+        with pytest.raises(SessionRequestError) as exc_info:
+            session.logs(ids)
+        assert exc_info.value.operation == "logs"
+        assert exc_info.value.results == {"one": "log-one"}
+        assert "failed" in exc_info.value.errors
+
+
+@pytest.mark.asyncio
+async def test_async_info_and_logs_raise_when_errors_is_raise() -> None:
+    """Async info and logs raise SessionRequestError under errors='raise'."""
+    real_async_client = httpx2.AsyncClient
+    with patch(
+        "canfar.client.AsyncClient",
+        side_effect=lambda **kwargs: real_async_client(
+            transport=httpx2.MockTransport(_respond),
+            **kwargs,
+        ),
+    ):
+        async with AsyncSession(
+            token=SecretStr("token"), url=_BASE_URL, errors="raise"
+        ) as session:
+            ids = ["one", "failed"]
+
+            with pytest.raises(SessionRequestError) as exc_info:
+                await session.info(ids)
+            assert exc_info.value.operation == "info"
+            assert exc_info.value.results == [{"id": "one"}]
+            assert "failed" in exc_info.value.errors
+
+            with pytest.raises(SessionRequestError) as exc_info:
+                await session.logs(ids)
+            assert exc_info.value.operation == "logs"
+            assert exc_info.value.results == {"one": "log-one"}
+            assert "failed" in exc_info.value.errors
