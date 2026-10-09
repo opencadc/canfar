@@ -11,6 +11,7 @@ import httpx2
 import pytest
 from pydantic import SecretStr, ValidationError
 
+from canfar.exceptions.session import SessionRequestError
 from canfar.models.session import CreateRequest
 from canfar.sessions import AsyncSession, Session
 
@@ -380,3 +381,57 @@ async def test_async_create_failure_logs_only_safe_replica_context(
             )
 
     _assert_safe_create_log(caplog, environment_secret)
+
+
+def test_sync_create_errors_raise_policy() -> None:
+    """Sync create raises SessionRequestError under errors='raise'."""
+    request = CreateRequest(
+        name="batch", image="skaha/terminal:latest", kind="headless", replicas=2
+    )
+    real_client = httpx2.Client
+    with (
+        patch(
+            "canfar.client.Client",
+            side_effect=lambda **kwargs: real_client(
+                transport=httpx2.MockTransport(_failure_responder({"batch-2"})),
+                **kwargs,
+            ),
+        ),
+        Session(token=SecretStr("token"), url=_BASE_URL) as session,
+    ):
+        with pytest.raises(SessionRequestError) as exc_info:
+            session.create(request, errors="raise")
+        assert exc_info.value.operation == "create"
+        assert exc_info.value.results == ["batch-1-id"]
+        assert 2 in exc_info.value.errors
+        assert isinstance(exc_info.value.errors[2], httpx2.ConnectError)
+        assert exc_info.value.__cause__ is exc_info.value.errors[2]
+
+
+@pytest.mark.asyncio
+async def test_async_create_errors_raise_policy() -> None:
+    """Async create raises SessionRequestError under errors='raise'."""
+    request = CreateRequest(
+        name="batch", image="skaha/terminal:latest", kind="headless", replicas=2
+    )
+    real_async_client = httpx2.AsyncClient
+    with patch(
+        "canfar.client.AsyncClient",
+        side_effect=lambda **kwargs: real_async_client(
+            transport=httpx2.MockTransport(_failure_responder({"batch-2"})),
+            **kwargs,
+        ),
+    ):
+        async with AsyncSession(
+            token=SecretStr("token"), url=_BASE_URL, errors="raise"
+        ) as session:
+            with pytest.raises(SessionRequestError) as exc_info:
+                await session.create(request)
+            assert exc_info.value.operation == "create"
+            assert exc_info.value.results == ["batch-1-id"]
+            assert 2 in exc_info.value.errors
+            assert isinstance(exc_info.value.errors[2], httpx2.ConnectError)
+            assert exc_info.value.__cause__ is exc_info.value.errors[2]
+
+            # Override with ignore
+            assert await session.create(request, errors="ignore") == ["batch-1-id"]

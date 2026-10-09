@@ -219,6 +219,12 @@ _COMMANDS: dict[str, _LazyCommand] = {
     "logs": _LazyCommand(
         "canfar.cli.logs:get_logs", "Show session logs", "Session Management"
     ),
+    "renew": _LazyCommand(
+        "canfar.cli.renew:renew_sessions",
+        "Renew sessions by ID.",
+        "Session Management",
+        options={"no_args_is_help": True},
+    ),
     "delete": _LazyCommand(
         "canfar.cli.delete:delete_sessions",
         "Delete sessions by ID.",

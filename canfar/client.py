@@ -10,7 +10,17 @@ from email.utils import formatdate
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
-from httpx2 import URL, AsyncClient, Client, Limits, Timeout
+from httpx2 import (
+    URL,
+    AsyncBaseTransport,
+    AsyncClient,
+    BaseTransport,
+    Client,
+    Limits,
+    Request,
+    Response,
+    Timeout,
+)
 from pydantic import (
     AnyHttpUrl,
     Field,
@@ -42,6 +52,32 @@ log = logging.getLogger(__name__)
 def _has_runtime_token(token: SecretStr | None) -> bool:
     """Return whether a runtime token contains a non-empty value."""
     return token is not None and bool(token.get_secret_value())
+
+
+class _UnclosableTransport(BaseTransport):
+    """Wrap a caller-owned synchronous transport so client close is a no-op."""
+
+    def __init__(self, transport: BaseTransport) -> None:
+        self._transport = transport
+
+    def handle_request(self, request: Request) -> Response:
+        return self._transport.handle_request(request)
+
+    def close(self) -> None:
+        """Preserve caller ownership; do not close the underlying transport."""
+
+
+class _UnclosableAsyncTransport(AsyncBaseTransport):
+    """Wrap a caller-owned asynchronous transport so client aclose is a no-op."""
+
+    def __init__(self, transport: AsyncBaseTransport) -> None:
+        self._transport = transport
+
+    async def handle_async_request(self, request: Request) -> Response:
+        return await self._transport.handle_async_request(request)
+
+    async def aclose(self) -> None:
+        """Preserve caller ownership; do not close the underlying transport."""
 
 
 class HTTPClient(BaseSettings):
@@ -133,6 +169,28 @@ class HTTPClient(BaseSettings):
     _client: Client | None = PrivateAttr(default=None)
     _asynclient: AsyncClient | None = PrivateAttr(default=None)
     _refresh_lock: asyncio.Lock = PrivateAttr(default_factory=asyncio.Lock)
+    _transport: BaseTransport | AsyncBaseTransport | None = PrivateAttr(default=None)
+
+    def __init__(
+        self,
+        *,
+        transport: BaseTransport | AsyncBaseTransport | None = None,
+        **values: Any,
+    ) -> None:
+        # A constructor argument, not a field, so no settings source can supply it.
+        super().__init__(**values)
+        if transport is not None and self._uses_x509():
+            msg = (
+                "Injected transport cannot be used with X.509 client certificate "
+                "authentication; Bearer tokens only."
+            )
+            raise ValueError(msg)
+        self._transport = transport
+
+    @property
+    def transport(self) -> BaseTransport | AsyncBaseTransport | None:
+        """Return the caller-owned httpx2 transport, if one was injected."""
+        return self._transport
 
     # Client Properties
     @property
@@ -203,6 +261,13 @@ class HTTPClient(BaseSettings):
             log.debug(msg)
 
         return self
+
+    def _uses_x509(self) -> bool:
+        """Return whether requests would authenticate with a client certificate."""
+        return self.certificate is not None or (
+            not _has_runtime_token(self.token)
+            and isinstance(self.authentication_record, X509Credential)
+        )
 
     def _client_options(self, *, asynchronous: bool) -> dict[str, Any]:
         """Return the keyword arguments for a sync or async HTTPX2 client."""
@@ -339,6 +404,28 @@ class HTTPClient(BaseSettings):
             raise ValueError(msg)
         return URL(f"{server.url}/{server.version}")
 
+    def _configured_transport(
+        self, *, asynchronous: bool
+    ) -> BaseTransport | AsyncBaseTransport | None:
+        """Resolve and validate caller-injected transport for sync or async client."""
+        if self.transport is None:
+            return None
+        if asynchronous:
+            if not isinstance(self.transport, AsyncBaseTransport):
+                msg = (
+                    "Async client requires an AsyncBaseTransport; "
+                    f"got {type(self.transport).__name__}"
+                )
+                raise TypeError(msg)
+            return _UnclosableAsyncTransport(self.transport)
+        if not isinstance(self.transport, BaseTransport):
+            msg = (
+                "Sync client requires a BaseTransport; "
+                f"got {type(self.transport).__name__}"
+            )
+            raise TypeError(msg)
+        return _UnclosableTransport(self.transport)
+
     def _get_client_kwargs(
         self,
         asynchronous: bool,
@@ -365,10 +452,16 @@ class HTTPClient(BaseSettings):
         if asynchronous:
             # Queued bulk requests wait for a connection without timing out locally.
             kwargs["timeout"] = Timeout(self.timeout, pool=None)
-            kwargs["limits"] = Limits(
-                max_connections=self.concurrency,
-                max_keepalive_connections=self.concurrency // 4,
-            )
+            if self.transport is None:
+                kwargs["limits"] = Limits(
+                    max_connections=self.concurrency,
+                    max_keepalive_connections=self.concurrency // 4,
+                )
+
+        transport = self._configured_transport(asynchronous=asynchronous)
+        if transport is not None:
+            kwargs["transport"] = transport
+
         if _has_runtime_token(self.token):
             return kwargs
 
