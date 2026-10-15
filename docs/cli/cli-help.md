@@ -13,7 +13,7 @@ Server, data, image, and configuration operations remain grouped:
 | Area | Commands |
 | --- | --- |
 | Authentication and Server Selection | `login`, `auth`, `server` |
-| Sessions | `create`, `ps`, `events`, `info`, `open`, `logs`, `delete`, `prune` |
+| Sessions | `create`, `ps`, `events`, `info`, `open`, `logs`, `renew`, `delete`, `prune` |
 | Platform information | `stats`, `image ls` |
 | Client configuration | `config show`, `config get`, `config set`, `config path`, `version` |
 | Data | `data` and its embedded file commands |
@@ -195,6 +195,7 @@ These leaves accept one or more Session IDs and produce human-readable output:
 | `canfar info SESSION_ID...` | Show Session details; `--debug` adds response warnings. |
 | `canfar logs SESSION_ID...` | Show Session logs. |
 | `canfar open SESSION_ID...` | Open ready Sessions in new browser tabs. |
+| `canfar renew SESSION_ID...` | Reset the lifetime of interactive Sessions (unreleased). |
 | `canfar delete SESSION_ID... [--force]` | Delete Sessions, confirming unless `--force` is used. |
 | `canfar prune PREFIX [KIND] [STATUS]` | Delete matching names; defaults to `headless` and `Succeeded`. |
 

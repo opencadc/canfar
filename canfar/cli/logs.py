@@ -23,7 +23,7 @@ def get_logs(
 
     async def _get_logs() -> None:
         """Fetch logs for the requested sessions and render them."""
-        async with AsyncSession() as session:
+        async with AsyncSession(errors="ignore") as session:
             try:
                 all_logs = await session.logs(ids=session_ids)
             except Exception as e:

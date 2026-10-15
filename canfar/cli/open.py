@@ -23,7 +23,7 @@ def open_sessions(
 
     async def _open_sessions() -> None:
         """Look up the requested sessions and open their connect URLs."""
-        async with AsyncSession() as session:
+        async with AsyncSession(errors="ignore") as session:
             sessions_info = await session.info(ids=session_ids)
         if not sessions_info:
             typer.echo("No information found for the specified session(s).", err=True)

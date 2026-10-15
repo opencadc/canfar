@@ -150,7 +150,7 @@ async def _get_info(
     debug: bool,
 ) -> None:
     """Get detailed information about one or more sessions."""
-    async with AsyncSession() as session:
+    async with AsyncSession(errors="ignore") as session:
         sessions_info = await session.info(ids=session_ids)
     if not sessions_info:
         get_console(stderr=True).print(
