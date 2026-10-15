@@ -177,8 +177,10 @@ canfar ps
 canfar delete SESSION_ID
 ```
 
-You can renew an interactive Session from the Science Portal web interface
-before it expires to reset its lifetime.
+To keep an interactive Session past its expiry time, renew it before it
+expires from the Science Portal, with `canfar renew SESSION_ID`, or with
+[`Session.renew()`](../../client/session.md#renew-an-interactive-session)
+(the CLI and Python options are unreleased). Renewal resets the lifetime.
 
 ### Scheduling and queue times
 

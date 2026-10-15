@@ -17,11 +17,15 @@ The current interface has these return shapes. Check the
 | `logs(ids, verbose=False)` | `dict[str, str]`, or `None` when `verbose=True` |
 | `events(ids, verbose=False)` | `list[dict[str, str]]`, or `None` when `verbose=True` |
 | `destroy(ids)` / `destroy_with(...)` | `dict[str, bool]` |
+| `renew(ids)` | `dict[str, bool]` |
 | `connect(ids)` | `None`; opens ready Session URLs |
 
-`create()` skips an individual launch after an HTTP or network failure and logs
-the failure without raising. If all requested launches fail, it returns `[]`.
-Validation errors in the request are raised before the HTTP call.
+By default, `create()` skips an individual launch after an HTTP or network
+failure and logs the failure without raising. If all requested launches fail,
+it returns `[]`. Validation errors in the request are raised before the HTTP
+call. `info`, `logs`, `events`, `destroy`, and `renew` likewise log and leave
+out failed IDs (or report `False`); see [Raise on failures](#raise-on-failures)
+to raise instead.
 
 `stats()` returns the Science Platform Server's aggregate resource statistics as a dictionary.
 
@@ -106,9 +110,48 @@ session.destroy_with(
 )
 ```
 
-Its signature is `destroy_with(prefix, *, kind="headless", status="Completed")`.
+Its signature is
+`destroy_with(prefix, *, kind="headless", status="Completed", errors=None)`.
 A prefix is matched literally unless it contains regular-expression
 metacharacters; such a value is treated as a regular expression.
+
+<span id="renew-an-interactive-session"></span>
+
+## Renew an interactive Session
+
+`renew()` (unreleased) resets the lifetime of interactive Sessions before they
+expire, as the Science Portal does. It returns `True` for each renewed ID:
+
+```python
+with Session() as session:
+    print(session.renew("hjko98yghj"))  # {"hjko98yghj": True}
+```
+
+<span id="raise-on-failures"></span>
+
+## Raise on failures
+
+Set `errors="raise"` on the client, or pass it to one call, to raise
+`SessionRequestError` instead of returning partial results (unreleased).
+Every request still runs first. The exception carries `results` (what the call
+would have returned) and `errors`, the `httpx2.HTTPError` for each failed
+Session ID, or for each 1-based replica number from `create()`.
+`CANFAR_ERRORS=raise` sets the client default; a per-call `errors="ignore"`
+overrides it. Authentication and validation errors raise either way.
+
+```python
+from canfar.exceptions.session import SessionRequestError
+
+with Session(errors="raise") as session:
+    try:
+        session.renew(["hjko98yghj", "ikvp1jtp"])
+    except SessionRequestError as err:
+        print(err.results)  # {"hjko98yghj": True, "ikvp1jtp": False}
+        print(err.errors)  # {"ikvp1jtp": HTTPStatusError(...)}
+```
+
+To share one connection pool across clients, see
+[Share a connection pool](client.md#share-a-connection-pool).
 
 ::: canfar.sessions.Session
     handler: python
@@ -120,6 +163,7 @@ metacharacters; such a value is treated as a regular expression.
         - info
         - logs
         - events
+        - renew
         - destroy
         - destroy_with
         - connect
