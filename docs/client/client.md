@@ -30,10 +30,44 @@ The main settings are:
 - `timeout`: HTTP request inactivity timeout in seconds (1–300, default 30), not
   a total job deadline.
 - `concurrency`: maximum async connection count (1–128).
+- `transport`: an `httpx2` transport you own, to share one connection pool
+  across clients (unreleased; keyword argument only).
 
 In the unreleased async client, requests wait for a free connection without a
 pool timeout. Connect, read, and write timeouts still use `timeout`, and
 `concurrency` still limits connections. Synchronous pool waits also use `timeout`.
+
+<span id="share-a-connection-pool"></span>
+
+### Share a connection pool
+
+A service that calls the Science Platform for many users can pass one
+`transport` to every client. Use an `httpx2.BaseTransport` for synchronous
+requests and an `httpx2.AsyncBaseTransport` for asynchronous ones; a mismatch
+raises `TypeError`. Closing a client leaves the transport open, so close it
+yourself when your service stops. Connection limits come from the transport,
+not `concurrency`; `timeout` still applies to each request.
+
+```python
+import httpx2
+
+from canfar.sessions import Session
+
+transport = httpx2.HTTPTransport(limits=httpx2.Limits(max_connections=64))
+for token in user_tokens:
+    with Session(
+        token=token,
+        url="https://ws-uv.canfar.net/skaha/v1",
+        transport=transport,
+    ) as session:
+        print(session.fetch())
+transport.close()
+```
+
+A transport works with bearer tokens only. Combining it with a runtime
+certificate or a saved X.509 Authentication Record raises `ValueError`, because
+`httpx2` would otherwise drop the client certificate. No environment variable
+sets the transport.
 
 When no explicit `url` is supplied, the active Server Selection in
 `Configuration` supplies the Science Platform Server. Without a runtime

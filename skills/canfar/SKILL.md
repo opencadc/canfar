@@ -117,6 +117,7 @@ canfar info SESSION_ID
 canfar events SESSION_ID
 canfar logs SESSION_ID
 canfar open SESSION_ID
+canfar renew SESSION_ID
 canfar delete SESSION_ID
 ```
 
@@ -144,7 +145,7 @@ copied to storage that Session mounts, or built into the image.
 ## Output and cleanup
 
 - **Machine output** (`-o json` or `-o yaml`, placed on the owning command): `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `config show`, `config get`.
-- **Human text only**: `info`, `logs`, `events`, `open`, `delete`, `prune`, `stats`, `image ls`, `version`.
+- **Human text only**: `info`, `logs`, `events`, `open`, `renew`, `delete`, `prune`, `stats`, `image ls`, `version`.
 
 With `-o`, stdout carries only the payload, and a failure exits nonzero with
 `code`, `message`, and `hint` as JSON on stderr. Select list items by ID or
