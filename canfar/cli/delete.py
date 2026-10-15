@@ -44,7 +44,7 @@ def delete_sessions(
 
     async def _delete() -> None:
         """Delete the requested sessions from the science platform server."""
-        async with AsyncSession() as session:
+        async with AsyncSession(errors="ignore") as session:
             try:
                 deleted = await session.destroy(ids=session_ids)
                 get_console().print(

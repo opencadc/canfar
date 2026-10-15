@@ -4,111 +4,44 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import re
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Literal
 from webbrowser import open_new_tab
 
 from httpx2 import HTTPError, Response
+from pydantic import Field
 
 from canfar.client import HTTPClient
-from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.hooks.httpx.auth import AuthenticationError
+from canfar.helpers.session import (
+    _destroy_failure,
+    _ids,
+    _matching_session_ids,
+    _raise_authentication_failure,
+    _raise_failures,
+    _renew,
+    _response_session_id,
+    _session_name_pattern,
+    _session_url,
+    _task_result,
+    connection_url,
+)
 from canfar.models.session import CreateRequest
 from canfar.utils import build
 
 if TYPE_CHECKING:
-    from collections.abc import Mapping
-
     from canfar.models.types import Kind, Status
 log = logging.getLogger(__name__)
-_Result = TypeVar("_Result")
 
-
-def _raise_authentication_failure(result: object) -> None:
-    """Raise a collected Authentication failure, which belongs to the client.
-
-    ``asyncio.gather(..., return_exceptions=True)`` collects one copy per task.
-    Reporting it as a per-Session transport failure would hide that no request
-    was sent, so the asynchronous client raises it as the synchronous one does.
-    """
-    if isinstance(result, AuthContextError | AuthExpiredError | AuthenticationError):
-        raise result
-
-
-def _task_result(
-    operation: str,
-    context: object,
-    result: _Result | Exception,
-) -> _Result | None:
-    """Keep one failure and logging policy for collected transport results."""
-    _raise_authentication_failure(result)
-    if isinstance(result, Exception):
-        # HTTPX2 response hooks already log the status and safe request context.
-        log.error("%s: %s (%s)", operation, context, type(result).__name__)
-        return None
-    return result
-
-
-def _destroy_failure(session_id: str, exc: BaseException | None = None) -> bool:
-    """Log a failed Session deletion and preserve the false result policy."""
-    msg = f"Failed to destroy session {session_id}"
-    if exc is not None:
-        msg += f": {exc}"
-    # Both callers invoke this from their HTTPError handler; keep traceback logging.
-    log.exception(msg)  # noqa: LOG004
-    return False
-
-
-def _ids(value: str | list[str]) -> list[str]:
-    """Normalize one or many Session identifiers without changing their order."""
-    return [value] if isinstance(value, str) else value
-
-
-def _session_url(session_id: str) -> str:
-    """Build the endpoint path for one Session identifier."""
-    return f"session/{session_id}"
-
-
-def _response_session_id(response: Response) -> str:
-    """Interpret a create response as a clean Session identifier."""
-    return response.text.rstrip("\r\n")
-
-
-def _session_name_pattern(selector: str) -> re.Pattern[str]:
-    """Compile a regular expression or an anchored literal Session selector."""
-    meta = frozenset(".^$*+?{}[]()|")
-    if any(char in meta for char in selector):
-        log.info("destroy_with using regex pattern: %s", selector)
-        pattern = selector
-    else:
-        log.info("destroy_with using literal prefix: %s", selector)
-        pattern = rf"^{re.escape(selector)}"
-    try:
-        return re.compile(pattern)
-    except re.error as exc:
-        msg = f"Invalid regex pattern '{selector}': {exc}"
-        log.exception(msg)
-        raise ValueError(msg) from exc
-
-
-def _matching_session_ids(sessions: list[Any], regex: re.Pattern[str]) -> list[str]:
-    """Return session IDs whose names match the compiled selector."""
-    return [session["id"] for session in sessions if regex.search(session["name"])]
-
-
-def connection_url(session: Mapping[str, Any]) -> str | None:
-    """Return the URL only when a Session is ready for a connection."""
-    value = session.get("connectURL")
-    if session.get("status") != "Running" or not isinstance(value, str):
-        return None
-    return value or None
+_ERRORS_DESCRIPTION = (
+    "'ignore' returns partial results and logs failures; 'raise' raises "
+    "SessionRequestError after every request has run."
+)
 
 
 class Session(HTTPClient):
     """CANFAR Session Management Client.
 
     This class provides methods to manage sessions, including fetching
-    session details, creating new sessions, retrieving logs, and
+    session details, creating new sessions, retrieving logs, renewing and
     destroying existing sessions. It is a subclass of the `HTTPClient`
     class and inherits its attributes and methods.
 
@@ -119,6 +52,10 @@ class Session(HTTPClient):
                 concurrency=100, # No effect on sync client
             )
     """
+
+    errors: Literal["ignore", "raise"] = Field(
+        "ignore", title="Error Policy", description=_ERRORS_DESCRIPTION
+    )
 
     def fetch(
         self,
@@ -177,14 +114,24 @@ class Session(HTTPClient):
         data: dict[str, Any] = response.json()
         return data
 
-    def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
+    def info(
+        self,
+        ids: list[str] | str,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> list[dict[str, Any]]:
         """Get information about session[s].
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             list[dict[str, Any]]: Session information.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> session.info(ids="hjko98yghj")
@@ -192,18 +139,23 @@ class Session(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, Any]] = []
+        failures: dict[str | int, HTTPError] = {}
         for value in ids:
             try:
                 response: Response = self.client.get(url=_session_url(value))
                 results.append(response.json())
             except HTTPError as err:
+                failures[value] = err
                 _task_result("failed to fetch session info for", value, err)
+        _raise_failures("info", errors or self.errors, results, failures)
         return results
 
     def logs(
         self,
         ids: list[str] | str,
         verbose: bool = False,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, str] | None:
         """Get logs from a session[s].
 
@@ -211,9 +163,14 @@ class Session(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
             verbose: Send logs to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected logs.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> session.logs(ids="hjko98yghj")
@@ -222,6 +179,7 @@ class Session(HTTPClient):
         ids = _ids(ids)
         parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
+        failures: dict[str | int, HTTPError] = {}
 
         for value in ids:
             try:
@@ -231,15 +189,16 @@ class Session(HTTPClient):
                 )
                 results[value] = response.text
             except HTTPError as err:
+                failures[value] = err
                 _task_result("failed to fetch logs for session", value, err)
 
         if verbose:
             for key, value in results.items():
                 log.info("Session ID: %s\n", key)
                 log.info(value)
-            return None
-
-        return results
+        output = None if verbose else results
+        _raise_failures("logs", errors or self.errors, output, failures)
+        return output
 
     def create(  # noqa: PLR0917
         self,
@@ -253,6 +212,8 @@ class Session(HTTPClient):
         args: str | None = None,
         env: dict[str, Any] | None = None,
         replicas: int = 1,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
 
@@ -270,6 +231,8 @@ class Session(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Notes:
             - If cores and ram are not specified, the Session uses the Server's
@@ -281,9 +244,13 @@ class Session(HTTPClient):
                 * REPLICA_COUNT - The total number of replicas
 
         Returns:
-            List[str]: Session IDs for launched sessions. On HTTP or network failure
-                for a given attempt, that attempt is omitted; if all attempts fail,
-                returns an empty list. Does not raise for those errors.
+            List[str]: Session IDs for launched sessions. With ``errors="ignore"``,
+                an attempt that fails with an HTTP or network error is omitted; if
+                all attempts fail, returns an empty list.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
+                Its ``errors`` are keyed by 1-based replica number.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -314,6 +281,7 @@ class Session(HTTPClient):
             replicas,
         )
         results: list[str] = []
+        failures: dict[str | int, HTTPError] = {}
         session_kind = name.kind if isinstance(name, CreateRequest) else kind
         log.debug("Creating %d %s session[s].", len(payloads), session_kind)
         for replica, payload in enumerate(payloads, start=1):
@@ -321,17 +289,21 @@ class Session(HTTPClient):
                 response: Response = self.client.post(url="session", params=payload)
                 results.append(_response_session_id(response))
             except HTTPError as err:
+                failures[replica] = err
                 _task_result(
                     "Failed to create session",
                     f"replica {replica}/{len(payloads)}",
                     err,
                 )
+        _raise_failures("create", errors or self.errors, results, failures)
         return results
 
     def events(
         self,
         ids: str | list[str],
         verbose: bool = False,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> list[dict[str, str]] | None:
         """Get deployment events for a session[s].
 
@@ -339,9 +311,14 @@ class Session(HTTPClient):
             ids (Union[str, List[str]]): Session ID[s].
             verbose: Send events to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected events.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Notes:
             Configure application logging to display verbose events. Their output
@@ -355,6 +332,7 @@ class Session(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, str]] = []
+        failures: dict[str | int, HTTPError] = {}
         parameters: dict[str, str] = {"view": "events"}
         for value in ids:
             try:
@@ -364,23 +342,36 @@ class Session(HTTPClient):
                 )
                 results.append({value: response.text})
             except HTTPError as err:
+                failures[value] = err
                 _task_result("Failed to fetch events for session", value, err)
         if verbose and results:
             for result in results:
                 for key, value in result.items():
                     log.info("Session ID: %s", key)
                     log.info("\n %s", value)
-        return results if not verbose else None
+        output = results if not verbose else None
+        _raise_failures("events", errors or self.errors, output, failures)
+        return output
 
-    def destroy(self, ids: str | list[str]) -> dict[str, bool]:
+    def destroy(
+        self,
+        ids: str | list[str],
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> dict[str, bool]:
         """Destroy canfar session[s].
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Dict[str, bool]: A dictionary of session IDs
             and a bool indicating if the session was destroyed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -390,12 +381,54 @@ class Session(HTTPClient):
         """
         ids = _ids(ids)
         results: dict[str, bool] = {}
+        failures: dict[str | int, HTTPError] = {}
         for value in ids:
             try:
                 self.client.delete(url=_session_url(value))
                 results[value] = True
-            except HTTPError:
+            except HTTPError as err:
+                failures[value] = err
                 results[value] = _destroy_failure(value)
+        _raise_failures("destroy", errors or self.errors, results, failures)
+        return results
+
+    def renew(
+        self,
+        ids: str | list[str],
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> dict[str, bool]:
+        """Renew interactive session[s], resetting their lifetime.
+
+        Args:
+            ids (Union[str, List[str]]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
+
+        Returns:
+            Dict[str, bool]: A dictionary of session IDs
+            and a bool indicating if the session was renewed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
+
+        Examples:
+            >>> from canfar.sessions import Session
+            >>> session = Session()
+            >>> session.renew(ids="hjko98yghj")
+            >>> session.renew(ids=["hjko98yghj", "ikvp1jtp"])
+        """
+        ids = _ids(ids)
+        results: dict[str, bool] = {}
+        failures: dict[str | int, HTTPError] = {}
+        for value in ids:
+            try:
+                self.client.post(url=_session_url(value), params={"action": "renew"})
+                results[value] = True
+            except HTTPError as err:
+                failures[value] = err
+                results[value] = _renew(value)
+        _raise_failures("renew", errors or self.errors, results, failures)
         return results
 
     def destroy_with(
@@ -404,6 +437,7 @@ class Session(HTTPClient):
         *,
         kind: Kind = "headless",
         status: Status = "Completed",
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, bool]:
         """Destroy session[s] matching a prefix or regex.
 
@@ -412,10 +446,15 @@ class Session(HTTPClient):
                 Treated literally unless regex meta-characters are found.
             kind (Kind): Type of session. Defaults to "headless".
             status (Status): Status of the session. Defaults to "Completed".
+            errors: Failure policy for the deletions. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Dict[str, bool]: A dictionary of session IDs
             and a bool indicating if the session was destroyed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any deletion failed.
 
         Notes:
             - If the value contains regex metacharacters (e.g., `.^$*+?{}[]()|`),
@@ -431,7 +470,7 @@ class Session(HTTPClient):
         """
         regex = _session_name_pattern(prefix)
         sessions = self.fetch(kind=kind, status=status)
-        return self.destroy(_matching_session_ids(sessions, regex))
+        return self.destroy(_matching_session_ids(sessions, regex), errors=errors)
 
     def connect(self, ids: list[str] | str) -> None:
         """Open session[s] in a web browser.
@@ -463,7 +502,7 @@ class AsyncSession(HTTPClient):
 
     This class provides methods to manage sessions in the system,
     including fetching session details, creating new sessions,
-    retrieving logs, and destroying existing sessions.
+    retrieving logs, renewing and destroying existing sessions.
 
     This class is a subclass of the `HTTPClient` class and inherits its
     attributes and methods.
@@ -477,6 +516,10 @@ class AsyncSession(HTTPClient):
                 concurrency=100,
             )
     """
+
+    errors: Literal["ignore", "raise"] = Field(
+        "ignore", title="Error Policy", description=_ERRORS_DESCRIPTION
+    )
 
     async def fetch(
         self,
@@ -548,14 +591,24 @@ class AsyncSession(HTTPClient):
         data: dict[str, Any] = response.json()
         return data
 
-    async def info(self, ids: list[str] | str) -> list[dict[str, Any]]:
+    async def info(
+        self,
+        ids: list[str] | str,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> list[dict[str, Any]]:
         """Get information about session[s].
 
         Args:
             ids (Union[List[str], str]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             list[dict[str, Any]]: Session information.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -565,6 +618,7 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, Any]] = []
+        failures: dict[str | int, HTTPError] = {}
 
         async def request(value: str) -> dict[str, Any]:
             response = await self.asynclient.get(url=_session_url(value))
@@ -574,16 +628,21 @@ class AsyncSession(HTTPClient):
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
+            if isinstance(reply, HTTPError):
+                failures[value] = reply
             result = _task_result("failed to fetch session info for", value, reply)
             if isinstance(result, dict):
                 results.append(result)
         log.debug("Session info records collected: %s", results)
+        _raise_failures("info", errors or self.errors, results, failures)
         return results
 
     async def logs(
         self,
         ids: list[str] | str,
         verbose: bool = False,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, str] | None:
         """Get logs from a session[s].
 
@@ -591,9 +650,14 @@ class AsyncSession(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
             verbose: Send logs to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected logs.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Dict[str, str]: Logs in text/plain format.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -604,6 +668,7 @@ class AsyncSession(HTTPClient):
         ids = _ids(ids)
         parameters: dict[str, str] = {"view": "logs"}
         results: dict[str, str] = {}
+        failures: dict[str | int, HTTPError] = {}
 
         async def request(value: str) -> tuple[str, str]:
             response = await self.asynclient.get(
@@ -615,6 +680,8 @@ class AsyncSession(HTTPClient):
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
+            if isinstance(reply, HTTPError):
+                failures[value] = reply
             result = _task_result("failed to fetch logs for session", value, reply)
             if isinstance(result, tuple):
                 results[result[0]] = result[1]
@@ -623,8 +690,9 @@ class AsyncSession(HTTPClient):
             for key, value in results.items():
                 log.info("Session ID: %s\n", key)
                 log.info(value)
-            return None
-        return results
+        output = None if verbose else results
+        _raise_failures("logs", errors or self.errors, output, failures)
+        return output
 
     async def create(  # noqa: PLR0917
         self,
@@ -638,6 +706,8 @@ class AsyncSession(HTTPClient):
         args: str | None = None,
         env: dict[str, Any] | None = None,
         replicas: int = 1,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
 
@@ -655,6 +725,8 @@ class AsyncSession(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Notes:
             - If cores and ram are not specified, the Session uses the Server's
@@ -666,9 +738,13 @@ class AsyncSession(HTTPClient):
                 * REPLICA_COUNT - The total number of replicas
 
         Returns:
-            List[str]: Session IDs for launched sessions. On HTTP or network failure
-                for a given attempt, that attempt is omitted; if all attempts fail,
-                returns an empty list. Does not raise for those errors.
+            List[str]: Session IDs for launched sessions. With ``errors="ignore"``,
+                an attempt that fails with an HTTP or network error is omitted; if
+                all attempts fail, returns an empty list.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
+                Its ``errors`` are keyed by 1-based replica number.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -699,6 +775,7 @@ class AsyncSession(HTTPClient):
             replicas,
         )
         results: list[str] = []
+        failures: dict[str | int, HTTPError] = {}
 
         async def request_session(parameters: list[tuple[str, Any]]) -> str:
             response = await self.asynclient.post(url="session", params=parameters)
@@ -710,6 +787,8 @@ class AsyncSession(HTTPClient):
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for replica, reply in enumerate(responses, start=1):
+            if isinstance(reply, HTTPError):
+                failures[replica] = reply
             result = _task_result(
                 "Failed to create session",
                 f"replica {replica}/{len(payloads)}",
@@ -718,12 +797,15 @@ class AsyncSession(HTTPClient):
             if isinstance(result, str):
                 results.append(result)
         log.debug("Session IDs collected from create: %s", results)
+        _raise_failures("create", errors or self.errors, results, failures)
         return results
 
     async def events(
         self,
         ids: str | list[str],
         verbose: bool = False,
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> list[dict[str, str]] | None:
         """Get deployment events for a session[s].
 
@@ -731,9 +813,14 @@ class AsyncSession(HTTPClient):
             ids (Union[str, List[str]]): Session ID[s].
             verbose: Send events to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected events.
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Optional[List[Dict[str, str]]]: A list of events for the session[s].
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Notes:
             Configure application logging to display verbose events. Their output
@@ -747,6 +834,7 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: list[dict[str, str]] = []
+        failures: dict[str | int, HTTPError] = {}
         parameters: dict[str, str] = {"view": "events"}
 
         async def request(value: str) -> dict[str, str]:
@@ -759,6 +847,8 @@ class AsyncSession(HTTPClient):
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for value, reply in zip(ids, responses, strict=True):
+            if isinstance(reply, HTTPError):
+                failures[value] = reply
             result = _task_result(
                 "Failed to fetch events for session",
                 value,
@@ -773,17 +863,29 @@ class AsyncSession(HTTPClient):
                     log.info("Session ID: %s", key)
                     log.info(value)
         log.debug("Session events collected: %s", results)
-        return results if not verbose else None
+        output = results if not verbose else None
+        _raise_failures("events", errors or self.errors, output, failures)
+        return output
 
-    async def destroy(self, ids: str | list[str]) -> dict[str, bool]:
+    async def destroy(
+        self,
+        ids: str | list[str],
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> dict[str, bool]:
         """Destroy session[s].
 
         Args:
             ids (Union[str, List[str]]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
 
         Returns:
             Dict[str, bool]: A dictionary of session IDs
             and a bool indicating if the session was destroyed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -793,22 +895,80 @@ class AsyncSession(HTTPClient):
         """
         ids = _ids(ids)
         results: dict[str, bool] = {}
+        failures: dict[str | int, HTTPError] = {}
 
-        async def request(value: str) -> tuple[str, bool]:
+        async def request(value: str) -> tuple[str, HTTPError | None]:
             try:
                 await self.asynclient.delete(url=_session_url(value))
             except HTTPError as err:
-                return value, _destroy_failure(value, err)
-            else:
-                return value, True
+                _destroy_failure(value, err)
+                return value, err
+            return value, None
 
         tasks = [request(value) for value in ids]
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for reply in responses:
             _raise_authentication_failure(reply)
             if isinstance(reply, tuple):
-                results[reply[0]] = reply[1]
+                value, failure = reply
+                results[value] = failure is None
+                if failure is not None:
+                    failures[value] = failure
         log.debug(results)
+        _raise_failures("destroy", errors or self.errors, results, failures)
+        return results
+
+    async def renew(
+        self,
+        ids: str | list[str],
+        *,
+        errors: Literal["ignore", "raise"] | None = None,
+    ) -> dict[str, bool]:
+        """Renew interactive session[s], resetting their lifetime.
+
+        Args:
+            ids (Union[str, List[str]]): Session ID[s].
+            errors: Failure policy for this call. Defaults to the client's
+                ``errors`` setting.
+
+        Returns:
+            Dict[str, bool]: A dictionary of session IDs
+            and a bool indicating if the session was renewed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any request failed.
+
+        Examples:
+            >>> from canfar.sessions import AsyncSession
+            >>> session = AsyncSession()
+            >>> await session.renew(ids="hjko98yghj")
+            >>> await session.renew(ids=["hjko98yghj", "ikvp1jtp"])
+        """
+        ids = _ids(ids)
+        results: dict[str, bool] = {}
+        failures: dict[str | int, HTTPError] = {}
+
+        async def request(value: str) -> tuple[str, HTTPError | None]:
+            try:
+                await self.asynclient.post(
+                    url=_session_url(value), params={"action": "renew"}
+                )
+            except HTTPError as err:
+                _renew(value, err)
+                return value, err
+            return value, None
+
+        tasks = [request(value) for value in ids]
+        responses = await asyncio.gather(*tasks, return_exceptions=True)
+        for reply in responses:
+            _raise_authentication_failure(reply)
+            if isinstance(reply, tuple):
+                value, failure = reply
+                results[value] = failure is None
+                if failure is not None:
+                    failures[value] = failure
+        log.debug(results)
+        _raise_failures("renew", errors or self.errors, results, failures)
         return results
 
     async def destroy_with(
@@ -817,6 +977,7 @@ class AsyncSession(HTTPClient):
         *,
         kind: Kind = "headless",
         status: Status = "Completed",
+        errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, bool]:
         """Destroy session[s] matching a prefix or regex pattern.
 
@@ -825,11 +986,16 @@ class AsyncSession(HTTPClient):
                 Treated literally unless regex meta-characters are found.
             kind (Kind): Type of session. Defaults to "headless".
             status (Status): Status of the session. Defaults to "Completed".
+            errors: Failure policy for the deletions. Defaults to the client's
+                ``errors`` setting.
 
 
         Returns:
             Dict[str, bool]: A dictionary of session IDs
             and a bool indicating if the session was destroyed.
+
+        Raises:
+            SessionRequestError: If ``errors`` is ``"raise"`` and any deletion failed.
 
         Notes:
             - If the value contains regex metacharacters (e.g., `.^$*+?{}[]()|`), it is
@@ -845,7 +1011,7 @@ class AsyncSession(HTTPClient):
         """
         regex = _session_name_pattern(prefix)
         sessions = await self.fetch(kind=kind, status=status)
-        return await self.destroy(_matching_session_ids(sessions, regex))
+        return await self.destroy(_matching_session_ids(sessions, regex), errors=errors)
 
     async def connect(self, ids: list[str] | str) -> None:
         """Connect to a session[s] in a web browser.

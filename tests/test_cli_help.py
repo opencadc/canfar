@@ -28,6 +28,7 @@ COMMANDS = [
     ["events"],
     ["info"],
     ["logs"],
+    ["renew"],
     ["prune"],
     ["ps"],
     ["stats"],

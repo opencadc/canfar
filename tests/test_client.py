@@ -714,3 +714,148 @@ def test_non_readable_certfile() -> None:
     Path(temp_path).chmod(0o000)
     with pytest.raises(PermissionError):
         HTTPClient(certificate=temp_path, url="https://example.com")
+
+
+class TestCustomTransport:
+    """Test caller-injected transport handling on HTTPClient."""
+
+    def test_sync_client_uses_injected_transport_and_does_not_close_it(
+        self,
+    ) -> None:
+        """Sync client sends requests via transport and close leaves it open."""
+        closed = False
+
+        class SyncTransport(httpx2.BaseTransport):
+            def handle_request(self, request: httpx2.Request) -> httpx2.Response:
+                payload = {"source": "sync_pool"}
+                return httpx2.Response(200, json=payload, request=request)
+
+            def close(self) -> None:
+                nonlocal closed
+                closed = True
+
+        transport = SyncTransport()
+        with HTTPClient(
+            token=SecretStr("test-token"),
+            url="https://example.test",
+            transport=transport,
+        ) as client:
+            response = client.client.get("probe")
+            assert response.status_code == 200
+            assert response.json() == {"source": "sync_pool"}
+
+        assert closed is False
+        transport.close()
+        assert closed is True
+
+    async def test_async_client_uses_injected_transport_and_does_not_close_it(
+        self,
+    ) -> None:
+        """Async client sends requests via transport and aclose leaves it open."""
+        closed = False
+
+        class AsyncPoolTransport(httpx2.AsyncBaseTransport):
+            async def handle_async_request(
+                self, request: httpx2.Request
+            ) -> httpx2.Response:
+                payload = {"source": "async_pool"}
+                return httpx2.Response(200, json=payload, request=request)
+
+            async def aclose(self) -> None:
+                nonlocal closed
+                closed = True
+
+        transport = AsyncPoolTransport()
+        async with HTTPClient(
+            token=SecretStr("test-token"),
+            url="https://example.test",
+            transport=transport,
+        ) as client:
+            response = await client.asynclient.get("probe")
+            assert response.status_code == 200
+            assert response.json() == {"source": "async_pool"}
+
+        assert closed is False
+        await transport.aclose()
+        assert closed is True
+
+    def test_sync_client_rejects_pure_async_transport(self) -> None:
+        """Building a sync client with an AsyncBaseTransport raises TypeError."""
+
+        class PureAsyncTransport(httpx2.AsyncBaseTransport):
+            async def handle_async_request(
+                self, request: httpx2.Request
+            ) -> httpx2.Response:
+                return httpx2.Response(200, request=request)
+
+        client = HTTPClient(
+            token=SecretStr("test-token"),
+            url="https://example.test",
+            transport=PureAsyncTransport(),
+        )
+        with pytest.raises(TypeError, match="BaseTransport"):
+            _ = client.client
+
+    async def test_async_client_rejects_pure_sync_transport(self) -> None:
+        """Building an async client with a BaseTransport raises TypeError."""
+
+        class PureSyncTransport(httpx2.BaseTransport):
+            def handle_request(self, request: httpx2.Request) -> httpx2.Response:
+                return httpx2.Response(200, request=request)
+
+        client = HTTPClient(
+            token=SecretStr("test-token"),
+            url="https://example.test",
+            transport=PureSyncTransport(),
+        )
+        with pytest.raises(TypeError, match="AsyncBaseTransport"):
+            _ = client.asynclient
+
+    def test_mock_transport_serves_both_sync_and_async(self) -> None:
+        """MockTransport implements both protocols and serves both client modes."""
+        transport = httpx2.MockTransport(
+            lambda req: httpx2.Response(200, json={"ok": True}, request=req)
+        )
+        client = HTTPClient(
+            token=SecretStr("test-token"),
+            url="https://example.test",
+            transport=transport,
+        )
+        assert client.client.get("probe").json() == {"ok": True}
+
+    def test_transport_with_runtime_certificate_raises_value_error(
+        self, tmp_path
+    ) -> None:
+        """Combining transport with runtime cert raises ValueError."""
+        cert_path = tmp_path / "cert.pem"
+        generate_cert(cert_path)
+        transport = httpx2.HTTPTransport()
+
+        with pytest.raises(ValueError, match=r"X\.509 client certificate"):
+            HTTPClient(
+                certificate=cert_path,
+                url="https://example.test",
+                transport=transport,
+            )
+
+    def test_transport_with_saved_x509_credential_raises_value_error(
+        self, tmp_path
+    ) -> None:
+        """Combining transport with saved X.509 record raises ValueError."""
+        cert_path = tmp_path / "cert.pem"
+        generate_cert(cert_path)
+        transport = httpx2.HTTPTransport()
+
+        with pytest.raises(ValueError, match=r"X\.509 client certificate"):
+            HTTPClient(
+                config=x509_config(idp="cadc", path=cert_path, expiry=1000.0),
+                url="https://example.test",
+                transport=transport,
+            )
+
+    @pytest.mark.parametrize("name", ["CANFAR_TRANSPORT", "TRANSPORT"])
+    def test_transport_ignores_env_var(self, monkeypatch, name) -> None:
+        """No environment variable can supply the transport."""
+        monkeypatch.setenv(name, "invalid-transport-string")
+        client = HTTPClient(token=SecretStr("token"), url="https://example.test")
+        assert client.transport is None
