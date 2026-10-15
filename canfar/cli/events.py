@@ -25,7 +25,7 @@ def get_events(
 
     async def _get_events() -> None:
         """Fetch events for the requested sessions and render them."""
-        async with AsyncSession() as session:
+        async with AsyncSession(errors="ignore") as session:
             all_events = await session.events(ids=session_ids)
 
         if not all_events:
