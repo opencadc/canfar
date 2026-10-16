@@ -25,7 +25,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
 
 LOGGER_NAME = "canfar"
-LIBRARY_LOGGER_NAMES = ("vosfs", "fsspec_cli")
+LIBRARY_LOGGER_NAMES = ("vosfs", "fss_cli")
 """Storage libraries behind ``canfar data`` whose records follow CANFAR's level."""
 _LOCK = threading.Lock()
 

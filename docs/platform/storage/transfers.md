@@ -122,7 +122,7 @@ canfar data find vault:/project --type f
 ```
 
 Use `canfar data --help` and the individual command help for the complete
-upstream fsspec-cli surface. The command output is intentionally owned by that
+upstream fss-cli surface. The command output is intentionally owned by that
 application; CANFAR does not add an active-server banner to it.
 
 ## Copy files and directories

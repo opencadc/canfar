@@ -107,10 +107,10 @@
     Implement VOSpace as an fsspec filesystem. A VOSpace node is another backend, not a special protocol.
   ]
   #v(4mm)
-  #link("https://github.com/shinybrar/vosfs")[github.com/shinybrar/vosfs]
+  #link("https://github.com/shinybrar/vostools")[github.com/shinybrar/vostools]
 ]
 
-// 3. fsspec-cli + claim
+// 3. fss-cli + claim
 #slide(
   [One CLI across identity providers.],
   eyebrow: [The front door],
@@ -133,7 +133,7 @@
   #highlight[
     #text(size: 11pt, weight: "bold", fill: blue)[POSIX for any fsspec]
     #v(2mm)
-    #text(size: 26pt, weight: "bold")[fsspec-cli]
+    #text(size: 26pt, weight: "bold")[fss-cli]
     #v(2mm)
     Turns any fsspec into a POSIX-like experience: *ls*, *cp*, *head*, *rm*. *canfar data* is that CLI with your logins already wired.
   ]
