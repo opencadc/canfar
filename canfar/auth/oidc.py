@@ -128,6 +128,20 @@ def _parse_device_authorization(response: Response) -> DeviceAuthorization:
         raise ValueError(msg) from None
 
 
+def _raise_poll_http_error(error: HTTPStatusError) -> NoReturn:
+    """Translate a token-endpoint HTTP failure without exposing its body.
+
+    A client error whose body is not a JSON object is a malformed token
+    response. A 5xx response is raised before that body is parsed and stays a
+    generic failure.
+    """
+    if error.response.status_code < 500:
+        msg = "OIDC device authorization failed: malformed token response"
+    else:
+        msg = "OIDC device authorization failed"
+    raise ValueError(msg) from None
+
+
 def _raise_poll_oauth_error(error: OAuthError) -> NoReturn:
     """Translate an OAuth device-poll error into the public protocol errors."""
     if error.error == "authorization_pending":
@@ -298,9 +312,8 @@ async def _poll_token(url: str, code: str, client: AsyncOAuth2Client) -> dict[st
         )
     except OAuthError as error:
         _raise_poll_oauth_error(error)
-    except HTTPStatusError:
-        msg = "OIDC device authorization failed"
-        raise ValueError(msg) from None
+    except HTTPStatusError as error:
+        _raise_poll_http_error(error)
     except ValueError:
         msg = "OIDC device authorization failed: malformed token response"
         raise ValueError(msg) from None
@@ -721,9 +734,8 @@ def _sync_poll_token(
         )
     except OAuthError as error:
         _raise_poll_oauth_error(error)
-    except HTTPStatusError:
-        msg = "OIDC device authorization failed"
-        raise ValueError(msg) from None
+    except HTTPStatusError as error:
+        _raise_poll_http_error(error)
     except ValueError:
         msg = "OIDC device authorization failed: malformed token response"
         raise ValueError(msg) from None
