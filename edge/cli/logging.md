@@ -62,7 +62,7 @@ with its query and the response body. These records follow the same
 stderr/file routing; do not enable debug logging if response bodies must
 remain private.
 
-The storage libraries behind `canfar data`, `vosfs` and `fsspec-cli`, follow
+The storage libraries behind `canfar data`, `vosfs` and `fss-cli`, follow
 the same level and sinks. Use `canfar -v data cp` to log completed file
 operations to stderr and, when configured, your log file. Recursive copies
 also report verified skips and a final verification record. A remote copy

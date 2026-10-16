@@ -2132,7 +2132,9 @@ their contracts:</p>
 or later for compatible OpenID Connect clients. If your code handles HTTP
 exceptions or supplies test transports, use the corresponding <code>httpx2</code> types;
 see the <a href="../migration/#update-http-client-imports">upgrade guide</a>.</p>
-<p>The storage dependencies are pinned to <code>vosfs</code> 0.11.0 and <code>fsspec-cli</code> 0.10.0.
+<p>The storage dependencies are pinned to <code>vosfs</code> 0.11.0 and <code>fss-cli</code> 0.10.0
+from <code>shinybrar/vostools</code>. <code>fss-cli</code> is the renamed <code>fsspec-cli</code> distribution;
+import it as <code>fss_cli</code>.
 Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See <a href="../../cli/data/">Data commands</a>.
 These releases reduce requests during tree and bulk operations and report
@@ -2161,7 +2163,7 @@ dependency update builds on them:</p>
 <tr>
 <td>Storage</td>
 <td><code>canfar data</code>, explicit <code>identifiers()</code> / <code>filesystem()</code>, and caching guidance</td>
-<td><code>vosfs</code> 0.11.0 and <code>fsspec-cli</code> 0.10.0, including verified recursive-copy resumption and transfer logging</td>
+<td><code>vosfs</code> 0.11.0 and <code>fss-cli</code> 0.10.0 from <code>shinybrar/vostools</code>, including verified recursive-copy resumption and transfer logging</td>
 </tr>
 <tr>
 <td>Authentication</td>
@@ -2201,7 +2203,7 @@ follow the <a href="../migration/">upgrade guide</a> when moving from the publis
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 00:03:59 UTC">October 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 01:03:29 UTC">October 16, 2026</span>
   </span>
 
     

@@ -198,6 +198,6 @@ The public Python storage surface is deliberately small:
 from canfar.storage import filesystem, identifiers
 ```
 
-The fsspec-cli source mapping is private. There is no configuration helper,
+The fss-cli source mapping is private. There is no configuration helper,
 automatic `vos://` scheme, or module member for each configured identifier.
 Keep the Storage Identifier and the path as separate arguments.
