@@ -31,7 +31,7 @@ def _patch_config(path: Path):
 def _write_config(path: Path, *, banner: bool | None = None) -> None:
     """Write a minimal config fixture for machine-output tests."""
     data = {
-        "version": 1,
+        "version": 2,
         "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
         "authentication": {
             "cadc": {

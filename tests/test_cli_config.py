@@ -175,7 +175,7 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
         result = runner.invoke(config, ["show"])
 
     assert result.exit_code == 0
-    assert "'version': 1" in result.stdout
+    assert "'version': 2" in result.stdout
 
     result = runner.invoke(config, ["ls"])
     assert result.exit_code == 2
@@ -224,7 +224,7 @@ def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:
     assert not result.stdout.startswith("@")
     payload = json.loads(result.stdout)
     assert set(payload) == _CONFIG_KEYS
-    assert payload["version"] == 1
+    assert payload["version"] == 2
 
 
 def test_config_show_yaml_emits_configuration_model(tmp_path: Path) -> None:
@@ -248,7 +248,7 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
     config_path.write_text(
         yaml.dump(
             {
-                "version": 1,
+                "version": 2,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -304,7 +304,7 @@ def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
     config_path.write_text(
         yaml.dump(
             {
-                "version": 1,
+                "version": 2,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -384,7 +384,7 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
     config_path.write_text(
         yaml.dump(
             {
-                "version": 1,
+                "version": 2,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -440,7 +440,7 @@ def test_config_get_json_redacts_secrets_inside_credential_record(
     config_path.write_text(
         yaml.dump(
             {
-                "version": 1,
+                "version": 2,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",

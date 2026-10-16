@@ -47,7 +47,7 @@ def _logging_contract_probe() -> None:
 
 def _write_null_active_server_config(path: Path) -> None:
     data = {
-        "version": 1,
+        "version": 2,
         "active": {"authentication": "cadc", "server": None},
         "authentication": {
             "cadc": {
@@ -256,7 +256,7 @@ def unreadable_config(
             "version: 1\nfuture_key: true\n",
             "future_key = True (Extra inputs are not permitted)",
         ),
-        ("version: 99\n", "version = 99 (expected 1)"),
+        ("version: 99\n", "version = 99 (expected 2)"),
         ("version: [1\n", "invalid YAML: while parsing a flow sequence"),
     ],
     ids=["unknown-field", "unsupported-version", "malformed-yaml"],

@@ -241,7 +241,7 @@ def test_login_existing_cadc_reuses_or_reauthenticates(
     _write_config(
         config_path,
         {
-            "version": 1,
+            "version": 2,
             "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
             "authentication": {
                 "cadc": {
@@ -304,7 +304,7 @@ def test_login_presents_device_flow_failure_on_terminal(
         _write_config(
             config_path,
             {
-                "version": 1,
+                "version": 2,
                 "active": {"authentication": "srcnet", "server": None},
                 "authentication": {"srcnet": {"mode": "oidc"}},
             },

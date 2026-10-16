@@ -44,14 +44,7 @@ def get_value(config: Configuration, path: str) -> Any:
 
 def _validated_copy(config: Configuration, **updates: Any) -> Configuration:
     """Validate a source-isolated copy of a complete Configuration."""
-    data = {**config.model_dump(mode="python"), **updates}
-    candidate = config.__class__.model_construct()
-    # Full validation must not re-enter BaseSettings persisted sources.
-    config.__class__.__pydantic_validator__.validate_python(
-        data,
-        self_instance=candidate,
-    )
-    return candidate
+    return config.from_document({**config.model_dump(mode="python"), **updates})
 
 
 def _updated_data(config: Configuration, path: str, value: Any) -> dict[str, Any]:
