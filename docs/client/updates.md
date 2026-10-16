@@ -85,7 +85,8 @@ expiry hooks, for that client only.
   alternative spellings were removed, including the login alias under `auth`;
   the [migration table](migration.md#update-command-lines) lists replacements.
 - Use `config.editor.get()`, `.set()`, and `.save()` for validated configuration
-  edits. The stored schema remains stable; the editing methods moved.
+  edits. The editing methods moved. A written version 1 file is rewritten as
+  version 2 the first time it loads.
 - Use `--log-level`, `-v` (`info`: one line per Science Platform HTTP
   response), or `-vv` (`debug`) before the command; `-v` previously selected
   `error`, and `info` needed `-vvv`. Add `--log-file PATH` for a rotating JSON
@@ -98,7 +99,9 @@ expiry hooks, for that client only.
   Supported machine-output commands omit it automatically.
 - Read Server limits from `resources`. The flat `cores`, `ram`, and `gpus`
   Server fields are gone, as are the unused Server `status` field and
-  `console.file` setting; saved configurations still load. See the
+  `console.file` setting. Loading a version 1 file rewrites it as version 2
+  and fills omitted defaults such as `arc` and `vault` on the shipped CADC
+  server. See the
   [upgrade guide](migration.md#read-server-limits-from-resources).
 - Type a number to choose an Identity Provider or Server when `canfar login`
   or `canfar auth use` asks; the prompts list the choices by number instead of

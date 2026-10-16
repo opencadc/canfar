@@ -26,7 +26,7 @@ from canfar.models.registry import ContainerRegistry
 
 def _sample_config(**overrides: Any) -> dict[str, Any]:
     payload: dict[str, Any] = {
-        "version": 1,
+        "version": 2,
         "active": {
             "authentication": "cadc",
             "server": "canfar",
@@ -112,7 +112,7 @@ class TestConfigurationDefaults:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 1
+        assert config.version == 2
         assert config.active.authentication == "cadc"
         assert config.active.server == "canfar"
         assert set(config.authentication) == {"cadc"}
@@ -515,18 +515,20 @@ class TestConfigurationSerialization:
         assert loaded.servers["canfar"].idp == "cadc"
         assert loaded == config
 
-    def test_existing_v1_configuration_without_storage_loads_unchanged(
+    def test_version_2_configuration_without_storage_loads_unchanged(
         self, tmp_path: Path
     ) -> None:
-        """A released storage-less Server remains unchanged on load."""
+        """A version 2 Server without storage is not rewritten on load."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.safe_dump(_sample_config()), encoding="utf-8")
+        original = config_path.read_bytes()
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 1
+        assert config.version == 2
         assert config.servers["canfar"].storage == {}
+        assert config_path.read_bytes() == original
 
     def test_save_creates_directory(self, tmp_path: Path) -> None:
         """Save creates parent directories when missing."""
@@ -630,7 +632,7 @@ class TestConfigurationSerialization:
             config.editor.save()
 
         yaml_data = yaml.safe_load(temp_config_path.read_text(encoding="utf-8"))
-        assert yaml_data["version"] == 1
+        assert yaml_data["version"] == 2
         assert yaml_data["active"]["authentication"] == "cadc"
         assert yaml_data["authentication"]["cadc"]["mode"] == "x509"
         assert yaml_data["authentication"]["cadc"]["idp"] == "cadc"

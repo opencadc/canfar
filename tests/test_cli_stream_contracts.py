@@ -58,7 +58,7 @@ def _write_config(path: Path, *, with_server: bool) -> None:
     path.write_text(
         yaml.safe_dump(
             {
-                "version": 1,
+                "version": 2,
                 "active": {"authentication": "cadc", "server": server_name},
                 "authentication": {
                     "cadc": {"mode": "x509", "path": None, "expiry": 0.0}
@@ -130,10 +130,10 @@ def test_config_success_warning_and_failure_keep_stream_contracts(
     assert "does not exist, showing defaults" in warning_stderr
     assert "does not exist, showing defaults" not in " ".join(warning.stdout.split())
     if load is None:
-        assert "'version': 1" in warning.stdout
+        assert "'version': 2" in warning.stdout
     else:
         payload = load(warning.stdout)
-        assert payload["version"] == 1
+        assert payload["version"] == 2
         assert "@" not in warning.stdout
 
     with _config_path(config_path):

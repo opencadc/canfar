@@ -256,7 +256,7 @@ The persisted shape separates Authentication Records and Science Platform
 Servers. `active.server` refers to a Server Name, not an IVOA URI:
 
 ```yaml
-version: 1
+version: 2
 active:
   authentication: cadc
   server: canfar
@@ -280,6 +280,12 @@ servers:
 
 `resources` is written by discovery and `server use`; it is absent until a
 Server has reported its limits.
+
+A file written by an older client, such as `version: 1` from v1.4.1, is
+upgraded the first time it loads. The client fills in current defaults, keeps
+your values, rewrites the file, and prints one line such as
+`Migrating canfar client config v1 → v2` on stderr. A missing file is not
+created.
 
 Use `canfar config get` and `canfar config set` for dotted configuration
 paths. Values passed to `config set` are parsed as YAML:

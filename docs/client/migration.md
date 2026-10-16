@@ -64,8 +64,8 @@ config.editor.save()
 Use the public `canfar.authentication` and `canfar.server` operations for
 credential and server selection, rather than removed Configuration service
 methods. See [Install and set up](get-started.md#edit-and-save-configuration).
-The stored schema is unchanged by the editor move; a reset is unnecessary if
-your existing configuration loads successfully.
+The editor move does not require a reset. A written version 1 file is migrated
+to version 2 the first time it loads.
 
 ### Update HTTP client imports
 
@@ -128,10 +128,13 @@ showed `2`, `16`, and `0` when the Server had never reported them.
 A limit the Server does not advertise is `null` in `canfar server ls -o json`
 and `None` in Python, so check for it before comparing. The Server `status`
 field, which discovery never filled in, is also gone from the configuration and
-from `canfar server ls -o json`. Configuration files saved by v1.4.1 still
-load, and the retired fields are dropped the next time the configuration is
-saved. Run `canfar login IDP` or `canfar server use NAME` to read the limits
-again.
+from `canfar server ls -o json`. The first time this client loads a version 1
+file it prints `Migrating canfar client config v1 → v2` and rewrites that
+file as version 2. Your saved values stay. Omitted defaults are filled, so the
+shipped CADC server gains `arc` and `vault` when the old file had no storage.
+The old `cores`, `ram`, `gpus`, and `status` values are dropped and are not
+copied into `resources`. Run `canfar login IDP` or `canfar server use NAME` to
+read the limits again. A missing configuration file is not created.
 
 ### Request at most 256 replicas
 
