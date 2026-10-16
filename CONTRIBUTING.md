@@ -1,6 +1,8 @@
 # Contributing to CANFAR
 
-Thank you for considering contributing to the canfar project! We welcome contributions from everyone. Please follow the guidelines below to help us maintain a high-quality codebase.
+You can contribute through questions, feedback, research examples, documentation,
+testing, or code. Read the [community guidelines](https://www.opencadc.org/canfar/edge/platform/community/guidelines/)
+for where to post and how the team follows up.
 
 We follow the [Contributor Convenant of Code of Conduct](https://github.com/opencadc/canfar/blob/main/CODE_OF_CONDUCT.md). If you wish to contribute to canfar, please make sure to familiarize yourself with it.
 
@@ -8,10 +10,17 @@ Contributions are not limited to just code. You can help us by:
 
 - Answering questions on the [Discussions board](https://github.com/opencadc/canfar/discussions)
 - Improving the [Documentation](https://github.com/opencadc/canfar/tree/main/docs)
-- Reporting bugs and suggesting features via [GitHub Issues](https://github.com/opencadc/canfar/issues) (see our [Bug Reporting Guide](https://opencadc.github.io/canfar/bug-reports/) for detailed instructions)
+- Reporting problems through the [issue forms](https://github.com/opencadc/canfar/issues/new/choose). A short description is enough to start; see the [bug reporting guide](https://www.opencadc.org/canfar/edge/client/bug-reports/).
+- Suggesting improvements in [Ideas](https://github.com/opencadc/canfar/discussions/categories/ideas) or sharing experiences in [Feedback](https://github.com/opencadc/canfar/discussions/categories/feedback)
 - Spreading the word about CANFAR
 
 ## How to Contribute Code
+
+Maintainers review community intake weekly and summarize progress in the
+existing platform release notes every three months with the new release.
+Individual reports receive updates when decisions or release availability
+change. The [community triage guide](https://www.opencadc.org/canfar/edge/agents/community/) describes the
+maintainer procedure and labels.
 
 ### 1. Fork the Repository
 

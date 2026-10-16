@@ -30,14 +30,16 @@ SKILLS = ROOT / "skills"
 DOCS = ROOT / "docs"
 
 SKILL_FILES = sorted(SKILLS.rglob("*.md"))
-# Contributor records, release notes, and the migration guide name removed
-# interfaces on purpose; every other page describes the current interface.
+# Contributor records, historical release notes, and the migration guide name
+# removed interfaces on purpose; other pages describe the current interface.
 DOC_FILES = sorted(
     path
     for path in DOCS.rglob("*.md")
     if path.relative_to(DOCS).parts[0] not in {"agents", "releases"}
     and path.relative_to(DOCS).as_posix() not in {"client/migration.md", "changelog.md"}
 )
+# The current launch notes must describe commands and APIs this client has.
+DOC_FILES.append(DOCS / "releases/2026-3.md")
 # Removed commands the user docs name while telling readers what replaced them.
 # The skill gets no such allowance: it names only commands that exist.
 REMOVED_COMMANDS = {("context",), ("storage",)}

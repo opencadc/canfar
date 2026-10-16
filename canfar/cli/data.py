@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 _DATA_GROUP_META_KEY = "canfar.data_group"
 _DATA_ARGS_META_KEY = "canfar.data_args"
 
+_BETA = "CANFAR Data is in beta. Share feedback with `canfar feedback`."
+
 _OPERANDS = (
     "Name every path IDENTIFIER:/PATH, for example vault:/home/USER/data.fits; "
     "use local:/PATH for files on this computer, such as local:/tmp/."
@@ -47,7 +49,7 @@ def group() -> TyperGroup:
             capabilities={"recursion": {"copy": True, "remove": False}},
         ).typer_app
     )
-    epilog = f"{_OPERANDS} Identifiers: {', '.join(sources)}."
+    epilog = f"{_BETA} {_OPERANDS} Identifiers: {', '.join(sources)}."
     for command in commands.commands.values():
         command.epilog = epilog
     return commands
@@ -102,8 +104,8 @@ class _DataGroup(TyperGroup):
 
 data = typer.Typer(
     cls=_DataGroup,
-    help="Operate on configured data sources.",
-    epilog=_OPERANDS,
+    help="Operate on configured data sources. Beta.",
+    epilog=f"{_BETA} {_OPERANDS}",
     add_completion=False,
     no_args_is_help=True,
 )

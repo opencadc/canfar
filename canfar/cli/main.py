@@ -187,7 +187,7 @@ _COMMANDS: dict[str, _LazyCommand] = {
     ),
     "data": _LazyCommand(
         "canfar.cli.data:data",
-        "Operate on configured data sources.",
+        "Operate on configured data sources. Beta.",
         "Data Management",
         group=True,
     ),
@@ -260,6 +260,9 @@ _COMMANDS: dict[str, _LazyCommand] = {
     ),
     "version": _LazyCommand(
         "canfar.cli.version:callback", "View client info", "Client Info"
+    ),
+    "feedback": _LazyCommand(
+        "canfar.cli.feedback:callback", "Find help and share feedback.", "Client Info"
     ),
 }
 """Root commands in help order, imported only when used."""

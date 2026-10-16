@@ -1,4 +1,8 @@
-"""Explicit access to configured VOSpace Services and the local filesystem."""
+"""Explicit access to configured VOSpace Services and the local filesystem.
+
+These Python storage tools and the Data CLI are being released in beta with
+client v1.5.0. See the community guidelines for feedback and support routes.
+"""
 
 from __future__ import annotations
 

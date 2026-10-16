@@ -63,15 +63,18 @@ def test_cli_startup_loads_no_command_dependencies(code: str) -> None:
     assert _loaded_after(code) == {"deferred": [], "commands": []}
 
 
-def test_a_command_loads_only_its_own_module() -> None:
-    """Running ``version`` imports its module but not the others."""
+@pytest.mark.parametrize("command", ["version", "feedback"])
+def test_a_command_loads_only_its_own_module(command: str) -> None:
+    """Client information commands import only their own modules."""
     loaded = _loaded_after(
-        "sys.argv = ['canfar', 'version']\n"
+        f"sys.argv = ['canfar', {command!r}]\n"
         "from canfar.cli.main import main\n"
         "try:\n    main()\nexcept SystemExit:\n    pass"
     )
 
-    assert loaded["commands"] == ["canfar.cli.version"]
+    assert loaded["commands"] == [f"canfar.cli.{command}"]
+    if command == "feedback":
+        assert loaded["deferred"] == []
 
 
 def test_every_root_command_loads_as_root_help_lists_it() -> None:
