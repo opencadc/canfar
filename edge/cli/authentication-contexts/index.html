@@ -2130,7 +2130,7 @@ discovery metadata and can still be used as a selector.</p>
 <h2 id="configuration-shape">Configuration shape<a class="headerlink" href="#configuration-shape" title="Permanent link">&para;</a></h2>
 <p>The persisted shape separates Authentication Records and Science Platform
 Servers. <code>active.server</code> refers to a Server Name, not an IVOA URI:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<div class="highlight"><pre><span></span><code><span class="nt">version</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
 <span class="nt">active</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">authentication</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">cadc</span>
 <span class="w">  </span><span class="nt">server</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">canfar</span>
@@ -2153,6 +2153,11 @@ Servers. <code>active.server</code> refers to a Server Name, not an IVOA URI:</p
 </code></pre></div>
 <p><code>resources</code> is written by discovery and <code>server use</code>; it is absent until a
 Server has reported its limits.</p>
+<p>A file written by an older client, such as <code>version: 1</code> from v1.4.1, is
+upgraded the first time it loads. The client fills in current defaults, keeps
+your values, rewrites the file, and prints one line such as
+<code>Migrating canfar client config v1 → v2</code> on stderr. A missing file is not
+created.</p>
 <p>Use <code>canfar config get</code> and <code>canfar config set</code> for dotted configuration
 paths. Values passed to <code>config set</code> are parsed as YAML:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>config<span class="w"> </span>get<span class="w"> </span>active.server
@@ -2185,7 +2190,7 @@ canfar<span class="w"> </span>config<span class="w"> </span><span class="nb">set
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 07:29:50 UTC">October 3, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 00:03:59 UTC">October 16, 2026</span>
   </span>
 
     
