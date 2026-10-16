@@ -18,8 +18,8 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator
     from pathlib import Path
 
+    from fss_cli import AsyncFilesystemSource
     from fsspec.spec import AbstractFileSystem
-    from fsspec_cli import AsyncFilesystemSource
     from pydantic import SecretStr
     from vosfs import VOSpaceFileSystem
 

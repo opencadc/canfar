@@ -503,7 +503,7 @@ class TestPublicSurface:
             storage.filesystem("missing")
 
     def test_data_source_mapping_is_private(self) -> None:
-        """The fsspec-cli source mapping is not a public storage API."""
+        """The fss-cli source mapping is not a public storage API."""
         _config(credential=x509_credential("inactive")).editor.save()
 
         assert not hasattr(storage, "sources")

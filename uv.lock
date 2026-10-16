@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.12' and sys_platform == 'emscripten'",
@@ -91,7 +91,7 @@ dependencies = [
     { name = "authlib" },
     { name = "cryptography" },
     { name = "defusedxml" },
-    { name = "fsspec-cli" },
+    { name = "fss-cli" },
     { name = "httpx2", extra = ["http2"] },
     { name = "humanize" },
     { name = "pydantic" },
@@ -127,7 +127,7 @@ requires-dist = [
     { name = "authlib", specifier = ">=1.8.0" },
     { name = "cryptography", specifier = ">=45.0.1" },
     { name = "defusedxml", specifier = ">=0.7.1" },
-    { name = "fsspec-cli", git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.10.0" },
+    { name = "fss-cli", git = "https://github.com/shinybrar/vostools?subdirectory=libs%2Ffss-cli&rev=d6e2a44e3433bcff2e8f61437f10f2ce9f902a72" },
     { name = "httpx2", extras = ["http2"], specifier = ">=2.0.0" },
     { name = "humanize", specifier = ">=4.16.0" },
     { name = "pydantic", specifier = ">=2.7.0" },
@@ -136,7 +136,7 @@ requires-dist = [
     { name = "rich", specifier = ">=15.0.0" },
     { name = "segno", specifier = ">=1.6.6" },
     { name = "typer", specifier = ">=0.27.2" },
-    { name = "vosfs", git = "https://github.com/shinybrar/vosfs?rev=v0.11.0" },
+    { name = "vosfs", git = "https://github.com/shinybrar/vostools?subdirectory=libs%2Fvosfs&rev=d6e2a44e3433bcff2e8f61437f10f2ce9f902a72" },
 ]
 
 [package.metadata.requires-dev]
@@ -719,21 +719,21 @@ wheels = [
 ]
 
 [[package]]
+name = "fss-cli"
+version = "0.10.0"
+source = { git = "https://github.com/shinybrar/vostools?subdirectory=libs%2Ffss-cli&rev=d6e2a44e3433bcff2e8f61437f10f2ce9f902a72#d6e2a44e3433bcff2e8f61437f10f2ce9f902a72" }
+dependencies = [
+    { name = "fsspec" },
+    { name = "typer" },
+]
+
+[[package]]
 name = "fsspec"
 version = "2026.9.0"
 source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/77/cd/9be253869fc42e764de7f3dedd6969af7d44ff9c3375214a3442a6f3fc08/fsspec-2026.9.0.tar.gz", hash = "sha256:0f08147951c8cb31d844c3547d631053b127863b60be04cf06e121333ee0e2fe", size = 333545, upload-time = "2026-09-18T17:50:42.825Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6c/c0/a98505f18594f1bce828bb159cec0fcf9860562f1a2c85913409fc8f3d9e/fsspec-2026.9.0-py3-none-any.whl", hash = "sha256:8dd6e646e99ea382bd85f97a45e6b526a442d79423a7dc673f1e2756d05fcb5f", size = 221738, upload-time = "2026-09-18T17:50:41.341Z" },
-]
-
-[[package]]
-name = "fsspec-cli"
-version = "0.10.0"
-source = { git = "https://github.com/shinybrar/vosfs?subdirectory=src%2Ffsspec-cli&rev=fsspec-cli-v0.10.0#054cfd9e1cd68081d23578595a9c5c16f70dee60" }
-dependencies = [
-    { name = "fsspec" },
-    { name = "typer" },
 ]
 
 [[package]]
@@ -2019,7 +2019,7 @@ wheels = [
 [[package]]
 name = "vosfs"
 version = "0.11.0"
-source = { git = "https://github.com/shinybrar/vosfs?rev=v0.11.0#d7e2cbc5a5d121a2cc006796884452ad5ed7539c" }
+source = { git = "https://github.com/shinybrar/vostools?subdirectory=libs%2Fvosfs&rev=d6e2a44e3433bcff2e8f61437f10f2ce9f902a72#d6e2a44e3433bcff2e8f61437f10f2ce9f902a72" }
 dependencies = [
     { name = "defusedxml" },
     { name = "fsspec" },

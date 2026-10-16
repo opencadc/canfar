@@ -22,8 +22,8 @@ if TYPE_CHECKING:
     from collections.abc import AsyncIterator, Mapping
     from pathlib import Path
 
+    from fss_cli import AsyncFilesystemSource
     from fsspec.spec import AbstractFileSystem
-    from fsspec_cli import AsyncFilesystemSource
 
 runner = CliRunner()
 
@@ -88,7 +88,7 @@ def test_upstream_app_receives_configured_sources_and_policy(monkeypatch) -> Non
 
     monkeypatch.setattr(storage, "Configuration", configuration)
     monkeypatch.setattr(storage, "_vospace", source_factory)
-    monkeypatch.setattr("fsspec_cli.App", FakeApp)
+    monkeypatch.setattr("fss_cli.App", FakeApp)
 
     data_cli.group()
     data_cli.group()

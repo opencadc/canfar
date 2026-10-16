@@ -18,7 +18,7 @@ DEFERRED = (
     "canfar.client",
     "canfar.server",
     "fsspec",
-    "fsspec_cli",
+    "fss_cli",
     "httpx2",
     "segno",
 )

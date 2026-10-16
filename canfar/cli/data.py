@@ -36,7 +36,7 @@ def group() -> TyperGroup:
         TyperGroup: The upstream command group bound to configured sources.
     """
     # fsspec and the storage CLI load only when `canfar data` runs.
-    from fsspec_cli import App  # noqa: PLC0415
+    from fss_cli import App  # noqa: PLC0415
 
     from canfar.storage import _sources  # noqa: PLC0415
 
