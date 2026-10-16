@@ -1,5 +1,12 @@
 # Move and read data
 
+The `canfar data` commands and Python storage tools in `canfar.storage` are
+being released in beta with client v1.5.0. Until publication, these examples
+describe the development client. Check installed command help and API
+capabilities. Beta appears in CLI help only; operations and Python imports
+print no beta notice. For feedback, use `canfar feedback` when available or
+the [community guidelines](https://www.opencadc.org/canfar/edge/platform/community/guidelines/).
+
 Every operand is a **Storage Identifier** followed by an absolute path:
 `arc:/home/USER/file.fits`. `local` is the machine running the command. `arc`
 and `vault` are the default CADC identifiers; list the ones this user has with

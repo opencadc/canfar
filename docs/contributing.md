@@ -5,6 +5,11 @@ Contributions to CANFAR include code, tests, documentation, examples, issue
 reports, and improvements to the user experience. Read the
 [Code of Conduct](conduct.md) before participating.
 
+Start with the [community guidelines](platform/community/guidelines.md) for
+questions, quick feedback, and ideas. Short reports are welcome; maintainers
+can help gather technical details. We summarize progress every three months
+in the existing release notes and update individual reports as work changes.
+
 ## Set up
 
 CANFAR uses [uv](https://docs.astral.sh/uv/) for development:

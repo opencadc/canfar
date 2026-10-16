@@ -2,10 +2,31 @@
 
 # Support
 
-Start with the guide for the component that failed, then contact the service
-operator with a small, reproducible diagnostic set.
+Ask for help or tell us what happened. You do not need to identify the
+component responsible or prepare a complete bug report first.
 
-## Check the documentation first
+## Give feedback or ask a question
+
+Use [Q&A](https://github.com/opencadc/canfar/discussions/categories/q-a) for
+questions, [Feedback](https://github.com/opencadc/canfar/discussions/categories/feedback)
+for your experience, and [Ideas](https://github.com/opencadc/canfar/discussions/categories/ideas)
+for improvements. The [issue forms](https://github.com/opencadc/canfar/issues/new/choose)
+accept problem reports and documentation corrections. Start in Feedback if
+you are unsure. Read the [community guidelines](../community/guidelines.md)
+for the roadmap, voting, and what happens after you post.
+
+The development client and v1.5.0 provide `canfar feedback`, which prints
+the reporting URL without opening a browser or collecting information.
+It does not require authentication or a working configuration.
+
+The team reviews feedback weekly and summarizes progress in the platform
+release notes every three months with the new release. Individual
+conversations receive updates when decisions or release availability change.
+Email remains available if you prefer not to create a GitHub account.
+
+<span id="check-the-documentation-first"></span>
+
+## Troubleshooting guides
 
 - [Getting started](../get-started.md) covers login, server selection, and a
   first Session.
@@ -131,6 +152,8 @@ public issues.
 ## Community and bug reports
 
 Use the [CANFAR Discord](https://discord.gg/vcCQ8QBvBa) for community
-questions and the [GitHub issue tracker](https://github.com/opencadc/canfar/issues)
-for reproducible bugs or documentation changes. Search existing issues first
-and include a minimal reproduction.
+chat and [Discussions](https://github.com/opencadc/canfar/discussions) for
+questions, feedback, and ideas. The [bug reporting guide](../../client/bug-reports.md)
+explains what helps a report. Commands, versions, and reviewed error excerpts
+are useful when available, but are optional. Maintainers can help clarify a
+report and coordinate with upstream projects.

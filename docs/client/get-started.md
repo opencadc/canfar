@@ -13,6 +13,10 @@ resources.
     shown here. Read [What's new](updates.md) and the [upgrade guide](migration.md)
     before changing an existing environment.
 
+    CANFAR Data's CLI and Python storage tools are being released in beta
+    with v1.5.0. See the [Data guide](data.md) and
+    [community feedback routes](../platform/community/guidelines.md).
+
 ### Use the published release
 
 Install the released package for regular use, and use the documentation that

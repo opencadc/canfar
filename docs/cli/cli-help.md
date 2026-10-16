@@ -224,6 +224,18 @@ accepts the image-kind filter shown above. `version --debug` prints client,
 Python, operating-system, and dependency details for a bug report; it is not a
 logging control.
 
+### Help and feedback
+
+```bash
+canfar feedback
+```
+
+The development client and v1.5.0 print the GitHub chooser URL without
+authentication, configuration reads, browser opening, or diagnostics
+collection. Use it for problems, questions, ideas, and documentation feedback.
+See the [community guidelines](../platform/community/guidelines.md) for
+follow-up and private support.
+
 <span id="data"></span>
 <span id="client-configuration"></span>
 
@@ -242,6 +254,9 @@ Data operands use an explicit `Storage Identifier`, for example
 for the embedded command surface. Configuration keys use dotted paths; values
 passed to `config set` are parsed as YAML. See [Authentication and Servers](authentication-contexts.md)
 for the persisted Authentication, Server, and active-selection shape.
+
+The Data tools are being released in beta with v1.5.0. Bare Data and
+subcommand help show a beta notice; operations and Python calls do not.
 
 <span id="machine-output-contract"></span>
 

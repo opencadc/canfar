@@ -9,6 +9,7 @@ copyright: Copyright &copy; 1986-2025 Canadian Astronomy Data Centre
 remote_branch: gh-pages
 
 theme:
+  custom_dir: docs/overrides
   logo: static/logo.png
   favicon: static/logo.png
   name: material
@@ -102,6 +103,7 @@ hooks:
 
 exclude_docs: |
   hooks/**
+  overrides/**
   agents/adrs/**
   agents/research/**
   agents/reviews/**
@@ -129,18 +131,6 @@ extra:
       link: https://discord.gg/vcCQ8QBvBa
     - icon: fontawesome/solid/paper-plane
       link: mailto:support@canfar.net
-  analytics:
-    feedback:
-      title: Was this page helpful?
-      ratings:
-        - icon: material/emoticon-happy-outline
-          name: This page was helpful
-          data: 1
-          note: Thanks for your feedback!
-        - icon: material/emoticon-sad-outline
-          name: This page could be improved
-          data: 0
-          note: Let us know how we can improve this page.
 
 # Extensions
 markdown_extensions:
@@ -221,6 +211,7 @@ nav:
           - Registry: platform/containers/registry.md
       - Community:
           - Overview: platform/community/index.md
+          - Get Help and Give Feedback: platform/community/guidelines.md
           - CASA: platform/community/CASA_and_more.md
           - ALMA: platform/community/alma/index.md
       - Support:
@@ -276,6 +267,7 @@ nav:
               - Domain Docs: agents/domain.md
               - Issue Tracker: agents/issue-tracker.md
               - Triage Statuses: agents/triage-labels.md
+              - Community Triage: agents/community.md
               - Upstream Provenance: agents/upstream-provenance.md
       - Operations:
           - Platform Deployments: https://www.opencadc.org/deployments/

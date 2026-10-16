@@ -1,5 +1,12 @@
 # Data commands
 
+!!! info "CANFAR Data beta"
+
+    The `canfar data` commands and Python storage tools in `canfar.storage`
+    are being released in beta with client v1.5.0. These client interfaces
+    are available in the development checkout until that release is published.
+    [Share your experience or get help](../platform/community/guidelines.md#give-feedback-on-the-data-beta).
+
 Use `canfar data` to copy files between your computer and CANFAR storage,
 inspect remote files, and manage directories. Each path starts with a storage
 name: `local` means the computer running the command; configured names such as

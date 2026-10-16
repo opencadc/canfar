@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {{ super() }}
+  <aside aria-label="Community feedback">
+    <hr>
+    <p>
+      <a href="https://github.com/opencadc/canfar/issues/new/choose">Give feedback or report a problem</a>
+      · <a href="{{ 'platform/community/guidelines/' | url }}">Community guidelines</a>
+    </p>
+  </aside>
+{% endblock %}
