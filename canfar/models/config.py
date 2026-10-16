@@ -2,16 +2,20 @@
 
 from __future__ import annotations
 
+import copy
 import re
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any, Literal
 
+import yaml
 from pydantic import (
     AnyHttpUrl,
     AnyUrl,
     BaseModel,
     ConfigDict,
     Field,
+    ValidationError,
     model_validator,
 )
 
@@ -29,6 +33,7 @@ from pydantic_settings.sources import EnvSettingsSource
 
 from canfar import CONFIG_PATH
 from canfar.config.editor import ConfigurationEditor as _ConfigurationEditor
+from canfar.config.migration import ConfigResetRequiredError, schema_version, upgrade
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
     AuthenticationCredential,
@@ -115,8 +120,8 @@ class Configuration(BaseSettings):
         str_strip_whitespace=True,
     )
 
-    version: Literal[1] = Field(
-        default=1,
+    version: Literal[2] = Field(
+        default=2,
         description="Configuration schema version.",
     )
     # Pydantic deep-copies these mutable defaults for each instance.
@@ -174,6 +179,20 @@ class Configuration(BaseSettings):
             _CheckedYamlConfigSettingsSource(settings_cls, yaml_file=CONFIG_PATH),
             file_secret_settings,
         )
+
+    @classmethod
+    def from_document(cls, data: dict[str, Any]) -> Configuration:
+        """Validate ``data`` alone, without environment or file settings.
+
+        Args:
+            data: Complete configuration document, changed in place.
+
+        Returns:
+            The validated configuration.
+        """
+        config = cls.model_construct()
+        cls.__pydantic_validator__.validate_python(data, self_instance=config)
+        return config
 
     @model_validator(mode="after")
     def _normalize_and_validate_servers(self) -> Configuration:
@@ -295,7 +314,11 @@ class _CanfarEnvSettingsSource(EnvSettingsSource):
 
 
 class _CheckedYamlConfigSettingsSource(YamlConfigSettingsSource):
-    """YAML settings source that rejects unsupported configuration before loading."""
+    """YAML settings source that upgrades an older written schema once.
+
+    Only this source sees the file without environment or init overrides, so
+    an upgraded file is written here rather than in a model validator.
+    """
 
     def __init__(
         self,
@@ -303,13 +326,33 @@ class _CheckedYamlConfigSettingsSource(YamlConfigSettingsSource):
         *,
         yaml_file: Path,
     ) -> None:
-        from canfar.config.migration import ensure_current_config  # noqa: PLC0415
-
-        ensure_current_config(yaml_file)
+        self._config_path = yaml_file
         super().__init__(settings_cls, yaml_file=yaml_file)
 
     def _read_file(self, file_path: Path | Traversable) -> dict[str, Any]:
-        """Read YAML configuration without retired Server fields."""
-        from canfar.config.migration import drop_retired_server_fields  # noqa: PLC0415
+        """Read the file at the current schema version, rewriting an older one."""
+        try:
+            data = super()._read_file(file_path)
+        except yaml.YAMLError as err:
+            problem = f"invalid YAML: {' '.join(str(err).split())}"
+            raise ConfigResetRequiredError(self._config_path, [problem]) from err
 
-        return drop_retired_server_fields(super()._read_file(file_path))
+        current = Configuration.model_fields["version"].default
+        version = schema_version(self._config_path, data, current)
+        if version == current:
+            data["version"] = current
+            return data
+
+        defaults = Configuration.model_construct().model_dump(
+            mode="json", exclude_none=True
+        )
+        data = upgrade(data, version, defaults)
+        try:
+            config = Configuration.from_document(copy.deepcopy(data))
+        except ValidationError as exc:
+            raise ConfigResetRequiredError.from_validation(
+                self._config_path, exc
+            ) from exc
+        config.editor.save()
+        sys.stderr.write(f"Migrating canfar client config v{version} → v{current}\n")
+        return data

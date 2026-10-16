@@ -1,16 +1,14 @@
-"""Configuration compatibility checks for the current schema."""
+"""Configuration schema upgrades and the reset-required error."""
 
 from __future__ import annotations
 
 import reprlib
 from typing import TYPE_CHECKING, Any
 
-import yaml
-
 from canfar.errors import ErrorCode
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable
+    from collections.abc import Callable, Iterable
     from pathlib import Path
 
     from pydantic import ValidationError
@@ -63,53 +61,81 @@ class ConfigResetRequiredError(Exception):
         return cls(config_path, problems)
 
 
-_RETIRED_SERVER_FIELDS = ("cores", "ram", "gpus", "status")
-"""Server fields retired after v1.4.1; ``resources`` replaces the limits."""
-
-
-def drop_retired_server_fields(data: dict[str, Any]) -> dict[str, Any]:
-    """Remove retired Server fields so v1.4.1 configuration files still load.
-
-    The next save writes the configuration without them.
-
-    Args:
-        data: Parsed YAML configuration, changed in place.
-
-    Returns:
-        The same configuration data.
-    """
+def _v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
+    """Drop the v1.4.1 Server limits and console file; ``resources`` replaces them."""
     servers = data.get("servers")
     if isinstance(servers, dict):
         for server in servers.values():
             if isinstance(server, dict):
-                for field in _RETIRED_SERVER_FIELDS:
+                for field in ("cores", "ram", "gpus", "status"):
                     server.pop(field, None)
+    console = data.get("console")
+    if isinstance(console, dict):
+        console.pop("file", None)
     return data
 
 
-def ensure_current_config(config_path: Path) -> None:
-    """Require existing config files to use the current schema.
+UPGRADES: dict[int, Callable[[dict[str, Any]], dict[str, Any]]] = {1: _v1_to_v2}
+"""Steps keyed by the schema version they read; each returns the next version."""
+
+
+def schema_version(config_path: Path, data: Any, current: int) -> int:
+    """Return the version of a written document that this client can load.
 
     Args:
         config_path: Path to the YAML configuration file.
+        data: Parsed YAML document.
+        current: Schema version of ``Configuration``.
+
+    Returns:
+        ``current`` or an older version with an upgrade path to it.
 
     Raises:
-        ConfigResetRequiredError: If the file is malformed or unsupported.
+        ConfigResetRequiredError: If the document is not a mapping or its
+            version cannot be upgraded to ``current``.
     """
-    if not config_path.exists():
-        return
-
-    try:
-        with config_path.open(encoding="utf-8") as handle:
-            data = yaml.safe_load(handle) or {}
-    except yaml.YAMLError as err:
-        problem = f"invalid YAML: {' '.join(str(err).split())}"
-        raise ConfigResetRequiredError(config_path, [problem]) from err
-
     if not isinstance(data, dict):
         problem = f"{reprlib.repr(data)} (expected a mapping of settings)"
         raise ConfigResetRequiredError(config_path, [problem])
-    if data.get("version") not in (1, "1"):
-        version = reprlib.repr(data["version"]) if "version" in data else "<missing>"
-        problem = f"version = {version} (expected 1)"
-        raise ConfigResetRequiredError(config_path, [problem])
+    version = data.get("version")
+    if isinstance(version, str) and version.isdecimal():
+        version = int(version)
+    if version == current or version in UPGRADES:
+        return version
+    shown = reprlib.repr(data["version"]) if "version" in data else "<missing>"
+    problem = f"version = {shown} (expected {current})"
+    raise ConfigResetRequiredError(config_path, [problem])
+
+
+def upgrade(
+    data: dict[str, Any], version: int, defaults: dict[str, Any]
+) -> dict[str, Any]:
+    """Step ``data`` up to the defaults' version, then fill omitted defaults.
+
+    Args:
+        data: Written document at ``version``, changed in place.
+        version: Schema version of ``data``.
+        defaults: Current default document, including its ``version``.
+
+    Returns:
+        Document at the current version. User values win; nested mappings merge.
+    """
+    data.pop("version", None)
+    for step in range(version, defaults["version"]):
+        data = UPGRADES[step](data)
+    return _deep_merge(defaults, data)
+
+
+def _deep_merge(base: dict[str, Any], overlay: dict[str, Any]) -> dict[str, Any]:
+    """Overlay ``overlay`` onto ``base``.
+
+    Nested mappings merge. Every other value replaces the base value.
+    """
+    merged = dict(base)
+    for key, value in overlay.items():
+        current = merged.get(key)
+        if isinstance(current, dict) and isinstance(value, dict):
+            merged[key] = _deep_merge(current, value)
+        else:
+            merged[key] = value
+    return merged

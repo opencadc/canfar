@@ -44,7 +44,7 @@ class TestAuthenticationList:
     def test_list_returns_saved_authentication_summaries(self, tmp_path: Path) -> None:
         """Saved authentication records are exposed as summaries."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",
@@ -100,7 +100,7 @@ class TestAuthenticationShow:
     def test_show_returns_active_authentication_summary(self, tmp_path: Path) -> None:
         """Active authentication is summarized with server reference when set."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",
@@ -142,7 +142,7 @@ class TestAuthenticationUse:
     def test_use_switches_active_authentication(self, tmp_path: Path) -> None:
         """use() selects the requested IDP as active authentication."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",
@@ -190,7 +190,7 @@ class TestAuthenticationUse:
     def test_use_clears_incompatible_active_server(self, tmp_path: Path) -> None:
         """use() clears active server when it belongs to another IDP."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",
@@ -242,7 +242,7 @@ class TestAuthenticationUse:
         config_dir = home / ".canfar"
         config_dir.mkdir(parents=True)
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {"authentication": "srcnet", "server": None},
             "authentication": {
                 "srcnet": {
@@ -281,7 +281,7 @@ class TestAuthenticationUse:
     def test_use_keeps_compatible_active_server(self, tmp_path: Path) -> None:
         """use() preserves active server when it matches the selected IDP."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "srcnet",
                 "server": "SRCNet",
@@ -361,7 +361,7 @@ class TestAuthenticationLogin:
     ) -> None:
         """Existing authentication is preserved when force is false."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",
@@ -457,7 +457,7 @@ class TestAuthenticationLogin:
     ) -> None:
         """force=True overwrites an existing authentication record."""
         config_data = {
-            "version": 1,
+            "version": 2,
             "active": {
                 "authentication": "cadc",
                 "server": "CADC-CANFAR",

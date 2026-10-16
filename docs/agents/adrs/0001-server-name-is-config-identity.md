@@ -1,6 +1,6 @@
 # Server Name is the configuration identity for Science Platform Servers
 
-Client configuration stores Science Platform Servers as `servers: Dict[str, Server]` keyed by Server Name, and Authentication Records as `authentication: Dict[str, AuthenticationCredential]` keyed by IDP. Server Selection (`active.server`) and remembered selections (`active.servers`) reference Servers by name, not IVOA URI. We chose name over URI because dotted-path config access (`canfar config get servers.canfar.url`) needs keys without dots, and users think in names. Schema stays v1: v1 has not shipped, so no migration is required.
+Client configuration stores Science Platform Servers as `servers: Dict[str, Server]` keyed by Server Name, and Authentication Records as `authentication: Dict[str, AuthenticationCredential]` keyed by IDP. Server Selection (`active.server`) and remembered selections (`active.servers`) reference Servers by name, not IVOA URI. We chose name over URI because dotted-path config access (`canfar config get servers.canfar.url`) needs keys without dots, and users think in names. The written schema is version 2. A version 1 file is deep-merged onto the current defaults and rewritten as version 2 the first time it loads.
 
 ## Consequences
 
@@ -12,5 +12,5 @@ Client configuration stores Science Platform Servers as `servers: Dict[str, Serv
 ## Considered options
 
 - `Dict[str, Server]` keyed by IVOA URI: rejected, URIs contain dots and slashes and are hostile to dotted paths and env vars.
-- Keep `list[Server]` and teach the dotted-path editor name-based selectors: rejected, dict gives native path access with no editor magic, and pre-ship there is no migration cost.
+- Keep `list[Server]` and teach the dotted-path editor name-based selectors: rejected, dict gives native path access with no editor magic. v1 had not shipped when this was chosen.
 - Match discovery upserts by URI instead of name: rejected to keep name as the single identity; duplicate URIs under two names are acceptable.
