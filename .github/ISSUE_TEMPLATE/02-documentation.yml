@@ -1,0 +1,23 @@
+name: Improve the documentation
+description: Point out something unclear, missing, or incorrect.
+labels: [documentation, needs-triage]
+body:
+  - type: input
+    id: page
+    attributes:
+      label: Page or topic
+      description: Paste the page URL or name the topic if you could not find a page.
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What was unclear, missing, or incorrect?
+      description: Tell us what you wanted to learn or do.
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested wording or example
+      description: Optional. You do not need to write the correction yourself.

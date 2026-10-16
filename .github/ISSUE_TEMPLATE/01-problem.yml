@@ -1,0 +1,34 @@
+name: Report a problem
+description: Tell us what failed. A short description is enough to start.
+labels: [bug, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        You do not need to know which CANFAR component caused the problem.
+        Commands and diagnostics are optional; we can help gather details.
+        Remove credentials and private research data before posting.
+        For account or service help, email support@canfar.net.
+        Report vulnerabilities through our [security policy](https://github.com/opencadc/canfar/security/policy).
+  - type: textarea
+    id: problem
+    attributes:
+      label: What were you trying to do, and what happened?
+      description: Include the result you expected if it helps explain the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Command or steps
+      description: Paste a command with private paths replaced, or describe the actions you took.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: If known, include your client version, operating system, and whether you used the CLI, Python, or browser.
+  - type: textarea
+    id: details
+    attributes:
+      label: Error output or other details
+      description: A reviewed error excerpt or screenshot can help. Please do not attach full configuration files or unreviewed debug logs.

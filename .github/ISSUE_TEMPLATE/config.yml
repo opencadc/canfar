@@ -1,0 +1,23 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Ask a question
+    url: https://github.com/opencadc/canfar/discussions/categories/q-a
+    about: Ask how to use CANFAR or get help when you are stuck.
+  - name: Share quick feedback
+    url: https://github.com/opencadc/canfar/discussions/categories/feedback
+    about: Tell us what worked or was confusing. Start here if you are unsure where to post.
+  - name: Suggest an idea
+    url: https://github.com/opencadc/canfar/discussions/categories/ideas
+    about: Describe a research task you want to make easier and upvote existing proposals.
+  - name: Follow the roadmap
+    url: https://github.com/opencadc/canfar/discussions/345
+    about: Read the pinned roadmap and release updates.
+  - name: Private or account-specific support
+    url: https://www.opencadc.org/canfar/latest/platform/support/#contact-canfar-support
+    about: Email support@canfar.net for account access, service incidents, or private data concerns.
+  - name: Chat with the community
+    url: https://discord.gg/vcCQ8QBvBa
+    about: Ask questions and share experiences in CANFAR Discord.
+  - name: Report a security vulnerability
+    url: https://github.com/opencadc/canfar/security/policy
+    about: Follow the private reporting instructions instead of opening a public issue.
