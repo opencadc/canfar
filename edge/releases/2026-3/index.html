@@ -64,8 +64,6 @@
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-  
-
 
     
     
@@ -1408,6 +1406,8 @@
       
         
       
+        
+      
     
     
     
@@ -1467,6 +1467,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../platform/community/guidelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Help and Give Feedback
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -2216,6 +2244,7 @@
               
               <article class="md-content__inner md-typeset">
                 
+  
                   
 
 
@@ -2248,18 +2277,21 @@
 <li>Shared memory is available across all Session types through <code>/dev/shm</code>.</li>
 <li>Session ID included in the title for Web Terminal sessions.</li>
 </ul>
+<p><span id="python-client-cli-v150"></span></p>
 <h3 id="python-client-cli-v150"><strong>🐍 Python Client &amp; CLI (v1.5.0+)</strong><a class="headerlink" href="#python-client-cli-v150" title="Permanent link">&para;</a></h3>
-<p>Upgrade with:</p>
+<p>Once v1.5.0 is published, upgrade an existing installation with:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>upgrade<span class="w"> </span>canfar
 <span class="c1"># or: pip install -U canfar</span>
 </code></pre></div>
 <p>Intel Macs need wheels-only install for <code>cryptography</code>:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--no-build-package<span class="w"> </span>cryptography
 </code></pre></div>
-<h4 id="canfar-data-access">CANFAR Data Access<a class="headerlink" href="#canfar-data-access" title="Permanent link">&para;</a></h4>
+<p><span id="canfar-data-access"></span></p>
+<h4 id="canfar-data-access-beta">🗃️ CANFAR Data Access Beta<a class="headerlink" href="#canfar-data-access-beta" title="Permanent link">&para;</a></h4>
+<p>CANFAR Data is a <a href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a> compliant storage adapter that will be available in beta to all CANFAR users with Python client v1.5.0+. The beta includes the <code>canfar data</code> commands and the Python storage tools in <code>canfar.storage</code>. Your existing storage permissions still apply.</p>
 <p>List, inspect, copy, move, and remove files across local and remote storage
 (<code>arc</code>, <code>vault</code>, <code>local</code>). Every path starts with <code>IDENTIFIER:/PATH</code>.
-Authentication is required.</p>
+Remote storage requires authentication; <code>local</code> does not.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/USER
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/data/input.fits<span class="w"> </span>arc:/home/USER/input.fits
@@ -2279,7 +2311,8 @@ canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </s
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">arc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
-<h4 id="login-discovery-and-server-limits">Login, discovery, and server limits<a class="headerlink" href="#login-discovery-and-server-limits" title="Permanent link">&para;</a></h4>
+<p>See <a href="../../cli/data/">Data commands</a> and the <a href="../../client/data/">Python data guide</a> for more details.</p>
+<h4 id="login-discovery-and-server-limits">➜] Login, discovery, and server limits<a class="headerlink" href="#login-discovery-and-server-limits" title="Permanent link">&para;</a></h4>
 <p><code>canfar.login()</code> and <code>canfar.alogin()</code> run browser-based device login from
 Python, save discovered servers, and return <code>True</code> when authenticated.
 Select your identity and server before launching Sessions:</p>
@@ -2301,7 +2334,7 @@ sending the request:</p>
   canfar   ivo://cadc.nrc.ca/skaha          v1        1-16 cores   1-16 cores   1-7    3
            https://ws-uv.canfar.net/skaha             4-32 GB      1-192 GB
 </code></pre></div>
-<h4 id="session-management">Session management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h4>
+<h4 id="session-management">📋 Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h4>
 <p>Renew interactive Sessions from the CLI or Python (matching the Science
 Portal):</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>renew<span class="w"> </span>SESSION_ID
@@ -2419,7 +2452,18 @@ helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc
 </table>
 <p>See <a href="https://www.opencadc.org/deployments/helm/#canfar-science-platform"><strong>detailed upgrade and deployment guidance</strong></a> for administrators and operators.</p>
 <h3 id="contact-support">💬 Contact &amp; Support<a class="headerlink" href="#contact-support" title="Permanent link">&para;</a></h3>
-<p>For any questions about this release, or for information relating to CANFAR issues or deployment support, head over to the <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord Server</a> or please contact us at <a href="mailto:support@canfar.net">support@canfar.net</a>.</p>
+<p>Ask questions, share Data beta feedback, and follow the roadmap in
+<a href="https://github.com/opencadc/canfar/discussions">CANFAR Discussions</a>.
+Use the <a href="https://github.com/opencadc/canfar/issues/new/choose">issue forms</a>
+for problems or documentation corrections. Read the
+<a href="../../platform/community/guidelines/">community guidelines</a> for what happens
+after you post.</p>
+<p>We review new feedback weekly and summarize progress in these platform
+release notes every three months, alongside the new release. Individual
+reports receive updates when decisions change or fixes become available.</p>
+<p>For account access, service incidents, or private data concerns, contact
+<a href="mailto:support@canfar.net">support@canfar.net</a>. You can also ask questions
+in <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord</a>.</p>
 <p><br>
 <div style="text-align: center;">
 Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2764.svg" title=":heart:" /> at CADC
@@ -2447,7 +2491,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 15, 2026 21:59:20 UTC">October 15, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 22:36:11 UTC">October 16, 2026</span>
   </span>
 
     
@@ -2466,62 +2510,18 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
   </aside>
 
 
-  
 
 
 
-  <form class="md-feedback" name="feedback" hidden>
-    <fieldset>
-      <legend class="md-feedback__title">
-        Was this page helpful?
-      </legend>
-      <div class="md-feedback__inner">
-        <div class="md-feedback__list">
-          
-            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
-            </button>
-          
-            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
-            </button>
-          
-        </div>
-        <div class="md-feedback__note">
-          
-            <div data-md-value="1" hidden>
-              
-              
                 
-              
-              
-              
-                
-                
-              
-              Thanks for your feedback!
-            </div>
-          
-            <div data-md-value="0" hidden>
-              
-              
-                
-              
-              
-              
-                
-                
-              
-              Let us know how we can improve this page.
-            </div>
-          
-        </div>
-      </div>
-    </fieldset>
-  </form>
+  <aside aria-label="Community feedback">
+    <hr>
+    <p>
+      <a href="https://github.com/opencadc/canfar/issues/new/choose">Give feedback or report a problem</a>
+      · <a href="../../platform/community/guidelines/">Community guidelines</a>
+    </p>
+  </aside>
 
-
-                
               </article>
             </div>
           

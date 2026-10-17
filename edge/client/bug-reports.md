@@ -1,90 +1,74 @@
-# Bug Reports
+# Bug reports
 
+[Report a problem](https://github.com/opencadc/canfar/issues/new/choose) by
+describing what you were trying to do and what happened. You do not need to
+know which component caused it or prepare a complete reproduction first.
+For a question or general feedback, use [CANFAR Discussions](https://github.com/opencadc/canfar/discussions).
 
-Thank you for taking the time to report a bug! Your feedback helps us improve CANFAR for everyone. This guide will help you create effective bug reports so we can quickly identify and resolve issues.
+<span id="before-reporting-a-bug"></span>
+<span id="how-to-report-a-bug"></span>
 
+## Start with a short description
 
-## Before Reporting a Bug
+Give the report a descriptive title. Explain your task, what happened, and
+the result you expected. If a related issue already exists, add your
+experience there. You can also start a new report and let maintainers link
+related work. Updating the client is not a requirement for asking for help.
 
-Before creating a new bug report, please:
-
-- **Search existing issues**: Check if the bug has already been reported in our [GitHub Issues](https://github.com/opencadc/canfar/issues).
-- **Update to the latest version**: Ensure you are using the latest version of the CANFAR Client.
-- **Check the documentation**: Review our [documentation](https://opencadc.github.io/canfar/) to confirm the expected behaviour.
-
-
-## How to Report a Bug
-
-### Gather System Information
-
-Before reporting a bug, collect detailed system information using the CANFAR CLI:
+In the development client and v1.5.0, run:
 
 ```bash
-canfar version --debug
+canfar feedback
 ```
 
-This command provides information about your environment:
+This prints the issue chooser URL. It does not open a browser, read your
+configuration, collect diagnostics, or submit a report. If your installed
+client does not have the command, use the link at the top of this page.
 
-- **Client Information**: `canfar` version, git commit info, installation method
-- **Python Environment**: Python version, executable path, implementation
-- **System Details**: Operating system, version, architecture, platform
-- **Dependencies**: Versions of key packages that might affect functionality
+<span id="create-a-detailed-bug-report"></span>
+<span id="what-makes-a-good-bug-report"></span>
+<span id="good-bug-reports-include"></span>
+<span id="avoid-these-common-issues"></span>
 
+## Add details if you have them
 
-### Create a Detailed Bug Report
+Commands or steps, the client version, operating system, and a reviewed error
+excerpt help maintainers investigate. Screenshots can help with browser
+problems. These fields are optional. If a minimal example is difficult to
+produce, describe the workflow and we can help narrow it down.
 
-When creating your bug report, please provide:
+Keep one problem per report where possible. You do not need to decide
+whether it belongs to the client, a storage dependency, or the service.
+Maintainers handle that routing and keep you informed.
 
-- **Bug Description**
-    - What you were trying to do
-    - What actually happened
-    - What you expected to happen
-- **Steps to Reproduce**: Exact steps to reproduce the behaviour, including relevant commands and options.
-- **Expected Behaviour**: What you expected to happen instead.
-- **System Information**: Complete output from `canfar version --debug`.
-- **Error Messages and Logs**: Any error messages, stack traces, or relevant log output. Use code blocks for formatting.
-- **Screenshots (if applicable)**: Screenshots that help explain the problem.
-- **Additional Context**: Any other details, such as:
-    - When the issue started occurring
-    - Whether it happens consistently or intermittently
-    - Any workarounds you have found
-    - Related configuration or environment details
+<span id="gather-system-information"></span>
 
+## Share diagnostics selectively
 
-## What Makes a Good Bug Report
+`canfar version` shows the client version. A maintainer may ask for selected
+details from `canfar version --debug`, which also shows Python, operating
+system, dependency, and installation information. Its Python executable path
+can include your username. Review it before sharing.
 
+Do not attach credentials, full configuration files, private research data,
+or unreviewed debug logs. Debug output can include response bodies and paths;
+see [logging](../cli/logging.md). Email
+[support@canfar.net](mailto:support@canfar.net) for account or service help
+that cannot be discussed publicly.
 
-### ✅ Good Bug Reports Include
+## Security issues
 
-- Clear, descriptive title
-- Complete system information from `canfar version --debug`
-- Detailed steps to reproduce
-- Expected vs. actual behaviour
-- Error messages and stack traces
-- Relevant context and environment details
+Follow the [security policy](../security.md) to report vulnerabilities
+privately instead of opening a public issue.
 
+## After reporting
 
-### ❌ Avoid These Common Issues
+The team reviews feedback weekly. We may ask a focused question, link your
+report to existing work, or create an implementation issue from a discussion.
+Confirmed unresolved bugs are not closed just because they become quiet.
 
-- Vague descriptions like "it doesn't work"
-- Missing system information
-- Incomplete reproduction steps
-- Screenshots of text instead of copy-pasted text
-- Mixing multiple unrelated issues in one report
-
-
-## Security Issues
-
-If you discover a security vulnerability, please **do not** create a public issue. Instead, refer to our [Security Policy](../security.md) for instructions on how to report security issues responsibly.
-
-
-## After Reporting
-
-After you submit a bug report:
-
-- **Monitor the issue**: Watch for responses from maintainers
-- **Provide additional information**: Be ready to answer follow-up questions
-- **Test fixes**: Help test proposed solutions when available
-- **Update the issue**: Let us know if the problem is resolved
-
-Thank you for helping make Canfar better! 🚀
+When a fix ships, we will identify the release and ask you to confirm whether
+it solves the problem. We summarize feedback and progress in the existing
+platform release notes every three months with each new release. See the
+[community guidelines](../platform/community/guidelines.md) for roadmap
+statuses and other ways to contribute.

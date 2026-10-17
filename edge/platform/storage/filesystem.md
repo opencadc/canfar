@@ -2,6 +2,13 @@
 
 # Filesystem and Python tools
 
+!!! info "CANFAR Data beta"
+
+    The `canfar data` commands and Python storage tools in `canfar.storage`
+    are being released in beta with client v1.5.0. These client interfaces
+    are available in the development checkout until that release is published.
+    [Share your experience or get help](../community/guidelines.md#give-feedback-on-the-data-beta).
+
 Use a normal `/arc` path inside a Science Platform Session whenever the data is
 already mounted. Use `canfar.storage` when Python is running outside the
 Session, or when the object lives in a configured VOSpace Service. The module

@@ -64,8 +64,6 @@
     <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
-  
-
 
     
     
@@ -1564,10 +1562,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#before-reporting-a-bug" class="md-nav__link">
+  <a href="#start-with-a-short-description" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Before Reporting a Bug
+        Start with a short description
       
     </span>
   </a>
@@ -1575,10 +1573,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-report-a-bug" class="md-nav__link">
+  <a href="#add-details-if-you-have-them" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How to Report a Bug
+        Add details if you have them
       
     </span>
   </a>
@@ -1586,10 +1584,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-makes-a-good-bug-report" class="md-nav__link">
+  <a href="#share-diagnostics-selectively" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Makes a Good Bug Report
+        Share diagnostics selectively
       
     </span>
   </a>
@@ -1600,7 +1598,7 @@
   <a href="#security-issues" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Security Issues
+        Security issues
       
     </span>
   </a>
@@ -1611,7 +1609,7 @@
   <a href="#after-reporting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        After Reporting
+        After reporting
       
     </span>
   </a>
@@ -1793,10 +1791,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#before-reporting-a-bug" class="md-nav__link">
+  <a href="#start-with-a-short-description" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Before Reporting a Bug
+        Start with a short description
       
     </span>
   </a>
@@ -1804,10 +1802,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#how-to-report-a-bug" class="md-nav__link">
+  <a href="#add-details-if-you-have-them" class="md-nav__link">
     <span class="md-ellipsis">
       
-        How to Report a Bug
+        Add details if you have them
       
     </span>
   </a>
@@ -1815,10 +1813,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#what-makes-a-good-bug-report" class="md-nav__link">
+  <a href="#share-diagnostics-selectively" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What Makes a Good Bug Report
+        Share diagnostics selectively
       
     </span>
   </a>
@@ -1829,7 +1827,7 @@
   <a href="#security-issues" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Security Issues
+        Security issues
       
     </span>
   </a>
@@ -1840,7 +1838,7 @@
   <a href="#after-reporting" class="md-nav__link">
     <span class="md-ellipsis">
       
-        After Reporting
+        After reporting
       
     </span>
   </a>
@@ -1860,6 +1858,7 @@
               
               <article class="md-content__inner md-typeset">
                 
+  
                   
 
 
@@ -1880,78 +1879,59 @@
   
 
 
-<h1 id="bug-reports">Bug Reports<a class="headerlink" href="#bug-reports" title="Permanent link">&para;</a></h1>
-<p>Thank you for taking the time to report a bug! Your feedback helps us improve CANFAR for everyone. This guide will help you create effective bug reports so we can quickly identify and resolve issues.</p>
-<h2 id="before-reporting-a-bug">Before Reporting a Bug<a class="headerlink" href="#before-reporting-a-bug" title="Permanent link">&para;</a></h2>
-<p>Before creating a new bug report, please:</p>
-<ul>
-<li><strong>Search existing issues</strong>: Check if the bug has already been reported in our <a href="https://github.com/opencadc/canfar/issues">GitHub Issues</a>.</li>
-<li><strong>Update to the latest version</strong>: Ensure you are using the latest version of the CANFAR Client.</li>
-<li><strong>Check the documentation</strong>: Review our <a href="https://opencadc.github.io/canfar/">documentation</a> to confirm the expected behaviour.</li>
-</ul>
-<h2 id="how-to-report-a-bug">How to Report a Bug<a class="headerlink" href="#how-to-report-a-bug" title="Permanent link">&para;</a></h2>
-<h3 id="gather-system-information">Gather System Information<a class="headerlink" href="#gather-system-information" title="Permanent link">&para;</a></h3>
-<p>Before reporting a bug, collect detailed system information using the CANFAR CLI:</p>
-<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>version<span class="w"> </span>--debug
+<h1 id="bug-reports">Bug reports<a class="headerlink" href="#bug-reports" title="Permanent link">&para;</a></h1>
+<p><a href="https://github.com/opencadc/canfar/issues/new/choose">Report a problem</a> by
+describing what you were trying to do and what happened. You do not need to
+know which component caused it or prepare a complete reproduction first.
+For a question or general feedback, use <a href="https://github.com/opencadc/canfar/discussions">CANFAR Discussions</a>.</p>
+<p><span id="before-reporting-a-bug"></span>
+<span id="how-to-report-a-bug"></span></p>
+<h2 id="start-with-a-short-description">Start with a short description<a class="headerlink" href="#start-with-a-short-description" title="Permanent link">&para;</a></h2>
+<p>Give the report a descriptive title. Explain your task, what happened, and
+the result you expected. If a related issue already exists, add your
+experience there. You can also start a new report and let maintainers link
+related work. Updating the client is not a requirement for asking for help.</p>
+<p>In the development client and v1.5.0, run:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>feedback
 </code></pre></div>
-<p>This command provides information about your environment:</p>
-<ul>
-<li><strong>Client Information</strong>: <code>canfar</code> version, git commit info, installation method</li>
-<li><strong>Python Environment</strong>: Python version, executable path, implementation</li>
-<li><strong>System Details</strong>: Operating system, version, architecture, platform</li>
-<li><strong>Dependencies</strong>: Versions of key packages that might affect functionality</li>
-</ul>
-<h3 id="create-a-detailed-bug-report">Create a Detailed Bug Report<a class="headerlink" href="#create-a-detailed-bug-report" title="Permanent link">&para;</a></h3>
-<p>When creating your bug report, please provide:</p>
-<ul>
-<li><strong>Bug Description</strong><ul>
-<li>What you were trying to do</li>
-<li>What actually happened</li>
-<li>What you expected to happen</li>
-</ul>
-</li>
-<li><strong>Steps to Reproduce</strong>: Exact steps to reproduce the behaviour, including relevant commands and options.</li>
-<li><strong>Expected Behaviour</strong>: What you expected to happen instead.</li>
-<li><strong>System Information</strong>: Complete output from <code>canfar version --debug</code>.</li>
-<li><strong>Error Messages and Logs</strong>: Any error messages, stack traces, or relevant log output. Use code blocks for formatting.</li>
-<li><strong>Screenshots (if applicable)</strong>: Screenshots that help explain the problem.</li>
-<li><strong>Additional Context</strong>: Any other details, such as:<ul>
-<li>When the issue started occurring</li>
-<li>Whether it happens consistently or intermittently</li>
-<li>Any workarounds you have found</li>
-<li>Related configuration or environment details</li>
-</ul>
-</li>
-</ul>
-<h2 id="what-makes-a-good-bug-report">What Makes a Good Bug Report<a class="headerlink" href="#what-makes-a-good-bug-report" title="Permanent link">&para;</a></h2>
-<h3 id="good-bug-reports-include">✅ Good Bug Reports Include<a class="headerlink" href="#good-bug-reports-include" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Clear, descriptive title</li>
-<li>Complete system information from <code>canfar version --debug</code></li>
-<li>Detailed steps to reproduce</li>
-<li>Expected vs. actual behaviour</li>
-<li>Error messages and stack traces</li>
-<li>Relevant context and environment details</li>
-</ul>
-<h3 id="avoid-these-common-issues">❌ Avoid These Common Issues<a class="headerlink" href="#avoid-these-common-issues" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Vague descriptions like "it doesn't work"</li>
-<li>Missing system information</li>
-<li>Incomplete reproduction steps</li>
-<li>Screenshots of text instead of copy-pasted text</li>
-<li>Mixing multiple unrelated issues in one report</li>
-</ul>
-<h2 id="security-issues">Security Issues<a class="headerlink" href="#security-issues" title="Permanent link">&para;</a></h2>
-<p>If you discover a security vulnerability, please <strong>do not</strong> create a public issue. Instead, refer to our <a href="../../security/">Security Policy</a> for instructions on how to report security issues responsibly.</p>
-<h2 id="after-reporting">After Reporting<a class="headerlink" href="#after-reporting" title="Permanent link">&para;</a></h2>
-<p>After you submit a bug report:</p>
-<ul>
-<li><strong>Monitor the issue</strong>: Watch for responses from maintainers</li>
-<li><strong>Provide additional information</strong>: Be ready to answer follow-up questions</li>
-<li><strong>Test fixes</strong>: Help test proposed solutions when available</li>
-<li><strong>Update the issue</strong>: Let us know if the problem is resolved</li>
-</ul>
-<p>Thank you for helping make Canfar better! 🚀</p>
+<p>This prints the issue chooser URL. It does not open a browser, read your
+configuration, collect diagnostics, or submit a report. If your installed
+client does not have the command, use the link at the top of this page.</p>
+<p><span id="create-a-detailed-bug-report"></span>
+<span id="what-makes-a-good-bug-report"></span>
+<span id="good-bug-reports-include"></span>
+<span id="avoid-these-common-issues"></span></p>
+<h2 id="add-details-if-you-have-them">Add details if you have them<a class="headerlink" href="#add-details-if-you-have-them" title="Permanent link">&para;</a></h2>
+<p>Commands or steps, the client version, operating system, and a reviewed error
+excerpt help maintainers investigate. Screenshots can help with browser
+problems. These fields are optional. If a minimal example is difficult to
+produce, describe the workflow and we can help narrow it down.</p>
+<p>Keep one problem per report where possible. You do not need to decide
+whether it belongs to the client, a storage dependency, or the service.
+Maintainers handle that routing and keep you informed.</p>
+<p><span id="gather-system-information"></span></p>
+<h2 id="share-diagnostics-selectively">Share diagnostics selectively<a class="headerlink" href="#share-diagnostics-selectively" title="Permanent link">&para;</a></h2>
+<p><code>canfar version</code> shows the client version. A maintainer may ask for selected
+details from <code>canfar version --debug</code>, which also shows Python, operating
+system, dependency, and installation information. Its Python executable path
+can include your username. Review it before sharing.</p>
+<p>Do not attach credentials, full configuration files, private research data,
+or unreviewed debug logs. Debug output can include response bodies and paths;
+see <a href="../../cli/logging/">logging</a>. Email
+<a href="mailto:support@canfar.net">support@canfar.net</a> for account or service help
+that cannot be discussed publicly.</p>
+<h2 id="security-issues">Security issues<a class="headerlink" href="#security-issues" title="Permanent link">&para;</a></h2>
+<p>Follow the <a href="../../security/">security policy</a> to report vulnerabilities
+privately instead of opening a public issue.</p>
+<h2 id="after-reporting">After reporting<a class="headerlink" href="#after-reporting" title="Permanent link">&para;</a></h2>
+<p>The team reviews feedback weekly. We may ask a focused question, link your
+report to existing work, or create an implementation issue from a discussion.
+Confirmed unresolved bugs are not closed just because they become quiet.</p>
+<p>When a fix ships, we will identify the release and ask you to confirm whether
+it solves the problem. We summarize feedback and progress in the existing
+platform release notes every three months with each new release. See the
+<a href="../../platform/community/guidelines/">community guidelines</a> for roadmap
+statuses and other ways to contribute.</p>
 
 
 
@@ -1974,7 +1954,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 10, 2025 20:42:32 UTC">September 10, 2025</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 22:36:11 UTC">October 16, 2026</span>
   </span>
 
     
@@ -2002,14 +1982,14 @@
     
     <nav>
       
-        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
-          
-          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
-        </a>
-      
         <a href="https://github.com/shinybrar" class="md-author" title="@shinybrar">
           
           <img src="https://avatars.githubusercontent.com/u/4196481?v=4&size=72" alt="shinybrar">
+        </a>
+      
+        <a href="https://github.com/sfabbro" class="md-author" title="@sfabbro">
+          
+          <img src="https://avatars.githubusercontent.com/u/1484206?v=4&size=72" alt="sfabbro">
         </a>
       
       
@@ -2021,62 +2001,18 @@
   </aside>
 
 
-  
 
 
 
-  <form class="md-feedback" name="feedback" hidden>
-    <fieldset>
-      <legend class="md-feedback__title">
-        Was this page helpful?
-      </legend>
-      <div class="md-feedback__inner">
-        <div class="md-feedback__list">
-          
-            <button class="md-feedback__icon md-icon" type="submit" title="This page was helpful" data-md-value="1">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m7 0c0 .8-.7 1.5-1.5 1.5S14 10.3 14 9.5 14.7 8 15.5 8s1.5.7 1.5 1.5m-5 7.73c-1.75 0-3.29-.73-4.19-1.81L9.23 14c.45.72 1.52 1.23 2.77 1.23s2.32-.51 2.77-1.23l1.42 1.42c-.9 1.08-2.44 1.81-4.19 1.81"/></svg>
-            </button>
-          
-            <button class="md-feedback__icon md-icon" type="submit" title="This page could be improved" data-md-value="0">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 12a8 8 0 0 0-8-8 8 8 0 0 0-8 8 8 8 0 0 0 8 8 8 8 0 0 0 8-8m2 0a10 10 0 0 1-10 10A10 10 0 0 1 2 12 10 10 0 0 1 12 2a10 10 0 0 1 10 10m-6.5-4c.8 0 1.5.7 1.5 1.5s-.7 1.5-1.5 1.5-1.5-.7-1.5-1.5.7-1.5 1.5-1.5M10 9.5c0 .8-.7 1.5-1.5 1.5S7 10.3 7 9.5 7.7 8 8.5 8s1.5.7 1.5 1.5m2 4.5c1.75 0 3.29.72 4.19 1.81l-1.42 1.42C14.32 16.5 13.25 16 12 16s-2.32.5-2.77 1.23l-1.42-1.42C8.71 14.72 10.25 14 12 14"/></svg>
-            </button>
-          
-        </div>
-        <div class="md-feedback__note">
-          
-            <div data-md-value="1" hidden>
-              
-              
                 
-              
-              
-              
-                
-                
-              
-              Thanks for your feedback!
-            </div>
-          
-            <div data-md-value="0" hidden>
-              
-              
-                
-              
-              
-              
-                
-                
-              
-              Let us know how we can improve this page.
-            </div>
-          
-        </div>
-      </div>
-    </fieldset>
-  </form>
+  <aside aria-label="Community feedback">
+    <hr>
+    <p>
+      <a href="https://github.com/opencadc/canfar/issues/new/choose">Give feedback or report a problem</a>
+      · <a href="../../platform/community/guidelines/">Community guidelines</a>
+    </p>
+  </aside>
 
-
-                
               </article>
             </div>
           
