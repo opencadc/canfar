@@ -1,5 +1,12 @@
 # Data transfers
 
+!!! info "CANFAR Data beta"
+
+    The `canfar data` commands and Python storage tools in `canfar.storage`
+    are being released in beta with client v1.5.0. These client interfaces
+    are available in the development checkout until that release is published.
+    [Share your experience or get help](../community/guidelines.md#give-feedback-on-the-data-beta).
+
 Copy files between your computer and CANFAR storage in your browser, or use
 `canfar data` for repeatable command-line transfers.
 

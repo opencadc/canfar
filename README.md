@@ -38,6 +38,12 @@ Select the skill in your coding agent, then ask it to start a notebook or help
 with another CANFAR task. See [CANFAR Agent Skill](docs/platform/agent-skill.md)
 for installation and examples for your agent.
 
+## Community
+
+Ask questions and share ideas in [Discussions](https://github.com/opencadc/canfar/discussions),
+or [report a problem](https://github.com/opencadc/canfar/issues/new/choose). Read the [community guidelines](docs/platform/community/guidelines.md) for
+the roadmap and follow-up process. Email [support@canfar.net](mailto:support@canfar.net) if you prefer not to create a GitHub account.
+
 ---
 <p align="center">
     <a href="https://www.opencadc.org/canfar/latest/">

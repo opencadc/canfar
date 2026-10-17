@@ -1,0 +1,25 @@
+labels: [needs-triage, "roadmap:considering"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the task you want to accomplish and what makes it difficult today.
+        You do not need to design a solution. If a similar idea exists, add your use case and upvote it.
+        Considering means a proposal, not an implementation commitment.
+        Keep credentials and private research data out of public posts.
+  - type: textarea
+    id: task
+    attributes:
+      label: What task or problem should CANFAR address?
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Effect on your research and current workaround
+      description: Optional. How often does this affect you, and what do you do instead?
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested solution
+      description: Optional. Describe an approach if you have one.

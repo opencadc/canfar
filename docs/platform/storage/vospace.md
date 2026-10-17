@@ -2,6 +2,13 @@
 
 # VOSpace Services
 
+!!! info "CANFAR Data beta"
+
+    The `canfar data` commands and Python storage tools in `canfar.storage`
+    are being released in beta with client v1.5.0. These client interfaces
+    are available in the development checkout until that release is published.
+    [Share your experience or get help](../community/guidelines.md#give-feedback-on-the-data-beta).
+
 VOSpace lets you store and transfer astronomical files remotely. Its
 [protocol](https://www.ivoa.net/documents/VOSpace/) is defined by the
 International Virtual Observatory Alliance (IVOA). A CANFAR Science Platform Server can expose one or

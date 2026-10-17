@@ -1,0 +1,24 @@
+labels: [question, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ask your question in your own words. You do not need to know which component is responsible.
+        Keep credentials and private research data out of public posts.
+        For account-specific help, email support@canfar.net.
+  - type: textarea
+    id: question
+    attributes:
+      label: What would you like help with?
+    validations:
+      required: true
+  - type: textarea
+    id: tried
+    attributes:
+      label: What have you tried?
+      description: Optional. Include a command, example, or documentation link if useful.
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Optional. Include the client version and whether you used the CLI, Python, or browser.

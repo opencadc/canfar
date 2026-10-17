@@ -27,8 +27,9 @@ Three states mark progress. Claim only the one you observed:
    | A Python script or notebook that drives CANFAR | [references/python.md](references/python.md) |
    | Listing, copying, or reading files on `arc`, `vault`, or another Storage Identifier | [references/data.md](references/data.md) |
    | How the platform works: storage, images, permissions, DOI, CVMFS, support | [Platform questions](#platform-questions) below |
+   | Giving feedback, reporting a problem, or following the roadmap | [Community feedback](#community-feedback) below |
 
-   A platform question needs only its page. Every other branch runs steps 2
+   A platform question or feedback request needs only its page. Every other branch runs steps 2
    and 3, then reads its reference before composing commands.
 2. **Installed interface.** Run `canfar version` and `canfar ps --help`. This
    skill matches the installed client when that help lists `-o, --output`; the
@@ -146,6 +147,7 @@ copied to storage that Session mounts, or built into the image.
 
 - **Machine output** (`-o json` or `-o yaml`, placed on the owning command): `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `config show`, `config get`.
 - **Human text only**: `info`, `logs`, `events`, `open`, `renew`, `delete`, `prune`, `stats`, `image ls`, `version`.
+- **URL only**: `feedback`; it prints the reporting URL without a Server banner.
 
 With `-o`, stdout carries only the payload, and a failure exits nonzero with
 `code`, `message`, and `hint` as JSON on stderr. Select list items by ID or
@@ -198,6 +200,29 @@ wait for the user's explicit instruction.
 | CVMFS software stacks | https://www.opencadc.org/canfar/edge/platform/cvmfs/ |
 | Publishing data with a DOI | https://www.opencadc.org/canfar/edge/platform/doi/ |
 | FAQ, support, reporting a problem | https://www.opencadc.org/canfar/edge/platform/support/faq/ and https://www.opencadc.org/canfar/edge/platform/support/ |
+| Feedback, community guidelines, roadmap | https://www.opencadc.org/canfar/edge/platform/community/guidelines/ |
 | Authentication Records and Server Selection | https://www.opencadc.org/canfar/edge/cli/authentication-contexts/ |
 | CLI reference, logging | https://www.opencadc.org/canfar/edge/cli/cli-help/ and https://www.opencadc.org/canfar/edge/cli/logging/ |
 | Acknowledging CANFAR in a paper | https://www.opencadc.org/canfar/edge/about/acknowledgement/ |
+
+## Community feedback
+
+Use the [community guidelines](https://www.opencadc.org/canfar/edge/platform/community/guidelines/)
+for questions, feedback, ideas, roadmap statuses, and private support. Skip
+login, credential inspection, and server discovery for a feedback request.
+
+The development client and v1.5.0 provide `canfar feedback`, which prints
+https://github.com/opencadc/canfar/issues/new/choose without reading
+configuration, collecting diagnostics, opening a browser, or submitting a
+report. If that command is unavailable, use the URL directly.
+
+Help the user draft a short description of their task and what happened.
+Include reviewed examples only when useful; do not attach credentials,
+configuration files, or unreviewed logs. Publishing a report requires the
+user's instruction to publish. Email and Discord remain available for users
+who prefer those channels.
+
+Maintainers review intake weekly and summarize progress in the existing
+platform release notes every three months with each new release. Distinguish
+reported, investigated, merged, released, and user-verified outcomes. A merged
+fix is not necessarily available in the user's installed client.

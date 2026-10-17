@@ -132,6 +132,7 @@ def test_data_cat_delegates_without_active_server_banner(
 
     assert result.exit_code == 0, result.output
     assert result.stdout == "upstream output\n"
+    assert result.stderr == ""
 
 
 def test_data_long_listing_delegates_unchanged(
@@ -263,6 +264,7 @@ def test_data_help_explains_operands_and_lists_identifiers(monkeypatch) -> None:
     monkeypatch.setattr(storage, "Configuration", partial(_configuration, "vault"))
 
     group_help = runner.invoke(cli, ["data", "--help"], env={"COLUMNS": "200"})
+    bare_help = runner.invoke(cli, ["data"], env={"COLUMNS": "200"})
     command_help = runner.invoke(cli, ["data", "cp", "--help"], env={"COLUMNS": "200"})
 
     assert group_help.exit_code == command_help.exit_code == 0
@@ -272,6 +274,10 @@ def test_data_help_explains_operands_and_lists_identifiers(monkeypatch) -> None:
     assert syntax in command_text
     assert "use local:/PATH for files on this computer" in command_text
     assert "Identifiers: vault, local." in command_text
+    for result in (bare_help, group_help, command_help):
+        text = " ".join(result.output.split())
+        assert "CANFAR Data is in beta." in text
+        assert "canfar feedback" in text
 
 
 @pytest.mark.parametrize("operand", ["/tmp/", "./out.fits", "results/out.fits"])

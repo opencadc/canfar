@@ -20,6 +20,10 @@ as [2026.2](../releases/2026-2.md) have separate numbering and deployment scope.
 
 ## Copy and read research data
 
+The Data commands and the Python storage tools in `canfar.storage` are being
+released in beta with v1.5.0. This designation applies to Data. Share your
+experience through the [community feedback routes](../platform/community/guidelines.md).
+
 The new `canfar data` commands let you list, inspect, copy, move, and remove
 files using familiar shell operations. Each path names a storage location:
 `local` is the computer running the command; configured names such as `arc`
@@ -79,6 +83,10 @@ expiry hooks, for that client only.
 
 ## Update scripts and configuration
 
+- `canfar feedback` prints the GitHub feedback URL. It works without login
+  or a valid configuration and does not open a browser or collect diagnostics.
+- Data group and subcommand help identify the beta. Ordinary commands,
+  including file output from `cat`, and Python calls print no beta notice.
 - Use `-o json` or `-o yaml` on supported commands in place of `--json` and
   `--yaml`. Machine output contains only data on stdout; diagnostics use stderr.
 - Use canonical command names such as `auth`, `create`, and `delete`. Several
