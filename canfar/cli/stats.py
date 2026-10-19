@@ -61,7 +61,7 @@ def get_stats() -> None:
         table.add_row(*columns)
 
         get_console().print(table)
-        config = Configuration()
+        config = Configuration()  # ty: ignore[missing-argument]
         server = config.servers.get(config.active.server or "")
         resources = server.resources if server is not None else None
         get_console().print("\n[bold]Maximum Resource Requests[/bold]\n")
