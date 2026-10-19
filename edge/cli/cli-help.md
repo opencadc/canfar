@@ -219,8 +219,13 @@ canfar version
 canfar version --debug
 ```
 
-`stats` prints platform usage tables. `image ls` lists Container Images and
-accepts the image-kind filter shown above. `version --debug` prints client,
+`stats` prints CPU and RAM usage, plus GPU usage when the server includes it.
+In the development client, **Maximum Resource Requests** shows the Fixed and
+Flexible CPU and RAM maxima saved for your selected server, as listed by
+`canfar server ls`. Missing limits are shown as `unknown`; these request limits
+do not guarantee that capacity is currently available.
+
+`image ls` lists Container Images and accepts the image-kind filter shown above. `version --debug` prints client,
 Python, operating-system, and dependency details for a bug report; it is not a
 logging control.
 
