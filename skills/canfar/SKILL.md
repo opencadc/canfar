@@ -160,6 +160,11 @@ command, as in `canfar --log-level debug ps -o json`; debug logs can include
 response bodies, so keep them out of shared reports. `--log-file PATH` adds a
 rotating JSON Lines log.
 
+`canfar stats` shows CPU and RAM usage, and GPU usage when reported by the
+server. In the development client, Maximum Resource Requests lists Fixed and
+Flexible maxima from the selected server's saved resources; missing limits
+remain unknown. Request limits do not guarantee current capacity.
+
 Cleanup scope is the Session IDs this work created, deleted only when the user
 asks: `canfar delete SESSION_ID`, adding `--force` to skip the confirmation
 once the user has authorized that deletion.

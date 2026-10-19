@@ -6,12 +6,14 @@ import json
 from typing import TYPE_CHECKING
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx2
 import pytest
 import yaml
 from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
+from canfar.models.config import Configuration
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -292,7 +294,7 @@ def test_stats_outputs_cluster_tables() -> None:
 
     assert result.exit_code == 0
     assert "CANFAR Platform Load" in result.stdout
-    assert "Maximum Requests Size" in result.stdout
+    assert "Maximum Resource Requests" in result.stdout
     session_cls.assert_called_once_with()
 
 
@@ -341,3 +343,114 @@ def test_ps_command_integration() -> None:
     # Command should exit cleanly even if it fails due to auth/config issues
     # We're just testing that it doesn't crash with exit code 2 (syntax error)
     assert result.exit_code in [0, 1]  # 0 = success, 1 = expected failure
+
+
+@pytest.mark.parametrize("requested", [15, 0])
+def test_stats_displays_optional_gpu_usage(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, requested: int
+) -> None:
+    """GPU-capable servers show usage, including an idle GPU pool."""
+    monkeypatch.setenv("CANFAR_TOKEN", "test-token")
+    monkeypatch.setenv("CANFAR_URL", "https://example.test/skaha/v1/")
+    real_client = httpx2.AsyncClient
+    transport = httpx2.MockTransport(
+        lambda _request: httpx2.Response(
+            200,
+            json={
+                "cores": {"requestedCPUCores": 873.25, "cpuCoresAvailable": 3000},
+                "ram": {"requestedRAM": "9432.822G", "ramAvailable": "15032.386G"},
+                "gpu": {"requestedGPU": requested, "gpuAvailable": 112, "maxGPU": 7},
+            },
+        )
+    )
+    with (
+        _patch_config(tmp_path / "config.yaml"),
+        patch(
+            "canfar.client.AsyncClient",
+            side_effect=lambda **kw: real_client(transport=transport, **kw),
+        ),
+    ):
+        result = runner.invoke(cli, ["stats"])
+    assert result.exit_code == 0, result.output
+    assert "GPU" in result.stdout
+    assert f"Usage │ {requested}" in result.stdout
+    assert "Total │ 112" in result.stdout
+
+
+@pytest.mark.parametrize(
+    ("resources", "expected"),
+    [
+        (
+            {
+                "fixed": {
+                    "cores": {"min": 1, "max": 16},
+                    "ram": {"min": 1, "max": 192},
+                },
+                "flexible": {
+                    "cores": {"min": 1, "max": 16},
+                    "ram": {"min": 4, "max": 32},
+                },
+            },
+            ["Fixed: 16 Cores & 192 GB", "Flexible: 16 Cores & 32 GB"],
+        ),
+        (
+            {
+                "fixed": {"cores": {"min": 1, "max": 48}},
+                "flexible": {"ram": {"min": 2, "max": 64}},
+            },
+            ["Fixed: 48 Cores & unknown GB", "Flexible: unknown Cores & 64 GB"],
+        ),
+        (None, ["Fixed: unknown", "Flexible: unknown"]),
+    ],
+)
+def test_stats_uses_selected_server_resource_limits(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    resources: dict | None,
+    expected: list[str],
+) -> None:
+    """Saved limits override stats maxima, and missing limits stay unknown."""
+    monkeypatch.setenv("CANFAR_TOKEN", "test-token")
+    monkeypatch.setenv("CANFAR_URL", "https://example.test/skaha/v1/")
+    real_client = httpx2.AsyncClient
+    transport = httpx2.MockTransport(
+        lambda _request: httpx2.Response(
+            200,
+            json={
+                "cores": {
+                    "requestedCPUCores": 4,
+                    "cpuCoresAvailable": 64,
+                    "maxCPUCores": {"cpuCores": 99, "withRam": "999G"},
+                },
+                "ram": {"requestedRAM": "8G", "ramAvailable": "128G"},
+            },
+        )
+    )
+    with (
+        _patch_config(tmp_path / "config.yaml"),
+        patch(
+            "canfar.client.AsyncClient",
+            side_effect=lambda **kw: real_client(transport=transport, **kw),
+        ),
+    ):
+        config = Configuration()
+        config.editor.set(
+            "servers.other",
+            {
+                "url": "https://example.test/skaha",
+                "version": "v1",
+                "idp": "cadc",
+                "resources": resources,
+            },
+        )
+        config.editor.set("active.server", "other")
+        config.editor.save()
+        result = runner.invoke(cli, ["stats"])
+    assert result.exit_code == 0, result.output
+    assert "@other" in result.stdout
+    assert "Maximum Resource Requests" in result.stdout
+    for line in expected:
+        assert line in result.stdout
+    assert "GPU" not in result.stdout
+    assert "999" not in result.stdout
+    assert "Maximum Requests Size" not in result.stdout

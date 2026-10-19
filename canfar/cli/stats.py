@@ -7,6 +7,7 @@ import asyncio
 from rich import box
 from rich.table import Table
 
+from canfar.models.config import Configuration
 from canfar.sessions import AsyncSession
 from canfar.utils.console import emit_cli_active_server_banner, get_console
 
@@ -47,15 +48,32 @@ def get_stats() -> None:
         ram_table.add_row("Usage", f"{ram.get('requestedRAM', 'N/A')}")
         ram_table.add_row("Total", f"{ram.get('ramAvailable', 'N/A')}")
 
-        # Add the first row with nested tables
-        table.add_row(cores_table, ram_table)
+        columns = [cores_table, ram_table]
+        if "gpu" in data:
+            gpu = data["gpu"]
+            table.add_column("GPU", justify="center")
+            gpu_table = Table(box=box.MINIMAL, show_header=False)
+            gpu_table.add_column("Metric", justify="left")
+            gpu_table.add_column("Value", justify="left")
+            gpu_table.add_row("Usage", str(gpu.get("requestedGPU", "N/A")))
+            gpu_table.add_row("Total", str(gpu.get("gpuAvailable", "N/A")))
+            columns.append(gpu_table)
+        table.add_row(*columns)
 
         get_console().print(table)
-        get_console().print(
-            "[bold]Maximum Requests Size:[/bold] 16 Cores & 192.0 GB RAM"
-        )
-        get_console(stderr=True).print(
-            "[dim]Based on best-case scenario, and may not be achievable.[/dim]"
-        )
+        config = Configuration()
+        server = config.servers.get(config.active.server or "")
+        resources = server.resources if server is not None else None
+        get_console().print("\n[bold]Maximum Resource Requests[/bold]\n")
+        for label, mode in (
+            ("Fixed", resources.fixed if resources is not None else None),
+            ("Flexible", resources.flexible if resources is not None else None),
+        ):
+            if mode is None:
+                get_console().print(f"{label}: unknown")
+                continue
+            max_cores = mode.cores.max if mode.cores is not None else "unknown"
+            max_ram = mode.ram.max if mode.ram is not None else "unknown"
+            get_console().print(f"{label}: {max_cores} Cores & {max_ram} GB")
 
     asyncio.run(_get_stats())

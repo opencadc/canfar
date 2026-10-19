@@ -98,7 +98,8 @@ class Session(HTTPClient):
         """Get statistics for the entire platform.
 
         Returns:
-            Dict[str, Any]: Cluster statistics.
+            Dict[str, Any]: Cluster statistics, unchanged from the server.
+                The optional ``gpu`` section reports GPU usage and capacity.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -575,7 +576,8 @@ class AsyncSession(HTTPClient):
         """Get statistics for the canfar cluster.
 
         Returns:
-            Dict[str, Any]: Cluster statistics.
+            Dict[str, Any]: Cluster statistics, unchanged from the server.
+                The optional ``gpu`` section reports GPU usage and capacity.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
