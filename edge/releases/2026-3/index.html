@@ -2382,21 +2382,22 @@ results if any request failed. The default logs failures and continues.</p>
 <li>posix-mapper fixes a caching issue that could make groups collide. A Keycloak-based posix-mapper is planned for CanfarSP 2026.4.</li>
 <li>See the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments repository</a> for updated deployment instructions.</li>
 <li>The Harbor instance at <a href="https://images.canfar.net">https://images.canfar.net</a> now runs version 2.15.0, which serves Helm charts only as standard OCI artifacts. Instead of adding chart repositories with <code>helm repo add</code>, install charts directly from their <code>oci://</code> URLs with <code>helm install</code>.</li>
+<li>The <code>storageui</code> chart is renamed to <code>storage-ui</code>. Install it from <code>oci://images.opencadc.org/client/storage-ui</code>. The last <code>storageui</code> chart is version 0.9.0; this release ships <code>storage-ui</code> 1.4.8.</li>
 </ul>
 <p>The old method:
 <div class="highlight"><pre><span></span><code>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>science-platform<span class="w"> </span>https://images.opencadc.org/chartrepo/platform
 helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>science-client<span class="w"> </span>https://images.opencadc.org/chartrepo/client
 helm<span class="w"> </span>repo<span class="w"> </span>update
-helm<span class="w"> </span>install<span class="w"> </span>science-platform/cavern
+helm<span class="w"> </span>install<span class="w"> </span>cavern<span class="w"> </span>science-platform/cavern
 ....
-helm<span class="w"> </span>install<span class="w"> </span>science-client/storageui
+helm<span class="w"> </span>install<span class="w"> </span>storageui<span class="w"> </span>science-client/storageui
 </code></pre></div>
 The new method:
-<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc.org/platform/cavern
-helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc.org/platform/science-portal
-helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc.org/platform/skaha
-helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc.org/platform/posix-mapper
-helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc.org/client/storage-ui
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>install<span class="w"> </span>cavern<span class="w"> </span>oci://images.opencadc.org/platform/cavern
+helm<span class="w"> </span>install<span class="w"> </span>science-portal<span class="w"> </span>oci://images.opencadc.org/platform/science-portal
+helm<span class="w"> </span>install<span class="w"> </span>skaha<span class="w"> </span>oci://images.opencadc.org/platform/skaha
+helm<span class="w"> </span>install<span class="w"> </span>posix-mapper<span class="w"> </span>oci://images.opencadc.org/platform/posix-mapper
+helm<span class="w"> </span>install<span class="w"> </span>storage-ui<span class="w"> </span>oci://images.opencadc.org/client/storage-ui
 </code></pre></div></p>
 <h3 id="releases">🔖 Releases<a class="headerlink" href="#releases" title="Permanent link">&para;</a></h3>
 <h4 id="python-client-cli">Python Client &amp; CLI<a class="headerlink" href="#python-client-cli" title="Permanent link">&para;</a></h4>
@@ -2482,7 +2483,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 20, 2026 19:42:16 UTC">October 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 20, 2026 20:31:26 UTC">October 20, 2026</span>
   </span>
 
     
