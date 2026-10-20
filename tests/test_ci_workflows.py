@@ -58,40 +58,37 @@ def test_reusable_tests_preserve_fast_and_credentialed_commands():
     assert '-m "not slow"' not in full_step["run"]
 
 
-def test_release_and_edge_delegate_to_one_container_build_contract():
+def test_release_is_the_only_container_build():
     release = load_workflow("release.yml")
-    edge = load_workflow("edge.yml")
+    cd = load_workflow("cd.yml")
+
+    assert not (ROOT / ".github" / "workflows" / "edge.yml").exists()
+    dispatched = {
+        step["with"]["event-type"]
+        for step in cd["jobs"]["release-please"]["steps"]
+        if step.get("uses", "").startswith("peter-evans/repository-dispatch@")
+    }
+    assert "edge-build" not in dispatched
+    assert "release-build" in dispatched
 
     assert workflow_events(release) == {
         "repository_dispatch": {"types": ["release-build"]},
     }
-    assert workflow_events(edge) == {
-        "repository_dispatch": {"types": ["edge-build"]},
-    }
-
     release_job = release["jobs"]["release-build"]
-    edge_job = edge["jobs"]["edge-build"]
     assert release_job["uses"] == "./.github/workflows/reusable-container.yml"
-    assert edge_job["uses"] == "./.github/workflows/reusable-container.yml"
-    assert (
-        release_job["permissions"]
-        == edge_job["permissions"]
-        == {
-            "packages": "write",
-            "attestations": "write",
-            "id-token": "write",
-        }
-    )
+    assert release_job["permissions"] == {
+        "contents": "read",
+        "packages": "write",
+        "attestations": "write",
+        "id-token": "write",
+    }
     assert release_job["with"]["checkout-ref"] == (
         "${{ github.event.client_payload.tag_name }}"
     )
-    assert "checkout-ref" not in edge_job["with"]
     assert release_job["with"]["image-version"] == (
         "${{ github.event.client_payload.tag_name }}"
     )
-    assert edge_job["with"]["image-version"] == "edge"
     assert release_job["with"]["image-tags"].strip().endswith(":latest")
-    assert edge_job["with"]["image-tags"].strip().endswith(":edge")
 
 
 def test_reusable_container_preserves_build_and_attestation_guards():
@@ -109,6 +106,7 @@ def test_reusable_container_preserves_build_and_attestation_guards():
     }
     assert workflow["permissions"] == {"contents": "read"}
     assert job["permissions"] == {
+        "contents": "read",
         "packages": "write",
         "attestations": "write",
         "id-token": "write",
