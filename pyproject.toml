@@ -10,7 +10,7 @@ allow-direct-references = true
 
 [project]
 name = "canfar"
-version = "1.4.1"
+version = "1.5.0"
 requires-python = ">=3.10"
 description = "Python Client for CANFAR Science Platform"
 license = { file = "LICENSE" }
