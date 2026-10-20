@@ -11,6 +11,7 @@ jobs:
   release-build:
     uses: ./.github/workflows/reusable-container.yml
     permissions:
+      contents: read # Checkout the release tag
       packages: write # Upload package to ghcr.io
       attestations: write # Attest the build provenance
       id-token: write # Genereate OIDC token for attestations
