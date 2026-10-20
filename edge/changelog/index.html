@@ -1242,24 +1242,240 @@
 <a href="../client/updates/">What's new (unreleased)</a> and the <a href="../client/migration/">upgrade guide</a>.
 <a href="../releases/releases/">Platform release history</a> is maintained separately.</p>
 <h1 id="changelog">Changelog<a class="headerlink" href="#changelog" title="Permanent link">&para;</a></h1>
-<h2 id="141-2026-06-11"><a href="https://github.com/opencadc/canfar/compare/v1.4.0...v1.4.1">1.4.1</a> (2026-06-11)<a class="headerlink" href="#141-2026-06-11" title="Permanent link">&para;</a></h2>
+<h2 id="150-2026-10-20"><a href="https://github.com/opencadc/canfar/compare/v1.4.1...v1.5.0">1.5.0</a> (2026-10-20)<a class="headerlink" href="#150-2026-10-20" title="Permanent link">&para;</a></h2>
+<h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
+<ul>
+<li>add Science Platform agent skills (<a href="https://github.com/opencadc/canfar/commit/4b5341d62fff8dee9ccb8f57a769ef78091dc847">4b5341d</a>)</li>
+<li><strong>auth:</strong> expose native OIDC device login APIs (<a href="https://github.com/opencadc/canfar/commit/11a04bec3ca1a4578a8a5855442cc2170544fcb4">11a04be</a>)</li>
+<li><strong>auth:</strong> expose native OIDC device login APIs (<a href="https://github.com/opencadc/canfar/commit/d6f6ce942753dd30dfeb24d37616cd551e4c2e78">d6f6ce9</a>)</li>
+<li><strong>auth:</strong> return boolean and print status in python login (<a href="https://github.com/opencadc/canfar/commit/5de140932bbde4e974be9ec50bd8f91c6918d228">5de1409</a>)</li>
+<li><strong>client:</strong> log HTTP URL and status at debug level (<a href="https://github.com/opencadc/canfar/commit/1bda687c3580c02667605913dcf00c93ce434759">1bda687</a>)</li>
+<li><strong>client:</strong> log HTTP URL and status at debug level (<a href="https://github.com/opencadc/canfar/commit/2168d34a175d3b6b8db4c3d5d16575e4417403f1">2168d34</a>)</li>
+<li><strong>cli:</strong> make create a domain request adapter (<a href="https://github.com/opencadc/canfar/issues/194">#194</a>) (<a href="https://github.com/opencadc/canfar/commit/3595f5cd72f4bb9e343c9d479dc3a328c258f8e1">3595f5c</a>)</li>
+<li><strong>cli:</strong> print only the summary when discovery finds one server (<a href="https://github.com/opencadc/canfar/commit/6fa20145012711c3d0fb8f2ce2f90280945fdad1">6fa2014</a>)</li>
+<li><strong>cli:</strong> replace machine flags with output option (<a href="https://github.com/opencadc/canfar/commit/d8922703ba53b8e2d824cb2d213c8d0dbcadc872">d892270</a>)</li>
+<li><strong>cli:</strong> replace machine flags with output option (<a href="https://github.com/opencadc/canfar/commit/d37903875e2c0161c702de0ff6d69d6c1a0d3f22">d379038</a>)</li>
+<li><strong>cli:</strong> show server limits and discovery progress, address user feedback (<a href="https://github.com/opencadc/canfar/commit/98998cf42e06d410005f531f330996486e8b031f">98998cf</a>)</li>
+<li><strong>cli:</strong> show server limits and discovery progress, address user feedback (<a href="https://github.com/opencadc/canfar/commit/f67b3acad97a7fbd04c44e4436f1394618f612ac">f67b3ac</a>)</li>
+<li><strong>config:</strong> add bound configuration editor (<a href="https://github.com/opencadc/canfar/commit/7e7aac4995fc88dea6b4819734feaf858eee296f">7e7aac4</a>)</li>
+<li><strong>config:</strong> add named VOSpace services (<a href="https://github.com/opencadc/canfar/commit/d699d794a789a9c6633cb4bdc84cb0e08ccb4dc9">d699d79</a>)</li>
+<li><strong>config:</strong> add named VOSpace services (<a href="https://github.com/opencadc/canfar/commit/1271ff8e400983b2ab643fb5269a311440b557cb">1271ff8</a>)</li>
+<li><strong>config:</strong> establish bound Configuration editor (<a href="https://github.com/opencadc/canfar/commit/06a50458d2ba6d086978112e61a30cd0a9fd1d93">06a5045</a>)</li>
+<li><strong>data:</strong> embed upstream fsspec commands (<a href="https://github.com/opencadc/canfar/commit/e45debe4a03ba5da893ee4b0ebaf9be4ba07f0b1">e45debe</a>)</li>
+<li><strong>data:</strong> embed upstream fsspec commands (<a href="https://github.com/opencadc/canfar/commit/7193c6958b74c4b9135ee9d28f544f0b841d2cde">7193c69</a>)</li>
+<li><strong>data:</strong> integrate vosfs data commands (<a href="https://github.com/opencadc/canfar/commit/5f95cfe72ae0852b20414ea1ebcf7d576cd41f65">5f95cfe</a>)</li>
+<li><strong>discovery:</strong> discover primary VOSpace services (<a href="https://github.com/opencadc/canfar/commit/5ce4e6ff504303a7ec4a87d9ffce859603e40744">5ce4e6f</a>)</li>
+<li><strong>discovery:</strong> discover primary VOSpace services (<a href="https://github.com/opencadc/canfar/commit/d69de914eeeb26ebbce524f6ecedee2284ee92d8">d69de91</a>)</li>
+<li><strong>docs:</strong> publish llms.txt and Markdown sources for coding agents (<a href="https://github.com/opencadc/canfar/commit/59a752560cb6934d6bd77369a1102d6cd26ea7cb">59a7525</a>)</li>
+<li><strong>docs:</strong> redesign landing page and embed acknowledgement (<a href="https://github.com/opencadc/canfar/commit/8c5acda4e6e126d7ce1a7980faa79a1750f83e45">8c5acda</a>)</li>
+<li><strong>logging:</strong> add opt-in OTLP export (<a href="https://github.com/opencadc/canfar/issues/191">#191</a>) (<a href="https://github.com/opencadc/canfar/commit/6ae202546bb016237c521cbf8abd46cf616fef17">6ae2025</a>)</li>
+<li><strong>logging:</strong> add rotating JSONL file sink (<a href="https://github.com/opencadc/canfar/issues/192">#192</a>) (<a href="https://github.com/opencadc/canfar/commit/7a5bca78729fc26863b78aab5a8a5971fd52caf9">7a5bca7</a>)</li>
+<li><strong>logging:</strong> add secret-safe HTTPX tracing (<a href="https://github.com/opencadc/canfar/issues/188">#188</a>) (<a href="https://github.com/opencadc/canfar/commit/08df4f1f1986b229b73f3e413a4944639e8690e7">08df4f1</a>)</li>
+<li><strong>maintainability:</strong> integrate platform session and logging contracts (<a href="https://github.com/opencadc/canfar/issues/156">#156</a>) (<a href="https://github.com/opencadc/canfar/commit/81da64c02212e45dfc9f9ba165ce8e10e7b60397">81da64c</a>)</li>
+<li><strong>maintainability:</strong> systematic improvements (<a href="https://github.com/opencadc/canfar/commit/5d8e2e663f9cb97da15cadd833f55a627e8f92a7">5d8e2e6</a>)</li>
+<li><strong>presentation:</strong> added presentation for canfar data cli (<a href="https://github.com/opencadc/canfar/commit/d91582b87ec155c63dadf8e8f999deff5d45314e">d91582b</a>)</li>
+<li><strong>sessions:</strong> add renew, errors policy, and shared transport (<a href="https://github.com/opencadc/canfar/commit/f9a225fa87c5de573a7d461c2d0cf93f46cc87ac">f9a225f</a>)</li>
+<li><strong>sessions:</strong> renew, errors policy, and shared transport (<a href="https://github.com/opencadc/canfar/commit/8dadc5f79ea6242f801ffcba4143a26f3b5048cc">8dadc5f</a>)</li>
+<li><strong>skills:</strong> add CANFAR science workflow guidance (<a href="https://github.com/opencadc/canfar/commit/a3f3a81671bd0bee5250d295f49c45f7b13461cb">a3f3a81</a>)</li>
+<li><strong>skills:</strong> consolidate platform skills into one tested canfar skill (<a href="https://github.com/opencadc/canfar/commit/970f0e8beed757192dc66c376d4633bca8f54b22">970f0e8</a>)</li>
+<li><strong>skills:</strong> publish one tested canfar skill, synced with the CLI and docs (<a href="https://github.com/opencadc/canfar/commit/3e79eb3d50c661e0e2321cfa1e6ffcc56743e017">3e79eb3</a>)</li>
+<li><strong>storage:</strong> expose Storage Identifiers as importable filesystems (<a href="https://github.com/opencadc/canfar/commit/239861dcd5f93a2a7b37a4e610f2522d4c2b17b7">239861d</a>)</li>
+<li><strong>storage:</strong> map arc and vault VOSpace Services for CADC (<a href="https://github.com/opencadc/canfar/commit/fe175f646745596a40c7a3179e5832de6cdff329">fe175f6</a>)</li>
+<li><strong>storage:</strong> materialize authenticated vosfs sources (<a href="https://github.com/opencadc/canfar/commit/8ecdabedca9d479640abe34f3b46196b33b0a316">8ecdabe</a>)</li>
+<li><strong>storage:</strong> materialize authenticated vosfs sources (<a href="https://github.com/opencadc/canfar/commit/639c245d1ba52d352dc6a787ac79310721e6ba29">639c245</a>)</li>
+</ul>
 <h3 id="bug-fixes">Bug Fixes<a class="headerlink" href="#bug-fixes" title="Permanent link">&para;</a></h3>
+<ul>
+<li>address wave 3 review findings (<a href="https://github.com/opencadc/canfar/commit/88fa9d8631932f6298c7546ec80cb39a03d7474d">88fa9d8</a>)</li>
+<li><strong>agents:</strong> updated core description (<a href="https://github.com/opencadc/canfar/commit/2ef3a00cb81a1a93566d3d1fd424bac59cd39610">2ef3a00</a>)</li>
+<li><strong>auth:</strong> accept omitted device refresh tokens (<a href="https://github.com/opencadc/canfar/issues/180">#180</a>) (<a href="https://github.com/opencadc/canfar/commit/247600a143bdeb86c515a4bf453869d72883377a">247600a</a>)</li>
+<li><strong>auth:</strong> handle OIDC credential expiry and reauthentication (<a href="https://github.com/opencadc/canfar/commit/ff47016f7514477903dd21c592dcdbf06f6671d4">ff47016</a>)</li>
+<li><strong>auth:</strong> increase login timeout default to 10 seconds (<a href="https://github.com/opencadc/canfar/issues/156">#156</a>) (<a href="https://github.com/opencadc/canfar/commit/6b637a1eff43bcc75ffef117e8493023cb65b6e3">6b637a1</a>)</li>
+<li><strong>auth:</strong> keep malformed device-token bodies distinct from server errors (<a href="https://github.com/opencadc/canfar/commit/42dcef660ff20353e6e14835b41ba3783beb359a">42dcef6</a>)</li>
+<li><strong>auth:</strong> reuse valid CADC proxy certificates (<a href="https://github.com/opencadc/canfar/commit/cb36468a2102126c7b600c230e9b8686e50a5dbf">cb36468</a>)</li>
+<li><strong>auth:</strong> wrap config save OSError during OIDC refresh (<a href="https://github.com/opencadc/canfar/commit/80ee986df42da751963b0cf8c4de557d661d3e3a">80ee986</a>)</li>
+<li><strong>ci:</strong> address Wave 0 review findings (<a href="https://github.com/opencadc/canfar/commit/31bcb06726d4a0d69571c49527547b3dd4c92126">31bcb06</a>)</li>
+<li><strong>ci:</strong> fail closed on missing test credentials (<a href="https://github.com/opencadc/canfar/commit/cf1b3fb4bd5dea372ac50880afda80d2f4836730">cf1b3fb</a>)</li>
+<li><strong>ci:</strong> resolve CodeQL and github-code-quality findings (<a href="https://github.com/opencadc/canfar/commit/cadb28e40fbd62ae9b541eb96331bdd4058736a7">cadb28e</a>)</li>
+<li><strong>ci:</strong> secure merged full test workflow (<a href="https://github.com/opencadc/canfar/commit/687545f98f63e92c090b021dd24f6a69386cc43e">687545f</a>)</li>
+<li><strong>ci:</strong> stabilize CLI and discovery tests under CI terminals (<a href="https://github.com/opencadc/canfar/commit/649e331b3f59f4f905c77b95daa1b4c8f419848f">649e331</a>)</li>
+<li><strong>ci:</strong> support pinned ty checks (<a href="https://github.com/opencadc/canfar/commit/92b5535d521b29ec486ffdc7c7c9a0f6731060cc">92b5535</a>)</li>
+<li><strong>ci:</strong> support pinned ty checks (<a href="https://github.com/opencadc/canfar/commit/94c3b515e49fb4b98ebac80b15bf48659f68a65e">94c3b51</a>)</li>
+<li><strong>cli:</strong> align stats configuration typing with pinned checker (<a href="https://github.com/opencadc/canfar/commit/435f351e7bbc8ed577a1082b2f8d243ddd3da66f">435f351</a>)</li>
+<li><strong>cli:</strong> await poll task not progress for device timeout (<a href="https://github.com/opencadc/canfar/commit/4e31d17d7b1915a7eb768d0e9fa90240d070a10b">4e31d17</a>)</li>
+<li><strong>cli:</strong> build create ranges with IntRange and strip help colors in tests (<a href="https://github.com/opencadc/canfar/commit/68bd6ed0b0fc95a352670cc28cb8c76c38179e5f">68bd6ed</a>)</li>
+<li><strong>cli:</strong> derive banner mode from parsed options (<a href="https://github.com/opencadc/canfar/commit/6b4d77ac7c65a7ee242f2adddfcf55107fa442ee">6b4d77a</a>)</li>
+<li><strong>cli:</strong> document ps default status filter (<a href="https://github.com/opencadc/canfar/commit/7117a751f63a571e5357538f66225d861a0bdb4a">7117a75</a>)</li>
+<li><strong>client:</strong> clarify missing-URL server error message (<a href="https://github.com/opencadc/canfar/commit/4f884417ad2644861611844feae70c5e0edf791d">4f88441</a>)</li>
+<li><strong>client:</strong> ignore empty runtime tokens (<a href="https://github.com/opencadc/canfar/commit/04bca24d93101dc98d1bc872593f60f685959a8a">04bca24</a>)</li>
+<li><strong>client:</strong> updated httpx connection pool settings (<a href="https://github.com/opencadc/canfar/commit/59681a7d95d671d66f93e554cbfb0e00cd9f7124">59681a7</a>)</li>
+<li><strong>cli:</strong> exit nonzero and ask for login when not authenticated (<a href="https://github.com/opencadc/canfar/commit/ede9b0659a627233f601f2a77316ef47f43f44d7">ede9b06</a>)</li>
+<li><strong>cli:</strong> explain unreadable config files instead of a traceback (<a href="https://github.com/opencadc/canfar/commit/b34b56e15e68b23f4b8945e19fe691525b1fc484">b34b56e</a>)</li>
+<li><strong>cli:</strong> fall back to literal logs on Rich markup errors (<a href="https://github.com/opencadc/canfar/commit/52b6d7837d20c6d8db9595df0b988a254c087508">52b6d78</a>)</li>
+<li><strong>cli:</strong> handle Rich markup errors in session logs (<a href="https://github.com/opencadc/canfar/commit/1f1a53fb03d63e3e1e9cd827e51240bf330506c4">1f1a53f</a>)</li>
+<li><strong>cli:</strong> infer setup output from leaf options (<a href="https://github.com/opencadc/canfar/commit/8c3b6fdc2aca6d78632018a619df1b1d810dbc91">8c3b6fd</a>)</li>
+<li><strong>cli:</strong> list invalid config keys and suggest a reset (<a href="https://github.com/opencadc/canfar/commit/a3d96fec35b803e2d76a15bbc1c281e1ab73a89e">a3d96fe</a>)</li>
+<li><strong>cli:</strong> make server banner configurable (<a href="https://github.com/opencadc/canfar/commit/417acc22cf589181dd7cb459d3df501d52f1e0b2">417acc2</a>)</li>
+<li><strong>cli:</strong> preserve banner semantics for passthrough args (<a href="https://github.com/opencadc/canfar/commit/769a110e91f18b7530d99ef7a41997594bf62763">769a110</a>)</li>
+<li><strong>cli:</strong> satisfy output helper lint (<a href="https://github.com/opencadc/canfar/commit/7238833b70246ffc6690f9b3ee0d05c79ebe152f">7238833</a>)</li>
+<li><strong>cli:</strong> show GPU stats and configured resource limits (<a href="https://github.com/opencadc/canfar/commit/b035fd68f259c9461a0435e71b272bb86da16cc5">b035fd6</a>)</li>
+<li><strong>cli:</strong> show GPU stats and configured resource limits (<a href="https://github.com/opencadc/canfar/commit/d133916c4e68dc2c5296ba991b52d6f30ecb5042">d133916</a>)</li>
+<li><strong>config:</strong> apply domain state transitions atomically (<a href="https://github.com/opencadc/canfar/commit/f06e1c8959f4ab15a084a0fb6c3ad1cc04a47dc9">f06e1c8</a>)</li>
+<li><strong>config:</strong> persist configuration atomically (<a href="https://github.com/opencadc/canfar/issues/166">#166</a>) (<a href="https://github.com/opencadc/canfar/commit/f1d8cc732c168e150b3b581e8ce6b2810091bf4e">f1d8cc7</a>)</li>
+<li><strong>config:</strong> preserve editor mapping validation (<a href="https://github.com/opencadc/canfar/commit/9126c45d4f9c38ac1041eeb14508cc696314c632">9126c45</a>)</li>
+<li><strong>config:</strong> preserve source-isolated editor validation (<a href="https://github.com/opencadc/canfar/commit/8bb7605dfb6972d36970de4584fbd745aa042423">8bb7605</a>)</li>
+<li><strong>config:</strong> preserve source-isolated editor validation (<a href="https://github.com/opencadc/canfar/commit/b37fade22254e0d6e46ba51eb3a27661191fd9ce">b37fade</a>)</li>
+<li><strong>config:</strong> upgrade written version 1 configuration to version 2 (<a href="https://github.com/opencadc/canfar/commit/6c54dff2a75526afefe5697147f281c84552cf53">6c54dff</a>)</li>
+<li><strong>config:</strong> upgrade written version 1 configuration to version 2 (<a href="https://github.com/opencadc/canfar/commit/19a1fde95404dc6f2729dc94f1789683b2bbf362">19a1fde</a>), closes <a href="https://github.com/opencadc/canfar/issues/339">#339</a></li>
+<li><strong>config:</strong> validate before atomic persistence (<a href="https://github.com/opencadc/canfar/issues/166">#166</a>) (<a href="https://github.com/opencadc/canfar/commit/666544f2648596d68124e72ce55ee8d3c3317ddd">666544f</a>)</li>
+<li><strong>config:</strong> validate normalized storage names (<a href="https://github.com/opencadc/canfar/commit/9de7bcc481850e6c106fc0a60be592dda3f17648">9de7bcc</a>)</li>
+<li><strong>config:</strong> validate raw storage names (<a href="https://github.com/opencadc/canfar/commit/5f75b13196ae181d3363d79fa99861a3d42969f1">5f75b13</a>)</li>
+<li><strong>deps:</strong> drop the Intel macOS cryptography cap (<a href="https://github.com/opencadc/canfar/commit/b6c906894da61317f1adb4dadc42854fc653250e">b6c9068</a>)</li>
+<li><strong>deps:</strong> restore Intel macOS installs and relax dependency floors (<a href="https://github.com/opencadc/canfar/commit/e1ce63c38cd27ebf544c304523c1c435d3c4d221">e1ce63c</a>)</li>
+<li><strong>discovery:</strong> carry storage failures into activation (<a href="https://github.com/opencadc/canfar/commit/c8f09242f07d7153d9eb22ee79a23012ce3d5412">c8f0924</a>)</li>
+<li><strong>docs:</strong> align client guidance with implemented contracts (<a href="https://github.com/opencadc/canfar/commit/ce8efa3819cd1dc3f6b2ae76c34dd9f837c290a5">ce8efa3</a>)</li>
+<li><strong>feedback:</strong> added cli command (<a href="https://github.com/opencadc/canfar/commit/cc2e645585f48767486f6e150f96e69e46839e7c">cc2e645</a>)</li>
+<li><strong>idp:</strong> discover CADC servers from cadc-west-01 (<a href="https://github.com/opencadc/canfar/commit/e2142921261c57a35663d9e3b46d06bad8a0b6f3">e214292</a>)</li>
+<li><strong>idp:</strong> discover CADC servers from cadc-west-01 (<a href="https://github.com/opencadc/canfar/commit/ae22ddd36f05ecced636c8c0b53157c6ea1006ed">ae22ddd</a>)</li>
+<li>Intel Mac install guidance, relaxed dependency floors, and readable config errors (<a href="https://github.com/opencadc/canfar/commit/3b9a0ce5fbf711c9a66998446096a50052971535">3b9a0ce</a>)</li>
+<li>keep skill install docs and leak scan accurate (<a href="https://github.com/opencadc/canfar/commit/d352f2a829966eb5749f1d18004ce0a7cb5862f4">d352f2a</a>)</li>
+<li><strong>logging:</strong> make handler setup idempotent (<a href="https://github.com/opencadc/canfar/commit/40804e821da14c4c6c3ade8073eec7889db7ce66">40804e8</a>)</li>
+<li><strong>logging:</strong> retain configuration status compatibility (<a href="https://github.com/opencadc/canfar/commit/09776c0e833f9be87c28005c693695b5265e48cc">09776c0</a>)</li>
+<li><strong>quality:</strong> resolve code-quality findings (<a href="https://github.com/opencadc/canfar/commit/f9ef5ce9853d0e059af0d3bc9dbdd17c24e347ff">f9ef5ce</a>)</li>
+<li><strong>quality:</strong> resolve PR 276 analyzer findings (<a href="https://github.com/opencadc/canfar/commit/ee63dd8e15a809bff7de2a2760e2c5ee3559b23d">ee63dd8</a>)</li>
+<li>remove references to view all as it is no longer supported (<a href="https://github.com/opencadc/canfar/commit/39f5721e4a7061d8e8f717019466933efad71490">39f5721</a>)</li>
+<li>remove references to view all as it is no longer supported (<a href="https://github.com/opencadc/canfar/commit/49f20c7bf72416ae3c69d3ff136ddcde11117535">49f20c7</a>)</li>
+<li><strong>server:</strong> harden VOSpace discovery and inspection (<a href="https://github.com/opencadc/canfar/commit/e2bf7b900df1e87e8111fe56042b86cdcda12cc9">e2bf7b9</a>)</li>
+<li><strong>server:</strong> isolate registry discovery evidence (<a href="https://github.com/opencadc/canfar/commit/1f3cfbe295a5cc2111b1008db0eded5ba13de4c8">1f3cfbe</a>)</li>
+<li><strong>server:</strong> make storage inspection stateless (<a href="https://github.com/opencadc/canfar/commit/e06c6ebd60047ea476afbebedc82767afc0d8aa4">e06c6eb</a>)</li>
+<li><strong>server:</strong> preserve enrich annotation contract (<a href="https://github.com/opencadc/canfar/commit/4115da5485a2de8817be9761a234f2178a34053b">4115da5</a>)</li>
+<li><strong>server:</strong> preserve environment credentials (<a href="https://github.com/opencadc/canfar/commit/afb822f0b1f9c47be3c336b1a6fb465576826ce0">afb822f</a>)</li>
+<li><strong>sessions:</strong> align destroy_with sync/async keyword-only parity (<a href="https://github.com/opencadc/canfar/commit/4a47e303cd7ece2fd7fba5b93b3f488f6e80f5fc">4a47e30</a>)</li>
+<li>stop vos:/arc from targeting Vault (<a href="https://github.com/opencadc/canfar/commit/523939eb81eeb8a265e8f7beb8e605b8d556233e">523939e</a>)</li>
+<li><strong>storage:</strong> address authenticated source review (<a href="https://github.com/opencadc/canfar/commit/9cb8d6ca01e6c6ebd6bc2ac5c361a98223117b74">9cb8d6c</a>)</li>
+<li><strong>storage:</strong> address wave 2 review findings (<a href="https://github.com/opencadc/canfar/commit/4cdd1bfc00c6b58afe6f147dda3acae8f84fbf13">4cdd1bf</a>)</li>
+<li><strong>storage:</strong> preserve environment credential precedence (<a href="https://github.com/opencadc/canfar/commit/29a49dcb7c019047bb5c0ee091a650ae852586ab">29a49dc</a>)</li>
+<li><strong>test:</strong> isolate pytest home per run (<a href="https://github.com/opencadc/canfar/commit/169a330046f88b3df348992cd55aa2f0bc653790">169a330</a>)</li>
+<li><strong>test:</strong> isolate pytest HOME per run (<a href="https://github.com/opencadc/canfar/commit/4b7f61086f4db9301de08116f1223f0382640a0f">4b7f610</a>)</li>
+<li><strong>tests:</strong> assert recursion policy without rich-rendered text (<a href="https://github.com/opencadc/canfar/commit/20760e96d58b7df9754b6cc94aa83ba5aca44b90">20760e9</a>)</li>
+<li>update docs for replaced functionalityu (<a href="https://github.com/opencadc/canfar/commit/4f1c506ab10a381d4751cdd5827eea56b39ca3be">4f1c506</a>)</li>
+</ul>
+<h3 id="performance-improvements">Performance Improvements<a class="headerlink" href="#performance-improvements" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>storage:</strong> cache VOSpace directory listings per command (<a href="https://github.com/opencadc/canfar/commit/501810479cd22f25e8ae9bcd22378384abbba09d">5018104</a>)</li>
+</ul>
+<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>2026-3.md:</strong> adding missing info and include harbor ugrade (<a href="https://github.com/opencadc/canfar/commit/a4e90ed0fd262b51413c9a678b036e95b9bf5491">a4e90ed</a>)</li>
+<li><strong>2026-3.md:</strong> CanfarSP 2026.3 draft release notes (<a href="https://github.com/opencadc/canfar/commit/0306d6952a1017d7ba77f6e4f0d07ad92fc4f237">0306d69</a>)</li>
+<li><strong>2026-3.md:</strong> CanfarSP 2026.3 draft release notes (<a href="https://github.com/opencadc/canfar/commit/53edd68a8e7cafb84648a13588ce860f58c72278">53edd68</a>)</li>
+<li>add wheels-only install steps for Intel Macs (<a href="https://github.com/opencadc/canfar/commit/42be1f64b7eafb0fe204cf669566c813d7c8829f">42be1f6</a>)</li>
+<li><strong>agents:</strong> drop stale display and auth-context wording (<a href="https://github.com/opencadc/canfar/commit/1f3a286f672c49641eb92e119700b2b34e28cdb4">1f3a286</a>)</li>
+<li><strong>agents:</strong> drop stale selection and Logfire architecture claims (<a href="https://github.com/opencadc/canfar/commit/3a8092be8fdffaaace947be6b6021322a345581a">3a8092b</a>)</li>
+<li><strong>agents:</strong> record Intel Mac install, test env, and PR style notes (<a href="https://github.com/opencadc/canfar/commit/a6038a9fa10d7dccfe3831a87665811dc4539fcc">a6038a9</a>)</li>
+<li><strong>agent:</strong> updated docs (<a href="https://github.com/opencadc/canfar/commit/90e997158a94d99696d3437ffdb57ab2ba3969c0">90e9971</a>)</li>
+<li>align client and storage guidance with dependency updates (<a href="https://github.com/opencadc/canfar/commit/0684e5c678f5819f860664edfb9c8a944a1b2034">0684e5c</a>)</li>
+<li>allocations creation doc (<a href="https://github.com/opencadc/canfar/commit/7a1ed69a4f192ca16d8825a580719e5f258901ae">7a1ed69</a>)</li>
+<li>allocations creation doc (<a href="https://github.com/opencadc/canfar/commit/eff47b58e6ed16e0c5a042a74d8d9cadf46d4406">eff47b5</a>)</li>
+<li><strong>alma:</strong> replace screenshot guides with text workflow (<a href="https://github.com/opencadc/canfar/commit/4c9d3b216dd9a20f14f617413ea5aca1093f0d03">4c9d3b2</a>)</li>
+<li><strong>alma:</strong> replace screenshot guides with text workflow (<a href="https://github.com/opencadc/canfar/commit/31ca84da21ebef412ec031b1a7c1a6946de0c60b">31ca84d</a>)</li>
+<li><strong>alma:</strong> use glossary terminology (<a href="https://github.com/opencadc/canfar/commit/8384e9268345c6140858ed5788e3bee18dac9475">8384e92</a>)</li>
+<li><strong>auth:</strong> document Python OIDC login (<a href="https://github.com/opencadc/canfar/commit/4c157c765a2908ec60a5bedb567e2e32699209ad">4c157c7</a>)</li>
+<li><strong>auth:</strong> link Python login guidance (<a href="https://github.com/opencadc/canfar/commit/8813704d39282df6cc2a1055693f87648fd075b5">8813704</a>)</li>
+<li>clarify replica resource allocation (<a href="https://github.com/opencadc/canfar/commit/193011629627e374f1e57ab5cc5646efbd87c9ee">1930116</a>)</li>
+<li><strong>cli:</strong> align command reference with shipped interface (<a href="https://github.com/opencadc/canfar/commit/3171cb2da0af3fe77089d9c44179ab2a0472a85a">3171cb2</a>)</li>
+<li><strong>cli:</strong> align command reference with shipped interface (<a href="https://github.com/opencadc/canfar/commit/85b5ac69936bf1734f93d681c66ea4952e1edcf7">85b5ac6</a>)</li>
+<li><strong>cli:</strong> document create machine output (<a href="https://github.com/opencadc/canfar/issues/194">#194</a>) (<a href="https://github.com/opencadc/canfar/commit/01dd94f2f926880ed4bd806cadb45bd50929ef61">01dd94f</a>)</li>
+<li><strong>cli:</strong> document output format option (<a href="https://github.com/opencadc/canfar/commit/a44ab5e6cdb9021da17378a2b3c7fc99b2af481c">a44ab5e</a>)</li>
+<li><strong>client:</strong> add a Data Access guide for the Python client (<a href="https://github.com/opencadc/canfar/commit/39286e45391f8d32728bc0a35bac3836a90fa833">39286e4</a>)</li>
+<li><strong>client:</strong> audit Python API documentation (<a href="https://github.com/opencadc/canfar/commit/f8d7d28bb10cb9b55743595e19a1059214a757fd">f8d7d28</a>)</li>
+<li><strong>client:</strong> audit Python API documentation (<a href="https://github.com/opencadc/canfar/commit/495a5b89d3d93da2f2b4dac4b27f72f5771bede6">495a5b8</a>)</li>
+<li><strong>client:</strong> close filesystem examples (<a href="https://github.com/opencadc/canfar/commit/7df7a186dfbc795b515ad0ab08d226513d90f0b5">7df7a18</a>)</li>
+<li><strong>client:</strong> drop the removed auth login alias (<a href="https://github.com/opencadc/canfar/commit/2ad7dc32d4b7aadf4e1bfc69ef10d446d22da9bf">2ad7dc3</a>)</li>
+<li><strong>client:</strong> name the removed View type in upgrade notes (<a href="https://github.com/opencadc/canfar/commit/4f3b0a282cfeea88aa830dd169f4a3a96b70f5b4">4f3b0a2</a>)</li>
+<li><strong>client:</strong> updates (<a href="https://github.com/opencadc/canfar/commit/8aafe2ec911fa5306997288c44167261f0be457f">8aafe2e</a>)</li>
+<li><strong>cli:</strong> quote prune regex examples for shell safety (<a href="https://github.com/opencadc/canfar/commit/a2ccfee84b5d7161f491113b78c76ed1d53efebd">a2ccfee</a>)</li>
+<li><strong>cli:</strong> remove stale command aliases (<a href="https://github.com/opencadc/canfar/commit/19d22b886871134578e748b81b93212c11200b16">19d22b8</a>)</li>
+<li>close remote after cache setup failures (<a href="https://github.com/opencadc/canfar/commit/72cf887530ca86e73da598d01101aa07e1be8f63">72cf887</a>)</li>
+<li><strong>community:</strong> feedback guidelines (<a href="https://github.com/opencadc/canfar/commit/cfa991bc1d03d2b831350b89765a3ba7d4a1f9ee">cfa991b</a>)</li>
+<li><strong>contributing:</strong> document CI test policy (<a href="https://github.com/opencadc/canfar/commit/e0ad198c4120451c5855ce38bf0b55749248e309">e0ad198</a>)</li>
+<li>correct machine output and storage API contracts (<a href="https://github.com/opencadc/canfar/commit/12e50377b335d51ab6fbbe8df168957ab98feead">12e5037</a>)</li>
+<li><strong>data:</strong> align VOSpace credential ownership (<a href="https://github.com/opencadc/canfar/commit/48306d74eb831f0b2c6dfde246e241aa97b2ef0a">48306d7</a>)</li>
+<li><strong>data:</strong> call the operand prefix an identifier (<a href="https://github.com/opencadc/canfar/commit/511199fec2054dc57875a9de4f3a70834c4cd29d">511199f</a>)</li>
+<li><strong>data:</strong> clarify credential and removal policy (<a href="https://github.com/opencadc/canfar/commit/a8880159b55322886fe774b36ceb67ff6ab4599d">a888015</a>)</li>
+<li><strong>data:</strong> clarify source mapping lifecycle (<a href="https://github.com/opencadc/canfar/commit/5db3df9ec9e8c2ec10c5dd4092bb04775deff143">5db3df9</a>)</li>
+<li><strong>data:</strong> correct storage names and verified command behaviour (<a href="https://github.com/opencadc/canfar/commit/265b585574bf1fb2a48ef1565a2d9ade1c2fe270">265b585</a>)</li>
+<li><strong>data:</strong> correct the byte-range caching guidance (<a href="https://github.com/opencadc/canfar/commit/b26261f58a875fe454ace903543fbc50bf62980a">b26261f</a>)</li>
+<li><strong>data:</strong> document listing, file, and byte-range caching (<a href="https://github.com/opencadc/canfar/commit/63c6f72ed545d02f48e97ba5e4ee14996ad9e836">63c6f72</a>)</li>
+<li><strong>data:</strong> document supported transfer workflows (<a href="https://github.com/opencadc/canfar/commit/f919b3c181dbbcfbc013c0ce2184c70bda976cf0">f919b3c</a>)</li>
+<li><strong>data:</strong> explain explicit cross-source copy (<a href="https://github.com/opencadc/canfar/commit/d12b197ce110c5b7dc00ea6eace76c51cef3bf98">d12b197</a>)</li>
+<li><strong>data:</strong> remove obsolete optional install (<a href="https://github.com/opencadc/canfar/commit/0ef59c98f71f219e6a2c544b83a9e04374b9021b">0ef59c9</a>)</li>
+<li><strong>data:</strong> separate client and service byte-range limits (<a href="https://github.com/opencadc/canfar/commit/dfe368033ab57dea188f47fd8d4871593666d9cc">dfe3680</a>)</li>
+<li><strong>data:</strong> use default CADC storage name (<a href="https://github.com/opencadc/canfar/commit/7feaa71e0d455c1d3cd42006922903a6909a7de3">7feaa71</a>)</li>
+<li><strong>data:</strong> use default CADC storage name (<a href="https://github.com/opencadc/canfar/commit/3ec51a356d4da5b05eb6176cd319b398dd823dd6">3ec51a3</a>)</li>
+<li><strong>data:</strong> validate VOSpace integration (<a href="https://github.com/opencadc/canfar/commit/e41441a0c557c29faa086f92398fb2f1a06796bc">e41441a</a>)</li>
+<li><strong>demo:</strong> added typst demo (<a href="https://github.com/opencadc/canfar/commit/f6609e23acda7159f18f83ee6ed156b71c67870f">f6609e2</a>)</li>
+<li><strong>discussions:</strong> added template (<a href="https://github.com/opencadc/canfar/commit/4b7c8e0b145db7fd855340c91aadce400731da4f">4b7c8e0</a>)</li>
+<li>guide users from first sessions to recoverable pipelines (<a href="https://github.com/opencadc/canfar/commit/d8936e02f3cfce6f727f106e9c37b239525a99e3">d8936e0</a>)</li>
+<li><strong>install:</strong> condense Intel Mac install guidance (<a href="https://github.com/opencadc/canfar/commit/7f88a365a154382cb8277b02b07227786815d8cb">7f88a36</a>)</li>
+<li><strong>install:</strong> recommend only uv tool install on Intel Macs (<a href="https://github.com/opencadc/canfar/commit/e481013b6b0f767056ae26738bf62b89fe08ae7f">e481013</a>)</li>
+<li>introduce Data beta and community feedback (<a href="https://github.com/opencadc/canfar/commit/0d96a72761cc6dc7063d6cd97049ae3743133efa">0d96a72</a>)</li>
+<li><strong>issues:</strong> templates (<a href="https://github.com/opencadc/canfar/commit/ac46fe1ae3d104cdd3fbe8333c9efb7cbe17eee1">ac46fe1</a>)</li>
+<li><strong>logging:</strong> publish canonical observability policy (<a href="https://github.com/opencadc/canfar/issues/193">#193</a>) (<a href="https://github.com/opencadc/canfar/commit/f69f2a0e0de98ecaa73d76a33a9e1259f586244a">f69f2a0</a>)</li>
+<li><strong>maintainability:</strong> record audit and Authlib research (<a href="https://github.com/opencadc/canfar/issues/156">#156</a>) (<a href="https://github.com/opencadc/canfar/commit/3b2691fdd613e1ceda4a985f8a22b1184bb2732e">3b2691f</a>)</li>
+<li>make client data guide canonical (<a href="https://github.com/opencadc/canfar/commit/8312d2883aebfb30f27dfd2adbef62dfc05a1c37">8312d28</a>)</li>
+<li><strong>platform:</strong> align IDP and server terms (<a href="https://github.com/opencadc/canfar/commit/f175c981b823ad87199fcbbccf0c93534e7bfbc9">f175c98</a>)</li>
+<li><strong>platform:</strong> describe limits as each provider's, with CANFAR's values (<a href="https://github.com/opencadc/canfar/commit/96d23d7e069b5b2839a85d2391d602c67b2b100c">96d23d7</a>)</li>
+<li><strong>platform:</strong> document Session limits and concurrent storage use (<a href="https://github.com/opencadc/canfar/commit/a498b7a5aae7cdf03ce04de66e891b345c5d7070">a498b7a</a>)</li>
+<li><strong>platform:</strong> explain flexible and fixed session limits with CLI discovery (<a href="https://github.com/opencadc/canfar/commit/d0a770e87ff3a9096783096b5fd5dddb0774b31f">d0a770e</a>)</li>
+<li><strong>platform:</strong> record operator facts confirmed by a maintainer (<a href="https://github.com/opencadc/canfar/commit/377643216b0743985d8b417d46d5308d3b74458a">3776432</a>)</li>
+<li><strong>platform:</strong> upstream verified platform knowledge from the skills (<a href="https://github.com/opencadc/canfar/commit/af0ed564352856b05c498ac60fd9e17dc18c1ac2">af0ed56</a>)</li>
+<li><strong>platform:</strong> use deployment-neutral server examples (<a href="https://github.com/opencadc/canfar/commit/e749871ae49977dfd0ba4fb05ae9d1eb70f66715">e749871</a>)</li>
+<li><strong>readme:</strong> modify canfar open to use json + jq (<a href="https://github.com/opencadc/canfar/issues/128">#128</a>) (<a href="https://github.com/opencadc/canfar/commit/ac2c3deb58d0500827b8968a0fd536954d52a0fe">ac2c3de</a>)</li>
+<li><strong>release:</strong> note storage-ui rename and fix helm install examples (<a href="https://github.com/opencadc/canfar/commit/9f015b767cfb5cab62f4ba40f3ca0663904939a0">9f015b7</a>)</li>
+<li><strong>release:</strong> note storage-ui rename and fix helm install examples (<a href="https://github.com/opencadc/canfar/commit/18134de7b28cd3ff711a9934aea949e0005f4142">18134de</a>)</li>
+<li><strong>release:</strong> removed discussions (<a href="https://github.com/opencadc/canfar/commit/11342273d6c6eceaeb18cbd9e5bd44087b841a09">1134227</a>)</li>
+<li><strong>release:</strong> removed discussions (<a href="https://github.com/opencadc/canfar/commit/5268edd2efd3fbfc8671fc185f62351a8df28c93">5268edd</a>)</li>
+<li><strong>releases:</strong> drop replica and config editor bullets from 2026.3 (<a href="https://github.com/opencadc/canfar/commit/8a457d6935245b8f01cd4035e97b031fc45ee860">8a457d6</a>)</li>
+<li><strong>releases:</strong> expand canfar 1.5.0 notes in 2026.3 (<a href="https://github.com/opencadc/canfar/commit/f19cecec1ed1b4b8f023d3af0adeac1570a8f65c">f19cece</a>)</li>
+<li><strong>releases:</strong> expand canfar v1.5.0+ notes in 2026.3 (<a href="https://github.com/opencadc/canfar/commit/6194ab7cbe0eab3108485e0650311090ba7e472a">6194ab7</a>)</li>
+<li><strong>releases:</strong> restore platform release notes from v1.4.1 (<a href="https://github.com/opencadc/canfar/commit/c70a2c27463188e7f7b0c22da0c77d04c1922801">c70a2c2</a>)</li>
+<li><strong>releases:</strong> restore platform release notes from v1.4.1 (<a href="https://github.com/opencadc/canfar/commit/d4ee1d667f998145b7256dcefcaa30d7dfcf0e10">d4ee1d6</a>)</li>
+<li><strong>releases:</strong> tighten 2026.3 client data and session notes (<a href="https://github.com/opencadc/canfar/commit/9c18e8e90e0b0d1ce2843ee3108b69ec9bb9fcb6">9c18e8e</a>)</li>
+<li><strong>releases:</strong> use v1.5.0+ in client section heading (<a href="https://github.com/opencadc/canfar/commit/5c69fc6bcc6eb0e5268d6a7165d88a98c92e23ab">5c69fc6</a>)</li>
+<li><strong>release:</strong> tighten 2026.3 release note wording (<a href="https://github.com/opencadc/canfar/commit/608eca7e1d9cc4d22a48d9f0cf1f6ba58eeb23b5">608eca7</a>)</li>
+<li><strong>release:</strong> update v1.5.0 wording for 2026.3 (<a href="https://github.com/opencadc/canfar/commit/4ac95cd901d780e228580939e88802fdf3af337d">4ac95cd</a>)</li>
+<li><strong>release:</strong> update v1.5.0 wording for 2026.3 (<a href="https://github.com/opencadc/canfar/commit/b15a7a80a404cf9dcf4f11fa8711e5391ba0faa1">b15a7a8</a>)</li>
+<li>restore familiar navigation and legacy bookmarks (<a href="https://github.com/opencadc/canfar/commit/de35c4cf92c5e71484c8f10cb8483e4849a524f3">de35c4c</a>)</li>
+<li>restore science workflows and document client upgrades (<a href="https://github.com/opencadc/canfar/commit/6ccf7c4738109c65e619b95d355501e37db54758">6ccf7c4</a>)</li>
+<li><strong>site:</strong> align platform workflows and support guidance (<a href="https://github.com/opencadc/canfar/commit/4cb6e1ba64aa3897cb72e86a5df42e544cfa4e71">4cb6e1b</a>)</li>
+<li><strong>site:</strong> remove unreferenced legacy assets (<a href="https://github.com/opencadc/canfar/commit/4fa4c6806e825c70da75e993a5e7ecffa9b676f8">4fa4c68</a>)</li>
+<li><strong>skills:</strong> updated docs for agentic skills (<a href="https://github.com/opencadc/canfar/commit/0a9ba1ead84960be7b62572a8ac78b9618e0eaab">0a9ba1e</a>)</li>
+<li><strong>skills:</strong> updated docs for agentic skills (<a href="https://github.com/opencadc/canfar/commit/c9222b6e3f03d087c27b4cc28afbe6d3cc528f9d">c9222b6</a>)</li>
+<li><strong>storage:</strong> clarify explicit filesystem and staging workflows (<a href="https://github.com/opencadc/canfar/commit/8bb5991ec45c4a7dc80c4d9f03fb2994d5b10a6c">8bb5991</a>)</li>
+<li><strong>storage:</strong> correct filesystem lifecycle examples (<a href="https://github.com/opencadc/canfar/commit/3a1954128644492bbc2028c1ffb6e1d255737b4c">3a19541</a>)</li>
+<li><strong>storage:</strong> document explicit filesystem access (<a href="https://github.com/opencadc/canfar/commit/4b54f7a34bf176bfc61e38e78e6f6a13ced904fe">4b54f7a</a>)</li>
+<li>update notification for allocations (<a href="https://github.com/opencadc/canfar/commit/c27f21cc7b82b752095f2f8100128f32b206452e">c27f21c</a>)</li>
+<li>use Session terminology in user guides (<a href="https://github.com/opencadc/canfar/commit/99dd80932f06190c4c1d9770ea721da3b359ac58">99dd809</a>)</li>
+</ul>
+<h2 id="141-2026-06-11"><a href="https://github.com/opencadc/canfar/compare/v1.4.0...v1.4.1">1.4.1</a> (2026-06-11)<a class="headerlink" href="#141-2026-06-11" title="Permanent link">&para;</a></h2>
+<h3 id="bug-fixes_1">Bug Fixes<a class="headerlink" href="#bug-fixes_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>docs:</strong> updated compatibility notes (<a href="https://github.com/opencadc/canfar/commit/3eb0ee2876e5e314fee1c6da51ad38985e8aab79">3eb0ee2</a>)</li>
 <li>typo and link fix (<a href="https://github.com/opencadc/canfar/commit/2fe2ec9fb200d319a4ccc27d26c3c1ac02b4cd5c">2fe2ec9</a>)</li>
 </ul>
-<h3 id="documentation">Documentation<a class="headerlink" href="#documentation" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_1">Documentation<a class="headerlink" href="#documentation_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li>add latest to list of releases and add platform notes (<a href="https://github.com/opencadc/canfar/commit/440de9f9091693e48e2b021a9ba73f09746e5c24">440de9f</a>)</li>
 <li>add reference link (<a href="https://github.com/opencadc/canfar/commit/36f8afe4406abd3f9fa4f04c1c6709f6a1007a02">36f8afe</a>)</li>
 </ul>
 <h2 id="140-2026-06-11"><a href="https://github.com/opencadc/canfar/compare/v1.3.5...v1.4.0">1.4.0</a> (2026-06-11)<a class="headerlink" href="#140-2026-06-11" title="Permanent link">&para;</a></h2>
-<h3 id="features">Features<a class="headerlink" href="#features" title="Permanent link">&para;</a></h3>
+<h3 id="features_1">Features<a class="headerlink" href="#features_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>2026.2:</strong> new login flow, manage identities &amp; servers, script-friendly machine output, support for new ui (<a href="https://github.com/opencadc/canfar/commit/70441f25f538198afaac5bdcbf6770d61a82e9f8">70441f2</a>)</li>
 <li><strong>config:</strong> key servers by name and simplify config get/set (<a href="https://github.com/opencadc/canfar/commit/eb98a2335452773b34b568d3602cffb6cbca83ea">eb98a23</a>)</li>
 </ul>
-<h3 id="bug-fixes_1">Bug Fixes<a class="headerlink" href="#bug-fixes_1" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_2">Bug Fixes<a class="headerlink" href="#bug-fixes_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>ci:</strong> configure codecov coverage statuses (<a href="https://github.com/opencadc/canfar/commit/9539995285579b4fb9e24a97c0a8f726e7512110">9539995</a>)</li>
 <li><strong>ci:</strong> relaxed int tests (<a href="https://github.com/opencadc/canfar/commit/7fccadde5d388dba59be7d4371db4c45ea797d4b">7fccadd</a>)</li>
@@ -1274,7 +1490,7 @@
 <li><strong>syntax:</strong> improvement for if/else (<a href="https://github.com/opencadc/canfar/commit/48265d517cedc1ca9972460d86f972dea74e6d01">48265d5</a>)</li>
 <li><strong>test:</strong> use cross-platform isolated HOME for pytest (<a href="https://github.com/opencadc/canfar/commit/1132f82dddf93e9b343505452a24f83c658081e2">1132f82</a>)</li>
 </ul>
-<h3 id="documentation_1">Documentation<a class="headerlink" href="#documentation_1" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_2">Documentation<a class="headerlink" href="#documentation_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>add Server Name glossary and agent memory for dict-keyed config (<a href="https://github.com/opencadc/canfar/commit/bfaf6f874a04b337ff8208aa5af85e11e407257e">bfaf6f8</a>)</li>
 <li><strong>adr:</strong> record server name as configuration identity (<a href="https://github.com/opencadc/canfar/commit/a91ca7ef3bf015a54586eae3ace26e49e7be718b">a91ca7e</a>)</li>
@@ -1287,33 +1503,33 @@
 <li><strong>release:</strong> Draft version of the 2026.2 release notes (<a href="https://github.com/opencadc/canfar/commit/ef59d1c493efbc3d628c041c2aa633f6073aed89">ef59d1c</a>)</li>
 </ul>
 <h2 id="135-2026-04-28"><a href="https://github.com/opencadc/canfar/compare/v1.3.4...v1.3.5">1.3.5</a> (2026-04-28)<a class="headerlink" href="#135-2026-04-28" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_2">Bug Fixes<a class="headerlink" href="#bug-fixes_2" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_3">Bug Fixes<a class="headerlink" href="#bug-fixes_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li>release note versions (<a href="https://github.com/opencadc/canfar/commit/1df92d97ed4eb68ff8820ca7fb816552b0b7a239">1df92d9</a>)</li>
 </ul>
 <h2 id="134-2026-03-31"><a href="https://github.com/opencadc/canfar/compare/v1.3.3...v1.3.4">1.3.4</a> (2026-03-31)<a class="headerlink" href="#134-2026-03-31" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_3">Bug Fixes<a class="headerlink" href="#bug-fixes_3" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_4">Bug Fixes<a class="headerlink" href="#bug-fixes_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>logging:</strong> enhanced error handling in session management for HTTP task failures. (<a href="https://github.com/opencadc/canfar/commit/0b57d7532b93ab839d21141701ff4ad0a92b8dca">0b57d75</a>)</li>
 </ul>
 <h2 id="133-2026-03-04"><a href="https://github.com/opencadc/canfar/compare/v1.3.2...v1.3.3">1.3.3</a> (2026-03-04)<a class="headerlink" href="#133-2026-03-04" title="Permanent link">&para;</a></h2>
-<h3 id="documentation_2">Documentation<a class="headerlink" href="#documentation_2" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_3">Documentation<a class="headerlink" href="#documentation_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>platform:</strong> Refine Canadian spelling preference to use -ize (<a href="https://github.com/opencadc/canfar/commit/b8d9d5d776f67c8c50f9481f6729015831396d8a">b8d9d5d</a>)</li>
 <li><strong>platform:</strong> Review, Canadian English, fix links, reduce redundancy, tone &amp; external refs (<a href="https://github.com/opencadc/canfar/commit/5abd45b3b5d857a5f2d67ae995a6aa5b1eca588e">5abd45b</a>)</li>
 </ul>
 <h2 id="132-2026-02-26"><a href="https://github.com/opencadc/canfar/compare/v1.3.1...v1.3.2">1.3.2</a> (2026-02-26)<a class="headerlink" href="#132-2026-02-26" title="Permanent link">&para;</a></h2>
-<h3 id="documentation_3">Documentation<a class="headerlink" href="#documentation_3" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_4">Documentation<a class="headerlink" href="#documentation_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li>put latest release on top in side nave (<a href="https://github.com/opencadc/canfar/commit/1a3abd234e11b74a4268533ed8b07b28de8bf4a3">1a3abd2</a>)</li>
 </ul>
 <h2 id="131-2026-02-26"><a href="https://github.com/opencadc/canfar/compare/v1.3.0...v1.3.1">1.3.1</a> (2026-02-26)<a class="headerlink" href="#131-2026-02-26" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_4">Bug Fixes<a class="headerlink" href="#bug-fixes_4" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_5">Bug Fixes<a class="headerlink" href="#bug-fixes_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>ci:</strong> added timeouts to workflows and fixed Dockerfile (<a href="https://github.com/opencadc/canfar/commit/a6ec24bcfa747dc790e833cd580c3436afa1dc7d">a6ec24b</a>)</li>
 <li><strong>dockerfile:</strong> added healthcheck (<a href="https://github.com/opencadc/canfar/commit/95c6e051c53b39718b9628325f7ead8e413267eb">95c6e05</a>)</li>
 </ul>
-<h3 id="documentation_4">Documentation<a class="headerlink" href="#documentation_4" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_5">Documentation<a class="headerlink" href="#documentation_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>2026.1-release-notes:</strong> Docs ready for review (<a href="https://github.com/opencadc/canfar/commit/44a97bfe6d046834b9a3c1dcde15b003d00620a2">44a97bf</a>)</li>
 <li><strong>2026.1-release-notes:</strong> First draft of release 2026.1 release notes (<a href="https://github.com/opencadc/canfar/commit/3f98fc94bc0200b913e5dbd3abf3213ccd7ce595">3f98fc9</a>)</li>
@@ -1323,12 +1539,12 @@
 <li>update release versions (<a href="https://github.com/opencadc/canfar/commit/8fffcded8c9a5ce024c600b91b1a35655151f361">8fffcde</a>)</li>
 </ul>
 <h2 id="130-2026-02-10"><a href="https://github.com/opencadc/canfar/compare/v1.2.0...v1.3.0">1.3.0</a> (2026-02-10)<a class="headerlink" href="#130-2026-02-10" title="Permanent link">&para;</a></h2>
-<h3 id="features_1">Features<a class="headerlink" href="#features_1" title="Permanent link">&para;</a></h3>
+<h3 id="features_2">Features<a class="headerlink" href="#features_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li>add image ls CLI command (<a href="https://github.com/opencadc/canfar/commit/1343a1312148000c57e8fa375a81af0817dd06e4">1343a13</a>)</li>
 <li>handle empty image list (<a href="https://github.com/opencadc/canfar/commit/249e8a3ed0f2d88a0b9bcaec312ebd2ff547fb25">249e8a3</a>)</li>
 </ul>
-<h3 id="bug-fixes_5">Bug Fixes<a class="headerlink" href="#bug-fixes_5" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_6">Bug Fixes<a class="headerlink" href="#bug-fixes_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>cli:</strong> image (<a href="https://github.com/opencadc/canfar/commit/f46d0dd3dfdf696984f4bb188736aadb494f7ce9">f46d0dd</a>)</li>
 <li><strong>cli:</strong> image (<a href="https://github.com/opencadc/canfar/commit/e4e16a72aa41b5ab2007d1d7e7e949f41ce56840">e4e16a7</a>)</li>
@@ -1336,21 +1552,21 @@
 <li>forgot to save files (<a href="https://github.com/opencadc/canfar/commit/430b2d2925212dba33474661b12b10e8f50a0c34">430b2d2</a>)</li>
 <li><strong>package:</strong> updated dockerfile and build (<a href="https://github.com/opencadc/canfar/commit/a3cbe1b9de647f158341186a46f2d6ab8283a0f3">a3cbe1b</a>)</li>
 </ul>
-<h3 id="documentation_5">Documentation<a class="headerlink" href="#documentation_5" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_6">Documentation<a class="headerlink" href="#documentation_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li>documentation corrections and clarity with long switches (<a href="https://github.com/opencadc/canfar/commit/887339515817c4e69ce64893dba0ff1df8659b56">8873395</a>)</li>
 <li>remove drac references (<a href="https://github.com/opencadc/canfar/commit/eb91fc320a76d9a60196ff81bef1a6c983f82029">eb91fc3</a>)</li>
 <li>small update for desktop doc (<a href="https://github.com/opencadc/canfar/commit/b303e12071138fe8e7c5c6ad267f38b00b6eee85">b303e12</a>)</li>
 </ul>
 <h2 id="120-2025-12-22"><a href="https://github.com/opencadc/canfar/compare/v1.1.1...v1.2.0">1.2.0</a> (2025-12-22)<a class="headerlink" href="#120-2025-12-22" title="Permanent link">&para;</a></h2>
-<h3 id="features_2">Features<a class="headerlink" href="#features_2" title="Permanent link">&para;</a></h3>
+<h3 id="features_3">Features<a class="headerlink" href="#features_3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>cli:</strong> added console configuration parameter, which allows the user to overload any parameter for the rich.console.Console (<a href="https://github.com/opencadc/canfar/commit/933638395a57a53d793617a5fa323ef30880787b">9336383</a>)</li>
 <li><strong>console:</strong> added functionality to change the console width of the output from the cli (<a href="https://github.com/opencadc/canfar/commit/72719b321bc6e723c26f7a01d1c2a71fc7021c65">72719b3</a>)</li>
 <li><strong>demos:</strong> added srcnet workshop demo (<a href="https://github.com/opencadc/canfar/commit/f6cbcb9d284c68aec6ca15730a4b5137495295c9">f6cbcb9</a>)</li>
 <li><strong>prune:</strong> allow regex-aware prefix matching with logging when using <code>canfar prune</code> or session api function <code>destroy_with</code> (<a href="https://github.com/opencadc/canfar/commit/16e5f257663687bd2f3b6639f173ec811dd72f24">16e5f25</a>), closes <a href="https://github.com/opencadc/canfar/issues/68">#68</a></li>
 </ul>
-<h3 id="bug-fixes_6">Bug Fixes<a class="headerlink" href="#bug-fixes_6" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_7">Bug Fixes<a class="headerlink" href="#bug-fixes_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>cli:</strong> added new canfar servers to login process (<a href="https://github.com/opencadc/canfar/commit/fb875eea47e9ed8d762cd32eac445969a7ac1a60">fb875ee</a>)</li>
 <li><strong>docs:</strong> added pipx installation instructions (<a href="https://github.com/opencadc/canfar/commit/b2ebfc734a06a8b3b9ae9efd4bbb57d329945569">b2ebfc7</a>)</li>
@@ -1360,22 +1576,22 @@
 <li><strong>session:</strong> improved httpx error message (<a href="https://github.com/opencadc/canfar/commit/848ce15cb5603119227a7c5c85fa373f9327b685">848ce15</a>)</li>
 <li><strong>session:</strong> session.connect now first checks if the session is Running before trying to open it (<a href="https://github.com/opencadc/canfar/commit/b06ad86b61e984ae181e0ef251b6764d9d1f8730">b06ad86</a>), closes <a href="https://github.com/opencadc/canfar/issues/70">#70</a></li>
 </ul>
-<h3 id="documentation_6">Documentation<a class="headerlink" href="#documentation_6" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_7">Documentation<a class="headerlink" href="#documentation_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>canfar:</strong> added placeholder docs for 2026.1 release notes with the currently released bugfixes (<a href="https://github.com/opencadc/canfar/commit/6046e9e4a6644a584a02e843af79e57c065692f9">6046e9e</a>)</li>
 <li><strong>fix:</strong> toc, navigation (<a href="https://github.com/opencadc/canfar/commit/d965831e3816089743fbd7ec4e21e1abd035fefe">d965831</a>)</li>
 </ul>
 <h2 id="111-2025-11-26"><a href="https://github.com/opencadc/canfar/compare/v1.1.0...v1.1.1">1.1.1</a> (2025-11-26)<a class="headerlink" href="#111-2025-11-26" title="Permanent link">&para;</a></h2>
-<h3 id="documentation_7">Documentation<a class="headerlink" href="#documentation_7" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_8">Documentation<a class="headerlink" href="#documentation_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li>update release versionss (<a href="https://github.com/opencadc/canfar/commit/651fc4777f7fba60eb104d8e8129abea7041adfe">651fc47</a>)</li>
 </ul>
 <h2 id="110-2025-11-25"><a href="https://github.com/opencadc/canfar/compare/v1.0.4...v1.1.0">1.1.0</a> (2025-11-25)<a class="headerlink" href="#110-2025-11-25" title="Permanent link">&para;</a></h2>
-<h3 id="features_3">Features<a class="headerlink" href="#features_3" title="Permanent link">&para;</a></h3>
+<h3 id="features_4">Features<a class="headerlink" href="#features_4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>cli:</strong> enhanced resilience when handling session data from skaha api (<a href="https://github.com/opencadc/canfar/commit/2662f891d19e151e3dc5b3e69a0fabbe6d273085">2662f89</a>)</li>
 </ul>
-<h3 id="bug-fixes_7">Bug Fixes<a class="headerlink" href="#bug-fixes_7" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_8">Bug Fixes<a class="headerlink" href="#bug-fixes_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>auth:</strong> better reporting for x509 cert date validity errors (<a href="https://github.com/opencadc/canfar/commit/47e800b273e30564e6d6c4fbcbd4417895a317c2">47e800b</a>)</li>
 <li><strong>build:</strong> updated dependencies to support python 3.14 (<a href="https://github.com/opencadc/canfar/commit/664011cdd5866e0afbb896b2e17ea23a26f75597">664011c</a>)</li>
@@ -1383,7 +1599,7 @@
 <li>remove instances expectation from stats (<a href="https://github.com/opencadc/canfar/commit/aad2656b0819f27df3dfbc66e322863724af3cd3">aad2656</a>)</li>
 <li><strong>sessions:</strong> added debug logging to all async session requests (<a href="https://github.com/opencadc/canfar/commit/bd4b5a49c9bc3c2eb3f09fb86ca73ea434bab328">bd4b5a4</a>)</li>
 </ul>
-<h3 id="documentation_8">Documentation<a class="headerlink" href="#documentation_8" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_9">Documentation<a class="headerlink" href="#documentation_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li>add deployments documentation link (<a href="https://github.com/opencadc/canfar/commit/2a4cc49400538eb3dafdede85689243551e3ef1d">2a4cc49</a>)</li>
 <li><strong>best-practices:</strong> for containerizing (<a href="https://github.com/opencadc/canfar/commit/5d05f80c2cba7626b7c4069446fc2538a6322d48">5d05f80</a>)</li>
@@ -1397,42 +1613,42 @@
 <li><strong>releases:</strong> Update of general release information (<a href="https://github.com/opencadc/canfar/commit/47637158e91ef5d482d7a973c8ca9e8549e6b40d">4763715</a>)</li>
 </ul>
 <h2 id="104-2025-09-26"><a href="https://github.com/opencadc/canfar/compare/v1.0.3...v1.0.4">1.0.4</a> (2025-09-26)<a class="headerlink" href="#104-2025-09-26" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_8">Bug Fixes<a class="headerlink" href="#bug-fixes_8" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_9">Bug Fixes<a class="headerlink" href="#bug-fixes_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>docs:</strong> updated colors for better accessibility in dark mode (<a href="https://github.com/opencadc/canfar/commit/a16903723f8bf4fc740fb49fd046b72dc27ddcfc">a169037</a>)</li>
 </ul>
-<h3 id="documentation_9">Documentation<a class="headerlink" href="#documentation_9" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_10">Documentation<a class="headerlink" href="#documentation_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>conduct:</strong> updated links (<a href="https://github.com/opencadc/canfar/commit/03576d1d897a42af4e1e8e7cc70b0a5c0ab29096">03576d1</a>)</li>
 <li><strong>fixes:</strong> updates to landing page (<a href="https://github.com/opencadc/canfar/commit/112c5ca4dd2230d3d455d3f6c5918e553edc2b22">112c5ca</a>)</li>
 <li><strong>support:</strong> updated support help page to remove repition (<a href="https://github.com/opencadc/canfar/commit/092aae5ef5794ce2e1bdae7bc01548e755b7081b">092aae5</a>)</li>
 </ul>
 <h2 id="103-2025-09-23"><a href="https://github.com/opencadc/canfar/compare/v1.0.2...v1.0.3">1.0.3</a> (2025-09-23)<a class="headerlink" href="#103-2025-09-23" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_9">Bug Fixes<a class="headerlink" href="#bug-fixes_9" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_10">Bug Fixes<a class="headerlink" href="#bug-fixes_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>docs:</strong> updated docs with link to the platform (<a href="https://github.com/opencadc/canfar/commit/39aead3ac22c2e488a899b171e0414b51f24193b">39aead3</a>)</li>
 <li><strong>docs:</strong> updates for community docs (<a href="https://github.com/opencadc/canfar/commit/57d0d6f25cded4bfb8cbba23584bbd8a5a9d69b4">57d0d6f</a>)</li>
 </ul>
 <h2 id="102-2025-09-16"><a href="https://github.com/opencadc/canfar/compare/v1.0.1...v1.0.2">1.0.2</a> (2025-09-16)<a class="headerlink" href="#102-2025-09-16" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_10">Bug Fixes<a class="headerlink" href="#bug-fixes_10" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_11">Bug Fixes<a class="headerlink" href="#bug-fixes_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>defaults:</strong> updated default config to use v1 server api (<a href="https://github.com/opencadc/canfar/commit/447b17ec37072bf6b08d279baafe7f8d561d6afd">447b17e</a>)</li>
 <li><strong>session:</strong> default destroy_with not targets <code>Completed</code> jobs (<a href="https://github.com/opencadc/canfar/commit/08581bed48b4530142ae54418ff6b168655dee5b">08581be</a>)</li>
 <li><strong>sessions:</strong> image parameter now is not locked down to images.canfar.net to support local variations in all SRCnet deployments (<a href="https://github.com/opencadc/canfar/commit/2b69c521b7757a390b97aaac677eecffa8ae4b8b">2b69c52</a>)</li>
 <li><strong>sessions:</strong> removed no longer needed view=event param during http get (<a href="https://github.com/opencadc/canfar/commit/6afb91c10b6309090128425331e8e2267e525794">6afb91c</a>)</li>
 </ul>
-<h3 id="documentation_10">Documentation<a class="headerlink" href="#documentation_10" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_11">Documentation<a class="headerlink" href="#documentation_11" title="Permanent link">&para;</a></h3>
 <ul>
 <li>overhaul and clarify platform guides, containers, sessions, storage, permissions, and mkdocs config (<a href="https://github.com/opencadc/canfar/commit/db52b025ccda768fc113b735381a9bc2c3c81b69">db52b02</a>)</li>
 <li><strong>release-notes:</strong> consolidation (<a href="https://github.com/opencadc/canfar/commit/7cbebae106ebc45b902a90c6da625b7ce4b69521">7cbebae</a>)</li>
 <li><strong>updates:</strong> for breaking changes between v0 and v1 api (<a href="https://github.com/opencadc/canfar/commit/d58bd6cf173cc4cf2394a2062a446ab85b8b1def">d58bd6c</a>)</li>
 </ul>
 <h2 id="101-2025-09-11"><a href="https://github.com/opencadc/canfar/compare/v1.0.0...v1.0.1">1.0.1</a> (2025-09-11)<a class="headerlink" href="#101-2025-09-11" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_11">Bug Fixes<a class="headerlink" href="#bug-fixes_11" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_12">Bug Fixes<a class="headerlink" href="#bug-fixes_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li>correct typos in release notes (<a href="https://github.com/opencadc/canfar/commit/def5f3c6f966f5857f850a53456d6b080ecfc75f">def5f3c</a>)</li>
 </ul>
-<h3 id="documentation_11">Documentation<a class="headerlink" href="#documentation_11" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_12">Documentation<a class="headerlink" href="#documentation_12" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>about-page:</strong> removed outedated governance info (<a href="https://github.com/opencadc/canfar/commit/16ff6ccf6ec2d7a78aa171cd731d6cd028a3827e">16ff6cc</a>)</li>
 <li><strong>alma:</strong> fix image paths to sessions/images where needed (<a href="https://github.com/opencadc/canfar/commit/a8524e74467f75e9a0b31b7d75772cb7553c4928">a8524e7</a>)</li>
@@ -1448,7 +1664,7 @@
 <ul>
 <li><strong>project:</strong> - The configuration directory has moved from <code>~/.skaha</code> to <code>~/.canfar</code>.</li>
 </ul>
-<h3 id="features_4">Features<a class="headerlink" href="#features_4" title="Permanent link">&para;</a></h3>
+<h3 id="features_5">Features<a class="headerlink" href="#features_5" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>api:</strong> added support for flexible user sessions (<a href="https://github.com/opencadc/canfar/commit/c9b5b986bcf933b364276f2c02146201a6829998">c9b5b98</a>)</li>
 <li><strong>auth:</strong> add HTTPx authentication hooks for token refresh (<a href="https://github.com/opencadc/canfar/commit/489066d560d883f1bad77521e6fa5a02e754b494">489066d</a>)</li>
@@ -1509,7 +1725,7 @@
 <li><strong>types:</strong> updated to the auth data model (<a href="https://github.com/opencadc/canfar/commit/7f293c43a1a028be38a27787a44f1d781580acc7">7f293c4</a>)</li>
 <li>update release-please configuration and versioning for CANFAR (<a href="https://github.com/opencadc/canfar/commit/b71a8d1af147742cee8bfbe8b0a2b9b726d61eb9">b71a8d1</a>)</li>
 </ul>
-<h3 id="bug-fixes_12">Bug Fixes<a class="headerlink" href="#bug-fixes_12" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_13">Bug Fixes<a class="headerlink" href="#bug-fixes_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>api:</strong> httpx error catching hook now re-raises the errors rather than execessive printing in stdout (<a href="https://github.com/opencadc/canfar/commit/6b7aa71a3ff69c06e2110e53e662d2abdfdd135e">6b7aa71</a>)</li>
 <li><strong>api:</strong> httpx error catching hook now re-raises the errors rather than execessive printing in stdout (<a href="https://github.com/opencadc/canfar/commit/827205f92922be7b0c71eaf4f0a0a6bd24c739b0">827205f</a>)</li>
@@ -1655,7 +1871,7 @@
 <li><strong>x509:</strong> fixes for handling unintialized expiry (<a href="https://github.com/opencadc/canfar/commit/76e7523344d903c72e4db272d11c1ad526769312">76e7523</a>)</li>
 <li><strong>x509:</strong> updated x509 auth utils to be all colocated and updated tests (<a href="https://github.com/opencadc/canfar/commit/9e5e7c6553389ac96d8eb018472c189ef60dc4f9">9e5e7c6</a>)</li>
 </ul>
-<h3 id="documentation_12">Documentation<a class="headerlink" href="#documentation_12" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_13">Documentation<a class="headerlink" href="#documentation_13" title="Permanent link">&para;</a></h3>
 <ul>
 <li>add CanfarSP 2025.1 release notes to homepage (<a href="https://github.com/opencadc/canfar/commit/86b1a328f33b04ce91dedd578e42222199e1d5af">86b1a32</a>)</li>
 <li>add detailed technical information and links to release notes (<a href="https://github.com/opencadc/canfar/commit/003b8a5b16c430c065e27487230282d833834f2c">003b8a5</a>)</li>
@@ -1705,7 +1921,7 @@
 <li><strong>user-guides----documentations:</strong> add legacy index and pages; update guides link; (<a href="https://github.com/opencadc/canfar/commit/0867c9620692967224428e01d8afe2eb5389b881">0867c96</a>)</li>
 </ul>
 <h2 id="080-2025-08-08"><a href="https://github.com/opencadc/canfar/compare/v0.7.0...v0.8.0">0.8.0</a> (2025-08-08)<a class="headerlink" href="#080-2025-08-08" title="Permanent link">&para;</a></h2>
-<h3 id="features_5">Features<a class="headerlink" href="#features_5" title="Permanent link">&para;</a></h3>
+<h3 id="features_6">Features<a class="headerlink" href="#features_6" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>auth:</strong> add HTTPx authentication hooks for token refresh (<a href="https://github.com/opencadc/canfar/commit/489066d560d883f1bad77521e6fa5a02e754b494">489066d</a>)</li>
 <li><strong>auth:</strong> add OIDC authentication hooks for automatic token refresh (<a href="https://github.com/opencadc/canfar/commit/bc4596fdad62db016a7cc81f00150a5fd2e85150">bc4596f</a>)</li>
@@ -1737,7 +1953,7 @@
 <li><strong>types:</strong> added mode, which reflects the auth type of the client (<a href="https://github.com/opencadc/canfar/commit/5781e4ad2c39be0faea78a6a814bb58c0d8cec79">5781e4a</a>)</li>
 <li><strong>types:</strong> updated to the auth data model (<a href="https://github.com/opencadc/canfar/commit/7f293c43a1a028be38a27787a44f1d781580acc7">7f293c4</a>)</li>
 </ul>
-<h3 id="bug-fixes_13">Bug Fixes<a class="headerlink" href="#bug-fixes_13" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_14">Bug Fixes<a class="headerlink" href="#bug-fixes_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>auth, config, http:</strong> refactor imports and clean up default handling in models (<a href="https://github.com/opencadc/canfar/commit/6095a09b3a94a01ac509dc3f8b9937c5d754c472">6095a09</a>)</li>
 <li><strong>auth, config, models:</strong> refactor authentication handling and improve configuration properties (<a href="https://github.com/opencadc/canfar/commit/aaa8c618dd4c9de6314437a170e33d5f63328ced">aaa8c61</a>)</li>
@@ -1804,7 +2020,7 @@
 <li><strong>x509:</strong> fixes for handling unintialized expiry (<a href="https://github.com/opencadc/canfar/commit/76e7523344d903c72e4db272d11c1ad526769312">76e7523</a>)</li>
 <li><strong>x509:</strong> updated x509 auth utils to be all colocated and updated tests (<a href="https://github.com/opencadc/canfar/commit/9e5e7c6553389ac96d8eb018472c189ef60dc4f9">9e5e7c6</a>)</li>
 </ul>
-<h3 id="documentation_13">Documentation<a class="headerlink" href="#documentation_13" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_14">Documentation<a class="headerlink" href="#documentation_14" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>auth:</strong> added auth and context docs (<a href="https://github.com/opencadc/canfar/commit/65d3c2ef5dcd3150c5aec07f5b801cb530272c9b">65d3c2e</a>)</li>
 <li><strong>bug-reports:</strong> added issue template and docs for reporting bugs (<a href="https://github.com/opencadc/canfar/commit/1e177ea5eee695a103d6b359f38d90626d1166a0">1e177ea</a>)</li>
@@ -1818,24 +2034,24 @@
 <li><strong>updates:</strong> all over, work-in-progress (<a href="https://github.com/opencadc/canfar/commit/8ea1cced8474ed2be7f6ea92552f306a7cc4a18f">8ea1cce</a>)</li>
 </ul>
 <h2 id="070-2025-05-28"><a href="https://github.com/opencadc/canfar/compare/v0.6.1...v0.7.0">0.7.0</a> (2025-05-28)<a class="headerlink" href="#070-2025-05-28" title="Permanent link">&para;</a></h2>
-<h3 id="features_6">Features<a class="headerlink" href="#features_6" title="Permanent link">&para;</a></h3>
+<h3 id="features_7">Features<a class="headerlink" href="#features_7" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>session:</strong> added session.events to show deployment events on the cluster, e.g. loading container image etc (<a href="https://github.com/opencadc/canfar/commit/58e9bca90652ffcbcca8eeaecf351123254d62c0">58e9bca</a>)</li>
 </ul>
-<h3 id="bug-fixes_14">Bug Fixes<a class="headerlink" href="#bug-fixes_14" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_15">Bug Fixes<a class="headerlink" href="#bug-fixes_15" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>security:</strong> improvements to assertion checks (<a href="https://github.com/opencadc/canfar/commit/2ea11088d2879918d653dd1c7bd8eaf2ceff24d6">2ea1108</a>)</li>
 <li><strong>security:</strong> X509 certs are checked if valid before first conn. to server (<a href="https://github.com/opencadc/canfar/commit/08327a9ea233ed67084f5a1fd6347f919111aea5">08327a9</a>)</li>
 <li><strong>session:</strong> events now returns None, when verbose=True (<a href="https://github.com/opencadc/canfar/commit/1b01dd6cfb5972d6476a297679f341e6b00e1bd2">1b01dd6</a>)</li>
 <li><strong>session:</strong> improved docs, better testing logic to await async sleep (<a href="https://github.com/opencadc/canfar/commit/e54b9af2e011692250e11efb1abf0be6ce53e40b">e54b9af</a>)</li>
 </ul>
-<h3 id="documentation_14">Documentation<a class="headerlink" href="#documentation_14" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_15">Documentation<a class="headerlink" href="#documentation_15" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>events:</strong> added session.events docs (<a href="https://github.com/opencadc/canfar/commit/7540062a53f480555c8e38253a34d2dd6c8484db">7540062</a>)</li>
 <li><strong>session:</strong> docstring (<a href="https://github.com/opencadc/canfar/commit/7189052f0727ed5937072bb56d6942bf54583fd3">7189052</a>)</li>
 </ul>
 <h2 id="061-2025-05-22"><a href="https://github.com/opencadc/canfar/compare/v0.6.0...v0.6.1">0.6.1</a> (2025-05-22)<a class="headerlink" href="#061-2025-05-22" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_15">Bug Fixes<a class="headerlink" href="#bug-fixes_15" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_16">Bug Fixes<a class="headerlink" href="#bug-fixes_16" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>cleanup:</strong> comments (<a href="https://github.com/opencadc/canfar/commit/8a1a0785232c404b5b0b68cbd4b8b0349d09a34c">8a1a078</a>)</li>
 <li><strong>gha:</strong> fix for gh-pages push (<a href="https://github.com/opencadc/canfar/commit/27aa8f816575d41b060aec947b8824ee5322f25b">27aa8f8</a>)</li>
@@ -1844,7 +2060,7 @@
 <li><strong>security:</strong> restricting ssl context to use TLSv1.2 at a minimum (<a href="https://github.com/opencadc/canfar/commit/09654d01d4fbd3092930fa82ef87d504ca4583c0">09654d0</a>)</li>
 </ul>
 <h2 id="060-2025-05-12"><a href="https://github.com/opencadc/canfar/compare/v0.5.2...v0.6.0">0.6.0</a> (2025-05-12)<a class="headerlink" href="#060-2025-05-12" title="Permanent link">&para;</a></h2>
-<h3 id="features_7">Features<a class="headerlink" href="#features_7" title="Permanent link">&para;</a></h3>
+<h3 id="features_8">Features<a class="headerlink" href="#features_8" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>client:</strong> added loglevel to configure the python logging levels (<a href="https://github.com/opencadc/canfar/commit/431f46dd4abebff53edb1485a5d5064ef432f3bf">431f46d</a>)</li>
 <li><strong>client:</strong> added token support to skaha client (<a href="https://github.com/opencadc/canfar/commit/6c7c7486b6a078a77b5a6b42e2c8162d95ff80f7">6c7c748</a>)</li>
@@ -1853,7 +2069,7 @@
 <li><strong>sessions:</strong> added skaha AsyncSession (<a href="https://github.com/opencadc/canfar/commit/26932724e4533bf1823cfad97e3b9ccc8ef5fd7b">2693272</a>)</li>
 <li><strong>sessions:</strong> added support for firefly (<a href="https://github.com/opencadc/canfar/commit/87d16c1637d5848fbc522c3340c611df40f6d2fa">87d16c1</a>)</li>
 </ul>
-<h3 id="bug-fixes_16">Bug Fixes<a class="headerlink" href="#bug-fixes_16" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_17">Bug Fixes<a class="headerlink" href="#bug-fixes_17" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>api:</strong> updated context, images, overview with httpx (<a href="https://github.com/opencadc/canfar/commit/391e85732dc324b1d2dee51c4d46d558e5d7d72f">391e857</a>)</li>
 <li><strong>client:</strong> changed to the default and max values of parallel conns (<a href="https://github.com/opencadc/canfar/commit/ce552bff74602c3525154a5ef4308d9291e9cc53">ce552bf</a>)</li>
@@ -1864,7 +2080,7 @@
 <li><strong>session:</strong> fixed sync log output when verbose is True (<a href="https://github.com/opencadc/canfar/commit/6ac63f9e1a13d7c31d3e0626ae638bb40ed27650">6ac63f9</a>)</li>
 <li><strong>session:</strong> solidified the skaha async session api, moved common query building logic to utils.build (<a href="https://github.com/opencadc/canfar/commit/3f11aeea5b8ea3617a7d6eed4b4d86863ce4f856">3f11aee</a>)</li>
 </ul>
-<h3 id="documentation_15">Documentation<a class="headerlink" href="#documentation_15" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_16">Documentation<a class="headerlink" href="#documentation_16" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>asyncSession:</strong> added docs (<a href="https://github.com/opencadc/canfar/commit/a8be7fc540c35f85d24b16f233ef46107302ac5a">a8be7fc</a>)</li>
 <li><strong>client:</strong> updated class docstring (<a href="https://github.com/opencadc/canfar/commit/5531c6f3794312a1fac64ffbed2f4e20033803c2">5531c6f</a>)</li>
@@ -1875,49 +2091,49 @@
 <li><strong>updates:</strong> site config + token support (<a href="https://github.com/opencadc/canfar/commit/54d6ed92285a44421450e1139d5f22e62c863694">54d6ed9</a>)</li>
 </ul>
 <h2 id="052-2025-03-03"><a href="https://github.com/opencadc/canfar/compare/v0.5.1...v0.5.2">0.5.2</a> (2025-03-03)<a class="headerlink" href="#052-2025-03-03" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_17">Bug Fixes<a class="headerlink" href="#bug-fixes_17" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_18">Bug Fixes<a class="headerlink" href="#bug-fixes_18" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>session:</strong> fixed kind translation for session.create, increased max replicas limit to 512 (<a href="https://github.com/opencadc/canfar/commit/9bfe3575fb78209df546886d08654874799c7b07">9bfe357</a>)</li>
 </ul>
 <h2 id="051-2025-02-26"><a href="https://github.com/opencadc/canfar/compare/v0.5.0...v0.5.1">0.5.1</a> (2025-02-26)<a class="headerlink" href="#051-2025-02-26" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_18">Bug Fixes<a class="headerlink" href="#bug-fixes_18" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_19">Bug Fixes<a class="headerlink" href="#bug-fixes_19" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>models:</strong> createSpec model now outputs kind with alias type (<a href="https://github.com/opencadc/canfar/commit/3184d5c8df740d04b652fa94282682de9084b8d3">3184d5c</a>)</li>
 </ul>
 <h2 id="050-2024-11-22"><a href="https://github.com/opencadc/canfar/compare/v0.4.4...v0.5.0">0.5.0</a> (2024-11-22)<a class="headerlink" href="#050-2024-11-22" title="Permanent link">&para;</a></h2>
-<h3 id="features_8">Features<a class="headerlink" href="#features_8" title="Permanent link">&para;</a></h3>
+<h3 id="features_9">Features<a class="headerlink" href="#features_9" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>context:</strong> updates to context.resources api (<a href="https://github.com/opencadc/canfar/commit/4d08876de0b49201ddef0b8c9ddc01f022fcf11f">4d08876</a>)</li>
 </ul>
-<h3 id="bug-fixes_19">Bug Fixes<a class="headerlink" href="#bug-fixes_19" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_20">Bug Fixes<a class="headerlink" href="#bug-fixes_20" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>docker:</strong> fix for docker build due to uv path install changes (<a href="https://github.com/opencadc/canfar/commit/00fd5de260793d00b33d65216058c94854e73133">00fd5de</a>)</li>
 </ul>
-<h3 id="documentation_16">Documentation<a class="headerlink" href="#documentation_16" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_17">Documentation<a class="headerlink" href="#documentation_17" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>style:</strong> updates (<a href="https://github.com/opencadc/canfar/commit/e886d77253d9b52f43bd5ab3d4c826b1d8a591c3">e886d77</a>)</li>
 </ul>
 <h2 id="044-2024-11-22"><a href="https://github.com/opencadc/canfar/compare/v0.4.3...v0.4.4">0.4.4</a> (2024-11-22)<a class="headerlink" href="#044-2024-11-22" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_20">Bug Fixes<a class="headerlink" href="#bug-fixes_20" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_21">Bug Fixes<a class="headerlink" href="#bug-fixes_21" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>session:</strong> fixed set env in session.create (<a href="https://github.com/opencadc/canfar/commit/00b67ac1c834439596e481e0a5db17c33f9d7290">00b67ac</a>)</li>
 </ul>
 <h2 id="043-2024-11-08"><a href="https://github.com/opencadc/canfar/compare/v0.4.2...v0.4.3">0.4.3</a> (2024-11-08)<a class="headerlink" href="#043-2024-11-08" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_21">Bug Fixes<a class="headerlink" href="#bug-fixes_21" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_22">Bug Fixes<a class="headerlink" href="#bug-fixes_22" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>models:</strong> create.spec model used in session.create now expects env to be None by default (<a href="https://github.com/opencadc/canfar/commit/c34b110fba0e8a84d5e811bc55060fb7a370f6b5">c34b110</a>)</li>
 </ul>
 <h2 id="042-2024-10-30"><a href="https://github.com/opencadc/canfar/compare/v0.4.0...v0.4.2">0.4.2</a> (2024-10-30)<a class="headerlink" href="#042-2024-10-30" title="Permanent link">&para;</a></h2>
-<h3 id="bug-fixes_22">Bug Fixes<a class="headerlink" href="#bug-fixes_22" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_23">Bug Fixes<a class="headerlink" href="#bug-fixes_23" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>models:</strong> added logging (<a href="https://github.com/opencadc/canfar/commit/514fda226a5167ed200b63f0e0bfab06901f4683">514fda2</a>)</li>
 </ul>
-<h3 id="documentation_17">Documentation<a class="headerlink" href="#documentation_17" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_18">Documentation<a class="headerlink" href="#documentation_18" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>index:</strong> updated the landing page (<a href="https://github.com/opencadc/canfar/commit/e7dbac2049e4bc9e24886c83d1d971c04119c0a8">e7dbac2</a>)</li>
 </ul>
 <h2 id="040-2024-10-25"><a href="https://github.com/opencadc/canfar/commit/b68cefc0f9abf356fea1fdeb42034ba75b4bf42e">0.4.0</a> (2024-10-25)<a class="headerlink" href="#040-2024-10-25" title="Permanent link">&para;</a></h2>
-<h3 id="features_9">Features<a class="headerlink" href="#features_9" title="Permanent link">&para;</a></h3>
+<h3 id="features_10">Features<a class="headerlink" href="#features_10" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>build:</strong> added edge container build and attestation (<a href="https://github.com/opencadc/canfar/commit/d07e008dd8c4de36a8e20ca50f5a91dc03f8afd4">d07e008</a>)</li>
 <li><strong>codecov:</strong> added badge (<a href="https://github.com/opencadc/canfar/commit/373412d8f8b6a806b111a5d8dac89c64a876d6b3">373412d</a>)</li>
@@ -1941,7 +2157,7 @@
 <li><strong>session:</strong> skaha.sessions api deprecated (<a href="https://github.com/opencadc/canfar/commit/e18466330e67a1b714da86062c79710fd459fa39">e184663</a>)</li>
 <li><strong>release-please:</strong> implemented (<a href="https://github.com/opencadc/canfar/commit/2ac972870d84876a74c7631f8af5cad453fab81e">2ac9728</a>)</li>
 </ul>
-<h3 id="bug-fixes_23">Bug Fixes<a class="headerlink" href="#bug-fixes_23" title="Permanent link">&para;</a></h3>
+<h3 id="bug-fixes_24">Bug Fixes<a class="headerlink" href="#bug-fixes_24" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>attestation:</strong> added attestation for dockerhub container image (<a href="https://github.com/opencadc/canfar/commit/0ff4ba2b321d61483325018d42f39c97d22eb3cb">0ff4ba2</a>)</li>
 <li><strong>badge:</strong> update to codeql bagde url (<a href="https://github.com/opencadc/canfar/commit/c95b6e075c8c81f079bca7936940da01645f04a7">c95b6e0</a>)</li>
@@ -1980,7 +2196,7 @@
 <li><strong>type-hints:</strong> fixed broken type hints (<a href="https://github.com/opencadc/canfar/commit/c1d1356bbba6642bb86e12b1aaf553094e83ea04">c1d1356</a>)</li>
 <li><strong>gha:</strong> fix to release action (<a href="https://github.com/opencadc/canfar/commit/cc7b61a472da50463f3159aac46f6aa3ae49e79c">cc7b61a</a>)</li>
 </ul>
-<h3 id="documentation_18">Documentation<a class="headerlink" href="#documentation_18" title="Permanent link">&para;</a></h3>
+<h3 id="documentation_19">Documentation<a class="headerlink" href="#documentation_19" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>github-actions:</strong> changed the workflow name (<a href="https://github.com/opencadc/canfar/commit/868e1147e7a32c69d92cc325db7b3074feeace31">868e114</a>)</li>
 <li><strong>README:</strong> updated with CI status (<a href="https://github.com/opencadc/canfar/commit/175ffcecdeb6e89f45c078180b732f22890b6403">175ffce</a>)</li>
