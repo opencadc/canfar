@@ -2271,34 +2271,34 @@
 <p class="admonition-title">CanfarSP 2026.3</p>
 <h3 id="new-features"><strong>✨ New Features</strong><a class="headerlink" href="#new-features" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Science Portal UX refresh.</li>
-<li>When available, the Science Portal displays improved metrics for the platform, for users, and for sessions.</li>
-<li>Platform metrics now include GPU info (when available).</li>
-<li>Shared memory is available across all Session types through <code>/dev/shm</code>.</li>
-<li>Session ID included in the title for Web Terminal sessions.</li>
+<li>The Science Portal has a refreshed interface.</li>
+<li>When the platform provides metrics, the Science Portal shows usage for the platform, for users, and for Sessions.</li>
+<li>Platform metrics include GPUs when the platform has them.</li>
+<li>All Session types have shared memory at <code>/dev/shm</code>.</li>
+<li>Web Terminal Session titles include the Session ID.</li>
 </ul>
 <p><span id="python-client-cli-v150"></span></p>
 <h3 id="python-client-cli-v150"><strong>🐍 Python Client &amp; CLI (v1.5.0+)</strong><a class="headerlink" href="#python-client-cli-v150" title="Permanent link">&para;</a></h3>
-<p>Once v1.5.0 is published, upgrade an existing installation with:</p>
+<p>CanfarSP 2026.3 ships with v1.5.0 of the <code>canfar</code> Python client and CLI. Upgrade an existing installation with:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>upgrade<span class="w"> </span>canfar
 <span class="c1"># or: pip install -U canfar</span>
 </code></pre></div>
-<p>Intel Macs need wheels-only install for <code>cryptography</code>:</p>
+<p>On Intel Macs, install <code>canfar</code> without building <code>cryptography</code> from source:</p>
 <div class="highlight"><pre><span></span><code>uv<span class="w"> </span>tool<span class="w"> </span>install<span class="w"> </span>canfar<span class="w"> </span>--no-build-package<span class="w"> </span>cryptography
 </code></pre></div>
 <p><span id="canfar-data-access"></span></p>
-<h4 id="canfar-data-access-beta">🗃️ CANFAR Data Access Beta<a class="headerlink" href="#canfar-data-access-beta" title="Permanent link">&para;</a></h4>
-<p>CANFAR Data is a <a href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a> compliant storage adapter that will be available in beta to all CANFAR users with Python client v1.5.0+. The beta includes the <code>canfar data</code> commands and the Python storage tools in <code>canfar.storage</code>. Your existing storage permissions still apply.</p>
+<h4 id="canfar-data-access-beta">CANFAR Data access beta<a class="headerlink" href="#canfar-data-access-beta" title="Permanent link">&para;</a></h4>
+<p>CANFAR Data is an <a href="https://filesystem-spec.readthedocs.io/en/latest/">fsspec</a>-compliant storage adapter, available in beta in v1.5.0+ of the CANFAR Python client. The beta includes the <code>canfar data</code> commands and the Python storage tools in <code>canfar.storage</code>. Your existing storage permissions still apply.</p>
 <p>List, inspect, copy, move, and remove files across local and remote storage
 (<code>arc</code>, <code>vault</code>, <code>local</code>). Every path starts with <code>IDENTIFIER:/PATH</code>.
-Remote storage requires authentication; <code>local</code> does not.</p>
+Remote storage requires authentication. <code>local</code> does not.</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>login<span class="w"> </span>cadc
 canfar<span class="w"> </span>data<span class="w"> </span>ls<span class="w"> </span>-lh<span class="w"> </span>arc:/home/USER
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>local:/data/input.fits<span class="w"> </span>arc:/home/USER/input.fits
 canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </span>-R<span class="w"> </span>vault:/project/cubes<span class="w"> </span>local:/data/cubes
 </code></pre></div>
 <p>In Python, call <code>identifiers()</code> to list configured storage and
-<code>filesystem()</code> for a standard fsspec filesystem:</p>
+<code>filesystem()</code> to open a standard fsspec filesystem:</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.storage</span><span class="w"> </span><span class="kn">import</span> <span class="n">filesystem</span><span class="p">,</span> <span class="n">identifiers</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="n">identifiers</span><span class="p">())</span>  <span class="c1"># ['arc', 'vault', 'local']</span>
@@ -2311,8 +2311,8 @@ canfar<span class="w"> </span>data<span class="w"> </span>cp<span class="w"> </s
 <span class="k">finally</span><span class="p">:</span>
     <span class="n">arc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </code></pre></div>
-<p>See <a href="../../cli/data/">Data commands</a> and the <a href="../../client/data/">Python data guide</a> for more details.</p>
-<h4 id="login-discovery-and-server-limits">➜] Login, discovery, and server limits<a class="headerlink" href="#login-discovery-and-server-limits" title="Permanent link">&para;</a></h4>
+<p>See <a href="../../cli/data/">Data commands</a> and the <a href="../../client/data/">Python data guide</a> for details.</p>
+<h4 id="login-discovery-and-server-limits">Login, discovery, and server limits<a class="headerlink" href="#login-discovery-and-server-limits" title="Permanent link">&para;</a></h4>
 <p><code>canfar.login()</code> and <code>canfar.alogin()</code> run browser-based device login from
 Python, save discovered servers, and return <code>True</code> when authenticated.
 Select your identity and server before launching Sessions:</p>
@@ -2324,7 +2324,7 @@ Select your identity and server before launching Sessions:</p>
 <span class="n">server</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">"canfar"</span><span class="p">)</span>
 </code></pre></div>
 <p><code>canfar server ls</code> shows each server's CPU, memory, GPU, and interactive
-Session limits for fixed and flexible Sessions. <code>canfar create</code> validates
+Session limits for fixed and flexible Sessions. <code>canfar create</code> checks
 <code>--cpu</code>, <code>--memory</code>, and <code>--gpu</code> against the active server's limits before
 sending the request:</p>
 <div class="highlight"><pre><span></span><code>                                          Known Servers
@@ -2334,53 +2334,54 @@ sending the request:</p>
   canfar   ivo://cadc.nrc.ca/skaha          v1        1-16 cores   1-16 cores   1-7    3
            https://ws-uv.canfar.net/skaha             4-32 GB      1-192 GB
 </code></pre></div>
-<h4 id="session-management">📋 Session Management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h4>
-<p>Renew interactive Sessions from the CLI or Python (matching the Science
-Portal):</p>
+<h4 id="session-management">Session management<a class="headerlink" href="#session-management" title="Permanent link">&para;</a></h4>
+<p>You can renew interactive Sessions from the CLI or Python, as you can in the
+Science Portal:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>renew<span class="w"> </span>SESSION_ID
 </code></pre></div>
 <div class="highlight"><pre><span></span><code><span class="n">session</span><span class="o">.</span><span class="n">renew</span><span class="p">(</span><span class="s2">"SESSION_ID"</span><span class="p">)</span>
 </code></pre></div>
-<p>All <code>session</code> methods support <code>errors="raise"</code> (or <code>CANFAR_ERRORS=raise</code>)
-to raise <code>SessionRequestError</code> with partial results when any request fails,
-instead of only logging and continuing.</p>
+<p><code>create</code>, <code>info</code>, <code>logs</code>, <code>events</code>, <code>destroy</code>, <code>destroy_with</code>, and <code>renew</code>
+accept <code>errors="raise"</code>, or you can set <code>CANFAR_ERRORS=raise</code>. These methods
+then run every request and raise <code>SessionRequestError</code> with the partial
+results if any request failed. The default logs failures and continues.</p>
 <h4 id="updates-for-existing-scripts-and-cli-workflows">Updates for existing scripts and CLI workflows<a class="headerlink" href="#updates-for-existing-scripts-and-cli-workflows" title="Permanent link">&para;</a></h4>
 <ul>
-<li>Machine output is <code>-o json</code> or <code>-o yaml</code> on supported commands (replaces
-  <code>--json</code> / <code>--yaml</code>). Stdout is the payload; logs go to stderr.</li>
-<li>Logging: <code>-v</code> for one line per Science Platform HTTP response, <code>-vv</code> for
-  debug, and <code>--log-file PATH</code> for rotating JSON Lines logs.</li>
+<li>Supported commands take <code>-o json</code> or <code>-o yaml</code> for machine output, replacing
+  <code>--json</code> and <code>--yaml</code>. Stdout contains only the payload, and logs go to stderr.</li>
+<li><code>-v</code> logs one line per Science Platform HTTP response, <code>-vv</code> logs debug
+  output, and <code>--log-file PATH</code> writes rotating JSON Lines logs.</li>
 <li><code>canfar</code> obtains CADC certificates directly and no longer installs
   <code>cadcutils</code>. If you run <code>cadc-get-cert</code> yourself, install it with
   <code>pip install cadcutils</code>.</li>
-<li><code>fetch()</code> accepts only <code>kind</code> and <code>status</code> (<code>view="all"</code> was removed).</li>
+<li><code>fetch()</code> accepts only <code>kind</code> and <code>status</code>. It no longer accepts <code>view="all"</code>.</li>
 </ul>
 <p>See <a href="../../client/updates/">What's new</a> and the
 <a href="../../client/migration/">upgrade guide</a> for the full client change list.</p>
 <h3 id="platform-fixes">🐛 Platform Fixes<a class="headerlink" href="#platform-fixes" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>Desktop Sessions</strong><ul>
-<li>Fixed race condition that caused the Astro Software menu to build incorrectly.</li>
-<li>Address issue where older CASA versions were failing to start.</li>
-<li>Desktop browser restored.</li>
+<li>Fixed a race condition that could build the Astro Software menu incorrectly.</li>
+<li>Older CASA versions no longer fail to start.</li>
+<li>Restored the browser in Desktop Sessions.</li>
 </ul>
 </li>
-<li><strong>Science Portal</strong> — clearer error when a user is not authorized to launch Sessions.</li>
-<li><strong>CARTA</strong> — cookie length no longer blocks access to CARTA Sessions.</li>
-<li>The <strong>Request GPU</strong> Checkbox (in the 'Fixed' session tab) will not show if platform configuration does not declare GPU to be availabile.</li>
+<li>The Science Portal shows a clearer error when you are not authorized to launch Sessions.</li>
+<li>Long cookies no longer block access to CARTA Sessions.</li>
+<li>The Science Portal hides the <strong>Request GPU</strong> checkbox on the Fixed Session tab when the platform configuration declares no GPUs.</li>
 </ul>
 <h3 id="technical-changes">⚙️ Technical Changes<a class="headerlink" href="#technical-changes" title="Permanent link">&para;</a></h3>
 <ul>
-<li>New internal metrics microservice that can connect to metrics collectors.</li>
-<li>Consistent and enhanced job labelling for better metrics collection.</li>
-<li>Registry lookup failover improved; non-responsive servers no longer stall discovery on timeouts.</li>
+<li>A new internal Metrics service collects platform, user, and Session usage, and can query external metrics collectors.</li>
+<li>Session Jobs and Pods use consistent labels, so the Metrics service can attribute usage to each Session.</li>
+<li>Registry lookups fail over to another server, so an unresponsive server no longer stalls discovery until it times out.</li>
 </ul>
 <h3 id="deployment-notes">📦 Deployment Notes<a class="headerlink" href="#deployment-notes" title="Permanent link">&para;</a></h3>
 <ul>
 <li>Helm charts accept custom annotations.</li>
-<li>posix-mapper — fixed a caching issue that could make groups collide. New Keycloak-based version of posix-mapper expected in CanfarSP 2026.4.</li>
-<li>For updated deployment instructions, refer to the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments repository</a>.</li>
-<li>The Harbor instance at <a href="https://images.canfar.net">https://images.canfar.net</a> has been upgraded to version 2.15.0. This version has one change that affects deployments: helm charts can only be served as standard OCI objects. So, instead of adding repositories with <code>helm add</code>, they must be installed directly with <code>helm install</code>.</li>
+<li>posix-mapper fixes a caching issue that could make groups collide. A Keycloak-based posix-mapper is planned for CanfarSP 2026.4.</li>
+<li>See the <a href="https://github.com/opencadc/deployments">OpenCADC Deployments repository</a> for updated deployment instructions.</li>
+<li>The Harbor instance at <a href="https://images.canfar.net">https://images.canfar.net</a> now runs version 2.15.0, which serves Helm charts only as standard OCI artifacts. Instead of adding chart repositories with <code>helm repo add</code>, install charts directly from their <code>oci://</code> URLs with <code>helm install</code>.</li>
 </ul>
 <p>The old method:
 <div class="highlight"><pre><span></span><code>helm<span class="w"> </span>repo<span class="w"> </span>add<span class="w"> </span>science-platform<span class="w"> </span>https://images.opencadc.org/chartrepo/platform
@@ -2450,10 +2451,10 @@ helm<span class="w"> </span>install<span class="w"> </span>oci://images.opencadc
 </tr>
 </tbody>
 </table>
-<p>See <a href="https://www.opencadc.org/deployments/helm/#canfar-science-platform"><strong>detailed upgrade and deployment guidance</strong></a> for administrators and operators.</p>
+<p>Administrators and operators can find <a href="https://www.opencadc.org/deployments/helm/#canfar-science-platform">detailed upgrade and deployment guidance</a> in the OpenCADC deployments docs.</p>
 <h3 id="contact-support">💬 Contact &amp; Support<a class="headerlink" href="#contact-support" title="Permanent link">&para;</a></h3>
-<p>Ask questions, share feedback, account access, service incidents, or private data concerns, contact
-<a href="mailto:support@canfar.net">support@canfar.net</a>. You can also ask questions in <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord</a>.</p>
+<p>For questions, feedback, account access, service incidents, or private data concerns, contact
+<a href="mailto:support@canfar.net">support@canfar.net</a>. You can also ask questions in the <a href="https://discord.gg/vcCQ8QBvBa">CANFAR Discord</a>.</p>
 <p><br>
 <div style="text-align: center;">
 Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh/jdecked/twemoji@16.0.1/assets/svg/2764.svg" title=":heart:" /> at CADC
@@ -2481,7 +2482,7 @@ Built with <img alt="❤" class="twemoji heart" src="https://cdn.jsdelivr.net/gh
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 20, 2026 18:43:01 UTC">October 20, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 20, 2026 19:42:16 UTC">October 20, 2026</span>
   </span>
 
     
