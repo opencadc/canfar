@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.5.1](https://github.com/opencadc/canfar/compare/v1.5.0...v1.5.1) (2026-10-22)
+
+
+### Bug Fixes
+
+* **ci:** grant contents read to reusable container workflow callers ([b2ebc36](https://github.com/opencadc/canfar/commit/b2ebc36fe91aae5372265d85f0265fead9fc79e4))
+* **ci:** remove edge container build and fix release build permissions ([b717167](https://github.com/opencadc/canfar/commit/b717167fc2a53f7b3c86d142d71ad048fba5b3cc))
+* **deps:** added vosfs, fss-cli to pypi and updated lock file ([6889368](https://github.com/opencadc/canfar/commit/68893682bb5321b7b0c8a7434be2e06df483db70))
+* **deps:** added vosfs, fss-cli to pypi and updated lock file ([9fadc17](https://github.com/opencadc/canfar/commit/9fadc174600942add827024464679b752a964817))
+
+
+### Documentation
+
+* update for versions ([eaa6d8e](https://github.com/opencadc/canfar/commit/eaa6d8e5c7ca495c8e47db8efddaebe967a0c418))
+* update for versions ([fb51bbd](https://github.com/opencadc/canfar/commit/fb51bbd5398835742f385a77a8c72b79876e3b4e))
+
 ## [1.5.0](https://github.com/opencadc/canfar/compare/v1.4.1...v1.5.0) (2026-10-20)
 
 
