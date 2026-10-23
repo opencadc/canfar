@@ -17,7 +17,7 @@ _DATA_ARGS_META_KEY = "canfar.data_args"
 _BETA = "CANFAR Data is in beta. Share feedback with `canfar feedback`."
 
 _OPERANDS = (
-    "Name every path IDENTIFIER:/PATH, for example vault:/home/USER/data.fits; "
+    "Name every path IDENTIFIER:/PATH, for example vault:/USER/data.fits; "
     "use local:/PATH for files on this computer, such as local:/tmp/."
 )
 """Operand syntax that the upstream commands' own help does not explain."""
