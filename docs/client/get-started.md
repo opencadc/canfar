@@ -1,4 +1,4 @@
-# Install and Set Up
+# Install and set up
 
 Use the CANFAR Python package to automate work on a Science Platform Server:
 launch Sessions, list Container Images, fetch logs, inspect state, and clean up
@@ -231,8 +231,8 @@ network failure returns `[]`; request validation errors still raise.
 `Configuration` is the persisted data shape. Its top-level fields are
 `version`, `active`, `authentication`, `servers`, `registry`, and `console`.
 Authentication Records are keyed by Identity Provider, Science Platform Servers
-by Server Name, and `active` stores the selected references. The bound
-`config.editor` is the supported editing surface:
+by Server Name, and `active` stores the selected references. Use the bound
+`config.editor` to read, validate, and save changes:
 
 ```python
 from canfar.models.config import Configuration

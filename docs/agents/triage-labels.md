@@ -1,4 +1,4 @@
-# Triage Labels
+# Triage labels
 
 Engineering skills use five canonical triage roles. Apply each role as a Jira
 status or a GitHub issue label, according to the work item's tracker.

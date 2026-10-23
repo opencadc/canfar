@@ -5,7 +5,7 @@
 A Container Image is pulled from the registry named by its image reference.
 The Science Platform may provide public images and project-scoped private
 images; availability and permissions are deployment-specific. Use the image
-listing and the project’s published instructions as the source of truth.
+listing and the project's published instructions as the source of truth.
 
 <span id="harbor-registry-overview"></span>
 <span id="what-is-harbor"></span>

@@ -1,4 +1,4 @@
-# Python Quickstart
+# Python quickstart
 
 Create a notebook Session, open it, and keep your results before cleaning up.
 Run these examples on the computer where you installed and authenticated the

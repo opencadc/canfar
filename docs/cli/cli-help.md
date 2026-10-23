@@ -5,7 +5,7 @@ selection, Sessions, Container Images, data sources, and client configuration.
 Run `canfar --help` or append `--help` to any command for the installed
 options.
 
-## Canonical command surface
+## Canonical commands
 
 The root keeps Session and information operations as leaves. Authentication,
 Server, data, image, and configuration operations remain grouped:
@@ -256,7 +256,7 @@ canfar config path
 
 Data operands use an explicit `Storage Identifier`, for example
 `arc:/home/user/file.fits` or `local:/tmp/file.fits`. See [Data commands](data.md)
-for the embedded command surface. Configuration keys use dotted paths; values
+for the embedded commands. Configuration keys use dotted paths; values
 passed to `config set` are parsed as YAML. See [Authentication and Servers](authentication-contexts.md)
 for the persisted Authentication, Server, and active-selection shape.
 

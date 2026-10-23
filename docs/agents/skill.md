@@ -27,7 +27,7 @@ of it as possible:
 - the skill's machine-output list differs from the commands that own `-o`;
 - a docs URL, anchor, or relative link in the skill has no target.
 
-A change to the CLI or Python surface therefore updates the docs and the skill
+A change to the CLI or Python API therefore updates the docs and the skill
 in the same pull request.
 
 ## Which docs the skill links

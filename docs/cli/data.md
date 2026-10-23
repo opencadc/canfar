@@ -53,7 +53,7 @@ Server Selection. Each data command's `--help` ends with this syntax and the
 configured identifiers, and a usage error caused by a bare local path adds a
 `local:/PATH` hint.
 
-## Command surface
+## Commands
 
 Use `canfar data --help` for the installed upstream options. The available
 commands are:

@@ -128,9 +128,9 @@ canfar data stat vault:/project/catalog.csv
 canfar data find vault:/project --type f
 ```
 
-Use `canfar data --help` and the individual command help for the complete
-upstream fss-cli surface. The command output is intentionally owned by that
-application; CANFAR does not add an active-server banner to it.
+Use `canfar data --help` and the individual command help for the installed
+`fss-cli` options. That application owns the command output, so CANFAR does not
+add an active-server banner to it.
 
 ## Copy files and directories
 

@@ -27,9 +27,9 @@ The main settings are:
 - `authentication_idp`: a transient Identity Provider selector for this client.
 - `token`: a runtime bearer token.
 - `certificate`: a runtime X.509 certificate path.
-- `timeout`: HTTP request inactivity timeout in seconds (1–300, default 30), not
-  a total job deadline.
-- `concurrency`: maximum async connection count (1–128).
+- `timeout`: HTTP request inactivity timeout in seconds, from 1 to 300 with a
+  default of 30, not a total job deadline.
+- `concurrency`: maximum async connection count, from 1 to 128.
 - `transport`: an `httpx2` transport you own, to share one connection pool
   across clients (unreleased; keyword argument only).
 
@@ -154,7 +154,7 @@ alternate configuration services. Use `config.editor.get()`, `set()`, and
 `version`/`active`/`authentication`/`servers`/`registry`/`console` shape. See
 [Install and set up](get-started.md#edit-and-save-configuration).
 
-## API Reference
+## API reference
 
 ::: canfar.client.HTTPClient
     handler: python

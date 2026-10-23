@@ -14,18 +14,18 @@ configured VOSpace Services, and preserve results outside temporary compute.
 
 ## Choose a starting point
 
-- [Get started](get-started.md) — account, first Session, and first workflow.
-- [Agent Skill](agent-skill.md) — install the official skill and use CANFAR
+- [Get started](get-started.md): account, first Session, and first workflow.
+- [Agent Skill](agent-skill.md): install the official skill and use CANFAR
   with your coding agent.
-- [Platform concepts](concepts.md) — Authentication, Server Selection, Sessions,
+- [Platform concepts](concepts.md): Authentication, Server Selection, Sessions,
   Container Images, and Storage Identifiers.
-- [Sessions](sessions/index.md) — Notebook, Desktop, CARTA, Firefly, contributed,
+- [Sessions](sessions/index.md): Notebook, Desktop, CARTA, Firefly, contributed,
   and headless workflows.
-- [Storage](storage/index.md) — `/arc`, `/scratch`, VOSpace, fsspec, and data
+- [Storage](storage/index.md): `/arc`, `/scratch`, VOSpace, fsspec, and data
   transfers.
-- [Containers](containers/index.md) — choose or build a software environment.
-- [Permissions](permissions.md) — accounts, groups, and access control.
-- [Support](support/index.md) — troubleshooting and contact options.
+- [Containers](containers/index.md): choose or build a software environment.
+- [Permissions](permissions.md): accounts, groups, and access control.
+- [Support](support/index.md): troubleshooting and contact options.
 
 ## Typical workflow
 
