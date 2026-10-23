@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.5.2](https://github.com/opencadc/canfar/compare/v1.5.1...v1.5.2) (2026-10-23)
+
+
+### Bug Fixes
+
+* **ci:** obtain the test certificate with canfar login ([ad53d00](https://github.com/opencadc/canfar/commit/ad53d00c7ba741b7717e90f6f40514f341eb84e2))
+* **ci:** obtain the test certificate with canfar login ([5d4846e](https://github.com/opencadc/canfar/commit/5d4846e4983875d622f37fd157b85faa8672508f))
+* **cli:** correct the vault path in data help ([6ea9a2d](https://github.com/opencadc/canfar/commit/6ea9a2da1f3b01f15db0923fa86a33500a360ca0))
+* **cli:** correct the vault path in data help ([2b60ec0](https://github.com/opencadc/canfar/commit/2b60ec0c49a53005b514dc4ec85f020593f8e70d))
+
+
+### Documentation
+
+* **releases:** set the 2026.3 release date to October 23 ([792b8ae](https://github.com/opencadc/canfar/commit/792b8aecb5e1ed741a1746afc38f8118590f1010))
+* **releases:** set the 2026.3 release date to October 23 ([7b3aaa0](https://github.com/opencadc/canfar/commit/7b3aaa058694874fa2d1cf5db90cb8f1c0dbb15e))
+* tighten wording and remove AI style patterns across docs ([8c4404c](https://github.com/opencadc/canfar/commit/8c4404ce6679efcbc6da8ef5b5af113d0610ee70))
+* tighten wording and remove AI style patterns across docs ([feeba25](https://github.com/opencadc/canfar/commit/feeba25a81e834970b6877692d0da23f04897321))
+
 ## [1.5.1](https://github.com/opencadc/canfar/compare/v1.5.0...v1.5.1) (2026-10-22)
 
 
