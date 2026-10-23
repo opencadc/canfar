@@ -1,4 +1,4 @@
-# Python Client
+# Python client
 
 The CANFAR Python client provides authenticated access to Sessions, Container
 Images, VOSpace Services, and Science Platform metadata.

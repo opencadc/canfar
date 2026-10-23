@@ -4,7 +4,7 @@
 
 ---
 
-The [National Research Council of Canada (NRC)](https://nrc.canada.ca/en) is Canada’s premier science agency. It supports the development of cutting-edge technologies and research that drive innovation and economic growth.
+The [National Research Council of Canada (NRC)](https://nrc.canada.ca/en) is Canada's federal research and development organization.
 
 The NRC is home to the [Canadian Astronomy Data Centre](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/) and the [Canadian Advanced Network for Astronomy Research (CANFAR)](https://www.canfar.net/).
 
@@ -17,18 +17,18 @@ The NRC is home to the [Canadian Astronomy Data Centre](https://www.cadc-ccda.hi
 
     ---
 
-    [CANARIE](https://www.canarie.ca) connects Canada to the world by providing an ultra high-speed network that links Canada’s researchers and educators to each other and to global data, technology, and colleagues through collaboration with government, industry, and international partners.
+    [CANARIE](https://www.canarie.ca) operates Canada's national research and education network, connecting Canadian researchers and educators to each other and to international data, computing, and collaborators.
 
 - ![Digital Research Alliance Canada](./digital-research-alliance-canada.png)
 
     ---
 
-    Digital Research Alliance Canada drives the acceleration of research and innovation across Canada. By deploying advanced research computing (ARC) systems, storage, and software solutions—delivered in partnership with regional organizations—they provide essential infrastructure for Canadian researchers and their collaborators across academia and industry. Their resources form a cornerstone of CANFAR’s capabilities.
+    Digital Research Alliance Canada coordinates and funds advanced research computing, data management, and research software in partnership with regional organizations. Its compute and storage systems host CANFAR's primary deployment.
 
 - ![CSA](./csa.png)
 
     ---
 
-    The [Canadian Space Agency](https://www.asc-csa.gc.ca/eng/) supports Canada’s leadership in space astronomy and the growth of the national space technology sector. Through its funding of the [Canadian Astronomy Data Centre](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/), it directly supports the operation and advancement of CANFAR.
+    The [Canadian Space Agency](https://www.asc-csa.gc.ca/eng/) leads Canada's space astronomy program and funds the [Canadian Astronomy Data Centre](https://www.cadc-ccda.hia-iha.nrc-cnrc.gc.ca/en/), supporting CANFAR's operation and development.
 
 </div>

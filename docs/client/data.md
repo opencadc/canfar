@@ -1,4 +1,4 @@
-# Data Access
+# Data access
 
 !!! info "CANFAR Data beta"
 
@@ -199,7 +199,7 @@ so close the known VOSpace client (`remote`) explicitly.
 
 ## Python API boundary
 
-The public Python storage surface is deliberately small:
+The public Python storage API exports two functions:
 
 ```python
 from canfar.storage import filesystem, identifiers

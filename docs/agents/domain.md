@@ -1,4 +1,4 @@
-# Domain Docs
+# Domain docs
 
 Read the domain documentation before architecture, diagnosis, test design,
 implementation planning, or issue-writing work.
@@ -29,7 +29,7 @@ only when the user explicitly requests that change in convention.
   relationships; it is not a specification or module map.
 - If a concept is missing or overloaded, use `grill-with-docs` and
   `domain-modeling` to resolve the term before updating the glossary.
-- Surface conflicts with an existing Jira, GitHub, or repository decision
+- Report conflicts with an existing Jira, GitHub, or repository decision
   record explicitly. Do not silently supersede a decision or assume an old
   report describes the current implementation.
 - If a supporting document does not exist, continue with the available

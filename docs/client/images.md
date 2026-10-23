@@ -38,7 +38,7 @@ with Images() as images:
 `details()` returns `list[canfar.models.containers.Image]`; each model has `id`,
 `types`, and `digest` fields.
 
-## API Reference
+## API reference
 
 ::: canfar.images.Images
     handler: python

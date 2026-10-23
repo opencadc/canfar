@@ -56,8 +56,8 @@ in the portal and consult [Support](../support/index.md).
     ```
 
 4. Confirm that the message appears below the cell. Rename the notebook to
-   `first-analysis.ipynb` and use **File → Save Notebook** (or **Save and
-   Checkpoint** in the classic interface).
+   `first-analysis.ipynb` and choose **File > Save Notebook** in JupyterLab, or
+   **Save and Checkpoint** in the classic interface.
 5. Confirm that the saved file appears under your chosen `/arc` directory.
    Use [Storage Management](../storage/transfers.md#transfer-files-in-your-browser)
    to upload inputs or download a copy of the notebook.
