@@ -1,9 +1,11 @@
 # Helpers API
 
 !!! info "Overview"
-    The Helpers API provides utility functions to partition work across replicas of a CANFAR session. Containers receive `REPLICA_ID` and `REPLICA_COUNT` environment variables, and these helpers make using them simple and correct.
+    `canfar.helpers.distributed` partitions an ordered list across Session
+    replicas. Each replica container receives `REPLICA_ID` and `REPLICA_COUNT`
+    in its environment, and these functions read them by default.
 
-## Practical Examples
+## Practical examples
 
 ### Stripe: take every Nth item with an offset
 ```python
@@ -49,7 +51,7 @@ no items. Both functions use `REPLICA_ID` and `REPLICA_COUNT` when
 their corresponding arguments are omitted, defaulting to one replica when the
 environment is absent.
 
-## API Reference
+## API reference
 
 ::: canfar.helpers.distributed
     handler: python

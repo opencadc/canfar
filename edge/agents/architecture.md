@@ -1,8 +1,8 @@
-# Agent Architecture Notes
+# Agent architecture notes
 
 Use these notes as navigation guardrails. They are not a refactor backlog.
 
-## Module Map
+## Module map
 
 - Domain request/response and config shapes live in `canfar/models/`.
 - HTTP composition, credential precedence, sync/async clients, and auth hooks live in `canfar/client.py`.
@@ -11,16 +11,16 @@ Use these notes as navigation guardrails. They are not a refactor backlog.
 - Auth flows live in `canfar/auth/`; request/response hooks live in `canfar/hooks/`.
 - Discovery, logging, request builders, and other helper modules live in `canfar/utils/`. The Session clients' request, failure-logging, and `errors` policy helpers live in `canfar/helpers/session.py`.
 
-## Current Seams
+## Current seams
 
 - `Configuration` is the validated persisted data seam; `config.editor` owns dotted edits and atomic saves. Tests that construct it must isolate `CONFIG_PATH` from the developer's real `~/.canfar/config.yaml`.
 - `HTTPClient` is the transport seam. It decides runtime credential precedence before creating `httpx2` clients. Authlib 1.8.0 or later uses `httpx2` through its `authlib.integrations.httpx_client` integration; the integration name and CANFAR's `canfar/hooks/httpx/` module paths are retained.
 - `Session` and `AsyncSession` duplicate many operations in sync/async form. Keep behavior aligned when changing either adapter.
 - CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.
-- Request builders in `canfar/utils/build.py` are useful test surfaces for payload shape and validation.
+- Request builders in `canfar/utils/build.py` are useful test targets for payload shape and validation.
 - Logging is stdlib `logging` plus Rich stderr and optional `--log-file` JSONL (`canfar/utils/logging.py`). There is no Logfire, OTLP, or `telemetry.py` layer.
 
-## Authentication Configuration
+## Authentication configuration
 
 `OIDCCredential` and `X509Credential` Authentication Records live in
 `Configuration.authentication`. The bound `config.editor` owns validated edits
@@ -31,13 +31,13 @@ active Authentication and Server Selection references; `HTTPClient` composes
 history lives on `ActiveConfig` and the Platform operation (there is no separate
 `selection.py` shim).
 
-## Test Caveats
+## Test caveats
 
 - Some tests touch live CANFAR endpoints even if they are not long-running. They must be marked `slow` and `integration`.
 - `pytest -m "not slow"` should be deterministic without real CANFAR credentials.
 - Full `uv run --no-sync pytest` requires valid CANFAR auth and may depend on platform availability.
 
-## Change Rules
+## Change rules
 
 - Match CLI behavior to docs and docs to CLI behavior in the same change.
 - Avoid new seams until at least two adapters need them.

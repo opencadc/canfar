@@ -1041,7 +1041,7 @@
   <a href="#module-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Map
+        Module map
       
     </span>
   </a>
@@ -1052,7 +1052,7 @@
   <a href="#current-seams" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current Seams
+        Current seams
       
     </span>
   </a>
@@ -1063,7 +1063,7 @@
   <a href="#authentication-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Configuration
+        Authentication configuration
       
     </span>
   </a>
@@ -1074,7 +1074,7 @@
   <a href="#test-caveats" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test Caveats
+        Test caveats
       
     </span>
   </a>
@@ -1085,7 +1085,7 @@
   <a href="#change-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Change Rules
+        Change rules
       
     </span>
   </a>
@@ -1534,7 +1534,7 @@
   <a href="#module-map" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Module Map
+        Module map
       
     </span>
   </a>
@@ -1545,7 +1545,7 @@
   <a href="#current-seams" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current Seams
+        Current seams
       
     </span>
   </a>
@@ -1556,7 +1556,7 @@
   <a href="#authentication-configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Authentication Configuration
+        Authentication configuration
       
     </span>
   </a>
@@ -1567,7 +1567,7 @@
   <a href="#test-caveats" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Test Caveats
+        Test caveats
       
     </span>
   </a>
@@ -1578,7 +1578,7 @@
   <a href="#change-rules" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Change Rules
+        Change rules
       
     </span>
   </a>
@@ -1641,9 +1641,9 @@
   
 
 
-<h1 id="agent-architecture-notes">Agent Architecture Notes<a class="headerlink" href="#agent-architecture-notes" title="Permanent link">&para;</a></h1>
+<h1 id="agent-architecture-notes">Agent architecture notes<a class="headerlink" href="#agent-architecture-notes" title="Permanent link">&para;</a></h1>
 <p>Use these notes as navigation guardrails. They are not a refactor backlog.</p>
-<h2 id="module-map">Module Map<a class="headerlink" href="#module-map" title="Permanent link">&para;</a></h2>
+<h2 id="module-map">Module map<a class="headerlink" href="#module-map" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Domain request/response and config shapes live in <code>canfar/models/</code>.</li>
 <li>HTTP composition, credential precedence, sync/async clients, and auth hooks live in <code>canfar/client.py</code>.</li>
@@ -1652,16 +1652,16 @@
 <li>Auth flows live in <code>canfar/auth/</code>; request/response hooks live in <code>canfar/hooks/</code>.</li>
 <li>Discovery, logging, request builders, and other helper modules live in <code>canfar/utils/</code>. The Session clients' request, failure-logging, and <code>errors</code> policy helpers live in <code>canfar/helpers/session.py</code>.</li>
 </ul>
-<h2 id="current-seams">Current Seams<a class="headerlink" href="#current-seams" title="Permanent link">&para;</a></h2>
+<h2 id="current-seams">Current seams<a class="headerlink" href="#current-seams" title="Permanent link">&para;</a></h2>
 <ul>
 <li><code>Configuration</code> is the validated persisted data seam; <code>config.editor</code> owns dotted edits and atomic saves. Tests that construct it must isolate <code>CONFIG_PATH</code> from the developer's real <code>~/.canfar/config.yaml</code>.</li>
 <li><code>HTTPClient</code> is the transport seam. It decides runtime credential precedence before creating <code>httpx2</code> clients. Authlib 1.8.0 or later uses <code>httpx2</code> through its <code>authlib.integrations.httpx_client</code> integration; the integration name and CANFAR's <code>canfar/hooks/httpx/</code> module paths are retained.</li>
 <li><code>Session</code> and <code>AsyncSession</code> duplicate many operations in sync/async form. Keep behavior aligned when changing either adapter.</li>
 <li>CLI modules are adapters over library modules. Prefer testing command parsing/output separately from library behavior.</li>
-<li>Request builders in <code>canfar/utils/build.py</code> are useful test surfaces for payload shape and validation.</li>
+<li>Request builders in <code>canfar/utils/build.py</code> are useful test targets for payload shape and validation.</li>
 <li>Logging is stdlib <code>logging</code> plus Rich stderr and optional <code>--log-file</code> JSONL (<code>canfar/utils/logging.py</code>). There is no Logfire, OTLP, or <code>telemetry.py</code> layer.</li>
 </ul>
-<h2 id="authentication-configuration">Authentication Configuration<a class="headerlink" href="#authentication-configuration" title="Permanent link">&para;</a></h2>
+<h2 id="authentication-configuration">Authentication configuration<a class="headerlink" href="#authentication-configuration" title="Permanent link">&para;</a></h2>
 <p><code>OIDCCredential</code> and <code>X509Credential</code> Authentication Records live in
 <code>Configuration.authentication</code>. The bound <code>config.editor</code> owns validated edits
 and atomic persistence; Authentication and Platform operations own decisions
@@ -1670,13 +1670,13 @@ active Authentication and Server Selection references; <code>HTTPClient</code> c
 <code>Configuration</code> and resolves those records for transport. Server Selection
 history lives on <code>ActiveConfig</code> and the Platform operation (there is no separate
 <code>selection.py</code> shim).</p>
-<h2 id="test-caveats">Test Caveats<a class="headerlink" href="#test-caveats" title="Permanent link">&para;</a></h2>
+<h2 id="test-caveats">Test caveats<a class="headerlink" href="#test-caveats" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Some tests touch live CANFAR endpoints even if they are not long-running. They must be marked <code>slow</code> and <code>integration</code>.</li>
 <li><code>pytest -m "not slow"</code> should be deterministic without real CANFAR credentials.</li>
 <li>Full <code>uv run --no-sync pytest</code> requires valid CANFAR auth and may depend on platform availability.</li>
 </ul>
-<h2 id="change-rules">Change Rules<a class="headerlink" href="#change-rules" title="Permanent link">&para;</a></h2>
+<h2 id="change-rules">Change rules<a class="headerlink" href="#change-rules" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Match CLI behavior to docs and docs to CLI behavior in the same change.</li>
 <li>Avoid new seams until at least two adapters need them.</li>
@@ -1770,7 +1770,7 @@ current design; treat older notes as historical unless they match the code.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 9, 2026 00:18:42 UTC">October 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 23, 2026 18:10:22 UTC">October 23, 2026</span>
   </span>
 
     

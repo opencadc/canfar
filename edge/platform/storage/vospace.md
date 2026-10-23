@@ -103,7 +103,7 @@ guidance.
 
 ## Python access
 
-The public Python surface is deliberately small:
+The public Python storage API exports two functions:
 
 ```python
 from canfar.storage import filesystem, identifiers

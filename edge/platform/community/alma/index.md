@@ -79,7 +79,7 @@ the source and final products under `/arc`.
 
 ### 3. Start CASA in a Desktop Session
 
-In a Desktop Session, open **Applications → Astro Software**, choose the CASA
+In a Desktop Session, open **Applications > Astro Software**, choose the CASA
 version required by the project, and open its terminal. Start CASA in the
 mode required by the supplied reduction script:
 
@@ -108,7 +108,7 @@ lists version-specific package notes and known issues.
 ### 4. Inspect and analyse the products
 
 Open the **image products** from CASA imaging in a CARTA Session for cube
-navigation, spectra, regions, or moment maps. In CARTA, use **File → Open Image**
+navigation, spectra, regions, or moment maps. In CARTA, use **File > Open Image**
 and choose a CASA image or an exported FITS image. CARTA's
 [file browser](https://carta.readthedocs.io/en/latest/file_browser.html) accepts
 image formats; use CASA to work with measurement sets. Use a Notebook Session
@@ -172,7 +172,7 @@ At the end of the workflow:
 | A data copy fails | Confirm the `local:`, `arc:`, or `vault:` source and destination with `canfar data ls -lh IDENTIFIER:/path`; check the credentials for the storage identifier's owning server. Default `arc` and `vault` use CADC credentials independently of the active compute server. |
 | Files disappear after the Session ends | Move them from `/scratch` to `/arc/home/[username]` or `/arc/projects/[project]` before deleting the Session. |
 | A shared project path is denied | Ask the project administrator to add your CADC account to the project group; see [Permissions](../../permissions.md). |
-| CASA is missing or incompatible | Select a Desktop image that lists the required CASA version and match the version to the archive scripts. If CASA 6.5.0–6.5.2 opens with display errors, exit CASA and start it again. |
+| CASA is missing or incompatible | Select a Desktop image that lists the required CASA version and match the version to the archive scripts. If CASA 6.5.0 to 6.5.2 opens with display errors, exit CASA and start it again. |
 | A transfer reports expired credentials | Renew the credentials used by the storage identifier's owning server, then retry. See [support](../../support/index.md) if the record or certificate cannot be refreshed. |
 | The browser cannot connect to a new Session | Wait for the Session to reach `Running`, then retry `canfar open [session-id]`; inspect `canfar info [session-id]` and `canfar logs [session-id]` if it still fails. |
 

@@ -2,50 +2,46 @@
 
 !!! abstract "CanfarSP Releases"
 
-    - Oct 14, 2026 **[2026.3](2026-3.md)**
+    - Oct 23, 2026 **[2026.3](2026-3.md)**
     - Jun 11, 2026 **[2026.2](2026-2.md)**
     - Feb 26, 2026 **[2026.1](2026-1.md)**
     - Nov 25, 2025 **[2025.2](2025-2.md)**
     - Sept 9, 2025 **[2025.1](2025-1.md)**
 
-## 🎯 CANFAR Releases
+## Release schedule
 
-The CADC team releases the CANFAR Science Platform (CanfarSP) on a fixed, predictable schedule so users and deployers can plan upgrades.
+The CADC team releases the CANFAR Science Platform (CanfarSP) every three months so users and operators can plan upgrades.
 
 ### Who is this page for?
 
-If you use the CANFAR Python Client or CLI:
+If you use the CANFAR Python client or CLI:
 
-- Use the release notes in this section to see user-visible changes in the client, CLI, and documentation.
-- Each release page focuses on what changed and how it might affect your workflows.
+- Read the release notes in this section to see user-visible changes in the client, CLI, and documentation.
+- Check each release page for changes that affect your scripts or workflows.
 
-If you deploy the Canfar Science Platform:
+If you deploy the CANFAR Science Platform:
 
-- Use these release notes to understand user-facing changes that may drive support or rollout timing.
-- Track backend deployment changes in the [opencadc/deployments](https://github.com/opencadc/deployments) repository.
+- Use these release notes to track user-facing changes and plan rollouts.
+- Track chart and deployment changes in [opencadc/deployments](https://github.com/opencadc/deployments).
 
-### Release Naming
+### Release naming
 
-CanfarSP releases are named using the year and number, in the form `CanfarSP YYYY.MM`. For example, the first release of 2025 was named **CanfarSP 2025.1**.
+CanfarSP releases use the year and release number, such as **CanfarSP 2025.1** for the first release of 2025.
 
-We currently aim for a CanfarSP release every 3 months.
+Each quarterly release goes through integration, regression, and internal user testing:
 
-In the subpages of this section of documentation, detailed notes about each release can be found.
-
-CanfarSP releases include dedicated integration and regression testing, plus internal user testing. Generally:
-
-- New features can only be added to CanfarSP in a fixed cycle release
-- Bug fixes are added to CanfarSP immediately and result in a patch release
-- Collaborators can get access to new features prior to their target release, but only as experimental software because the features have not been thoroughly tested.
+- New features ship in quarterly releases.
+- Bug fixes ship as patch releases as soon as they are ready.
+- Collaborators can test upcoming features before a quarterly release, with the understanding that pre-release software is still changing.
 
 ### Roadmap
 
-Currently, the CanfarSP Roadmap is managed internally by CADC, though we plan on making it public in the near future. For questions or suggestions about the CanfarSP Roadmap, please reach out to the CADC team.
+Follow the public roadmap and feature proposals in [CANFAR Discussions](https://github.com/opencadc/canfar/discussions), or read the [community guidelines](../platform/community/guidelines.md).
 
-### Development Contributions
+### Development contributions
 
-We welcome and encourage contributions to all areas of the CANFAR and OpenCADC code bases! For information on how to start, please see the contributing guidelines in these OpenCADC repositories:
+Contributions are welcome across the CANFAR and OpenCADC repositories. See the contributing guides in:
 
-- [CANFAR Python Client, CLI, and Documentation](https://github.com/opencadc/canfar)
-- [CANFAR Backend Services](https://github.com/opencadc/science-platform)
-- [CANFAR Helm Charts](https://github.com/opencadc/deployments)
+- [CANFAR Python client, CLI, and documentation](https://github.com/opencadc/canfar)
+- [CANFAR backend services](https://github.com/opencadc/science-platform)
+- [CANFAR Helm charts](https://github.com/opencadc/deployments)

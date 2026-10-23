@@ -1,4 +1,4 @@
-# Python Client Examples
+# Python client examples
 
 Follow [Install and set up](get-started.md#install) for the client version used
 by these examples, then authenticate:

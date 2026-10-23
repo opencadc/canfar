@@ -2398,37 +2398,31 @@
 
 
 <h1 id="session-limits-and-resources">Session limits and resources<a class="headerlink" href="#session-limits-and-resources" title="Permanent link">&para;</a></h1>
-<p>Every Session on the Science Platform runs inside a container governed by one of
-two resource allocation models: <strong>flexible</strong> or <strong>fixed</strong>. Understanding how
-these models work, who configures them, and how to inspect them lets you size
-your workload efficiently without waiting unnecessarily in job queues.</p>
+<p>Every Session on the Science Platform runs inside a container with either
+<strong>flexible</strong> or <strong>fixed</strong> resource allocation.</p>
 <ul>
-<li><strong>Flexible allocation (the default):</strong> When you launch a Session without
-  requesting <code>--cpu</code> or <code>--memory</code>, the Server grants a modest guaranteed
-  baseline so your Session starts immediately. When cluster capacity is
-  available, the Session can dynamically burst up to a higher ceiling.
-  Flexible allocation is optimal for interactive exploration, development, and
-  prototyping.</li>
-<li><strong>Fixed allocation:</strong> When your pipeline requires guaranteed, non-preemptible
-  compute or predictable execution times, you can request explicit <code>--cpu</code> and
-  <code>--memory</code> values from the specific sizes the Server offers. Fixed Sessions
-  may wait longer in a <code>Pending</code> state while the platform schedules a host with
-  sufficient dedicated capacity.</li>
+<li><strong>Flexible allocation.</strong> This is the default when you launch a Session without
+  <code>--cpu</code> or <code>--memory</code>. The Server grants a small guaranteed baseline so your
+  Session starts without waiting for a dedicated reservation, and the Session
+  can burst to a higher ceiling when cluster capacity is free. Use flexible
+  allocation for interactive exploration, development, and prototyping.</li>
+<li><strong>Fixed allocation.</strong> Pass <code>--cpu</code> and <code>--memory</code> from the sizes the Server
+  offers when your workload needs a guaranteed reservation. Fixed Sessions can
+  stay <code>Pending</code> longer while the cluster schedules a node with that free
+  capacity.</li>
 </ul>
-<p>Because CANFAR powers diverse astronomical deployments—from the primary
-Canadian Astronomy Data Centre (CADC) facility to regional centres across the
-SKA Regional Centre Network (SRCNet)—these limits are not uniform. <strong>Local
-platform administrators configure the flexible baseline, burst ceilings, and
-supported fixed sizes for each Science Platform Server.</strong></p>
+<p>CANFAR runs at the Canadian Astronomy Data Centre (CADC) and at regional
+centres across the SKA Regional Centre Network (SRCNet), so these limits vary
+by deployment. Platform administrators configure the flexible baseline, burst
+ceilings, and fixed sizes on each Science Platform Server.</p>
 <hr />
 <p><span id="what-your-server-offers"></span></p>
 <h2 id="what-your-server-offers">What your Server offers<a class="headerlink" href="#what-your-server-offers" title="Permanent link">&para;</a></h2>
-<p>You do not need to guess what resources are available on your active Server. The
-CLI and the Python library query the Server's context capabilities directly.</p>
+<p>The CLI and the Python library read the active Server's limits from its context
+endpoint.</p>
 <h3 id="check-limits-with-the-cli">Check limits with the CLI<a class="headerlink" href="#check-limits-with-the-cli" title="Permanent link">&para;</a></h3>
-<p>Run <code>canfar server ls</code> to inspect the resource ranges configured by local
-platform administrators for each Server available to your active Identity
-Provider (IDP):</p>
+<p>Run <code>canfar server ls</code> to inspect the resource ranges configured for each Server
+available to your active Identity Provider (IDP):</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>server<span class="w"> </span>ls
 </code></pre></div>
 <div class="highlight"><pre><span></span><code>                                          Known Servers
@@ -2444,20 +2438,18 @@ Sessions limit per user.
 </code></pre></div>
 <p>In this output from the CADC-maintained Science Platform:</p>
 <ul>
-<li>The <strong>Flexible</strong> column (<code>1-16 cores</code>, <code>4-32 GB</code>) shows the guaranteed share
-  to burst ceiling: a flexible Session is guaranteed 1 core and 4 GB RAM, and
-  can burst up to 16 cores and 32 GB RAM when capacity allows.</li>
-<li>The <strong>Fixed</strong> column (<code>1-16 cores</code>, <code>1-192 GB</code>) shows the minimum and maximum
-  fixed requests accepted.</li>
-<li>The <strong>GPUs</strong> column (<code>1-28</code>) shows available GPU bounds (or <code>none</code>).</li>
-<li>The <strong>Sessions</strong> column (<code>5</code>) shows the maximum concurrent interactive
-  Sessions per user (<code>headless</code> batch Sessions do not count against this
-  limit).</li>
+<li><strong>Flexible</strong> (<code>1-16 cores</code>, <code>4-32 GB</code>) shows the guaranteed share and burst
+  ceiling. A flexible Session is guaranteed 1 core and 4 GB RAM, and can burst
+  up to 16 cores and 32 GB RAM when capacity allows.</li>
+<li><strong>Fixed</strong> (<code>1-16 cores</code>, <code>1-192 GB</code>) shows the smallest and largest fixed
+  requests accepted.</li>
+<li><strong>GPUs</strong> (<code>1-28</code>) shows the accepted GPU counts, or <code>none</code>.</li>
+<li><strong>Sessions</strong> (<code>5</code>) shows the maximum concurrent interactive Sessions per user.
+  <code>headless</code> batch Sessions do not count toward this limit.</li>
 </ul>
 <p>You can also check the active Server's limits with <code>canfar create --help</code>. The
-help text dynamically narrows the <code>--cpu</code>, <code>--memory</code>, and <code>--gpu</code> options to
-the values your Server supports, displaying the flexible burst ceiling as the
-default:</p>
+help text narrows the <code>--cpu</code>, <code>--memory</code>, and <code>--gpu</code> options to the values
+your Server supports and shows the flexible burst ceiling as the default:</p>
 <div class="highlight"><pre><span></span><code>--cpu INTEGER RANGE [1&lt;=x&lt;=16] [default: flexible ≤ 16]
 --memory INTEGER RANGE [1&lt;=x&lt;=192] [default: flexible ≤ 32]
 </code></pre></div>
@@ -2542,18 +2534,16 @@ before contacting the remote platform:</p>
 profiles set by the Server; explicit <code>--cpu</code> and <code>--memory</code> parameters are
 ignored for them.</p>
 <p>When the active Server's limits are known, <code>canfar create</code> narrows its
-acceptable ranges so that out-of-bounds requests fail fast (with exit code 2)
-before submitting any HTTP requests. A request within the general boundaries
-can still be rejected by the Server if a fixed request does not match one of
-the Server's advertised <code>options</code>.</p>
-<p>You can test request syntax and limits safely without launching any containers
-by adding <code>--dry-run</code>:</p>
+accepted ranges so out-of-range values exit with code 2 before sending an HTTP
+request. The Server can still reject a fixed request within those bounds if the
+value is not one of the Server's advertised <code>options</code>.</p>
+<p>Test request syntax and limits without launching a container by adding
+<code>--dry-run</code>:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/astroml:latest<span class="w"> </span>--cpu<span class="w"> </span><span class="m">8</span><span class="w"> </span>--memory<span class="w"> </span><span class="m">32</span><span class="w"> </span>--replicas<span class="w"> </span><span class="m">100</span><span class="w"> </span>--dry-run
 </code></pre></div>
-<p>When creating replicated Sessions (<code>--replicas &gt; 1</code>), instances are named
-<code>NAME-1</code> to <code>NAME-N</code>. Each container receives <code>REPLICA_ID</code> (1-indexed) and
-<code>REPLICA_COUNT</code> environment variables to simplify data partitioning; see
-<a href="../../../client/helpers/">distributed helpers</a>.</p>
+<p>When you pass <code>--replicas</code> greater than 1, the Server names the Sessions
+<code>NAME-1</code> to <code>NAME-N</code> and sets <code>REPLICA_ID</code> (1-based) and <code>REPLICA_COUNT</code> in
+each container. See <a href="../../../client/helpers/">distributed helpers</a>.</p>
 <hr />
 <h2 id="what-the-server-enforces">What the Server enforces<a class="headerlink" href="#what-the-server-enforces" title="Permanent link">&para;</a></h2>
 <p>Once accepted, your container runs under platform policies enforced by the
@@ -2613,44 +2603,42 @@ may adjust them:</p>
 </tbody>
 </table>
 <h3 id="managing-your-active-session-quota">Managing your active Session quota<a class="headerlink" href="#managing-your-active-session-quota" title="Permanent link">&para;</a></h3>
-<p><code>Pending</code> and <code>Running</code> interactive Sessions count toward your per-user limit
-(typically 5). Batch <code>headless</code> Sessions and sub-processes inside an existing
-Desktop session do not count against this quota. If you reach your limit, check
-running Sessions and delete any you no longer need:</p>
+<p><code>Pending</code> and <code>Running</code> interactive Sessions count toward your per-user limit,
+which is 5 by default. Batch <code>headless</code> Sessions and child applications opened
+inside a Desktop Session do not count toward this quota. If you reach your
+limit, list your running Sessions and delete any you no longer need:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>ps
 canfar<span class="w"> </span>delete<span class="w"> </span>SESSION_ID
 </code></pre></div>
 <p>To keep an interactive Session past its expiry time, renew it before it
 expires from the Science Portal, with <code>canfar renew SESSION_ID</code>, or with
-<a href="../../../client/session/#renew-an-interactive-session"><code>Session.renew()</code></a>
-(the CLI and Python options are unreleased). Renewal resets the lifetime.</p>
+<a href="../../../client/session/#renew-an-interactive-session"><code>Session.renew()</code></a>. The
+CLI and Python renewal methods are unreleased. Renewal resets the lifetime.</p>
 <h3 id="scheduling-and-queue-times">Scheduling and queue times<a class="headerlink" href="#scheduling-and-queue-times" title="Permanent link">&para;</a></h3>
-<p>Fixed requests must be scheduled onto nodes that have the full requested CPU
-and memory immediately unreserved. If the cluster is busy, a large fixed
-request will remain <code>Pending</code> until resources clear. If a Session is waiting,
-inspect its scheduling events to see why:</p>
+<p>Fixed requests need a node with the full requested CPU and memory free at the
+same time. When the cluster is busy, a large fixed request stays <code>Pending</code>
+until capacity frees up. Inspect its scheduling events to see why it is waiting:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>events<span class="w"> </span>SESSION_ID
 </code></pre></div>
-<p>See <a href="../batch/#monitor-and-troubleshoot">Batch processing</a> for detailed queue
-investigation workflows.</p>
+<p>See <a href="../batch/#monitor-and-troubleshoot">Batch processing</a> for queue
+troubleshooting.</p>
 <hr />
 <p><span id="threads-follow-the-request"></span></p>
 <h2 id="threads-follow-the-request">Threads follow the request<a class="headerlink" href="#threads-follow-the-request" title="Permanent link">&para;</a></h2>
-<p>To prevent unintended CPU contention on shared nodes, the Science Platform
-automatically initializes thread limit environment variables—specifically
+<p>To prevent CPU contention on shared nodes, the Science Platform sets
 <code>OMP_NUM_THREADS</code>, <code>MKL_NUM_THREADS</code>, <code>OPENBLAS_NUM_THREADS</code>, and
-<code>JULIA_NUM_THREADS</code>—to the number of cores you requested.</p>
-<p>In a <strong>flexible</strong> Session, because you did not specify cores, the Server sets
-these variables to the guaranteed base allocation—typically <strong><code>1</code></strong> core—even
-though your container can burst up to 16 cores.</p>
-<p>If your code uses multi-threaded libraries (like NumPy, SciPy, OpenBLAS, or
-Julia) in a flexible Session, check the environment variable:</p>
+<code>JULIA_NUM_THREADS</code> to the number of cores you requested.</p>
+<p>In a flexible Session, you did not request a fixed core count, so the Server
+sets these variables to the guaranteed baseline, usually <code>1</code>, even though the
+container can burst up to 16 cores.</p>
+<p>If your code uses threaded libraries such as NumPy, SciPy, OpenBLAS, or Julia
+in a flexible Session, check the environment variable:</p>
 <div class="highlight"><pre><span></span><code><span class="nb">echo</span><span class="w"> </span><span class="nv">$OMP_NUM_THREADS</span>
 </code></pre></div>
-<p>To take advantage of burst CPU capacity in a flexible Session, set the thread
-variables explicitly:</p>
+<p>To use burst CPU capacity in a flexible Session, set the thread variables
+explicitly:</p>
 <ul>
-<li>In a <code>headless</code> Session, pass <code>--env OMP_NUM_THREADS=4</code> (or your chosen burst level).</li>
+<li>In a <code>headless</code> Session, pass <code>--env OMP_NUM_THREADS=4</code> or your chosen thread count.</li>
 <li>In a Jupyter notebook or interactive terminal, set the variable before
   importing numerical libraries:
   <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
@@ -2660,27 +2648,26 @@ variables explicitly:</p>
 </ul>
 <hr />
 <h2 id="what-a-running-session-really-has">What a running Session really has<a class="headerlink" href="#what-a-running-session-really-has" title="Permanent link">&para;</a></h2>
-<p>You can verify the container's granted limits and available storage from inside
-the Session terminal:</p>
+<p>Check the container's granted limits and available storage from inside the
+Session terminal:</p>
 <div class="highlight"><span class="filename">Terminal inside your Session</span><pre><span></span><code>nproc
 free<span class="w"> </span>-h
 cat<span class="w"> </span>/sys/fs/cgroup/memory.max
 df<span class="w"> </span>-h<span class="w"> </span>/scratch
 nvidia-smi
 </code></pre></div>
-<p>Key points about container resources:</p>
 <ul>
-<li><code>/scratch</code> provides high-speed, Session-local temporary storage. It survives
-  in-place container restarts of interactive Sessions, but is permanently
-  purged when the Session is deleted. Always write persistent results to
-  mounted <code>/arc</code> storage or remote VOSpace services.</li>
-<li><code>cat /sys/fs/cgroup/memory.max</code> reports the cgroup memory limit in bytes
-  (<code>max</code> means unlimited; older Linux kernels use
-  <code>/sys/fs/cgroup/memory/memory.limit_in_bytes</code>).</li>
-<li><code>nvidia-smi</code> is available only when a GPU was explicitly allocated and the
-  container image includes the compatible GPU drivers and runtime.</li>
-<li><code>canfar info SESSION_ID</code> displays what was requested and current usage,
-  whereas <code>canfar stats</code> provides aggregate platform-wide metrics.</li>
+<li><code>/scratch</code> is fast Session-local temporary storage. It survives container
+  restarts of an interactive Session, and the Server deletes it when the
+  Session is deleted. Write persistent results to mounted <code>/arc</code> storage or a
+  VOSpace Service.</li>
+<li><code>cat /sys/fs/cgroup/memory.max</code> prints the cgroup memory limit in bytes.
+  <code>max</code> means unlimited. Older Linux kernels use
+  <code>/sys/fs/cgroup/memory/memory.limit_in_bytes</code>.</li>
+<li><code>nvidia-smi</code> works only when the Session requested a GPU and the Container
+  Image includes the NVIDIA tools.</li>
+<li><code>canfar info SESSION_ID</code> shows the Session's requested resources and current
+  usage. <code>canfar stats</code> shows platform-wide capacity and allocation.</li>
 </ul>
 <hr />
 <p><span id="read-the-symptom"></span></p>
@@ -2752,7 +2739,7 @@ exceeded. Use this table to diagnose the boundary and choose the appropriate fix
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 9, 2026 00:18:42 UTC">October 9, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 23, 2026 18:10:22 UTC">October 23, 2026</span>
   </span>
 
     

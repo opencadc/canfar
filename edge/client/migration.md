@@ -209,8 +209,8 @@ These current variables configure `HTTPClient` and its Session clients:
 | `SKAHA_TOKEN` | `CANFAR_TOKEN` | Runtime bearer token |
 | `SKAHA_CERTIFICATE` | `CANFAR_CERTIFICATE` | Path to an X.509 certificate |
 | `SKAHA_URL` | `CANFAR_URL` | Service URL; required with a runtime token or certificate |
-| `SKAHA_TIMEOUT` | `CANFAR_TIMEOUT` | HTTP timeout in seconds (1–300); not a total workflow deadline |
-| `SKAHA_CONCURRENCY` | `CANFAR_CONCURRENCY` | Maximum asynchronous connections (1–128) |
+| `SKAHA_TIMEOUT` | `CANFAR_TIMEOUT` | HTTP timeout in seconds, from 1 to 300; not a total workflow deadline |
+| `SKAHA_CONCURRENCY` | `CANFAR_CONCURRENCY` | Maximum asynchronous connections, from 1 to 128 |
 
 Explicit constructor arguments override these environment values. Runtime
 authentication takes precedence over saved credentials for that client;

@@ -1,4 +1,4 @@
-# Advanced Examples
+# Advanced examples
 
 Run a small FITS metadata pipeline, check every output, and recover missing
 work before scaling up. This example writes one JSON summary per input file.

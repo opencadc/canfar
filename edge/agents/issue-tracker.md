@@ -1,4 +1,4 @@
-# Issue Trackers: Jira and GitHub Issues
+# Issue trackers: Jira and GitHub Issues
 
 You can track issues, product requirements documents (PRDs), specifications,
 and implementation decisions through either route:
