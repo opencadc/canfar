@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.metadata
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
@@ -76,11 +77,14 @@ class _RootTyperGroup(TyperGroup):
 
     def list_commands(self, ctx: ClickContext) -> list[str]:
         """List registered commands in registration order."""
-        return list(dict.fromkeys([*_COMMANDS, *super().list_commands(ctx)]))
+        names = [*_COMMANDS, *_plugin_commands(), *super().list_commands(ctx)]
+        return list(dict.fromkeys(names))
 
     def get_command(self, ctx: ClickContext, cmd_name: str) -> Command | None:
         """Return a command, importing its module the first time it is used."""
         lazy = _COMMANDS.get(cmd_name)
+        if lazy is None and cmd_name not in self.commands:
+            lazy = _plugin_commands().get(cmd_name)
         if lazy is not None and cmd_name not in self.commands:
             if self._listing:
                 return lazy.summary(cmd_name)
@@ -266,6 +270,36 @@ _COMMANDS: dict[str, _LazyCommand] = {
     ),
 }
 """Root commands in help order, imported only when used."""
+
+_EXTENSIONS = "Extensions"
+
+
+def _plugin_summary(ep: importlib.metadata.EntryPoint) -> str:
+    """Short help from the plugin distribution, without importing its code."""
+    dist = getattr(ep, "dist", None)
+    summary = ""
+    if dist is not None:
+        summary = str(dist.metadata.get("Summary") or "")
+    return summary or "Installed extension."
+
+
+def _plugin_commands() -> dict[str, _LazyCommand]:
+    """``canfar.commands`` entry points that do not replace a builtin.
+
+    Names and help come from distribution metadata. The plugin module is
+    imported only when the command actually runs.
+    """
+    selected: dict[str, _LazyCommand] = {}
+    for ep in importlib.metadata.entry_points(group="canfar.commands"):
+        if ep.name in _COMMANDS or ep.name in selected or not ep.value:
+            continue
+        selected[ep.name] = _LazyCommand(
+            ep.value,
+            _plugin_summary(ep),
+            _EXTENSIONS,
+            group=True,
+        )
+    return selected
 
 
 def callback(
