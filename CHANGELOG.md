@@ -1,5 +1,23 @@
 # Changelog
 
+## [1.6.0](https://github.com/opencadc/canfar/compare/v1.5.2...v1.6.0) (2026-10-27)
+
+
+### Features
+
+* **cli:** load canfar.commands plugins on demand ([a909073](https://github.com/opencadc/canfar/commit/a9090737befe361818f09c1f5a18d89421d6ecd5))
+
+
+### Bug Fixes
+
+* **cli:** preserve lazy plugin loading and entry-point semantics ([a458a81](https://github.com/opencadc/canfar/commit/a458a81278afaadaf4e12bfe74db900501104b21))
+
+
+### Documentation
+
+* **client:** align examples and release guidance with v1.5.2 ([dc1de74](https://github.com/opencadc/canfar/commit/dc1de74ed1d2996f57368c43e733b4f51c1cb17c))
+* **cli:** explain installed extensions and their commands ([32f9201](https://github.com/opencadc/canfar/commit/32f92018895894e498c6b66a7590beefc1e532c6))
+
 ## [1.5.2](https://github.com/opencadc/canfar/compare/v1.5.1...v1.5.2) (2026-10-23)
 
 
