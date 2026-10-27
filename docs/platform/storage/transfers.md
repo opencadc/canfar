@@ -3,8 +3,8 @@
 !!! info "CANFAR Data beta"
 
     The `canfar data` commands and Python storage tools in `canfar.storage`
-    are being released in beta with client v1.5.0. These client interfaces
-    are available in the development checkout until that release is published.
+    have been available in beta since client v1.5.0. Your existing storage
+    permissions still apply.
     [Share your experience or get help](../community/guidelines.md#give-feedback-on-the-data-beta).
 
 Copy files between your computer and CANFAR storage in your browser, or use

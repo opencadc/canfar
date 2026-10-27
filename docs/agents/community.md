@@ -35,10 +35,10 @@ Rename General to Feedback. Q&A uses the answerable format; Announcements
 uses the maintainer announcement format. Feedback, Ideas, and Show and tell
 are open discussions. Keep Polls for occasional focused questions.
 
-Pin the existing welcome discussion, the roadmap, and the Data beta
-invitation when v1.5.0 is released. The beta invitation and release
-announcement are prepared in `.github/discussions/` alongside the other
-post drafts. Check live state before posting to avoid duplicates.
+Check live state before posting or pinning a welcome discussion, roadmap, or
+Data beta invitation to avoid duplicates. The v1.5.0 client is published.
+The former `.github/discussions/` drafts are no longer in this checkout;
+the dated record below describes the October 16 setup.
 
 ## Labels
 
@@ -173,17 +173,16 @@ filenames must match category slugs; forms activate on the default branch.
 Check the chooser as an ordinary contributor, since maintainers can see
 options other users cannot. Verify all destinations after setup.
 
-Keep v1.5.0 announcements as drafts until GitHub and PyPI publish the client
-and its installed help exposes the documented Data and feedback commands.
-Then change upcoming wording in 2026.3 and the current docs to released
-wording, retaining the Data beta designation. Never mark unrelated client
-features as beta because of this change.
+Before announcing a client release, verify its GitHub and PyPI publication
+and check the installed help for each documented command. Update upcoming
+wording in current docs to released wording. Retain the Data beta designation
+without applying it to unrelated client features.
 
 ## Publication record
 
 Community setup on October 16, 2026:
 
-| Post source | Destination or release condition |
+| Historical post source | Destination or condition recorded on October 16 |
 | --- | --- |
 | `.github/discussions/welcome.md` | [Welcome, discussion 6](https://github.com/opencadc/canfar/discussions/6), updated in place |
 | `.github/discussions/roadmap.md` | [Roadmap, discussion 345](https://github.com/opencadc/canfar/discussions/345) |
@@ -193,7 +192,7 @@ Community setup on October 16, 2026:
 | `.github/discussions/release-announcement.md` | Draft until v1.5.0 and the augmented 2026.3 notes are published; post in Announcements |
 | `.github/discussions/show-and-tell.md` | Draft until v1.5.0 and its Data guides are published; post in Show and tell |
 
-Remove each draft's publication notice after verifying its prerequisites.
-The version-controlled copies support later edits; the live discussions
-hold the ongoing conversation. Forms and chooser changes activate when the
-repository changes reach the default branch.
+This table records the setup at that date, not current publication status.
+The local draft files have since been removed. Read the live discussions
+before updating or publishing a post. Forms and chooser changes activate
+when the repository changes reach the default branch.

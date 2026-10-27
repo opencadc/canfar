@@ -15,7 +15,7 @@ accept problem reports and documentation corrections. Start in Feedback if
 you are unsure. Read the [community guidelines](../community/guidelines.md)
 for the roadmap, voting, and what happens after you post.
 
-The development client and v1.5.0 provide `canfar feedback`, which prints
+Clients from v1.5.0 onward provide `canfar feedback`, which prints
 the reporting URL without opening a browser or collecting information.
 It does not require authentication or a working configuration.
 

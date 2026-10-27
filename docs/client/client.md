@@ -31,9 +31,9 @@ The main settings are:
   default of 30, not a total job deadline.
 - `concurrency`: maximum async connection count, from 1 to 128.
 - `transport`: an `httpx2` transport you own, to share one connection pool
-  across clients (unreleased; keyword argument only).
+  across clients. This is a keyword argument only.
 
-In the unreleased async client, requests wait for a free connection without a
+Async requests wait for a free connection without a
 pool timeout. Connect, read, and write timeouts still use `timeout`, and
 `concurrency` still limits connections. Synchronous pool waits also use `timeout`.
 

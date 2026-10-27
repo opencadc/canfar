@@ -54,10 +54,10 @@ Alternatively, use your operating system's package manager:
 
 !!! warning "Check your client version first"
 
-    These examples describe the unreleased interface on this branch.
-    `pipx install canfar` installs the published release, which may differ.
-    Follow [installation and capability checks](../client/get-started.md#try-this-development-branch)
-    before continuing. Older recordings may also show earlier commands.
+    These examples use the released v1.5.2 client. Follow the
+    [installation guide](../client/get-started.md#install) before continuing.
+    Older recordings may show earlier commands; use the text examples and
+    installed command help for the current syntax.
 
 For a published release, open your terminal and type:
 

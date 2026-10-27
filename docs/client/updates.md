@@ -3,25 +3,34 @@
 
 # What's new in the client
 
-## Unreleased: changes since v1.4.1
+## Unreleased changes after v1.5.2
 
-This guide describes the development client after v1.4.1. The previous
-published Python client is [v1.4.1](https://github.com/opencadc/canfar/releases/tag/v1.4.1)
-(June 11, 2026). Installing `canfar` from PyPI does not yet provide all the
-features below. Follow [Install and set up](get-started.md#install) to choose
-a released or development installation, and read the
-[upgrade guide](migration.md) before updating scripts.
+Development builds add installed [CLI extensions](../cli/extensions.md).
+Root help and root shell completion list extension names from distribution
+metadata. Selecting a command loads its Typer application. The v1.5.2 release
+does not include extension discovery.
 
-The development checkout still reports version `1.4.1` in its package metadata.
-Check command help and Python capabilities as well as the version. Platform releases such
-as [2026.2](../releases/2026-2.md) have separate numbering and deployment scope.
+<span id="unreleased-changes-since-v141"></span>
+
+## Released changes since v1.4.1
+
+The latest published client is [v1.5.2](https://github.com/opencadc/canfar/releases/tag/v1.5.2),
+released October 23, 2026. That release includes the data, authentication,
+Session, and logging features below. Development builds also add the
+extension discovery described above.
+
+Follow [Install and set up](get-started.md#install) to choose an installation,
+and read the [upgrade guide](migration.md) before updating scripts written for
+v1.4.1. Check command help and Python capabilities as well as the version.
+Platform releases such as [2026.3](../releases/2026-3.md) have separate
+numbering and deployment scope.
 
 <span id="improved-session-data-validation"></span>
 
 ## Copy and read research data
 
-The Data commands and the Python storage tools in `canfar.storage` are being
-released in beta with v1.5.0. This designation applies to Data. Share your
+The Data commands and the Python storage tools in `canfar.storage` have been
+in beta since v1.5.0. This designation applies to Data. Share your
 experience through the [community feedback routes](../platform/community/guidelines.md).
 
 The new `canfar data` commands let you list, inspect, copy, move, and remove
@@ -196,14 +205,15 @@ Start with the [Python tutorial](quick-start.md) or
 
 ## Updated HTTP and storage dependencies
 
-The development client uses `httpx2` 2.13.1 or later and requires Authlib 1.8.0
+The client requires `httpx2` 2.0.0 or later and Authlib 1.8.0
 or later for compatible OpenID Connect clients. If your code handles HTTP
 exceptions or supplies test transports, use the corresponding `httpx2` types;
 see the [upgrade guide](migration.md#update-http-client-imports).
 
-The storage dependencies are pinned to `vosfs` 0.11.0 and `fss-cli` 0.10.0
-from `shinybrar/vostools`. `fss-cli` is the renamed `fsspec-cli` distribution;
-import it as `fss_cli`.
+The storage requirements are `vosfs>=0.12.0` and `fss-cli>=0.11.1`, both
+published on PyPI from [opencadc/fsspec-tools](https://github.com/opencadc/fsspec-tools).
+`uv.lock` records exact versions and artifact hashes for development installs.
+`fss-cli` is the renamed `fsspec-cli` distribution; import it as `fss_cli`.
 Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See [Data commands](../cli/data.md).
 These releases reduce requests during tree and bulk operations and report
@@ -221,17 +231,10 @@ install it yourself; see the
 
 ## Where these changes landed
 
-The interfaces described above have landed on main since v1.4.1. This
-dependency update builds on them:
-
-| Area | Main after v1.4.1 | This dependency update |
-| --- | --- | --- |
-| Storage | `canfar data`, explicit `identifiers()` / `filesystem()`, and caching guidance | `vosfs` 0.11.0 and `fss-cli` 0.10.0 from `shinybrar/vostools`, including verified recursive-copy resumption and transfer logging |
-| Authentication | Native Python OIDC login, certificate reuse, and explicit credential/server selection | Authlib 1.8.0 or later for `httpx2` compatibility |
-| HTTP transport | Native synchronous and asynchronous HTTP clients | `httpx2` clients, exceptions, and test transports |
-
-Canonical `-o/--output` commands, validated `config.editor` edits, and
-standard-library logging with `--log-file` are also on main after v1.4.1;
-follow the [upgrade guide](migration.md) when moving from the published client.
+The v1.5.0 release introduced the data commands, native Python OIDC login,
+canonical `-o/--output` options, validated `config.editor` edits, Session
+renewal, and standard-library logging with `--log-file`. The v1.5.1 release
+switched storage dependencies to PyPI. The v1.5.2 release corrected Data help
+examples and updated the platform release date. These releases are on main.
 
 For published release history, see the [client changelog](../changelog.md).

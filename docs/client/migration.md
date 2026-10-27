@@ -6,14 +6,12 @@
 
 ## Upgrade from v1.4.1
 
-The changes below describe the **unreleased development client**. They are not
-all available in the published v1.4.1 package. Choose an installation using
-[Install and set up](get-started.md#install), then check `canfar --help` and the
-help for each command you automate. The development checkout still reports
-`1.4.1`, so the version string alone cannot identify its interface.
+The changes below apply to the released v1.5.x client. Choose an installation
+using [Install and set up](get-started.md#install), then check `canfar --help` and the
+help for each command you automate. Unreleased additions are marked separately
+in [What's new](updates.md).
 
-See [What's new](updates.md) for features added on main since v1.4.1 and the
-current dependency update. Existing scripts need the following changes.
+Existing scripts written for v1.4.1 need the following changes.
 
 <span id="documentation-and-links"></span>
 

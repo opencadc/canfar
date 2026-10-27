@@ -14,18 +14,20 @@ canfar login cadc
 canfar create notebook skaha/astroml:26.04
 canfar ps -o json
 # assumes jq is installed
-canfar open $(canfar ps -o json | jq -r ".[0].id")
+SESSION_ID=$(canfar ps -o json | jq -r '.[0].id')
+canfar open "$SESSION_ID"
 ```
 
 ```python
 from canfar.sessions import Session
 
-session = Session()
-ids = session.create(
-    kind="notebook",
-    image="skaha/astroml:26.04",
-)
-session.connect(ids)
+with Session() as session:
+    ids = session.create(
+        name="my-notebook",
+        kind="notebook",
+        image="skaha/astroml:26.04",
+    )
+    session.connect(ids)
 ```
 
 ## Agent skills

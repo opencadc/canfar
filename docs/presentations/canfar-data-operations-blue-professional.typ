@@ -107,7 +107,7 @@
     Implement VOSpace as an fsspec filesystem. A VOSpace node is another backend, not a special protocol.
   ]
   #v(4mm)
-  #link("https://github.com/shinybrar/vostools")[github.com/shinybrar/vostools]
+  #link("https://github.com/opencadc/fsspec-tools")[github.com/opencadc/fsspec-tools]
 ]
 
 // 3. fss-cli + claim
