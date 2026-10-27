@@ -250,6 +250,7 @@ nav:
           - 5-Minute Tutorial: cli/quick-start.md
           - Data Commands: cli/data.md
           - Logging: cli/logging.md
+          - Extensions: cli/extensions.md
           - Reference: cli/cli-help.md
       - Demos:
           - SRCnet Workshop: demos/srcnet-workshop.md

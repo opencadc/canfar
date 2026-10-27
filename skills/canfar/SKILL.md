@@ -28,9 +28,12 @@ Three states mark progress. Claim only the one you observed:
    | Listing, copying, or reading files on `arc`, `vault`, or another Storage Identifier | [references/data.md](references/data.md) |
    | How the platform works: storage, images, permissions, DOI, CVMFS, support | [Platform questions](#platform-questions) below |
    | Giving feedback, reporting a problem, or following the roadmap | [Community feedback](#community-feedback) below |
+   | An installed CLI extension | [CLI extensions](https://www.opencadc.org/canfar/edge/cli/extensions/) and that extension's help |
 
-   A platform question or feedback request needs only its page. Every other branch runs steps 2
-   and 3, then reads its reference before composing commands.
+   A platform question or feedback request needs only its linked page.
+   Extension requests use step 2 and the extension's page and help; follow
+   its authentication instructions if needed. Other branches run steps 2 and 3,
+   then read their reference before composing commands.
 2. **Installed interface.** Run `canfar version` and `canfar ps --help`. This
    skill matches the installed client when that help lists `-o, --output`; the
    version number alone does not tell, because a development checkout can
@@ -43,6 +46,8 @@ Three states mark progress. Claim only the one you observed:
    [Install on an Intel Mac](https://opencadc.github.io/canfar/client/get-started/#install-on-an-intel-mac)).
    On `config.invalid`, give the user the `hint` command; the file holds their
    credentials.
+   Extensions define their own output options. Use the extension's help
+   instead of assuming that it supports the built-in machine-output options.
 3. **Identity and Server.** `canfar auth show -o json` prints the active
    Authentication Record and `canfar server ls -o json` the Servers. The
    identity is usable when `canfar ps -o json` exits 0; keep its payload, the
@@ -161,7 +166,7 @@ response bodies, so keep them out of shared reports. `--log-file PATH` adds a
 rotating JSON Lines log.
 
 `canfar stats` shows CPU and RAM usage, and GPU usage when reported by the
-server. In the development client, Maximum Resource Requests lists Fixed and
+server. Maximum Resource Requests lists Fixed and
 Flexible maxima from the selected server's saved resources; missing limits
 remain unknown. Request limits do not guarantee current capacity.
 
@@ -216,7 +221,7 @@ Use the [community guidelines](https://www.opencadc.org/canfar/edge/platform/com
 for questions, feedback, ideas, roadmap statuses, and private support. Skip
 login, credential inspection, and server discovery for a feedback request.
 
-The development client and v1.5.0 provide `canfar feedback`, which prints
+Clients from v1.5.0 onward provide `canfar feedback`, which prints
 https://github.com/opencadc/canfar/issues/new/choose without reading
 configuration, collecting diagnostics, opening a browser, or submitting a
 report. If that command is unavailable, use the URL directly.
