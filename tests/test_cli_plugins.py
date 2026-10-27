@@ -6,96 +6,61 @@ import sys
 from typing import TYPE_CHECKING
 
 import pytest
-
-if TYPE_CHECKING:
-    from collections.abc import Iterator
-from typer.main import get_command
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 _DEMO = "tests.cli_plugin_demo"
 _RUNNER = CliRunner()
 
 
-class _Metadata:
-    """Stand-in for a distribution's metadata mapping."""
-
-    def __init__(self, summary: str) -> None:
-        """Store the Summary field the loader reads."""
-        self._summary = summary
-
-    def get(self, key: str, default: str = "") -> str:
-        """Return Summary, or ``default`` for every other field."""
-        if key == "Summary":
-            return self._summary
-        return default
-
-
-class _Dist:
-    """Stand-in for an installed distribution."""
-
-    def __init__(self, summary: str) -> None:
-        """Attach metadata with the given summary."""
-        self.metadata = _Metadata(summary)
-
-
-class _EntryPoint:
-    """Entry point the loader can read without calling ``load``."""
-
-    def __init__(self, name: str, summary: str) -> None:
-        """Point at the demo Typer app."""
-        self.name = name
-        self.value = f"{_DEMO}:app"
-        self.dist = _Dist(summary)
-
-
-def _install(monkeypatch: pytest.MonkeyPatch, *points: _EntryPoint) -> None:
-    """Replace entry-point discovery for one test."""
-
-    def entry_points(**kwargs: object) -> list[_EntryPoint]:
-        if kwargs.get("group") == "canfar.commands":
-            return list(points)
-        return []
-
-    monkeypatch.setattr(
-        "canfar.cli.main.importlib.metadata.entry_points",
-        entry_points,
-    )
-
-
-def _forget_plugin(name: str) -> None:
-    """Drop a command the loader attached to the process-wide Click group."""
-    get_command(cli).commands.pop(name, None)
-
-
-@pytest.fixture
-def _plug() -> Iterator[None]:
-    """Remove the demo command if a test invoked it."""
-    yield
-    _forget_plugin("plug")
-
-
-def test_root_help_lists_plugin_without_importing_it(
+def _install(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    *,
+    name: str = "plug",
+    value: str = f"{_DEMO}:app",
+    summary: str = "Demo extension.",
+) -> None:
+    """Expose real distribution metadata without installing a package."""
+    dist = tmp_path / f"{name}_demo-1.0.dist-info"
+    dist.mkdir()
+    (dist / "METADATA").write_text(
+        f"Metadata-Version: 2.1\nName: {name}-demo\nVersion: 1.0\nSummary: {summary}\n",
+        encoding="utf-8",
+    )
+    (dist / "entry_points.txt").write_text(
+        f"[canfar.commands]\n{name} = {value}\n", encoding="utf-8"
+    )
+    monkeypatch.syspath_prepend(str(tmp_path))
+    monkeypatch.delitem(sys.modules, _DEMO, raising=False)
+
+
+@pytest.mark.parametrize("summary", ["Demo extension.", ""])
+def test_root_help_lists_plugin_without_importing_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, summary: str
 ) -> None:
     """Help shows the distribution summary and does not import the plugin."""
-    sys.modules.pop(_DEMO, None)
-    _install(monkeypatch, _EntryPoint("plug", "Demo extension."))
+    _install(tmp_path, monkeypatch, summary=summary)
 
     result = _RUNNER.invoke(cli, ["--help"])
 
     assert result.exit_code == 0, result.stdout
+    assert "Extensions" in result.stdout
     assert "plug" in result.stdout
-    assert "Demo extension." in result.stdout
+    assert (summary or "Installed extension.") in result.stdout
     assert _DEMO not in sys.modules
 
 
-@pytest.mark.usefixtures("_plug")
-def test_invoking_plugin_imports_its_module(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Running the command loads the entry-point target."""
-    sys.modules.pop(_DEMO, None)
-    _install(monkeypatch, _EntryPoint("plug", "Demo extension."))
+@pytest.mark.parametrize("target", ["app", "commands.app", "app [extra]", " app "])
+def test_invoking_plugin_loads_entry_point(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, target: str
+) -> None:
+    """Invocation resolves standard entry-point targets and imports the app."""
+    _install(tmp_path, monkeypatch, value=f"{_DEMO}:{target}")
 
     result = _RUNNER.invoke(cli, ["plug"])
 
@@ -104,14 +69,64 @@ def test_invoking_plugin_imports_its_module(monkeypatch: pytest.MonkeyPatch) -> 
     assert _DEMO in sys.modules
 
 
-def test_builtin_name_hides_plugin(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_builtin_name_hides_plugin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """A plugin cannot replace a command the client already ships."""
-    sys.modules.pop(_DEMO, None)
-    _install(monkeypatch, _EntryPoint("version", "Demo extension."))
+    _install(tmp_path, monkeypatch, name="version", value="missing_plugin:app")
 
     result = _RUNNER.invoke(cli, ["--help"])
 
     assert result.exit_code == 0, result.stdout
     assert "View client info" in result.stdout
     assert "Demo extension." not in result.stdout
+    assert _RUNNER.invoke(cli, ["version"]).exit_code == 0
+    assert "missing_plugin" not in sys.modules
+
+
+@pytest.mark.parametrize("value", [f"{_DEMO}:app", "missing_plugin:app"])
+def test_root_completion_does_not_import_plugin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, value: str
+) -> None:
+    """Root completion lists even unloadable plugins alongside built-ins."""
+    _install(tmp_path, monkeypatch, value=value)
+
+    result = _RUNNER.invoke(
+        cli,
+        [],
+        prog_name="canfar",
+        env={
+            "_CANFAR_COMPLETE": "complete_bash",
+            "COMP_WORDS": "canfar ",
+            "COMP_CWORD": "1",
+        },
+    )
+
+    assert result.exit_code == 0, result.stdout + result.stderr
+    assert "plug" in result.stdout
+    assert "version" in result.stdout
     assert _DEMO not in sys.modules
+
+
+def test_completion_inside_plugin_loads_selected_app(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Nested completion loads its app without importing another extension."""
+    _install(tmp_path, monkeypatch)
+    _install(tmp_path, monkeypatch, name="broken", value="missing_plugin:app")
+
+    result = _RUNNER.invoke(
+        cli,
+        [],
+        prog_name="canfar",
+        env={
+            "_CANFAR_COMPLETE": "complete_bash",
+            "COMP_WORDS": "canfar plug h",
+            "COMP_CWORD": "2",
+        },
+    )
+
+    assert result.exit_code == 0, result.stdout + result.stderr
+    assert "hello" in result.stdout
+    assert _DEMO in sys.modules
+    assert "missing_plugin" not in sys.modules
