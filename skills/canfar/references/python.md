@@ -7,8 +7,8 @@ closing a client leaves its remote Sessions running.
 
 The default HTTP `timeout` is 30 seconds. See
 [HTTPClient](https://www.opencadc.org/canfar/edge/client/client/) for timeout
-semantics and the unreleased async client's wait for connection capacity.
-The development client uses native `httpx2` clients; import HTTP exceptions
+semantics and the async client's wait for connection capacity.
+Clients from v1.5.0 onward use native `httpx2` clients; import HTTP exceptions
 and test transports from `httpx2`. See the
 [upgrade guide](https://www.opencadc.org/canfar/edge/client/migration/#update-http-client-imports).
 
@@ -42,10 +42,10 @@ are for `kind="headless"`; [batch.md](batch.md) covers replicas.
 | `events(ids)` | a list of `{id: text}` dictionaries |
 | `destroy(ids)` | a dictionary of success booleans |
 | `destroy_with(prefix, *, kind=..., status=...)` | the same, for names matching a literal prefix or a regex |
-| `renew(ids)` | a dictionary of success booleans; resets interactive Session lifetimes (unreleased) |
+| `renew(ids)` | a dictionary of success booleans; resets interactive Session lifetimes |
 | `connect(ids)` | `None`; opens ready Sessions in a browser after one readiness check |
 
-In the unreleased client, those methods except `fetch` and `connect` also take
+Those methods except `fetch` and `connect` also take
 `errors="raise"` (or `CANFAR_ERRORS=raise`): every request runs, then
 `canfar.exceptions.session.SessionRequestError` carries `results` and the
 per-ID `errors`. See

@@ -55,11 +55,19 @@ def _loaded_after(code: str) -> dict[str, list[str]]:
             "from canfar.cli.main import main\n"
             "try:\n    main()\nexcept SystemExit:\n    pass"
         ),
+        (
+            "from typer.testing import CliRunner\n"
+            "from canfar.cli.main import cli\n"
+            "result = CliRunner().invoke(cli, [], prog_name='canfar', env={"
+            "'_CANFAR_COMPLETE': 'complete_bash',"
+            "'COMP_WORDS': 'canfar ', 'COMP_CWORD': '1'})\n"
+            "assert result.exit_code == 0, result.output"
+        ),
     ],
-    ids=["import", "root-help"],
+    ids=["import", "root-help", "root-completion"],
 )
 def test_cli_startup_loads_no_command_dependencies(code: str) -> None:
-    """Importing the CLI and listing its commands imports no command module."""
+    """Startup, root help, and root completion import no command dependencies."""
     assert _loaded_after(code) == {"deferred": [], "commands": []}
 
 

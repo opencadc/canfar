@@ -8,9 +8,9 @@ it. Replace `SESSION_ID` with the ID printed by `canfar create` or `canfar ps`.
 
 ## Install and log in
 
-[Install the client](../client/get-started.md#install) first. These examples describe the unreleased
-development interface; follow the installation guide to choose a
-compatible environment.
+[Install the client](../client/get-started.md#install) first. These examples
+use the released v1.5.2 client. Read the [upgrade guide](../client/migration.md)
+when moving from v1.4.1.
 
 ```bash
 canfar login cadc

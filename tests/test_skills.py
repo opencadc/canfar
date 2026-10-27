@@ -40,6 +40,7 @@ DOC_FILES = sorted(
 )
 # The current launch notes must describe commands and APIs this client has.
 DOC_FILES.append(DOCS / "releases/2026-3.md")
+DOC_FILES.append(ROOT / "README.md")
 # Removed commands the user docs name while telling readers what replaced them.
 # The skill gets no such allowance: it names only commands that exist.
 REMOVED_COMMANDS = {("context",), ("storage",)}
@@ -274,14 +275,30 @@ def _resolve(dotted: str) -> Any:
     raise ImportError(dotted)
 
 
-def _unknown_keywords(target: Any, call: ast.Call) -> list[str]:
+def _call_error(target: Any, call: ast.Call) -> str | None:
+    """Check argument names and required arguments without running the example."""
     try:
-        parameters = inspect.signature(target).parameters
+        signature = inspect.signature(target)
     except (TypeError, ValueError):
-        return []
-    if any(p.kind is p.VAR_KEYWORD for p in parameters.values()):
-        return []
-    return [k.arg for k in call.keywords if k.arg and k.arg not in parameters]
+        return None
+    if any(
+        isinstance(arg, ast.Starred)
+        or (isinstance(arg, ast.Constant) and arg.value is Ellipsis)
+        for arg in call.args
+    ) or any(keyword.arg is None for keyword in call.keywords):
+        return None
+    parameters = list(signature.parameters.values())
+    # Example instance names resolve to classes, whose methods still have self.
+    if parameters and parameters[0].name == "self":
+        signature = signature.replace(parameters=parameters[1:])
+    try:
+        signature.bind(
+            *[None for _ in call.args],
+            **{keyword.arg: None for keyword in call.keywords},
+        )
+    except TypeError as exc:
+        return str(exc)
+    return None
 
 
 def _imports(tree: ast.AST, problems: list[str]) -> dict[str, Any]:
@@ -357,10 +374,9 @@ def _python_problems(source: str) -> list[str]:
                 continue
         else:
             continue
-        problems += [
-            f"{shown}() has no `{keyword}` argument"
-            for keyword in _unknown_keywords(target, node)
-        ]
+        error = _call_error(target, node)
+        if error is not None:
+            problems.append(f"{shown}(): {error}")
     return problems
 
 

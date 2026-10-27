@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import importlib
 import sys
 from dataclasses import dataclass, field
+from importlib import import_module
+from importlib.metadata import EntryPoint, entry_points
 from pathlib import Path  # noqa: TC003 - Typer resolves callback annotations at runtime
 from typing import TYPE_CHECKING, Annotated, Any
 
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from typer._click import HelpFormatter
     from typer._click.core import Command
     from typer._click.core import Context as ClickContext
+    from typer._click.shell_completion import CompletionItem
 
     from canfar.errors import StructuredError
 
@@ -60,9 +62,9 @@ def _leaf_output_mode(args: list[str]) -> output.OutputMode:
 class _RootTyperGroup(TyperGroup):
     """Load root commands on demand and capture child argv for root setup.
 
-    Each command's module is imported only when that command runs, so a
-    command does not pay for the dependencies of the others. Root help lists
-    commands from their registered summaries without importing them.
+    A command's module loads for invocation or completion inside that command.
+    Root help and root completion use registered summaries without importing
+    command modules.
     """
 
     _listing = False
@@ -76,11 +78,14 @@ class _RootTyperGroup(TyperGroup):
 
     def list_commands(self, ctx: ClickContext) -> list[str]:
         """List registered commands in registration order."""
-        return list(dict.fromkeys([*_COMMANDS, *super().list_commands(ctx)]))
+        names = [*_COMMANDS, *_plugin_commands(), *super().list_commands(ctx)]
+        return list(dict.fromkeys(names))
 
     def get_command(self, ctx: ClickContext, cmd_name: str) -> Command | None:
         """Return a command, importing its module the first time it is used."""
         lazy = _COMMANDS.get(cmd_name)
+        if lazy is None and cmd_name not in self.commands:
+            lazy = _plugin_commands().get(cmd_name)
         if lazy is not None and cmd_name not in self.commands:
             if self._listing:
                 return lazy.summary(cmd_name)
@@ -92,6 +97,16 @@ class _RootTyperGroup(TyperGroup):
         self._listing = True
         try:
             super().format_help(ctx, formatter)
+        finally:
+            self._listing = False
+
+    def shell_complete(
+        self, ctx: ClickContext, incomplete: str
+    ) -> list[CompletionItem]:
+        """Complete root names from summaries without importing commands."""
+        self._listing = True
+        try:
+            return super().shell_complete(ctx, incomplete)
         finally:
             self._listing = False
 
@@ -129,14 +144,14 @@ class _LazyCommand:
     """A root command whose module is imported only when the command is used.
 
     Attributes:
-        target: ``module:attribute`` of a command function or Typer application.
+        target: A builtin's ``module:attribute`` or a plugin entry point.
         help: Short help, also shown in root help before the module loads.
         panel: Root help panel that groups the command.
         group: Whether ``target`` is a Typer application of subcommands.
         options: Further ``Typer.command`` or ``Typer.add_typer`` settings.
     """
 
-    target: str
+    target: str | EntryPoint
     help: str
     panel: str
     group: bool = False
@@ -148,8 +163,11 @@ class _LazyCommand:
 
     def load(self, name: str) -> Command:
         """Import the command and build it as a root registration would."""
-        module, _, attribute = self.target.partition(":")
-        target = getattr(importlib.import_module(module), attribute)
+        if isinstance(self.target, EntryPoint):
+            target = self.target.load()
+        else:
+            module, _, attribute = self.target.partition(":")
+            target = getattr(import_module(module), attribute)
         host = typer.Typer(rich_markup_mode="rich")
         settings: dict[str, Any] = {
             "help": self.help,
@@ -266,6 +284,31 @@ _COMMANDS: dict[str, _LazyCommand] = {
     ),
 }
 """Root commands in help order, imported only when used."""
+
+
+def _plugin_summary(ep: EntryPoint) -> str:
+    """Short help from the plugin distribution, without importing its code."""
+    summary = ep.dist.metadata["Summary"] if ep.dist is not None else None
+    return summary or "Installed extension."
+
+
+def _plugin_commands() -> dict[str, _LazyCommand]:
+    """``canfar.commands`` entry points that do not replace a builtin.
+
+    Names and help come from distribution metadata. The plugin module is
+    imported for invocation or completion inside that command.
+    """
+    selected: dict[str, _LazyCommand] = {}
+    for ep in entry_points(group="canfar.commands"):
+        if ep.name in _COMMANDS or ep.name in selected or not ep.value:
+            continue
+        selected[ep.name] = _LazyCommand(
+            ep,
+            _plugin_summary(ep),
+            "Extensions",
+            group=True,
+        )
+    return selected
 
 
 def callback(

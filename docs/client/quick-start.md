@@ -6,9 +6,9 @@ client. Each code block can run as a separate script.
 
 !!! note "Choose a compatible client"
 
-    [Install and set up](get-started.md#install) first. These examples describe
-    unreleased changes since v1.4.1; use the development installation when
-    following this version of the documentation.
+    [Install and set up](get-started.md#install) first. These examples use the
+    released v1.5.2 client. Read the [upgrade guide](migration.md) when moving
+    from v1.4.1.
 
 Use the same tab throughout: **Sync Python** for a normal script, or
 **Async Python** for an application using `async` and `await`.
