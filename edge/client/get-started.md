@@ -6,15 +6,14 @@ resources.
 
 ## Install
 
-!!! note "Development documentation"
+!!! note "Client version"
 
-    The examples in this branch describe unreleased changes since v1.4.1.
-    The published package does not yet contain every command and Python API
-    shown here. Read [What's new](updates.md) and the [upgrade guide](migration.md)
-    before changing an existing environment.
+    These examples use the released v1.5.2 client. Unreleased additions are
+    marked on their own pages. Read [What's new](updates.md) and the
+    [upgrade guide](migration.md) before upgrading from v1.4.1.
 
-    CANFAR Data's CLI and Python storage tools are being released in beta
-    with v1.5.0. See the [Data guide](data.md) and
+    CANFAR Data's CLI and Python storage tools have been in beta since
+    v1.5.0. See the [Data guide](data.md) and
     [community feedback routes](../platform/community/guidelines.md).
 
 ### Use the published release
@@ -83,9 +82,9 @@ canfar ps --help
 ```
 
 The activation command above is for a macOS or Linux shell. In another shell,
-use `uv run canfar …` from the checkout instead. The checkout still reports
-version `1.4.1`; confirm that `canfar ps --help` offers `-o/--output` and that
-`canfar data --help` works before following these examples.
+use `uv run canfar …` from the checkout instead. A development checkout can
+share the last release's version string. Read command help to verify each
+unreleased feature, such as [CLI extensions](../cli/extensions.md).
 
 The Python environment is separate, but the client still uses your normal
 `~/.canfar/config.yaml`. Review the [migration guide](migration.md) before

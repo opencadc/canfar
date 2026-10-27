@@ -70,6 +70,7 @@ inside those files are relative to the file that contains them.
 - [CLI / 5-Minute Tutorial](cli/quick-start.md)
 - [CLI / Data Commands](cli/data.md)
 - [CLI / Logging](cli/logging.md)
+- [CLI / Extensions](cli/extensions.md)
 - [CLI / Reference](cli/cli-help.md)
 - [Demos / SRCnet Workshop](demos/srcnet-workshop.md)
 - [Bug Reports](client/bug-reports.md)

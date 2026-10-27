@@ -76,7 +76,7 @@ expression metacharacters are treated as regular expressions.
 
 ## Renew an interactive Session
 
-`renew()` (unreleased) resets the lifetime of interactive Sessions before they
+`renew()` resets the lifetime of interactive Sessions before they
 expire. Renewals run concurrently:
 
 ```python

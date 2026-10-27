@@ -783,10 +783,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased-changes-since-v141" class="md-nav__link">
+  <a href="#unreleased-changes-after-v152" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased: changes since v1.4.1
+        Unreleased changes after v1.5.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#released-changes-since-v141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Released changes since v1.4.1
       
     </span>
   </a>
@@ -1370,6 +1381,8 @@
       
         
       
+        
+      
     
     
     
@@ -1493,6 +1506,34 @@
     
   
     Logging
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cli/extensions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Extensions
   
 
     
@@ -1835,10 +1876,21 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#unreleased-changes-since-v141" class="md-nav__link">
+  <a href="#unreleased-changes-after-v152" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Unreleased: changes since v1.4.1
+        Unreleased changes after v1.5.2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#released-changes-since-v141" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Released changes since v1.4.1
       
     </span>
   </a>
@@ -1970,20 +2022,26 @@
 <p><span id="whats-new-in-canfar"></span>
 <span id="recent-updates"></span></p>
 <h1 id="whats-new-in-the-client">What's new in the client<a class="headerlink" href="#whats-new-in-the-client" title="Permanent link">&para;</a></h1>
-<h2 id="unreleased-changes-since-v141">Unreleased: changes since v1.4.1<a class="headerlink" href="#unreleased-changes-since-v141" title="Permanent link">&para;</a></h2>
-<p>This guide describes the development client after v1.4.1. The previous
-published Python client is <a href="https://github.com/opencadc/canfar/releases/tag/v1.4.1">v1.4.1</a>
-(June 11, 2026). Installing <code>canfar</code> from PyPI does not yet provide all the
-features below. Follow <a href="../get-started/#install">Install and set up</a> to choose
-a released or development installation, and read the
-<a href="../migration/">upgrade guide</a> before updating scripts.</p>
-<p>The development checkout still reports version <code>1.4.1</code> in its package metadata.
-Check command help and Python capabilities as well as the version. Platform releases such
-as <a href="../../releases/2026-2/">2026.2</a> have separate numbering and deployment scope.</p>
+<h2 id="unreleased-changes-after-v152">Unreleased changes after v1.5.2<a class="headerlink" href="#unreleased-changes-after-v152" title="Permanent link">&para;</a></h2>
+<p>Development builds add installed <a href="../../cli/extensions/">CLI extensions</a>.
+Root help and root shell completion list extension names from distribution
+metadata. Selecting a command loads its Typer application. The v1.5.2 release
+does not include extension discovery.</p>
+<p><span id="unreleased-changes-since-v141"></span></p>
+<h2 id="released-changes-since-v141">Released changes since v1.4.1<a class="headerlink" href="#released-changes-since-v141" title="Permanent link">&para;</a></h2>
+<p>The latest published client is <a href="https://github.com/opencadc/canfar/releases/tag/v1.5.2">v1.5.2</a>,
+released October 23, 2026. That release includes the data, authentication,
+Session, and logging features below. Development builds also add the
+extension discovery described above.</p>
+<p>Follow <a href="../get-started/#install">Install and set up</a> to choose an installation,
+and read the <a href="../migration/">upgrade guide</a> before updating scripts written for
+v1.4.1. Check command help and Python capabilities as well as the version.
+Platform releases such as <a href="../../releases/2026-3/">2026.3</a> have separate
+numbering and deployment scope.</p>
 <p><span id="improved-session-data-validation"></span></p>
 <h2 id="copy-and-read-research-data">Copy and read research data<a class="headerlink" href="#copy-and-read-research-data" title="Permanent link">&para;</a></h2>
-<p>The Data commands and the Python storage tools in <code>canfar.storage</code> are being
-released in beta with v1.5.0. This designation applies to Data. Share your
+<p>The Data commands and the Python storage tools in <code>canfar.storage</code> have been
+in beta since v1.5.0. This designation applies to Data. Share your
 experience through the <a href="../../platform/community/guidelines/">community feedback routes</a>.</p>
 <p>The new <code>canfar data</code> commands let you list, inspect, copy, move, and remove
 files using familiar shell operations. Each path names a storage location:
@@ -2134,13 +2192,14 @@ their contracts:</p>
 <span id="previous-versions"></span>
 <span id="stay-updated"></span></p>
 <h2 id="updated-http-and-storage-dependencies">Updated HTTP and storage dependencies<a class="headerlink" href="#updated-http-and-storage-dependencies" title="Permanent link">&para;</a></h2>
-<p>The development client uses <code>httpx2</code> 2.13.1 or later and requires Authlib 1.8.0
+<p>The client requires <code>httpx2</code> 2.0.0 or later and Authlib 1.8.0
 or later for compatible OpenID Connect clients. If your code handles HTTP
 exceptions or supplies test transports, use the corresponding <code>httpx2</code> types;
 see the <a href="../migration/#update-http-client-imports">upgrade guide</a>.</p>
-<p>The storage dependencies are pinned to <code>vosfs</code> 0.11.0 and <code>fss-cli</code> 0.10.0
-from <code>shinybrar/vostools</code>. <code>fss-cli</code> is the renamed <code>fsspec-cli</code> distribution;
-import it as <code>fss_cli</code>.
+<p>The storage requirements are <code>vosfs&gt;=0.12.0</code> and <code>fss-cli&gt;=0.11.1</code>, both
+published on PyPI from <a href="https://github.com/opencadc/fsspec-tools">opencadc/fsspec-tools</a>.
+<code>uv.lock</code> records exact versions and artifact hashes for development installs.
+<code>fss-cli</code> is the renamed <code>fsspec-cli</code> distribution; import it as <code>fss_cli</code>.
 Recursive copies can be rerun into an existing destination directory and skip
 files only after verifying their contents. See <a href="../../cli/data/">Data commands</a>.
 These releases reduce requests during tree and bulk operations and report
@@ -2155,37 +2214,11 @@ choices come from Typer. If you use <code>cadc-get-cert</code> or import <code>c
 install it yourself; see the
 <a href="../migration/#install-cadcutils-for-cadc-tools">upgrade guide</a>.</p>
 <h2 id="where-these-changes-landed">Where these changes landed<a class="headerlink" href="#where-these-changes-landed" title="Permanent link">&para;</a></h2>
-<p>The interfaces described above have landed on main since v1.4.1. This
-dependency update builds on them:</p>
-<table>
-<thead>
-<tr>
-<th>Area</th>
-<th>Main after v1.4.1</th>
-<th>This dependency update</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Storage</td>
-<td><code>canfar data</code>, explicit <code>identifiers()</code> / <code>filesystem()</code>, and caching guidance</td>
-<td><code>vosfs</code> 0.11.0 and <code>fss-cli</code> 0.10.0 from <code>shinybrar/vostools</code>, including verified recursive-copy resumption and transfer logging</td>
-</tr>
-<tr>
-<td>Authentication</td>
-<td>Native Python OIDC login, certificate reuse, and explicit credential/server selection</td>
-<td>Authlib 1.8.0 or later for <code>httpx2</code> compatibility</td>
-</tr>
-<tr>
-<td>HTTP transport</td>
-<td>Native synchronous and asynchronous HTTP clients</td>
-<td><code>httpx2</code> clients, exceptions, and test transports</td>
-</tr>
-</tbody>
-</table>
-<p>Canonical <code>-o/--output</code> commands, validated <code>config.editor</code> edits, and
-standard-library logging with <code>--log-file</code> are also on main after v1.4.1;
-follow the <a href="../migration/">upgrade guide</a> when moving from the published client.</p>
+<p>The v1.5.0 release introduced the data commands, native Python OIDC login,
+canonical <code>-o/--output</code> options, validated <code>config.editor</code> edits, Session
+renewal, and standard-library logging with <code>--log-file</code>. The v1.5.1 release
+switched storage dependencies to PyPI. The v1.5.2 release corrected Data help
+examples and updated the platform release date. These releases are on main.</p>
 <p>For published release history, see the <a href="../../changelog/">client changelog</a>.</p>
 
 
@@ -2209,7 +2242,7 @@ follow the <a href="../migration/">upgrade guide</a> when moving from the publis
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 16, 2026 22:36:11 UTC">October 16, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 27, 2026 18:17:14 UTC">October 27, 2026</span>
   </span>
 
     

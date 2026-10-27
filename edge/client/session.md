@@ -119,7 +119,7 @@ metacharacters; such a value is treated as a regular expression.
 
 ## Renew an interactive Session
 
-`renew()` (unreleased) resets the lifetime of interactive Sessions before they
+`renew()` resets the lifetime of interactive Sessions before they
 expire, as the Science Portal does. It returns `True` for each renewed ID:
 
 ```python
@@ -132,7 +132,7 @@ with Session() as session:
 ## Raise on failures
 
 Set `errors="raise"` on the client, or pass it to one call, to raise
-`SessionRequestError` instead of returning partial results (unreleased).
+`SessionRequestError` instead of returning partial results.
 Every request still runs first. The exception carries `results` (what the call
 would have returned) and `errors`, the `httpx2.HTTPError` for each failed
 Session ID, or for each 1-based replica number from `create()`.

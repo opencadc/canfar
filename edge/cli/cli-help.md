@@ -5,6 +5,9 @@ selection, Sessions, Container Images, data sources, and client configuration.
 Run `canfar --help` or append `--help` to any command for the installed
 options.
 
+Development builds also discover installed [CLI extensions](extensions.md).
+They appear under **Extensions** in root help and define their own options.
+
 ## Canonical commands
 
 The root keeps Session and information operations as leaves. Authentication,
@@ -195,7 +198,7 @@ These leaves accept one or more Session IDs and produce human-readable output:
 | `canfar info SESSION_ID...` | Show Session details; `--debug` adds response warnings. |
 | `canfar logs SESSION_ID...` | Show Session logs. |
 | `canfar open SESSION_ID...` | Open ready Sessions in new browser tabs. |
-| `canfar renew SESSION_ID...` | Reset the lifetime of interactive Sessions (unreleased). |
+| `canfar renew SESSION_ID...` | Reset the lifetime of interactive Sessions. |
 | `canfar delete SESSION_ID... [--force]` | Delete Sessions, confirming unless `--force` is used. |
 | `canfar prune PREFIX [KIND] [STATUS]` | Delete matching names; defaults to `headless` and `Succeeded`. |
 
@@ -220,7 +223,7 @@ canfar version --debug
 ```
 
 `stats` prints CPU and RAM usage, plus GPU usage when the server includes it.
-In the development client, **Maximum Resource Requests** shows the Fixed and
+**Maximum Resource Requests** shows the Fixed and
 Flexible CPU and RAM maxima saved for your selected server, as listed by
 `canfar server ls`. Missing limits are shown as `unknown`; these request limits
 do not guarantee that capacity is currently available.
@@ -235,7 +238,7 @@ logging control.
 canfar feedback
 ```
 
-The development client and v1.5.0 print the GitHub chooser URL without
+Clients from v1.5.0 onward print the GitHub chooser URL without
 authentication, configuration reads, browser opening, or diagnostics
 collection. Use it for problems, questions, ideas, and documentation feedback.
 See the [community guidelines](../platform/community/guidelines.md) for
@@ -260,7 +263,7 @@ for the embedded commands. Configuration keys use dotted paths; values
 passed to `config set` are parsed as YAML. See [Authentication and Servers](authentication-contexts.md)
 for the persisted Authentication, Server, and active-selection shape.
 
-The Data tools are being released in beta with v1.5.0. Bare Data and
+The Data tools have been in beta since v1.5.0. Bare Data and
 subcommand help show a beta notice; operations and Python calls do not.
 
 <span id="machine-output-contract"></span>

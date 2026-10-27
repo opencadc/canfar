@@ -29,16 +29,15 @@ original channel. You do not need to repeat a report in several places.
 ## Give feedback on the Data beta
 
 The `canfar data` commands and the Python storage tools in `canfar.storage`
-are being released in beta with client v1.5.0. Until that release is
-published, use the [installation guide](../../client/get-started.md#install)
-to distinguish the published client from the development interface.
+have been available in beta since client v1.5.0. Use the
+[installation guide](../../client/get-started.md#install) to update your client.
 
 Tell us what you tried, where you needed a workaround, and what would make
 the task easier. Successful workflows are useful too. Start a Feedback
-discussion now, or reply to the pinned Data beta thread once v1.5.0 ships.
+discussion, or join an existing conversation about the same workflow.
 Maintainers will link any issue or proposal that grows out of your report.
 
-In the development client and v1.5.0, this command prints the feedback URL:
+In v1.5.0 and later, this command prints the feedback URL:
 
 ```bash
 canfar feedback

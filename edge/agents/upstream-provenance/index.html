@@ -1178,10 +1178,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#current-pins" class="md-nav__link">
+  <a href="#current-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current pins
+        Current requirements
       
     </span>
   </a>
@@ -1487,10 +1487,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#current-pins" class="md-nav__link">
+  <a href="#current-requirements" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Current pins
+        Current requirements
       
     </span>
   </a>
@@ -1554,47 +1554,50 @@
 
 
 <h1 id="upstream-provenance">Upstream provenance<a class="headerlink" href="#upstream-provenance" title="Permanent link">&para;</a></h1>
-<p><code>canfar</code> depends on two upstream distributions that are <strong>pinned to one commit
-of <code>shinybrar/vostools</code></strong>, not to PyPI releases. Record the pin and its basis
-here whenever it moves.</p>
-<h2 id="current-pins">Current pins<a class="headerlink" href="#current-pins" title="Permanent link">&para;</a></h2>
+<p><code>canfar</code> installs its storage dependencies from PyPI. Both distributions come
+from <a href="https://github.com/opencadc/fsspec-tools">opencadc/fsspec-tools</a>.
+Update this record when their requirements or sources change.</p>
+<p><span id="current-pins"></span></p>
+<h2 id="current-requirements">Current requirements<a class="headerlink" href="#current-requirements" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Distribution</th>
-<th>Version</th>
+<th>Required minimum</th>
+<th>Locked version</th>
 <th>Source</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>vosfs</code></td>
-<td><code>0.11.0</code></td>
-<td><code>git+https://github.com/shinybrar/vostools@d6e2a44e3433bcff2e8f61437f10f2ce9f902a72#subdirectory=libs/vosfs</code></td>
+<td><code>0.12.0</code></td>
+<td><code>0.12.0</code></td>
+<td><a href="https://pypi.org/project/vosfs/">PyPI</a></td>
 </tr>
 <tr>
 <td><code>fss-cli</code></td>
-<td><code>0.10.0</code></td>
-<td>same commit, <code>subdirectory=libs/fss-cli</code></td>
+<td><code>0.11.1</code></td>
+<td><code>0.11.1</code></td>
+<td><a href="https://pypi.org/project/fss-cli/">PyPI</a></td>
 </tr>
 </tbody>
 </table>
-<p>Verified on October 15, 2026. <code>fss-cli</code> is the renamed <code>fsspec-cli</code>
+<p>Verified against <code>pyproject.toml</code>, <code>uv.lock</code>, and installed package metadata
+on October 27, 2026. <code>fss-cli</code> is the renamed <code>fsspec-cli</code>
 distribution: import it as <code>fss_cli</code>, and route the <code>fss_cli</code> logger. There is
-no compatibility alias. The commit is past the <code>vosfs</code> 0.11.0 and <code>fsspec-cli</code>
-0.10.0 tags from <code>shinybrar/vosfs</code>. It also pages <code>vosfs</code> container listings
-that exceed the XML parse cap.</p>
+no compatibility alias. Registry requirements replaced the former Git pin
+in CANFAR v1.5.1.</p>
 <p>CANFAR imports <code>httpx2</code> and requires Authlib 1.8.0 or later, whose existing
-<code>authlib.integrations.httpx_client</code> integration uses <code>httpx2</code>. <code>vosfs</code> 0.11.0
+<code>authlib.integrations.httpx_client</code> integration uses <code>httpx2</code>. <code>vosfs</code> 0.12.0
 still declares and uses <code>httpx</code>, so the original package remains a transitive
 dependency in <code>uv.lock</code>.</p>
 <h2 id="why-this-matters">Why this matters<a class="headerlink" href="#why-this-matters" title="Permanent link">&para;</a></h2>
 <ul>
-<li>The source is a personal repository, so the usual PyPI ownership and
-  yanking guarantees do not apply. Review the commit before moving a pin.</li>
-<li><code>uv.lock</code> records the resolved commit, which is the real integrity anchor.
-  The requirement names that commit because <code>shinybrar/vostools</code> has no
-  package release tag for this pin.</li>
+<li><code>pyproject.toml</code> declares minimum versions. A new installation can resolve
+  newer compatible releases.</li>
+<li><code>uv.lock</code> records registry versions and artifact hashes. Use the lockfile
+  to reproduce development installs and review upstream changes when updating it.</li>
 <li><code>vosfs</code> v0.8.0 added HTTP <code>Range</code> support, honoured by the <code>vault</code> byte
   endpoint and not by Cavern behind <code>arc</code>. Behaviour therefore differs per
   Storage Identifier; see <a href="../../client/data/">Data Access</a>.</li>
@@ -1616,7 +1619,9 @@ dependency in <code>uv.lock</code>.</p>
   <a href="../../cli/logging/">Logging</a>.</li>
 <li><code>d6e2a44e3433bcff2e8f61437f10f2ce9f902a72</code>: both packages now come from
   <code>shinybrar/vostools</code>. The command library's distribution is <code>fss-cli</code> and
-  its import and logger are <code>fss_cli</code> (current).</li>
+  its import and logger are <code>fss_cli</code>. This was the former Git source.</li>
+<li>CANFAR v1.5.1: switched to PyPI requirements for <code>vosfs&gt;=0.12.0</code> and
+  <code>fss-cli&gt;=0.11.1</code> from <code>opencadc/fsspec-tools</code>.</li>
 </ul>
 
 
@@ -1640,7 +1645,7 @@ dependency in <code>uv.lock</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 23, 2026 18:10:22 UTC">October 23, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 27, 2026 18:17:14 UTC">October 27, 2026</span>
   </span>
 
     

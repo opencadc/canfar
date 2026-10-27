@@ -15,7 +15,7 @@ the result you expected. If a related issue already exists, add your
 experience there. You can also start a new report and let maintainers link
 related work. Updating the client is not a requirement for asking for help.
 
-In the development client and v1.5.0, run:
+In v1.5.0 and later, run:
 
 ```bash
 canfar feedback
