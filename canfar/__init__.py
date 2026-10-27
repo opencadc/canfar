@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 # Kept in sync with pyproject.toml by release-please
 # DO NOT EDIT MANUALLY
-__version__: str = "1.5.2"  # x-release-please-version
+__version__: str = "1.6.0"  # x-release-please-version
 
 __all__ = [
     "CONFIG_DIR",
