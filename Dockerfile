@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1
 
 # renovate: datasource=docker depName=ghcr.io/astral-sh/uv versioning=semver
-FROM ghcr.io/astral-sh/uv:alpine@sha256:95f501aef734a5aaf167ff0640e02f215dcc7043ff48685de70328e5c55a57b0 AS uv
+FROM ghcr.io/astral-sh/uv:alpine@sha256:a788290ce829958f18bcea1dfd9fb5dcf4bfb22f6380b52c9322f9d91e86b117 AS uv
 
 # renovate: datasource=docker depName=python versioning=python
-FROM python:alpine@sha256:9e9fde4d32eedce0b661d9ab91e826b62dddf28e928c230ec55f1866cac66b01 AS builder
+FROM python:alpine@sha256:20a82dbc2783112ddb91d1534603f802d222a3e63e593cd002eb2ac534e70211 AS builder
 
 WORKDIR /build
 
@@ -18,7 +18,7 @@ RUN uv build --wheel --out-dir /dist \
     && uv pip install --prefix=/install /dist/*.whl
 
 # renovate: datasource=docker depName=python versioning=python
-FROM python:alpine@sha256:9e9fde4d32eedce0b661d9ab91e826b62dddf28e928c230ec55f1866cac66b01 AS production
+FROM python:alpine@sha256:20a82dbc2783112ddb91d1534603f802d222a3e63e593cd002eb2ac534e70211 AS production
 
 LABEL org.opencontainers.image.title="CANFAR Python CLI" \
       org.opencontainers.image.description="CLI for CANFAR Science Platform" \
