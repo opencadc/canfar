@@ -7,10 +7,20 @@ server information.
 from __future__ import annotations
 
 from base64 import b64encode
-from typing import Literal
+from typing import Annotated, Any, Literal
+from urllib.parse import urlsplit
 
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, model_validator
-from typing_extensions import Self
+from pydantic import (
+    AnyUrl,
+    BaseModel,
+    BeforeValidator,
+    ConfigDict,
+    Field,
+    SecretStr,
+)
+
+DEFAULT_REGISTRY_HOST = "images.canfar.net"
+"""Container Registry host used when a command or setting names none."""
 
 ProbeStatus = Literal["pending", "connected", "timeout", "unreachable", "error"]
 """Discovery state of one Science Platform Server; every state but ``pending``
@@ -66,48 +76,95 @@ class ServerProbe(BaseModel):
     detail: str | None = None
 
 
-class ContainerRegistry(BaseModel):
-    """Authentication details for private container registry."""
+def parse_host(value: Any) -> Any:
+    """Reduce a Container Registry host or ``http(s)`` URL to ``host[:port]``.
 
-    url: AnyHttpUrl | None = Field(default=None, description="Container Registry URL")
-    username: str | None = Field(
-        default=None,
-        description="Username for the container registry",
+    Args:
+        value: Bare host, such as ``images.canfar.net``, or an ``http`` or
+            ``https`` URL without a path, as a string or Pydantic URL.
+
+    Returns:
+        Lowercase ``host[:port]``. Other values are returned unchanged for
+        Pydantic to reject.
+
+    Raises:
+        ValueError: If the value has another scheme, a path, or no host.
+    """
+    if isinstance(value, AnyUrl):
+        value = str(value)
+    if not isinstance(value, str):
+        return value
+    text = value.strip()
+    parts = urlsplit(text if "://" in text else f"//{text}")
+    if (
+        parts.scheme not in {"", "http", "https"}
+        or parts.path not in {"", "/"}
+        or parts.query
+        or parts.fragment
+        or parts.username is not None
+        or not parts.hostname
+    ):
+        msg = f"invalid container registry host {value!r}: expected HOST[:PORT]"
+        raise ValueError(msg)
+    return parts.netloc.lower()
+
+
+RegistryHost = Annotated[str, BeforeValidator(parse_host)]
+"""Container Registry ``host[:port]``, parsed from a bare host or URL."""
+
+_Username = Annotated[
+    str,
+    Field(
+        description="Username for the container registry.",
         min_length=1,
         max_length=255,
         examples=["shinybrar"],
-    )
-    secret: str | None = Field(
-        default=None,
-        description="Secret for the container registry",
+    ),
+]
+_Secret = Annotated[
+    SecretStr,
+    Field(
+        description="Secret for the container registry, such as a Harbor CLI secret.",
         min_length=1,
         max_length=255,
-        examples=["sup3rs3cr3t"],
-    )
+    ),
+]
 
-    @model_validator(mode="after")
-    def _check_container_registry(self) -> Self:
-        """Check if the container registry is configured correctly.
 
-        Raises:
-            ValueError: If the secret is provided without a username.
-            ValueError: If the username is provided without a secret.
+class RegistryCredential(BaseModel):
+    """Saved credential for one Container Registry host."""
 
-        Returns:
-            Self: The validated model instance.
-        """
-        if self.username and not self.secret:
-            msg = "container registry secret is required."
-            raise ValueError(msg)
-        if self.secret and not self.username:
-            msg = "container registry username is required."
-            raise ValueError(msg)
-        return self
+    model_config = ConfigDict(frozen=True)
 
-    def encoded(self) -> str:
-        """Return the encoded username:secret.
+    username: _Username
+    secret: _Secret
+
+    def header(self) -> str:
+        """Return the ``X-Skaha-Registry-Auth`` value, base64 ``username:secret``.
 
         Returns:
             str: String encoded in base64 format.
         """
-        return b64encode(f"{self.username}:{self.secret}".encode()).decode()
+        pair = f"{self.username}:{self.secret.get_secret_value()}"
+        return b64encode(pair.encode()).decode()
+
+
+class ContainerRegistry(BaseModel):
+    """Runtime credential for one Container Registry host.
+
+    ``CANFAR_REGISTRY__USERNAME``, ``CANFAR_REGISTRY__SECRET``, and optional
+    ``CANFAR_REGISTRY__URL`` fill it, as does ``Configuration(registry=...)``.
+    It is never saved to the configuration file.
+    """
+
+    url: RegistryHost = Field(
+        default=DEFAULT_REGISTRY_HOST,
+        description="Container Registry host or https URL.",
+    )
+    username: _Username
+    secret: _Secret
+
+    @property
+    def credential(self) -> RegistryCredential:
+        """Return the credential this override supplies for ``url``."""
+        return RegistryCredential(username=self.username, secret=self.secret)

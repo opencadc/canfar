@@ -21,6 +21,7 @@ from pydantic import (
 )
 from typing_extensions import Self
 
+from canfar.models.registry import DEFAULT_REGISTRY_HOST
 from canfar.models.types import Kind, Status
 
 
@@ -31,6 +32,14 @@ class CreateRequest(BaseModel):
         ...,
         description="A unique name for the session.",
         examples=["canfar-test"],
+    )
+    private: bool = Field(
+        default=False,
+        description=(
+            "Send the Container Registry credential for the image's host. "
+            "The image must name that host."
+        ),
+        exclude=True,
     )
     image: str = Field(
         ...,
@@ -125,44 +134,60 @@ class CreateRequest(BaseModel):
 
     @field_validator("image")
     @classmethod
-    def _validate_image(cls, value: str) -> str:
-        """Validate and normalize container image reference.
+    def _validate_image(cls, value: str, context: ValidationInfo) -> str:
+        """Normalize ``image`` with the rule the ``private`` flag selects.
 
-        Only supports the CANFAR registry (images.canfar.net).
-        Adds default registry if not specified and :latest tag if no tag specified.
-
-        Args:
-            value (str): Container image reference.
-
-        Returns:
-            str: Normalized image reference.
-
-        Raises:
-            ValueError: If a custom registry is specified (not images.canfar.net).
+        ``private`` is declared before ``image`` so it is already validated.
 
         Examples:
             skaha/astroml -> images.canfar.net/skaha/astroml:latest
             skaha/astroml:v1.0 -> images.canfar.net/skaha/astroml:v1.0
             images.canfar.net/skaha/astroml -> images.canfar.net/skaha/astroml:latest
+            skaha/astroml with private=True -> error naming the full reference
         """
-        # Image Registry Format
-        # registry.domain/repository/image:tag
+        return _normalize_image(value, private=context.data.get("private", False))
 
-        msg: str = "invalid image container reference."
-        msg += "must follow the format [registry/]repository/image[:tag]"
+    @property
+    def registry_host(self) -> str:
+        """Container Registry ``host[:port]`` the normalized image names."""
+        return self.image.split("/", 1)[0].lower()
 
-        splits: list[str] = value.split("/")
-        if len(splits) < 2 or len(splits) > 3:
+
+def _names_host(segment: str) -> bool:
+    """Apply Docker's rule for whether an image's first segment is a host."""
+    return "." in segment or ":" in segment or segment == "localhost"
+
+
+def _with_tag(image: str) -> str:
+    """Append ``:latest`` when the last segment has no tag or digest."""
+    return image if ":" in image.rsplit("/", 1)[-1] else f"{image}:latest"
+
+
+def _normalize_image(value: str, *, private: bool) -> str:
+    """Return the image reference a Session request sends.
+
+    Public short names (``project/image``) gain ``images.canfar.net``. Private
+    images are never rewritten to a host, so they must name one.
+
+    Raises:
+        ValueError: If the reference has the wrong number of segments, or a
+            private reference does not start with a registry host.
+    """
+    msg = "invalid image container reference."
+    msg += "must follow the format [registry/]repository/image[:tag]"
+    splits = value.split("/")
+    if len(splits) < 2 or len(splits) > 3:
+        raise ValueError(msg)
+    if private:
+        if not _names_host(splits[0]):
+            msg = "private images must name their registry host as "
+            msg += "HOST/PROJECT/IMAGE[:TAG]."
+            if len(splits) == 2:
+                msg += f" Did you mean {_with_tag(f'{DEFAULT_REGISTRY_HOST}/{value}')}?"
             raise ValueError(msg)
-
-        if len(splits) == 2:
-            value = f"images.canfar.net/{value}"
-
-        # Add :latest tag if no tag specified (check only the last component)
-        if ":" not in value.split("/")[-1]:
-            value += ":latest"
-
-        return value
+    elif len(splits) == 2:
+        value = f"{DEFAULT_REGISTRY_HOST}/{value}"
+    return _with_tag(value)
 
 
 class FetchRequest(BaseModel):

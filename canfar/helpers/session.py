@@ -7,13 +7,16 @@ import re
 from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.exceptions.session import SessionRequestError
+from canfar.exceptions.session import RegistryCredentialsRequired, SessionRequestError
 from canfar.hooks.httpx.auth import AuthenticationError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from httpx2 import HTTPError, Response
+
+    from canfar.models.config import Configuration
+    from canfar.models.session import CreateRequest
 
 # Failure records stay on the logger callers configure for the Session clients.
 log = logging.getLogger("canfar.sessions")
@@ -84,6 +87,28 @@ def _ids(value: str | list[str]) -> list[str]:
 def _session_url(session_id: str) -> str:
     """Build the endpoint path for one Session identifier."""
     return f"session/{session_id}"
+
+
+def registry_headers(config: Configuration, request: CreateRequest) -> dict[str, str]:
+    """Return the headers each ``POST /session`` for ``request`` carries.
+
+    Args:
+        config: Configuration holding saved and runtime registry credentials.
+        request: Validated Session request.
+
+    Returns:
+        ``X-Skaha-Registry-Auth`` for a private request, otherwise nothing.
+
+    Raises:
+        RegistryCredentialsRequired: If a private request's image host has no
+            credential.
+    """
+    if not request.private:
+        return {}
+    credential = config.registry_credential(request.registry_host)
+    if credential is None:
+        raise RegistryCredentialsRequired(request.registry_host)
+    return {"X-Skaha-Registry-Auth": credential.header()}
 
 
 def _response_session_id(response: Response) -> str:

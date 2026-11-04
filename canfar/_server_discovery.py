@@ -543,7 +543,6 @@ def _fetch_capabilities(
         request_client = client.client
         request_client.headers["Accept"] = "application/xml"
         request_client.headers.pop("Content-Type", None)
-        request_client.headers.pop("X-Skaha-Registry-Auth", None)
         response = request_client.get("capabilities")
         response.raise_for_status()
         return response.text
@@ -635,8 +634,6 @@ def _fetch_resources(
             timeout=timeout,
             raise_http_errors=False,
         ) as context:
-            # Do not send Container Registry credentials to every discovered Server.
-            context.client.headers.pop("X-Skaha-Registry-Auth", None)
             resources = ServerResources.from_context(context.resources())
     except (
         HTTPError,

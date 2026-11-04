@@ -256,22 +256,22 @@ filters after `prefix` in `destroy_with()` are keyword-only:
 
 ## Private Container Registry
 
-Use the Configuration data model when an image is private:
+After `canfar registry login images.canfar.net`, launch a private image by
+naming its registry host and passing `private=True`:
 
 ```python
-from canfar.models.config import Configuration
-from canfar.models.registry import ContainerRegistry
 from canfar.sessions import Session
 
-config = Configuration(
-    registry=ContainerRegistry(username="username", secret="CLI_SECRET")
-)
-with Session(config=config) as session:
+with Session() as session:
     ids = session.create(
         name="private-session",
         image="images.canfar.net/project/private-image:latest",
         kind="headless",
         cmd="python",
         args="/app/run.py",
+        private=True,
     )
 ```
+
+See [Private Container Images](get-started.md#private-container-images) for
+runtime credentials and the errors a private launch can raise.

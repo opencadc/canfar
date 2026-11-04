@@ -16,6 +16,7 @@ from pydantic import (
     ConfigDict,
     Field,
     ValidationError,
+    field_validator,
     model_validator,
 )
 
@@ -40,7 +41,11 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.http import Server, VOSpaceService
-from canfar.models.registry import ContainerRegistry
+from canfar.models.registry import (  # noqa: TC001 - Pydantic resolves field annotations at runtime
+    ContainerRegistry,
+    RegistryCredential,
+    RegistryHost,
+)
 
 _CADC_URI = AnyUrl("ivo://cadc.nrc.ca/skaha")
 _CONFIG_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
@@ -120,8 +125,8 @@ class Configuration(BaseSettings):
         str_strip_whitespace=True,
     )
 
-    version: Literal[2] = Field(
-        default=2,
+    version: Literal[3] = Field(
+        default=3,
         description="Configuration schema version.",
     )
     # Pydantic deep-copies these mutable defaults for each instance.
@@ -143,9 +148,20 @@ class Configuration(BaseSettings):
             description="Known science platform servers keyed by Server Name.",
         ),
     ]
-    registry: ContainerRegistry = Field(
-        default_factory=ContainerRegistry,
-        description="Container Registry Settings.",
+    registries: Annotated[
+        dict[RegistryHost, RegistryCredential],
+        Field(
+            default_factory=dict,
+            description="Saved Container Registry credentials keyed by host.",
+        ),
+    ]
+    registry: ContainerRegistry | None = Field(
+        default=None,
+        description=(
+            "Runtime Container Registry credential from CANFAR_REGISTRY__* or "
+            "init. It overrides the saved credential for its host and is "
+            "never saved."
+        ),
     )
     console: ConsoleConfig = Field(
         default_factory=ConsoleConfig,
@@ -193,6 +209,32 @@ class Configuration(BaseSettings):
         config = cls.model_construct()
         cls.__pydantic_validator__.validate_python(data, self_instance=config)
         return config
+
+    @field_validator("registry", mode="before")
+    @classmethod
+    def _ignore_registry_without_credential(cls, value: Any) -> Any:
+        """Read a registry setting with only a host, or nothing, as no credential."""
+        if isinstance(value, dict) and not (
+            value.get("username") or value.get("secret")
+        ):
+            return None
+        return value
+
+    def registry_credential(self, host: str) -> RegistryCredential | None:
+        """Return the credential to send to the Container Registry ``host``.
+
+        The runtime ``registry`` override wins for its own host; otherwise the
+        saved ``registries`` entry applies.
+
+        Args:
+            host: Container Registry ``host[:port]``.
+
+        Returns:
+            The credential for ``host``, or ``None`` when there is none.
+        """
+        if self.registry is not None and self.registry.url == host:
+            return self.registry.credential
+        return self.registries.get(host)
 
     @model_validator(mode="after")
     def _normalize_and_validate_servers(self) -> Configuration:

@@ -10,6 +10,42 @@ Root help and root shell completion list extension names from distribution
 metadata. Selecting a command loads its Typer application. The v1.5.2 release
 does not include extension discovery.
 
+<span id="private-container-images"></span>
+
+### Private Container Images
+
+Development builds launch images from private registry projects. Save a
+credential, such as a Harbor CLI secret, once per registry host, then launch
+with `--private` in the CLI or `private=True` in Python:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
+```
+
+- `canfar registry login`, `logout`, and `ls` manage credentials. The secret
+  comes from a hidden prompt or `--secret-stdin`, never an argument, and
+  `config show`, `config get`, and `registry ls` never print it.
+- The credential is sent only on the create requests of a private launch.
+  Earlier clients sent a configured credential on every request.
+- A private image must name its registry host. `skaha/astroml --private` is
+  rejected rather than expanded. Public short names still gain
+  `images.canfar.net` and `:latest`.
+- Python code that passed `Configuration(registry=ContainerRegistry(...))`
+  must now also pass `private=True` and a full image name.
+  `ContainerRegistry.secret` is a `SecretStr`.
+- `CANFAR_REGISTRY__USERNAME`, `CANFAR_REGISTRY__SECRET`, and
+  `CANFAR_REGISTRY__URL` remain runtime overrides. They are no longer written
+  to the configuration file when the client saves it.
+- The configuration file moves to schema version 3. The first time this
+  client loads a version 2 file, it moves a saved `registry` credential under
+  `registries`, keyed by host, and fills in omitted shipped defaults, such as
+  the `canfar` server. Older clients cannot read a version 3 file and ask you
+  to reset it.
+
+See [Private Container Images](../cli/cli-help.md#canfar-registry) and the
+[Python guide](get-started.md#private-container-images).
+
 <span id="unreleased-changes-since-v141"></span>
 
 ## Released changes since v1.4.1

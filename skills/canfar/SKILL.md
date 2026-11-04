@@ -79,6 +79,13 @@ Three states mark progress. Claim only the one you observed:
    names and Kinds on the chosen Server; pin a version tag when the work must
    be repeatable. The client adds `images.canfar.net/` and `:latest` to a short
    name such as `skaha/astroml`.
+   A **private image** launches with `--private` and its full
+   `HOST/PROJECT/IMAGE:TAG` name; the client never expands a private short
+   name. Check `canfar registry ls -o json` for a credential on that host.
+   On `registry.credentials_required`, hand the login to the user: they run
+   `canfar registry login HOST -u USERNAME` in their own terminal, because the
+   secret is theirs to type. Never put a registry secret in a command line.
+   See [Private Container Images](https://www.opencadc.org/canfar/edge/cli/cli-help/#canfar-registry).
 3. **Create.** Name the Session for the work; without `--name` the client
    generates one. Pass `--cpu` and `--memory` (GB) together only when the user
    gives sizes or a test run measured them; without them the Server applies
@@ -150,8 +157,8 @@ copied to storage that Session mounts, or built into the image.
 
 ## Output and cleanup
 
-- **Machine output** (`-o json` or `-o yaml`, placed on the owning command): `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `config show`, `config get`.
-- **Human text only**: `info`, `logs`, `events`, `open`, `renew`, `delete`, `prune`, `stats`, `image ls`, `version`.
+- **Machine output** (`-o json` or `-o yaml`, placed on the owning command): `auth`, `auth show`, `auth ls`, `server ls`, `create`, `ps`, `registry ls`, `config show`, `config get`.
+- **Human text only**: `info`, `logs`, `events`, `open`, `renew`, `delete`, `prune`, `stats`, `image ls`, `registry login`, `registry logout`, `version`.
 - **URL only**: `feedback`; it prints the reporting URL without a Server banner.
 
 With `-o`, stdout carries only the payload, and a failure exits nonzero with

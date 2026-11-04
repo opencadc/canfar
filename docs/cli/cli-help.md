@@ -18,6 +18,7 @@ Server, data, image, and configuration operations remain grouped:
 | Authentication and Server Selection | `login`, `auth`, `server` |
 | Sessions | `create`, `ps`, `events`, `info`, `open`, `logs`, `renew`, `delete`, `prune` |
 | Platform information | `stats`, `image ls` |
+| Container Registry credentials | `registry login`, `registry logout`, `registry ls` |
 | Client configuration | `config show`, `config get`, `config set`, `config path`, `version` |
 | Data | `data` and its embedded file commands |
 
@@ -134,6 +135,7 @@ name from `canfar image ls`. Accepted ranges for every option are in
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
 | `--replicas`, `-r` | Number of Sessions, 1 to 256; default `1`. |
+| `--private` | Send your saved registry credential for the image's host. See [Private Container Images](#canfar-registry). |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
@@ -157,6 +159,51 @@ GPUs accepts only `--gpu 0`, which requests none. A value outside a range is a
 usage error:
 exit code 2 with `Invalid value` on stderr, before any request is sent,
 `--dry-run` included.
+
+<span id="canfar-registry"></span>
+
+### Private Container Images
+
+A private image needs a Container Registry credential, such as a Harbor CLI
+secret. Save it once per registry host, then launch with `--private`:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
+```
+
+`registry login` prompts for a hidden secret. In a script, pipe it on stdin;
+no option takes the secret as an argument:
+
+```bash
+printf %s "$HARBOR_CLI_SECRET" | canfar registry login images.canfar.net -u USERNAME --secret-stdin
+```
+
+The host defaults to `images.canfar.net`. One saved credential serves every
+Science Platform Server. Login saves the credential without checking it with
+the registry, so a wrong secret shows up as an image-pull failure in
+`canfar events SESSION_ID`.
+
+| Command | Effect |
+| --- | --- |
+| `canfar registry login [HOST]` | Save or replace the credential for `HOST`. |
+| `canfar registry logout [HOST]` | Remove the saved credential; exits 0 when there is none. |
+| `canfar registry ls` | List host, username, and source (`saved` or `env`). Secrets are never shown. |
+
+`--private` sends the credential in the `X-Skaha-Registry-Auth` header of each
+replica's create request, and on no other request. A private image must name
+its registry host: the first segment contains `.` or `:`, or is `localhost`.
+The client does not add `images.canfar.net` to a private short name, so
+`canfar create notebook skaha/astroml --private` fails and suggests
+`images.canfar.net/skaha/astroml:latest`. Without a credential for the host,
+`create --private` fails with `registry.credentials_required` before any
+request, in every output mode and with `--dry-run`. It never prompts.
+
+For a one-off launch, such as in CI or a batch job, set
+`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` instead of saving a
+credential. Optional `CANFAR_REGISTRY__URL` names the host they apply to
+(default `images.canfar.net`). They override the saved credential for that
+host only and are never written to the configuration file.
 
 <span id="canfar-ps"></span>
 
@@ -272,7 +319,8 @@ subcommand help show a beta notice; operations and Python calls do not.
 
 The leaf option `-o/--output` accepts only `json` or `yaml`. It is available on
 the data-producing forms `auth` (the default active view), `auth show`,
-`auth ls`, `server ls`, `create`, `ps`, `config show`, and `config get`:
+`auth ls`, `server ls`, `create`, `ps`, `registry ls`, `config show`, and
+`config get`:
 
 ```bash
 canfar auth show -o json
@@ -303,6 +351,7 @@ with a stable `code`, a `message`, and a `hint`, and stdout stays empty:
 | `authentication.expired` | The saved credential has expired. | Run `canfar login IDP` with the IDP named in the hint. |
 | `authentication.credential_invalid` | A credential is saved but cannot be used, such as an unreadable certificate. | Check `canfar auth show`, then log in again. |
 | `transport.failure` | A request to the Science Platform or IDP failed. | Follow the hint, check connectivity, then retry. |
+| `registry.credentials_required` | `create --private` has no credential for the image's host. | Run `canfar registry login HOST`, or set `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET`. |
 
 Codes are stable; message and hint wording can change. Every command that
 contacts a Server reports a missing login this way, including the human-text

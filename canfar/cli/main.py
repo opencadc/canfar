@@ -269,6 +269,13 @@ _COMMANDS: dict[str, _LazyCommand] = {
         group=True,
         options={"no_args_is_help": True},
     ),
+    "registry": _LazyCommand(
+        "canfar.cli.registry:registry",
+        "Manage container registry credentials.",
+        "Image Management",
+        group=True,
+        options={"no_args_is_help": True},
+    ),
     "config": _LazyCommand(
         "canfar.cli.config:config",
         "Manage client config",

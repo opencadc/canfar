@@ -47,7 +47,7 @@ def _logging_contract_probe() -> None:
 
 def _write_null_active_server_config(path: Path) -> None:
     data = {
-        "version": 2,
+        "version": 3,
         "active": {"authentication": "cadc", "server": None},
         "authentication": {
             "cadc": {
@@ -256,7 +256,7 @@ def unreadable_config(
             "version: 1\nfuture_key: true\n",
             "future_key = True (Extra inputs are not permitted)",
         ),
-        ("version: 99\n", "version = 99 (expected 2)"),
+        ("version: 99\n", "version = 99 (expected 3)"),
         ("version: [1\n", "invalid YAML: while parsing a flow sequence"),
     ],
     ids=["unknown-field", "unsupported-version", "malformed-yaml"],
@@ -302,7 +302,7 @@ def test_main_hides_credential_values_in_config_errors(
         main()
 
     err = capsys.readouterr().err
-    assert "registry.secret = <hidden>" in err
+    assert "registries.images.canfar.net.secret = <hidden>" in err
     assert "hunter2" not in err
 
 

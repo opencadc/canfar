@@ -250,22 +250,62 @@ Configuration shape.
 
 ## Private Container Images
 
-Pass a `ContainerRegistry` in the Configuration when creating a Session from a
-private image:
+A private image needs a Container Registry credential, such as a Harbor CLI
+secret, and an explicit `private=True`. Save the credential once with the CLI;
+it is stored by registry host and reused for every Science Platform Server:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+```
+
+Then name the image's registry host and pass `private=True`:
 
 ```python
+from canfar.sessions import Session
+
+with Session() as session:
+    ids = session.create(
+        kind="notebook",
+        image="images.canfar.net/my-project/private-image:latest",
+        name="private-image-test",
+        private=True,
+    )
+```
+
+The client sends the credential in the `X-Skaha-Registry-Auth` header of each
+replica's `POST /session` request, and on no other request. Without
+`private=True`, no request carries it. A private image must start with its
+registry host: `my-project/private-image` is rejected rather than expanded to
+`images.canfar.net`. With no credential for the host, `create()` raises
+`canfar.exceptions.session.RegistryCredentialsRequired` before any request.
+When you pass a `CreateRequest`, set `private=True` on the request instead.
+
+To supply a credential without saving it, pass a `ContainerRegistry` or set
+`CANFAR_REGISTRY__USERNAME`, `CANFAR_REGISTRY__SECRET`, and optional
+`CANFAR_REGISTRY__URL` (default `images.canfar.net`). Either overrides the
+saved credential for its host only and is never written to the configuration
+file:
+
+```python
+import os
+
 from canfar.models.config import Configuration
 from canfar.models.registry import ContainerRegistry
 from canfar.sessions import Session
 
 config = Configuration(
-    registry=ContainerRegistry(username="username", secret="CLI_SECRET")
+    registry=ContainerRegistry(
+        url="images.canfar.net",
+        username="robot-ci",
+        secret=os.environ["HARBOR_CLI_SECRET"],
+    )
 )
 with Session(config=config) as session:
     ids = session.create(
-        kind="notebook",
-        image="images.canfar.net/my-project/private-image:latest",
-        name="private-image-test",
+        kind="headless",
+        image="images.canfar.net/my-project/private-image:1.2",
+        name="private-batch",
+        private=True,
     )
 ```
 

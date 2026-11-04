@@ -8,7 +8,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
-from pydantic import AnyHttpUrl, AnyUrl, ValidationError
+from pydantic import AnyHttpUrl, AnyUrl, SecretStr, ValidationError
 
 from canfar.models.active import ActiveConfig
 from canfar.models.auth import (
@@ -21,12 +21,12 @@ from canfar.models.auth import (
 )
 from canfar.models.config import Configuration, _CanfarEnvSettingsSource
 from canfar.models.http import Server, VOSpaceService
-from canfar.models.registry import ContainerRegistry
+from canfar.models.registry import ContainerRegistry, RegistryCredential
 
 
 def _sample_config(**overrides: Any) -> dict[str, Any]:
     payload: dict[str, Any] = {
-        "version": 2,
+        "version": 3,
         "active": {
             "authentication": "cadc",
             "server": "canfar",
@@ -112,14 +112,15 @@ class TestConfigurationDefaults:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
+        assert config.version == 3
         assert config.active.authentication == "cadc"
         assert config.active.server == "canfar"
         assert set(config.authentication) == {"cadc"}
         assert isinstance(config.authentication["cadc"], X509Credential)
         assert set(config.servers) == {"canfar"}
         assert config.servers["canfar"].name == "canfar"
-        assert isinstance(config.registry, ContainerRegistry)
+        assert config.registries == {}
+        assert config.registry is None
 
     def test_default_records_are_not_shared(self, tmp_path: Path) -> None:
         """Editing one default Configuration leaves the next one unchanged."""
@@ -453,6 +454,11 @@ class TestConfigurationSerialization:
                     auths=["x509"],
                 ),
             },
+            registries={
+                "Harbor.Example:5000": RegistryCredential(
+                    username="saved-user", secret=SecretStr("saved-secret")
+                )
+            },
             registry=registry,
         )
 
@@ -462,7 +468,11 @@ class TestConfigurationSerialization:
             loaded = Configuration()
 
         assert loaded.active.authentication == "srcnet"
-        assert loaded.registry.username == "test-user"
+        assert loaded.registry is None
+        saved = loaded.registries["harbor.example:5000"]
+        assert saved.username == "saved-user"
+        assert saved.secret.get_secret_value() == "saved-secret"
+        assert "test-secret" not in temp_config_path.read_text(encoding="utf-8")
         loaded_oidc = loaded.authentication["srcnet"]
         assert isinstance(loaded_oidc, OIDCCredential)
         assert loaded_oidc.client.secret is not None
@@ -515,10 +525,10 @@ class TestConfigurationSerialization:
         assert loaded.servers["canfar"].idp == "cadc"
         assert loaded == config
 
-    def test_version_2_configuration_without_storage_loads_unchanged(
+    def test_current_configuration_without_storage_loads_unchanged(
         self, tmp_path: Path
     ) -> None:
-        """A version 2 Server without storage is not rewritten on load."""
+        """A current Server without storage is not rewritten on load."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(yaml.safe_dump(_sample_config()), encoding="utf-8")
         original = config_path.read_bytes()
@@ -526,7 +536,7 @@ class TestConfigurationSerialization:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
+        assert config.version == 3
         assert config.servers["canfar"].storage == {}
         assert config_path.read_bytes() == original
 
@@ -632,12 +642,13 @@ class TestConfigurationSerialization:
             config.editor.save()
 
         yaml_data = yaml.safe_load(temp_config_path.read_text(encoding="utf-8"))
-        assert yaml_data["version"] == 2
+        assert yaml_data["version"] == 3
         assert yaml_data["active"]["authentication"] == "cadc"
         assert yaml_data["authentication"]["cadc"]["mode"] == "x509"
         assert yaml_data["authentication"]["cadc"]["idp"] == "cadc"
         assert yaml_data["servers"]["canfar"]["name"] == "canfar"
-        assert "registry" in yaml_data
+        assert yaml_data["registries"] == {}
+        assert "registry" not in yaml_data
 
 
 class TestConfigurationSettingsPrecedence:
@@ -695,10 +706,8 @@ class TestConfigurationSettingsPrecedence:
     def test_yaml_loads_when_no_env_or_init(self, tmp_path: Path) -> None:
         """YAML settings apply when no env or init overrides exist."""
         config_data = _sample_config(
-            registry={
-                "url": "https://yaml.registry.com",
-                "username": "yaml_user",
-                "secret": "yaml_secret",
+            registries={
+                "yaml.registry.com": {"username": "yaml_user", "secret": "yaml_secret"}
             },
         )
         temp_config_path = tmp_path / "config.yaml"
@@ -707,8 +716,10 @@ class TestConfigurationSettingsPrecedence:
         with patch("canfar.models.config.CONFIG_PATH", temp_config_path):
             config = Configuration()
 
-        assert config.registry.username == "yaml_user"
-        assert str(config.registry.url).rstrip("/") == "https://yaml.registry.com"
+        credential = config.registry_credential("yaml.registry.com")
+        assert credential is not None
+        assert credential.username == "yaml_user"
+        assert credential.secret.get_secret_value() == "yaml_secret"
 
 
 class TestConfigurationErrorHandling:

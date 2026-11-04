@@ -140,7 +140,7 @@ def _active_with_target(
             credential.idp: credential,
         },
         servers={"Active-CADC": active},
-        registry=registry or ContainerRegistry(),
+        registry=registry,
     )
 
 

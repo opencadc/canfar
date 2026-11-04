@@ -32,7 +32,7 @@ def _patch_config(path: Path):
 
 def _write_config(path: Path) -> None:
     data = {
-        "version": 2,
+        "version": 3,
         "active": {"authentication": "cadc", "server": "CADC-CANFAR"},
         "authentication": {
             "cadc": {
