@@ -7,7 +7,7 @@ import re
 from typing import TYPE_CHECKING, Any, Literal, TypeVar
 
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
-from canfar.exceptions.session import RegistryCredentialsRequired, SessionRequestError
+from canfar.exceptions.session import SessionRequestError
 from canfar.hooks.httpx.auth import AuthenticationError
 
 if TYPE_CHECKING:
@@ -97,17 +97,15 @@ def registry_headers(config: Configuration, request: CreateRequest) -> dict[str,
         request: Validated Session request.
 
     Returns:
-        ``X-Skaha-Registry-Auth`` for a private request, otherwise nothing.
-
-    Raises:
-        RegistryCredentialsRequired: If a private request's image host has no
-            credential.
+        ``X-Skaha-Registry-Auth`` when the launch is private and a credential
+        is saved for the image host. Public images need no credential, so a
+        private launch with none sends no header.
     """
     if not request.private:
         return {}
     credential = config.registry_credential(request.registry_host)
     if credential is None:
-        raise RegistryCredentialsRequired(request.registry_host)
+        return {}
     return {"X-Skaha-Registry-Auth": credential.header()}
 
 

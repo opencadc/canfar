@@ -97,8 +97,9 @@ provided by the registry operator.
 
 ## Launch a private image
 
-To start a Session from an image in a private project, save your registry
-credential once, then launch with the full image name and `--private`:
+Public images on the registry need no credential. To start a Session from an
+image in a private project, save your registry credential once, then launch
+with the full image name and `--private`:
 
 ```bash
 canfar registry login images.canfar.net -u USERNAME
@@ -140,8 +141,9 @@ with an image that the target Science Platform Server can pull.
 
 - A `not found` or pull error usually means the image reference is wrong, the
   tag was removed, or the target server cannot reach that registry.
-- A private image needs project membership and a saved registry credential;
-  launch it with `--private`. If the Session never starts, check
+- A private image in a private project can use a saved registry credential.
+  Launch it with `--private`. Public images on the same registry need no
+  credential. If the Session never starts, check
   `canfar registry ls` and `canfar events SESSION_ID`.
 - A successful push does not guarantee that every Science Platform deployment
   can pull the image.

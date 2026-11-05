@@ -274,4 +274,4 @@ with Session() as session:
 ```
 
 See [Private Container Images](get-started.md#private-container-images) for
-runtime credentials and the errors a private launch can raise.
+runtime credentials. A missing credential does not stop the launch.

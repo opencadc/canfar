@@ -250,9 +250,9 @@ Configuration shape.
 
 ## Private Container Images
 
-A private image needs a Container Registry credential, such as a Harbor CLI
-secret, and an explicit `private=True`. Save the credential once with the CLI;
-it is stored by registry host and reused for every Science Platform Server:
+A public image needs no registry credential. For an image in a private project,
+save a credential such as a Harbor CLI secret once per registry host, then pass
+`private=True`. The saved credential is reused for every Science Platform Server:
 
 ```bash
 canfar registry login images.canfar.net -u USERNAME
@@ -274,10 +274,10 @@ with Session() as session:
 
 The client sends the credential in the `X-Skaha-Registry-Auth` header of each
 replica's `POST /session` request, and on no other request. Without
-`private=True`, no request carries it. A private image must start with its
+`private=True`, no request carries it. A missing credential is not an error.
+The launch still runs, and the header is omitted. A private image must start with its
 registry host: `my-project/private-image` is rejected rather than expanded to
-`images.canfar.net`. With no credential for the host, `create()` raises
-`canfar.exceptions.session.RegistryCredentialsRequired` before any request.
+`images.canfar.net`.
 When you pass a `CreateRequest`, set `private=True` on the request instead.
 
 To supply a credential without saving it, pass a `ContainerRegistry` or set

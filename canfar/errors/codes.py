@@ -18,7 +18,6 @@ class ErrorCode(str, Enum):
     SERVER_DISCOVERY_FAILED = "server.discovery_failed"
     SERVER_NONE_AVAILABLE = "server.none_available"
     CONFIG_INVALID = "config.invalid"
-    REGISTRY_CREDENTIALS_REQUIRED = "registry.credentials_required"
     LOGGING_INVALID_ENV_VALUE = "logging.invalid_env_value"
     LOGGING_INVALID_FILE_PATH = "logging.invalid_file_path"
     LOGGING_FILE_SINK_UNAVAILABLE = "logging.file_sink_unavailable"

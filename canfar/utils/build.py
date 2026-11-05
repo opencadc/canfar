@@ -58,7 +58,8 @@ def create_request(  # noqa: PLR0917
         args: Container arguments (headless sessions only).
         env: Additional environment variables.
         replicas: Number of session replicas to create.
-        private: Set ``CreateRequest.private``. ``Session.create`` sends the credential.
+        private: Set ``CreateRequest.private``. A saved credential is sent
+            when one exists.
 
     Returns:
         CreateRequest: ``name`` itself, or a request built from the scalars.

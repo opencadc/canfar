@@ -26,7 +26,9 @@ canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
 - `canfar registry login`, `logout`, and `ls` manage credentials. The secret
   comes from a hidden prompt or `--secret-stdin`, never an argument, and
   `config show`, `config get`, and `registry ls` never print it.
-- The credential is sent only on the create requests of a private launch.
+- The credential is optional. It is sent only on the create requests of a
+  private launch that has a credential for the image host. A public image, and
+  a private launch with no saved credential, send no registry header.
   Earlier clients sent a configured credential on every request.
 - A private image must name its registry host. `skaha/astroml --private` is
   rejected rather than expanded. Public short names still gain

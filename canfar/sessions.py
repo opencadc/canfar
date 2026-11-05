@@ -234,8 +234,9 @@ class Session(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
-            private: Send the Container Registry credential for the image's host
-                with each request. The image must name that host. Set
+            private: Send a saved Container Registry credential for the image's host
+                with each request, when one exists. Public images need none.
+                The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
@@ -255,8 +256,6 @@ class Session(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
-            RegistryCredentialsRequired: If a private request has no credential
-                for its image host. No request is sent.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
             TypeError: If ``private=True`` is passed with a ``CreateRequest``.
@@ -740,8 +739,9 @@ class AsyncSession(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
-            private: Send the Container Registry credential for the image's host
-                with each request. The image must name that host. Set
+            private: Send a saved Container Registry credential for the image's host
+                with each request, when one exists. Public images need none.
+                The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
@@ -761,8 +761,6 @@ class AsyncSession(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
-            RegistryCredentialsRequired: If a private request has no credential
-                for its image host. No request is sent.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
             TypeError: If ``private=True`` is passed with a ``CreateRequest``.

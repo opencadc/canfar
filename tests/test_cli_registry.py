@@ -181,20 +181,22 @@ def test_create_sends_registry_auth_only_with_private(private: bool) -> None:
     [[], ["-o", "json"], ["-o", "yaml"], ["--dry-run"]],
     ids=["human", "json", "yaml", "dry-run"],
 )
-def test_private_create_without_credential_fails_before_any_post(
+def test_private_create_without_credential_still_launches(
     config_path: Path, mode: list[str]
 ) -> None:
-    """A missing credential is ``registry.credentials_required`` in every mode."""
+    """A missing credential does not block a private launch or a dry run."""
     seen: list[httpx2.Request] = []
     with _sessions(seen):
         result = runner.invoke(cli, ["create", "headless", _IMAGE, "--private", *mode])
 
-    assert result.exit_code == 1
-    assert seen == []
-    assert "canfar registry login images.canfar.net" in result.stderr
-    if "-o" in mode:
-        assert "registry.credentials_required" in result.stderr
+    assert result.exit_code == 0, result.output
     assert not config_path.exists()
+    if mode == ["--dry-run"]:
+        assert seen == []
+        return
+    posts = [request for request in seen if request.method == "POST"]
+    assert posts
+    assert all(request.headers.get(_HEADER) is None for request in posts)
 
 
 @pytest.mark.usefixtures("config_path")
