@@ -62,7 +62,10 @@ def test_login_saves_by_host_and_never_echoes_the_secret(
     )
 
     assert result.exit_code == 0, result.output
-    assert "images.canfar.net" in result.stdout
+    _before, marker, after = result.stdout.partition("Saved credential for ")
+    shown_host, _as_label, _rest = after.partition(" as ")
+    assert marker
+    assert shown_host == "images.canfar.net"
     assert _SECRET not in result.output
     assert not log_file.exists() or _SECRET not in log_file.read_text("utf-8")
     saved = yaml.safe_load(config_path.read_text(encoding="utf-8"))
