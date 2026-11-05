@@ -21,7 +21,7 @@ from canfar.models.auth import (
 )
 from canfar.models.config import Configuration, _CanfarEnvSettingsSource
 from canfar.models.http import Server, VOSpaceService
-from canfar.models.registry import ContainerRegistry, RegistryCredential
+from canfar.models.registry import RegistryCredential
 
 
 def _sample_config(**overrides: Any) -> dict[str, Any]:
@@ -120,7 +120,6 @@ class TestConfigurationDefaults:
         assert set(config.servers) == {"canfar"}
         assert config.servers["canfar"].name == "canfar"
         assert config.registries == {}
-        assert config.registry is None
 
     def test_default_records_are_not_shared(self, tmp_path: Path) -> None:
         """Editing one default Configuration leaves the next one unchanged."""
@@ -427,11 +426,6 @@ class TestConfigurationSerialization:
             path=Path("/custom/path/cert.pem"),
             expiry=9876543210.0,
         )
-        registry = ContainerRegistry(
-            url=AnyHttpUrl("https://registry.example.com"),
-            username="test-user",
-            secret="test-secret",
-        )
         original = Configuration(
             active=ActiveConfig(
                 authentication="srcnet",
@@ -459,7 +453,6 @@ class TestConfigurationSerialization:
                     username="saved-user", secret=SecretStr("saved-secret")
                 )
             },
-            registry=registry,
         )
 
         temp_config_path = tmp_path / "config.yaml"
@@ -468,11 +461,9 @@ class TestConfigurationSerialization:
             loaded = Configuration()
 
         assert loaded.active.authentication == "srcnet"
-        assert loaded.registry is None
         saved = loaded.registries["harbor.example:5000"]
         assert saved.username == "saved-user"
         assert saved.secret.get_secret_value() == "saved-secret"
-        assert "test-secret" not in temp_config_path.read_text(encoding="utf-8")
         loaded_oidc = loaded.authentication["srcnet"]
         assert isinstance(loaded_oidc, OIDCCredential)
         assert loaded_oidc.client.secret is not None

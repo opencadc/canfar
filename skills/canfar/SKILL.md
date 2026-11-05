@@ -82,9 +82,11 @@ Three states mark progress. Claim only the one you observed:
    A **private image** launches with `--private` and its full
    `HOST/PROJECT/IMAGE:TAG` name; the client never expands a private short
    name. A registry credential is optional. Public images on the same host
-   need none. When the user has a credential for that host, `canfar registry ls
-   -o json` shows it and `--private` sends it. If a private pull fails, hand
-   login to the user: they run `canfar registry login HOST -u USERNAME` in
+   need none. A saved credential for that host is sent. When the host has none,
+   `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent instead,
+   and `canfar registry ls -o json` shows that row with `"source": "env"`.
+   Those variables are never written to the config file. If a private pull fails,
+   hand login to the user: they run `canfar registry login HOST -u USERNAME` in
    their own terminal, because the secret is theirs to type. Never put a
    registry secret in a command line.
    See [Private Container Images](https://www.opencadc.org/canfar/edge/cli/cli-help/#canfar-registry).

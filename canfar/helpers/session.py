@@ -93,7 +93,7 @@ def registry_headers(config: Configuration, request: CreateRequest) -> dict[str,
     """Return the headers each ``POST /session`` for ``request`` carries.
 
     Args:
-        config: Configuration holding saved and runtime registry credentials.
+        config: Configuration holding saved registry credentials.
         request: Validated Session request.
 
     Returns:

@@ -228,7 +228,7 @@ network failure returns `[]`; request validation errors still raise.
 ## Edit and save Configuration
 
 `Configuration` is the persisted data shape. Its top-level fields are
-`version`, `active`, `authentication`, `servers`, `registry`, and `console`.
+`version`, `active`, `authentication`, `servers`, `registries`, and `console`.
 Authentication Records are keyed by Identity Provider, Science Platform Servers
 by Server Name, and `active` stores the selected references. Use the bound
 `config.editor` to read, validate, and save changes:
@@ -280,34 +280,11 @@ registry host: `my-project/private-image` is rejected rather than expanded to
 `images.canfar.net`.
 When you pass a `CreateRequest`, set `private=True` on the request instead.
 
-To supply a credential without saving it, pass a `ContainerRegistry` or set
-`CANFAR_REGISTRY__USERNAME`, `CANFAR_REGISTRY__SECRET`, and optional
-`CANFAR_REGISTRY__URL` (default `images.canfar.net`). Either overrides the
-saved credential for its host only and is never written to the configuration
-file:
-
-```python
-import os
-
-from canfar.models.config import Configuration
-from canfar.models.registry import ContainerRegistry
-from canfar.sessions import Session
-
-config = Configuration(
-    registry=ContainerRegistry(
-        url="images.canfar.net",
-        username="robot-ci",
-        secret=os.environ["HARBOR_CLI_SECRET"],
-    )
-)
-with Session(config=config) as session:
-    ids = session.create(
-        kind="headless",
-        image="images.canfar.net/my-project/private-image:1.2",
-        name="private-batch",
-        private=True,
-    )
-```
+A saved credential for the image host is sent when one exists. When that host
+has none, `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent
+instead. Optional `CANFAR_REGISTRY__URL` names their host (default
+`images.canfar.net`). Those variables are never written to the configuration
+file. `canfar registry login` is what saves a credential.
 
 ## Read next
 

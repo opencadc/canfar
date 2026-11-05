@@ -46,7 +46,6 @@ class TestConfigDefaults:
         assert srv.auths == ["x509"]
         assert srv.resources is None
         assert config.registries == {}
-        assert config.registry is None
         assert config.console.width == 120
 
     def test_authentication_credentials_have_no_embedded_server(
@@ -863,12 +862,12 @@ _V2_ACTIVE = "version: 2\nactive:\n  authentication: cadc\n  server: canfar\n"
 
 
 class TestContainerRegistryCredentials:
-    """Saved and runtime Container Registry credentials."""
+    """Saved credentials win. Environment credentials fill a host that has none."""
 
-    def test_version_2_registry_moves_under_its_host(
+    def test_version_2_drops_the_registry_block(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A legacy ``registry`` block is saved by host, never with env values."""
+        """Upgrade deletes ``registry`` and does not write the environment secret."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
             _V2_ACTIVE + "registry:\n  url: https://Harbor.Example/\n"
@@ -882,18 +881,16 @@ class TestContainerRegistryCredentials:
             config = Configuration()
 
         saved = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        written = config_path.read_text(encoding="utf-8")
         assert saved["version"] == 3
         assert "registry" not in saved
-        assert saved["registries"] == {
-            "harbor.example": {"username": "ada", "secret": "file-s3cret"}
-        }
-        assert "env-s3cret" not in config_path.read_text(encoding="utf-8")
-        legacy = config.registry_credential("harbor.example")
-        assert legacy is not None
-        assert legacy.username == "ada"
-        override = config.registry_credential("images.canfar.net")
-        assert override is not None
-        assert override.username == "robot-ci"
+        assert saved["registries"] == {}
+        assert "file-s3cret" not in written
+        assert "env-s3cret" not in written
+        assert config.registry_credential("harbor.example") is None
+        fallback = config.registry_credential("images.canfar.net")
+        assert fallback is not None
+        assert fallback.username == "robot-ci"
 
     @pytest.mark.parametrize(
         "block",
@@ -903,7 +900,7 @@ class TestContainerRegistryCredentials:
     def test_version_2_registry_without_credential_is_dropped(
         self, tmp_path: Path, block: str
     ) -> None:
-        """An empty or URL-only legacy block loads as no credential."""
+        """An empty or URL-only legacy block is removed."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(_V2_ACTIVE + block, encoding="utf-8")
 
@@ -911,34 +908,22 @@ class TestContainerRegistryCredentials:
             config = Configuration()
 
         assert config.registries == {}
-        assert config.registry is None
         assert "registry:" not in config_path.read_text(encoding="utf-8")
 
-    def test_registry_url_environment_alone_is_no_credential(
+    def test_partial_environment_credential_is_ignored(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """``CANFAR_REGISTRY__URL`` without a username does not fail the load."""
-        monkeypatch.setenv("CANFAR_REGISTRY__URL", "https://images.canfar.net")
+        """A username without a secret does not fail loading or supply a credential."""
+        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
         with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
             config = Configuration()
 
-        assert config.registry is None
+        assert config.registry_credential("images.canfar.net") is None
 
-    def test_registry_username_without_secret_fails(
+    def test_saved_credential_wins_and_env_fills_a_missing_host(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A partial runtime credential is still a validation error."""
-        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
-        with (
-            patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"),
-            pytest.raises(ValidationError, match=r"registry\.secret"),
-        ):
-            Configuration()
-
-    def test_environment_override_wins_only_for_its_host(
-        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
-        """The env credential replaces the saved one for its host only."""
+        """Environment credentials apply only to a host with nothing saved."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
             "version: 3\nregistries:\n"
@@ -946,17 +931,34 @@ class TestContainerRegistryCredentials:
             "  harbor.example: {username: bob, secret: saved-b}\n",
             encoding="utf-8",
         )
+        monkeypatch.setenv("CANFAR_REGISTRY__URL", "ghcr.io")
         monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
         monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
 
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
+            config.editor.save()
 
         canfar_credential = config.registry_credential("images.canfar.net")
         other_credential = config.registry_credential("harbor.example")
+        env_credential = config.registry_credential("ghcr.io")
         assert canfar_credential is not None
-        assert canfar_credential.username == "robot-ci"
+        assert canfar_credential.username == "ada"
         assert other_credential is not None
         assert other_credential.username == "bob"
-        assert config.registry_credential("ghcr.io") is None
-        assert config.registries["images.canfar.net"].username == "ada"
+        assert env_credential is not None
+        assert env_credential.username == "robot-ci"
+        assert "env-s3cret" not in config_path.read_text(encoding="utf-8")
+        assert "robot-ci" not in config_path.read_text(encoding="utf-8")
+
+    def test_invalid_environment_url_is_not_a_credential(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A URL with a path does not fail lookup and does not supply a credential."""
+        monkeypatch.setenv("CANFAR_REGISTRY__URL", "https://images.canfar.net/v2")
+        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
+        monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            config = Configuration()
+
+        assert config.registry_credential("images.canfar.net") is None

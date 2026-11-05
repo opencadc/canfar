@@ -26,24 +26,21 @@ canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
 - `canfar registry login`, `logout`, and `ls` manage credentials. The secret
   comes from a hidden prompt or `--secret-stdin`, never an argument, and
   `config show`, `config get`, and `registry ls` never print it.
-- The credential is optional. It is sent only on the create requests of a
-  private launch that has a credential for the image host. A public image, and
-  a private launch with no saved credential, send no registry header.
+- The credential is optional. A private launch sends the saved credential for
+  the image host. When that host has none, it sends `CANFAR_REGISTRY__USERNAME`
+  and `CANFAR_REGISTRY__SECRET` instead. A public image sends no registry header.
   Earlier clients sent a configured credential on every request.
 - A private image must name its registry host. `skaha/astroml --private` is
   rejected rather than expanded. Public short names still gain
   `images.canfar.net` and `:latest`.
-- Python code that passed `Configuration(registry=ContainerRegistry(...))`
-  must now also pass `private=True` and a full image name.
-  `ContainerRegistry.secret` is a `SecretStr`.
-- `CANFAR_REGISTRY__USERNAME`, `CANFAR_REGISTRY__SECRET`, and
-  `CANFAR_REGISTRY__URL` remain runtime overrides. They are no longer written
-  to the configuration file when the client saves it.
+- `CANFAR_REGISTRY__URL` names the host for those variables (default
+  `images.canfar.net`). They are never written to the configuration file.
+  `canfar registry login` is what saves a credential.
 - The configuration file moves to schema version 3. The first time this
-  client loads a version 2 file, it moves a saved `registry` credential under
-  `registries`, keyed by host, and fills in omitted shipped defaults, such as
-  the `canfar` server. Older clients cannot read a version 3 file and ask you
-  to reset it.
+  client loads a version 2 file, it removes the old `registry` block and fills
+  in omitted shipped defaults, such as the `canfar` server. Save the credential
+  again with `canfar registry login`. Older clients cannot read a version 3
+  file and ask you to reset it.
 
 See [Private Container Images](../cli/cli-help.md#canfar-registry) and the
 [Python guide](get-started.md#private-container-images).

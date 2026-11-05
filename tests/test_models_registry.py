@@ -6,10 +6,10 @@ import pytest
 from pydantic import AnyHttpUrl, ValidationError
 
 from canfar.models.registry import (
-    ContainerRegistry,
     IVOARegistry,
     RegistryCredential,
     Server,
+    parse_host,
 )
 from canfar.utils import discover
 
@@ -109,15 +109,8 @@ class TestServer:
             Server(**server_data)
 
 
-class TestContainerRegistry:
-    """Runtime and saved Container Registry credentials."""
-
-    def test_defaults_to_canfar_host(self) -> None:
-        """A runtime credential without a URL applies to images.canfar.net."""
-        registry = ContainerRegistry(username="testuser", secret="testsecret")
-        assert registry.url == "images.canfar.net"
-        assert registry.secret.get_secret_value() == "testsecret"
-        assert "testsecret" not in repr(registry)
+class TestParseHost:
+    """``parse_host`` reduces a bare host or http(s) URL to ``host[:port]``."""
 
     @pytest.mark.parametrize(
         ("url", "host"),
@@ -130,8 +123,7 @@ class TestContainerRegistry:
     )
     def test_url_is_reduced_to_host(self, url, host) -> None:
         """Bare hosts and http(s) URLs normalize to the same registry host."""
-        registry = ContainerRegistry(url=url, username="user", secret="secret")
-        assert registry.url == host
+        assert parse_host(url) == host
 
     @pytest.mark.parametrize(
         "url",
@@ -139,31 +131,20 @@ class TestContainerRegistry:
     )
     def test_url_rejects_non_hosts(self, url) -> None:
         """Other schemes, paths, and empty hosts are not registry hosts."""
-        with pytest.raises(ValidationError, match="container registry host"):
-            ContainerRegistry(url=url, username="user", secret="secret")
+        with pytest.raises(ValueError, match="container registry host"):
+            parse_host(url)
 
-    @pytest.mark.parametrize(
-        "kwargs",
-        [{"username": "user"}, {"secret": "secret"}],
-        ids=["no-secret", "no-username"],
-    )
-    def test_credential_needs_username_and_secret(self, kwargs) -> None:
-        """A username without a secret, or the reverse, is invalid."""
-        with pytest.raises(ValidationError):
-            ContainerRegistry(**kwargs)
 
+class TestRegistryCredential:
+    """Saved username and secret."""
     @pytest.mark.parametrize(
         ("username", "secret"),
         [("testuser", "testsecret"), ("user@domain.com", "p@ssw0rd!")],
     )
     def test_header_is_base64_username_secret(self, username, secret) -> None:
         """The header value is base64 of ``username:secret``."""
-        registry = ContainerRegistry(username=username, secret=secret)
         expected = base64.b64encode(f"{username}:{secret}".encode()).decode()
-        assert registry.credential.header() == expected
-        assert RegistryCredential(username=username, secret=secret).header() == (
-            expected
-        )
+        assert RegistryCredential(username=username, secret=secret).header() == expected
 
     @pytest.mark.parametrize(
         ("field", "value", "is_valid"),

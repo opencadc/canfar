@@ -201,10 +201,10 @@ The client does not add `images.canfar.net` to a private short name, so
 `images.canfar.net/skaha/astroml:latest`. Create never prompts for a secret.
 
 For a one-off launch, such as in CI or a batch job, set
-`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` instead of saving a
-credential. Optional `CANFAR_REGISTRY__URL` names the host they apply to
-(default `images.canfar.net`). They override the saved credential for that
-host only and are never written to the configuration file.
+`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET`. They are used when
+the image host has no saved credential. Optional `CANFAR_REGISTRY__URL` names
+the host they apply to (default `images.canfar.net`). They are never written
+to the configuration file.
 
 <span id="canfar-ps"></span>
 

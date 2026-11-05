@@ -6,6 +6,7 @@ server information.
 
 from __future__ import annotations
 
+import os
 from base64 import b64encode
 from typing import Annotated, Any, Literal
 from urllib.parse import urlsplit
@@ -149,22 +150,23 @@ class RegistryCredential(BaseModel):
         return b64encode(pair.encode()).decode()
 
 
-class ContainerRegistry(BaseModel):
-    """Runtime credential for one Container Registry host.
+def env_credential() -> tuple[str, RegistryCredential] | None:
+    """Return ``CANFAR_REGISTRY__*`` when both the username and secret are set.
 
-    ``CANFAR_REGISTRY__USERNAME``, ``CANFAR_REGISTRY__SECRET``, and optional
-    ``CANFAR_REGISTRY__URL`` fill it, as does ``Configuration(registry=...)``.
-    It is never saved to the configuration file.
+    ``CANFAR_REGISTRY__URL`` selects the host. It defaults to
+    ``images.canfar.net``. This is not read from, or written to, the
+    configuration file.
+
+    Returns:
+        The host and credential, or ``None`` when a value is missing or invalid.
     """
-
-    url: RegistryHost = Field(
-        default=DEFAULT_REGISTRY_HOST,
-        description="Container Registry host or https URL.",
-    )
-    username: _Username
-    secret: _Secret
-
-    @property
-    def credential(self) -> RegistryCredential:
-        """Return the credential this override supplies for ``url``."""
-        return RegistryCredential(username=self.username, secret=self.secret)
+    username = os.environ.get("CANFAR_REGISTRY__USERNAME", "").strip()
+    secret = os.environ.get("CANFAR_REGISTRY__SECRET", "").strip()
+    if not username or not secret:
+        return None
+    raw_url = os.environ.get("CANFAR_REGISTRY__URL", "").strip()
+    try:
+        host = parse_host(raw_url) if raw_url else DEFAULT_REGISTRY_HOST
+        return host, RegistryCredential(username=username, secret=SecretStr(secret))
+    except ValueError:
+        return None

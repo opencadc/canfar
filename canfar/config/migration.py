@@ -6,7 +6,6 @@ import reprlib
 from typing import TYPE_CHECKING, Any
 
 from canfar.errors import ErrorCode
-from canfar.models.registry import DEFAULT_REGISTRY_HOST
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterable
@@ -14,7 +13,7 @@ if TYPE_CHECKING:
 
     from pydantic import ValidationError
 
-_SECRET_SECTIONS = ("authentication", "registries", "registry")
+_SECRET_SECTIONS = ("authentication", "registries")
 """Top-level sections whose values may hold credentials and are never printed."""
 
 
@@ -77,18 +76,8 @@ def _v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def _v2_to_v3(data: dict[str, Any]) -> dict[str, Any]:
-    registry = data.pop("registry", None)
-    if not isinstance(registry, dict):
-        if registry is not None:
-            data["registry"] = registry
-        return data
-    if registry.get("username") or registry.get("secret"):
-        host = registry.get("url") or DEFAULT_REGISTRY_HOST
-        registries = data.setdefault("registries", {})
-        registries[host] = {
-            "username": registry.get("username"),
-            "secret": registry.get("secret"),
-        }
+    """Drop the version 2 ``registry`` block. Login saves a credential."""
+    data.pop("registry", None)
     return data
 
 

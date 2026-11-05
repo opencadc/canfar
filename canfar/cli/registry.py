@@ -20,6 +20,7 @@ from canfar.models.config import Configuration
 from canfar.models.registry import (
     DEFAULT_REGISTRY_HOST,
     RegistryCredential,
+    env_credential,
     parse_host,
 )
 from canfar.utils.console import get_console
@@ -133,7 +134,8 @@ def logout_command(host: Host = DEFAULT_REGISTRY_HOST) -> None:
         )
     else:
         console.print(f"Not logged in to {escape(key)}.")
-    if config.registry is not None and config.registry.url == key:
+    found = env_credential()
+    if found is not None and found[0] == key:
         get_console(stderr=True).print(
             f"[yellow]CANFAR_REGISTRY__* still sets a credential for "
             f"{escape(key)}.[/yellow]"
@@ -149,14 +151,10 @@ def list_command(output_format: OutputOption = None) -> None:
         {"host": host, "username": credential.username, "source": "saved"}
         for host, credential in config.registries.items()
     ]
-    if config.registry is not None:
-        rows.append(
-            {
-                "host": config.registry.url,
-                "username": config.registry.username,
-                "source": "env",
-            }
-        )
+    found = env_credential()
+    if found is not None and found[0] not in config.registries:
+        host, credential = found
+        rows.append({"host": host, "username": credential.username, "source": "env"})
     if mode is not output.OutputMode.HUMAN:
         output.to_stdout(rows, mode)
         return

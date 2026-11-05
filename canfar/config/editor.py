@@ -107,7 +107,7 @@ def _save_config(config: Configuration) -> None:
     try:
         candidate = _validated_copy(config)
         data = candidate.model_dump(
-            mode="json", exclude_none=True, exclude={"registry"}
+            mode="json", exclude_none=True
         )
         _restore_secrets(candidate, data)
         serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)

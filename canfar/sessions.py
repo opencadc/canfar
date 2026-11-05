@@ -234,9 +234,9 @@ class Session(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
-            private: Send a saved Container Registry credential for the image's host
-                with each request, when one exists. Public images need none.
-                The image must name that host. Set
+            private: Send a saved Container Registry credential for the image's host,
+                or ``CANFAR_REGISTRY__*`` when that host has nothing saved.
+                Public images need none. The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
@@ -739,9 +739,9 @@ class AsyncSession(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
-            private: Send a saved Container Registry credential for the image's host
-                with each request, when one exists. Public images need none.
-                The image must name that host. Set
+            private: Send a saved Container Registry credential for the image's host,
+                or ``CANFAR_REGISTRY__*`` when that host has nothing saved.
+                Public images need none. The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.

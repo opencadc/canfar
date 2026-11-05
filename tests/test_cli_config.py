@@ -313,9 +313,8 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
         ["show", "-o", "json"],
         ["show"],
         ["get", "registries"],
-        ["get", "registry", "-o", "json"],
     ],
-    ids=["show-json", "show-human", "get-saved", "get-env"],
+    ids=["show-json", "show-human", "get-saved"],
 )
 def test_config_show_and_get_mask_registry_secrets(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, args: list[str]

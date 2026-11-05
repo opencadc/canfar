@@ -168,6 +168,10 @@ def test_editor_save_never_writes_registry_environment_secret(
     config_path = tmp_path / "config.yaml"
     monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
     monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-only-s3cret")
+    monkeypatch.setenv(
+        "CANFAR_REGISTRIES",
+        '{"ghcr.io": {"username": "x", "secret": "from-env-map"}}',
+    )
     with patch("canfar.models.config.CONFIG_PATH", config_path):
         config = Configuration()
         config.editor.set("console.width", 133)
@@ -175,6 +179,7 @@ def test_editor_save_never_writes_registry_environment_secret(
 
     written = config_path.read_text(encoding="utf-8")
     assert "env-only-s3cret" not in written
+    assert "from-env-map" not in written
     assert "robot-ci" not in written
     assert config_path.stat().st_mode & 0o777 == 0o600
 

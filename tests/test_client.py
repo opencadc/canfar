@@ -19,7 +19,6 @@ from canfar.exceptions.context import AuthExpiredError
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
-from canfar.models.registry import ContainerRegistry
 from tests.helpers.config import configuration_with_credential, oidc_config, x509_config
 from tests.test_auth_x509 import generate_cert
 
@@ -500,7 +499,6 @@ class TestHTTPClientCreationAndHeaders:
     ) -> None:
         """A native sync request carries common headers, never registry auth."""
         config = Configuration()
-        config.registry = ContainerRegistry(username="test", secret="test")
         requests: list[httpx2.Request] = []
 
         with (
