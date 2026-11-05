@@ -137,6 +137,7 @@ class TestParseHost:
 
 class TestRegistryCredential:
     """Saved username and secret."""
+
     @pytest.mark.parametrize(
         ("username", "secret"),
         [("testuser", "testsecret"), ("user@domain.com", "p@ssw0rd!")],

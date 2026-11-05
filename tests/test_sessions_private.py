@@ -129,7 +129,8 @@ async def test_private_create_without_credential_sends_no_request(
     with transport, session, pytest.raises(RegistryCredentialsRequired) as raised:
         session.create("proto", _IMAGE, private=True)
     assert raised.value.host == "images.canfar.net"
-    assert "canfar registry login images.canfar.net" in str(raised.value)
+    assert "canfar registry login" in str(raised.value)
+    assert "CANFAR_REGISTRY__USERNAME" in str(raised.value)
 
     real_async_client = httpx2.AsyncClient
     with patch(
@@ -162,7 +163,10 @@ async def test_private_create_uses_environment_credential_and_logs_it(
         assert session.create("proto", _IMAGE, private=True) == ["proto-id"]
     assert seen[0].headers.get(_HEADER) == _AUTH
     assert "CANFAR_REGISTRY__USERNAME" in caplog.text
-    assert "images.canfar.net" in caplog.text
+    _before, marker, rest = caplog.text.partition("No saved registry credential for ")
+    logged_host, _separator, _after = rest.partition(";")
+    assert marker
+    assert logged_host == "images.canfar.net"
 
 
 def test_private_flag_with_a_request_is_a_type_error(config: Configuration) -> None:

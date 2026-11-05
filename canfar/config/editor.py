@@ -106,9 +106,7 @@ def _save_config(config: Configuration) -> None:
     temporary: Path | None = None
     try:
         candidate = _validated_copy(config)
-        data = candidate.model_dump(
-            mode="json", exclude_none=True
-        )
+        data = candidate.model_dump(mode="json", exclude_none=True)
         _restore_secrets(candidate, data)
         serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)
         with tempfile.NamedTemporaryFile(

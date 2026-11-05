@@ -26,7 +26,6 @@ _CONFIG_KEYS = frozenset(
         "authentication",
         "servers",
         "registries",
-        "registry",
         "console",
     }
 )

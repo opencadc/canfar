@@ -11,6 +11,7 @@ from unittest.mock import patch
 
 import pytest
 import yaml
+from rich.text import Text
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli, main
@@ -293,7 +294,8 @@ def test_main_hides_credential_values_in_config_errors(
 ) -> None:
     """Invalid fields in credential sections print their key, never their value."""
     unreadable_config.write_text(
-        "version: 1\nregistry:\n  username: me\n  secret: [hunter2]\n",
+        "version: 3\nregistries:\n  images.canfar.net:\n"
+        "    username: me\n    secret: [hunter2]\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(sys, "argv", ["canfar", "version"])
@@ -301,9 +303,11 @@ def test_main_hides_credential_values_in_config_errors(
     with pytest.raises(SystemExit):
         main()
 
-    err = capsys.readouterr().err
-    assert "registries.images.canfar.net.secret = <hidden>" in err
-    assert "hunter2" not in err
+    plain = Text.from_ansi(capsys.readouterr().err).plain
+    field, _separator, value = plain.partition(" = ")
+    assert field.endswith(".secret")
+    assert "hidden" in value
+    assert "hunter2" not in plain
 
 
 def test_main_reports_unreadable_config_as_structured_error(

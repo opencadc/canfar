@@ -45,6 +45,10 @@ Agent shells may set `NO_COLOR=1`, `FORCE_COLOR=0`, and `TERM=dumb`, which fail 
 
 `skills/canfar/` is the one skill users install (`npx skills add opencadc/canfar`). A change to the CLI or Python surface updates `docs/` and the skill in the same change; `tests/test_skills.py` fails on commands, Python examples, API names, and links that drift. Put new platform knowledge in `docs/` and point the skill at it. See `docs/agents/skill.md`.
 
+### Private launch credential check
+
+`.cursor/skills/verify-private-registry-launch/SKILL.md` enumerates `Session.create` over saved credentials, `CANFAR_REGISTRY__USERNAME` / `CANFAR_REGISTRY__SECRET`, and a public launch. Run it when changing `registry_headers`, `registry_credential`, or `env_credential`. Before any commit, `pre-commit run --all-files` and `pytest tests -m "not slow"` must both exit 0.
+
 ### Issue tracker
 
 Issues, PRDs, and implementation decisions can be tracked in Jira on `herzberg.atlassian.net` (project `CADC`, label `CANFAR`) or GitHub Issues in `opencadc/canfar`. Follow the user's choice or the existing work item's tracker; ask which to use when neither resolves the destination. See `docs/agents/issue-tracker.md`.
