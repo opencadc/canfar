@@ -132,20 +132,12 @@ class CreateRequest(BaseModel):
             raise ValueError(msg)
         return value
 
-    @field_validator("image")
-    @classmethod
-    def _validate_image(cls, value: str, context: ValidationInfo) -> str:
-        """Normalize ``image`` with the rule the ``private`` flag selects.
-
-        ``private`` is declared before ``image`` so it is already validated.
-
-        Examples:
-            skaha/astroml -> images.canfar.net/skaha/astroml:latest
-            skaha/astroml:v1.0 -> images.canfar.net/skaha/astroml:v1.0
-            images.canfar.net/skaha/astroml -> images.canfar.net/skaha/astroml:latest
-            skaha/astroml with private=True -> error naming the full reference
-        """
-        return _normalize_image(value, private=context.data.get("private", False))
+    @model_validator(mode="after")
+    def _normalize_image_reference(self) -> Self:
+        normalized = _normalize_image(self.image, private=self.private)
+        if normalized != self.image:
+            self.image = normalized
+        return self
 
     @property
     def registry_host(self) -> str:
@@ -154,25 +146,15 @@ class CreateRequest(BaseModel):
 
 
 def _names_host(segment: str) -> bool:
-    """Apply Docker's rule for whether an image's first segment is a host."""
+    """A first segment is a host when it contains '.' or ':', or it is localhost."""
     return "." in segment or ":" in segment or segment == "localhost"
 
 
 def _with_tag(image: str) -> str:
-    """Append ``:latest`` when the last segment has no tag or digest."""
     return image if ":" in image.rsplit("/", 1)[-1] else f"{image}:latest"
 
 
 def _normalize_image(value: str, *, private: bool) -> str:
-    """Return the image reference a Session request sends.
-
-    Public short names (``project/image``) gain ``images.canfar.net``. Private
-    images are never rewritten to a host, so they must name one.
-
-    Raises:
-        ValueError: If the reference has the wrong number of segments, or a
-            private reference does not start with a registry host.
-    """
     msg = "invalid image container reference."
     msg += "must follow the format [registry/]repository/image[:tag]"
     splits = value.split("/")

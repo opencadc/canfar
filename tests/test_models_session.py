@@ -366,6 +366,10 @@ class TestFetchSpec:
         with pytest.raises(ValidationError, match="HOST/PROJECT/IMAGE"):
             private.image = "p/b"
 
+        public = CreateRequest(name="t", image="skaha/proj/img", kind="headless")
+        with pytest.raises(ValidationError, match="HOST/PROJECT/IMAGE"):
+            public.private = True
+
     @pytest.mark.parametrize(
         ("image", "normalized", "host"),
         [

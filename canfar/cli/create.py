@@ -126,7 +126,6 @@ async def _create_sessions(request: CreateRequest) -> list[str]:
 
 
 def _credentials_required(host: str) -> StructuredError:
-    """Describe a private launch with no Container Registry credential."""
     return StructuredError(
         code=ErrorCode.REGISTRY_CREDENTIALS_REQUIRED,
         message=f"No container registry credential for {host}.",
@@ -138,7 +137,6 @@ def _credentials_required(host: str) -> StructuredError:
 
 
 def _check_registry_credential(request: CreateRequest, mode: output.OutputMode) -> None:
-    """Fail before any request when a private launch has no credential."""
     try:
         registry_headers(Configuration(), request)  # ty: ignore[missing-argument]
     except ConfigResetRequiredError as err:

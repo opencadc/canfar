@@ -58,7 +58,7 @@ def create_request(  # noqa: PLR0917
         args: Container arguments (headless sessions only).
         env: Additional environment variables.
         replicas: Number of session replicas to create.
-        private: Send the Container Registry credential for the image's host.
+        private: Set ``CreateRequest.private``. ``Session.create`` sends the credential.
 
     Returns:
         CreateRequest: ``name`` itself, or a request built from the scalars.

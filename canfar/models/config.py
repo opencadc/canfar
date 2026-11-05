@@ -213,7 +213,6 @@ class Configuration(BaseSettings):
     @field_validator("registry", mode="before")
     @classmethod
     def _ignore_registry_without_credential(cls, value: Any) -> Any:
-        """Read a registry setting with only a host, or nothing, as no credential."""
         if isinstance(value, dict) and not (
             value.get("username") or value.get("secret")
         ):

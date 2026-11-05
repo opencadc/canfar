@@ -77,10 +77,6 @@ def _v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
 
 
 def _v2_to_v3(data: dict[str, Any]) -> dict[str, Any]:
-    """Move a saved ``registry`` credential into ``registries`` under its host.
-
-    A block with no username and no secret held no credential and is dropped.
-    """
     registry = data.pop("registry", None)
     if not isinstance(registry, dict):
         if registry is not None:
