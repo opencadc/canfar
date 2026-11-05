@@ -30,7 +30,6 @@ from canfar.models.http import (
     VOSpaceService,
 )
 from canfar.models.registry import (
-    ContainerRegistry,
     IVOARegistry,
     ServerProbe,
 )
@@ -1636,10 +1635,6 @@ class TestDiscoveryOutcomes:
             ),
         ):
             config = _anonymous_config()
-            config.editor.set(
-                "registry",
-                ContainerRegistry(username="user", secret="registry-secret"),
-            )
             with patch("canfar._server_discovery.log") as log:
                 servers = discover(
                     "cadc", config=config, save=False, on_probe=probes.append

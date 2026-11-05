@@ -24,7 +24,6 @@ from canfar.models.auth import (
 )
 from canfar.models.config import Configuration
 from canfar.models.http import Server, ServerResources, VOSpaceService
-from canfar.models.registry import ContainerRegistry
 from tests.test_auth_x509 import generate_cert
 
 if TYPE_CHECKING:
@@ -128,8 +127,6 @@ def _oidc_credential(
 
 def _active_with_target(
     credential: OIDCCredential | X509Credential,
-    *,
-    registry: ContainerRegistry | None = None,
 ) -> Configuration:
     """Build active CADC state with an unselected target Authentication Record."""
     active = _server(name="Active-CADC")
@@ -140,7 +137,6 @@ def _active_with_target(
             credential.idp: credential,
         },
         servers={"Active-CADC": active},
-        registry=registry or ContainerRegistry(),
     )
 
 
@@ -434,12 +430,7 @@ class TestPlatformEnrichment:
                     )
                 )
             else:
-                config = _active_with_target(
-                    _oidc_credential(),
-                    registry=ContainerRegistry(
-                        username="registry-user", secret="registry-secret"
-                    ),
-                )
+                config = _active_with_target(_oidc_credential())
             before = config.model_dump(mode="json")
             with patch(
                 "canfar.client.Client",

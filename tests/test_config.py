@@ -26,7 +26,7 @@ class TestConfigDefaults:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
+        assert config.version == 3
         assert config.active.authentication == "cadc"
         assert config.active.server == "canfar"
 
@@ -45,7 +45,7 @@ class TestConfigDefaults:
         assert srv.version == "v1"
         assert srv.auths == ["x509"]
         assert srv.resources is None
-        assert config.registry.model_dump(exclude_none=True) == {}
+        assert config.registries == {}
         assert config.console.width == 120
 
     def test_authentication_credentials_have_no_embedded_server(
@@ -419,7 +419,7 @@ class TestConfigManualReset:
 
         assert exc_info.value.code == "config.invalid"
         assert str(exc_info.value) == (
-            "CANFAR config error:\n  version = <missing> (expected 2)"
+            "CANFAR config error:\n  version = <missing> (expected 3)"
         )
         assert exc_info.value.hint == (
             "If you recently updated canfar, reset the configuration with "
@@ -436,14 +436,14 @@ class TestConfigManualReset:
 
         with (
             patch("canfar.models.config.CONFIG_PATH", config_path),
-            pytest.raises(ConfigResetRequiredError, match="expected 2"),
+            pytest.raises(ConfigResetRequiredError, match="expected 3"),
         ):
             Configuration()
 
     def test_current_config_loads_without_reset(self, tmp_path: Path) -> None:
         """Valid current config files load unchanged and create no backup."""
         current = {
-            "version": 2,
+            "version": 3,
             "active": {
                 "authentication": "cadc",
                 "server": "canfar",
@@ -481,7 +481,7 @@ class TestConfigManualReset:
     ) -> None:
         """Legacy CANFAR_ACTIVE env var does not override active selection."""
         current = {
-            "version": 2,
+            "version": 3,
             "active": {
                 "authentication": "cadc",
                 "server": "canfar",
@@ -550,7 +550,7 @@ class TestSchemaMigration:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
+        assert config.version == 3
         assert not config_path.exists()
         assert capsys.readouterr().err == ""
 
@@ -598,13 +598,13 @@ console:
             rewritten = config_path.read_bytes()
             again = Configuration()
 
-        assert captured.err == "Migrating canfar client config v1 → v2\n"
+        assert captured.err == "Migrating canfar client config v1 → v3\n"
         assert capsys.readouterr().err == ""
         assert config_path.read_bytes() == rewritten
-        assert again.version == 2
+        assert again.version == 3
         saved = yaml.safe_load(rewritten)
         canfar_server = saved["servers"]["canfar"]
-        assert saved["version"] == 2
+        assert saved["version"] == 3
         assert saved["authentication"]["cadc"]["path"] == "/home/ada/.ssl/cadcproxy.pem"
         assert saved["authentication"]["cadc"]["expiry"] == 1800000000.0
         assert saved["console"]["width"] == 100
@@ -638,18 +638,18 @@ console:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
-        assert yaml.safe_load(config_path.read_text(encoding="utf-8"))["version"] == 2
-        assert capsys.readouterr().err == "Migrating canfar client config v1 → v2\n"
+        assert config.version == 3
+        assert yaml.safe_load(config_path.read_text(encoding="utf-8"))["version"] == 3
+        assert capsys.readouterr().err == "Migrating canfar client config v1 → v3\n"
 
-    def test_version_2_string_loads_without_rewrite(
+    def test_current_version_string_loads_without_rewrite(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
-        """A quoted version 2 is current and is not rewritten."""
+        """A quoted current version is the same schema and is not rewritten."""
         config_path = tmp_path / "config.yaml"
         config_path.write_text(
             """
-version: "2"
+version: "3"
 active:
   authentication: cadc
   server: canfar
@@ -673,7 +673,7 @@ servers:
         with patch("canfar.models.config.CONFIG_PATH", config_path):
             config = Configuration()
 
-        assert config.version == 2
+        assert config.version == 3
         assert config.authentication["cadc"].path == Path("/saved/cert.pem")
         assert config_path.read_bytes() == original
         assert capsys.readouterr().err == ""
@@ -856,3 +856,112 @@ servers:
 
         assert config_path.read_text(encoding="utf-8") == original
         assert "Migrating" not in capsys.readouterr().err
+
+
+_V2_ACTIVE = "version: 2\nactive:\n  authentication: cadc\n  server: canfar\n"
+
+
+class TestContainerRegistryCredentials:
+    """Saved credentials win. Environment credentials fill a host that has none."""
+
+    def test_version_2_drops_the_registry_block(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Upgrade deletes ``registry`` and does not write the environment secret."""
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            _V2_ACTIVE + "registry:\n  url: https://Harbor.Example/\n"
+            "  username: ada\n  secret: file-s3cret\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
+        monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        saved = yaml.safe_load(config_path.read_text(encoding="utf-8"))
+        written = config_path.read_text(encoding="utf-8")
+        assert saved["version"] == 3
+        assert "registry" not in saved
+        assert saved["registries"] == {}
+        assert "file-s3cret" not in written
+        assert "env-s3cret" not in written
+        credential = config.registry_credential("harbor.example")
+        assert credential is not None
+        assert credential.username == "robot-ci"
+        fallback = config.registry_credential("images.canfar.net")
+        assert fallback is not None
+        assert fallback.username == "robot-ci"
+
+    @pytest.mark.parametrize(
+        "block",
+        ["registry: {}\n", "registry:\n  url: https://images.canfar.net\n"],
+        ids=["empty", "url-only"],
+    )
+    def test_version_2_registry_without_credential_is_dropped(
+        self, tmp_path: Path, block: str
+    ) -> None:
+        """An empty or URL-only legacy block is removed."""
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(_V2_ACTIVE + block, encoding="utf-8")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+
+        assert config.registries == {}
+        assert "registry:" not in config_path.read_text(encoding="utf-8")
+
+    def test_partial_environment_credential_is_ignored(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """A username without a secret does not fail loading or supply a credential."""
+        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            config = Configuration()
+
+        assert config.registry_credential("images.canfar.net") is None
+
+    def test_saved_credential_wins_and_env_fills_a_missing_host(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Environment credentials apply only to a host with nothing saved."""
+        config_path = tmp_path / "config.yaml"
+        config_path.write_text(
+            "version: 3\nregistries:\n"
+            "  images.canfar.net: {username: ada, secret: saved-a}\n"
+            "  harbor.example: {username: bob, secret: saved-b}\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
+        monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            config = Configuration()
+            config.editor.save()
+
+        canfar_credential = config.registry_credential("images.canfar.net")
+        other_credential = config.registry_credential("harbor.example")
+        env_credential = config.registry_credential("ghcr.io")
+        assert canfar_credential is not None
+        assert canfar_credential.username == "ada"
+        assert other_credential is not None
+        assert other_credential.username == "bob"
+        assert env_credential is not None
+        assert env_credential.username == "robot-ci"
+        assert "env-s3cret" not in config_path.read_text(encoding="utf-8")
+        assert "robot-ci" not in config_path.read_text(encoding="utf-8")
+
+    def test_bad_environment_url_does_not_hide_username_and_secret(
+        self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """``CANFAR_REGISTRY__URL`` is not part of the credential lookup."""
+        monkeypatch.setenv("CANFAR_REGISTRY__URL", "https://images.canfar.net/v2")
+        monkeypatch.setenv("canfar_registry__username", "robot-ci")
+        monkeypatch.setenv("canfar_registry__secret", "env-s3cret")
+        with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
+            config = Configuration()
+
+        credential = config.registry_credential("images.canfar.net")
+        assert credential is not None
+        assert credential.username == "robot-ci"

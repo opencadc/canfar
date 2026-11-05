@@ -93,6 +93,25 @@ Do not put passwords or access tokens in a Dockerfile, an image layer, a
 notebook, or a Session command. Prefer a short-lived credential mechanism
 provided by the registry operator.
 
+<span id="launch-a-private-image"></span>
+
+## Launch a private image
+
+Public images on the registry need no credential. To start a Session from an
+image in a private project, save your registry credential once, then launch
+with the full image name and `--private`:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
+```
+
+If that host has no saved credential, the launch uses `CANFAR_REGISTRY__USERNAME`
+and `CANFAR_REGISTRY__SECRET`. If neither is set, create fails before any request.
+
+See [Private Container Images](../../cli/cli-help.md#canfar-registry) for
+scripted login, environment variables, and the Python interface.
+
 <span id="vulnerability-scanning"></span>
 <span id="scanning-process"></span>
 <span id="vulnerability-reports"></span>
@@ -125,7 +144,10 @@ with an image that the target Science Platform Server can pull.
 
 - A `not found` or pull error usually means the image reference is wrong, the
   tag was removed, or the target server cannot reach that registry.
-- A private image may require project membership or a server-specific login.
+- A private image in a private project can use a saved registry credential.
+  Launch it with `--private`. Public images on the same registry need no
+  credential. If the Session never starts, check
+  `canfar registry ls` and `canfar events SESSION_ID`.
 - A successful push does not guarantee that every Science Platform deployment
   can pull the image.
 - For a `Pending` Session, inspect `canfar info SESSION_ID` and

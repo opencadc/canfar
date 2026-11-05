@@ -1,6 +1,15 @@
 """Tests for the build utilities module."""
 
-from canfar.utils.build import create_parameters, fetch_parameters
+from typing import Any
+
+import pytest
+
+from canfar.models.session import CreateRequest
+from canfar.utils.build import create_parameters, create_request, fetch_parameters
+
+
+def _payloads(**kwargs: Any) -> list[list[tuple[str, Any]]]:
+    return create_parameters(create_request(**kwargs))
 
 
 class TestFetchParameters:
@@ -22,7 +31,7 @@ class TestCreateParameters:
 
     def test_create_parameters_basic(self) -> None:
         """Test create_parameters with basic required parameters."""
-        result = create_parameters(
+        result = _payloads(
             name="test-session", image="images.canfar.net/skaha/terminal:1.1.1"
         )
 
@@ -47,7 +56,7 @@ class TestCreateParameters:
 
     def test_create_parameters_multiple_replicas(self) -> None:
         """Test create_parameters with multiple replicas (covers line 65)."""
-        result = create_parameters(
+        result = _payloads(
             name="test-session",
             image="images.canfar.net/skaha/terminal:1.1.1",
             replicas=3,
@@ -69,7 +78,7 @@ class TestCreateParameters:
 
     def test_create_parameters_all_options(self) -> None:
         """Test create_parameters with all optional parameters for headless."""
-        result = create_parameters(
+        result = _payloads(
             name="full-session",
             image="custom/image:latest",
             cores=8,
@@ -106,7 +115,7 @@ class TestCreateParameters:
 
     def test_create_parameters_preserves_field_and_environment_order(self) -> None:
         """Keep the form tuple order stable for repeated environment fields."""
-        assert create_parameters(
+        assert _payloads(
             name="session",
             image="custom/image:latest",
             cores=2,
@@ -126,7 +135,7 @@ class TestCreateParameters:
 
     def test_create_parameters_overrides_reserved_replica_environment(self) -> None:
         """System replica metadata wins without duplicate form fields."""
-        [payload] = create_parameters(
+        [payload] = _payloads(
             name="session",
             image="custom/image:latest",
             env={"REPLICA_ID": "caller", "REPLICA_COUNT": "caller"},
@@ -136,3 +145,23 @@ class TestCreateParameters:
             "REPLICA_ID=1",
             "REPLICA_COUNT=1",
         ]
+
+
+class TestCreateRequest:
+    """Test the create_request function."""
+
+    def test_private_flag_never_reaches_the_payload(self) -> None:
+        """``private`` selects the image rule and stays out of the form body."""
+        request = create_request(
+            "session", "images.canfar.net/p/img", private=True, replicas=2
+        )
+        assert request.private is True
+        for payload in create_parameters(request):
+            assert "private" not in dict(payload)
+
+    def test_private_with_a_request_is_rejected(self) -> None:
+        """A request carries its own flag, so ``private=True`` alongside it fails."""
+        request = CreateRequest(name="s", image="skaha/img", kind="headless")
+        with pytest.raises(TypeError, match="set private on the CreateRequest"):
+            create_request(request, private=True)
+        assert create_request(request) is request
