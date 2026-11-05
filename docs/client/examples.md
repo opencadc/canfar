@@ -274,4 +274,6 @@ with Session() as session:
 ```
 
 See [Private Container Images](get-started.md#private-container-images) for
-runtime credentials. A missing credential does not stop the launch.
+runtime credentials. A private launch with neither a saved credential nor
+`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` fails before any
+request.

@@ -189,7 +189,7 @@ the registry, so a wrong secret shows up as an image-pull failure in
 | --- | --- |
 | `canfar registry login [HOST]` | Save or replace the credential for `HOST`. |
 | `canfar registry logout [HOST]` | Remove the saved credential; exits 0 when there is none. |
-| `canfar registry ls` | List host, username, and source (`saved` or `env`). Secrets are never shown. |
+| `canfar registry ls` | List host, username, and source (`saved` or `env`). An `env` row uses host `*` and applies to hosts you have not saved. Secrets are never shown. |
 
 `--private` sends a saved credential in the `X-Skaha-Registry-Auth` header of
 each replica's create request, and on no other request. Public images need no
@@ -202,9 +202,9 @@ The client does not add `images.canfar.net` to a private short name, so
 
 For a one-off launch, such as in CI or a batch job, set
 `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET`. They are used when
-the image host has no saved credential. Optional `CANFAR_REGISTRY__URL` names
-the host they apply to (default `images.canfar.net`). They are never written
-to the configuration file.
+the image host has no saved credential. The names match without case. They are
+never written to the configuration file. A private launch with neither a saved
+credential nor both variables fails before any request.
 
 <span id="canfar-ps"></span>
 

@@ -17,6 +17,8 @@ from canfar.cli.machine import OutputOption, maximum, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.session import RegistryCredentialsRequired
+from canfar.helpers.session import registry_headers
 from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.config import Configuration
 from canfar.models.http import ServerResources
@@ -121,6 +123,39 @@ async def _create_sessions(request: CreateRequest) -> list[str]:
     """Create the requested Sessions on the selected Science Platform Server."""
     async with AsyncSession(errors="ignore") as session:
         return await session.create(request)
+
+
+def _require_registry_credential(
+    request: CreateRequest, mode: output.OutputMode
+) -> None:
+    """Fail a private launch that has no saved or environment credential."""
+    try:
+        registry_headers(Configuration(), request)  # ty: ignore[missing-argument]
+    except ConfigResetRequiredError as err:
+        output.fail(output.boundary_failure(err), mode)
+    except RegistryCredentialsRequired as err:
+        output.fail(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message=str(err),
+                hint=(
+                    f"Run `canfar registry login {err.host}`, or set "
+                    "CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET."
+                ),
+            ),
+            mode,
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
+        )
+    except ValueError as err:
+        output.fail(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message=str(err),
+                hint="Check CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET.",
+            ),
+            mode,
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
+        )
 
 
 def _render_create_result(
@@ -242,9 +277,9 @@ def creation(  # noqa: PLR0917
         typer.Option(
             "--private",
             help=(
-                "Send a saved registry credential for the image's host, when "
-                "one is saved. Requires HOST/PROJECT/IMAGE. Public images "
-                "need no credential."
+                "Require a registry credential for the image's host. Uses a "
+                "saved credential, or CANFAR_REGISTRY__USERNAME and "
+                "CANFAR_REGISTRY__SECRET. Requires HOST/PROJECT/IMAGE."
             ),
         ),
     ] = False,
@@ -305,6 +340,9 @@ def creation(  # noqa: PLR0917
             mode,
             f"[bold red]Error: {escape(str(err))}[/bold red]",
         )
+
+    if request.private:
+        _require_registry_credential(request, mode)
 
     if dry or debug:
         (get_console() if dry else get_console(stderr=True)).print(

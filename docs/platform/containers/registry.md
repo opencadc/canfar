@@ -106,6 +106,9 @@ canfar registry login images.canfar.net -u USERNAME
 canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
 ```
 
+If that host has no saved credential, the launch uses `CANFAR_REGISTRY__USERNAME`
+and `CANFAR_REGISTRY__SECRET`. If neither is set, create fails before any request.
+
 See [Private Container Images](../../cli/cli-help.md#canfar-registry) for
 scripted login, environment variables, and the Python interface.
 

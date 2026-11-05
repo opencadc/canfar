@@ -235,8 +235,9 @@ class Session(HTTPClient):
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
             private: Send a saved Container Registry credential for the image's host,
-                or ``CANFAR_REGISTRY__*`` when that host has nothing saved.
-                Public images need none. The image must name that host. Set
+                or ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET``
+                when that host has nothing saved. Public images need none.
+                The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
@@ -256,6 +257,10 @@ class Session(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
+            RegistryCredentialsRequired: If a private launch has no saved
+                credential for the image host and
+                ``CANFAR_REGISTRY__USERNAME`` / ``CANFAR_REGISTRY__SECRET``
+                are not both set.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
             TypeError: If ``private=True`` is passed with a ``CreateRequest``.
@@ -740,8 +745,9 @@ class AsyncSession(HTTPClient):
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
             private: Send a saved Container Registry credential for the image's host,
-                or ``CANFAR_REGISTRY__*`` when that host has nothing saved.
-                Public images need none. The image must name that host. Set
+                or ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET``
+                when that host has nothing saved. Public images need none.
+                The image must name that host. Set
                 ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
@@ -761,6 +767,10 @@ class AsyncSession(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
+            RegistryCredentialsRequired: If a private launch has no saved
+                credential for the image host and
+                ``CANFAR_REGISTRY__USERNAME`` / ``CANFAR_REGISTRY__SECRET``
+                are not both set.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
             TypeError: If ``private=True`` is passed with a ``CreateRequest``.

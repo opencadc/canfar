@@ -20,7 +20,9 @@ standard images, such as `skaha/astroml`, ship the client, a release or two
 behind at times. Confirm the image is listed by
 `canfar image ls --kind headless`. A private image uses its full
 `HOST/PROJECT/IMAGE:TAG` name and `--private` (or `private=True` in Python).
-A registry credential is optional. Public images need none. Details are under
+A private launch needs a saved credential or
+`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET`. Public images need
+none. Details are under
 [Private Container Images](https://www.opencadc.org/canfar/edge/client/get-started/#private-container-images).
 
 ## 2. Write one manifest

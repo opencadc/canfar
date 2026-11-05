@@ -274,17 +274,19 @@ with Session() as session:
 
 The client sends the credential in the `X-Skaha-Registry-Auth` header of each
 replica's `POST /session` request, and on no other request. Without
-`private=True`, no request carries it. A missing credential is not an error.
-The launch still runs, and the header is omitted. A private image must start with its
+`private=True`, no request carries it. A private launch with no saved
+credential and no `CANFAR_REGISTRY__USERNAME` / `CANFAR_REGISTRY__SECRET`
+fails before any request. A private image must start with its
 registry host: `my-project/private-image` is rejected rather than expanded to
 `images.canfar.net`.
 When you pass a `CreateRequest`, set `private=True` on the request instead.
 
 A saved credential for the image host is sent when one exists. When that host
 has none, `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent
-instead. Optional `CANFAR_REGISTRY__URL` names their host (default
-`images.canfar.net`). Those variables are never written to the configuration
-file. `canfar registry login` is what saves a credential.
+instead. Those names match without case, and they are never written to the
+configuration file. If neither is set, a private launch fails and tells you
+to run `canfar registry login` or set the variables. `canfar registry login`
+is what saves a credential.
 
 ## Read next
 

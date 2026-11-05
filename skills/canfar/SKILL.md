@@ -81,14 +81,12 @@ Three states mark progress. Claim only the one you observed:
    name such as `skaha/astroml`.
    A **private image** launches with `--private` and its full
    `HOST/PROJECT/IMAGE:TAG` name; the client never expands a private short
-   name. A registry credential is optional. Public images on the same host
+   name. A private launch needs a credential. Public images on the same host
    need none. A saved credential for that host is sent. When the host has none,
-   `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent instead,
-   and `canfar registry ls -o json` shows that row with `"source": "env"`.
-   Those variables are never written to the config file. If a private pull fails,
-   hand login to the user: they run `canfar registry login HOST -u USERNAME` in
-   their own terminal, because the secret is theirs to type. Never put a
-   registry secret in a command line.
+   `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent instead.
+   If neither is set, the launch fails: the user runs
+   `canfar registry login HOST -u USERNAME` in their own terminal, or sets
+   those two variables. Never put a registry secret in a command line.
    See [Private Container Images](https://www.opencadc.org/canfar/edge/cli/cli-help/#canfar-registry).
 3. **Create.** Name the Session for the work; without `--name` the client
    generates one. Pass `--cpu` and `--memory` (GB) together only when the user

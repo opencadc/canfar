@@ -59,7 +59,9 @@ def create_request(  # noqa: PLR0917
         env: Additional environment variables.
         replicas: Number of session replicas to create.
         private: Set ``CreateRequest.private``. A saved credential is sent
-            when one exists.
+            when one exists. Otherwise ``CANFAR_REGISTRY__USERNAME`` and
+            ``CANFAR_REGISTRY__SECRET`` are sent. A private launch with neither
+            raises ``RegistryCredentialsRequired``.
 
     Returns:
         CreateRequest: ``name`` itself, or a request built from the scalars.

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import logging
 import re
 import sys
 from pathlib import Path
@@ -45,6 +46,8 @@ from canfar.models.registry import (
     RegistryHost,
     env_credential,
 )
+
+log = logging.getLogger(__name__)
 
 _CADC_URI = AnyUrl("ivo://cadc.nrc.ca/skaha")
 _CONFIG_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
@@ -204,8 +207,8 @@ class Configuration(BaseSettings):
     def registry_credential(self, host: str) -> RegistryCredential | None:
         """Return the credential to send to the Container Registry ``host``.
 
-        A saved ``registries`` entry wins. ``CANFAR_REGISTRY__USERNAME`` and
-        ``CANFAR_REGISTRY__SECRET`` apply only when that host has nothing saved.
+        A saved ``registries`` entry wins. Otherwise
+        ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET`` apply.
         ``canfar registry login`` is what writes a credential to the file.
 
         Args:
@@ -217,9 +220,14 @@ class Configuration(BaseSettings):
         if saved := self.registries.get(host):
             return saved
         found = env_credential()
-        if found is None or found[0] != host:
+        if found is None:
             return None
-        return found[1]
+        log.debug(
+            "No saved registry credential for %s; using "
+            "CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET",
+            host,
+        )
+        return found
 
     @model_validator(mode="after")
     def _normalize_and_validate_servers(self) -> Configuration:

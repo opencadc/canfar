@@ -150,23 +150,30 @@ class RegistryCredential(BaseModel):
         return b64encode(pair.encode()).decode()
 
 
-def env_credential() -> tuple[str, RegistryCredential] | None:
-    """Return ``CANFAR_REGISTRY__*`` when both the username and secret are set.
+def _env_value(name: str) -> str:
+    """Return an environment value, matching ``name`` without case."""
+    folded = name.casefold()
+    for key, value in os.environ.items():
+        if key.casefold() == folded:
+            return value.strip()
+    return ""
 
-    ``CANFAR_REGISTRY__URL`` selects the host. It defaults to
-    ``images.canfar.net``. This is not read from, or written to, the
-    configuration file.
+
+def env_credential() -> RegistryCredential | None:
+    """Return ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET``.
+
+    Both must be set. They are not tied to a host and are never written to
+    the configuration file. Names match without case.
 
     Returns:
-        The host and credential, or ``None`` when a value is missing or invalid.
+        The credential, or ``None`` when either value is missing.
+
+    Raises:
+        ValidationError: If a value is empty after stripping or longer than
+            255 characters.
     """
-    username = os.environ.get("CANFAR_REGISTRY__USERNAME", "").strip()
-    secret = os.environ.get("CANFAR_REGISTRY__SECRET", "").strip()
+    username = _env_value("CANFAR_REGISTRY__USERNAME")
+    secret = _env_value("CANFAR_REGISTRY__SECRET")
     if not username or not secret:
         return None
-    raw_url = os.environ.get("CANFAR_REGISTRY__URL", "").strip()
-    try:
-        host = parse_host(raw_url) if raw_url else DEFAULT_REGISTRY_HOST
-        return host, RegistryCredential(username=username, secret=SecretStr(secret))
-    except ValueError:
-        return None
+    return RegistryCredential(username=username, secret=SecretStr(secret))

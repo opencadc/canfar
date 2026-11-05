@@ -26,16 +26,15 @@ canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
 - `canfar registry login`, `logout`, and `ls` manage credentials. The secret
   comes from a hidden prompt or `--secret-stdin`, never an argument, and
   `config show`, `config get`, and `registry ls` never print it.
-- The credential is optional. A private launch sends the saved credential for
-  the image host. When that host has none, it sends `CANFAR_REGISTRY__USERNAME`
-  and `CANFAR_REGISTRY__SECRET` instead. A public image sends no registry header.
-  Earlier clients sent a configured credential on every request.
+- The credential is required for a private launch. A saved credential for the
+  image host is sent. When that host has none, `CANFAR_REGISTRY__USERNAME` and
+  `CANFAR_REGISTRY__SECRET` are sent instead. If neither is set, create fails
+  before any request. A public image sends no registry header.
 - A private image must name its registry host. `skaha/astroml --private` is
   rejected rather than expanded. Public short names still gain
   `images.canfar.net` and `:latest`.
-- `CANFAR_REGISTRY__URL` names the host for those variables (default
-  `images.canfar.net`). They are never written to the configuration file.
-  `canfar registry login` is what saves a credential.
+- Those environment names match without case and are never written to the
+  configuration file. `canfar registry login` is what saves a credential.
 - The configuration file moves to schema version 3. The first time this
   client loads a version 2 file, it removes the old `registry` block and fills
   in omitted shipped defaults, such as the `canfar` server. Save the credential

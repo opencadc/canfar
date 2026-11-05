@@ -10,6 +10,7 @@ import httpx2
 import pytest
 from pydantic import SecretStr
 
+from canfar.exceptions.session import RegistryCredentialsRequired
 from canfar.models.config import Configuration
 from canfar.models.registry import RegistryCredential
 from canfar.models.session import CreateRequest
@@ -111,10 +112,10 @@ async def test_async_create_sends_registry_auth_from_a_private_request(
 
 
 @pytest.mark.asyncio
-async def test_private_create_without_credential_omits_the_header(
+async def test_private_create_without_credential_sends_no_request(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """A private launch with no credential for the host still posts, with no header."""
+    """A private launch with no saved or environment credential does not post."""
     monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
     config = Configuration(
         registries={
@@ -125,13 +126,11 @@ async def test_private_create_without_credential_omits_the_header(
     )
     seen: list[httpx2.Request] = []
     transport, session = _sync_session(seen, config)
-    with transport, session:
-        assert session.create("proto", _IMAGE, private=True) == ["proto-id"]
-    assert [(request.method, request.headers.get(_HEADER)) for request in seen] == [
-        ("POST", None)
-    ]
+    with transport, session, pytest.raises(RegistryCredentialsRequired) as raised:
+        session.create("proto", _IMAGE, private=True)
+    assert raised.value.host == "images.canfar.net"
+    assert "canfar registry login images.canfar.net" in str(raised.value)
 
-    seen.clear()
     real_async_client = httpx2.AsyncClient
     with patch(
         "canfar.client.AsyncClient",
@@ -142,12 +141,28 @@ async def test_private_create_without_credential_omits_the_header(
         async with AsyncSession(
             token=SecretStr("token"), url=_BASE_URL, config=config
         ) as async_session:
-            assert await async_session.create("proto", _IMAGE, private=True) == [
-                "proto-id"
-            ]
-    assert [(request.method, request.headers.get(_HEADER)) for request in seen] == [
-        ("POST", None)
-    ]
+            with pytest.raises(RegistryCredentialsRequired):
+                await async_session.create("proto", _IMAGE, private=True)
+
+    assert seen == []
+
+
+@pytest.mark.asyncio
+async def test_private_create_uses_environment_credential_and_logs_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Lower-case env names fill a host that has nothing saved."""
+    monkeypatch.setattr("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml")
+    monkeypatch.setenv("canfar_registry__username", "ada")
+    monkeypatch.setenv("canfar_registry__secret", "harbor-s3cret")
+    config = Configuration()
+    seen: list[httpx2.Request] = []
+    transport, session = _sync_session(seen, config)
+    with caplog.at_level("DEBUG", logger="canfar.models.config"), transport, session:
+        assert session.create("proto", _IMAGE, private=True) == ["proto-id"]
+    assert seen[0].headers.get(_HEADER) == _AUTH
+    assert "CANFAR_REGISTRY__USERNAME" in caplog.text
+    assert "images.canfar.net" in caplog.text
 
 
 def test_private_flag_with_a_request_is_a_type_error(config: Configuration) -> None:

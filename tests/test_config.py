@@ -887,7 +887,9 @@ class TestContainerRegistryCredentials:
         assert saved["registries"] == {}
         assert "file-s3cret" not in written
         assert "env-s3cret" not in written
-        assert config.registry_credential("harbor.example") is None
+        credential = config.registry_credential("harbor.example")
+        assert credential is not None
+        assert credential.username == "robot-ci"
         fallback = config.registry_credential("images.canfar.net")
         assert fallback is not None
         assert fallback.username == "robot-ci"
@@ -931,7 +933,6 @@ class TestContainerRegistryCredentials:
             "  harbor.example: {username: bob, secret: saved-b}\n",
             encoding="utf-8",
         )
-        monkeypatch.setenv("CANFAR_REGISTRY__URL", "ghcr.io")
         monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
         monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
 
@@ -951,14 +952,16 @@ class TestContainerRegistryCredentials:
         assert "env-s3cret" not in config_path.read_text(encoding="utf-8")
         assert "robot-ci" not in config_path.read_text(encoding="utf-8")
 
-    def test_invalid_environment_url_is_not_a_credential(
+    def test_bad_environment_url_does_not_hide_username_and_secret(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
     ) -> None:
-        """A URL with a path does not fail lookup and does not supply a credential."""
+        """``CANFAR_REGISTRY__URL`` is not part of the credential lookup."""
         monkeypatch.setenv("CANFAR_REGISTRY__URL", "https://images.canfar.net/v2")
-        monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
-        monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
+        monkeypatch.setenv("canfar_registry__username", "robot-ci")
+        monkeypatch.setenv("canfar_registry__secret", "env-s3cret")
         with patch("canfar.models.config.CONFIG_PATH", tmp_path / "config.yaml"):
             config = Configuration()
 
-        assert config.registry_credential("images.canfar.net") is None
+        credential = config.registry_credential("images.canfar.net")
+        assert credential is not None
+        assert credential.username == "robot-ci"

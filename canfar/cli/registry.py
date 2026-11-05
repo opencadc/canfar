@@ -134,11 +134,10 @@ def logout_command(host: Host = DEFAULT_REGISTRY_HOST) -> None:
         )
     else:
         console.print(f"Not logged in to {escape(key)}.")
-    found = env_credential()
-    if found is not None and found[0] == key:
+    if env_credential() is not None:
         get_console(stderr=True).print(
-            f"[yellow]CANFAR_REGISTRY__* still sets a credential for "
-            f"{escape(key)}.[/yellow]"
+            "[yellow]CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET "
+            "still supply a credential for hosts you have not saved.[/yellow]"
         )
 
 
@@ -151,10 +150,9 @@ def list_command(output_format: OutputOption = None) -> None:
         {"host": host, "username": credential.username, "source": "saved"}
         for host, credential in config.registries.items()
     ]
-    found = env_credential()
-    if found is not None and found[0] not in config.registries:
-        host, credential = found
-        rows.append({"host": host, "username": credential.username, "source": "env"})
+    credential = env_credential()
+    if credential is not None:
+        rows.append({"host": "*", "username": credential.username, "source": "env"})
     if mode is not output.OutputMode.HUMAN:
         output.to_stdout(rows, mode)
         return

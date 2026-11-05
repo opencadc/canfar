@@ -107,7 +107,7 @@ def test_ls_shows_host_username_and_source_without_secrets(
     assert machine.exit_code == 0, machine.output
     assert json.loads(machine.stdout) == [
         {"host": "harbor.example:5000", "username": "ada", "source": "saved"},
-        {"host": "images.canfar.net", "username": "robot-ci", "source": "env"},
+        {"host": "*", "username": "robot-ci", "source": "env"},
     ]
     assert human.exit_code == 0
     assert "harbor.example:5000" in human.stdout
@@ -184,22 +184,19 @@ def test_create_sends_registry_auth_only_with_private(private: bool) -> None:
     [[], ["-o", "json"], ["-o", "yaml"], ["--dry-run"]],
     ids=["human", "json", "yaml", "dry-run"],
 )
-def test_private_create_without_credential_still_launches(
+def test_private_create_without_credential_fails(
     config_path: Path, mode: list[str]
 ) -> None:
-    """A missing credential does not block a private launch or a dry run."""
+    """A private launch with no credential fails before any request."""
     seen: list[httpx2.Request] = []
     with _sessions(seen):
         result = runner.invoke(cli, ["create", "headless", _IMAGE, "--private", *mode])
 
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 1, result.output
+    assert seen == []
+    assert "canfar registry login images.canfar.net" in result.stderr
+    assert "CANFAR_REGISTRY__USERNAME" in result.stderr
     assert not config_path.exists()
-    if mode == ["--dry-run"]:
-        assert seen == []
-        return
-    posts = [request for request in seen if request.method == "POST"]
-    assert posts
-    assert all(request.headers.get(_HEADER) is None for request in posts)
 
 
 @pytest.mark.usefixtures("config_path")
