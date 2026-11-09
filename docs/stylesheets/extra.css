@@ -319,3 +319,35 @@
     transition: none !important;
   }
 }
+
+/* Off-site navigation targets (theme partials/external-nav.html). */
+.md-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.md-external-icon {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.2rem;
+  vertical-align: text-bottom;
+}
+
+.md-external-icon svg {
+  width: 0.85em;
+  height: 0.85em;
+  fill: currentColor;
+  opacity: 0.85;
+}
+
+.md-tabs__link--external .md-external-icon svg {
+  width: 0.9em;
+  height: 0.9em;
+}

@@ -255,6 +255,7 @@ nav:
       - Demos:
           - SRCnet Workshop: demos/srcnet-workshop.md
       - Bug Reports: client/bug-reports.md
+  - Deployments: https://www.opencadc.org/deployments/
   - Contribute:
       - Code of Conduct: conduct.md
       - OpenSSF Report: https://scorecard.dev/viewer/?uri=github.com/opencadc/canfar
@@ -270,8 +271,6 @@ nav:
               - Triage Statuses: agents/triage-labels.md
               - Community Triage: agents/community.md
               - Upstream Provenance: agents/upstream-provenance.md
-      - Operations:
-          - Platform Deployments: https://www.opencadc.org/deployments/
       - Security Issues: security.md
       - Changelog: changelog.md
   - About:

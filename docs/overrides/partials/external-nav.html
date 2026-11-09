@@ -1,0 +1,10 @@
+{#- Shared helpers for off-site navigation targets.
+   Macros return the literal "external" when true so {% if external(url) %} is reliable. -#}
+{% macro external(url) -%}
+{%- if url and (url.startswith('http://') or url.startswith('https://')) and not url.startswith(config.site_url | string) -%}external{%- endif -%}
+{%- endmacro %}
+
+{% macro external_suffix() -%}
+  <span class="md-visually-hidden"> (external site)</span>
+  <span class="md-external-icon" aria-hidden="true">{% include ".icons/material/open-in-new.svg" %}</span>
+{%- endmacro %}
