@@ -1,28 +1,26 @@
 version: 2
+
+multi-ecosystem-groups:
+  dependencies:
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+
 updates:
   - package-ecosystem: github-actions
     directory: /
-    schedule:
-      interval: weekly
-    groups:
-      actions:
-        patterns:
-          - "*"
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
 
   - package-ecosystem: docker
     directory: /
-    schedule:
-      interval: weekly
-    groups:
-      docker:
-        patterns:
-          - "*"
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
 
   - package-ecosystem: uv
     directory: /
-    schedule:
-      interval: weekly
-    groups:
-      python:
-        patterns:
-          - "*"
+    patterns:
+      - "*"
+    multi-ecosystem-group: dependencies
