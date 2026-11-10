@@ -3,12 +3,13 @@
 import base64
 
 import pytest
-from pydantic import ValidationError
+from pydantic import AnyHttpUrl, ValidationError
 
 from canfar.models.registry import (
-    ContainerRegistry,
     IVOARegistry,
+    RegistryCredential,
     Server,
+    parse_host,
 )
 from canfar.utils import discover
 
@@ -108,66 +109,43 @@ class TestServer:
             Server(**server_data)
 
 
-class TestContainerRegistry:
-    """Test ContainerRegistry class."""
-
-    def test_default_values(self) -> None:
-        """Test default values for ContainerRegistry."""
-        registry = ContainerRegistry()
-        assert registry.url is None
-        assert registry.username is None
-        assert registry.secret is None
-
-    def test_with_all_values(self) -> None:
-        """Test ContainerRegistry with all values."""
-        registry = ContainerRegistry(
-            url="https://registry.example.com",
-            username="testuser",
-            secret="testsecret",
-        )
-        assert str(registry.url) == "https://registry.example.com/"
-        assert registry.username == "testuser"
-        assert registry.secret == "testsecret"
+class TestParseHost:
+    """``parse_host`` reduces a bare host or http(s) URL to ``host[:port]``."""
 
     @pytest.mark.parametrize(
-        ("username", "secret", "message"),
+        ("url", "host"),
         [
-            ("user", None, "container registry secret is required"),
-            (None, "secret", "container registry username is required"),
+            ("https://Registry.Example.com/", "registry.example.com"),
+            ("http://localhost:5000", "localhost:5000"),
+            ("harbor.local:5000", "harbor.local:5000"),
+            (AnyHttpUrl("https://images.canfar.net"), "images.canfar.net"),
         ],
     )
-    def test_credentials_validation(self, username, secret, message) -> None:
-        """Test validation for credential pairs."""
-        with pytest.raises(ValidationError, match=message):
-            ContainerRegistry(username=username, secret=secret)
+    def test_url_is_reduced_to_host(self, url, host) -> None:
+        """Bare hosts and http(s) URLs normalize to the same registry host."""
+        assert parse_host(url) == host
+
+    @pytest.mark.parametrize(
+        "url",
+        ["sftp://registry.com", "https://registry.com/project", "https://", ""],
+    )
+    def test_url_rejects_non_hosts(self, url) -> None:
+        """Other schemes, paths, and empty hosts are not registry hosts."""
+        with pytest.raises(ValueError, match="container registry host"):
+            parse_host(url)
+
+
+class TestRegistryCredential:
+    """Saved username and secret."""
 
     @pytest.mark.parametrize(
         ("username", "secret"),
         [("testuser", "testsecret"), ("user@domain.com", "p@ssw0rd!")],
     )
-    def test_encoded(self, username, secret) -> None:
-        """Test encoded method."""
-        registry = ContainerRegistry(username=username, secret=secret)
+    def test_header_is_base64_username_secret(self, username, secret) -> None:
+        """The header value is base64 of ``username:secret``."""
         expected = base64.b64encode(f"{username}:{secret}".encode()).decode()
-        assert registry.encoded() == expected
-
-    @pytest.mark.parametrize(
-        ("url", "is_valid"),
-        [
-            ("https://registry.example.com", True),
-            ("http://localhost:5000", True),
-            ("not-a-valid-url", False),
-            ("sftp://registry.com", False),
-        ],
-    )
-    def test_url_validation(self, url, is_valid) -> None:
-        """Test URL field validation."""
-        if is_valid:
-            registry = ContainerRegistry(url=url)
-            assert str(registry.url).startswith(url)
-        else:
-            with pytest.raises(ValidationError):
-                ContainerRegistry(url=url)
+        assert RegistryCredential(username=username, secret=secret).header() == expected
 
     @pytest.mark.parametrize(
         ("field", "value", "is_valid"),
@@ -183,12 +161,11 @@ class TestContainerRegistry:
         ],
     )
     def test_field_length_validation(self, field, value, is_valid) -> None:
-        """Test field length validation."""
+        """Usernames and secrets are 1 to 255 characters."""
         kwargs = {"username": "user", "secret": "secret"}
         kwargs[field] = value
         if is_valid:
-            registry = ContainerRegistry(**kwargs)
-            assert getattr(registry, field) == value
+            RegistryCredential(**kwargs)
         else:
             with pytest.raises(ValidationError):
-                ContainerRegistry(**kwargs)
+                RegistryCredential(**kwargs)

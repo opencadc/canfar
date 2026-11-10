@@ -1,5 +1,7 @@
 """Comprehensive tests for the session models module."""
 
+from __future__ import annotations
+
 import warnings
 
 import pytest
@@ -351,6 +353,65 @@ class TestFetchSpec:
             name="test", image="skaha/astroml@sha256:abc123", kind="headless"
         )
         assert spec.image == "images.canfar.net/skaha/astroml@sha256:abc123"
+
+    def test_image_assignment_is_normalized(self) -> None:
+        """Assigning an image applies the same rule as construction."""
+        spec = CreateRequest(name="test", image="skaha/a", kind="headless")
+        spec.image = "skaha/b"
+        assert spec.image == "images.canfar.net/skaha/b:latest"
+
+        private = CreateRequest(
+            name="t", image="images.canfar.net/p/a", kind="headless", private=True
+        )
+        with pytest.raises(ValidationError, match="HOST/PROJECT/IMAGE"):
+            private.image = "p/b"
+
+        public = CreateRequest(name="t", image="skaha/proj/img", kind="headless")
+        with pytest.raises(ValidationError, match="HOST/PROJECT/IMAGE"):
+            public.private = True
+
+    @pytest.mark.parametrize(
+        ("image", "normalized", "host"),
+        [
+            (
+                "images.canfar.net/lisa-ddpc/protolab",
+                "images.canfar.net/lisa-ddpc/protolab:latest",
+                "images.canfar.net",
+            ),
+            (
+                "harbor.local:5000/p/img@sha256:abc",
+                "harbor.local:5000/p/img@sha256:abc",
+                "harbor.local:5000",
+            ),
+            ("localhost/p/img:1", "localhost/p/img:1", "localhost"),
+            ("ghcr.io/img:tag", "ghcr.io/img:tag", "ghcr.io"),
+        ],
+    )
+    def test_private_image_keeps_its_host(
+        self, image: str, normalized: str, host: str
+    ) -> None:
+        """A private image names its registry host and is not prefixed."""
+        spec = CreateRequest(name="t", image=image, kind="headless", private=True)
+        assert spec.image == normalized
+        assert spec.registry_host == host
+        assert "private" not in spec.model_dump()
+
+    @pytest.mark.parametrize(
+        ("image", "suggestion"),
+        [
+            ("skaha/astroml", "images.canfar.net/skaha/astroml:latest"),
+            ("skaha/astroml:v1", "images.canfar.net/skaha/astroml:v1"),
+            ("skaha/proj/img", None),
+        ],
+    )
+    def test_private_image_without_host_is_rejected(
+        self, image: str, suggestion: str | None
+    ) -> None:
+        """A private short name is never rewritten to images.canfar.net."""
+        with pytest.raises(ValidationError, match="HOST/PROJECT/IMAGE") as raised:
+            CreateRequest(name="t", image=image, kind="headless", private=True)
+        if suggestion is not None:
+            assert f"Did you mean {suggestion}?" in str(raised.value)
 
 
 class TestSessionModelsIntegration:

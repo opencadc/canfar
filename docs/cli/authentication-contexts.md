@@ -256,7 +256,7 @@ The persisted shape separates Authentication Records and Science Platform
 Servers. `active.server` refers to a Server Name, not an IVOA URI:
 
 ```yaml
-version: 2
+version: 3
 active:
   authentication: cadc
   server: canfar
@@ -276,16 +276,24 @@ servers:
         cores: {min: 1, max: 16}
         ram: {min: 1, max: 192}
       sessions: 5
+registries:
+  images.canfar.net:
+    username: USERNAME
+    secret: CLI_SECRET
 ```
 
 `resources` is written by discovery and `server use`; it is absent until a
-Server has reported its limits.
+Server has reported its limits. `registries` holds Container Registry
+credentials saved by `canfar registry login`, keyed by registry host and
+shared by every Server. `config show` and `config get` print each secret as
+`**********`.
 
-A file written by an older client, such as `version: 1` from v1.4.1, is
-upgraded the first time it loads. The client fills in current defaults, keeps
-your values, rewrites the file, and prints one line such as
-`Migrating canfar client config v1 → v2` on stderr. A missing file is not
-created.
+A file written by an older client, such as `version: 1` from v1.4.1 or
+`version: 2` from v1.5.x, is upgraded the first time it loads. The client
+fills in current defaults, keeps your values, rewrites the file, and prints
+one line such as `Migrating canfar client config v2 → v3` on stderr. A saved
+`registry` credential moves under `registries` by its host. A missing file is
+not created. Clients older than the version that wrote a file cannot read it.
 
 Use `canfar config get` and `canfar config set` for dotted configuration
 paths. Values passed to `config set` are parsed as YAML:

@@ -440,7 +440,7 @@ def _save_limited_server(path: Path) -> None:
     path.write_text(
         yaml.dump(
             {
-                "version": 2,
+                "version": 3,
                 "active": {"authentication": "cadc", "server": "canSRC"},
                 "authentication": {"cadc": {"mode": "x509"}},
                 "servers": {

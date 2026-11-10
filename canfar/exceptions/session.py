@@ -8,6 +8,27 @@ if TYPE_CHECKING:
     from httpx2 import HTTPError
 
 
+class RegistryCredentialsRequired(Exception):  # noqa: N818
+    """Raised when a private launch has no saved or environment credential.
+
+    Attributes:
+        host: Container Registry ``host[:port]`` the image names.
+    """
+
+    def __init__(self, host: str) -> None:
+        """Initialize RegistryCredentialsRequired.
+
+        Args:
+            host: Container Registry host with no credential.
+        """
+        self.host = host
+        super().__init__(
+            f"No container registry credential for {host}. "
+            f"Run `canfar registry login {host}`, or set "
+            "CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET."
+        )
+
+
 class SessionRequestError(Exception):
     """Raised when one or more session requests fail under errors='raise'.
 
