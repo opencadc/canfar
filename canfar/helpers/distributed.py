@@ -12,6 +12,29 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
+def _position(replica: int | None, total: int | None) -> tuple[int, int]:
+    """Resolve this worker's 1-based replica number and the replica count.
+
+    A batch pod has a 0-based ``CANFAR_REPLICA_INDEX`` and
+    ``CANFAR_REPLICA_COUNT``; a headless replica has a 1-based ``REPLICA_ID``
+    and ``REPLICA_COUNT``. Explicit arguments win, and a worker with neither
+    acts as the only replica.
+    """
+    if replica is None:
+        index = os.environ.get("CANFAR_REPLICA_INDEX")
+        replica = (
+            int(index) + 1
+            if index is not None
+            else int(os.environ.get("REPLICA_ID", "1"))
+        )
+    if total is None:
+        count = os.environ.get("CANFAR_REPLICA_COUNT")
+        total = int(
+            count if count is not None else os.environ.get("REPLICA_COUNT", "1")
+        )
+    return replica, total
+
+
 def stripe(
     iterable: Iterable[T],
     replica: int | None = None,
@@ -19,9 +42,9 @@ def stripe(
 ) -> Iterator[T]:
     """Return every ``total``-th item from ``iterable`` with a ``replica`` offset.
 
-    Uses 1-based ``replica`` indexing to match ``REPLICA_ID`` in CANFAR
-    containers. Replica 1 receives indices 0, ``total``, 2 * ``total``, …;
-    replica 2 receives indices 1, ``total`` + 1, …; and so on.
+    Uses 1-based ``replica`` numbers: replica 1 receives indices 0,
+    ``total``, 2 * ``total``, …; replica 2 receives indices 1, ``total`` + 1, …;
+    and so on. In a batch pod, replica 1 is ``CANFAR_REPLICA_INDEX=0``.
 
     Unlike ``chunk``, ``stripe`` returns no items when ``replica < 1``,
     even when ``total <= 0``. For a positive replica, ``total <= 0`` raises
@@ -29,8 +52,12 @@ def stripe(
 
     Args:
         iterable: The iterable to stripe across replicas.
-        replica: The replica number (1-based). Defaults to ``REPLICA_ID``.
-        total: The total number of replicas. Defaults to ``REPLICA_COUNT``.
+        replica: The replica number (1-based). Defaults to
+            ``CANFAR_REPLICA_INDEX`` + 1 when set, otherwise ``REPLICA_ID``,
+            otherwise 1.
+        total: The total number of replicas. Defaults to
+            ``CANFAR_REPLICA_COUNT`` when set, otherwise ``REPLICA_COUNT``,
+            otherwise 1.
 
     Yields:
         Items assigned to this replica.
@@ -44,8 +71,7 @@ def stripe(
         >>> list(distributed.stripe(range(100), replica=1, total=10))
         [0, 10, 20, 30, 40, 50, 60, 70, 80, 90]
     """
-    replica = int(os.environ.get("REPLICA_ID", "1")) if replica is None else replica
-    total = int(os.environ.get("REPLICA_COUNT", "1")) if total is None else total
+    replica, total = _position(replica, total)
 
     if replica < 1 or 0 < total < replica:
         return
@@ -61,7 +87,8 @@ def chunk(
     """Return the ``replica``-th contiguous chunk of ``iterable``.
 
     Splits ``iterable`` into ``total`` roughly equal contiguous chunks using
-    1-based ``replica`` indexing to match ``REPLICA_ID`` in CANFAR containers.
+    1-based ``replica`` numbers. In a batch pod, replica 1 is
+    ``CANFAR_REPLICA_INDEX=0``.
 
     **Distribution behavior:**
 
@@ -73,9 +100,11 @@ def chunk(
     Args:
         iterable: The iterable to distribute across replicas.
         replica: The replica number (1-based). Must be >= 1 and <= ``total``.
-            Defaults to ``REPLICA_ID``.
+            Defaults to ``CANFAR_REPLICA_INDEX`` + 1 when set, otherwise
+            ``REPLICA_ID``, otherwise 1.
         total: The total number of replicas. Must be > 0. Defaults to
-            ``REPLICA_COUNT``.
+            ``CANFAR_REPLICA_COUNT`` when set, otherwise ``REPLICA_COUNT``,
+            otherwise 1.
 
     Yields:
         Items assigned to this replica.
@@ -92,8 +121,7 @@ def chunk(
         >>> list(distributed.chunk([1, 2, 3], replica=2, total=5))
         [2]
     """
-    replica = int(os.environ.get("REPLICA_ID", "1")) if replica is None else replica
-    total = int(os.environ.get("REPLICA_COUNT", "1")) if total is None else total
+    replica, total = _position(replica, total)
 
     if total <= 0:
         msg = "total must be positive"

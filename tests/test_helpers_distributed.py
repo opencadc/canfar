@@ -219,3 +219,27 @@ def test_stripe_rejects_non_positive_total(total: int) -> None:
     """Reject a non-positive stripe replica count."""
     with pytest.raises(ValueError, match="positive integer"):
         list(distributed.stripe(range(3), 1, total))
+
+
+@pytest.mark.parametrize(
+    ("partitioner", "index", "expected"),
+    [
+        pytest.param(distributed.stripe, "0", [0, 50, 100, 150], id="stripe-first"),
+        pytest.param(distributed.stripe, "49", [49, 99, 149, 199], id="stripe-last"),
+        pytest.param(distributed.chunk, "0", [0, 1, 2, 3], id="chunk-first"),
+        pytest.param(distributed.chunk, "49", [196, 197, 198, 199], id="chunk-last"),
+    ],
+)
+def test_batch_pod_reads_zero_based_replica_index(
+    monkeypatch: pytest.MonkeyPatch,
+    partitioner: DefaultPartitioner,
+    index: str,
+    expected: list[int],
+) -> None:
+    """A batch pod's 0-based index and count select its share of the work."""
+    monkeypatch.setenv("CANFAR_REPLICA_INDEX", index)
+    monkeypatch.setenv("CANFAR_REPLICA_COUNT", "50")
+    monkeypatch.setenv("REPLICA_ID", "7")
+    monkeypatch.setenv("REPLICA_COUNT", "9")
+
+    assert list(partitioner(range(200))) == expected
