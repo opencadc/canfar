@@ -102,6 +102,9 @@ def _utilization(
 
 def _display(session_info: dict[str, Any], debug: bool = False) -> None:
     """Display information for a single session."""
+    if session_info.get("kind") == "Batch":
+        get_console().print_json(data=session_info)
+        return
     try:
         data = FetchResponse.model_validate(session_info)
     except ValidationError as err:

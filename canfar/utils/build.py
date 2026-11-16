@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any
 
 from canfar.models.session import CreateRequest, FetchRequest
@@ -42,23 +43,34 @@ def create_parameters(  # noqa: PLR0917
     args: str | None = None,
     env: dict[str, Any] | None = None,
     replicas: int = 1,
+    *,
+    maxfail: float | None = None,
 ) -> list[list[tuple[str, Any]]]:
     """Build form-encoded payloads for creating one or more sessions.
 
+    A batch is one payload that carries ``replicas``; the Server sets the
+    replica variables on each pod. Headless replicas are one payload per
+    replica, each with a 1-based ``REPLICA_ID`` and ``REPLICA_COUNT``.
+
     Args:
-        name: Domain request or base session name. Names are suffixed per replica.
+        name: Domain request or base session name. Headless replica names are
+            suffixed per replica.
         image: Container image reference when ``name`` is a string.
         cores: CPU core count.
         ram: RAM in gigabytes.
         kind: Session kind.
         gpu: GPU count (serialized as ``gpus``).
-        cmd: Container command (headless sessions only).
-        args: Container arguments (headless sessions only).
+        cmd: Container command (headless and batch sessions only).
+        args: Container arguments (headless and batch sessions only).
         env: Additional environment variables.
-        replicas: Number of session replicas to create.
+        replicas: Batch replica count, or the number of headless sessions.
+        maxfail: Failed fraction of replicas that stops a batch.
 
     Returns:
-        list[list[tuple[str, Any]]]: One tuple payload per replica.
+        list[list[tuple[str, Any]]]: One tuple payload per create request.
+
+    Warns:
+        FutureWarning: When a headless request asks for more than one replica.
     """
     if isinstance(name, CreateRequest):
         specification = name
@@ -77,11 +89,28 @@ def create_parameters(  # noqa: PLR0917
             args=args,
             env=env,
             replicas=replicas,
+            maxfail=maxfail,
         )
     data: dict[str, Any] = specification.model_dump(exclude_none=True, by_alias=True)
     environment = data.pop("env", {})
-    payloads: list[list[tuple[str, Any]]] = []
     replica_count = specification.replicas
+    if specification.kind == "batch":
+        return [
+            [
+                *data.items(),
+                ("replicas", replica_count),
+                *(("env", f"{key}={value}") for key, value in environment.items()),
+            ]
+        ]
+    if specification.fans_out:
+        warnings.warn(
+            "replicas above 1 for headless sessions are deprecated; use "
+            "kind='batch' to run them as one session.",
+            FutureWarning,
+            # Point at the caller of Session.create, which calls this builder.
+            stacklevel=3,
+        )
+    payloads: list[list[tuple[str, Any]]] = []
     for replica in range(replica_count):
         data["name"] = (
             specification.name

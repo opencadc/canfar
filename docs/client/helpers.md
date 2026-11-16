@@ -1,9 +1,13 @@
 # Helpers API
 
 !!! info "Overview"
-    `canfar.helpers.distributed` partitions an ordered list across Session
-    replicas. Each replica container receives `REPLICA_ID` and `REPLICA_COUNT`
-    in its environment, and these functions read them by default.
+    `canfar.helpers.distributed` partitions an ordered list across replicas.
+    A [batch](../platform/sessions/batch.md#run-many-replicas-as-one-batch)
+    replica receives a 0-based `CANFAR_REPLICA_INDEX` and
+    `CANFAR_REPLICA_COUNT`; a deprecated headless replica receives a 1-based
+    `REPLICA_ID` and `REPLICA_COUNT`. These functions read them by default.
+    Their `replica` argument stays 1-based: `CANFAR_REPLICA_INDEX=0` is
+    replica 1.
 
 ## Practical examples
 
@@ -34,7 +38,7 @@ print(list(distributed.chunk(items, replica=4, total=4)))
 
 ### Using container-provided environment variables
 ```python
-# Inside CANFAR container replicas, you can omit replica/total and read from env
+# Inside a batch replica, omit replica/total to read them from the environment
 from canfar.helpers import distributed
 work = list(range(1000))
 for item in distributed.chunk(work):
@@ -47,9 +51,15 @@ for item in distributed.chunk(work):
 `ValueError` otherwise. `stripe()` intentionally keeps a looser compatibility
 contract: `replica < 1` yields no items, even when `total <= 0`. For a positive
 replica, `total <= 0` raises `ValueError`; otherwise `replica > total` yields
-no items. Both functions use `REPLICA_ID` and `REPLICA_COUNT` when
-their corresponding arguments are omitted, defaulting to one replica when the
-environment is absent.
+no items. When `replica` is omitted, both functions use
+`CANFAR_REPLICA_INDEX` plus 1, otherwise `REPLICA_ID`. When `total` is
+omitted, they use `CANFAR_REPLICA_COUNT`, otherwise `REPLICA_COUNT`. Without
+any of them, the worker acts as the only replica, so the same script runs
+unchanged in a local test.
+
+A batch replica can run again from the beginning after preemption or a node
+drain. Make each item's work safe to repeat, for example by skipping items
+whose output already exists.
 
 ## API reference
 

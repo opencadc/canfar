@@ -110,8 +110,9 @@ before contacting the remote platform:
 | `--cpu` / `cores` | 1 to 256 cores |
 | `--memory` / `ram` | 1 to 512 GB |
 | `--gpu` / `gpu` | 1 to 28 GPUs |
-| `--replicas` / `replicas` | 1 to 256; exactly 1 for `desktop` and `firefly` |
-| Command, arguments, `--env` | `headless` Sessions only |
+| `--replicas` / `replicas` | 1 to 256 for `batch`; above 1 for `headless` is deprecated; exactly 1 for other kinds |
+| `--maxfail` / `maxfail` | 0 to 1, `batch` only |
+| Command, arguments, `--env` | `headless` and `batch` Sessions only; names starting with `CANFAR_` are reserved |
 | `--name` | Letters, digits, and hyphens |
 
 `desktop` and `firefly` interactive applications use pre-configured container
@@ -127,12 +128,14 @@ Test request syntax and limits without launching a container by adding
 `--dry-run`:
 
 ```bash
-canfar create headless skaha/astroml:latest --cpu 8 --memory 32 --replicas 100 --dry-run
+canfar create batch skaha/astroml:latest --cpu 8 --memory 32 --replicas 100 --dry-run
 ```
 
-When you pass `--replicas` greater than 1, the Server names the Sessions
-`NAME-1` to `NAME-N` and sets `REPLICA_ID` (1-based) and `REPLICA_COUNT` in
-each container. See [distributed helpers](../../client/helpers.md).
+A batch with `--replicas` greater than 1 is one Session. Each replica's
+container receives a 0-based `CANFAR_REPLICA_INDEX` and `CANFAR_REPLICA_COUNT`.
+For deprecated headless replicas, the client creates Sessions named `NAME-1`
+to `NAME-N` and sets `REPLICA_ID` (1-based) and `REPLICA_COUNT` in each
+container. See [distributed helpers](../../client/helpers.md).
 
 ---
 
@@ -151,7 +154,7 @@ may adjust them:
 | `desktop` and `firefly` sizes | Set by the Server | `--cpu` and `--memory` are ignored |
 | Interactive Session lifetime | 4 days | `canfar info SESSION_ID` shows the expiry time |
 | `headless` Session deadline | 14 days | A failed command is not restarted |
-| Finished Session record | Kept for 1 hour (`headless`) or 1 day (interactive) | The ID then leaves `canfar ps --all`; judge a run by its outputs |
+| Finished Session record | Kept for 1 hour (`headless`) or 1 day (`batch` and interactive) | The ID then leaves `canfar ps --all`; judge a run by its outputs |
 | Active interactive Sessions per user | 5 | `create` is rejected with "has reached the maximum of N active sessions" |
 | Session-local storage, including `/scratch` | 20 GiB to start, growing to 200 GiB | `No space left on device`; `desktop` Sessions get a smaller amount |
 

@@ -1,13 +1,132 @@
 # Batch processing
 
-Use a `headless` Session when a container should run a command without a
-Notebook, Desktop, CARTA, or Firefly interface. The command runs in the same
+Use a `headless` Session when a container should run one command without a
+Notebook, Desktop, CARTA, or Firefly interface. Use a `batch` Session to run
+the same command many times, as replicas of one Session. Both run in the same
 container and mounted-storage environment as an interactive Session; only the
 entrypoint and lifecycle differ.
 
 Follow [Install and set up](../../client/get-started.md#install) before using
 these commands. For a complete run with output verification and recovery, see
 [Advanced examples](../../client/advanced-examples.md).
+
+## Run many replicas as one batch
+
+!!! info "Server support"
+    `batch` needs a Science Platform release with batch support. On a Server
+    without it, `canfar create batch` fails; headless replicas remain
+    available there until the Server adds batch support.
+
+A batch runs one command in 1 to 256 replicas, as one Session with one ID.
+`--cpu`, `--memory`, and `--gpu` are the request for one replica:
+
+```bash
+canfar create batch skaha/astroml:latest \
+  --name field-reduction --replicas 50 --cpu 1 --memory 4 \
+  --maxfail 0.25 \
+  -- python /arc/projects/myproject/scripts/worker.py
+```
+
+Each replica's container receives `CANFAR_REPLICA_INDEX`, from `0` to one less
+than `--replicas`, and `CANFAR_REPLICA_COUNT`. The
+[distributed helpers](../../client/helpers.md) read both, so a worker can take
+its share of an ordered input list without arguments. Environment names that
+start with `CANFAR_` are reserved for the platform; `--env` cannot set them.
+
+The platform starts as many replicas as the queue has room for, at least one,
+and keeps that width for the whole run. The other replicas wait until a
+running replica finishes. A batch submitted while the cluster is busy can stay
+narrow after capacity frees up; delete it and submit it again to use the new
+room.
+
+Each replica runs its command once, and a failed replica is not retried.
+A replica can still **start again from the beginning**: a higher-priority
+Session, such as an interactive one, can preempt a batch, and a node drain
+replaces the replica's container. Write workers that are safe to run again:
+skip inputs whose output already exists, and write each output through a
+temporary file that you then rename.
+
+`--maxfail` is a fraction from 0 to 1. The batch stops when the failed share
+of its replicas reaches it:
+
+| `--maxfail` | Replicas | Result |
+| --- | --- | --- |
+| unset | 50 | Every replica runs. |
+| `0` | 50 | The first failed replica stops the batch. |
+| `0.25` | 50 | The 13th failed replica stops the batch. |
+| `1` | 50 | Every replica runs. |
+
+Without `--maxfail`, or with `1`, the batch still ends `Failed` when any
+replica failed.
+
+Check a batch with these commands:
+
+```bash
+canfar ps --kind batch
+canfar info SESSION_ID
+canfar logs SESSION_ID --replica 0
+canfar delete SESSION_ID
+```
+
+`ps` shows progress beside the status, for example
+`Running (12/50 succeeded, 1 failed)`. `info` prints the batch document: each
+replica's phase and exit code, and the CPU and memory the batch holds and
+uses. A batch has one log per replica, so `logs` needs `--replica`; without
+it the Server answers HTTP 400. `delete` stops every replica.
+
+A batch ends 14 days after it starts. After it finishes, the Server keeps its
+replica exit codes, logs, and batch document for 24 hours. Collect what you
+need in that time; results written to `/arc` stay.
+
+From Python, `kind="batch"` returns a list with one ID:
+
+=== "Sync Python"
+
+    ```python title="submit_batch.py"
+    from canfar.sessions import Session
+
+    with Session() as session:
+        ids = session.create(
+            name="field-reduction",
+            image="images.canfar.net/skaha/astroml:latest",
+            kind="batch",
+            replicas=50,
+            cores=1,
+            ram=4,
+            cmd="python",
+            args="/arc/projects/myproject/scripts/worker.py",
+            maxfail=0.25,
+        )
+        print(session.info(ids))
+        print(session.logs(ids, replica=1))
+    ```
+
+=== "Async Python"
+
+    ```python title="submit_batch.py"
+    import asyncio
+
+    from canfar.sessions import AsyncSession
+
+    async def main() -> None:
+        async with AsyncSession() as session:
+            ids = await session.create(
+                name="field-reduction",
+                image="images.canfar.net/skaha/astroml:latest",
+                kind="batch",
+                replicas=50,
+                cores=1,
+                ram=4,
+                cmd="python",
+                args="/arc/projects/myproject/scripts/worker.py",
+                maxfail=0.25,
+            )
+            print(await session.info(ids))
+            print(await session.logs(ids, replica=1))
+
+    if __name__ == "__main__":
+        asyncio.run(main())
+    ```
 
 <span id="submit-from-the-cli"></span>
 <span id="resource-guidance"></span>
@@ -43,21 +162,21 @@ canfar create \
   -- python /arc/projects/myproject/scripts/simulate.py
 ```
 
-Repeat `--env KEY=VALUE` for environment variables and use `--replicas` when
-each container can process an independent slice:
+Repeat `--env KEY=VALUE` for environment variables:
 
 ```bash
 canfar create \
   --name parameter-study \
-  --replicas 10 \
   --env OMP_NUM_THREADS=4 \
   headless skaha/astroml:latest \
   -- python /arc/projects/myproject/scripts/analyse.py
 ```
 
-Replicas receive `REPLICA_ID` and `REPLICA_COUNT`. Use those values or the
-[distributed helpers](../../client/helpers.md) to partition work
-deterministically.
+!!! warning "Headless replicas are deprecated"
+    `--replicas` above 1 with `headless` creates one Session per replica,
+    named `NAME-1` to `NAME-N`, each with a 1-based `REPLICA_ID` and
+    `REPLICA_COUNT`. The client warns, and a later release removes it. Use a
+    [batch](#run-many-replicas-as-one-batch) instead.
 
 ## What `create` prints
 
@@ -68,7 +187,8 @@ reports one successful Session as:
 Successfully created session 'data-reduction' (ID: SESSION_ID)
 ```
 
-For multiple replicas it reports the count and lists each ID. `--output json`
+For deprecated headless replicas it reports the count and lists each ID. A
+batch reports its one ID. `--output json`
 or `--output yaml` emits the raw list of returned IDs as data-only output; the
 same option must appear before `--`, because everything after `--` belongs to
 the container command:
@@ -78,7 +198,7 @@ canfar create headless skaha/astroml:latest --output json -- python run.py
 ```
 
 An empty result is a creation/transport failure, not evidence that a Session is
-queued. A partial replica result returns the IDs that were accepted. Use
+queued. A partial headless replica result returns the IDs that were accepted. Use
 `--debug` for request diagnostics on stderr. `CANFAR_TIMEOUT` controls HTTP
 request inactivity; it does not extend queue admission or image-pull time
 after a Session has been accepted.

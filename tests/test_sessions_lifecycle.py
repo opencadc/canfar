@@ -30,6 +30,7 @@ _EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
     ),
     "logs": (
         "(self, ids: 'list[str] | str', verbose: 'bool' = False, *, "
+        "replica: 'int | None' = None, "
         "errors: \"Literal['ignore', 'raise'] | None\" = None) "
         "-> 'dict[str, str] | None'"
     ),
@@ -39,6 +40,7 @@ _EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
         "kind: 'Kind' = 'headless', gpu: 'int | None' = None, "
         "cmd: 'str | None' = None, args: 'str | None' = None, "
         "env: 'dict[str, Any] | None' = None, replicas: 'int' = 1, *, "
+        "maxfail: 'float | None' = None, "
         "errors: \"Literal['ignore', 'raise'] | None\" = None) "
         "-> 'list[str]'"
     ),
