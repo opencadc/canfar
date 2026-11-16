@@ -156,6 +156,7 @@ class Session(HTTPClient):
         ids: list[str] | str,
         verbose: bool = False,
         *,
+        replica: int | None = None,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, str] | None:
         """Get logs from a session[s].
@@ -164,6 +165,8 @@ class Session(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
             verbose: Send logs to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected logs.
+            replica: 0-based replica index whose log to read. A batch needs it;
+                without it the Server answers HTTP 400. Defaults to None.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
@@ -176,9 +179,12 @@ class Session(HTTPClient):
         Examples:
             >>> session.logs(ids="hjko98yghj")
             >>> session.logs(ids=["hjko98yghj", "ikvp1jtp"])
+            >>> session.logs(ids="k7nq2wpx", replica=1)
         """
         ids = _ids(ids)
-        parameters: dict[str, str] = {"view": "logs"}
+        parameters: dict[str, str | int] = {"view": "logs"}
+        if replica is not None:
+            parameters["replica"] = replica
         results: dict[str, str] = {}
         failures: dict[str | int, HTTPError] = {}
 
@@ -214,6 +220,7 @@ class Session(HTTPClient):
         env: dict[str, Any] | None = None,
         replicas: int = 1,
         *,
+        maxfail: float | None = None,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
@@ -230,19 +237,28 @@ class Session(HTTPClient):
             cmd (Optional[str], optional): Command to run. Defaults to None.
             args (Optional[str], optional): Arguments to the command. Defaults to None.
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
-                Defaults to None.
-            replicas (int, optional): Number of sessions to launch. Defaults to 1.
+                Names starting with ``CANFAR_`` are reserved. Defaults to None.
+            replicas (int, optional): For ``kind="batch"``, the number of indexed
+                replicas in one session. For ``kind="headless"``, the number of
+                sessions to launch; above 1 that is deprecated. Defaults to 1.
+            maxfail (float, optional): Batch only. The batch stops when the
+                failed fraction of replicas reaches this value, from 0 to 1.
+                Defaults to None, which lets every replica run.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
         Notes:
             - If cores and ram are not specified, the Session uses the Server's
               flexible resource allocation policy. Limits depend on the Server.
-            - The name of the session suffixed with the replica number. eg. test-42
-              when replicas > 1.
-            - Each container will have the following environment variables injected:
-                * REPLICA_ID - The replica number
+            - A batch is one session. Each replica's container receives a
+              0-based ``CANFAR_REPLICA_INDEX`` and ``CANFAR_REPLICA_COUNT``.
+            - Headless replicas are separate sessions named with the replica
+              number, eg. test-42, and each container receives:
+                * REPLICA_ID - The replica number, 1-based
                 * REPLICA_COUNT - The total number of replicas
+
+        Warns:
+            FutureWarning: When ``kind="headless"`` and ``replicas`` > 1.
 
         Returns:
             List[str]: Session IDs for launched sessions. With ``errors="ignore"``,
@@ -262,12 +278,13 @@ class Session(HTTPClient):
                     cores=2,
                     ram=8,
                     gpu=1,
-                    kind="headless",
+                    kind="batch",
                     cmd="env",
                     env={"TEST": "test"},
                     replicas=2,
+                    maxfail=0.5,
                 )
-            >>> ["hjko98yghj", "ikvp1jtp"]
+            >>> ["hjko98yghj"]
         """
         payloads = build.create_parameters(
             name,
@@ -280,6 +297,7 @@ class Session(HTTPClient):
             args,
             env,
             replicas,
+            maxfail=maxfail,
         )
         results: list[str] = []
         failures: dict[str | int, HTTPError] = {}
@@ -644,6 +662,7 @@ class AsyncSession(HTTPClient):
         ids: list[str] | str,
         verbose: bool = False,
         *,
+        replica: int | None = None,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> dict[str, str] | None:
         """Get logs from a session[s].
@@ -652,6 +671,8 @@ class AsyncSession(HTTPClient):
             ids (Union[List[str], str]): Session ID[s].
             verbose: Send logs to the ``canfar.sessions`` logger and return None.
                 Defaults to False, which returns the collected logs.
+            replica: 0-based replica index whose log to read. A batch needs it;
+                without it the Server answers HTTP 400. Defaults to None.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
@@ -666,9 +687,12 @@ class AsyncSession(HTTPClient):
             >>> session = AsyncSession()
             >>> await session.logs(ids="hjko98yghj")
             >>> await session.logs(ids=["hjko98yghj", "ikvp1jtp"])
+            >>> await session.logs(ids="k7nq2wpx", replica=1)
         """
         ids = _ids(ids)
-        parameters: dict[str, str] = {"view": "logs"}
+        parameters: dict[str, str | int] = {"view": "logs"}
+        if replica is not None:
+            parameters["replica"] = replica
         results: dict[str, str] = {}
         failures: dict[str | int, HTTPError] = {}
 
@@ -709,6 +733,7 @@ class AsyncSession(HTTPClient):
         env: dict[str, Any] | None = None,
         replicas: int = 1,
         *,
+        maxfail: float | None = None,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
@@ -725,19 +750,28 @@ class AsyncSession(HTTPClient):
             cmd (Optional[str], optional): Command to run. Defaults to None.
             args (Optional[str], optional): Arguments to the command. Defaults to None.
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
-                Defaults to None.
-            replicas (int, optional): Number of sessions to launch. Defaults to 1.
+                Names starting with ``CANFAR_`` are reserved. Defaults to None.
+            replicas (int, optional): For ``kind="batch"``, the number of indexed
+                replicas in one session. For ``kind="headless"``, the number of
+                sessions to launch; above 1 that is deprecated. Defaults to 1.
+            maxfail (float, optional): Batch only. The batch stops when the
+                failed fraction of replicas reaches this value, from 0 to 1.
+                Defaults to None, which lets every replica run.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
         Notes:
             - If cores and ram are not specified, the Session uses the Server's
               flexible resource allocation policy. Limits depend on the Server.
-            - The name of the session suffixed with the replica number. eg. test-42
-              when replicas > 1.
-            - Each container will have the following environment variables injected:
-                * REPLICA_ID - The replica number
+            - A batch is one session. Each replica's container receives a
+              0-based ``CANFAR_REPLICA_INDEX`` and ``CANFAR_REPLICA_COUNT``.
+            - Headless replicas are separate sessions named with the replica
+              number, eg. test-42, and each container receives:
+                * REPLICA_ID - The replica number, 1-based
                 * REPLICA_COUNT - The total number of replicas
+
+        Warns:
+            FutureWarning: When ``kind="headless"`` and ``replicas`` > 1.
 
         Returns:
             List[str]: Session IDs for launched sessions. With ``errors="ignore"``,
@@ -757,12 +791,13 @@ class AsyncSession(HTTPClient):
                     cores=2,
                     ram=8,
                     gpu=1,
-                    kind="headless",
+                    kind="batch",
                     cmd="env",
                     env={"TEST": "test"},
                     replicas=2,
+                    maxfail=0.5,
                 )
-            >>> ["hjko98yghj", "ikvp1jtp"]
+            >>> ["hjko98yghj"]
         """
         payloads: list[list[tuple[str, Any]]] = build.create_parameters(
             name,
@@ -775,6 +810,7 @@ class AsyncSession(HTTPClient):
             args,
             env,
             replicas,
+            maxfail=maxfail,
         )
         results: list[str] = []
         failures: dict[str | int, HTTPError] = {}

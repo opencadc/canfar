@@ -118,8 +118,8 @@ one; machine output has them under `resources`.
 canfar create [OPTIONS] KIND IMAGE [-- CMD [ARGS]...]
 ```
 
-`KIND` is one of `desktop`, `notebook`, `carta`, `headless`, `firefly`, or
-`contributed`. `IMAGE` is a CANFAR Container Image such as
+`KIND` is one of `desktop`, `notebook`, `carta`, `headless`, `firefly`,
+`contributed`, or `batch`. `IMAGE` is a CANFAR Container Image such as
 `skaha/astroml:latest`; the client adds the CANFAR registry and `:latest` when
 they are omitted. That shorthand always expands to `images.canfar.net`, so on a
 Server that trusts another registry, write the full `REGISTRY/PROJECT/IMAGE:TAG`
@@ -133,7 +133,8 @@ name from `canfar image ls`. Accepted ranges for every option are in
 | `--memory`, `-m` | Requested RAM in GB. |
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
-| `--replicas`, `-r` | Number of Sessions, 1 to 256; default `1`. |
+| `--replicas`, `-r` | Replicas, 1 to 256; default `1`. A `batch` runs them in one Session. Above 1, `headless` creates one Session per replica, which is deprecated. |
+| `--maxfail` | `batch` only. Stop the batch when this fraction of its replicas has failed, from 0 to 1. Unset lets every replica run. |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
@@ -196,7 +197,7 @@ These leaves accept one or more Session IDs and produce human-readable output:
 | --- | --- |
 | `canfar events SESSION_ID...` | List Science Platform events. |
 | `canfar info SESSION_ID...` | Show Session details; `--debug` adds response warnings. |
-| `canfar logs SESSION_ID...` | Show Session logs. |
+| `canfar logs SESSION_ID... [--replica N]` | Show Session logs. A batch has one log per replica and needs `--replica`, counted from 0. |
 | `canfar open SESSION_ID...` | Open ready Sessions in new browser tabs. |
 | `canfar renew SESSION_ID...` | Reset the lifetime of interactive Sessions. |
 | `canfar delete SESSION_ID... [--force]` | Delete Sessions, confirming unless `--force` is used. |

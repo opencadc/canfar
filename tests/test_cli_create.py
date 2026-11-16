@@ -660,3 +660,88 @@ def test_zero_gpus_on_a_server_without_gpus_requests_none(tmp_path: Path) -> Non
 
     assert result.exit_code == 0, result.stderr
     assert session.create.await_args.args[0].gpus is None
+
+
+def test_create_batch_sends_one_request_with_maxfail() -> None:
+    """``create batch`` hands the library one batch request with its maxfail."""
+    with patch("canfar.cli.create.AsyncSession") as session_cls:
+        session = session_cls.return_value.__aenter__.return_value
+        session.create = AsyncMock(return_value=["k7nq2wpx"])
+        result = runner.invoke(
+            cli,
+            [
+                "create",
+                "batch",
+                "skaha/astroml:latest",
+                "--name",
+                "field-reduction",
+                "--replicas",
+                "50",
+                "--maxfail",
+                "0.25",
+                "--",
+                "python",
+                "/arc/projects/demo/worker.py",
+            ],
+        )
+
+    assert result.exit_code == 0, result.stderr
+    assert "ID: k7nq2wpx" in result.stdout
+    assert "deprecated" not in result.stderr
+    assert session.create.await_args.args == (
+        CreateRequest(
+            name="field-reduction",
+            image="images.canfar.net/skaha/astroml:latest",
+            kind="batch",
+            cmd="python",
+            args="/arc/projects/demo/worker.py",
+            replicas=50,
+            maxfail=0.25,
+        ),
+    )
+
+
+def test_create_maxfail_outside_zero_to_one_is_a_usage_error() -> None:
+    """An out-of-range --maxfail exits 2 before any request."""
+    with patch("canfar.cli.create.AsyncSession") as session_cls:
+        result = runner.invoke(
+            cli, ["create", "batch", "skaha/astroml:latest", "--maxfail", "1.5"]
+        )
+
+    assert result.exit_code == 2
+    session_cls.assert_not_called()
+
+
+def test_create_maxfail_on_headless_fails_validation() -> None:
+    """--maxfail on a headless Session is a validation failure, not a request."""
+    with patch("canfar.cli.create.AsyncSession") as session_cls:
+        result = runner.invoke(
+            cli,
+            [
+                "create",
+                "headless",
+                "skaha/astroml:latest",
+                "--maxfail",
+                "0.5",
+                "-o",
+                "json",
+            ],
+        )
+
+    assert result.exit_code == 1
+    error = StructuredError.model_validate(json.loads(result.stderr))
+    assert error.code == ErrorCode.COMMAND_VALIDATION_FAILED.value
+    session_cls.assert_not_called()
+
+
+def test_create_headless_replicas_tell_the_user_they_are_deprecated() -> None:
+    """Human output names the batch command as the replacement."""
+    with patch("canfar.cli.create.AsyncSession") as session_cls:
+        session = session_cls.return_value.__aenter__.return_value
+        session.create = AsyncMock(return_value=["id-1", "id-2"])
+        result = runner.invoke(
+            cli, ["create", "headless", "skaha/astroml:latest", "--replicas", "2"]
+        )
+
+    assert result.exit_code == 0
+    assert "canfar create batch" in result.stderr

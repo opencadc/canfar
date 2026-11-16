@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import warnings
 from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import typer
@@ -119,8 +120,11 @@ def _with_default(text: str, bounds: ResourceRange | None) -> str:
 
 async def _create_sessions(request: CreateRequest) -> list[str]:
     """Create the requested Sessions on the selected Science Platform Server."""
-    async with AsyncSession(errors="ignore") as session:
-        return await session.create(request)
+    with warnings.catch_warnings():
+        # The command prints its own notice; machine mode keeps stderr for JSON.
+        warnings.simplefilter("ignore", FutureWarning)
+        async with AsyncSession(errors="ignore") as session:
+            return await session.create(request)
 
 
 def _render_create_result(
@@ -215,11 +219,26 @@ def creation(  # noqa: PLR0917
         typer.Option(
             "--replicas",
             "-r",
-            help="Number of replicas to create.",
+            help=(
+                "Replicas in one batch Session. For headless, one Session per "
+                "replica (deprecated above 1)."
+            ),
             min=1,
             max=_MAX_REPLICAS,
         ),
     ] = 1,
+    maxfail: Annotated[
+        float | None,
+        typer.Option(
+            "--maxfail",
+            help=(
+                "Batch only. Stop the batch when this fraction of its replicas "
+                "has failed, from 0 to 1. Unset lets every replica run."
+            ),
+            min=0.0,
+            max=1.0,
+        ),
+    ] = None,
     debug: Annotated[
         bool,
         typer.Option(
@@ -242,6 +261,7 @@ def creation(  # noqa: PLR0917
     canfar create notebook skaha/base-notebook:latest
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
+    canfar create batch skaha/astroml:latest --replicas 50 -- python3 worker.py
     """
     mode = resolve_mode(output_format)
     if mode is output.OutputMode.HUMAN:
@@ -269,6 +289,7 @@ def creation(  # noqa: PLR0917
             args=args or None,
             env=environment or None,
             replicas=replicas,
+            maxfail=maxfail,
         )
     except ValueError as err:
         if isinstance(err, ValidationError) and mode is output.OutputMode.HUMAN:
@@ -294,12 +315,20 @@ def creation(  # noqa: PLR0917
             f"[dim]  GPU: {gpu}[/dim]\n"
             f"[dim]  Env: {environment}[/dim]\n"
             f"[dim]  Replicas: {replicas}[/dim]\n"
+            f"[dim]  Maxfail: {maxfail}[/dim]\n"
             f"[dim]  Command: {cmd}[/dim]\n"
             f"[dim]  Arguments: {args}[/dim]"
             + ("\n[yellow]Dry run complete.[/yellow]" if dry else "")
         )
     if dry:
         return
+
+    if mode is output.OutputMode.HUMAN and request.fans_out:
+        get_console(stderr=True).print(
+            "[yellow]Warning: --replicas above 1 for headless is deprecated; "
+            "use `canfar create batch` to run the replicas as one Session."
+            "[/yellow]"
+        )
 
     try:
         session_ids = asyncio.run(_create_sessions(request))
