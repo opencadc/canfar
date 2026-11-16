@@ -10,6 +10,14 @@ Root help and root shell completion list extension names from distribution
 metadata. Selecting a command loads its Typer application. The v1.5.2 release
 does not include extension discovery.
 
+Development builds also add the `batch` Session Kind, which needs a Science
+Platform release with batch support. `canfar create batch --replicas N` runs N
+replicas as one Session, `--maxfail` stops it after that fraction of replicas
+fails, and `canfar logs SESSION_ID --replica 0` reads one replica's log. The
+distributed helpers read the batch replica variables. Headless `--replicas`
+above 1 is deprecated, and an `--env` name starting with `CANFAR_` is
+rejected. See [Batch processing](../platform/sessions/batch.md#run-many-replicas-as-one-batch).
+
 <span id="unreleased-changes-since-v141"></span>
 
 ## Released changes since v1.4.1

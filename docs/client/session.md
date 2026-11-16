@@ -55,10 +55,11 @@ with Session() as session:
         print(session.destroy(ids))
 ```
 
-When `kind="headless"`, pass `cmd`, `args`, and `env` for the command. `cores`
-and `ram` request fixed resources; omitting them uses the server's flexible
-allocation policy. `replicas` requests multiple Sessions and the return value
-contains the successful IDs only.
+When `kind="headless"` or `kind="batch"`, pass `cmd`, `args`, and `env` for
+the command. `cores` and `ram` request fixed resources; omitting them uses the
+server's flexible allocation policy. With `kind="batch"`, `replicas` is the
+number of replicas in one Session, and `create` returns one ID. `maxfail`
+stops the batch when that fraction of its replicas has failed.
 
 ```python
 from canfar.sessions import Session
@@ -67,12 +68,19 @@ with Session() as session:
     ids = session.create(
         name="batch",
         image="images.canfar.net/skaha/terminal:latest",
-        kind="headless",
+        kind="batch",
         cmd="python",
         args="/arc/projects/demo/run.py",
         replicas=3,
+        maxfail=0.5,
     )
+    print(session.logs(ids, replica=0))
 ```
+
+A batch has one log per replica, so `logs` needs `replica`, counted from 0.
+`replicas` above 1 with `kind="headless"` still creates one Session per
+replica, but raises a `FutureWarning`; a later release removes it. See
+[Batch processing](../platform/sessions/batch.md#run-many-replicas-as-one-batch).
 
 `replicas` accepts 1 to 256; other ranges are in
 [Session limits](../platform/sessions/limits.md). Request GPUs with the `gpu`

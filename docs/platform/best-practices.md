@@ -14,8 +14,10 @@ interactive Session, validate on a small input, and run the same command in a
 - Record the Container Image, resource request, input identifiers, and code
   revision with each run.
 - Write useful progress and error messages to the Session log.
-- Give replicas disjoint inputs and use `REPLICA_ID`/`REPLICA_COUNT` or the
-  [distributed helpers](../client/helpers.md) to partition work.
+- Give replicas disjoint inputs and use `CANFAR_REPLICA_INDEX` and
+  `CANFAR_REPLICA_COUNT` in a batch, or the
+  [distributed helpers](../client/helpers.md), to partition work. A batch
+  replica can run again after preemption, so make its work safe to repeat.
 
 ```python
 import argparse

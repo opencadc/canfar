@@ -29,6 +29,15 @@ paths. These examples do not assume that `/arc` is mounted on your laptop.
 - Keep the input files, image, worker script, and manifest unchanged within a
   run. Start a new run directory when any of them changes.
 
+!!! warning "Headless replicas are deprecated"
+
+    This example submits headless replicas, one Session each. The client
+    warns about that, and a later release removes it. On a Server with batch
+    support, run the same worker as one
+    [batch](../platform/sessions/batch.md#run-many-replicas-as-one-batch).
+    The distributed helpers read the batch replica variables from a `canfar`
+    release with batch support installed in the image.
+
 !!! note "Start small"
 
     Submit one worker first. Try two replicas on a small dataset after that
