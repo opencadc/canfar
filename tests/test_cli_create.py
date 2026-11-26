@@ -534,6 +534,30 @@ class TestCreateServerLimits:
         assert result.exit_code == 0, result.stderr
         assert "Dry run complete." in result.stdout
 
+    def test_narrowing_rejects_values_the_client_bound_allows(
+        self, tmp_path: Path
+    ) -> None:
+        """35 cores passes the client bound (256) but not the Server's 34.
+
+        Checks only the exit code, since Typer 0.29 rewords range errors.
+        """
+        config_path = tmp_path / "config.yaml"
+        _save_limited_server(config_path)
+
+        with patch("canfar.models.config.CONFIG_PATH", config_path):
+            result = runner.invoke(
+                cli,
+                [
+                    *("create", "headless", "skaha/worker:v1"),
+                    "--cpu",
+                    "35",
+                    "--dry-run",
+                ],
+            )
+
+        assert result.exit_code == 2
+        assert "Dry run complete." not in result.stdout
+
     @pytest.mark.parametrize(
         ("arguments", "message"),
         [
