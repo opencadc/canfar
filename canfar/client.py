@@ -566,10 +566,6 @@ class HTTPClient(BaseSettings):
             headers["X-Skaha-Authentication-Type"] = "OIDC"
         elif isinstance(credential, X509Credential):
             headers["X-Skaha-Authentication-Type"] = "X509"
-        # Add container registry authentication if configured
-        if self.config.registry.username:
-            headers["X-Skaha-Registry-Auth"] = self.config.registry.encoded()
-
         return headers
 
     # Context Manager Methods

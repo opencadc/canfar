@@ -32,7 +32,7 @@ def fetch_parameters(
     )
 
 
-def create_parameters(  # noqa: PLR0917
+def create_request(  # noqa: PLR0917
     name: str | CreateRequest,
     image: str | None = None,
     cores: int | None = None,
@@ -45,16 +45,12 @@ def create_parameters(  # noqa: PLR0917
     replicas: int = 1,
     *,
     maxfail: float | None = None,
-) -> list[list[tuple[str, Any]]]:
-    """Build form-encoded payloads for creating one or more sessions.
-
-    A batch is one payload that carries ``replicas``; the Server sets the
-    replica variables on each pod. Headless replicas are one payload per
-    replica, each with a 1-based ``REPLICA_ID`` and ``REPLICA_COUNT``.
+    private: bool = False,
+) -> CreateRequest:
+    """Return the validated request for ``Session.create`` arguments.
 
     Args:
-        name: Domain request or base session name. Headless replica names are
-            suffixed per replica.
+        name: Domain request or base session name.
         image: Container image reference when ``name`` is a string.
         cores: CPU core count.
         ram: RAM in gigabytes.
@@ -65,6 +61,52 @@ def create_parameters(  # noqa: PLR0917
         env: Additional environment variables.
         replicas: Batch replica count, or the number of headless sessions.
         maxfail: Failed fraction of replicas that stops a batch.
+        private: Set ``CreateRequest.private``. A saved credential is sent
+            when one exists. Otherwise ``CANFAR_REGISTRY__USERNAME`` and
+            ``CANFAR_REGISTRY__SECRET`` are sent. A private launch with neither
+            raises ``RegistryCredentialsRequired``.
+
+    Returns:
+        CreateRequest: ``name`` itself, or a request built from the scalars.
+
+    Raises:
+        TypeError: If ``image`` is missing for scalar arguments, or ``private``
+            is passed with a ``CreateRequest``, which carries its own flag.
+    """
+    if isinstance(name, CreateRequest):
+        if private:
+            msg = "set private on the CreateRequest instead of passing private=True"
+            raise TypeError(msg)
+        return name
+    if image is None:
+        msg = "image is required when creating a Session from scalar arguments"
+        raise TypeError(msg)
+    return CreateRequest(
+        name=name,
+        image=image,
+        cores=cores,
+        ram=ram,
+        kind=kind,
+        gpus=gpu,
+        cmd=cmd,
+        args=args,
+        env=env,
+        replicas=replicas,
+        maxfail=maxfail,
+        private=private,
+    )
+
+
+def create_parameters(specification: CreateRequest) -> list[list[tuple[str, Any]]]:
+    """Build form-encoded payloads for creating one or more sessions.
+
+    A batch is one payload that carries ``replicas``; the Server sets the
+    replica variables on each pod. Headless replicas are one payload per
+    replica, each with a 1-based ``REPLICA_ID`` and ``REPLICA_COUNT``.
+
+    Args:
+        specification: Validated request. Headless replica names are suffixed
+            per replica.
 
     Returns:
         list[list[tuple[str, Any]]]: One tuple payload per create request.
@@ -72,25 +114,6 @@ def create_parameters(  # noqa: PLR0917
     Warns:
         FutureWarning: When a headless request asks for more than one replica.
     """
-    if isinstance(name, CreateRequest):
-        specification = name
-    else:
-        if image is None:
-            msg = "image is required when creating a Session from scalar arguments"
-            raise TypeError(msg)
-        specification = CreateRequest(
-            name=name,
-            image=image,
-            cores=cores,
-            ram=ram,
-            kind=kind,
-            gpus=gpu,
-            cmd=cmd,
-            args=args,
-            env=env,
-            replicas=replicas,
-            maxfail=maxfail,
-        )
     data: dict[str, Any] = specification.model_dump(exclude_none=True, by_alias=True)
     environment = data.pop("env", {})
     replica_count = specification.replicas

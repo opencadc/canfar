@@ -19,7 +19,6 @@ from canfar.exceptions.context import AuthExpiredError
 from canfar.models.auth import X509Credential
 from canfar.models.config import Configuration
 from canfar.models.http import Server
-from canfar.models.registry import ContainerRegistry
 from tests.helpers.config import configuration_with_credential, oidc_config, x509_config
 from tests.test_auth_x509 import generate_cert
 
@@ -495,12 +494,11 @@ class TestCertificateValidation:
 class TestHTTPClientCreationAndHeaders:
     """Test HTTP client requests and header generation."""
 
-    def test_sync_request_includes_common_and_registry_headers(
+    def test_sync_request_includes_common_headers_without_registry_auth(
         self,
     ) -> None:
-        """A native sync request carries common and registry headers."""
+        """A native sync request carries common headers, never registry auth."""
         config = Configuration()
-        config.registry = ContainerRegistry(username="test", secret="test")
         requests: list[httpx2.Request] = []
 
         with (
@@ -530,7 +528,7 @@ class TestHTTPClientCreationAndHeaders:
         assert request.headers["Accept"] == "application/json"
         assert request.headers["Date"] == "Wed, 09 Jun 2026 12:00:00 GMT"
         assert "python-canfar" in request.headers["User-Agent"]
-        assert request.headers["X-Skaha-Registry-Auth"] == "dGVzdDp0ZXN0"
+        assert "X-Skaha-Registry-Auth" not in request.headers
 
     async def test_async_request_includes_common_headers(
         self,

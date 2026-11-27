@@ -18,6 +18,8 @@ from canfar.cli.machine import OutputOption, maximum, resolve_mode
 from canfar.config.migration import ConfigResetRequiredError
 from canfar.errors import ErrorCode, StructuredError
 from canfar.exceptions.context import AuthContextError, AuthExpiredError
+from canfar.exceptions.session import RegistryCredentialsRequired
+from canfar.helpers.session import registry_headers
 from canfar.hooks.httpx.auth import AuthenticationError
 from canfar.models.config import Configuration
 from canfar.models.http import ServerResources
@@ -127,12 +129,46 @@ async def _create_sessions(request: CreateRequest) -> list[str]:
             return await session.create(request)
 
 
+def _require_registry_credential(
+    request: CreateRequest, mode: output.OutputMode
+) -> None:
+    """Fail a private launch that has no saved or environment credential."""
+    try:
+        registry_headers(Configuration(), request)  # ty: ignore[missing-argument]
+    except ConfigResetRequiredError as err:
+        output.fail(output.boundary_failure(err), mode)
+    except RegistryCredentialsRequired as err:
+        output.fail(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message=str(err),
+                hint=(
+                    f"Run `canfar registry login {err.host}`, or set "
+                    "CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET."
+                ),
+            ),
+            mode,
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
+        )
+    except ValueError as err:
+        output.fail(
+            StructuredError(
+                code=ErrorCode.COMMAND_VALIDATION_FAILED,
+                message=str(err),
+                hint="Check CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET.",
+            ),
+            mode,
+            f"[bold red]Error: {escape(str(err))}[/bold red]",
+        )
+
+
 def _render_create_result(
     session_ids: list[str],
-    name: str,
+    request: CreateRequest,
     mode: output.OutputMode,
 ) -> None:
     """Render the result of a Session creation request."""
+    name = request.name
     if session_ids:
         if mode is not output.OutputMode.HUMAN:
             output.to_stdout(session_ids, mode)
@@ -149,6 +185,14 @@ def _render_create_result(
             )
         return
 
+    host = request.registry_host
+    registry = (
+        "The registry may have rejected the credential. Check `canfar registry "
+        f"ls`, and run `canfar registry login {host}` to replace it."
+        if request.private
+        else f"If the image is private, run `canfar registry login {host}` and "
+        "rerun with --private."
+    )
     failure = StructuredError(
         code=ErrorCode.TRANSPORT_FAILURE,
         message="Failed to create session(s).",
@@ -158,7 +202,8 @@ def _render_create_result(
             "variable CANFAR_TIMEOUT, in seconds) for slow HTTP responses. "
             "Check `canfar ps --all` before retrying: a request may have been "
             "accepted even if its response was lost. For accepted IDs, use "
-            "`canfar events SESSION_ID` to inspect image pulls or admission."
+            "`canfar events SESSION_ID` to inspect image pulls or admission. "
+            f"{registry}"
         ),
     )
     output.fail(failure, mode)
@@ -246,6 +291,17 @@ def creation(  # noqa: PLR0917
             help="Print parsed Session request details.",
         ),
     ] = False,
+    private: Annotated[
+        bool,
+        typer.Option(
+            "--private",
+            help=(
+                "Require a registry credential for the image's host. Uses a "
+                "saved credential, or CANFAR_REGISTRY__USERNAME and "
+                "CANFAR_REGISTRY__SECRET. Requires HOST/PROJECT/IMAGE."
+            ),
+        ),
+    ] = False,
     dry: Annotated[
         bool,
         typer.Option(
@@ -262,6 +318,7 @@ def creation(  # noqa: PLR0917
     canfar create notebook images.canfar.net/skaha/base-notebook:latest
     canfar create headless skaha/base-notebook:latest -- python3 /path/to/script.py
     canfar create batch skaha/astroml:latest --replicas 50 -- python3 worker.py
+    canfar create notebook images.canfar.net/myproject/image:1.0 --private
     """
     mode = resolve_mode(output_format)
     if mode is output.OutputMode.HUMAN:
@@ -290,6 +347,7 @@ def creation(  # noqa: PLR0917
             env=environment or None,
             replicas=replicas,
             maxfail=maxfail,
+            private=private,
         )
     except ValueError as err:
         if isinstance(err, ValidationError) and mode is output.OutputMode.HUMAN:
@@ -304,11 +362,16 @@ def creation(  # noqa: PLR0917
             f"[bold red]Error: {escape(str(err))}[/bold red]",
         )
 
+    if request.private:
+        _require_registry_credential(request, mode)
+
     if dry or debug:
         (get_console() if dry else get_console(stderr=True)).print(
             "[dim]Debug: Parsed parameters:[/dim]\n"
             f"[dim]  Kind: {kind}[/dim]\n"
             f"[dim]  Image: {image}[/dim]\n"
+            f"[dim]  Resolved image: {request.image}[/dim]\n"
+            f"[dim]  Private: {private}[/dim]\n"
             f"[dim]  Name: {name}[/dim]\n"
             f"[dim]  CPUs: {cpu}[/dim]\n"
             f"[dim]  Memory: {memory}GB[/dim]\n"
@@ -358,4 +421,4 @@ def creation(  # noqa: PLR0917
             f"[bold red]Error: {escape(str(err))}[/bold red]",
         )
 
-    _render_create_result(session_ids, name, mode)
+    _render_create_result(session_ids, request, mode)

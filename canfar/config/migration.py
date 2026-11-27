@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
     from pydantic import ValidationError
 
-_SECRET_SECTIONS = ("authentication", "registry")
+_SECRET_SECTIONS = ("authentication", "registries")
 """Top-level sections whose values may hold credentials and are never printed."""
 
 
@@ -75,7 +75,16 @@ def _v1_to_v2(data: dict[str, Any]) -> dict[str, Any]:
     return data
 
 
-UPGRADES: dict[int, Callable[[dict[str, Any]], dict[str, Any]]] = {1: _v1_to_v2}
+def _v2_to_v3(data: dict[str, Any]) -> dict[str, Any]:
+    """Drop the version 2 ``registry`` block. Login saves a credential."""
+    data.pop("registry", None)
+    return data
+
+
+UPGRADES: dict[int, Callable[[dict[str, Any]], dict[str, Any]]] = {
+    1: _v1_to_v2,
+    2: _v2_to_v3,
+}
 """Steps keyed by the schema version they read; each returns the next version."""
 
 

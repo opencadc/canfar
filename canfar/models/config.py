@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import logging
 import re
 import sys
 from pathlib import Path
@@ -40,7 +41,13 @@ from canfar.models.auth import (
     X509Credential,
 )
 from canfar.models.http import Server, VOSpaceService
-from canfar.models.registry import ContainerRegistry
+from canfar.models.registry import (
+    RegistryCredential,
+    RegistryHost,
+    env_credential,
+)
+
+log = logging.getLogger(__name__)
 
 _CADC_URI = AnyUrl("ivo://cadc.nrc.ca/skaha")
 _CONFIG_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9_-]*$")
@@ -120,8 +127,8 @@ class Configuration(BaseSettings):
         str_strip_whitespace=True,
     )
 
-    version: Literal[2] = Field(
-        default=2,
+    version: Literal[3] = Field(
+        default=3,
         description="Configuration schema version.",
     )
     # Pydantic deep-copies these mutable defaults for each instance.
@@ -143,10 +150,13 @@ class Configuration(BaseSettings):
             description="Known science platform servers keyed by Server Name.",
         ),
     ]
-    registry: ContainerRegistry = Field(
-        default_factory=ContainerRegistry,
-        description="Container Registry Settings.",
-    )
+    registries: Annotated[
+        dict[RegistryHost, RegistryCredential],
+        Field(
+            default_factory=dict,
+            description="Saved Container Registry credentials keyed by host.",
+        ),
+    ]
     console: ConsoleConfig = Field(
         default_factory=ConsoleConfig,
         description="Kwargs forwarded to rich.console.Console.",
@@ -193,6 +203,31 @@ class Configuration(BaseSettings):
         config = cls.model_construct()
         cls.__pydantic_validator__.validate_python(data, self_instance=config)
         return config
+
+    def registry_credential(self, host: str) -> RegistryCredential | None:
+        """Return the credential to send to the Container Registry ``host``.
+
+        A saved ``registries`` entry wins. Otherwise
+        ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET`` apply.
+        ``canfar registry login`` is what writes a credential to the file.
+
+        Args:
+            host: Container Registry ``host[:port]``.
+
+        Returns:
+            The credential for ``host``, or ``None`` when there is none.
+        """
+        if saved := self.registries.get(host):
+            return saved
+        found = env_credential()
+        if found is None:
+            return None
+        log.debug(
+            "No saved registry credential for %s; using "
+            "CANFAR_REGISTRY__USERNAME and CANFAR_REGISTRY__SECRET",
+            host,
+        )
+        return found
 
     @model_validator(mode="after")
     def _normalize_and_validate_servers(self) -> Configuration:
@@ -296,7 +331,11 @@ __all__ = ["CONFIG_PATH", "Configuration", "ConsoleConfig"]
 
 
 class _CanfarEnvSettingsSource(EnvSettingsSource):
-    """Environment source that ignores legacy ``CANFAR_ACTIVE`` string overrides."""
+    """Ignore legacy ``CANFAR_ACTIVE`` and env values for ``registries``.
+
+    ``CANFAR_REGISTRY__*`` is read at launch by ``env_credential``. It is not a
+    settings field, so a save cannot copy it into the file.
+    """
 
     def get_field_value(
         self, field: FieldInfo, field_name: str
@@ -304,6 +343,8 @@ class _CanfarEnvSettingsSource(EnvSettingsSource):
         env_val, field_key, value_is_complex = super().get_field_value(
             field, field_name
         )
+        if field_name == "registries":
+            return None, field_key, False
         if (
             field_name == "active"
             and isinstance(env_val, str)

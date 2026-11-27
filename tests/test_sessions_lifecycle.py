@@ -41,6 +41,7 @@ _EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
         "cmd: 'str | None' = None, args: 'str | None' = None, "
         "env: 'dict[str, Any] | None' = None, replicas: 'int' = 1, *, "
         "maxfail: 'float | None' = None, "
+        "private: 'bool' = False, "
         "errors: \"Literal['ignore', 'raise'] | None\" = None) "
         "-> 'list[str]'"
     ),
