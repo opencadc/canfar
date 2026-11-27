@@ -31,7 +31,7 @@ def fetch_parameters(
     )
 
 
-def create_parameters(  # noqa: PLR0917
+def create_request(  # noqa: PLR0917
     name: str | CreateRequest,
     image: str | None = None,
     cores: int | None = None,
@@ -42,8 +42,10 @@ def create_parameters(  # noqa: PLR0917
     args: str | None = None,
     env: dict[str, Any] | None = None,
     replicas: int = 1,
-) -> list[list[tuple[str, Any]]]:
-    """Build form-encoded payloads for creating one or more sessions.
+    *,
+    private: bool = False,
+) -> CreateRequest:
+    """Return the validated request for ``Session.create`` arguments.
 
     Args:
         name: Domain request or base session name. Names are suffixed per replica.
@@ -56,28 +58,50 @@ def create_parameters(  # noqa: PLR0917
         args: Container arguments (headless sessions only).
         env: Additional environment variables.
         replicas: Number of session replicas to create.
+        private: Set ``CreateRequest.private``. A saved credential is sent
+            when one exists. Otherwise ``CANFAR_REGISTRY__USERNAME`` and
+            ``CANFAR_REGISTRY__SECRET`` are sent. A private launch with neither
+            raises ``RegistryCredentialsRequired``.
+
+    Returns:
+        CreateRequest: ``name`` itself, or a request built from the scalars.
+
+    Raises:
+        TypeError: If ``image`` is missing for scalar arguments, or ``private``
+            is passed with a ``CreateRequest``, which carries its own flag.
+    """
+    if isinstance(name, CreateRequest):
+        if private:
+            msg = "set private on the CreateRequest instead of passing private=True"
+            raise TypeError(msg)
+        return name
+    if image is None:
+        msg = "image is required when creating a Session from scalar arguments"
+        raise TypeError(msg)
+    return CreateRequest(
+        name=name,
+        image=image,
+        cores=cores,
+        ram=ram,
+        kind=kind,
+        gpus=gpu,
+        cmd=cmd,
+        args=args,
+        env=env,
+        replicas=replicas,
+        private=private,
+    )
+
+
+def create_parameters(specification: CreateRequest) -> list[list[tuple[str, Any]]]:
+    """Build form-encoded payloads for creating one or more sessions.
+
+    Args:
+        specification: Validated request. Names are suffixed per replica.
 
     Returns:
         list[list[tuple[str, Any]]]: One tuple payload per replica.
     """
-    if isinstance(name, CreateRequest):
-        specification = name
-    else:
-        if image is None:
-            msg = "image is required when creating a Session from scalar arguments"
-            raise TypeError(msg)
-        specification = CreateRequest(
-            name=name,
-            image=image,
-            cores=cores,
-            ram=ram,
-            kind=kind,
-            gpus=gpu,
-            cmd=cmd,
-            args=args,
-            env=env,
-            replicas=replicas,
-        )
     data: dict[str, Any] = specification.model_dump(exclude_none=True, by_alias=True)
     environment = data.pop("env", {})
     payloads: list[list[tuple[str, Any]]] = []

@@ -1,6 +1,6 @@
 # Server Name is the configuration identity for Science Platform Servers
 
-Client configuration stores Science Platform Servers as `servers: Dict[str, Server]` keyed by Server Name, and Authentication Records as `authentication: Dict[str, AuthenticationCredential]` keyed by IDP. Server Selection (`active.server`) and remembered selections (`active.servers`) reference Servers by name, not IVOA URI. We chose name over URI because dotted-path config access (`canfar config get servers.canfar.url`) needs keys without dots, and users think in names. The written schema is version 2. A version 1 file is deep-merged onto the current defaults and rewritten as version 2 the first time it loads.
+Client configuration stores Science Platform Servers as `servers: Dict[str, Server]` keyed by Server Name, and Authentication Records as `authentication: Dict[str, AuthenticationCredential]` keyed by IDP. Server Selection (`active.server`) and remembered selections (`active.servers`) reference Servers by name, not IVOA URI. We chose name over URI because dotted-path config access (`canfar config get servers.canfar.url`) needs keys without dots, and users think in names. The written schema is version 3. An older file is upgraded step by step, deep-merged onto the current defaults, and rewritten as version 3 the first time it loads.
 
 ## Consequences
 

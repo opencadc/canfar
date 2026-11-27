@@ -18,6 +18,7 @@ Server, data, image, and configuration operations remain grouped:
 | Authentication and Server Selection | `login`, `auth`, `server` |
 | Sessions | `create`, `ps`, `events`, `info`, `open`, `logs`, `renew`, `delete`, `prune` |
 | Platform information | `stats`, `image ls` |
+| Container Registry credentials | `registry login`, `registry logout`, `registry ls` |
 | Client configuration | `config show`, `config get`, `config set`, `config path`, `version` |
 | Data | `data` and its embedded file commands |
 
@@ -134,6 +135,7 @@ name from `canfar image ls`. Accepted ranges for every option are in
 | `--gpu`, `-g` | Requested GPU count. |
 | `--env`, `-e KEY=VALUE` | Set an environment variable; repeat as needed. |
 | `--replicas`, `-r` | Number of Sessions, 1 to 256; default `1`. |
+| `--private` | Send your saved registry credential for the image's host. See [Private Container Images](#canfar-registry). |
 | `--debug` | Print the parsed Session request. |
 | `--dry-run` | Validate and print the request without creating a Session. |
 | `--output`, `-o` | Emit created Session IDs as `json` or `yaml`. |
@@ -157,6 +159,52 @@ GPUs accepts only `--gpu 0`, which requests none. A value outside a range is a
 usage error:
 exit code 2 with `Invalid value` on stderr, before any request is sent,
 `--dry-run` included.
+
+<span id="canfar-registry"></span>
+
+### Private Container Images
+
+A public image on the registry needs no credential. For an image in a private
+project, save a credential such as a Harbor CLI secret once per registry host,
+then launch with `--private`:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
+```
+
+`registry login` prompts for a hidden secret. In a script, pipe it on stdin;
+no option takes the secret as an argument:
+
+```bash
+printf %s "$HARBOR_CLI_SECRET" | canfar registry login images.canfar.net -u USERNAME --secret-stdin
+```
+
+The host defaults to `images.canfar.net`. One saved credential serves every
+Science Platform Server. Login saves the credential without checking it with
+the registry, so a wrong secret shows up as an image-pull failure in
+`canfar events SESSION_ID`.
+
+| Command | Effect |
+| --- | --- |
+| `canfar registry login [HOST]` | Save or replace the credential for `HOST`. |
+| `canfar registry logout [HOST]` | Remove the saved credential; exits 0 when there is none. |
+| `canfar registry ls` | List host, username, and source (`saved` or `env`). An `env` row uses host `*` and applies to hosts you have not saved. Secrets are never shown. |
+
+`--private` sends a saved credential in the `X-Skaha-Registry-Auth` header of
+each replica's create request, and on no other request. Public images need no
+credential. With no credential for the host, the launch still runs and the
+header is omitted. A private image must name
+its registry host: the first segment contains `.` or `:`, or is `localhost`.
+The client does not add `images.canfar.net` to a private short name, so
+`canfar create notebook skaha/astroml --private` fails and suggests
+`images.canfar.net/skaha/astroml:latest`. Create never prompts for a secret.
+
+For a one-off launch, such as in CI or a batch job, set
+`CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET`. They are used when
+the image host has no saved credential. The names match without case. They are
+never written to the configuration file. A private launch with neither a saved
+credential nor both variables fails before any request.
 
 <span id="canfar-ps"></span>
 
@@ -272,7 +320,8 @@ subcommand help show a beta notice; operations and Python calls do not.
 
 The leaf option `-o/--output` accepts only `json` or `yaml`. It is available on
 the data-producing forms `auth` (the default active view), `auth show`,
-`auth ls`, `server ls`, `create`, `ps`, `config show`, and `config get`:
+`auth ls`, `server ls`, `create`, `ps`, `registry ls`, `config show`, and
+`config get`:
 
 ```bash
 canfar auth show -o json

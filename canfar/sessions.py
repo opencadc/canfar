@@ -23,11 +23,12 @@ from canfar.helpers.session import (
     _session_url,
     _task_result,
     connection_url,
+    registry_headers,
 )
-from canfar.models.session import CreateRequest
 from canfar.utils import build
 
 if TYPE_CHECKING:
+    from canfar.models.session import CreateRequest
     from canfar.models.types import Kind, Status
 log = logging.getLogger(__name__)
 
@@ -214,6 +215,7 @@ class Session(HTTPClient):
         env: dict[str, Any] | None = None,
         replicas: int = 1,
         *,
+        private: bool = False,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
@@ -232,6 +234,11 @@ class Session(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
+            private: Send a saved Container Registry credential for the image's host,
+                or ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET``
+                when that host has nothing saved. Public images need none.
+                The image must name that host. Set
+                ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
@@ -250,8 +257,13 @@ class Session(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
+            RegistryCredentialsRequired: If a private launch has no saved
+                credential for the image host and
+                ``CANFAR_REGISTRY__USERNAME`` / ``CANFAR_REGISTRY__SECRET``
+                are not both set.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
+            TypeError: If ``private=True`` is passed with a ``CreateRequest``.
 
         Examples:
             >>> from canfar.sessions import Session
@@ -269,7 +281,7 @@ class Session(HTTPClient):
                 )
             >>> ["hjko98yghj", "ikvp1jtp"]
         """
-        payloads = build.create_parameters(
+        request = build.create_request(
             name,
             image,
             cores,
@@ -280,14 +292,18 @@ class Session(HTTPClient):
             args,
             env,
             replicas,
+            private=private,
         )
+        headers = registry_headers(self.config, request)
+        payloads = build.create_parameters(request)
         results: list[str] = []
         failures: dict[str | int, HTTPError] = {}
-        session_kind = name.kind if isinstance(name, CreateRequest) else kind
-        log.debug("Creating %d %s session[s].", len(payloads), session_kind)
+        log.debug("Creating %d %s session[s].", len(payloads), request.kind)
         for replica, payload in enumerate(payloads, start=1):
             try:
-                response: Response = self.client.post(url="session", params=payload)
+                response: Response = self.client.post(
+                    url="session", params=payload, headers=headers
+                )
                 results.append(_response_session_id(response))
             except HTTPError as err:
                 failures[replica] = err
@@ -709,6 +725,7 @@ class AsyncSession(HTTPClient):
         env: dict[str, Any] | None = None,
         replicas: int = 1,
         *,
+        private: bool = False,
         errors: Literal["ignore", "raise"] | None = None,
     ) -> list[str]:
         """Launch a canfar session.
@@ -727,6 +744,11 @@ class AsyncSession(HTTPClient):
             env (Optional[Dict[str, Any]], optional): Environment variables to inject.
                 Defaults to None.
             replicas (int, optional): Number of sessions to launch. Defaults to 1.
+            private: Send a saved Container Registry credential for the image's host,
+                or ``CANFAR_REGISTRY__USERNAME`` and ``CANFAR_REGISTRY__SECRET``
+                when that host has nothing saved. Public images need none.
+                The image must name that host. Set
+                ``CreateRequest.private`` instead when ``name`` is a request.
             errors: Failure policy for this call. Defaults to the client's
                 ``errors`` setting.
 
@@ -745,8 +767,13 @@ class AsyncSession(HTTPClient):
                 all attempts fail, returns an empty list.
 
         Raises:
+            RegistryCredentialsRequired: If a private launch has no saved
+                credential for the image host and
+                ``CANFAR_REGISTRY__USERNAME`` / ``CANFAR_REGISTRY__SECRET``
+                are not both set.
             SessionRequestError: If ``errors`` is ``"raise"`` and any replica failed.
                 Its ``errors`` are keyed by 1-based replica number.
+            TypeError: If ``private=True`` is passed with a ``CreateRequest``.
 
         Examples:
             >>> from canfar.sessions import AsyncSession
@@ -764,7 +791,7 @@ class AsyncSession(HTTPClient):
                 )
             >>> ["hjko98yghj", "ikvp1jtp"]
         """
-        payloads: list[list[tuple[str, Any]]] = build.create_parameters(
+        request = build.create_request(
             name,
             image,
             cores,
@@ -775,17 +802,21 @@ class AsyncSession(HTTPClient):
             args,
             env,
             replicas,
+            private=private,
         )
+        headers = registry_headers(self.config, request)
+        payloads = build.create_parameters(request)
         results: list[str] = []
         failures: dict[str | int, HTTPError] = {}
 
         async def request_session(parameters: list[tuple[str, Any]]) -> str:
-            response = await self.asynclient.post(url="session", params=parameters)
+            response = await self.asynclient.post(
+                url="session", params=parameters, headers=headers
+            )
             return _response_session_id(response)
 
         tasks = [request_session(payload) for payload in payloads]
-        session_kind = name.kind if isinstance(name, CreateRequest) else kind
-        msg = f"Creating {len(payloads)} {session_kind} session[s]."
+        msg = f"Creating {len(payloads)} {request.kind} session[s]."
         log.debug(msg)
         responses = await asyncio.gather(*tasks, return_exceptions=True)
         for replica, reply in enumerate(responses, start=1):

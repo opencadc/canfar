@@ -228,7 +228,7 @@ network failure returns `[]`; request validation errors still raise.
 ## Edit and save Configuration
 
 `Configuration` is the persisted data shape. Its top-level fields are
-`version`, `active`, `authentication`, `servers`, `registry`, and `console`.
+`version`, `active`, `authentication`, `servers`, `registries`, and `console`.
 Authentication Records are keyed by Identity Provider, Science Platform Servers
 by Server Name, and `active` stores the selected references. Use the bound
 `config.editor` to read, validate, and save changes:
@@ -250,24 +250,43 @@ Configuration shape.
 
 ## Private Container Images
 
-Pass a `ContainerRegistry` in the Configuration when creating a Session from a
-private image:
+A public image needs no registry credential. For an image in a private project,
+save a credential such as a Harbor CLI secret once per registry host, then pass
+`private=True`. The saved credential is reused for every Science Platform Server:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+```
+
+Then name the image's registry host and pass `private=True`:
 
 ```python
-from canfar.models.config import Configuration
-from canfar.models.registry import ContainerRegistry
 from canfar.sessions import Session
 
-config = Configuration(
-    registry=ContainerRegistry(username="username", secret="CLI_SECRET")
-)
-with Session(config=config) as session:
+with Session() as session:
     ids = session.create(
         kind="notebook",
         image="images.canfar.net/my-project/private-image:latest",
         name="private-image-test",
+        private=True,
     )
 ```
+
+The client sends the credential in the `X-Skaha-Registry-Auth` header of each
+replica's `POST /session` request, and on no other request. Without
+`private=True`, no request carries it. A private launch with no saved
+credential and no `CANFAR_REGISTRY__USERNAME` / `CANFAR_REGISTRY__SECRET`
+fails before any request. A private image must start with its
+registry host: `my-project/private-image` is rejected rather than expanded to
+`images.canfar.net`.
+When you pass a `CreateRequest`, set `private=True` on the request instead.
+
+A saved credential for the image host is sent when one exists. When that host
+has none, `CANFAR_REGISTRY__USERNAME` and `CANFAR_REGISTRY__SECRET` are sent
+instead. Those names match without case, and they are never written to the
+configuration file. If neither is set, a private launch fails and tells you
+to run `canfar registry login` or set the variables. `canfar registry login`
+is what saves a credential.
 
 ## Read next
 

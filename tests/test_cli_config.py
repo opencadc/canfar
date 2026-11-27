@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from unittest.mock import patch
 from urllib.parse import urlparse
 
+import pytest
 import yaml
 from rich.text import Text
 from typer.testing import CliRunner
@@ -19,7 +20,14 @@ if TYPE_CHECKING:
 runner = CliRunner()
 
 _CONFIG_KEYS = frozenset(
-    {"version", "active", "authentication", "servers", "registry", "console"}
+    {
+        "version",
+        "active",
+        "authentication",
+        "servers",
+        "registries",
+        "console",
+    }
 )
 
 
@@ -175,7 +183,7 @@ def test_config_show_path_format_and_errors(tmp_path: Path) -> None:
         result = runner.invoke(config, ["show"])
 
     assert result.exit_code == 0
-    assert "'version': 2" in result.stdout
+    assert "'version': 3" in result.stdout
 
     result = runner.invoke(config, ["ls"])
     assert result.exit_code == 2
@@ -224,7 +232,7 @@ def test_config_show_json_emits_configuration_model(tmp_path: Path) -> None:
     assert not result.stdout.startswith("@")
     payload = json.loads(result.stdout)
     assert set(payload) == _CONFIG_KEYS
-    assert payload["version"] == 2
+    assert payload["version"] == 3
 
 
 def test_config_show_yaml_emits_configuration_model(tmp_path: Path) -> None:
@@ -248,7 +256,7 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
     config_path.write_text(
         yaml.dump(
             {
-                "version": 2,
+                "version": 3,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -298,13 +306,48 @@ def test_config_show_json_redacts_oidc_secrets(tmp_path: Path) -> None:
     assert oidc["token"]["refresh"] == "**********"
 
 
+@pytest.mark.parametrize(
+    "args",
+    [
+        ["show", "-o", "json"],
+        ["show"],
+        ["get", "registries"],
+    ],
+    ids=["show-json", "show-human", "get-saved"],
+)
+def test_config_show_and_get_mask_registry_secrets(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, args: list[str]
+) -> None:
+    """Saved and runtime Container Registry secrets print masked."""
+    config_path = tmp_path / "config.yaml"
+    config_path.write_text(
+        "version: 3\nregistries:\n"
+        "  images.canfar.net: {username: ada, secret: saved-s3cret}\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("CANFAR_REGISTRY__USERNAME", "robot-ci")
+    monkeypatch.setenv("CANFAR_REGISTRY__SECRET", "env-s3cret")
+
+    with (
+        _patch_config_path(config_path),
+        patch("canfar.cli.config.CONFIG_PATH", config_path),
+        patch("canfar.models.config.CONFIG_PATH", config_path),
+    ):
+        result = runner.invoke(config, args)
+
+    assert result.exit_code == 0, result.output
+    assert "saved-s3cret" not in result.output
+    assert "env-s3cret" not in result.output
+    assert "**********" in result.output
+
+
 def test_config_show_json_keeps_null_secrets_null(tmp_path: Path) -> None:
     """Unset OIDC secret fields stay null (stable keys, no fake masking)."""
     config_path = tmp_path / "config.yaml"
     config_path.write_text(
         yaml.dump(
             {
-                "version": 2,
+                "version": 3,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -384,7 +427,7 @@ def test_config_get_json_redacts_sensitive_paths(tmp_path: Path) -> None:
     config_path.write_text(
         yaml.dump(
             {
-                "version": 2,
+                "version": 3,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",
@@ -440,7 +483,7 @@ def test_config_get_json_redacts_secrets_inside_credential_record(
     config_path.write_text(
         yaml.dump(
             {
-                "version": 2,
+                "version": 3,
                 "active": {
                     "authentication": "srcnet",
                     "server": "test",

@@ -63,8 +63,15 @@ def _updated_data(config: Configuration, path: str, value: Any) -> dict[str, Any
     return data
 
 
-def _restore_oidc_secrets(config: Configuration, data: dict[str, Any]) -> None:
+def _restore_secrets(config: Configuration, data: dict[str, Any]) -> None:
     """Replace masked ``SecretStr`` placeholders with values for YAML persistence."""
+    registries = data.get("registries")
+    if isinstance(registries, dict):
+        for host, registry_data in registries.items():
+            credential = config.registries.get(host)
+            if credential is not None and isinstance(registry_data, dict):
+                registry_data["secret"] = credential.secret.get_secret_value()
+
     authentication = data.get("authentication")
     if not isinstance(authentication, dict):
         return
@@ -100,7 +107,7 @@ def _save_config(config: Configuration) -> None:
     try:
         candidate = _validated_copy(config)
         data = candidate.model_dump(mode="json", exclude_none=True)
-        _restore_oidc_secrets(candidate, data)
+        _restore_secrets(candidate, data)
         serialized = yaml.dump(data, default_flow_style=False, sort_keys=True, indent=2)
         with tempfile.NamedTemporaryFile(
             mode="w",

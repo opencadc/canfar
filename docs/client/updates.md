@@ -10,6 +10,40 @@ Root help and root shell completion list extension names from distribution
 metadata. Selecting a command loads its Typer application. The v1.5.2 release
 does not include extension discovery.
 
+<span id="private-container-images"></span>
+
+### Private Container Images
+
+Development builds launch images from private registry projects. Save a
+credential, such as a Harbor CLI secret, once per registry host, then launch
+with `--private` in the CLI or `private=True` in Python:
+
+```bash
+canfar registry login images.canfar.net -u USERNAME
+canfar create notebook images.canfar.net/PROJECT/IMAGE:TAG --private
+```
+
+- `canfar registry login`, `logout`, and `ls` manage credentials. The secret
+  comes from a hidden prompt or `--secret-stdin`, never an argument, and
+  `config show`, `config get`, and `registry ls` never print it.
+- The credential is required for a private launch. A saved credential for the
+  image host is sent. When that host has none, `CANFAR_REGISTRY__USERNAME` and
+  `CANFAR_REGISTRY__SECRET` are sent instead. If neither is set, create fails
+  before any request. A public image sends no registry header.
+- A private image must name its registry host. `skaha/astroml --private` is
+  rejected rather than expanded. Public short names still gain
+  `images.canfar.net` and `:latest`.
+- Those environment names match without case and are never written to the
+  configuration file. `canfar registry login` is what saves a credential.
+- The configuration file moves to schema version 3. The first time this
+  client loads a version 2 file, it removes the old `registry` block and fills
+  in omitted shipped defaults, such as the `canfar` server. Save the credential
+  again with `canfar registry login`. Older clients cannot read a version 3
+  file and ask you to reset it.
+
+See [Private Container Images](../cli/cli-help.md#canfar-registry) and the
+[Python guide](get-started.md#private-container-images).
+
 <span id="unreleased-changes-since-v141"></span>
 
 ## Released changes since v1.4.1

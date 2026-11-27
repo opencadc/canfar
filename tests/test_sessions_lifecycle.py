@@ -39,6 +39,7 @@ _EXPECTED_SESSION_SIGNATURES: dict[str, str] = {
         "kind: 'Kind' = 'headless', gpu: 'int | None' = None, "
         "cmd: 'str | None' = None, args: 'str | None' = None, "
         "env: 'dict[str, Any] | None' = None, replicas: 'int' = 1, *, "
+        "private: 'bool' = False, "
         "errors: \"Literal['ignore', 'raise'] | None\" = None) "
         "-> 'list[str]'"
     ),
