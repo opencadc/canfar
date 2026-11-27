@@ -2006,6 +2006,10 @@ Server, data, image, and configuration operations remain grouped:</p>
 <td><code>stats</code>, <code>image ls</code></td>
 </tr>
 <tr>
+<td>Container Registry credentials</td>
+<td><code>registry login</code>, <code>registry logout</code>, <code>registry ls</code></td>
+</tr>
+<tr>
 <td>Client configuration</td>
 <td><code>config show</code>, <code>config get</code>, <code>config set</code>, <code>config path</code>, <code>version</code></td>
 </tr>
@@ -2153,6 +2157,10 @@ name from <code>canfar image ls</code>. Accepted ranges for every option are in
 <td>Number of Sessions, 1 to 256; default <code>1</code>.</td>
 </tr>
 <tr>
+<td><code>--private</code></td>
+<td>Send your saved registry credential for the image's host. See <a href="#canfar-registry">Private Container Images</a>.</td>
+</tr>
+<tr>
 <td><code>--debug</code></td>
 <td>Print the parsed Session request.</td>
 </tr>
@@ -2182,6 +2190,57 @@ GPUs accepts only <code>--gpu 0</code>, which requests none. A value outside a r
 usage error:
 exit code 2 with <code>Invalid value</code> on stderr, before any request is sent,
 <code>--dry-run</code> included.</p>
+<p><span id="canfar-registry"></span></p>
+<h3 id="private-container-images">Private Container Images<a class="headerlink" href="#private-container-images" title="Permanent link">&para;</a></h3>
+<p>A public image on the registry needs no credential. For an image in a private
+project, save a credential such as a Harbor CLI secret once per registry host,
+then launch with <code>--private</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>registry<span class="w"> </span>login<span class="w"> </span>images.canfar.net<span class="w"> </span>-u<span class="w"> </span>USERNAME
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>images.canfar.net/PROJECT/IMAGE:TAG<span class="w"> </span>--private
+</code></pre></div>
+<p><code>registry login</code> prompts for a hidden secret. In a script, pipe it on stdin;
+no option takes the secret as an argument:</p>
+<div class="highlight"><pre><span></span><code><span class="nb">printf</span><span class="w"> </span>%s<span class="w"> </span><span class="s2">"</span><span class="nv">$HARBOR_CLI_SECRET</span><span class="s2">"</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>canfar<span class="w"> </span>registry<span class="w"> </span>login<span class="w"> </span>images.canfar.net<span class="w"> </span>-u<span class="w"> </span>USERNAME<span class="w"> </span>--secret-stdin
+</code></pre></div>
+<p>The host defaults to <code>images.canfar.net</code>. One saved credential serves every
+Science Platform Server. Login saves the credential without checking it with
+the registry, so a wrong secret shows up as an image-pull failure in
+<code>canfar events SESSION_ID</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Command</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>canfar registry login [HOST]</code></td>
+<td>Save or replace the credential for <code>HOST</code>.</td>
+</tr>
+<tr>
+<td><code>canfar registry logout [HOST]</code></td>
+<td>Remove the saved credential; exits 0 when there is none.</td>
+</tr>
+<tr>
+<td><code>canfar registry ls</code></td>
+<td>List host, username, and source (<code>saved</code> or <code>env</code>). An <code>env</code> row uses host <code>*</code> and applies to hosts you have not saved. Secrets are never shown.</td>
+</tr>
+</tbody>
+</table>
+<p><code>--private</code> sends a saved credential in the <code>X-Skaha-Registry-Auth</code> header of
+each replica's create request, and on no other request. Public images need no
+credential. With no credential for the host, the launch still runs and the
+header is omitted. A private image must name
+its registry host: the first segment contains <code>.</code> or <code>:</code>, or is <code>localhost</code>.
+The client does not add <code>images.canfar.net</code> to a private short name, so
+<code>canfar create notebook skaha/astroml --private</code> fails and suggests
+<code>images.canfar.net/skaha/astroml:latest</code>. Create never prompts for a secret.</p>
+<p>For a one-off launch, such as in CI or a batch job, set
+<code>CANFAR_REGISTRY__USERNAME</code> and <code>CANFAR_REGISTRY__SECRET</code>. They are used when
+the image host has no saved credential. The names match without case. They are
+never written to the configuration file. A private launch with neither a saved
+credential nor both variables fails before any request.</p>
 <p><span id="canfar-ps"></span></p>
 <h3 id="list-sessions">List Sessions<a class="headerlink" href="#list-sessions" title="Permanent link">&para;</a></h3>
 <div class="highlight"><span class="filename">Command syntax</span><pre><span></span><code>canfar ps [OPTIONS]
@@ -2318,7 +2377,8 @@ subcommand help show a beta notice; operations and Python calls do not.</p>
 <h2 id="machine-output">Machine output<a class="headerlink" href="#machine-output" title="Permanent link">&para;</a></h2>
 <p>The leaf option <code>-o/--output</code> accepts only <code>json</code> or <code>yaml</code>. It is available on
 the data-producing forms <code>auth</code> (the default active view), <code>auth show</code>,
-<code>auth ls</code>, <code>server ls</code>, <code>create</code>, <code>ps</code>, <code>config show</code>, and <code>config get</code>:</p>
+<code>auth ls</code>, <code>server ls</code>, <code>create</code>, <code>ps</code>, <code>registry ls</code>, <code>config show</code>, and
+<code>config get</code>:</p>
 <div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>auth<span class="w"> </span>show<span class="w"> </span>-o<span class="w"> </span>json
 canfar<span class="w"> </span>server<span class="w"> </span>ls<span class="w"> </span>--output<span class="w"> </span>yaml
 canfar<span class="w"> </span>create<span class="w"> </span>headless<span class="w"> </span>skaha/terminal:1.1.2<span class="w"> </span>-o<span class="w"> </span>json
@@ -2395,7 +2455,7 @@ container-command token.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 27, 2026 18:17:14 UTC">October 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2026 20:12:32 UTC">November 5, 2026</span>
   </span>
 
     

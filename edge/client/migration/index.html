@@ -2004,7 +2004,7 @@ Use the public <code>canfar.authentication</code> and <code>canfar.server</code>
 credential and server selection, rather than removed Configuration service
 methods. See <a href="../get-started/#edit-and-save-configuration">Install and set up</a>.
 The editor move does not require a reset. A written version 1 file is migrated
-to version 2 the first time it loads.</p>
+to the current version the first time it loads.</p>
 <h3 id="update-http-client-imports">Update HTTP client imports<a class="headerlink" href="#update-http-client-imports" title="Permanent link">&para;</a></h3>
 <p>CANFAR now uses <code>httpx2</code> for its synchronous and asynchronous HTTP clients.
 If you catch transport errors or provide test transports, import their types
@@ -2068,8 +2068,8 @@ showed <code>2</code>, <code>16</code>, and <code>0</code> when the Server had n
 and <code>None</code> in Python, so check for it before comparing. The Server <code>status</code>
 field, which discovery never filled in, is also gone from the configuration and
 from <code>canfar server ls -o json</code>. The first time this client loads a version 1
-file it prints <code>Migrating canfar client config v1 → v2</code> and rewrites that
-file as version 2. Your saved values stay. Omitted defaults are filled, so the
+file it prints <code>Migrating canfar client config v1 → v3</code> and rewrites that
+file as version 3. Your saved values stay. Omitted defaults are filled, so the
 shipped CADC server gains <code>arc</code> and <code>vault</code> when the old file had no storage.
 The old <code>cores</code>, <code>ram</code>, <code>gpus</code>, and <code>status</code> values are dropped and are not
 copied into <code>resources</code>. Run <code>canfar login IDP</code> or <code>canfar server use NAME</code> to
@@ -2267,7 +2267,7 @@ a reset. Contact <a href="../../platform/support/">support</a> if the error pers
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 27, 2026 18:17:14 UTC">October 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 4, 2026 23:56:33 UTC">November 4, 2026</span>
   </span>
 
     

@@ -1461,6 +1461,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#launch-a-private-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launch a private image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#image-contents" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2320,6 +2331,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#launch-a-private-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Launch a private image
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#image-contents" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -2454,6 +2476,18 @@ picks up new labels on its next refresh; see
 <p>Do not put passwords or access tokens in a Dockerfile, an image layer, a
 notebook, or a Session command. Prefer a short-lived credential mechanism
 provided by the registry operator.</p>
+<p><span id="launch-a-private-image"></span></p>
+<h2 id="launch-a-private-image">Launch a private image<a class="headerlink" href="#launch-a-private-image" title="Permanent link">&para;</a></h2>
+<p>Public images on the registry need no credential. To start a Session from an
+image in a private project, save your registry credential once, then launch
+with the full image name and <code>--private</code>:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>registry<span class="w"> </span>login<span class="w"> </span>images.canfar.net<span class="w"> </span>-u<span class="w"> </span>USERNAME
+canfar<span class="w"> </span>create<span class="w"> </span>notebook<span class="w"> </span>images.canfar.net/PROJECT/IMAGE:TAG<span class="w"> </span>--private
+</code></pre></div>
+<p>If that host has no saved credential, the launch uses <code>CANFAR_REGISTRY__USERNAME</code>
+and <code>CANFAR_REGISTRY__SECRET</code>. If neither is set, create fails before any request.</p>
+<p>See <a href="../../../cli/cli-help/#canfar-registry">Private Container Images</a> for
+scripted login, environment variables, and the Python interface.</p>
 <p><span id="vulnerability-scanning"></span>
 <span id="scanning-process"></span>
 <span id="vulnerability-reports"></span>
@@ -2481,7 +2515,10 @@ with an image that the target Science Platform Server can pull.</p>
 <ul>
 <li>A <code>not found</code> or pull error usually means the image reference is wrong, the
   tag was removed, or the target server cannot reach that registry.</li>
-<li>A private image may require project membership or a server-specific login.</li>
+<li>A private image in a private project can use a saved registry credential.
+  Launch it with <code>--private</code>. Public images on the same registry need no
+  credential. If the Session never starts, check
+  <code>canfar registry ls</code> and <code>canfar events SESSION_ID</code>.</li>
 <li>A successful push does not guarantee that every Science Platform deployment
   can pull the image.</li>
 <li>For a <code>Pending</code> Session, inspect <code>canfar info SESSION_ID</code> and
@@ -2511,7 +2548,7 @@ and <a href="../../support/">support</a>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 23, 2026 18:10:22 UTC">October 23, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2026 20:12:32 UTC">November 5, 2026</span>
   </span>
 
     

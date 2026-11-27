@@ -2166,7 +2166,7 @@ inspect and clean up this specific run, as shown in the <a href="../quick-start/
 network failure returns <code>[]</code>; request validation errors still raise.</p>
 <h2 id="edit-and-save-configuration">Edit and save Configuration<a class="headerlink" href="#edit-and-save-configuration" title="Permanent link">&para;</a></h2>
 <p><code>Configuration</code> is the persisted data shape. Its top-level fields are
-<code>version</code>, <code>active</code>, <code>authentication</code>, <code>servers</code>, <code>registry</code>, and <code>console</code>.
+<code>version</code>, <code>active</code>, <code>authentication</code>, <code>servers</code>, <code>registries</code>, and <code>console</code>.
 Authentication Records are keyed by Identity Provider, Science Platform Servers
 by Server Name, and <code>active</code> stores the selected references. Use the bound
 <code>config.editor</code> to read, validate, and save changes:</p>
@@ -2183,22 +2183,36 @@ invalid updates leave it unchanged. <code>save()</code> persists the validated
 Configuration atomically. The editor itself is not part of the serialized
 Configuration shape.</p>
 <h2 id="private-container-images">Private Container Images<a class="headerlink" href="#private-container-images" title="Permanent link">&para;</a></h2>
-<p>Pass a <code>ContainerRegistry</code> in the Configuration when creating a Session from a
-private image:</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">Configuration</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.models.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContainerRegistry</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
+<p>A public image needs no registry credential. For an image in a private project,
+save a credential such as a Harbor CLI secret once per registry host, then pass
+<code>private=True</code>. The saved credential is reused for every Science Platform Server:</p>
+<div class="highlight"><pre><span></span><code>canfar<span class="w"> </span>registry<span class="w"> </span>login<span class="w"> </span>images.canfar.net<span class="w"> </span>-u<span class="w"> </span>USERNAME
+</code></pre></div>
+<p>Then name the image's registry host and pass <code>private=True</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">canfar.sessions</span><span class="w"> </span><span class="kn">import</span> <span class="n">Session</span>
 
-<span class="n">config</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">(</span>
-    <span class="n">registry</span><span class="o">=</span><span class="n">ContainerRegistry</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s2">"username"</span><span class="p">,</span> <span class="n">secret</span><span class="o">=</span><span class="s2">"CLI_SECRET"</span><span class="p">)</span>
-<span class="p">)</span>
-<span class="k">with</span> <span class="n">Session</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+<span class="k">with</span> <span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
     <span class="n">ids</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
         <span class="n">kind</span><span class="o">=</span><span class="s2">"notebook"</span><span class="p">,</span>
         <span class="n">image</span><span class="o">=</span><span class="s2">"images.canfar.net/my-project/private-image:latest"</span><span class="p">,</span>
         <span class="n">name</span><span class="o">=</span><span class="s2">"private-image-test"</span><span class="p">,</span>
+        <span class="n">private</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
     <span class="p">)</span>
 </code></pre></div>
+<p>The client sends the credential in the <code>X-Skaha-Registry-Auth</code> header of each
+replica's <code>POST /session</code> request, and on no other request. Without
+<code>private=True</code>, no request carries it. A private launch with no saved
+credential and no <code>CANFAR_REGISTRY__USERNAME</code> / <code>CANFAR_REGISTRY__SECRET</code>
+fails before any request. A private image must start with its
+registry host: <code>my-project/private-image</code> is rejected rather than expanded to
+<code>images.canfar.net</code>.
+When you pass a <code>CreateRequest</code>, set <code>private=True</code> on the request instead.</p>
+<p>A saved credential for the image host is sent when one exists. When that host
+has none, <code>CANFAR_REGISTRY__USERNAME</code> and <code>CANFAR_REGISTRY__SECRET</code> are sent
+instead. Those names match without case, and they are never written to the
+configuration file. If neither is set, a private launch fails and tells you
+to run <code>canfar registry login</code> or set the variables. <code>canfar registry login</code>
+is what saves a credential.</p>
 <h2 id="read-next">Read next<a class="headerlink" href="#read-next" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../quick-start/">Python quickstart</a></li>
@@ -2229,7 +2243,7 @@ private image:</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 27, 2026 18:17:14 UTC">October 27, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 5, 2026 20:12:32 UTC">November 5, 2026</span>
   </span>
 
     
