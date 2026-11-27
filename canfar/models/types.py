@@ -9,12 +9,19 @@ from __future__ import annotations
 from typing import Literal, TypeAlias
 
 Kind: TypeAlias = Literal[
-    "desktop", "notebook", "carta", "headless", "firefly", "desktop-app", "contributed"
+    "desktop",
+    "notebook",
+    "carta",
+    "headless",
+    "firefly",
+    "desktop-app",
+    "contributed",
+    "batch",
 ]
 """Session type constants (new lowercase style)."""
 
 Pruneable: TypeAlias = Literal[
-    "desktop", "notebook", "carta", "headless", "firefly", "contributed"
+    "desktop", "notebook", "carta", "headless", "firefly", "contributed", "batch"
 ]
 """Session types that can be pruned (destroyed) via the API."""
 

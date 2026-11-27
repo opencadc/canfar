@@ -454,3 +454,57 @@ def test_stats_uses_selected_server_resource_limits(
     assert "GPU" not in result.stdout
     assert "999" not in result.stdout
     assert "Maximum Requests Size" not in result.stdout
+
+
+_BATCH_REPLICAS = {
+    "total": 50,
+    "succeeded": 12,
+    "failed": 1,
+    "active": 10,
+    "incomplete": 27,
+}
+
+
+def test_ps_shows_batch_progress_beside_its_status(tmp_path: Path) -> None:
+    """A batch row reads its succeeded and failed replicas out of the total."""
+    payloads = [
+        _session_payload("k7nq2wpx", kind="batch", replicas=_BATCH_REPLICAS),
+        _session_payload("headless-1"),
+    ]
+
+    with (
+        _patch_config(tmp_path / "config.yaml"),
+        patch("canfar.cli.ps.AsyncSession") as session_cls,
+    ):
+        session = _mock_async_session(session_cls)
+        session.fetch.return_value = payloads
+        result = runner.invoke(cli, ["ps"])
+
+    assert result.exit_code == 0
+    rows = {
+        line.split()[0]: line for line in result.stdout.splitlines() if line.strip()
+    }
+    assert "Running (12/50 succeeded, 1 failed)" in rows["k7nq2wpx"]
+    assert "succeeded" not in rows["headless-1"]
+
+
+def test_ps_json_keeps_the_batch_replicas_block(tmp_path: Path) -> None:
+    """Machine output passes batch counts through and adds none elsewhere."""
+    payloads = [
+        _session_payload("k7nq2wpx", kind="batch", replicas=_BATCH_REPLICAS),
+        _session_payload("headless-1"),
+    ]
+
+    with (
+        _patch_config(tmp_path / "config.yaml"),
+        patch("canfar.cli.ps.AsyncSession") as session_cls,
+    ):
+        session = _mock_async_session(session_cls)
+        session.fetch.return_value = payloads
+        result = runner.invoke(cli, ["ps", "--output", "json"])
+
+    assert result.exit_code == 0
+    batch, headless = json.loads(result.stdout)
+    assert batch["type"] == "batch"
+    assert batch["replicas"] == _BATCH_REPLICAS
+    assert "replicas" not in headless

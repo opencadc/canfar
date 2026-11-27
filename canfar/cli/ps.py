@@ -75,6 +75,17 @@ def _sanitize_sessions(
     return sessions, anomalies
 
 
+def _status(session: FetchResponse) -> str:
+    """Return the session status, with replica progress for a batch."""
+    replicas = session.replicas
+    if replicas is None:
+        return session.status
+    return (
+        f"{session.status} ({replicas.succeeded}/{replicas.total} succeeded, "
+        f"{replicas.failed} failed)"
+    )
+
+
 def _session_table(sessions: list[FetchResponse]) -> Table:
     """Build the human-readable session table."""
     table = Table(title="CANFAR Sessions", box=box.SIMPLE)
@@ -94,7 +105,7 @@ def _session_table(sessions: list[FetchResponse]) -> Table:
             session.id,
             session.name or session.id,
             session.type,
-            session.status,
+            _status(session),
             session.image,
             created,
         )

@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import httpx2
 import pytest
 from typer.testing import CliRunner
 
 from canfar.cli.main import cli
+from canfar.exceptions.session import SessionRequestError
 
 runner = CliRunner()
 
@@ -84,4 +86,37 @@ def test_logs_renders_once_with_markup_fallback(log_text: str, expected: str) ->
     assert result.stdout.count(expected) == 1
     assert result.stdout.endswith(f"{expected}\n")
     assert result.stdout.count("progress") == 1
-    session.logs.assert_awaited_once_with(ids=["abc"])
+    session.logs.assert_awaited_once_with(ids=["abc"], replica=None)
+
+
+def test_logs_passes_the_replica_index() -> None:
+    """``--replica`` reaches the library as the batch replica index."""
+    with patch("canfar.cli.logs.AsyncSession") as session_cls:
+        session = _mock_async_session(session_cls)
+        session.logs.return_value = {"k7nq2wpx": "replica one"}
+        result = runner.invoke(cli, ["logs", "k7nq2wpx", "--replica", "1"])
+
+    assert result.exit_code == 0
+    assert "replica one" in result.stdout
+    session.logs.assert_awaited_once_with(ids=["k7nq2wpx"], replica=1)
+
+
+def test_logs_reports_the_server_rejection_and_exits_one() -> None:
+    """A rejected log request prints the Server's 400 after the other logs."""
+    request = httpx2.Request("GET", "https://example.test/session/k7nq2wpx")
+    response = httpx2.Response(
+        400, text='{"message": "replica is required"}', request=request
+    )
+    error = httpx2.HTTPStatusError("400", request=request, response=response)
+    with patch("canfar.cli.logs.AsyncSession") as session_cls:
+        session = _mock_async_session(session_cls)
+        session.logs.side_effect = SessionRequestError(
+            "logs", {"abc": "hello"}, {"k7nq2wpx": error}
+        )
+        result = runner.invoke(cli, ["logs", "abc", "k7nq2wpx"])
+
+    assert result.exit_code == 1
+    assert "hello" in result.stdout
+    assert "HTTP 400" in result.stderr
+    assert "replica is required" in result.stderr
+    assert "No logs found" not in result.stderr

@@ -24,6 +24,9 @@ from typing_extensions import Self
 from canfar.models.registry import DEFAULT_REGISTRY_HOST
 from canfar.models.types import Kind, Status
 
+_COMMAND_KINDS = frozenset({"headless", "batch"})
+"""Session kinds that run a caller command and may request several replicas."""
+
 
 class CreateRequest(BaseModel):
     """Payload specification for creating a new session."""
@@ -68,26 +71,68 @@ class CreateRequest(BaseModel):
     )
     replicas: int = Field(
         1,
-        description="Number of sessions to launch.",
+        description=(
+            "For batch, the number of indexed replicas in one session. "
+            "For headless (deprecated above 1), the number of sessions to launch."
+        ),
         ge=1,
         le=256,
         exclude=True,
     )
+    maxfail: float | None = Field(
+        None,
+        description=(
+            "Batch only. The batch stops when the failed fraction of replicas "
+            "reaches this value. Unset lets every replica run."
+        ),
+        examples=[0.25],
+        ge=0,
+        le=1,
+    )
 
     model_config = ConfigDict(validate_assignment=True, populate_by_name=True)
 
-    # Validate that cmd, args and env are only used with headless sessions.
     @model_validator(mode="after")
-    def _validate_headless(self) -> Self:
-        """Validate that cmd, args and env are only used for headless sessions.
+    def _validate_kind_options(self) -> Self:
+        """Validate the options that only some session kinds accept.
 
         Returns:
             Self: The validated model instance.
         """
-        if (self.cmd or self.args or self.env) and self.kind != "headless":
-            msg = "cmd, args, env only allowed for headless sessions."
+        if (self.cmd or self.args or self.env) and self.kind not in _COMMAND_KINDS:
+            msg = "cmd, args, env only allowed for headless and batch sessions."
+            raise ValueError(msg)
+        if self.replicas > 1 and self.kind not in _COMMAND_KINDS:
+            msg = f"multiple replicas invalid for {self.kind} sessions."
+            raise ValueError(msg)
+        if self.maxfail is not None and self.kind != "batch":
+            msg = "maxfail is valid only for batch sessions."
             raise ValueError(msg)
         return self
+
+    @property
+    def fans_out(self) -> bool:
+        """Whether this is the deprecated one-session-per-replica headless form."""
+        return self.kind == "headless" and self.replicas > 1
+
+    @field_validator("env")
+    @classmethod
+    def _validate_env(cls, value: dict[str, Any] | None) -> dict[str, Any] | None:
+        """Reject environment names in the prefix the Server reserves.
+
+        Args:
+            value: Environment variables requested for the session.
+
+        Returns:
+            dict[str, Any] | None: The unchanged environment.
+        """
+        reserved = sorted(
+            name for name in value or {} if name.upper().startswith("CANFAR_")
+        )
+        if reserved:
+            msg = f"env names starting with CANFAR_ are reserved: {', '.join(reserved)}"
+            raise ValueError(msg)
+        return value
 
     @field_validator("kind", mode="after")
     @classmethod
@@ -112,24 +157,6 @@ class CreateRequest(BaseModel):
                 stacklevel=2,
             )
 
-        return value
-
-    @field_validator("replicas")
-    @classmethod
-    def _validate_replicas(cls, value: int, context: ValidationInfo) -> int:
-        """Validate replicas.
-
-        Args:
-            value (int): Value to validate.
-            context (ValidationInfo): Class validation context.
-
-        Returns:
-            int: Validated value.
-        """
-        kind: str = context.data.get("kind", "")
-        if kind in {"firefly", "desktop"} and value > 1:
-            msg = f"multiple replicas invalid for {kind} sessions."
-            raise ValueError(msg)
         return value
 
     @model_validator(mode="after")
@@ -188,6 +215,16 @@ class FetchRequest(BaseModel):
     )
 
     model_config = ConfigDict(validate_assignment=True, populate_by_name=True)
+
+
+class BatchReplicas(BaseModel):
+    """Replica counts of a batch session, as the session list reports them."""
+
+    total: int = Field(0, description="Replicas the batch runs.")
+    succeeded: int = Field(0, description="Replicas that succeeded.")
+    failed: int = Field(0, description="Replicas that failed.")
+    active: int = Field(0, description="Replicas with a pod, scheduled or not.")
+    incomplete: int = Field(0, description="Replicas without a pod yet.")
 
 
 # This model is excluded from pep8-naming checks, since its the data shape
@@ -286,6 +323,11 @@ class FetchResponse(BaseModel):
             ),
         ),
     ] = True
+    replicas: BatchReplicas | None = Field(
+        None,
+        description="Replica counts. Only batch sessions report them.",
+        exclude_if=lambda value: value is None,
+    )
     anomalies: list[str] = Field(default_factory=list, repr=False, exclude=True)
 
     @field_validator("type", mode="before")

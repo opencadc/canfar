@@ -1,5 +1,6 @@
 """Tests for the info CLI module."""
 
+import json
 from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -106,3 +107,24 @@ class TestInfoCLI:
         assert result.exit_code == 0
         assert "Session Response Warnings" in result.stderr
         assert "missing or invalid startTime" in result.stderr
+
+
+@patch("canfar.cli.info.AsyncSession")
+def test_info_prints_the_batch_document(mock_session_cls: MagicMock) -> None:
+    """``info`` on a batch prints the Batch document the Server returned."""
+    document = {
+        "apiVersion": "canfar.net/v1alpha1",
+        "kind": "Batch",
+        "metadata": {"name": "k7nq2wpx"},
+        "spec": {"replicas": 50, "maxfail": None},
+        "status": {"phase": "Running", "succeeded": 12, "failed": 1},
+    }
+    mock_session = AsyncMock()
+    mock_session_cls.return_value.__aenter__.return_value = mock_session
+    mock_session.info.return_value = [document]
+
+    result = runner.invoke(cli, ["info", "k7nq2wpx"])
+
+    assert result.exit_code == 0
+    printed = result.stdout[result.stdout.index("{") :]
+    assert json.loads(printed) == document

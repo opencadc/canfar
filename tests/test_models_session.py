@@ -547,3 +547,97 @@ class TestFetchResponse:
 
         assert response.isFixedResources is False
         assert response.ramInUse == "512Mi"
+
+
+class TestBatchRequest:
+    """Batch rules for replicas, maxfail, and reserved environment names."""
+
+    @pytest.mark.parametrize("maxfail", [0, 0.25, 1])
+    def test_maxfail_accepts_fractions_from_zero_to_one(self, maxfail: float) -> None:
+        """A batch accepts maxfail at both ends of 0 to 1 and between."""
+        spec = CreateRequest(
+            name="run", image="skaha/test", kind="batch", replicas=50, maxfail=maxfail
+        )
+
+        assert spec.maxfail == maxfail
+
+    @pytest.mark.parametrize("maxfail", [-0.1, 1.1])
+    def test_maxfail_outside_zero_to_one_is_rejected(self, maxfail: float) -> None:
+        """A maxfail outside 0 to 1 is a validation error."""
+        with pytest.raises(ValidationError, match="maxfail"):
+            CreateRequest(name="run", image="skaha/test", kind="batch", maxfail=maxfail)
+
+    def test_maxfail_on_headless_is_rejected(self) -> None:
+        """A maxfail belongs to a batch only."""
+        with pytest.raises(ValidationError, match="maxfail is valid only for batch"):
+            CreateRequest(name="run", image="skaha/test", kind="headless", maxfail=0.5)
+
+    @pytest.mark.parametrize("kind", ["notebook", "carta", "contributed"])
+    def test_replicas_above_one_need_batch_or_headless(self, kind: str) -> None:
+        """Interactive kinds take one replica."""
+        with pytest.raises(ValidationError, match="multiple replicas invalid"):
+            CreateRequest(name="run", image="skaha/test", kind=kind, replicas=2)
+
+    def test_batch_accepts_a_command(self) -> None:
+        """A batch runs a caller command like a headless Session."""
+        spec = CreateRequest(
+            name="run",
+            image="skaha/test",
+            kind="batch",
+            cmd="python",
+            args="worker.py",
+            env={"RUN_DIR": "/arc/projects/demo"},
+            replicas=256,
+        )
+
+        assert (spec.cmd, spec.replicas) == ("python", 256)
+
+    @pytest.mark.parametrize(
+        ("kind", "name"),
+        [
+            ("batch", "CANFAR_REPLICA_INDEX"),
+            ("headless", "CANFAR_REPLICA_INDEX"),
+            ("batch", "canfar_registry__secret"),
+        ],
+    )
+    def test_canfar_environment_names_are_reserved(self, kind: str, name: str) -> None:
+        """An env name with the CANFAR_ prefix, in any case, is rejected."""
+        with pytest.raises(ValidationError, match=name):
+            CreateRequest(
+                name="run",
+                image="skaha/test",
+                kind=kind,
+                env={"OK": "1", name: "3"},
+            )
+
+
+class TestBatchListEntry:
+    """Batch list entries carry replica counts; other kinds do not."""
+
+    def test_batch_entry_parses_replica_counts(self) -> None:
+        """The replicas block of a batch list entry is readable as counts."""
+        entry = FetchResponse.model_validate(
+            {
+                "id": "k7nq2wpx",
+                "type": "batch",
+                "status": "Running",
+                "replicas": {
+                    "total": 50,
+                    "succeeded": 12,
+                    "failed": 1,
+                    "active": 10,
+                    "incomplete": 27,
+                },
+            }
+        )
+
+        assert entry.type == "batch"
+        assert entry.replicas is not None
+        assert (entry.replicas.succeeded, entry.replicas.total) == (12, 50)
+        assert entry.model_dump()["replicas"]["incomplete"] == 27
+
+    def test_other_entries_dump_without_replicas(self) -> None:
+        """A non-batch entry keeps its serialized shape."""
+        entry = FetchResponse.model_validate({"id": "abc", "type": "notebook"})
+
+        assert "replicas" not in entry.model_dump()

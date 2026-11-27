@@ -29,16 +29,17 @@ with Session() as sessions:
 Read the signatures with `help(Session.create)` before adding arguments: the
 method takes `cores`, `ram`, and `gpu`, where the CLI spells them `--cpu`,
 `--memory`, and `--gpu`. `cmd`, `args` (one command-line string), and `env`
-are for `kind="headless"`; [batch.md](batch.md) covers replicas.
+are for `kind="headless"` and `kind="batch"`; [batch.md](batch.md) covers
+replicas and `maxfail`.
 
 ## What the methods return
 
 | Call | Returns |
 | --- | --- |
-| `create(...)` | `list[str]` of accepted IDs; failed HTTP or network attempts are left out, `[]` means none was confirmed, and an invalid request raises |
+| `create(...)` | `list[str]` of accepted IDs, one for a batch; failed HTTP or network attempts are left out, `[]` means none was confirmed, and an invalid request raises |
 | `fetch(kind=..., status=...)` | one list of Session dictionaries from a single request |
 | `info(ids)` | a list of dictionaries, one request per ID, omitting IDs whose request failed |
-| `logs(ids)` | a dictionary keyed by Session ID |
+| `logs(ids, replica=N)` | a dictionary keyed by Session ID; a batch needs the 0-based `replica` |
 | `events(ids)` | a list of `{id: text}` dictionaries |
 | `destroy(ids)` | a dictionary of success booleans |
 | `destroy_with(prefix, *, kind=..., status=...)` | the same, for names matching a literal prefix or a regex |

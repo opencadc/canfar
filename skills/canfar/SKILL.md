@@ -1,6 +1,6 @@
 ---
 name: canfar
-description: Operate the CANFAR Science Platform with the `canfar` CLI and Python client - launch and inspect Sessions (notebook, desktop, CARTA, Firefly, contributed, headless), scale out replicated batch jobs, move data through Storage Identifiers, script workflows in Python, and answer platform questions from the CANFAR docs. Use for any work on CANFAR, CADC, or SRCNet compute.
+description: Operate the CANFAR Science Platform with the `canfar` CLI and Python client - launch and inspect Sessions (notebook, desktop, CARTA, Firefly, contributed, headless, batch), scale out replicated batch jobs, move data through Storage Identifiers, script workflows in Python, and answer platform questions from the CANFAR docs. Use for any work on CANFAR, CADC, or SRCNet compute.
 ---
 
 # Work on the CANFAR Science Platform
@@ -8,7 +8,8 @@ description: Operate the CANFAR Science Platform with the `canfar` CLI and Pytho
 Carry out the user's request with their installed `canfar` client. A
 **Session** is a user-owned compute environment on a **Science Platform
 Server**, started from a **Container Image**. Its **Session Kind** is
-`notebook`, `desktop`, `carta`, `firefly`, `contributed`, or `headless`.
+`notebook`, `desktop`, `carta`, `firefly`, `contributed`, `headless`, or
+`batch`.
 
 Three states mark progress. Claim only the one you observed:
 
@@ -23,7 +24,7 @@ Three states mark progress. Claim only the one you observed:
    | The request is about | Read |
    | --- | --- |
    | Launching, opening, inspecting, or deleting a Session | [Launch a Session](#launch-a-session) below |
-   | Headless commands, replicas, pipelines, many Sessions | [references/batch.md](references/batch.md) |
+   | Headless commands, batches, replicas, pipelines, many Sessions | [references/batch.md](references/batch.md) |
    | A Python script or notebook that drives CANFAR | [references/python.md](references/python.md) |
    | Listing, copying, or reading files on `arc`, `vault`, or another Storage Identifier | [references/data.md](references/data.md) |
    | How the platform works: storage, images, permissions, DOI, CVMFS, support | [Platform questions](#platform-questions) below |
@@ -137,9 +138,11 @@ canfar delete SESSION_ID
 ```
 
 `ps` shows Pending and Running Sessions; add `--all` to see terminal ones,
-including with `--status`. `desktop` and `firefly` Sessions take one replica
-and the Server's own resource sizes. `cmd`, `args`, and `--env` belong to
-`headless` Sessions.
+including with `--status`. Only `batch` takes more than one replica; headless
+replicas are deprecated. `desktop` and `firefly` Sessions take the Server's
+own resource sizes. `cmd`, `args`, and `--env` belong to `headless` and
+`batch` Sessions, and `--env` cannot set names starting with `CANFAR_`. A
+batch has one log per replica: `canfar logs SESSION_ID --replica 0`.
 
 ## Where data lives
 

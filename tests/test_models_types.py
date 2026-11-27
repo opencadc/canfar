@@ -20,6 +20,7 @@ def test_supported_literal_alias_values() -> None:
             "firefly",
             "desktop-app",
             "contributed",
+            "batch",
         ),
         "Pruneable": (
             "desktop",
@@ -28,6 +29,7 @@ def test_supported_literal_alias_values() -> None:
             "headless",
             "firefly",
             "contributed",
+            "batch",
         ),
         "Status": (
             "Pending",
