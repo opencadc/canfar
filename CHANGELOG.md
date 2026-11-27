@@ -1,5 +1,33 @@
 # Changelog
 
+## [1.6.0](https://github.com/opencadc/canfar/compare/v1.5.2...v1.6.0) (2026-11-27)
+
+
+### Features
+
+* **cli:** launch private images with a saved registry credential ([a17a394](https://github.com/opencadc/canfar/commit/a17a394096590cc3a7fb65c396e0aaf94c63f9bb))
+* **cli:** load canfar.commands plugins on demand ([a909073](https://github.com/opencadc/canfar/commit/a9090737befe361818f09c1f5a18d89421d6ecd5))
+* send private registry credentials only on session create ([fea8fcc](https://github.com/opencadc/canfar/commit/fea8fcc1823e3b3a6597263c3b6e9840a2493fad))
+
+
+### Bug Fixes
+
+* add deployments link to documentation ([942fa94](https://github.com/opencadc/canfar/commit/942fa942541a497e198c801aacdefcce6c08db97))
+* add deployments link to documentation ([f9ceceb](https://github.com/opencadc/canfar/commit/f9ceceb08e7edd9f05fffc27361ce8218fdb1ee0))
+* **cli:** preserve lazy plugin loading and entry-point semantics ([a458a81](https://github.com/opencadc/canfar/commit/a458a81278afaadaf4e12bfe74db900501104b21))
+* **sessions:** recheck the image when private is assigned ([faed575](https://github.com/opencadc/canfar/commit/faed575a3c008383135f29e111e6c5adcddc4ae4))
+* **sessions:** require credentials for a private launch ([8e20d27](https://github.com/opencadc/canfar/commit/8e20d2755d0d88e61cd444fcfb1b0c5aca76475b))
+* **sessions:** treat a missing registry credential as optional ([905c481](https://github.com/opencadc/canfar/commit/905c4819bd08021a96035ba4d4c3c58409085edb))
+* simplify doc for deployment link ([0182821](https://github.com/opencadc/canfar/commit/01828215e7b56b05c7f2322ff8d35f107cf2bb45))
+* **tests:** compare the login host instead of searching stdout ([b35f5bc](https://github.com/opencadc/canfar/commit/b35f5bcf329b8c0b6b26e7e170bdbe99d65b1779))
+* **tests:** satisfy CI and pin the private-launch credential check ([dc119bb](https://github.com/opencadc/canfar/commit/dc119bbbf8a80b0395b0cfb751c65ad9155bd49e))
+
+
+### Documentation
+
+* **client:** align examples and release guidance with v1.5.2 ([dc1de74](https://github.com/opencadc/canfar/commit/dc1de74ed1d2996f57368c43e733b4f51c1cb17c))
+* **cli:** explain installed extensions and their commands ([32f9201](https://github.com/opencadc/canfar/commit/32f92018895894e498c6b66a7590beefc1e532c6))
+
 ## [1.5.2](https://github.com/opencadc/canfar/compare/v1.5.1...v1.5.2) (2026-10-23)
 
 
