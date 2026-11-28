@@ -476,18 +476,24 @@ class TestCreateServerLimits:
         [
             (
                 ["--cpu", "64"],
-                "Invalid value for '--cpu' / '-c': 64 is not in the range 1<=x<=34.",
+                (
+                    "Invalid value for '--cpu' / '-c': "
+                    "Input should be less than or equal to 34"
+                ),
             ),
             (
                 ["--memory", "512"],
                 (
-                    "Invalid value for '--memory' / '-m': 512 is not in the range "
-                    "1<=x<=384."
+                    "Invalid value for '--memory' / '-m': "
+                    "Input should be less than or equal to 384"
                 ),
             ),
             (
                 ["--gpu", "1"],
-                "Invalid value for '--gpu' / '-g': 1 is not in the range 0<=x<=0.",
+                (
+                    "Invalid value for '--gpu' / '-g': "
+                    "Input should be less than or equal to 0"
+                ),
             ),
         ],
     )
@@ -537,10 +543,10 @@ class TestCreateServerLimits:
     @pytest.mark.parametrize(
         ("arguments", "message"),
         [
-            (["--cpu", "257"], "257 is not in the range 1<=x<=256."),
-            (["--memory", "0"], "0 is not in the range 1<=x<=512."),
-            (["--gpu", "29"], "29 is not in the range 1<=x<=28."),
-            (["--replicas", "257"], "257 is not in the range 1<=x<=256."),
+            (["--cpu", "257"], "'-c': Input should be less than or equal to 256"),
+            (["--memory", "0"], "'-m': Input should be greater than or equal to 1"),
+            (["--gpu", "29"], "'-g': Input should be less than or equal to 28"),
+            (["--replicas", "257"], "'-r': Input should be less than or equal to 256"),
         ],
     )
     def test_unknown_server_limits_keep_the_client_bounds(
@@ -609,12 +615,12 @@ def test_create_help_shows_the_active_server_ranges(
         (
             {"fixed": {"cores": {"min": 1, "max": 300}}},
             ["--cpu", "300"],
-            "300 is not in the range 1<=x<=256.",
+            "'-c': Input should be less than or equal to 256",
         ),
         (
             {"gpus": {"min": 0, "max": 0}},
             ["--gpu", "1"],
-            "1 is not in the range 0<=x<=0.",
+            "'-g': Input should be less than or equal to 0",
         ),
     ],
     ids=["server-above-client-bound", "server-without-gpus"],

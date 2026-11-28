@@ -9,7 +9,6 @@ import typer
 from httpx2 import HTTPError
 from pydantic import ValidationError
 from rich.markup import escape
-from typer._click.types import IntRange
 from typer.core import TyperOption
 
 from canfar.cli import output
@@ -102,7 +101,10 @@ def _narrow(option: TyperOption, bounds: ResourceRange | None, maximum: int) -> 
         low, high = max(low, bounds.min), min(high, bounds.max)
         if low > high:
             low = high = 0
-    option.type = IntRange(min=low, max=high)
+    # Typer validates against parameter_info; help reads option.min/max.
+    info = option.type_descriptor.parameter_info
+    info.min = option.min = low
+    info.max = option.max = high
 
 
 def _with_default(text: str, bounds: ResourceRange | None) -> str:

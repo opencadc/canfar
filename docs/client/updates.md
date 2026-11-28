@@ -5,6 +5,9 @@
 
 ## Unreleased changes after v1.5.2
 
+Python 3.10 is no longer supported. Development builds require Python 3.11 or
+later.
+
 Development builds add installed [CLI extensions](../cli/extensions.md).
 Root help and root shell completion list extension names from distribution
 metadata. Selecting a command loads its Typer application. The v1.5.2 release
