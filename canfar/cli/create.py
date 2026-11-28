@@ -3,9 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-import copy
-import dataclasses
-import importlib
 from typing import TYPE_CHECKING, Annotated, Any, get_args
 
 import typer
@@ -102,20 +99,10 @@ def _narrow(option: TyperOption, bounds: ResourceRange | None, maximum: int) -> 
         low, high = max(low, bounds.min), min(high, bounds.max)
         if low > high:
             low = high = 0
-    # Typer 0.29 replaced Click parameter types, so the attributes differ by version.
-    param: Any = option
-    descriptor = getattr(param, "type_descriptor", None)
-    if descriptor is None:  # Typer < 0.29 validates with Click's parameter type
-        types = importlib.import_module("typer._click.types")
-        param.type = types.IntRange(min=low, max=high)
-        return
-    # Typer 0.29+ validates against the descriptor's (shared) OptionInfo and shows
-    # min/max in help, so narrow a copy of the OptionInfo and both.
-    info = copy.copy(descriptor.parameter_info)
-    info.min, info.max = low, high
-    param.type_descriptor = dataclasses.replace(descriptor, parameter_info=info)
-    param.min, param.max = low, high
-    param._runtime_param = None  # noqa: SLF001 - rebuilt from the new descriptor
+    # Typer validates against parameter_info; help reads option.min/max.
+    info = option.type_descriptor.parameter_info
+    info.min = option.min = low
+    info.max = option.max = high
 
 
 def _with_default(text: str, bounds: ResourceRange | None) -> str:
